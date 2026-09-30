@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getTopics, getPagesByTopic } from '../../../../lib/data';
+import { getTopics, getPagesByTopic, getBlocksByPage } from '../../../../lib/data';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,6 +9,7 @@ interface LessonCatalogItem {
   page_title: string;
   page_slug: string;
   summary: string;
+  content: string;
 }
 
 async function buildLessonCatalog(): Promise<LessonCatalogItem[]> {
@@ -19,12 +20,30 @@ async function buildLessonCatalog(): Promise<LessonCatalogItem[]> {
     for (const topic of topics) {
       const pages = await getPagesByTopic(topic.id, false);
       for (const page of pages) {
+        let contentText = '';
+        try {
+          const blocks = await getBlocksByPage(page.id, false);
+          const lines: string[] = [];
+          for (const b of blocks) {
+            if (b.type === 'text' && b.data?.lines) {
+              lines.push(...b.data.lines);
+            } else if (b.type === 'comparison') {
+              if (b.data?.left_lines) lines.push(...b.data.left_lines);
+              if (b.data?.right_lines) lines.push(...b.data.right_lines);
+            }
+          }
+          contentText = lines.join(' ').slice(0, 500);
+        } catch {
+          // ignore
+        }
+
         catalog.push({
           topic_title: topic.title,
           topic_slug: topic.slug,
           page_title: page.title,
           page_slug: page.slug,
           summary: page.summary || '',
+          content: contentText,
         });
       }
     }
@@ -34,32 +53,32 @@ async function buildLessonCatalog(): Promise<LessonCatalogItem[]> {
   }
 }
 
-// Hàm fallback gợi ý bài học theo từ khóa nếu mạng lỗi
+// Fallback siêu ngắn gọn theo đúng tài liệu
 function fallbackSearch(query: string, catalog: LessonCatalogItem[]) {
   const lower = query.toLowerCase();
   const matched = catalog.filter((item) => {
     return (
       item.page_title.toLowerCase().includes(lower) ||
       item.topic_title.toLowerCase().includes(lower) ||
-      item.summary.toLowerCase().includes(lower)
+      item.summary.toLowerCase().includes(lower) ||
+      item.content.toLowerCase().includes(lower)
     );
   });
 
-  const selected = (matched.length > 0 ? matched : catalog).slice(0, 3);
+  const selected = (matched.length > 0 ? matched : catalog).slice(0, 2);
 
   return {
-    answer: `Chào bạn! Về vấn đề **"${query}"**, việc hiểu rõ cấu trúc sinh cơ học và nguyên nhân gây đau là chìa khóa then chốt để phục hồi an toàn tại nhà. Bạn nên kết hợp nghỉ ngơi hợp lý, tránh các tư thế gây áp lực xấu và bắt đầu với các bài tập vận động nhẹ nhàng theo lộ trình chuẩn. Dưới đây là các bài học liên quan nhất trong hệ thống dành cho bạn:`,
+    answer: `Theo tài liệu hướng dẫn của tác giả, vấn đề này cần được điều chỉnh từ tư thế và cơ chế vận động sinh học. Mời bạn mở bài học chi tiết dưới đây:`,
     suggested_pages: selected.map((s) => ({
       title: s.page_title,
       topic_title: s.topic_title,
       topic_slug: s.topic_slug,
       page_slug: s.page_slug,
-      reason: 'Bài học cung cấp kiến thức nền tảng và phương pháp phục hồi phù hợp cho tình trạng này.',
+      reason: 'Xem chi tiết hướng dẫn của tác giả trong bài học này.',
     })),
     follow_up_questions: [
-      'Làm thế nào để phân biệt đau cơ thông thường và thoát vị đĩa đệm?',
-      'Các bài tập kéo giãn an toàn khi bị đau cấp tính?',
-      'Tư thế ngồi làm việc đúng cho cột sống và cổ vai gáy?',
+      'Tư thế sinh hoạt đúng cần chú ý gì?',
+      'Cách phân biệt đau mỏi thông thường?',
     ],
   };
 }
@@ -82,45 +101,44 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(fallbackResult);
     }
 
-    // Danh sách bài học để cung cấp ngữ cảnh RAG cho Gemini
+    // Danh sách bài học và nội dung thực tế do tác giả viết
     const catalogText = catalog
       .map(
         (c, idx) =>
-          `${idx + 1}. [${c.topic_title}] ${c.page_title} (slug: ${c.topic_slug}/${c.page_slug}) - Tóm tắt: ${c.summary}`
+          `[Bài ${idx + 1}] Chủ đề: "${c.topic_title}" | Bài: "${c.page_title}" (slug: ${c.topic_slug}/${c.page_slug})\n- Tóm tắt: ${c.summary}\n- Nội dung tác giả hướng dẫn: ${c.content || 'Xem bài giảng chi tiết.'}`
       )
-      .join('\n');
+      .join('\n\n');
 
-    const prompt = `Bạn là Trợ lý AI Chuyên gia Cơ Thể & Phục hồi Chức năng trong ứng dụng "Học Cơ Thể".
-Bạn có phong cách tư vấn: Ân cần, chuẩn xác y khoa, khoa học, dễ hiểu, trấn an người bệnh và hướng tới việc tự thấu hiểu cơ thể để chăm sóc đúng cách.
+    const prompt = `Bạn là Trợ lý AI đồng hành, hướng dẫn người học DỰA TRÊN CHÍNH TÀI LIỆU VÀ BÀI GIẢNG CỦA TÁC GIẢ trong ứng dụng "Học Cơ Thể".
 
-DANH MỤC CÁC BÀI HỌC CÓ SẴN TRONG ỨNG DỤNG:
+TOÀN BỘ TÀI LIỆU & NỘI DUNG TÁC GIẢ HƯỚNG DẪN TRONG HỆ THỐNG:
 ${catalogText}
 
 CÂU HỎI CỦA NGƯỜI HỌC: "${question}"
 
-LỊCH SỬ HỘI THOẠI TRƯỚC ĐÓ:
-${history.slice(-4).map((h: any) => `${h.role === 'user' ? 'Người học' : 'Trợ lý'}: ${h.text}`).join('\n')}
+LỊCH SỬ HỘI THOẠI TRƯỚC:
+${history.slice(-2).map((h: any) => `${h.role === 'user' ? 'Người học' : 'Trợ lý'}: ${h.text}`).join('\n')}
 
-NHIỆM VỤ CỦA BẠN:
-1. Trả lời tư vấn chuyên môn ngắn gọn, súc tích (khoảng 2-3 đoạn ngắn), giải thích cơ chế hoặc nguyên nhân và lời khuyên an toàn.
-2. CHỌN TỪ 1 ĐẾN 3 BÀI HỌC PHÙ HỢP NHẤT từ danh mục trên để gợi ý cho người học vào đọc ngay. Nếu có bài học liên quan trực tiếp, bắt buộc phải chọn!
-3. Đưa ra 2 đến 3 câu hỏi gợi ý tiếp theo ngắn gọn để người học tiện hỏi tiếp.
+QUY TẮC BẮT BUỘC:
+1. CHỈ TRẢ LỜI DỰA VÀO TÀI LIỆU VÀ BÀI HỌC CỦA TÁC GIẢ Ở TRÊN. Không tự bịa đặt hoặc nói lý thuyết lan man bên ngoài.
+2. NÓI THẬT NGẮN GỌN (CHỈ TỪ 1 ĐẾN 2 CÂU NGẮN, TỐI ĐA 40 - 50 TỪ)! Nêu thẳng vào kết luận cốt lõi theo tác giả hướng dẫn, không dài dòng.
+3. CHỌN 1 ĐẾN 2 BÀI HỌC CHÍNH XÁC trong tài liệu trên để người học mở ra xem chi tiết.
 
-BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON (không kèm văn bản thừa bên ngoài) có cấu trúc sau:
+BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON (không kèm văn bản nào khác):
 {
-  "answer": "Nội dung câu trả lời tư vấn định dạng markdown...",
+  "answer": "Câu trả lời siêu ngắn gọn (1-2 câu, nêu đúng hướng dẫn cốt lõi của tác giả)...",
   "suggested_pages": [
     {
-      "title": "Tên bài học",
+      "title": "Tên bài học chính xác trong tài liệu",
       "topic_title": "Tên chủ đề",
       "topic_slug": "slug_chu_de",
       "page_slug": "slug_bai_hoc",
-      "reason": "Lý do ngắn gọn vì sao nên học bài này"
+      "reason": "Lý do ngắn gọn 1 câu"
     }
   ],
   "follow_up_questions": [
-    "Câu hỏi gợi ý 1",
-    "Câu hỏi gợi ý 2"
+    "Câu hỏi ngắn gợi ý tiếp theo 1?",
+    "Câu hỏi ngắn gợi ý tiếp theo 2?"
   ]
 }`;
 
@@ -140,8 +158,8 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON (không kèm văn bả
               },
             ],
             generationConfig: {
-              temperature: 0.3,
-              maxOutputTokens: 1200,
+              temperature: 0.2,
+              maxOutputTokens: 600,
             },
           }),
         });
@@ -174,7 +192,6 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON (không kèm văn bả
         .trim();
       parsedJson = JSON.parse(cleaned);
     } catch {
-      // Tìm khối JSON đầu tiên nếu có văn bản bọc ngoài
       const jsonMatch = rawText.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         try {
@@ -210,29 +227,11 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON (không kèm văn bả
       });
     }
 
-    // Nếu parse thất bại, trả về rawText hoặc fallback
-    if (rawText.trim()) {
-      return NextResponse.json({
-        answer: rawText.replace(/```json/g, '').replace(/```/g, '').trim(),
-        suggested_pages: catalog.slice(0, 2).map((c) => ({
-          title: c.page_title,
-          topic_title: c.topic_title,
-          topic_slug: c.topic_slug,
-          page_slug: c.page_slug,
-          reason: 'Bài học kiến thức cơ bản liên quan trong ứng dụng',
-        })),
-        follow_up_questions: [
-          'Các lưu ý khi tập luyện phục hồi cột sống?',
-          'Cách nhận biết dấu hiệu chèn ép thần kinh?',
-        ],
-      });
-    }
-
     return NextResponse.json(fallbackSearch(question, catalog));
   } catch (error: any) {
     return NextResponse.json(
       {
-        answer: 'Xin lỗi bạn, kết nối tới Trợ lý AI đang gián đoạn một chút. Dưới đây là các chủ đề bài học gợi ý bạn có thể tham khảo trực tiếp:',
+        answer: 'Xin lỗi bạn, kết nối tới Trợ lý AI đang gián đoạn một chút. Mời bạn tham khảo trực tiếp các bài học hướng dẫn dưới đây:',
         suggested_pages: [],
         follow_up_questions: [],
       },
