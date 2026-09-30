@@ -13,6 +13,8 @@ import {
   ArrowDown,
   ExternalLink,
   Sparkles,
+  Film,
+  Images,
 } from 'lucide-react';
 import { RecommendedBook } from '../../lib/types';
 import { uploadImageFile } from '../../lib/storageUpload';
@@ -46,10 +48,13 @@ export default function EditRecommendedBooksModal({
   const [books, setBooks] = useState<RecommendedBook[]>([]);
   const [uploadingBookId, setUploadingBookId] = useState<string | null>(null);
   const [activeBookForUpload, setActiveBookForUpload] = useState<string | null>(null);
+  const [uploadingGalleryBookId, setUploadingGalleryBookId] = useState<string | null>(null);
+  const [activeBookForGallery, setActiveBookForGallery] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   const coverInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -59,7 +64,10 @@ export default function EditRecommendedBooksModal({
       );
       setBooks(
         Array.isArray(initialBooks) && initialBooks.length > 0
-          ? initialBooks.map((b) => ({ ...b }))
+          ? initialBooks.map((b) => ({
+              ...b,
+              gallery_images: Array.isArray(b.gallery_images) ? [...b.gallery_images] : [],
+            }))
           : []
       );
       setErrorMsg('');
@@ -98,6 +106,62 @@ export default function EditRecommendedBooksModal({
     coverInputRef.current?.click();
   };
 
+  // Xử lý upload ảnh trang sách (Gallery)
+  const handleGalleryFilesChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0 || !activeBookForGallery) return;
+    try {
+      setUploadingGalleryBookId(activeBookForGallery);
+      setErrorMsg('');
+
+      const uploadedUrls: string[] = [];
+      for (const f of files) {
+        const res = await uploadImageFile(f);
+        if (res && res.url) {
+          uploadedUrls.push(res.url);
+        }
+      }
+
+      if (uploadedUrls.length > 0) {
+        setBooks((prev) =>
+          prev.map((b) =>
+            b.id === activeBookForGallery
+              ? {
+                  ...b,
+                  gallery_images: [...(b.gallery_images || []), ...uploadedUrls],
+                }
+              : b
+          )
+        );
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Lỗi khi tải ảnh trang sách.');
+    } finally {
+      setUploadingGalleryBookId(null);
+      setActiveBookForGallery(null);
+      if (galleryInputRef.current) galleryInputRef.current.value = '';
+      e.target.value = '';
+    }
+  };
+
+  const triggerUploadGallery = (bookId: string) => {
+    setActiveBookForGallery(bookId);
+    galleryInputRef.current?.click();
+  };
+
+  const handleDeleteGalleryImage = (bookId: string, imgIdx: number) => {
+    setBooks((prev) =>
+      prev.map((b) =>
+        b.id === bookId
+          ? {
+              ...b,
+              gallery_images: (b.gallery_images || []).filter((_, i) => i !== imgIdx),
+            }
+          : b
+      )
+    );
+  };
+
   // Thêm sách mới
   const handleAddBook = () => {
     const newBook: RecommendedBook = {
@@ -107,6 +171,8 @@ export default function EditRecommendedBooksModal({
       description: 'Mô tả ngắn gọn về cuốn sách hoặc giá trị cốt lõi.',
       author: '',
       link_url: '',
+      youtube_url: '',
+      gallery_images: [],
     };
     setBooks((prev) => [...prev, newBook]);
   };
@@ -151,6 +217,8 @@ export default function EditRecommendedBooksModal({
         description: (b.description || '').trim(),
         author: (b.author || '').trim() || null,
         link_url: (b.link_url || '').trim() || null,
+        youtube_url: (b.youtube_url || '').trim() || null,
+        gallery_images: Array.isArray(b.gallery_images) ? b.gallery_images.filter(Boolean) : [],
       }));
 
       const res = await saveSettingsApi({
@@ -178,16 +246,24 @@ export default function EditRecommendedBooksModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4 animate-in fade-in duration-200">
-      <div className="w-full max-w-[560px] max-h-[92vh] bg-white rounded-t-[28px] sm:rounded-[28px] flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-200">
+      <div className="w-full max-w-[580px] max-h-[92vh] bg-white rounded-t-[28px] sm:rounded-[28px] flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-200">
         {/* Nút kéo trên mobile */}
         <div className="w-12 h-1.5 bg-line-strong rounded-full mx-auto mt-3 mb-1 sm:hidden" />
 
-        {/* Input file ẩn cho upload ảnh */}
+        {/* Input file ẩn cho upload ảnh bìa & gallery */}
         <input
           type="file"
           ref={coverInputRef}
           onChange={handleCoverFileChange}
           accept="image/*"
+          className="hidden"
+        />
+        <input
+          type="file"
+          ref={galleryInputRef}
+          onChange={handleGalleryFilesChange}
+          accept="image/*"
+          multiple
           className="hidden"
         />
 
@@ -202,7 +278,7 @@ export default function EditRecommendedBooksModal({
                 Quản lý mục Sách Nên Đọc
               </h3>
               <p className="text-[12px] text-muted">
-                Lưới 2 cột · Ảnh dọc chuẩn tỷ lệ 3:4
+                Bìa 3:4 · Video YouTube · Ảnh chi tiết bên trong sách
               </p>
             </div>
           </div>
@@ -266,7 +342,7 @@ export default function EditRecommendedBooksModal({
                   Danh sách sách hiển thị ({books.length})
                 </h4>
                 <p className="text-[12px] text-muted">
-                  Hiển thị 2 cuốn mỗi hàng · Tự động cân đối trên điện thoại
+                  Tất cả sách đều có mục video & ảnh bên trong
                 </p>
               </div>
 
@@ -342,7 +418,7 @@ export default function EditRecommendedBooksModal({
                       {/* Cột trái: Ảnh bìa 3:4 */}
                       <div className="sm:col-span-4 flex flex-col gap-2">
                         <label className="text-[12px] font-bold text-ink">
-                          Ảnh bìa (Dọc 3:4)
+                          Ảnh bìa sách (Dọc 3:4)
                         </label>
                         <div className="relative w-full aspect-[3/4] rounded-[14px] bg-surface-2 border border-line overflow-hidden flex items-center justify-center group shadow-2xs">
                           {book.cover_url ? (
@@ -375,7 +451,7 @@ export default function EditRecommendedBooksModal({
                             className="flex-1 h-8 rounded-[9px] bg-primary-soft text-primary text-[11.5px] font-extrabold flex items-center justify-center gap-1 hover:bg-primary-soft/80 transition-colors cursor-pointer"
                           >
                             <ImageIcon size={13} />
-                            <span>Tải ảnh</span>
+                            <span>Tải ảnh bìa</span>
                           </button>
                           {book.cover_url && (
                             <button
@@ -410,7 +486,7 @@ export default function EditRecommendedBooksModal({
                             type="text"
                             value={book.title}
                             onChange={(e) => handleUpdateBook(book.id, { title: e.target.value })}
-                            placeholder="Ví dụ: Hiểu Đúng Về Cột Sống"
+                            placeholder="Ví dụ: Lắng Nghe Cơ Thể Để Tự Chữa Lành"
                             className="w-full h-9 px-3 rounded-[10px] bg-surface border border-line text-[13.5px] font-bold text-ink focus:border-primary focus:outline-hidden"
                             required
                           />
@@ -438,9 +514,26 @@ export default function EditRecommendedBooksModal({
                             onChange={(e) =>
                               handleUpdateBook(book.id, { description: e.target.value })
                             }
-                            rows={3}
+                            rows={2}
                             placeholder="Tóm tắt ngắn gọn nội dung, giá trị ứng dụng thực tế..."
-                            className="w-full p-2.5 rounded-[10px] bg-surface border border-line text-[12.5px] text-ink focus:border-primary focus:outline-hidden resize-none leading-relaxed"
+                            className="w-full p-2 rounded-[10px] bg-surface border border-line text-[12.5px] text-ink focus:border-primary focus:outline-hidden resize-none leading-relaxed"
+                          />
+                        </div>
+
+                        {/* MỤC VIDEO YOUTUBE ("tất cả mọi cái sách đều phải có mục video") */}
+                        <div>
+                          <label className="block text-[12px] font-bold text-ink mb-1 flex items-center gap-1.5">
+                            <Film size={13} className="text-red-600" />
+                            <span>Link video YouTube giới thiệu về sách</span>
+                          </label>
+                          <input
+                            type="url"
+                            value={book.youtube_url || ''}
+                            onChange={(e) =>
+                              handleUpdateBook(book.id, { youtube_url: e.target.value.trim() || null })
+                            }
+                            placeholder="https://www.youtube.com/watch?v=..."
+                            className="w-full h-8 px-3 rounded-[10px] bg-surface border border-line text-[12px] text-ink focus:border-primary focus:outline-hidden"
                           />
                         </div>
 
@@ -465,6 +558,68 @@ export default function EditRecommendedBooksModal({
                           </div>
                         </div>
                       </div>
+                    </div>
+
+                    {/* HÀNG QUẢN LÝ ẢNH BÊN TRONG TRANG SÁCH (GALLERY IMAGES) */}
+                    <div className="pt-3 border-t border-line/60 flex flex-col gap-2">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[12.5px] font-bold text-ink flex items-center gap-1.5">
+                          <Images size={14} className="text-primary" />
+                          <span>
+                            Ảnh bên trong trang sách ({book.gallery_images?.length || 0})
+                          </span>
+                        </label>
+
+                        <button
+                          type="button"
+                          disabled={uploadingGalleryBookId === book.id}
+                          onClick={() => triggerUploadGallery(book.id)}
+                          className="flex items-center gap-1 h-7 px-2.5 rounded-[8px] bg-primary-soft text-primary text-[11px] font-extrabold hover:bg-primary-soft/80 cursor-pointer shadow-2xs transition-colors"
+                        >
+                          {uploadingGalleryBookId === book.id ? (
+                            <>
+                              <Loader2 size={12} className="animate-spin" />
+                              <span>Đang tải...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Plus size={12} strokeWidth={2.5} />
+                              <span>Tải thêm ảnh trang sách</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      {/* Danh sách ảnh trang sách đã tải lên */}
+                      {book.gallery_images && book.gallery_images.length > 0 ? (
+                        <div className="flex gap-2.5 overflow-x-auto py-1">
+                          {book.gallery_images.map((imgUrl, imgIdx) => (
+                            <div
+                              key={imgIdx}
+                              className="relative w-16 h-20 aspect-[3/4] rounded-[10px] bg-surface-2 border border-line overflow-hidden shrink-0 group shadow-2xs"
+                            >
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={imgUrl}
+                                alt={`Trang ${imgIdx + 1}`}
+                                className="w-full h-full object-cover"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteGalleryImage(book.id, imgIdx)}
+                                className="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center cursor-pointer shadow-sm opacity-90 hover:opacity-100 transition-opacity"
+                                title="Xóa ảnh này"
+                              >
+                                <X size={11} strokeWidth={3} />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-[12px] text-muted italic">
+                          Chưa có ảnh chụp trang sách. Bấm &quot;Tải thêm ảnh trang sách&quot; để thêm ảnh minh họa bên trong.
+                        </p>
+                      )}
                     </div>
                   </div>
                 ))}

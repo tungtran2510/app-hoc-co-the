@@ -41,6 +41,8 @@ export function normalizeRecommendedBooks(raw?: any): RecommendedBook[] {
     description: item.description || '',
     author: item.author || '',
     link_url: item.link_url || '',
+    youtube_url: item.youtube_url || null,
+    gallery_images: Array.isArray(item.gallery_images) ? item.gallery_images.filter(Boolean) : [],
   }));
 }
 
@@ -54,7 +56,12 @@ export function normalizeAuthorProfile(raw?: any): AuthorProfile {
     name: raw.name?.trim() ? raw.name : DEFAULT_AUTHOR_PROFILE.name,
     title: raw.title?.trim() ? raw.title : DEFAULT_AUTHOR_PROFILE.title,
     bio: raw.bio !== undefined ? raw.bio : DEFAULT_AUTHOR_PROFILE.bio,
-    books: Array.isArray(raw.books) && raw.books.length > 0 ? raw.books : DEFAULT_AUTHOR_PROFILE.books,
+    books: Array.isArray(raw.books) && raw.books.length > 0
+      ? raw.books.map((b: any) => ({
+          ...b,
+          gallery_images: Array.isArray(b.gallery_images) ? b.gallery_images.filter(Boolean) : [],
+        }))
+      : DEFAULT_AUTHOR_PROFILE.books,
     phone: raw.phone !== undefined ? raw.phone : DEFAULT_AUTHOR_PROFILE.phone,
     zalo_url: raw.zalo_url !== undefined ? raw.zalo_url : DEFAULT_AUTHOR_PROFILE.zalo_url,
     email: raw.email !== undefined ? raw.email : DEFAULT_AUTHOR_PROFILE.email,

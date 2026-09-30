@@ -7,6 +7,7 @@ export interface AuthorBook {
   description: string;
   year?: string;
   youtube_url?: string | null;
+  gallery_images?: string[];
 }
 
 export interface AuthorProfile {
@@ -36,6 +37,8 @@ export interface RecommendedBook {
   link_url?: string | null;
   tag?: string | null;
   color_theme?: string | null;
+  youtube_url?: string | null;
+  gallery_images?: string[];
 }
 
 export interface AiKnowledgeDoc {

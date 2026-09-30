@@ -18,6 +18,7 @@ import {
   Mail,
   MapPin,
   Globe,
+  Images,
 } from 'lucide-react';
 import { AuthorProfile, AuthorBook } from '../../lib/types';
 import { uploadImageFile } from '../../lib/storageUpload';
@@ -50,7 +51,10 @@ export default function EditAuthorModal({
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const introImageInputRef = useRef<HTMLInputElement>(null);
   const bookCoverInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
   const [activeBookForUpload, setActiveBookForUpload] = useState<string | null>(null);
+  const [activeBookForGallery, setActiveBookForGallery] = useState<string | null>(null);
+  const [uploadingGalleryBookId, setUploadingGalleryBookId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -129,6 +133,64 @@ export default function EditAuthorModal({
     }
   };
 
+  // Xử lý tải ảnh trang sách (Gallery)
+  const handleGalleryFilesChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0 || !activeBookForGallery) return;
+    try {
+      setUploadingGalleryBookId(activeBookForGallery);
+      setErrorMsg('');
+
+      const uploadedUrls: string[] = [];
+      for (const f of files) {
+        const res = await uploadImageFile(f);
+        if (res && res.url) {
+          uploadedUrls.push(res.url);
+        }
+      }
+
+      if (uploadedUrls.length > 0) {
+        setProfile((prev) => ({
+          ...prev,
+          books: prev.books.map((b) =>
+            b.id === activeBookForGallery
+              ? {
+                  ...b,
+                  gallery_images: [...(b.gallery_images || []), ...uploadedUrls],
+                }
+              : b
+          ),
+        }));
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Lỗi khi tải ảnh trang sách.');
+    } finally {
+      setUploadingGalleryBookId(null);
+      setActiveBookForGallery(null);
+      if (galleryInputRef.current) galleryInputRef.current.value = '';
+      e.target.value = '';
+    }
+  };
+
+  const triggerUploadGallery = (bookId: string) => {
+    setActiveBookForGallery(bookId);
+    galleryInputRef.current?.click();
+  };
+
+  const handleDeleteGalleryImage = (bookId: string, imgIdx: number) => {
+    setProfile((prev) => ({
+      ...prev,
+      books: prev.books.map((b) =>
+        b.id === bookId
+          ? {
+              ...b,
+              gallery_images: (b.gallery_images || []).filter((_, i) => i !== imgIdx),
+            }
+          : b
+      ),
+    }));
+  };
+
   // Thêm sách mới
   const handleAddBook = () => {
     const newBook: AuthorBook = {
@@ -138,6 +200,7 @@ export default function EditAuthorModal({
       description: 'Mô tả ngắn gọn về cuốn sách hoặc nội dung chính.',
       year: new Date().getFullYear().toString(),
       youtube_url: '',
+      gallery_images: [],
     };
     setProfile((prev) => ({ ...prev, books: [...prev.books, newBook] }));
   };
@@ -287,6 +350,14 @@ export default function EditAuthorModal({
           type="file"
           accept="image/*"
           onChange={handleBookCoverFileChange}
+          className="hidden"
+        />
+        <input
+          ref={galleryInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleGalleryFilesChange}
           className="hidden"
         />
 
@@ -589,6 +660,68 @@ export default function EditAuthorModal({
                           placeholder="https://www.youtube.com/watch?v=..."
                           className="w-full h-8 px-2.5 rounded-[8px] border border-line text-[13px] text-ink focus:border-primary"
                         />
+                      </div>
+
+                      {/* Quản lý ảnh bên trong cuốn sách (Gallery) */}
+                      <div className="pt-2 border-t border-line/60 flex flex-col gap-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-[12px] font-bold text-ink flex items-center gap-1.5">
+                            <Images size={13} className="text-primary" />
+                            <span>
+                              Ảnh bên trong trang sách ({book.gallery_images?.length || 0})
+                            </span>
+                          </label>
+
+                          <button
+                            type="button"
+                            disabled={uploadingGalleryBookId === book.id}
+                            onClick={() => triggerUploadGallery(book.id)}
+                            className="flex items-center gap-1 h-7 px-2.5 rounded-[8px] bg-primary-soft text-primary text-[11px] font-extrabold hover:bg-primary-soft/80 cursor-pointer shadow-2xs transition-colors"
+                          >
+                            {uploadingGalleryBookId === book.id ? (
+                              <>
+                                <Loader2 size={12} className="animate-spin" />
+                                <span>Đang tải...</span>
+                              </>
+                            ) : (
+                              <>
+                                <Plus size={12} strokeWidth={2.5} />
+                                <span>Tải ảnh trang sách</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+
+                        {/* Danh sách ảnh trang sách đã tải lên */}
+                        {book.gallery_images && book.gallery_images.length > 0 ? (
+                          <div className="flex gap-2 overflow-x-auto py-1">
+                            {book.gallery_images.map((imgUrl, imgIdx) => (
+                              <div
+                                key={imgIdx}
+                                className="relative w-14 aspect-[3/4] rounded-[8px] bg-surface-2 border border-line overflow-hidden shrink-0 group shadow-2xs"
+                              >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={imgUrl}
+                                  alt={`Trang ${imgIdx + 1}`}
+                                  className="w-full h-full object-cover"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteGalleryImage(book.id, imgIdx)}
+                                  className="absolute top-0.5 right-0.5 w-4.5 h-4.5 rounded-full bg-red-600 text-white flex items-center justify-center cursor-pointer shadow-sm opacity-90 hover:opacity-100 transition-opacity"
+                                  title="Xóa ảnh này"
+                                >
+                                  <X size={10} strokeWidth={3} />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-[11.5px] text-muted italic">
+                            Chưa có ảnh chụp trang sách. Bấm &quot;Tải ảnh trang sách&quot; để thêm ảnh minh họa bên trong.
+                          </p>
+                        )}
                       </div>
                     </div>
                   ))}

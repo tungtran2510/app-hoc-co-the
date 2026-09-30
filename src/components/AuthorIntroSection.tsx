@@ -14,6 +14,7 @@ import {
   MapPin,
   Globe,
   Plus,
+  ChevronRight,
 } from 'lucide-react';
 import { AuthorProfile, AuthorBook } from '../lib/types';
 import { normalizeAuthorProfile } from '../lib/data';
@@ -105,7 +106,7 @@ export default function AuthorIntroSection({
         {/* Avatar + Tên + Chức danh + Nút sửa khối */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3.5 min-w-0">
-            <div className="w-18 h-18 rounded-full bg-primary-soft flex items-center justify-center overflow-hidden border-2 border-primary/20 shrink-0 shadow-sm">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-primary-soft flex items-center justify-center overflow-hidden border-2 border-primary/20 shrink-0 shadow-sm">
               {profile.avatar_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -224,10 +225,10 @@ export default function AuthorIntroSection({
                 <div
                   key={book.id}
                   onClick={() => setSelectedBook(book)}
-                  className="p-4 sm:p-5 rounded-[22px] bg-white border border-line shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-row gap-4 sm:gap-5 group"
+                  className="p-3.5 sm:p-5 rounded-[22px] bg-white border border-line shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-row gap-3 sm:gap-4.5 group"
                 >
-                  {/* BÊN TRÁI: Bìa sách TO, RÕ RÀNG tỷ lệ 3:4 */}
-                  <div className="w-[110px] sm:w-[130px] aspect-[3/4] rounded-[14px] bg-surface-2 overflow-hidden shrink-0 shadow-md border border-line/70 relative flex items-center justify-center group-hover:scale-[1.02] transition-transform">
+                  {/* BÊN TRÁI: Bìa sách gọn gàng chuẩn tỷ lệ 3:4 */}
+                  <div className="w-[82px] sm:w-[110px] aspect-[3/4] rounded-[14px] bg-surface-2 overflow-hidden shrink-0 shadow-md border border-line/70 relative flex items-center justify-center group-hover:scale-[1.02] transition-transform">
                     {book.cover_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -248,34 +249,34 @@ export default function AuthorIntroSection({
 
                   {/* BÊN PHẢI: Miêu tả, tiêu đề, năm phát hành & nút xem chi tiết */}
                   <div className="flex-1 flex flex-col justify-between min-w-0 py-0.5">
-                    <div className="flex flex-col gap-1.5">
+                    <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         {book.year && (
-                          <span className="px-2.5 py-0.5 rounded-[6px] bg-primary/10 text-primary text-[11px] font-extrabold">
+                          <span className="px-2 py-0.5 rounded-[5px] bg-primary/10 text-primary text-[10.5px] font-extrabold">
                             Năm {book.year}
                           </span>
                         )}
                         {hasVideo && (
-                          <span className="flex items-center gap-1 px-2 py-0.5 rounded-[6px] bg-red-100 text-red-600 text-[11px] font-extrabold">
+                          <span className="flex items-center gap-1 px-2 py-0.5 rounded-[5px] bg-red-100 text-red-600 text-[10.5px] font-extrabold">
                             <Play size={10} className="fill-red-600" />
                             <span>Có video</span>
                           </span>
                         )}
                       </div>
 
-                      <h4 className="text-[16px] sm:text-[17px] font-extrabold text-ink leading-snug line-clamp-2 group-hover:text-primary transition-colors">
+                      <h4 className="text-[15px] sm:text-[16.5px] font-extrabold text-ink leading-snug line-clamp-2 group-hover:text-primary transition-colors">
                         {book.title}
                       </h4>
 
-                      <p className="text-[13px] sm:text-[13.5px] text-muted leading-relaxed line-clamp-3 sm:line-clamp-4">
+                      <p className="text-[12px] sm:text-[12.5px] text-muted leading-relaxed line-clamp-2 sm:line-clamp-3">
                         {book.description}
                       </p>
                     </div>
 
-                    <div className="pt-2 flex items-center justify-between">
-                      <span className="text-[12.5px] text-primary font-bold inline-flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                    <div className="pt-2 flex items-center justify-between border-t border-line/40 mt-1.5">
+                      <span className="text-[12px] text-primary font-extrabold inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap">
                         <span>Xem chi tiết & video</span>
-                        <span>→</span>
+                        <ChevronRight size={13} strokeWidth={2.5} />
                       </span>
 
                       {isAdmin && (
@@ -285,7 +286,7 @@ export default function AuthorIntroSection({
                             e.stopPropagation();
                             openModalWithTab('books');
                           }}
-                          className="flex items-center gap-1 h-6 px-2 rounded-[6px] bg-surface-2 hover:bg-primary-soft text-muted hover:text-primary text-[11px] font-bold cursor-pointer shrink-0"
+                          className="flex items-center gap-1 h-6 px-2 rounded-[6px] bg-surface-2 hover:bg-primary-soft text-muted hover:text-primary text-[11px] font-bold cursor-pointer shrink-0 ml-auto transition-colors"
                           title="Sửa cuốn sách này"
                         >
                           <Edit2 size={10} />
@@ -461,11 +462,20 @@ export default function AuthorIntroSection({
         </div>
       )}
 
-      {/* Modal chi tiết sách khi bấm vào (Không có nút mua, có video) */}
+      {/* Modal chi tiết sách khi bấm vào (Có video và ảnh bên trong có phóng to) */}
       {selectedBook && (
         <BookDetailModal
-          book={selectedBook}
+          book={{
+            ...selectedBook,
+            author: profile.name,
+            type: 'author',
+          }}
+          isAdmin={isAdmin}
           onClose={() => setSelectedBook(null)}
+          onEdit={() => {
+            setSelectedBook(null);
+            openModalWithTab('books');
+          }}
         />
       )}
 
