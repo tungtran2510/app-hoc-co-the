@@ -4,6 +4,7 @@ import { Search } from 'lucide-react';
 import { getSettings, getTopics, getPagesByTopic } from '../lib/data';
 import HomeContinueSection from '../components/HomeContinueSection';
 import TopicListClient from '../components/TopicListClient';
+import AuthorIntroSection from '../components/AuthorIntroSection';
 import BottomNav from '../components/BottomNav';
 import HomeHeader from '../components/HomeHeader';
 import { Metadata } from 'next';
@@ -76,7 +77,10 @@ export default async function HomePage() {
       {/* 5 & 6. Lưới 2 cột các thẻ Chủ đề kèm quản trị */}
       <TopicListClient initialTopics={topicsWithCounts} />
 
-      {/* 7. Thanh điều hướng dưới cùng */}
+      {/* 7. Khối giới thiệu tác giả & các sách đã làm ở cuối trang chủ */}
+      <AuthorIntroSection initialProfile={settings.author_profile} />
+
+      {/* 8. Thanh điều hướng dưới cùng */}
       <BottomNav />
     </main>
   );

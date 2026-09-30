@@ -7,6 +7,7 @@
 alter table if exists settings add column if not exists expert_title text;
 alter table if exists settings add column if not exists hotline text;
 alter table if exists settings add column if not exists zalo_url text;
+alter table if exists settings add column if not exists author_profile jsonb;
 
 -- 2. Cập nhật ràng buộc type của bảng blocks để hỗ trợ loại khối mới 'comparison'
 alter table if exists blocks drop constraint if exists blocks_type_check;

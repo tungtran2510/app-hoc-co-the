@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
         expert_title: settings.expert_title || null,
         hotline: settings.hotline || null,
         zalo_url: settings.zalo_url || null,
+        author_profile: settings.author_profile || null,
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'workspace_id' }

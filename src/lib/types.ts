@@ -1,5 +1,27 @@
 export type AccessMode = 'OPEN' | 'GUIDED' | 'LOCKED';
 
+export interface AuthorBook {
+  id: string;
+  title: string;
+  cover_url?: string | null;
+  description: string;
+  year?: string;
+  youtube_url?: string | null;
+}
+
+export interface AuthorProfile {
+  name: string;
+  title: string;
+  avatar_url?: string | null;
+  bio: string;
+  intro_image_url?: string | null;
+  intro_video_url?: string | null;
+  books: AuthorBook[];
+  extra_title?: string;
+  extra_content?: string;
+  contact_note?: string;
+}
+
 export interface Settings {
   workspace_id: string;
   app_name: string;
@@ -11,6 +33,7 @@ export interface Settings {
   hotline?: string | null;
   expert_title?: string | null;
   zalo_url?: string | null;
+  author_profile?: AuthorProfile | null;
 }
 
 export interface Topic {

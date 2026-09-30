@@ -1,4 +1,34 @@
-import { Settings, Topic, Page, Block } from '../lib/types';
+import { Settings, Topic, Page, Block, AuthorProfile } from '../lib/types';
+
+export const DEFAULT_AUTHOR_PROFILE: AuthorProfile = {
+  name: 'Bác sĩ / Chuyên gia Trị liệu',
+  title: 'Chuyên gia Phục hồi Chức năng & Sức khỏe Cột sống',
+  avatar_url: null,
+  bio: 'Dành hơn 10 năm nghiên cứu và đồng hành cùng hàng nghìn người bệnh phục hồi cột sống tự nhiên, khoa học và an toàn tại nhà.',
+  intro_image_url: null,
+  intro_video_url: null,
+  books: [
+    {
+      id: 'book-1',
+      title: 'Hiểu Đúng Về Cột Sống',
+      cover_url: null,
+      description: 'Cẩm nang toàn diện giải mã cơ chế thoát vị đĩa đệm, thoái hóa và giải pháp vận động tự phục hồi.',
+      year: '2025',
+      youtube_url: 'https://www.youtube.com/watch?v=c9kmCxFKHPY',
+    },
+    {
+      id: 'book-2',
+      title: 'Tự Chữa Lành Lưng & Cổ',
+      cover_url: null,
+      description: 'Các bài tập sinh cơ học đơn giản, 15 phút mỗi ngày giúp bảo vệ và phục hồi đường cong sinh lý.',
+      year: '2024',
+      youtube_url: 'https://www.youtube.com/watch?v=zQVOV1eevck',
+    },
+  ],
+  extra_title: 'Triết lý phụng sự',
+  extra_content: 'Sức khỏe không đến từ sự lo sợ, mà đến từ sự thấu hiểu chính cơ thể mình. Khi bạn hiểu cơ thể, bạn sẽ biết cách yêu thương và chăm sóc đúng cách mỗi ngày.',
+  contact_note: 'Mọi thắc mắc hoặc cần tư vấn lộ trình phục hồi, vui lòng liên hệ trực tiếp qua Zalo hoặc Hotline chuyên gia ở phía dưới.',
+};
 
 export const sampleSettings: Settings = {
   workspace_id: 'default',
@@ -7,6 +37,10 @@ export const sampleSettings: Settings = {
   primary_color: '#0E6B5A',
   access_mode: 'OPEN',
   block_styles: {},
+  expert_title: 'Chuyên gia Trị liệu & Chăm sóc Cột sống',
+  hotline: '0988.123.456',
+  zalo_url: 'https://zalo.me',
+  author_profile: DEFAULT_AUTHOR_PROFILE,
 };
 
 export const sampleTopics: Topic[] = [

@@ -14,6 +14,7 @@ create table if not exists settings (
   expert_title text,
   hotline      text,
   zalo_url     text,
+  author_profile jsonb not null default '{}'::jsonb,
   updated_at   timestamptz not null default now()
 );
 
