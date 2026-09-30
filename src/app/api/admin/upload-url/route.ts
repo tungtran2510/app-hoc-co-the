@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
 
   const supabase = getSupabaseServer();
   if (!supabase) {
-    return NextResponse.json({ error: 'Chưa cấu hình Supabase Server' }, { status: 500 });
+    return NextResponse.json({ error: 'Chưa lưu được – chưa kết nối dữ liệu' }, { status: 503 });
   }
 
   try {

@@ -6,12 +6,14 @@ export async function POST(req: NextRequest) {
     const { password } = await req.json();
     const serverPassword = process.env.ADMIN_PASSWORD;
 
-    // Nếu chưa cấu hình ADMIN_PASSWORD, cho phép mật khẩu mặc định khi dev local
-    const isValid = serverPassword
-      ? password === serverPassword
-      : (password === '1234' || password === 'admin123');
+    if (!serverPassword) {
+      return NextResponse.json(
+        { error: 'Chưa cài mật khẩu Admin trên máy chủ' },
+        { status: 403 }
+      );
+    }
 
-    if (!isValid) {
+    if (password !== serverPassword) {
       return NextResponse.json(
         { error: 'Mật khẩu quản trị không chính xác' },
         { status: 401 }

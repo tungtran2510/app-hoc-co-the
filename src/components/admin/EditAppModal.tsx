@@ -83,7 +83,7 @@ export default function EditAppModal({
         hotline: hotline.trim(),
       });
 
-      if (res.success || true) {
+      if (res.success) {
         onSaved(appName.trim(), logoUrl);
         onClose();
       } else {

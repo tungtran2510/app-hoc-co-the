@@ -11,6 +11,9 @@ create table if not exists settings (
   primary_color text not null default '#0E6B5A',
   access_mode  text not null default 'OPEN' check (access_mode in ('OPEN','GUIDED','LOCKED')),
   block_styles jsonb not null default '{}'::jsonb,
+  expert_title text,
+  hotline      text,
+  zalo_url     text,
   updated_at   timestamptz not null default now()
 );
 
@@ -56,7 +59,7 @@ create table if not exists blocks (
   id            uuid primary key default gen_random_uuid(),
   workspace_id  text not null default 'default',
   page_id       uuid not null references pages(id) on delete cascade,
-  type          text not null check (type in ('text','images','videos','links','files')),
+  type          text not null check (type in ('text','images','videos','links','files','comparison')),
   display_style text not null,
   data          jsonb not null default '{}'::jsonb,
   sort_order    int  not null default 0,
@@ -99,8 +102,8 @@ create policy "Cho phép mọi người xem media" on storage.objects for select
 -- 7. NẠP DỮ LIỆU MẪU BAN ĐẦU (SEED DATA VỚI UUID CỐ ĐỊNH)
 
 -- Settings
-insert into settings (workspace_id, app_name, logo_url, primary_color, access_mode, block_styles)
-values ('default', 'Sống Khỏe Mỗi Ngày', null, '#0E6B5A', 'OPEN', '{}'::jsonb)
+insert into settings (workspace_id, app_name, logo_url, primary_color, access_mode, block_styles, expert_title, hotline, zalo_url)
+values ('default', 'Sống Khỏe Mỗi Ngày', null, '#0E6B5A', 'OPEN', '{}'::jsonb, 'Chuyên gia Trị liệu & Chăm sóc Cột sống', '0988.123.456', 'https://zalo.me')
 on conflict (workspace_id) do update set
   app_name = excluded.app_name,
   primary_color = excluded.primary_color;

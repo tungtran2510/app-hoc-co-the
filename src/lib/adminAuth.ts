@@ -3,16 +3,29 @@
  * Mọi xác thực bảo mật được xử lý qua Cookie HTTPOnly tại Server Route /api/admin/*
  */
 
-export async function checkIsAdminClient(): Promise<boolean> {
-  if (typeof window === 'undefined') return false;
+export interface AdminStatus {
+  isAdmin: boolean;
+  supabaseOk: boolean;
+}
+
+export async function checkAdminStatus(): Promise<AdminStatus> {
+  if (typeof window === 'undefined') return { isAdmin: false, supabaseOk: false };
   try {
     const res = await fetch('/api/admin/me', { cache: 'no-store' });
-    if (!res.ok) return false;
+    if (!res.ok) return { isAdmin: false, supabaseOk: false };
     const data = await res.json();
-    return Boolean(data.isAdmin);
+    return {
+      isAdmin: Boolean(data.isAdmin),
+      supabaseOk: Boolean(data.supabase_ok),
+    };
   } catch {
-    return false;
+    return { isAdmin: false, supabaseOk: false };
   }
+}
+
+export async function checkIsAdminClient(): Promise<boolean> {
+  const status = await checkAdminStatus();
+  return status.isAdmin;
 }
 
 export async function loginAdmin(password: string): Promise<{ success: boolean; error?: string }> {

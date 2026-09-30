@@ -61,10 +61,19 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
 
     setPagesWithCount(reordered);
 
-    await Promise.all([
+    const [res1, res2] = await Promise.all([
       savePageApi(current.page),
       savePageApi(target.page),
     ]);
+    if (!res1.success || !res2.success) {
+      alert('Chưa lưu được – chưa kết nối dữ liệu');
+      // Phục hồi lại vị trí cũ
+      current.page.sort_order = target.page.sort_order;
+      target.page.sort_order = currentOrder;
+      list[index] = current;
+      list[targetIndex] = target;
+      setPagesWithCount(list.map((item, idx) => ({ ...item, orderNumber: idx + 1 })));
+    }
   };
 
   const handleToggleVisible = async (index: number) => {
@@ -76,7 +85,12 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
     };
     item.page = updated;
     setPagesWithCount([...list]);
-    await savePageApi(updated);
+    const res = await savePageApi(updated);
+    if (!res.success) {
+      alert(res.error || 'Chưa lưu được – chưa kết nối dữ liệu');
+      item.page.is_visible = !item.page.is_visible;
+      setPagesWithCount([...list]);
+    }
   };
 
   const handleToggleStatus = async (index: number) => {
@@ -89,7 +103,12 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
     };
     item.page = updated;
     setPagesWithCount([...list]);
-    await savePageApi(updated);
+    const res = await savePageApi(updated);
+    if (!res.success) {
+      alert(res.error || 'Chưa lưu được – chưa kết nối dữ liệu');
+      item.page.status = item.page.status === 'published' ? 'draft' : 'published';
+      setPagesWithCount([...list]);
+    }
   };
 
   const handleDelete = async (pageId: string, title: string) => {
@@ -102,7 +121,7 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
             .map((item, idx) => ({ ...item, orderNumber: idx + 1 }))
         );
       } else {
-        alert(res.error || 'Chưa xóa được trang, thử lại');
+        alert(res.error || 'Chưa lưu được – chưa kết nối dữ liệu');
       }
     }
   };

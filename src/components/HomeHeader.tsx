@@ -13,7 +13,7 @@ import {
   Edit2,
   X,
 } from 'lucide-react';
-import { checkIsAdminClient, logoutAdmin } from '../lib/adminAuth';
+import { checkAdminStatus, logoutAdmin } from '../lib/adminAuth';
 import { getStoredAppSettings } from '../lib/storage';
 import AdminSettingsModal from './admin/AdminSettingsModal';
 import EditAppModal from './admin/EditAppModal';
@@ -25,6 +25,7 @@ interface HomeHeaderProps {
 
 export default function HomeHeader({ initialAppName }: HomeHeaderProps) {
   const [isAdmin, setIsAdmin] = useState(false);
+  const [supabaseOk, setSupabaseOk] = useState(false);
   const [appName, setAppName] = useState(initialAppName);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [showSettings, setShowSettings] = useState(false);
@@ -34,7 +35,10 @@ export default function HomeHeader({ initialAppName }: HomeHeaderProps) {
   const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
-    checkIsAdminClient().then(setIsAdmin);
+    checkAdminStatus().then(({ isAdmin, supabaseOk }) => {
+      setIsAdmin(isAdmin);
+      setSupabaseOk(supabaseOk);
+    });
     const stored = getStoredAppSettings();
     if (stored.app_name) {
       setAppName(stored.app_name);
@@ -75,8 +79,16 @@ export default function HomeHeader({ initialAppName }: HomeHeaderProps) {
       {isAdmin && (
         <div className="w-full flex items-center justify-between px-3.5 py-2 rounded-[14px] bg-black/90 text-white text-[13px] font-bold shadow-md -mb-2">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-white/90">Chế độ Quản trị</span>
+            <span
+              className={`w-2 h-2 rounded-full shrink-0 ${
+                supabaseOk ? 'bg-emerald-400' : 'bg-red-400 animate-pulse'
+              }`}
+            />
+            <span className={supabaseOk ? 'text-white/90' : 'text-red-300 font-extrabold'}>
+              {supabaseOk
+                ? 'Dữ liệu: Đã kết nối ✓'
+                : 'Dữ liệu: CHƯA kết nối – nội dung sửa sẽ không được lưu'}
+            </span>
           </div>
 
           <div className="flex items-center gap-1.5">
@@ -175,6 +187,26 @@ export default function HomeHeader({ initialAppName }: HomeHeaderProps) {
 
             {isAdmin ? (
               <>
+                {/* Trạng thái kết nối Supabase */}
+                <div
+                  className={`px-3 py-2 rounded-[12px] text-[12px] font-extrabold flex items-center gap-2 ${
+                    supabaseOk
+                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                      : 'bg-red-50 text-red-700 border border-red-200'
+                  }`}
+                >
+                  <span
+                    className={`w-2 h-2 rounded-full shrink-0 ${
+                      supabaseOk ? 'bg-emerald-500' : 'bg-red-500 animate-pulse'
+                    }`}
+                  />
+                  <span className="leading-tight">
+                    {supabaseOk
+                      ? 'Dữ liệu: Đã kết nối ✓'
+                      : 'Dữ liệu: CHƯA kết nối – nội dung sửa sẽ không được lưu'}
+                  </span>
+                </div>
+
                 <button
                   type="button"
                   onClick={() => {

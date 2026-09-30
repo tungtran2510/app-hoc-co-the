@@ -43,10 +43,19 @@ export default function TopicListClient({ initialTopics }: TopicListClientProps)
 
     setTopicsWithCounts(list);
 
-    await Promise.all([
+    const [res1, res2] = await Promise.all([
       saveTopicApi(current.topic),
       saveTopicApi(target.topic),
     ]);
+    if (!res1.success || !res2.success) {
+      alert('Chưa lưu được – chưa kết nối dữ liệu');
+      // Phục hồi lại vị trí cũ
+      current.topic.sort_order = target.topic.sort_order;
+      target.topic.sort_order = currentOrder;
+      list[index] = current;
+      list[targetIndex] = target;
+      setTopicsWithCounts([...list]);
+    }
   };
 
   const handleToggleVisible = async (index: number) => {
@@ -58,7 +67,12 @@ export default function TopicListClient({ initialTopics }: TopicListClientProps)
     };
     item.topic = updated;
     setTopicsWithCounts([...list]);
-    await saveTopicApi(updated);
+    const res = await saveTopicApi(updated);
+    if (!res.success) {
+      alert(res.error || 'Chưa lưu được – chưa kết nối dữ liệu');
+      item.topic.is_visible = !item.topic.is_visible;
+      setTopicsWithCounts([...list]);
+    }
   };
 
   const handleDelete = async (topicId: string, title: string) => {
@@ -67,7 +81,7 @@ export default function TopicListClient({ initialTopics }: TopicListClientProps)
       if (res.success) {
         setTopicsWithCounts((prev) => prev.filter((t) => t.topic.id !== topicId));
       } else {
-        alert(res.error || 'Chưa xóa được chủ đề, thử lại');
+        alert(res.error || 'Chưa lưu được – chưa kết nối dữ liệu');
       }
     }
   };

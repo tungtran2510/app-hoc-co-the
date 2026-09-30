@@ -9,6 +9,8 @@ export interface Settings {
   block_styles: Record<string, { label: string | null; icon: string | null; bg: string | null; fg: string }>;
   zalo_consult_url?: string | null;
   hotline?: string | null;
+  expert_title?: string | null;
+  zalo_url?: string | null;
 }
 
 export interface Topic {

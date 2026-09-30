@@ -27,7 +27,8 @@ import VideoManagerModal from './admin/VideoManagerModal';
 import AddBlockDrawer from './admin/AddBlockDrawer';
 import EditPageModal from './admin/EditPageModal';
 import AdminSettingsModal from './admin/AdminSettingsModal';
-import { checkIsAdminClient, setAdminClient } from '../lib/adminAuth';
+import { checkAdminStatus, setAdminClient } from '../lib/adminAuth';
+import { deleteBlockApi } from '../lib/apiAdmin';
 import {
   getStoredBlocks,
   saveStoredBlocks,
@@ -68,6 +69,7 @@ export default function ContentViewer({
 }: ContentViewerProps) {
   const [fontSizeMode, setFontSizeMode] = useState<FontSizeOption>('normal');
   const [isAdmin, setIsAdmin] = useState(false);
+  const [supabaseOk, setSupabaseOk] = useState(false);
   const [currentPage, setCurrentPage] = useState<Page>(page);
   const [pageStatus, setPageStatus] = useState<'draft' | 'published'>(page.status);
   const [blockList, setBlockList] = useState<Block[]>(initialBlocks);
@@ -93,8 +95,11 @@ export default function ContentViewer({
         setFontSizeMode('normal');
       }
 
-      // 2. Quyền Admin
-      checkIsAdminClient().then((status) => setIsAdmin(status));
+      // 2. Quyền Admin & Trạng thái kết nối dữ liệu
+      checkAdminStatus().then((status) => {
+        setIsAdmin(status.isAdmin);
+        setSupabaseOk(status.supabaseOk);
+      });
 
       // 3. Trạng thái và thông tin trang
       const storedPage = getStoredPage(page.id, page);
@@ -202,66 +207,76 @@ export default function ContentViewer({
     setAdminClient(nextState);
   };
 
-  const handleToggleStatus = () => {
+  const handleToggleStatus = async () => {
     const nextStatus = pageStatus === 'published' ? 'draft' : 'published';
+    const ok = await saveStoredPageStatus(page.id, nextStatus);
+    if (!ok) {
+      setSaveErrorMsg('Chưa lưu được – chưa kết nối dữ liệu');
+      setTimeout(() => setSaveErrorMsg(''), 4000);
+      return;
+    }
     setPageStatus(nextStatus);
-    saveStoredPageStatus(page.id, nextStatus);
   };
 
-    const triggerSaveBlocks = async (blocks: Block[]) => {
-      const ok = await saveStoredBlocks(page.id, blocks);
-      if (!ok) {
-        setSaveErrorMsg('Chưa lưu được, thử lại');
-        setTimeout(() => setSaveErrorMsg(''), 3500);
-      }
-    };
+  const triggerSaveBlocks = async (blocks: Block[]) => {
+    const ok = await saveStoredBlocks(page.id, blocks);
+    if (!ok) {
+      setSaveErrorMsg('Chưa lưu được – chưa kết nối dữ liệu');
+      setTimeout(() => setSaveErrorMsg(''), 4000);
+    }
+  };
 
-    const handleSavePage = async (updated: Partial<Page>) => {
-      const newPage = { ...currentPage, ...updated };
-      setCurrentPage(newPage);
-      const ok = await saveStoredPage(page.id, updated);
-      if (!ok) {
-        setSaveErrorMsg('Chưa lưu được, thử lại');
-        setTimeout(() => setSaveErrorMsg(''), 3500);
-      }
-      if (updated.status) {
-        setPageStatus(updated.status);
-        await saveStoredPageStatus(page.id, updated.status);
-      }
-    };
+  const handleSavePage = async (updated: Partial<Page>) => {
+    const ok = await saveStoredPage(page.id, updated);
+    if (!ok) {
+      setSaveErrorMsg('Chưa lưu được – chưa kết nối dữ liệu');
+      setTimeout(() => setSaveErrorMsg(''), 4000);
+      return;
+    }
+    const newPage = { ...currentPage, ...updated };
+    setCurrentPage(newPage);
+    if (updated.status) {
+      setPageStatus(updated.status);
+    }
+  };
 
-    // Di chuyển khối lên
-    const handleMoveBlockUp = (index: number) => {
-      if (index === 0) return;
-      const updated = [...blockList];
-      const temp = updated[index - 1];
-      updated[index - 1] = updated[index];
-      updated[index] = temp;
-      setBlockList(updated);
-      triggerSaveBlocks(updated);
-    };
+  // Di chuyển khối lên
+  const handleMoveBlockUp = (index: number) => {
+    if (index === 0) return;
+    const updated = [...blockList];
+    const temp = updated[index - 1];
+    updated[index - 1] = updated[index];
+    updated[index] = temp;
+    setBlockList(updated);
+    triggerSaveBlocks(updated);
+  };
 
-    // Di chuyển khối xuống
-    const handleMoveBlockDown = (index: number) => {
-      if (index === blockList.length - 1) return;
-      const updated = [...blockList];
-      const temp = updated[index + 1];
-      updated[index + 1] = updated[index];
-      updated[index] = temp;
-      setBlockList(updated);
-      triggerSaveBlocks(updated);
-    };
+  // Di chuyển khối xuống
+  const handleMoveBlockDown = (index: number) => {
+    if (index === blockList.length - 1) return;
+    const updated = [...blockList];
+    const temp = updated[index + 1];
+    updated[index + 1] = updated[index];
+    updated[index] = temp;
+    setBlockList(updated);
+    triggerSaveBlocks(updated);
+  };
 
-    // Xóa khối
-    const handleDeleteBlock = (blockId: string) => {
-      if (!confirm('Bạn có chắc chắn muốn xóa khối nội dung này?')) return;
-      const updated = blockList.filter((b) => b.id !== blockId);
-      setBlockList(updated);
-      triggerSaveBlocks(updated);
-      setActiveMenuBlockId(null);
-    };
+  // Xóa khối
+  const handleDeleteBlock = async (blockId: string) => {
+    if (!confirm('Bạn có chắc chắn muốn xóa khối nội dung này?')) return;
+    const res = await deleteBlockApi(blockId);
+    if (!res.success) {
+      setSaveErrorMsg(res.error || 'Chưa lưu được – chưa kết nối dữ liệu');
+      setTimeout(() => setSaveErrorMsg(''), 4000);
+      return;
+    }
+    const updated = blockList.filter((b) => b.id !== blockId);
+    setBlockList(updated);
+    setActiveMenuBlockId(null);
+  };
 
-    // Nhân bản khối
+  // Nhân bản khối
     const handleDuplicateBlock = (index: number) => {
       const target = blockList[index];
       const duplicate: Block = {
@@ -706,6 +721,26 @@ export default function ContentViewer({
             </span>
             <span className="text-[12px] text-muted font-bold">
               {blockList.length} khối nội dung
+            </span>
+          </div>
+
+          {/* Trạng thái kết nối dữ liệu */}
+          <div
+            className={`px-3 py-2 rounded-[12px] text-[12px] font-extrabold flex items-center gap-2 ${
+              supabaseOk
+                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                : 'bg-red-50 text-red-700 border border-red-200'
+            }`}
+          >
+            <span
+              className={`w-2 h-2 rounded-full shrink-0 ${
+                supabaseOk ? 'bg-emerald-500' : 'bg-red-500 animate-pulse'
+              }`}
+            />
+            <span className="leading-tight">
+              {supabaseOk
+                ? 'Dữ liệu: Đã kết nối ✓'
+                : 'Dữ liệu: CHƯA kết nối – nội dung sửa sẽ không được lưu'}
             </span>
           </div>
 
