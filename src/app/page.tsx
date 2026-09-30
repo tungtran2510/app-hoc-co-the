@@ -6,8 +6,17 @@ import HomeContinueSection from '../components/HomeContinueSection';
 import TopicListClient from '../components/TopicListClient';
 import BottomNav from '../components/BottomNav';
 import HomeHeader from '../components/HomeHeader';
+import { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSettings();
+  return {
+    title: `${settings?.app_name || 'Học Cơ Thể'} · Hiểu Về Cơ Thể`,
+    description: 'Ứng dụng học hiểu kiến thức về cơ thể theo lộ trình chuẩn y khoa',
+  };
+}
 
 export default async function HomePage() {
   const [settings, topics] = await Promise.all([

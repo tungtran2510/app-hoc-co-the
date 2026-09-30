@@ -360,10 +360,17 @@ export default function ContentViewer({
       </section>
 
       {/* 4. Danh sách các khối */}
-      <div className="flex flex-col gap-4">
-        {blockList.map((block, idx) => {
-          // Nếu không phải admin và khối bị ẩn thì không hiển thị
-          if (!isAdmin && !block.is_visible) return null;
+      {blockList.filter((b) => isAdmin || b.is_visible).length === 0 ? (
+        <div className="p-8 text-center bg-white rounded-[22px] border border-line my-4">
+          <p className="text-[17px] text-muted font-medium">
+            Bài học đang được cập nhật nội dung.
+          </p>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-4">
+          {blockList.map((block, idx) => {
+            // Nếu không phải admin và khối bị ẩn thì không hiển thị
+            if (!isAdmin && !block.is_visible) return null;
 
           const blockTitle =
             block.type === 'videos'
@@ -516,6 +523,7 @@ export default function ContentViewer({
           );
         })}
       </div>
+    )}
 
       {/* 5. Nút "+ Thêm nội dung" (Hiện khi ở chế độ Admin) */}
       {isAdmin && (

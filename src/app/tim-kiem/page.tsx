@@ -58,9 +58,10 @@ export default function SearchPage() {
   const [allData, setAllData] = useState<SearchData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Tự động focus vào ô nhập
+  // Tự động focus vào ô nhập và cập nhật tiêu đề trang
   useEffect(() => {
     inputRef.current?.focus();
+    document.title = 'Tìm kiếm bài học · Học Cơ Thể';
   }, []);
 
   // Tải dữ liệu tìm kiếm

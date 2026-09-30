@@ -19,6 +19,8 @@ import PageListClient from '../../components/PageListClient';
 import SpineIllustration from '../../components/SpineIllustration';
 import BottomNav from '../../components/BottomNav';
 import TopicMainButton from '../../components/TopicMainButton';
+import { getSettings } from '../../lib/data';
+import { Metadata } from 'next';
 
 interface TopicPageProps {
   params: {
@@ -27,6 +29,18 @@ interface TopicPageProps {
 }
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({ params }: TopicPageProps): Promise<Metadata> {
+  const [topic, settings] = await Promise.all([
+    getTopicBySlug(params.topicSlug),
+    getSettings(),
+  ]);
+  if (!topic) return { title: 'Không tìm thấy chủ đề' };
+  return {
+    title: `${topic.title} · ${settings?.app_name || 'Học Cơ Thể'}`,
+    description: topic.description || `Khám phá kiến thức ${topic.title}`,
+  };
+}
 
 export default async function TopicPage({ params }: TopicPageProps) {
   const { topicSlug } = params;

@@ -96,8 +96,86 @@ Bấm nút `+ Thêm nội dung` ở cuối trang mở modal chọn dạng khối
 
 ---
 
-## 5. Lưu trữ & Đồng bộ Dữ liệu (LENH_02 Hoàn tất)
+## 5. Lưu trữ & Đồng bộ Dữ liệu (Supabase + In-Place Admin)
 - Toàn bộ dữ liệu nằm ở Supabase PostgreSQL (4 bảng: `settings`, `topics`, `pages`, `blocks`).
 - Mọi thao tác ghi (thêm, sửa, xóa, di chuyển) đi qua Route Handler `/api/admin/*` kiểm tra cookie HMAC-SHA256 bảo mật phía server, ghi bằng `SUPABASE_SERVICE_ROLE_KEY`.
 - Không còn lưu `localStorage` cho nội dung bài học. Khi sửa 1 lần, bất kỳ người dùng nào mở ứng dụng cũng thấy nội dung cập nhật ngay lập tức.
 - Bucket Storage `media` lưu ảnh WebP đã nén và file PDF tải lên qua Signed Upload URL.
+
+---
+
+## 6. Tính năng Nâng cao V1 (LENH_03 & LENH_04)
+1. **Xem tiếp & Tiến độ học tập:**
+   - Nhớ vị trí học và video đang xem trên thiết bị học viên qua `localStorage` (`xem_tiep`, `tien_do`).
+   - Tự động nhận diện tiến độ, hỗ trợ param `?v=n`, cuộn về vị trí học trước đó.
+2. **YouTube IFrame Player API:**
+   - Tự động chuyển tiếp video kế tiếp khi xem hết video hiện tại.
+   - Nhận diện khi xem $\ge 80\%$ thời lượng để đánh dấu đã học.
+   - Khi kết thúc playlist hiển thị thông báo "Đã xem hết danh sách · Tiếp theo: ...".
+3. **Phóng to Ảnh (Lightbox):**
+   - Hỗ trợ chụm 2 ngón tay (pinch-to-zoom) và chạm đúp (double-tap) phóng to 2 lần.
+   - Vuốt trái/phải xem bộ sưu tập, nút Đóng $\ge 52\text{px}$, tích hợp nút Back của điện thoại.
+4. **Chia sẻ & OpenGraph Metadata:**
+   - Tích hợp `navigator.share` native mở bảng chia sẻ Zalo, Messenger hoặc chép link.
+   - Thẻ OpenGraph động hỗ trợ hiển thị tiêu đề, mô tả và hình ảnh xem trước chuẩn trên mạng xã hội.
+5. **Tìm kiếm Nhanh (`/tim-kiem`):**
+   - Tìm kiếm không phân biệt dấu và hoa thường trên toàn bộ chủ đề, bài học, video và đoạn văn.
+   - Phân nhóm kết quả trực quan (Chủ đề · Trang nội dung · Video).
+6. **Sao lưu 1 Chạm:**
+   - Xuất toàn bộ 4 bảng dữ liệu ra file `sao-luu-YYYY-MM-DD.json` bảo mật.
+7. **Cài Đặt Ứng Dụng (PWA):**
+   - Hỗ trợ Web App Manifest, icon SVG/PNG qua Next.js ImageResponse, Service Worker tối thiểu và hướng dẫn cài ra màn hình chính cho Android & iOS.
+
+---
+
+## 7. Cấu trúc Thư mục Dự án Hiện tại
+```
+app-hoc-co-the/
+├── docs/                      # Toàn bộ tài liệu kỹ thuật, luật và hướng dẫn
+│   ├── 00_LUAT.md
+│   ├── 01_SPEC.md
+│   ├── 02_DU_LIEU.md
+│   ├── 03_THIET_KE.md
+│   ├── HUONG_DAN_SU_DUNG.md   # Hướng dẫn 8 mục cho chủ dự án
+│   ├── KE_HOACH.md
+│   ├── LENH_01.md
+│   ├── LENH_02.md
+│   ├── LENH_03.md
+│   ├── LENH_04.md
+│   └── SKILL.md               # File này
+├── public/                    # Tài nguyên tĩnh & Service worker
+│   └── sw.js
+├── src/
+│   ├── app/                   # Next.js App Router
+│   │   ├── [topicSlug]/       # Màn Chủ đề và Trang nội dung
+│   │   ├── api/admin/         # 8 API bảo mật quản trị và sao lưu
+│   │   ├── api/search/        # API tìm kiếm nhanh
+│   │   ├── dang-nhap/         # Màn đăng nhập quản trị
+│   │   ├── tim-kiem/          # Màn tìm kiếm nội dung
+│   │   ├── layout.tsx         # Root layout (PWA, font Be Vietnam Pro)
+│   │   ├── manifest.ts        # PWA Web Manifest
+│   │   └── page.tsx           # Trang chủ
+│   ├── components/            # Các UI Component di động
+│   │   ├── admin/             # Các Modal quản trị (EditTopic, EditPage, EditBlock...)
+│   │   ├── blocks/            # Render 13 loại khối nội dung
+│   │   ├── BottomNav.tsx      # Thanh điều hướng 3 mục dưới đáy
+│   │   ├── Lightbox.tsx       # Trình xem ảnh phóng to toàn màn hình
+│   │   └── ...
+│   └── lib/                   # Xử lý dữ liệu, nén ảnh, xác thực, Supabase
+└── supabase/
+    └── setup.sql              # File SQL khởi tạo toàn bộ CSDL và dữ liệu mẫu
+```
+
+---
+
+## 8. Những Gì Để Sau V1
+- Danh sách yêu thích / bookmark bài học.
+- Đăng nhập người học và đồng bộ tiến độ qua đám mây giữa nhiều thiết bị.
+- Thông báo nhắc học định kỳ qua Web Push.
+- Bảng thống kê số lượt xem, tỷ lệ hoàn thành bài học.
+- Chế độ tải nội dung xem offline toàn diện.
+- Tích hợp trợ lý AI hỏi đáp nội dung y khoa.
+- Đa ngôn ngữ (Tiếng Anh, v.v.).
+- Chế độ khóa lộ trình tuần tự (GUIDED / LOCKED).
+- Nền tảng SaaS phân quyền nhiều khách hàng (Multi-workspace).
+
