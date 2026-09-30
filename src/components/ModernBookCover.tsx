@@ -109,7 +109,7 @@ export default function ModernBookCover({
             <span
               className={`text-[9px] sm:text-[10px] font-black uppercase tracking-[1.5px] ${palette.accent}`}
             >
-              Y Khoa · Trị Liệu
+              Sức Khỏe · Cơ Thể
             </span>
             <Sparkles size={11} className={palette.accent} />
           </div>

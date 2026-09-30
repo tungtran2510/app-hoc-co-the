@@ -91,7 +91,7 @@ export default function BookDetailModal({
                   {book.type === 'author' ? 'Tác phẩm đã xuất bản' : 'Sách & Tài liệu khuyên đọc'}
                 </h3>
                 <p className="text-[12px] text-muted truncate">
-                  {book.author || 'Tài liệu y khoa & chăm sóc sức khỏe'}
+                  {book.author || 'Tài liệu chăm sóc sức khỏe & cơ thể'}
                 </p>
               </div>
             </div>

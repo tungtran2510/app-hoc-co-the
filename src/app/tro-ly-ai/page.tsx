@@ -243,10 +243,10 @@ export default function AiAssistantPage() {
 
             <div className="flex flex-col min-w-0">
               <h1 className="text-[14.5px] sm:text-[16px] font-extrabold text-ink leading-tight truncate">
-                <span>Trợ lý AI Cơ Thể</span>
+                <span>Trợ lý Sức Khỏe AI</span>
               </h1>
               <span className="text-[10.5px] sm:text-[11px] text-muted font-medium truncate">
-                Tư vấn chuẩn y khoa
+                Tư vấn chăm sóc sức khỏe chủ động
               </span>
             </div>
           </div>
@@ -322,13 +322,13 @@ export default function AiAssistantPage() {
                     Xin chào! Bạn cần tìm hiểu gì hôm nay?
                   </h2>
                   <p className="text-[11.5px] text-muted truncate">
-                    Trợ lý AI tư vấn chuẩn phương pháp tác giả 24/7
+                    Trợ lý Sức Khỏe AI đồng hành 24/7
                   </p>
                 </div>
               </div>
 
               <p className="text-[12.5px] text-ink/85 leading-snug pt-1 border-t border-primary/10">
-                Hỏi triệu chứng đau nhức (cổ vai gáy, lưng, gối), kỹ thuật bài tập an toàn hoặc tìm kiếm bài học chi tiết nhé!
+                Hỏi về cấu trúc cơ thể, thói quen sinh hoạt đúng, bài tập an toàn hoặc tìm kiếm bài học hướng dẫn trong ứng dụng!
               </p>
             </div>
 
@@ -384,7 +384,7 @@ export default function AiAssistantPage() {
                             <span className="w-4 h-4 rounded-full bg-primary text-white flex items-center justify-center shrink-0">
                               <Bot size={10} />
                             </span>
-                            <span className="tracking-wide uppercase text-[10.5px]">Trợ lý Y khoa AI</span>
+                            <span className="tracking-wide uppercase text-[10.5px]">Trợ lý Sức Khỏe AI</span>
                           </div>
                           <span className="text-[10px] text-primary/70 font-semibold">Tài liệu tác giả</span>
                         </div>
@@ -475,7 +475,7 @@ export default function AiAssistantPage() {
             {isLoading && (
               <div className="flex items-center gap-2 max-w-[85%] p-2 px-3 rounded-[12px] bg-white border border-primary/20 shadow-2xs text-[12px] text-muted animate-in fade-in duration-200">
                 <Loader2 size={13} className="animate-spin text-primary shrink-0" />
-                <span className="truncate">Trợ lý AI đang tra cứu và tổng hợp bài học...</span>
+                <span className="truncate">Trợ lý Sức Khỏe đang tra cứu bài học...</span>
               </div>
             )}
 
@@ -496,7 +496,7 @@ export default function AiAssistantPage() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Hỏi triệu chứng, bài tập hoặc tìm bài học..."
+              placeholder="Hỏi về cơ thể, thói quen đúng, bài tập..."
               disabled={isLoading}
               className="w-full h-10 sm:h-11 pl-3.5 pr-9 rounded-[14px] bg-surface border border-line text-[13.5px] sm:text-[14px] text-ink placeholder:text-muted focus:border-primary focus:bg-white focus:outline-hidden transition-all shadow-inner-xs"
             />

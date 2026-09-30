@@ -434,7 +434,7 @@ export default function EditAuthorModal({
                   type="text"
                   value={profile.name}
                   onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                  placeholder="Ví dụ: Bác sĩ Nguyễn Văn A"
+                  placeholder="Ví dụ: Tùng dinh dưỡng, Chuyên gia..."
                   className="w-full h-11 px-3.5 rounded-[12px] border border-line text-[15px] text-ink font-bold focus:border-primary"
                   required
                 />
@@ -805,11 +805,11 @@ export default function EditAuthorModal({
                 />
               </div>
 
-              {/* Địa chỉ phòng khám / làm việc */}
+              {/* Địa chỉ văn phòng / nơi làm việc */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-[13px] font-bold text-ink flex items-center gap-1.5">
                   <MapPin size={14} className="text-primary" />
-                  <span>Địa chỉ phòng khám / văn phòng</span>
+                  <span>Địa chỉ văn phòng / nơi làm việc</span>
                 </label>
                 <input
                   type="text"

@@ -351,7 +351,7 @@ export default function EditAiTrainingModal({
                                   handleUpdateDoc(doc.id, { content: e.target.value })
                                 }
                                 rows={8}
-                                placeholder="Dán toàn bộ nội dung chương sách, tài liệu nghiên cứu, ghi chú y khoa độc quyền của bạn vào đây..."
+                                placeholder="Dán toàn bộ nội dung chương sách, tài liệu nghiên cứu, ghi chú kiến thức sức khỏe độc quyền của bạn vào đây..."
                                 className="w-full p-3 rounded-[12px] bg-surface border border-line text-[13px] text-ink focus:border-primary focus:outline-hidden leading-relaxed font-normal"
                               />
                             </div>

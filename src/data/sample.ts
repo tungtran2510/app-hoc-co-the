@@ -1,10 +1,10 @@
 import { Settings, Topic, Page, Block, AuthorProfile, RecommendedBook, AiTrainingConfig } from '../lib/types';
 
 export const DEFAULT_AUTHOR_PROFILE: AuthorProfile = {
-  name: 'Bác sĩ / Chuyên gia Trị liệu',
-  title: 'Chuyên gia Phục hồi Chức năng & Sức khỏe Cột sống',
+  name: 'Tùng dinh dưỡng',
+  title: 'Hỗ trợ kiến thức nền tảng & Sức khỏe',
   avatar_url: null,
-  bio: 'Dành hơn 10 năm nghiên cứu và đồng hành cùng hàng nghìn người bệnh phục hồi cột sống tự nhiên, khoa học và an toàn tại nhà.',
+  bio: 'Tùng "không phải bác sĩ". Tùng mong muốn chia sẻ kiến thức đúng giúp mọi người chủ động chăm sóc đúng vì một Việt Nam khỏe mạnh.',
   intro_image_url: null,
   intro_video_url: null,
   books: [
@@ -41,7 +41,7 @@ export const DEFAULT_RECOMMENDED_BOOKS: RecommendedBook[] = [
     title: 'Lắng Nghe Cơ Thể Để Tự Chữa Lành',
     cover_url: null,
     description: 'Hướng dẫn nhận diện các tín hiệu cảnh báo sớm từ hệ cơ xương khớp và phương pháp phục hồi tự nhiên.',
-    author: 'Bs. Chuyên khoa Phục hồi Chức năng',
+    author: 'Tài liệu Chăm sóc Cơ thể',
     link_url: '',
   },
   {
@@ -49,7 +49,7 @@ export const DEFAULT_RECOMMENDED_BOOKS: RecommendedBook[] = [
     title: 'Giải Mã Cột Sống & Vận Động Đúng',
     cover_url: null,
     description: 'Phân tích cơ sinh học cột sống, các sai lầm trong sinh hoạt hằng ngày và bài tập điều chỉnh tư thế.',
-    author: 'Chuyên gia Trị liệu Cột sống',
+    author: 'Tài liệu Sức khỏe Cột sống',
     link_url: '',
   },
   {
@@ -65,23 +65,24 @@ export const DEFAULT_RECOMMENDED_BOOKS: RecommendedBook[] = [
     title: 'Cẩm Nang Bảo Vệ Đốt Sống Cổ',
     cover_url: null,
     description: 'Dành riêng cho người làm việc văn phòng, lái xe và những người thường xuyên bị đau mỏi vai gáy.',
-    author: 'Hội Phục hồi Chức năng',
+    author: 'Tài liệu Chăm sóc Cột sống',
     link_url: '',
   },
 ];
 
 export const DEFAULT_AI_TRAINING: AiTrainingConfig = {
-  guidelines: `1. Luôn trả lời ngắn gọn (1-2 câu), đi thẳng vào kết luận theo phương pháp sinh cơ học của tác giả.
-2. Tuyệt đối không khuyên uống thuốc bừa bãi hoặc gây hoang mang lo sợ.
-3. Luôn nhấn mạnh việc thấu hiểu cấu trúc cơ thể, điều chỉnh tư thế và phục hồi tự nhiên.
-4. Điều hướng người học mở các bài học liên quan trong hệ thống để xem chi tiết.`,
+  guidelines: `1. TÁC GIẢ KHÔNG PHẢI LÀ BÁC SĨ: Tác giả là Tùng dinh dưỡng, chia sẻ kiến thức nền tảng giúp mọi người hiểu về cơ thể và chủ động chăm sóc đúng.
+2. CẤM TUYỆT ĐỐI LIÊN QUAN ĐẾN CHỮA BỆNH: Không khám bệnh, không chẩn đoán bệnh, không chữa bệnh, không điều trị bệnh, không kê đơn thuốc.
+3. VAI TRÒ LÀ TRỢ LÝ SỨC KHỎE: Cung cấp kiến thức giáo dục về cấu trúc cơ thể, thói quen sinh hoạt đúng và phục hồi tự nhiên qua vận động sinh cơ học.
+4. KHI CÓ DẤU HIỆU BỆNH LÝ HOẶC ĐAU NHỨC CẤP TÍNH: Luôn dặn dò người học đi khám tại các cơ sở y tế / bác sĩ chuyên khoa để được thăm khám chính xác.
+5. PHONG CÁCH TRẢ LỜI: Luôn trả lời ngắn gọn (1-2 câu, tối đa 40-50 từ), đi thẳng vào kết luận theo tài liệu tác giả và điều hướng mở bài học trong hệ thống để xem chi tiết.`,
   documents: [
     {
       id: 'doc-1',
       title: 'Triết lý phục hồi cột sống tự nhiên & Sinh cơ học',
       content: `Cột sống không tự nhiên bị hỏng hay thoái hóa nhanh chóng, mà là kết quả của việc chịu áp lực sai tư thế tích tụ qua nhiều năm.
 Cơ chế tự phục hồi: Đĩa đệm không có mạch máu trực tiếp nuôi dưỡng ở người trưởng thành, nó nhận dinh dưỡng qua cơ chế thẩm thấu khi chúng ta vận động nhịp nhàng (bơm hút dịch). Khi ngồi yên một chỗ quá lâu, đĩa đệm bị thiếu nước và xơ cứng.
-Nguyên tắc điều trị: Giảm áp lực nén ép xấu -> Tăng cường tuần hoàn thẩm thấu -> Củng cố hệ cơ lõi (core) và dây chằng để giữ vững trục sinh lý.`,
+Nguyên tắc chăm sóc & phục hồi tự nhiên: Giảm áp lực nén ép xấu -> Tăng cường tuần hoàn thẩm thấu -> Củng cố hệ cơ lõi (core) và dây chằng để giữ vững trục sinh lý.`,
       updated_at: new Date().toISOString(),
     },
   ],
@@ -102,7 +103,7 @@ export const sampleSettings: Settings = {
   primary_color: '#0E6B5A',
   access_mode: 'OPEN',
   block_styles: {},
-  expert_title: 'Chuyên gia Trị liệu & Chăm sóc Cột sống',
+  expert_title: 'Hỗ trợ kiến thức nền tảng & Sức khỏe',
   hotline: '0974.248.716',
   zalo_url: 'https://zalo.me/0987792400',
   author_profile: DEFAULT_AUTHOR_PROFILE,

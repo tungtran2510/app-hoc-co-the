@@ -14,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   return {
     title: `${settings?.app_name || 'Học Cơ Thể'} · Hiểu Về Cơ Thể`,
-    description: 'Ứng dụng học hiểu kiến thức về cơ thể theo lộ trình chuẩn y khoa',
+    description: 'Ứng dụng học hiểu kiến thức về cơ thể và chăm sóc sức khỏe chủ động',
   };
 }
 

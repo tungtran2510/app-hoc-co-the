@@ -245,11 +245,11 @@ export default function EditPageModal({
               </div>
             )}
 
-            {/* Chọn nhanh ảnh mẫu y khoa 3D 1 chạm */}
+            {/* Chọn nhanh ảnh mẫu cơ thể 3D 1 chạm */}
             <div className="flex flex-col gap-1.5 pt-0.5">
               <div className="flex items-center gap-1.5 text-[12.5px] font-bold text-primary">
                 <Sparkles size={13} />
-                <span>Gợi ý ảnh giải phẫu y khoa 3D (chọn nhanh 1 chạm):</span>
+                <span>Gợi ý ảnh giải phẫu cơ thể 3D (chọn nhanh 1 chạm):</span>
               </div>
               <div className="grid grid-cols-3 gap-2">
                 {ANATOMY_PRESETS.map((preset) => {

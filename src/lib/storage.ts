@@ -13,7 +13,7 @@ export interface AppCustomSettings {
 
 export const DEFAULT_APP_SETTINGS: AppCustomSettings = {
   app_name: 'Sống Khỏe Mỗi Ngày',
-  expert_title: 'Chuyên gia Trị liệu & Chăm sóc Cột sống',
+  expert_title: 'Hỗ trợ kiến thức nền tảng & Sức khỏe',
   hotline: '0974.248.716',
   zalo_url: 'https://zalo.me/0987792400',
   auto_next_video: true,

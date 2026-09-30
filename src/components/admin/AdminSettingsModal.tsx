@@ -246,7 +246,7 @@ export default function AdminSettingsModal({
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-[14px] font-bold text-ink">
-                  Thông tin chuyên gia / Bác sĩ phụ trách
+                  Thông tin tác giả / Chuyên gia sức khỏe
                 </label>
                 <input
                   type="text"
