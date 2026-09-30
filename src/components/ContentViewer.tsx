@@ -136,6 +136,26 @@ export default function ContentViewer({
   const [consultSettings, setConsultSettings] = useState<{ zalo_url?: string; hotline?: string } | null>(null);
   const [showPhoneSyncModal, setShowPhoneSyncModal] = useState(false);
   const [phoneSyncReason, setPhoneSyncReason] = useState<'bookmark' | 'manual'>('bookmark');
+  const [activeTab, setActiveTab] = useState<'syllabus' | 'summary' | 'resources'>('syllabus');
+
+  const handleSelectTocItem = (blockId: string) => {
+    const target = blockList.find((b) => b.id === blockId);
+    if (target) {
+      if (target.type === 'videos') {
+        setActiveTab('syllabus');
+      } else if (target.type === 'text') {
+        setActiveTab('summary');
+      } else {
+        setActiveTab('resources');
+      }
+    }
+    setTimeout(() => {
+      const el = document.getElementById(`block-${blockId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 150);
+  };
 
   const handleToggleBookmark = () => {
     const newState = toggleSavePage({
@@ -391,6 +411,201 @@ export default function ContentViewer({
   const videoBlock = blockList.find((b) => b.type === 'videos');
   const currentVideos = videoBlock && videoBlock.type === 'videos' ? videoBlock.data.videos : [];
 
+  const textBlocks = blockList.filter((b) => b.type === 'text');
+  const resourceBlocks = blockList.filter(
+    (b) =>
+      b.type === 'files' ||
+      b.type === 'links' ||
+      b.type === 'images' ||
+      b.type === 'comparison'
+  );
+
+  const renderBlockItem = (
+    block: Block,
+    idx: number,
+    isSubBlock = false
+  ) => {
+    if (!isAdmin && !block.is_visible) return null;
+
+    const blockTitle =
+      block.type === 'videos'
+        ? 'DANH SÁCH VIDEO'
+        : block.type === 'text'
+        ? block.display_style.toUpperCase().replace('_', ' ')
+        : block.type === 'images'
+        ? 'HÌNH ẢNH'
+        : block.type === 'files'
+        ? 'TÀI LIỆU'
+        : 'BÀI LIÊN QUAN';
+
+    return (
+      <div
+        key={block.id}
+        id={`block-${block.id}`}
+        className={`relative transition-all ${
+          isAdmin
+            ? 'p-2.5 rounded-[22px] border-2 border-dashed border-[#2D5B94]/30 bg-white/40'
+            : ''
+        } ${!block.is_visible ? 'opacity-50' : ''}`}
+      >
+        {/* Thanh điều khiển của Admin trên từng khối */}
+        {isAdmin && (
+          <div className="flex items-center justify-between pb-2 mb-2 border-b border-line/60">
+            <span className="text-[12px] font-extrabold text-muted uppercase tracking-wider">
+              {blockTitle}
+            </span>
+
+            <div className="flex items-center gap-1.5">
+              {/* Nút Sửa */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (block.type === 'videos') {
+                    setShowVideoManager(true);
+                  } else {
+                    setEditingBlock(block);
+                  }
+                }}
+                className="flex items-center gap-1 h-8 px-3 rounded-[10px] bg-white border border-line text-ink font-bold text-[13px] hover:border-primary shadow-2xs cursor-pointer"
+              >
+                <Edit2 size={13} className="text-primary" />
+                <span>Sửa</span>
+              </button>
+
+              {/* Nút Di chuyển lên ▲ */}
+              <button
+                type="button"
+                onClick={() => handleMoveBlockUp(idx)}
+                disabled={idx === 0}
+                className="w-8 h-8 rounded-[10px] bg-white border border-line flex items-center justify-center text-ink disabled:opacity-30 shadow-2xs cursor-pointer"
+                aria-label="Di chuyển khối lên"
+              >
+                <ChevronUp size={16} />
+              </button>
+
+              {/* Nút Di chuyển xuống ▼ */}
+              <button
+                type="button"
+                onClick={() => handleMoveBlockDown(idx)}
+                disabled={idx === blockList.length - 1}
+                className="w-8 h-8 rounded-[10px] bg-white border border-line flex items-center justify-center text-ink disabled:opacity-30 shadow-2xs cursor-pointer"
+                aria-label="Di chuyển khối xuống"
+              >
+                <ChevronDown size={16} />
+              </button>
+
+              {/* Nút Menu ⋮ */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setActiveMenuBlockId(
+                      activeMenuBlockId === block.id ? null : block.id
+                    )
+                  }
+                  className="w-8 h-8 rounded-[10px] bg-white border border-line flex items-center justify-center text-ink shadow-2xs cursor-pointer"
+                  aria-label="Tùy chọn khối"
+                >
+                  <MoreVertical size={16} />
+                </button>
+
+                {/* Dropdown Menu ⋮ */}
+                {activeMenuBlockId === block.id && (
+                  <div className="absolute right-0 top-9 w-[180px] bg-white rounded-[16px] border border-line shadow-xl py-1.5 z-50 animate-in fade-in duration-150">
+                    <button
+                      type="button"
+                      onClick={() => handleToggleVisibility(block.id)}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[14px] font-bold text-ink hover:bg-surface-2 cursor-pointer"
+                    >
+                      {block.is_visible ? (
+                        <>
+                          <EyeOff size={16} />
+                          <span>Ẩn khối này</span>
+                        </>
+                      ) : (
+                        <>
+                          <Eye size={16} />
+                          <span>Hiện khối này</span>
+                        </>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDuplicateBlock(idx)}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[14px] font-bold text-ink hover:bg-surface-2 cursor-pointer"
+                    >
+                      <Copy size={16} />
+                      <span>Nhân bản khối</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteBlock(block.id)}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[14px] font-bold text-[#7A2F12] hover:bg-[#FBE7E1] cursor-pointer"
+                    >
+                      <Trash2 size={16} />
+                      <span>Xóa khối</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Nội dung khối */}
+        <BlockRenderer
+          block={block}
+          fontSizeMode={fontSizeMode}
+          defaultActiveVideoIndex={defaultActiveVideoIndex}
+          isAdmin={isAdmin}
+          onOpenVideoManager={() => setShowVideoManager(true)}
+          pageId={page.id}
+          topicSlug={topic.slug}
+          topicTitle={topic.title}
+          pageSlug={page.slug}
+          pageTitle={currentPage.title}
+          pageNumber={pageIndex}
+          pageCoverUrl={currentPage.cover_url}
+          nextPage={
+            nextPage
+              ? {
+                  slug: nextPage.slug,
+                  title: nextPage.title,
+                  orderNumber: nextPageIndex || 0,
+                }
+              : null
+          }
+          summaryContent={
+            block.type === 'videos' ? (
+              <div className="flex flex-col gap-4">
+                {textBlocks.map((b) => renderBlockItem(b, blockList.indexOf(b), true))}
+                {textBlocks.length === 0 && (
+                  <p className="text-muted text-[14px] p-4 text-center">
+                    Chưa có tóm tắt bằng văn bản cho bài học này.
+                  </p>
+                )}
+              </div>
+            ) : undefined
+          }
+          resourcesContent={
+            block.type === 'videos' ? (
+              <div className="flex flex-col gap-4">
+                {resourceBlocks.map((b) => renderBlockItem(b, blockList.indexOf(b), true))}
+                {resourceBlocks.length === 0 && (
+                  <p className="text-muted text-[14px] p-4 text-center">
+                    Tài liệu bài học đang được cập nhật.
+                  </p>
+                )}
+              </div>
+            ) : undefined
+          }
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
+      </div>
+    );
+  };
+
   return (
     <main className="flex-1 flex flex-col px-5 pt-2 pb-16 gap-4">
       {/* 1. ĐÃ BỎ THANH ĐEN ĐỈNH ĐẦU ĐỂ TIẾT KIỆM DIỆN TÍCH THEO YÊU CẦU CỦA ANH */}
@@ -414,6 +629,7 @@ export default function ContentViewer({
           setPhoneSyncReason('manual');
           setShowPhoneSyncModal(true);
         }}
+        onSelectTocItem={handleSelectTocItem}
       />
 
       {/* 3. Phần đầu bài viết: Badge BÀI 01 / 04 + Tiêu đề lớn (Không lặp lại tên chủ đề) */}
@@ -469,165 +685,29 @@ export default function ContentViewer({
             Bài học đang được cập nhật nội dung.
           </p>
         </div>
+      ) : videoBlock ? (
+        <div className="flex flex-col gap-4">
+          {/* Khối video là trung tâm lớp học EdTech (chứa 3 tab: Giáo trình, Tóm tắt cốt lõi, Tài liệu) */}
+          {renderBlockItem(videoBlock, blockList.indexOf(videoBlock), false)}
+
+          {/* Các khối khác (nếu có khối nào không thuộc text / resource / videoBlock) */}
+          {blockList
+            .filter(
+              (b) =>
+                b.id !== videoBlock.id &&
+                b.type !== 'text' &&
+                b.type !== 'files' &&
+                b.type !== 'links' &&
+                b.type !== 'images' &&
+                b.type !== 'comparison'
+            )
+            .map((b) => renderBlockItem(b, blockList.indexOf(b), false))}
+        </div>
       ) : (
         <div className="flex flex-col gap-4">
-          {blockList.map((block, idx) => {
-            // Nếu không phải admin và khối bị ẩn thì không hiển thị
-            if (!isAdmin && !block.is_visible) return null;
-
-          const blockTitle =
-            block.type === 'videos'
-              ? 'DANH SÁCH VIDEO'
-              : block.type === 'text'
-              ? block.display_style.toUpperCase().replace('_', ' ')
-              : block.type === 'images'
-              ? 'HÌNH ẢNH'
-              : block.type === 'files'
-              ? 'TÀI LIỆU'
-              : 'BÀI LIÊN QUAN';
-
-          return (
-            <div
-              key={block.id}
-              className={`relative transition-all ${
-                isAdmin
-                  ? 'p-2.5 rounded-[22px] border-2 border-dashed border-[#2D5B94]/30 bg-white/40'
-                  : ''
-              } ${!block.is_visible ? 'opacity-50' : ''}`}
-            >
-              {/* Thanh điều khiển của Admin trên từng khối */}
-              {isAdmin && (
-                <div className="flex items-center justify-between pb-2 mb-2 border-b border-line/60">
-                  <span className="text-[12px] font-extrabold text-muted uppercase tracking-wider">
-                    {blockTitle}
-                  </span>
-
-                  <div className="flex items-center gap-1.5">
-                    {/* Nút Sửa */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (block.type === 'videos') {
-                          setShowVideoManager(true);
-                        } else {
-                          setEditingBlock(block);
-                        }
-                      }}
-                      className="flex items-center gap-1 h-8 px-3 rounded-[10px] bg-white border border-line text-ink font-bold text-[13px] hover:border-primary shadow-2xs"
-                    >
-                      <Edit2 size={13} className="text-primary" />
-                      <span>Sửa</span>
-                    </button>
-
-                    {/* Nút Di chuyển lên ▲ */}
-                    <button
-                      type="button"
-                      onClick={() => handleMoveBlockUp(idx)}
-                      disabled={idx === 0}
-                      className="w-8 h-8 rounded-[10px] bg-white border border-line flex items-center justify-center text-ink disabled:opacity-30 shadow-2xs"
-                      aria-label="Di chuyển khối lên"
-                    >
-                      <ChevronUp size={16} />
-                    </button>
-
-                    {/* Nút Di chuyển xuống ▼ */}
-                    <button
-                      type="button"
-                      onClick={() => handleMoveBlockDown(idx)}
-                      disabled={idx === blockList.length - 1}
-                      className="w-8 h-8 rounded-[10px] bg-white border border-line flex items-center justify-center text-ink disabled:opacity-30 shadow-2xs"
-                      aria-label="Di chuyển khối xuống"
-                    >
-                      <ChevronDown size={16} />
-                    </button>
-
-                    {/* Nút Menu ⋮ */}
-                    <div className="relative">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setActiveMenuBlockId(
-                            activeMenuBlockId === block.id ? null : block.id
-                          )
-                        }
-                        className="w-8 h-8 rounded-[10px] bg-white border border-line flex items-center justify-center text-ink shadow-2xs"
-                        aria-label="Tùy chọn khối"
-                      >
-                        <MoreVertical size={16} />
-                      </button>
-
-                      {/* Dropdown Menu ⋮ */}
-                      {activeMenuBlockId === block.id && (
-                        <div className="absolute right-0 top-9 w-[180px] bg-white rounded-[16px] border border-line shadow-xl py-1.5 z-50 animate-in fade-in duration-150">
-                          <button
-                            type="button"
-                            onClick={() => handleToggleVisibility(block.id)}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[14px] font-bold text-ink hover:bg-surface-2"
-                          >
-                            {block.is_visible ? (
-                              <>
-                                <EyeOff size={16} />
-                                <span>Ẩn khối này</span>
-                              </>
-                            ) : (
-                              <>
-                                <Eye size={16} />
-                                <span>Hiện khối này</span>
-                              </>
-                            )}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDuplicateBlock(idx)}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[14px] font-bold text-ink hover:bg-surface-2"
-                          >
-                            <Copy size={16} />
-                            <span>Nhân bản khối</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteBlock(block.id)}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[14px] font-bold text-[#7A2F12] hover:bg-[#FBE7E1]"
-                          >
-                            <Trash2 size={16} />
-                            <span>Xóa khối</span>
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Nội dung khối */}
-              <BlockRenderer
-                block={block}
-                fontSizeMode={fontSizeMode}
-                defaultActiveVideoIndex={defaultActiveVideoIndex}
-                isAdmin={isAdmin}
-                onOpenVideoManager={() => setShowVideoManager(true)}
-                pageId={page.id}
-                topicSlug={topic.slug}
-                topicTitle={topic.title}
-                pageSlug={page.slug}
-                pageTitle={currentPage.title}
-                pageNumber={pageIndex}
-                pageCoverUrl={currentPage.cover_url}
-                nextPage={
-                  nextPage
-                    ? {
-                        slug: nextPage.slug,
-                        title: nextPage.title,
-                        orderNumber: nextPageIndex || 0,
-                      }
-                    : null
-                }
-              />
-            </div>
-          );
-        })}
-      </div>
-    )}
+          {blockList.map((block, idx) => renderBlockItem(block, idx, false))}
+        </div>
+      )}
 
       {/* 5. Nút "+ Thêm nội dung" (Hiện khi ở chế độ Admin) */}
       {isAdmin && (

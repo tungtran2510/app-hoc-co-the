@@ -22,6 +22,10 @@ interface BlockRendererProps {
   pageNumber?: number;
   pageCoverUrl?: string | null;
   nextPage?: { slug: string; title: string; orderNumber: number } | null;
+  summaryContent?: React.ReactNode;
+  resourcesContent?: React.ReactNode;
+  activeTab?: 'syllabus' | 'summary' | 'resources';
+  onTabChange?: (tab: 'syllabus' | 'summary' | 'resources') => void;
 }
 
 export default function BlockRenderer({
@@ -38,6 +42,10 @@ export default function BlockRenderer({
   pageNumber,
   pageCoverUrl,
   nextPage,
+  summaryContent,
+  resourcesContent,
+  activeTab,
+  onTabChange,
 }: BlockRendererProps) {
   const blockId = `block-${block.id}`;
 
@@ -73,6 +81,10 @@ export default function BlockRenderer({
           pageNumber={pageNumber}
           pageCoverUrl={pageCoverUrl}
           nextPage={nextPage}
+          summaryContent={summaryContent}
+          resourcesContent={resourcesContent}
+          activeTab={activeTab}
+          onTabChange={onTabChange}
         />
       );
 

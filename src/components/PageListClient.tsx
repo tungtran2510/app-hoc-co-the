@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, ArrowUp, ArrowDown, Eye, EyeOff, Trash2, FileText } from 'lucide-react';
+import { Plus, Edit2, ArrowUp, ArrowDown, Eye, EyeOff, Trash2, FileText, Check, Play } from 'lucide-react';
 import PageCard from './PageCard';
 import { Page, Topic } from '../lib/types';
 import { checkIsAdminClient } from '../lib/adminAuth';
@@ -151,65 +151,102 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
   );
 
   return (
-    <section className="flex flex-col gap-3 mt-0.5">
+    <section className="flex flex-col gap-3.5 mt-1">
       <div className="flex items-center justify-between">
-        <h2 className="text-[22px] font-extrabold text-ink leading-tight">
-          Danh sách nội dung
-        </h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-[18px] sm:text-[20px] font-black text-ink uppercase tracking-wide">
+            LỘ TRÌNH ĐÀO TẠO THEO BƯỚC
+          </h2>
+          <span className="text-[11px] font-black text-primary bg-primary-soft px-2 py-0.5 rounded-full border border-primary/20">
+            {visiblePages.length} BƯỚC
+          </span>
+        </div>
 
         {isAdmin && (
           <button
             type="button"
             onClick={() => setIsCreating(true)}
-            className="flex items-center gap-1.5 h-9 px-3 rounded-full bg-primary text-white font-bold text-[13px] shadow-xs hover:bg-primary-dark cursor-pointer transition-all"
+            className="flex items-center gap-1.5 h-8 px-3 rounded-full bg-primary text-white font-bold text-[12px] shadow-xs hover:bg-primary-dark cursor-pointer transition-all"
           >
-            <Plus size={16} strokeWidth={2.5} />
-            <span>Thêm trang</span>
+            <Plus size={15} strokeWidth={2.5} />
+            <span>Thêm bài</span>
           </button>
         )}
       </div>
 
       {visiblePages.length > 0 ? (
         <>
-          <p className="text-[15px] text-muted font-medium leading-normal">
+          <p className="text-[14px] text-muted font-medium leading-normal -mt-1">
             Gợi ý: nếu mới bắt đầu, nên xem theo thứ tự 01 → 02 → 03.
           </p>
 
-          <div className="flex flex-col gap-3 mt-0.5">
+          <div className="flex flex-col mt-1">
             {visiblePages.map(({ page, orderNumber, videoCount }, index) => {
               const pageTienDo = tienDo[page.id];
               const watchedVideos = pageTienDo?.watched || [];
               const lastVideo = pageTienDo?.last_video;
+              const isCompleted = completedPages.includes(page.id);
+              const hasStarted = isCompleted || watchedVideos.length > 0 || (lastVideo !== undefined && lastVideo > 0);
+              const isLast = index === visiblePages.length - 1;
 
               return (
-                <div key={page.id} className="relative flex flex-col group">
-                  <div className="relative">
-                    <PageCard
-                      page={page}
-                      topic={topic}
-                      orderNumber={orderNumber}
-                      videoCount={videoCount}
-                      watchedVideos={watchedVideos}
-                      lastVideo={lastVideo}
-                      isCompleted={completedPages.includes(page.id)}
-                    />
+                <div key={page.id} className="relative flex gap-2.5 sm:gap-3.5 group">
+                  {/* CỘT TIMELINE BÊN TRÁI (Mockup 2) */}
+                  <div className="flex flex-col items-center shrink-0 w-8 sm:w-9 pt-3.5">
+                    {/* Node hình tròn */}
+                    <div
+                      className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center shrink-0 transition-transform ${
+                        isCompleted
+                          ? 'bg-[#0E6B5A] text-white shadow-xs'
+                          : hasStarted
+                          ? 'bg-[#0E6B5A] text-white ring-4 ring-[#0E6B5A]/25 shadow-xs'
+                          : 'bg-white border-2 border-line text-muted font-bold text-[12px] sm:text-[13px]'
+                      }`}
+                    >
+                      {isCompleted ? (
+                        <Check size={16} strokeWidth={3} />
+                      ) : hasStarted ? (
+                        <Play size={13} fill="currentColor" className="ml-0.5" />
+                      ) : (
+                        <span>{String(orderNumber).padStart(2, '0')}</span>
+                      )}
+                    </div>
 
-                    {/* Huy hiệu Quản trị: Bản nháp / Đang ẩn */}
-                    {isAdmin && (
-                      <div className="absolute top-2 right-12 flex items-center gap-1.5">
-                        {page.status === 'draft' && (
-                          <span className="px-2 py-0.5 rounded-md bg-amber-500 text-white text-[11px] font-extrabold">
-                            Bản nháp
-                          </span>
-                        )}
-                        {!page.is_visible && (
-                          <span className="px-2 py-0.5 rounded-md bg-zinc-800 text-white text-[11px] font-extrabold">
-                            Đang ẩn
-                          </span>
-                        )}
-                      </div>
+                    {/* Đường nối Timeline dọc */}
+                    {!isLast && (
+                      <div className="w-0.5 flex-1 min-h-[36px] bg-line-strong/60 my-1 group-hover:bg-primary/40 transition-colors" />
                     )}
                   </div>
+
+                  {/* THẺ BÀI HỌC BÊN PHẢI */}
+                  <div className="flex-1 min-w-0 pb-3">
+                    <div className="relative">
+                      <PageCard
+                        page={page}
+                        topic={topic}
+                        orderNumber={orderNumber}
+                        videoCount={videoCount}
+                        watchedVideos={watchedVideos}
+                        lastVideo={lastVideo}
+                        isCompleted={isCompleted}
+                      />
+
+                      {/* Huy hiệu Quản trị: Bản nháp / Đang ẩn */}
+                      {isAdmin && (
+                        <div className="absolute top-2 right-12 flex items-center gap-1.5">
+                          {page.status === 'draft' && (
+                            <span className="px-2 py-0.5 rounded-md bg-amber-500 text-white text-[11px] font-extrabold">
+                              Bản nháp
+                            </span>
+                          )}
+                          {!page.is_visible && (
+                            <span className="px-2 py-0.5 rounded-md bg-zinc-800 text-white text-[11px] font-extrabold">
+                              Đang ẩn
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
 
                   {/* Thanh công cụ Admin trên mỗi thẻ trang */}
                   {isAdmin && (
@@ -278,8 +315,9 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
                     </div>
                   )}
                 </div>
-              );
-            })}
+              </div>
+            );
+          })}
           </div>
         </>
       ) : (

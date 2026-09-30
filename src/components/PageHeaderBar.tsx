@@ -28,6 +28,7 @@ interface PageHeaderBarProps {
   themeMode?: ThemeModeOption;
   onThemeChange?: (mode: ThemeModeOption) => void;
   onOpenPhoneSync?: () => void;
+  onSelectTocItem?: (blockId: string) => void;
 }
 
 export default function PageHeaderBar({
@@ -45,6 +46,7 @@ export default function PageHeaderBar({
   themeMode = 'light',
   onThemeChange,
   onOpenPhoneSync,
+  onSelectTocItem,
 }: PageHeaderBarProps) {
   const pathname = usePathname();
   const [showToc, setShowToc] = useState(false);
@@ -52,9 +54,13 @@ export default function PageHeaderBar({
 
   const handleScrollToBlock = (blockId: string) => {
     setShowToc(false);
-    const element = document.getElementById(`block-${blockId}`);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+    if (onSelectTocItem) {
+      onSelectTocItem(blockId);
+    } else {
+      const element = document.getElementById(`block-${blockId}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
 

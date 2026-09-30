@@ -87,62 +87,57 @@ export default async function TopicPage({ params }: TopicPageProps) {
       <TopicHeaderNav />
 
       {/* 2. Header Chủ đề: Tinh gọn, chuyên nghiệp, không chiếm diện tích */}
-      <section
-        className="w-full rounded-[20px] p-4 flex items-center justify-between gap-3 shadow-xs border border-line/40 overflow-hidden relative"
-        style={{ backgroundColor: topic.color_bg }}
-      >
-        <div className="flex flex-col z-10 flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <span
-              className="text-[11px] font-black tracking-wider uppercase px-2 py-0.5 rounded-[6px] bg-white/70"
-              style={{ color: topic.color_fg }}
-            >
-              CHỦ ĐỀ
-            </span>
-            {hasPages && (
-              <span className="text-[13px] font-bold text-ink/75">
-                {pages.length} bài học · {totalVideos} video
-              </span>
-            )}
-          </div>
-
-          <h1 className="text-[22px] sm:text-[24px] font-black text-ink leading-tight mt-1">
-            {topic.title}
-          </h1>
-
-          {topic.description ? (
-            <p className="text-[13px] sm:text-[14px] text-ink-2 font-normal leading-snug line-clamp-2 mt-1">
-              {topic.description}
-            </p>
+      {/* 2. Header Chủ đề: Thẻ Chuyên Đề Đào Tạo cao cấp chuẩn EdTech (Mockup 2) */}
+      <section className="w-full rounded-[24px] p-5 sm:p-6 bg-gradient-to-br from-[#06332A] via-[#0E6B5A] to-[#147D6A] text-white shadow-md border border-white/20 relative overflow-hidden flex flex-col gap-3">
+        {/* Họa tiết trang trí nền */}
+        <div className="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-white/5 pointer-events-none blur-2xl" />
+        <div className="absolute right-3 bottom-3 opacity-20 pointer-events-none">
+          {topic.slug === 'cot-song' ? (
+            <SpineIllustration className="w-24 h-24 text-white" />
           ) : (
-            <p className="text-[13px] text-ink-2 font-normal mt-0.5">
-              Kiến thức chuyên sâu và thực hành chăm sóc sức khỏe.
-            </p>
-          )}
-
-          {topic.meta_note && (
-            <span className="text-[12px] font-medium text-ink/65 mt-1">
-              ⏱ {topic.meta_note}
-            </span>
+            <TopicIcon name={topic.icon || 'body'} size={64} className="text-white" />
           )}
         </div>
 
-        {/* Minh họa thu nhỏ tinh tế góc phải */}
-        <div className="shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-[16px] overflow-hidden flex items-center justify-center bg-white/70 shadow-xs border border-white/60">
-          {topic.cover_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={topic.cover_url}
-              alt={topic.title}
-              className="w-full h-full object-cover"
-            />
-          ) : topic.slug === 'cot-song' ? (
-            <SpineIllustration className="h-full w-auto object-contain p-1" />
-          ) : (
-            <div className="w-12 h-12 flex items-center justify-center" style={{ color: topic.color_fg }}>
-              <TopicIcon name={topic.icon || 'body'} size={28} />
-            </div>
+        <div className="flex flex-col z-10 gap-1.5">
+          <div className="flex items-center gap-2">
+            <span className="text-[10.5px] font-black tracking-widest uppercase px-2.5 py-0.5 rounded-full bg-white/20 text-white backdrop-blur-xs border border-white/30">
+              CHUYÊN ĐỀ ĐÀO TẠO
+            </span>
+          </div>
+
+          <h1 className="text-[23px] sm:text-[26px] font-black leading-tight tracking-tight text-white mt-0.5">
+            {topic.title.toUpperCase()}
+          </h1>
+
+          <div className="flex items-center gap-2 text-[13.5px] text-white/90 font-medium">
+            <span>Tác giả: <strong className="text-white font-bold">Tùng Dinh Dưỡng</strong></span>
+          </div>
+
+          {topic.description && (
+            <p className="text-[13px] text-white/80 font-normal leading-snug line-clamp-2 mt-0.5">
+              {topic.description}
+            </p>
           )}
+
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-white/80 font-medium mt-1">
+            <span>📚 {pages.length} bài học</span>
+            <span>·</span>
+            <span>🎬 {totalVideos} video bài giảng</span>
+            <span>·</span>
+            <span>⏱ ~{totalVideos * 5} phút</span>
+          </div>
+        </div>
+
+        {/* Thanh tiến độ chuyên đề */}
+        <div className="z-10 mt-1 pt-3 border-t border-white/15 flex flex-col gap-1.5">
+          <div className="flex items-center justify-between text-[12px] font-bold text-white/90">
+            <span>Tiến độ chuyên đề</span>
+            <span className="text-white/80">Lộ trình {pages.length} bước</span>
+          </div>
+          <div className="w-full h-2 rounded-full bg-black/30 overflow-hidden p-0.5">
+            <div className="h-full rounded-full bg-emerald-300 w-1/3 transition-all duration-500" />
+          </div>
         </div>
       </section>
 

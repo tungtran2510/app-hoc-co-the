@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Play, Check, BarChart2, MoreVertical, ArrowRight } from 'lucide-react';
+import { Play, Check, BarChart2, MoreVertical, ArrowRight, Sparkles } from 'lucide-react';
 import { Video } from '../../lib/types';
 import SpineIllustration from '../SpineIllustration';
 import {
@@ -37,6 +37,10 @@ interface VideosBlockProps {
   pageNumber?: number;
   pageCoverUrl?: string | null;
   nextPage?: { slug: string; title: string; orderNumber: number } | null;
+  summaryContent?: React.ReactNode;
+  resourcesContent?: React.ReactNode;
+  activeTab?: 'syllabus' | 'summary' | 'resources';
+  onTabChange?: (tab: 'syllabus' | 'summary' | 'resources') => void;
 }
 
 export default function VideosBlock({
@@ -54,6 +58,10 @@ export default function VideosBlock({
   pageNumber = 1,
   pageCoverUrl,
   nextPage,
+  summaryContent,
+  resourcesContent,
+  activeTab,
+  onTabChange,
 }: VideosBlockProps) {
   const searchParams = useSearchParams();
   const vParam = searchParams.get('v');
@@ -73,6 +81,16 @@ export default function VideosBlock({
   const [isPlaying, setIsPlaying] = useState(false);
   const [isEndedPlaylist, setIsEndedPlaylist] = useState(false);
   const [watchedList, setWatchedList] = useState<number[]>([]);
+  const [localTab, setLocalTab] = useState<'syllabus' | 'summary' | 'resources'>('syllabus');
+
+  const currentTab = activeTab || localTab;
+  const handleTabChange = (tab: 'syllabus' | 'summary' | 'resources') => {
+    if (onTabChange) {
+      onTabChange(tab);
+    } else {
+      setLocalTab(tab);
+    }
+  };
 
   const playerRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -395,151 +413,199 @@ export default function VideosBlock({
         </div>
       )}
 
-      {/* Dòng phụ dưới trình phát nếu là playlist */}
-      {isPlaylist && !isEndedPlaylist && (
-        <p className="text-[15px] font-semibold text-muted leading-tight px-1">
-          Đang phát {safeIndex + 1}/{videos.length} · Xem hết tự chuyển video tiếp
-        </p>
-      )}
+      {/* 1. THANH TIẾN ĐỘ HỌC TẬP (MOCKUP 1) */}
+      <div className="flex flex-col gap-1.5 px-0.5 mt-2.5 mb-1">
+        <div className="flex items-center justify-between text-[13px] font-bold text-ink">
+          <span className="flex items-center gap-1.5 text-muted">
+            <span>Tiến độ bài học:</span>
+            <strong className="text-primary font-black">
+              {Math.min(100, Math.round(((videos.filter((_, idx) => watchedList.includes(idx + 1)).length) / (videos.length || 1)) * 100))}%
+            </strong>
+            <span>
+              ({videos.filter((_, idx) => watchedList.includes(idx + 1)).length}/{videos.length} video)
+            </span>
+          </span>
+          {videos.filter((_, idx) => watchedList.includes(idx + 1)).length === videos.length && videos.length > 0 && (
+            <span className="text-emerald-700 text-[10.5px] font-black bg-emerald-100 px-2 py-0.5 rounded-full">
+              ĐÃ HOÀN THÀNH
+            </span>
+          )}
+        </div>
+        <div className="w-full h-2 rounded-full bg-line overflow-hidden p-0.5">
+          <div
+            className="h-full rounded-full bg-[#0E6B5A] transition-all duration-500"
+            style={{
+              width: `${Math.max(
+                Math.min(100, Math.round(((videos.filter((_, idx) => watchedList.includes(idx + 1)).length) / (videos.length || 1)) * 100)),
+                4
+              )}%`,
+            }}
+          />
+        </div>
+      </div>
 
-      {/* Danh sách video nếu là playlist */}
-      {isPlaylist && (
-        <div className="flex flex-col gap-2.5 mt-1">
-          <div className="text-[15px] sm:text-[16px] font-extrabold tracking-[0.5px] text-ink uppercase px-1">
-            DANH SÁCH VIDEO ({videos.length})
-          </div>
+      {/* 2. HỆ THỐNG 3 TAB CHUẨN TRƯỜNG HỌC (MOCKUP 1) */}
+      <div className="flex items-center border-b border-line mt-3 mb-1 bg-white rounded-t-[14px]">
+        <button
+          type="button"
+          onClick={() => handleTabChange('syllabus')}
+          className={`flex items-center justify-center gap-1.5 flex-1 py-3 text-[14px] sm:text-[14.5px] font-extrabold transition-all border-b-2 cursor-pointer ${
+            currentTab === 'syllabus'
+              ? 'text-primary border-primary bg-primary-soft/30'
+              : 'text-muted border-transparent hover:text-ink'
+          }`}
+        >
+          <span>🎬</span>
+          <span>Giáo trình ({videos.length})</span>
+        </button>
 
-          <div className="flex flex-col gap-1.5 sm:gap-2">
-            {videos.map((vid, idx) => {
-              const isActive = idx === safeIndex;
-              const isWatched = watchedList.includes(idx + 1);
-              const thumbUrl =
-                vid.thumbnail_url ||
-                (vid.youtube_id ? `https://i.ytimg.com/vi/${vid.youtube_id}/hqdefault.jpg` : null);
+        <button
+          type="button"
+          onClick={() => handleTabChange('summary')}
+          className={`flex items-center justify-center gap-1.5 flex-1 py-3 text-[14px] sm:text-[14.5px] font-extrabold transition-all border-b-2 cursor-pointer ${
+            currentTab === 'summary'
+              ? 'text-primary border-primary bg-primary-soft/30'
+              : 'text-muted border-transparent hover:text-ink'
+          }`}
+        >
+          <span>📝</span>
+          <span>Tóm tắt cốt lõi</span>
+        </button>
 
-              return (
-                <div
-                  key={idx}
-                  onClick={() => handleSelectVideo(idx)}
-                  className={`w-full flex flex-col gap-2 p-2.5 sm:p-3 rounded-[16px] text-left transition-all cursor-pointer ${
-                    isActive
-                      ? 'bg-primary-soft/80 border-[1.5px] border-primary shadow-2xs'
-                      : 'bg-white border border-line hover:border-line-strong'
-                  }`}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      handleSelectVideo(idx);
-                    }
-                  }}
-                  aria-pressed={isActive}
-                >
-                  {/* 1. TIÊU ĐỀ Ở TRÊN VIDEO: Bắt đầu từ mép ngoài sang mép trong (Full width), không bị thụt lề, không mất chữ */}
-                  <div className="flex items-start justify-between gap-2 w-full">
-                    <h4 className={`text-[15px] sm:text-[16px] font-extrabold leading-snug ${
+        <button
+          type="button"
+          onClick={() => handleTabChange('resources')}
+          className={`flex items-center justify-center gap-1.5 flex-1 py-3 text-[14px] sm:text-[14.5px] font-extrabold transition-all border-b-2 cursor-pointer ${
+            currentTab === 'resources'
+              ? 'text-primary border-primary bg-primary-soft/30'
+              : 'text-muted border-transparent hover:text-ink'
+          }`}
+        >
+          <span>📚</span>
+          <span>Tài liệu</span>
+        </button>
+      </div>
+
+      {/* 3. NỘI DUNG THEO TAB */}
+      {currentTab === 'syllabus' && (
+        <div className="flex flex-col gap-2 mt-2 animate-in fade-in duration-150">
+          {videos.map((vid, idx) => {
+            const isActive = idx === safeIndex;
+            const isWatched = watchedList.includes(idx + 1);
+
+            return (
+              <div
+                key={idx}
+                onClick={() => handleSelectVideo(idx)}
+                className={`w-full flex items-center justify-between gap-3 p-3.5 sm:p-4 rounded-[16px] text-left transition-all cursor-pointer ${
+                  isActive
+                    ? 'bg-primary-soft/90 border-[1.5px] border-primary shadow-xs'
+                    : 'bg-white border border-line hover:border-line-strong'
+                }`}
+                role="button"
+                tabIndex={0}
+              >
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  {/* Icon trạng thái */}
+                  {isWatched ? (
+                    <div className="w-7 h-7 rounded-full bg-[#0E6B5A] text-white flex items-center justify-center shrink-0 shadow-2xs">
+                      <Check size={15} strokeWidth={3} />
+                    </div>
+                  ) : isActive ? (
+                    <div className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center shrink-0 shadow-xs ring-4 ring-primary/20">
+                      <Play size={12} fill="white" className="ml-0.5" />
+                    </div>
+                  ) : (
+                    <div className="w-7 h-7 rounded-full bg-surface-2 text-muted font-black text-[12px] flex items-center justify-center shrink-0 border border-line">
+                      {String(idx + 1).padStart(2, '0')}
+                    </div>
+                  )}
+
+                  {/* Tiêu đề & Huy hiệu */}
+                  <div className="flex flex-col gap-0.5 min-w-0">
+                    {isActive && (
+                      <span className="w-fit text-[9.5px] font-black uppercase tracking-wider text-primary bg-white/80 px-1.5 py-0.2 rounded border border-primary/25">
+                        ĐANG HỌC
+                      </span>
+                    )}
+                    <h4 className={`text-[15px] sm:text-[15.5px] font-bold leading-snug line-clamp-1 ${
                       isActive ? 'text-primary' : 'text-ink'
                     }`}>
                       {vid.title}
                     </h4>
-
-                    {isAdmin && onOpenVideoManager && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onOpenVideoManager();
-                        }}
-                        className="text-muted hover:text-primary p-1 rounded-sm hover:bg-surface-2 cursor-pointer shrink-0 -mr-1 -mt-0.5"
-                        aria-label="Sửa video"
-                        title="Sửa video"
-                      >
-                        <MoreVertical size={16} />
-                      </button>
-                    )}
-                  </div>
-
-                  {/* 2. KHUNG DƯỚI: VIDEO THUMBNAIL (BÊN TRÁI) VÀ MÔ TẢ (BÊN PHẢI) */}
-                  <div className="flex items-center gap-2.5 sm:gap-3 w-full">
-                    {/* Thumbnail video ở khung dưới */}
-                    <div className="relative w-[96px] h-[58px] sm:w-[106px] sm:h-[62px] rounded-[8px] sm:rounded-[10px] bg-[#1C2735] shrink-0 overflow-hidden flex items-center justify-center">
-                      {thumbUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={thumbUrl}
-                          alt={vid.title}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <>
-                          <div className="absolute inset-0 flex items-center justify-center opacity-40">
-                            <SpineIllustration className="w-8 h-8" />
-                          </div>
-                          <div className="relative z-10 w-5 h-5 rounded-full bg-white/90 flex items-center justify-center text-primary shadow-xs">
-                            <Play size={10} fill="#0E6B5A" className="ml-0.5 text-primary" />
-                          </div>
-                        </>
-                      )}
-
-                      {/* Huy hiệu Đang phát hoặc Đã xem */}
-                      {isActive ? (
-                        <span className="absolute top-1 left-1 bg-primary text-white text-[9px] font-black px-1.5 py-0.5 rounded-[3px] flex items-center gap-1 shadow-xs leading-none">
-                          <BarChart2 size={8} className="animate-pulse shrink-0" />
-                          <span>Phát</span>
-                        </span>
-                      ) : isWatched ? (
-                        <span className="absolute top-1 left-1 bg-emerald-700/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[3px] flex items-center gap-0.5 shadow-xs leading-none">
-                          <Check size={8} strokeWidth={3} />
-                          <span>Đã xem</span>
-                        </span>
-                      ) : null}
-
-                      {vid.duration_text && (
-                        <span className="absolute bottom-1 right-1 bg-black/80 text-white text-[9.5px] font-bold px-1 py-0.2 rounded-[2px] leading-none">
-                          {vid.duration_text}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Mô tả & trạng thái ở khung dưới */}
-                    <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-                      {vid.description && (
-                        <p className="text-[12.5px] sm:text-[13px] text-muted font-normal leading-snug line-clamp-2">
-                          {vid.description}
-                        </p>
-                      )}
-
-                      <div className="flex items-center gap-1.5 text-[11.5px] text-muted font-medium">
-                        <span>{vid.duration_text || '5 phút'}</span>
-                        {isActive && (
-                          <span className="text-primary font-bold flex items-center gap-0.5">
-                            · Đang phát
-                          </span>
-                        )}
-                        {isWatched && !isActive && (
-                          <span className="text-emerald-700 font-bold flex items-center gap-0.5">
-                            · Đã xem
-                          </span>
-                        )}
-                      </div>
-                    </div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
+
+                {/* Thời lượng & Nút Admin */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-[12.5px] sm:text-[13px] text-muted font-bold">
+                    {vid.duration_text || '05:00'}
+                  </span>
+
+                  {isAdmin && onOpenVideoManager && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onOpenVideoManager();
+                      }}
+                      className="text-muted hover:text-primary p-1 rounded-sm hover:bg-surface-2 cursor-pointer"
+                      aria-label="Sửa video"
+                      title="Sửa video"
+                    >
+                      <MoreVertical size={16} />
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
 
           {/* Nút Quản lý danh sách video (Hiện khi ở chế độ Admin) */}
           {isAdmin && onOpenVideoManager && (
             <button
               type="button"
               onClick={onOpenVideoManager}
-              className="flex items-center justify-center gap-2 h-[52px] min-h-[48px] w-full rounded-[16px] bg-primary text-white font-extrabold text-[16px] transition-transform active:scale-[0.98] mt-1 shadow-xs cursor-pointer"
+              className="flex items-center justify-center gap-2 h-[48px] w-full rounded-[14px] bg-primary text-white font-extrabold text-[15px] transition-transform active:scale-[0.98] mt-1 shadow-xs cursor-pointer"
             >
               <span>Quản lý danh sách video ({videos.length})</span>
-              <ArrowRight size={18} strokeWidth={2.5} />
+              <ArrowRight size={17} strokeWidth={2.5} />
             </button>
           )}
+        </div>
+      )}
+
+      {currentTab === 'summary' && (
+        <div className="flex flex-col gap-3 py-1 animate-in fade-in duration-150">
+          {summaryContent || (
+            <p className="text-muted text-[14px] p-4 text-center">Chưa có tóm tắt bổ sung cho bài học này.</p>
+          )}
+        </div>
+      )}
+
+      {currentTab === 'resources' && (
+        <div className="flex flex-col gap-3 py-1 animate-in fade-in duration-150">
+          {resourcesContent}
+          {/* Nút Hỏi trợ lý AI */}
+          <Link
+            href={`/tro-ly-ai?q=Giải thích chi tiết hơn về bài học: ${encodeURIComponent(pageTitle || '')}`}
+            className="flex items-center justify-between p-3.5 rounded-[16px] bg-gradient-to-r from-primary-soft to-surface-2 border border-primary/25 text-ink hover:border-primary transition-all shadow-2xs group mt-1"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center shadow-xs">
+                <Sparkles size={18} />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[14px] font-extrabold text-primary">
+                  Hỏi Trợ lý sức khỏe về bài này
+                </span>
+                <span className="text-[12px] text-muted font-normal">
+                  Giải đáp thắc mắc chuyên sâu 24/7
+                </span>
+              </div>
+            </div>
+            <ArrowRight size={18} className="text-primary group-hover:translate-x-1 transition-transform" />
+          </Link>
         </div>
       )}
     </div>
