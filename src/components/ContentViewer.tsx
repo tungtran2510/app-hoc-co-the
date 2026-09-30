@@ -416,12 +416,15 @@ export default function ContentViewer({
         }}
       />
 
-      {/* 3. Phần đầu bài viết: Dòng nhỏ CỘT SỐNG · 01 + Tiêu đề lớn */}
-      <section className="flex flex-col gap-1 mt-0.5">
+      {/* 3. Phần đầu bài viết: Badge BÀI 01 / 04 + Tiêu đề lớn (Không lặp lại tên chủ đề) */}
+      <section className="flex flex-col gap-1.5 mt-1">
         <div className="flex items-center justify-between">
-          <span className="text-[14px] font-extrabold tracking-[0.5px] uppercase text-muted">
-            {topic.title.toUpperCase()} · {formattedOrder}
-          </span>
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary-soft/60 border border-primary/20 text-primary text-[12px] font-black tracking-wider uppercase">
+            <span>BÀI {formattedOrder}</span>
+            {totalPages > 0 && (
+              <span className="text-primary/60 font-semibold">/ {String(totalPages).padStart(2, '0')}</span>
+            )}
+          </div>
           {isAdmin && (
             <div className="flex items-center gap-2">
               <button

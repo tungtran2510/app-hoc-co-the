@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChevronLeft, Menu, MoreVertical, X, Lock, Check, Settings as SettingsIcon, Share2, Bookmark, Sun, Moon, Eye, Smartphone } from 'lucide-react';
+import { ChevronLeft, Home, ListOrdered, MoreVertical, X, Lock, Check, Settings as SettingsIcon, Share2, Bookmark, Sun, Moon, Eye, Smartphone } from 'lucide-react';
 
 export interface TocItem {
   id: string;
@@ -60,46 +60,41 @@ export default function PageHeaderBar({
 
   return (
     <header className="relative w-full z-40">
-      <div className="flex items-center justify-between h-[52px] my-1">
-        {/* Nút quay lại */}
-        <Link
-          href={`/${topicSlug}`}
-          prefetch={true}
-          className="flex items-center gap-1 text-primary text-[18px] font-bold min-h-[48px] pr-2 transition-opacity active:opacity-75"
-          aria-label={`Quay lại ${topicTitle}`}
-        >
-          <ChevronLeft size={24} strokeWidth={2.5} />
-          <span>{topicTitle}</span>
-        </Link>
-
-        {/* Nút Mục lục + Nút Lưu + Nút Tuỳ chọn */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Nút Mục lục */}
-          <button
-            type="button"
-            onClick={() => {
-              setShowToc(!showToc);
-              setShowOptions(false);
-            }}
-            className={`flex items-center gap-1.5 h-[48px] min-w-[48px] px-3 rounded-[16px] border-[1.5px] text-[15px] font-bold transition-all shadow-xs ${
-              showToc
-                ? 'bg-primary-soft border-primary text-primary'
-                : 'bg-white border-line text-ink hover:border-line-strong'
-            }`}
-            aria-expanded={showToc}
-            aria-label="Mục lục"
+      <div className="flex items-center justify-between h-[52px] my-1 gap-2">
+        {/* 1. Breadcrumb: Home 🏠 › [Tên Chủ Đề] (Về trang chủ 1 chạm, không lặp chữ) */}
+        <div className="flex items-center gap-1.5 min-w-0">
+          <Link
+            href="/"
+            prefetch={true}
+            className="w-10 h-10 rounded-full bg-surface-2 hover:bg-surface-3 flex items-center justify-center text-ink hover:text-primary transition-colors shadow-2xs shrink-0"
+            title="Về Trang chủ"
+            aria-label="Về Trang chủ"
           >
-            <Menu size={18} strokeWidth={2.5} />
-            <span>Mục lục</span>
-          </button>
+            <Home size={19} strokeWidth={2.2} />
+          </Link>
 
+          <span className="text-muted/60 text-[14px] font-bold shrink-0">›</span>
+
+          <Link
+            href={`/${topicSlug}`}
+            prefetch={true}
+            className="flex items-center gap-1 text-primary hover:text-primary-dark text-[16px] sm:text-[17px] font-extrabold min-h-[44px] transition-colors truncate"
+            aria-label={`Về chủ đề ${topicTitle}`}
+            title={`Về chủ đề ${topicTitle}`}
+          >
+            <span className="truncate">{topicTitle}</span>
+          </Link>
+        </div>
+
+        {/* 2. Nút Lưu + Nút Tuỳ chọn (Chỉ 2 nút tròn gọn gàng, thoáng đãng) */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {/* Nút Lưu bài học */}
           <button
             type="button"
             onClick={() => {
               if (onToggleSave) onToggleSave();
             }}
-            className={`flex items-center justify-center w-[48px] h-[48px] min-w-[48px] rounded-[16px] border-[1.5px] transition-all shadow-xs ${
+            className={`flex items-center justify-center w-[44px] h-[44px] rounded-[14px] border-[1.5px] transition-all shadow-2xs cursor-pointer active:scale-95 ${
               isSaved
                 ? 'bg-primary-soft border-primary text-primary'
                 : 'bg-white border-line text-ink hover:border-line-strong'
@@ -108,7 +103,7 @@ export default function PageHeaderBar({
             title={isSaved ? 'Đã lưu (Bấm để bỏ lưu)' : 'Lưu bài học'}
           >
             <Bookmark
-              size={20}
+              size={19}
               className={isSaved ? 'fill-primary text-primary' : 'text-ink'}
               strokeWidth={2.5}
             />
@@ -119,9 +114,8 @@ export default function PageHeaderBar({
             type="button"
             onClick={() => {
               setShowOptions(!showOptions);
-              setShowToc(false);
             }}
-            className={`flex items-center justify-center w-[48px] h-[48px] min-w-[48px] rounded-[16px] border-[1.5px] transition-all shadow-xs ${
+            className={`flex items-center justify-center w-[44px] h-[44px] rounded-[14px] border-[1.5px] transition-all shadow-2xs cursor-pointer active:scale-95 ${
               showOptions
                 ? 'bg-primary-soft border-primary text-primary'
                 : 'bg-white border-line text-ink hover:border-line-strong'
@@ -129,40 +123,78 @@ export default function PageHeaderBar({
             aria-expanded={showOptions}
             aria-label="Tùy chọn"
           >
-            <MoreVertical size={20} strokeWidth={2.5} />
+            <MoreVertical size={19} strokeWidth={2.5} />
           </button>
         </div>
       </div>
 
-      {/* Bảng Mục lục bung ra */}
-      {showToc && (
-        <div className="absolute top-[58px] right-0 left-0 bg-white rounded-[20px] border-[1.5px] border-line shadow-xl p-3 flex flex-col gap-1 z-50 animate-in fade-in duration-150">
-          <div className="flex items-center justify-between px-3 py-2 border-b border-line mb-1">
-            <span className="text-[15px] font-extrabold text-ink uppercase tracking-[0.5px]">
-              MỤC LỤC TRANG
+      {/* 3. Nút Mục lục nổi góc dưới (Floating TOC - Tiện lợi mở bất cứ khi nào cuộn trang) */}
+      {tocItems.length > 0 && (
+        <div className="fixed bottom-6 right-4 sm:right-6 z-40">
+          <button
+            type="button"
+            onClick={() => {
+              setShowToc(!showToc);
+              setShowOptions(false);
+            }}
+            className="flex items-center gap-2 h-11 px-4 rounded-full bg-primary hover:bg-primary-dark text-white font-extrabold text-[13.5px] shadow-lg active:scale-95 transition-all cursor-pointer border border-white/20"
+            aria-label="Mở mục lục bài học"
+          >
+            <ListOrdered size={16} strokeWidth={2.5} />
+            <span>Mục lục</span>
+            <span className="w-5 h-5 rounded-full bg-white/25 text-white text-[11px] font-black flex items-center justify-center">
+              {tocItems.length}
             </span>
-            <button
-              type="button"
-              onClick={() => setShowToc(false)}
-              className="p-1 rounded-lg text-muted hover:bg-surface-2"
-              aria-label="Đóng mục lục"
-            >
-              <X size={18} />
-            </button>
-          </div>
+          </button>
+        </div>
+      )}
 
-          <div className="max-h-[360px] overflow-y-auto flex flex-col divide-y divide-line/60">
-            {tocItems.map((item) => (
+      {/* 4. Bảng Mục lục dạng Bottom Sheet trượt lên khi bấm nút nổi */}
+      {showToc && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-xs p-0 sm:p-4 animate-in fade-in duration-150">
+          <div className="w-full max-w-[480px] bg-white rounded-t-[24px] sm:rounded-[24px] p-4 flex flex-col gap-2 shadow-2xl animate-in slide-in-from-bottom duration-200 border border-line">
+            <div className="flex items-center justify-between pb-2.5 border-b border-line">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-[10px] bg-primary-soft text-primary flex items-center justify-center">
+                  <ListOrdered size={18} strokeWidth={2.5} />
+                </div>
+                <div>
+                  <h3 className="text-[16px] font-extrabold text-ink leading-tight">
+                    MỤC LỤC BÀI HỌC
+                  </h3>
+                  <span className="text-[12px] text-muted font-medium">
+                    {tocItems.length} phần nội dung
+                  </span>
+                </div>
+              </div>
               <button
-                key={item.id}
                 type="button"
-                onClick={() => handleScrollToBlock(item.id)}
-                className="w-full flex items-center justify-between h-[48px] min-h-[48px] px-3 rounded-[12px] text-left text-[16px] font-bold text-ink hover:bg-primary-soft hover:text-primary transition-colors"
+                onClick={() => setShowToc(false)}
+                className="w-8 h-8 rounded-full bg-surface-2 flex items-center justify-center text-muted hover:text-ink cursor-pointer"
+                aria-label="Đóng mục lục"
               >
-                <span>{item.label}</span>
-                <span className="text-muted text-[14px]">›</span>
+                <X size={18} />
               </button>
-            ))}
+            </div>
+
+            <div className="max-h-[380px] overflow-y-auto flex flex-col divide-y divide-line/60 py-1">
+              {tocItems.map((item, idx) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => handleScrollToBlock(item.id)}
+                  className="w-full flex items-center justify-between h-[48px] px-2.5 rounded-[12px] text-left text-[15px] font-bold text-ink hover:bg-primary-soft hover:text-primary transition-colors cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="w-5 h-5 rounded-full bg-surface-2 group-hover:bg-primary group-hover:text-white text-muted text-[11px] font-extrabold flex items-center justify-center shrink-0 transition-colors">
+                      {idx + 1}
+                    </span>
+                    <span className="truncate">{item.label}</span>
+                  </div>
+                  <span className="text-muted text-[14px] shrink-0 ml-2 group-hover:text-primary transition-colors">›</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}
