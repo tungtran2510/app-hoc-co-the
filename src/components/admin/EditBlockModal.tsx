@@ -11,6 +11,8 @@ import {
   Video as VideoIcon,
   Link as LinkIcon,
   Check,
+  ChevronUp,
+  ChevronDown,
 } from 'lucide-react';
 import { Block, Image as ImageType, FileItem, Video } from '../../lib/types';
 import { extractYouTubeId, fetchYouTubeMeta } from '../../lib/youtube';
@@ -63,15 +65,34 @@ export default function EditBlockModal({
   const [imageList, setImageList] = useState<ImageType[]>(
     block.type === 'images' ? [...block.data.images] : []
   );
+  const [newImgUrl, setNewImgUrl] = useState('');
+  const [newImgCaption, setNewImgCaption] = useState('');
 
   // State cho files block gốc
   const [fileList, setFileList] = useState<FileItem[]>(
     block.type === 'files' ? [...block.data.files] : []
   );
+  const [newFileName, setNewFileName] = useState('');
+  const [newFileUrl, setNewFileUrl] = useState('');
+
+  // State cho links block gốc
+  const [linkList, setLinkList] = useState<{ page_id?: string; url?: string; label?: string }[]>(
+    block.type === 'links' ? [...block.data.items] : []
+  );
+  const [newLinkLabel, setNewLinkLabel] = useState('');
+  const [newLinkUrl, setNewLinkUrl] = useState('');
+
+  // State cho videos block gốc
+  const [videoList, setVideoList] = useState<Video[]>(
+    block.type === 'videos' ? [...block.data.videos] : []
+  );
+  const [newVidUrl, setNewVidUrl] = useState('');
+  const [newVidTitle, setNewVidTitle] = useState('');
+  const [newVidDuration, setNewVidDuration] = useState('5 phút');
 
   if (!isOpen) return null;
 
-  // Thêm ảnh đính kèm
+  // Thêm ảnh đính kèm trong text
   const handleAddAttachedImage = () => {
     if (!inputImageUrl.trim()) {
       alert('Vui lòng dán link ảnh');
@@ -86,7 +107,7 @@ export default function EditBlockModal({
     setActiveAttachTab('none');
   };
 
-  // Thêm file PDF đính kèm
+  // Thêm file PDF đính kèm trong text
   const handleAddAttachedFile = () => {
     if (!inputFileName.trim() || !inputFileUrl.trim()) {
       alert('Vui lòng nhập tên tài liệu và link file');
@@ -101,7 +122,7 @@ export default function EditBlockModal({
     setActiveAttachTab('none');
   };
 
-  // Thêm video đính kèm
+  // Thêm video đính kèm trong text
   const handleAddAttachedVideo = async () => {
     const yid = extractYouTubeId(inputVideoUrl);
     if (!yid) {
@@ -122,6 +143,60 @@ export default function EditBlockModal({
     setIsLoadingVideo(false);
     setInputVideoUrl('');
     setActiveAttachTab('none');
+  };
+
+  // Thêm ảnh vào block images
+  const handleAddImageToBlock = () => {
+    if (!newImgUrl.trim()) return;
+    setImageList([...imageList, { url: newImgUrl.trim(), caption: newImgCaption.trim() || undefined }]);
+    setNewImgUrl('');
+    setNewImgCaption('');
+  };
+
+  // Thêm file vào block files
+  const handleAddFileToBlock = () => {
+    if (!newFileName.trim() || !newFileUrl.trim()) return;
+    setFileList([...fileList, { name: newFileName.trim(), url: newFileUrl.trim(), size_bytes: 1500000 }]);
+    setNewFileName('');
+    setNewFileUrl('');
+  };
+
+  // Thêm link vào block links
+  const handleAddLinkToBlock = () => {
+    if (!newLinkLabel.trim()) return;
+    setLinkList([...linkList, { label: newLinkLabel.trim(), url: newLinkUrl.trim() || '#' }]);
+    setNewLinkLabel('');
+    setNewLinkUrl('');
+  };
+
+  // Thêm video vào block videos
+  const handleAddVideoToBlock = async () => {
+    const yid = extractYouTubeId(newVidUrl) || '';
+    let title = newVidTitle.trim();
+    let thumb = yid ? `https://i.ytimg.com/vi/${yid}/hqdefault.jpg` : undefined;
+
+    if (!title && yid) {
+      const meta = await fetchYouTubeMeta(yid);
+      title = meta.title;
+      thumb = meta.thumbnail_url;
+    }
+
+    if (!title && !yid) {
+      alert('Vui lòng dán link YouTube hoặc nhập tên video');
+      return;
+    }
+
+    setVideoList([
+      ...videoList,
+      {
+        youtube_id: yid,
+        title: title || `Video bài học (${yid})`,
+        duration_text: newVidDuration.trim() || '5 phút',
+        thumbnail_url: thumb,
+      },
+    ]);
+    setNewVidUrl('');
+    setNewVidTitle('');
   };
 
   const handleSave = () => {
@@ -156,6 +231,22 @@ export default function EditBlockModal({
         ...block,
         data: {
           files: fileList,
+        },
+      };
+      onSaveBlock(updated);
+    } else if (block.type === 'links') {
+      const updated: Block = {
+        ...block,
+        data: {
+          items: linkList,
+        },
+      };
+      onSaveBlock(updated);
+    } else if (block.type === 'videos') {
+      const updated: Block = {
+        ...block,
+        data: {
+          videos: videoList,
         },
       };
       onSaveBlock(updated);
@@ -241,12 +332,12 @@ export default function EditBlockModal({
                         : 'bg-surface-2 text-ink border border-line'
                     }`}
                   >
-                    Dấu chấm •
+                    Gạch đầu dòng
                   </button>
                 </div>
               </div>
 
-              {/* Nội dung chữ */}
+              {/* Nội dung dòng chữ */}
               <div className="flex flex-col gap-1">
                 <label className="text-[14px] font-bold text-ink flex items-center justify-between">
                   <span>Nội dung (mỗi dòng 1 ý)</span>
@@ -261,7 +352,7 @@ export default function EditBlockModal({
                 />
               </div>
 
-              {/* HÀNG NÚT GỌN GÀNG ĐÍNH KÈM THÊM: ẢNH / PDF / VIDEO (Theo đúng yêu cầu của anh) */}
+              {/* HÀNG NÚT GỌN GÀNG ĐÍNH KÈM THÊM: ẢNH / PDF / VIDEO */}
               <div className="flex flex-col gap-2 pt-1 border-t border-line/60">
                 <div className="flex items-center justify-between">
                   <span className="text-[13px] font-extrabold text-muted uppercase tracking-wider">
@@ -402,7 +493,7 @@ export default function EditBlockModal({
                         <button
                           type="button"
                           onClick={() => setAttachedImages(attachedImages.filter((_, idx) => idx !== i))}
-                          className="hover:text-red-700"
+                          className="hover:text-red-700 ml-0.5"
                         >
                           ×
                         </button>
@@ -418,7 +509,7 @@ export default function EditBlockModal({
                         <button
                           type="button"
                           onClick={() => setAttachedFiles(attachedFiles.filter((_, idx) => idx !== i))}
-                          className="hover:text-red-700"
+                          className="hover:text-red-700 ml-0.5"
                         >
                           ×
                         </button>
@@ -434,7 +525,7 @@ export default function EditBlockModal({
                         <button
                           type="button"
                           onClick={() => setAttachedVideos(attachedVideos.filter((_, idx) => idx !== i))}
-                          className="hover:text-red-700"
+                          className="hover:text-red-700 ml-0.5"
                         >
                           ×
                         </button>
@@ -449,6 +540,33 @@ export default function EditBlockModal({
           {/* Dành cho block images gốc */}
           {block.type === 'images' && (
             <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-1.5 p-3 rounded-[14px] bg-surface-2 border border-line">
+                <span className="text-[13px] font-bold text-ink">+ Thêm ảnh mới</span>
+                <input
+                  type="url"
+                  value={newImgUrl}
+                  onChange={(e) => setNewImgUrl(e.target.value)}
+                  placeholder="Dán đường dẫn ảnh..."
+                  className="h-10 px-3 rounded-[10px] border border-line text-[14px]"
+                />
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newImgCaption}
+                    onChange={(e) => setNewImgCaption(e.target.value)}
+                    placeholder="Chú thích ảnh..."
+                    className="flex-1 h-10 px-3 rounded-[10px] border border-line text-[14px]"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddImageToBlock}
+                    className="h-10 px-4 rounded-[10px] bg-primary text-white font-bold text-[14px]"
+                  >
+                    Thêm
+                  </button>
+                </div>
+              </div>
+
               <label className="text-[14px] font-bold text-ink">
                 Danh sách ảnh ({imageList.length})
               </label>
@@ -461,7 +579,7 @@ export default function EditBlockModal({
                     <button
                       type="button"
                       onClick={() => setImageList(imageList.filter((_, i) => i !== idx))}
-                      className="p-1.5 text-red-600"
+                      className="p-1.5 text-red-600 hover:bg-red-50 rounded-md"
                     >
                       <Trash2 size={16} />
                     </button>
@@ -474,6 +592,33 @@ export default function EditBlockModal({
           {/* Dành cho block files gốc */}
           {block.type === 'files' && (
             <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-1.5 p-3 rounded-[14px] bg-surface-2 border border-line">
+                <span className="text-[13px] font-bold text-ink">+ Thêm tài liệu PDF mới</span>
+                <input
+                  type="text"
+                  value={newFileName}
+                  onChange={(e) => setNewFileName(e.target.value)}
+                  placeholder="Tên tài liệu..."
+                  className="h-10 px-3 rounded-[10px] border border-line text-[14px]"
+                />
+                <div className="flex gap-2">
+                  <input
+                    type="url"
+                    value={newFileUrl}
+                    onChange={(e) => setNewFileUrl(e.target.value)}
+                    placeholder="Đường dẫn file (https://...)..."
+                    className="flex-1 h-10 px-3 rounded-[10px] border border-line text-[14px]"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddFileToBlock}
+                    className="h-10 px-4 rounded-[10px] bg-primary text-white font-bold text-[14px]"
+                  >
+                    Thêm
+                  </button>
+                </div>
+              </div>
+
               <label className="text-[14px] font-bold text-ink">
                 Danh sách tài liệu ({fileList.length})
               </label>
@@ -484,7 +629,126 @@ export default function EditBlockModal({
                     <button
                       type="button"
                       onClick={() => setFileList(fileList.filter((_, i) => i !== idx))}
-                      className="p-1.5 text-red-600"
+                      className="p-1.5 text-red-600 hover:bg-red-50 rounded-md"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Dành cho block links gốc (Bài liên quan) */}
+          {block.type === 'links' && (
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-1.5 p-3 rounded-[14px] bg-surface-2 border border-line">
+                <span className="text-[13px] font-bold text-ink">+ Thêm liên kết mới</span>
+                <input
+                  type="text"
+                  value={newLinkLabel}
+                  onChange={(e) => setNewLinkLabel(e.target.value)}
+                  placeholder="Tiêu đề hiển thị..."
+                  className="h-10 px-3 rounded-[10px] border border-line text-[14px]"
+                />
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newLinkUrl}
+                    onChange={(e) => setNewLinkUrl(e.target.value)}
+                    placeholder="Đường dẫn liên kết (/cot-song/dia-dem hoặc https://...)"
+                    className="flex-1 h-10 px-3 rounded-[10px] border border-line text-[14px]"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddLinkToBlock}
+                    className="h-10 px-4 rounded-[10px] bg-primary text-white font-bold text-[14px]"
+                  >
+                    Thêm
+                  </button>
+                </div>
+              </div>
+
+              <label className="text-[14px] font-bold text-ink">
+                Danh sách liên kết ({linkList.length})
+              </label>
+              <div className="flex flex-col gap-2">
+                {linkList.map((item, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-2.5 rounded-[12px] bg-surface-2 border border-line">
+                    <div className="flex flex-col min-w-0 pr-2">
+                      <span className="text-[14px] font-bold truncate">{item.label}</span>
+                      <span className="text-[12px] text-muted truncate">{item.url || item.page_id}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setLinkList(linkList.filter((_, i) => i !== idx))}
+                      className="p-1.5 text-red-600 hover:bg-red-50 rounded-md"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Dành cho block videos gốc nếu mở qua EditBlockModal */}
+          {block.type === 'videos' && (
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-1.5 p-3 rounded-[14px] bg-surface-2 border border-line">
+                <span className="text-[13px] font-bold text-ink">+ Thêm video YouTube mới</span>
+                <input
+                  type="url"
+                  value={newVidUrl}
+                  onChange={(e) => setNewVidUrl(e.target.value)}
+                  placeholder="Dán link YouTube (youtube.com/watch?v=... hoặc youtu.be/...)"
+                  className="h-10 px-3 rounded-[10px] border border-line text-[14px]"
+                />
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newVidTitle}
+                    onChange={(e) => setNewVidTitle(e.target.value)}
+                    placeholder="Tiêu đề video..."
+                    className="flex-1 h-10 px-3 rounded-[10px] border border-line text-[14px]"
+                  />
+                  <input
+                    type="text"
+                    value={newVidDuration}
+                    onChange={(e) => setNewVidDuration(e.target.value)}
+                    placeholder="5 phút"
+                    className="w-20 h-10 px-2 rounded-[10px] border border-line text-[14px]"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddVideoToBlock}
+                    className="h-10 px-4 rounded-[10px] bg-primary text-white font-bold text-[14px]"
+                  >
+                    Thêm
+                  </button>
+                </div>
+              </div>
+
+              <label className="text-[14px] font-bold text-ink">
+                Danh sách video ({videoList.length})
+              </label>
+              <div className="flex flex-col gap-2">
+                {videoList.map((vid, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-2.5 rounded-[12px] bg-surface-2 border border-line">
+                    <div className="flex items-center gap-2 min-w-0 pr-2">
+                      {vid.thumbnail_url && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={vid.thumbnail_url} alt="" className="w-12 h-8 rounded-[6px] object-cover" />
+                      )}
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-[14px] font-bold truncate">{vid.title}</span>
+                        <span className="text-[12px] text-muted truncate">{vid.duration_text} · {vid.youtube_id}</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setVideoList(videoList.filter((_, i) => i !== idx))}
+                      className="p-1.5 text-red-600 hover:bg-red-50 rounded-md"
                     >
                       <Trash2 size={16} />
                     </button>

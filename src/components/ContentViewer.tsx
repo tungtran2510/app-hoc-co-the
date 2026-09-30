@@ -21,6 +21,8 @@ import BlockRenderer from './BlockRenderer';
 import EditBlockModal from './admin/EditBlockModal';
 import VideoManagerModal from './admin/VideoManagerModal';
 import AddBlockDrawer from './admin/AddBlockDrawer';
+import EditPageModal from './admin/EditPageModal';
+import AdminSettingsModal from './admin/AdminSettingsModal';
 import { checkIsAdminClient, setAdminClient } from '../lib/adminAuth';
 import {
   getStoredBlocks,
@@ -28,7 +30,10 @@ import {
   resetStoredBlocks,
   getStoredPageStatus,
   saveStoredPageStatus,
+  getStoredPage,
+  saveStoredPage,
 } from '../lib/storage';
+import { Settings as SettingsIcon } from 'lucide-react';
 
 interface ContentViewerProps {
   topic: Topic;
@@ -53,6 +58,7 @@ export default function ContentViewer({
 }: ContentViewerProps) {
   const [fontSizeMode, setFontSizeMode] = useState<FontSizeOption>('normal');
   const [isAdmin, setIsAdmin] = useState(false);
+  const [currentPage, setCurrentPage] = useState<Page>(page);
   const [pageStatus, setPageStatus] = useState<'draft' | 'published'>(page.status);
   const [blockList, setBlockList] = useState<Block[]>(initialBlocks);
 
@@ -60,6 +66,8 @@ export default function ContentViewer({
   const [editingBlock, setEditingBlock] = useState<Block | null>(null);
   const [showVideoManager, setShowVideoManager] = useState(false);
   const [showAddDrawer, setShowAddDrawer] = useState(false);
+  const [showEditPageModal, setShowEditPageModal] = useState(false);
+  const [showAdminSettingsModal, setShowAdminSettingsModal] = useState(false);
   const [activeMenuBlockId, setActiveMenuBlockId] = useState<string | null>(null);
 
   // Đọc dữ liệu từ localStorage khi client mount
@@ -78,8 +86,10 @@ export default function ContentViewer({
       // 2. Quyền Admin
       setIsAdmin(checkIsAdminClient());
 
-      // 3. Trạng thái trang
-      setPageStatus(getStoredPageStatus(page.id, page.status));
+      // 3. Trạng thái và thông tin trang
+      const storedPage = getStoredPage(page.id, page);
+      setCurrentPage(storedPage);
+      setPageStatus(getStoredPageStatus(page.id, storedPage.status));
 
       // 4. Khối nội dung đã sửa
       const loadedBlocks = getStoredBlocks(page.id, initialBlocks);
@@ -87,7 +97,7 @@ export default function ContentViewer({
     } catch {
       // Bỏ qua lỗi truy cập client storage
     }
-  }, [page.id, initialBlocks, page.status]);
+  }, [page.id, initialBlocks, page.status, page]);
 
   const handleFontSizeChange = (mode: FontSizeOption) => {
     setFontSizeMode(mode);
@@ -108,6 +118,16 @@ export default function ContentViewer({
     const nextStatus = pageStatus === 'published' ? 'draft' : 'published';
     setPageStatus(nextStatus);
     saveStoredPageStatus(page.id, nextStatus);
+  };
+
+  const handleSavePage = (updated: Partial<Page>) => {
+    const newPage = { ...currentPage, ...updated };
+    setCurrentPage(newPage);
+    saveStoredPage(page.id, updated);
+    if (updated.status) {
+      setPageStatus(updated.status);
+      saveStoredPageStatus(page.id, updated.status);
+    }
   };
 
   // Di chuyển khối lên
@@ -263,6 +283,7 @@ export default function ContentViewer({
         onFontSizeChange={handleFontSizeChange}
         isAdmin={isAdmin}
         onToggleAdmin={handleToggleAdmin}
+        onOpenSettings={() => setShowAdminSettingsModal(true)}
       />
 
       {/* 3. Phần đầu bài viết: Dòng nhỏ CỘT SỐNG · 01 + Tiêu đề lớn */}
@@ -272,23 +293,40 @@ export default function ContentViewer({
             {topic.title.toUpperCase()} · {formattedOrder}
           </span>
           {isAdmin && (
-            <button
-              type="button"
-              onClick={handleToggleStatus}
-              className={`text-[12px] font-bold px-2.5 py-0.5 rounded-full border transition-all ${
-                pageStatus === 'published'
-                  ? 'bg-[#E6F2EF] text-[#0A4F43] border-[#0E6B5A]/30'
-                  : 'bg-[#FFF1E6] text-[#8A3A14] border-[#F2B38A]'
-              }`}
-              title="Bấm để đổi trạng thái"
-            >
-              {pageStatus === 'published' ? '● Đang hiện' : '○ Bản nháp'}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setShowEditPageModal(true)}
+                className="flex items-center gap-1 h-7 px-2.5 rounded-[8px] bg-white border border-line text-ink font-bold text-[12px] hover:border-primary shadow-2xs"
+                title="Sửa tên bài & tóm tắt"
+              >
+                <Edit2 size={12} className="text-primary" />
+                <span>Sửa bài</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleToggleStatus}
+                className={`text-[12px] font-bold px-2.5 py-0.5 rounded-full border transition-all ${
+                  pageStatus === 'published'
+                    ? 'bg-[#E6F2EF] text-[#0A4F43] border-[#0E6B5A]/30'
+                    : 'bg-[#FFF1E6] text-[#8A3A14] border-[#F2B38A]'
+                }`}
+                title="Bấm để đổi trạng thái"
+              >
+                {pageStatus === 'published' ? '● Đang hiện' : '○ Bản nháp'}
+              </button>
+            </div>
           )}
         </div>
         <h1 className="text-[28px] sm:text-[30px] font-extrabold text-ink leading-[1.2]">
-          {page.title}
+          {currentPage.title}
         </h1>
+        {currentPage.summary && (
+          <p className="text-[15px] text-muted font-normal leading-relaxed mt-0.5">
+            {currentPage.summary}
+          </p>
+        )}
       </section>
 
       {/* 4. Danh sách các khối */}
@@ -486,6 +524,59 @@ export default function ContentViewer({
         )}
       </section>
 
+      {/* 7. Bảng điều khiển quản trị trang (Hiện khi isAdmin = true) */}
+      {isAdmin && (
+        <section className="flex flex-col gap-2.5 mt-6 p-4 rounded-[22px] bg-primary-soft/30 border-2 border-dashed border-primary/40">
+          <div className="flex items-center justify-between">
+            <span className="text-[13px] font-extrabold uppercase text-primary tracking-wider">
+              Quản trị nhanh
+            </span>
+            <span className="text-[12px] text-muted font-bold">
+              {blockList.length} khối nội dung
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setShowAddDrawer(true)}
+              className="flex items-center justify-center gap-1.5 h-11 rounded-[12px] bg-white border border-line text-ink font-bold text-[14px] hover:border-primary shadow-2xs"
+            >
+              <Plus size={16} className="text-primary" />
+              <span>+ Thêm khối</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowAdminSettingsModal(true)}
+              className="flex items-center justify-center gap-1.5 h-11 rounded-[12px] bg-white border border-line text-ink font-bold text-[14px] hover:border-primary shadow-2xs"
+            >
+              <SettingsIcon size={16} className="text-primary" />
+              <span>Cài đặt app</span>
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between pt-1 text-[13px]">
+            <button
+              type="button"
+              onClick={handleResetToDefault}
+              className="flex items-center gap-1 text-muted hover:text-red-600 font-medium py-1"
+            >
+              <RotateCcw size={13} />
+              <span>Khôi phục dữ liệu bài này</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleToggleAdmin}
+              className="text-[#8A3A14] font-bold py-1 hover:underline"
+            >
+              Thoát sửa
+            </button>
+          </div>
+        </section>
+      )}
+
       {/* Modals của Admin */}
       {editingBlock && (
         <EditBlockModal
@@ -512,6 +603,23 @@ export default function ContentViewer({
           pageId={page.id}
           onAddBlock={handleAddBlock}
           nextSortOrder={blockList.length + 1}
+        />
+      )}
+
+      {showEditPageModal && (
+        <EditPageModal
+          isOpen={true}
+          onClose={() => setShowEditPageModal(false)}
+          page={currentPage}
+          onSavePage={handleSavePage}
+        />
+      )}
+
+      {showAdminSettingsModal && (
+        <AdminSettingsModal
+          isOpen={true}
+          onClose={() => setShowAdminSettingsModal(false)}
+          onLogout={() => setIsAdmin(false)}
         />
       )}
     </main>

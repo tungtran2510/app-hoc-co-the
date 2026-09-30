@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, Menu, MoreVertical, X, Lock, Check } from 'lucide-react';
+import { ChevronLeft, Menu, MoreVertical, X, Lock, Check, Settings as SettingsIcon } from 'lucide-react';
 
 export interface TocItem {
   id: string;
@@ -19,6 +19,7 @@ interface PageHeaderBarProps {
   onFontSizeChange: (mode: FontSizeOption) => void;
   isAdmin?: boolean;
   onToggleAdmin?: () => void;
+  onOpenSettings?: () => void;
 }
 
 export default function PageHeaderBar({
@@ -29,6 +30,7 @@ export default function PageHeaderBar({
   onFontSizeChange,
   isAdmin = false,
   onToggleAdmin,
+  onOpenSettings,
 }: PageHeaderBarProps) {
   const [showToc, setShowToc] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
@@ -194,17 +196,32 @@ export default function PageHeaderBar({
               Quản trị
             </span>
             {isAdmin ? (
-              <button
-                type="button"
-                onClick={() => {
-                  if (onToggleAdmin) onToggleAdmin();
-                  setShowOptions(false);
-                }}
-                className="flex items-center justify-center gap-2 h-[44px] rounded-[12px] bg-[#FFF1E6] text-[#8A3A14] font-bold text-[14px] border border-[#F2B38A]"
-              >
-                <Check size={16} />
-                <span>Thoát chế độ sửa</span>
-              </button>
+              <div className="flex flex-col gap-2">
+                {onOpenSettings && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowOptions(false);
+                      onOpenSettings();
+                    }}
+                    className="flex items-center justify-center gap-2 h-[44px] rounded-[12px] bg-primary text-white font-bold text-[14px] shadow-xs hover:bg-primary-dark transition-all"
+                  >
+                    <SettingsIcon size={16} />
+                    <span>Cài đặt quản trị</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onToggleAdmin) onToggleAdmin();
+                    setShowOptions(false);
+                  }}
+                  className="flex items-center justify-center gap-2 h-[44px] rounded-[12px] bg-[#FFF1E6] text-[#8A3A14] font-bold text-[14px] border border-[#F2B38A]"
+                >
+                  <Check size={16} />
+                  <span>Thoát chế độ sửa</span>
+                </button>
+              </div>
             ) : (
               <Link
                 href="/dang-nhap"

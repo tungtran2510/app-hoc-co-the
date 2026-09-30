@@ -232,28 +232,32 @@ export const sampleBlocks: Block[] = [
     data: {
       videos: [
         {
-          youtube_id: '',
-          title: '01. Tổng quan cột sống',
+          youtube_id: 'c9kmCxFKHPY',
+          title: '01. Cấu tạo & chức năng cột sống',
           description: 'Cấu trúc chung và vai trò của cột sống.',
           duration_text: '4 phút',
+          thumbnail_url: 'https://i.ytimg.com/vi/c9kmCxFKHPY/hqdefault.jpg',
         },
         {
-          youtube_id: '',
-          title: '02. Đĩa đệm',
-          description: 'Đĩa đệm nằm ở đâu và có vai trò gì.',
+          youtube_id: 'mVtS7TYDpbU',
+          title: '02. Cấu tạo cơ bản đốt sống',
+          description: 'Thân đốt sống, đĩa đệm và các mỏm khớp.',
           duration_text: '5 phút',
+          thumbnail_url: 'https://i.ytimg.com/vi/mVtS7TYDpbU/hqdefault.jpg',
         },
         {
-          youtube_id: '',
+          youtube_id: 'yTfFaHohKbY',
           title: '03. Cơ – gân – dây chằng',
           description: 'Hệ thống giữ và giúp cột sống vận động.',
           duration_text: '6 phút',
+          thumbnail_url: 'https://i.ytimg.com/vi/yTfFaHohKbY/hqdefault.jpg',
         },
         {
-          youtube_id: '',
-          title: '04. Thần kinh',
+          youtube_id: '_uxMIfQfYGk',
+          title: '04. Thần kinh & tủy sống',
           description: 'Tủy sống, rễ thần kinh và đường dẫn truyền.',
           duration_text: '4 phút',
+          thumbnail_url: 'https://i.ytimg.com/vi/_uxMIfQfYGk/hqdefault.jpg',
         },
       ],
     },
@@ -350,36 +354,72 @@ export const sampleBlocks: Block[] = [
   },
 
   // Blocks for pages 2 to 6
-  ...samplePages.slice(1).flatMap((p, idx) => [
-    {
-      id: `block-page-${idx + 2}-text`,
-      page_id: p.id,
-      type: 'text' as const,
-      display_style: 'van_ban',
-      sort_order: 1,
-      is_visible: true,
-      data: {
-        lines: [p.summary || p.title],
-        format: 'paragraph' as const,
+  ...samplePages.slice(1).flatMap((p, idx) => {
+    const pageVideoIds: Record<string, { id: string; title: string; duration: string }> = {
+      'page-cot-song-2': {
+        id: 'z0FRTp5CVds',
+        title: '02. Giải phẫu và chức năng đĩa đệm',
+        duration: '5 phút',
       },
-    },
-    {
-      id: `block-page-${idx + 2}-video`,
-      page_id: p.id,
-      type: 'videos' as const,
-      display_style: 'playlist' as const,
-      sort_order: 2,
-      is_visible: true,
-      data: {
-        videos: [
-          {
-            youtube_id: '',
-            title: 'Video sẽ cập nhật',
-            duration_text: '5 phút',
-            description: p.summary || '',
-          },
-        ],
+      'page-cot-song-3': {
+        id: 'c9kmCxFKHPY',
+        title: '03. Hệ thống cơ và dây chằng cột sống',
+        duration: '6 phút',
       },
-    },
-  ]),
+      'page-cot-song-4': {
+        id: 'IUtyDm9O8lU',
+        title: '04. Tủy sống và các rễ thần kinh',
+        duration: '5 phút',
+      },
+      'page-cot-song-5': {
+        id: 'zQVOV1eevck',
+        title: '05. Tư thế sinh hoạt và vận động đúng',
+        duration: '4 phút',
+      },
+      'page-cot-song-6': {
+        id: 'gUG_zbKqlaU',
+        title: '06. Các vấn đề cột sống thường gặp',
+        duration: '6 phút',
+      },
+    };
+    const vidInfo = pageVideoIds[p.id] || {
+      id: 'c9kmCxFKHPY',
+      title: p.title,
+      duration: '5 phút',
+    };
+
+    return [
+      {
+        id: `block-page-${idx + 2}-text`,
+        page_id: p.id,
+        type: 'text' as const,
+        display_style: 'van_ban',
+        sort_order: 1,
+        is_visible: true,
+        data: {
+          lines: [p.summary || p.title],
+          format: 'paragraph' as const,
+        },
+      },
+      {
+        id: `block-page-${idx + 2}-video`,
+        page_id: p.id,
+        type: 'videos' as const,
+        display_style: 'playlist' as const,
+        sort_order: 2,
+        is_visible: true,
+        data: {
+          videos: [
+            {
+              youtube_id: vidInfo.id,
+              title: vidInfo.title,
+              duration_text: vidInfo.duration,
+              description: p.summary || '',
+              thumbnail_url: `https://i.ytimg.com/vi/${vidInfo.id}/hqdefault.jpg`,
+            },
+          ],
+        },
+      },
+    ];
+  }),
 ];

@@ -17,13 +17,19 @@ export default function LoginPage() {
     setIsSubmitting(true);
     setErrorMsg('');
 
-    if (password === DEFAULT_ADMIN_PASSWORD || password === 'admin123') {
+    const savedPin = typeof window !== 'undefined' ? localStorage.getItem('app_admin_pin') || 'admin123' : 'admin123';
+    if (
+      password === savedPin ||
+      password === DEFAULT_ADMIN_PASSWORD ||
+      password === 'admin123' ||
+      password === '1234'
+    ) {
       setAdminClient(true);
       // Chuyển hướng về trang nội dung để trải nghiệm chế độ sửa
       router.push('/cot-song/tong-quan-ve-cot-song');
       router.refresh();
     } else {
-      setErrorMsg('Mật khẩu không đúng. Vui lòng nhập lại (Mật khẩu mặc định: admin123).');
+      setErrorMsg('Mật khẩu không đúng. Vui lòng nhập lại (Mật khẩu mặc định: admin123 hoặc 1234).');
       setIsSubmitting(false);
     }
   };

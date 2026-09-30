@@ -12,6 +12,7 @@ import {
   Check,
   Trash2,
   Edit2,
+  Sparkles,
 } from 'lucide-react';
 import { Video } from '../../lib/types';
 import { extractYouTubeId, fetchYouTubeMeta } from '../../lib/youtube';
@@ -23,6 +24,39 @@ interface VideoManagerModalProps {
   videos: Video[];
   onSaveVideos: (newVideos: Video[]) => void;
 }
+
+const SAMPLE_PRESET_VIDEOS = [
+  {
+    title: 'Cấu tạo & chức năng cột sống',
+    url: 'https://www.youtube.com/watch?v=c9kmCxFKHPY',
+    id: 'c9kmCxFKHPY',
+    duration: '4 phút',
+  },
+  {
+    title: 'Cấu tạo cơ bản của đốt sống',
+    url: 'https://www.youtube.com/watch?v=mVtS7TYDpbU',
+    id: 'mVtS7TYDpbU',
+    duration: '5 phút',
+  },
+  {
+    title: 'Cơ và dây chằng cột sống',
+    url: 'https://www.youtube.com/watch?v=yTfFaHohKbY',
+    id: 'yTfFaHohKbY',
+    duration: '6 phút',
+  },
+  {
+    title: 'Giải phẫu tủy sống & thần kinh',
+    url: 'https://www.youtube.com/watch?v=_uxMIfQfYGk',
+    id: '_uxMIfQfYGk',
+    duration: '4 phút',
+  },
+  {
+    title: 'Giải phẫu & chức năng đĩa đệm',
+    url: 'https://www.youtube.com/watch?v=z0FRTp5CVds',
+    id: 'z0FRTp5CVds',
+    duration: '5 phút',
+  },
+];
 
 export default function VideoManagerModal({
   isOpen,
@@ -67,8 +101,13 @@ export default function VideoManagerModal({
 
   // Xóa video
   const handleDelete = (index: number) => {
+    if (!confirm('Bạn có chắc muốn xóa video này khỏi danh sách?')) return;
     const updated = videoList.filter((_, i) => i !== index);
     setVideoList(updated);
+    if (editingIndex === index) {
+      setEditingIndex(null);
+      setAddMode('none');
+    }
   };
 
   // Bắt đầu sửa video
@@ -87,35 +126,61 @@ export default function VideoManagerModal({
   const handleFetchYoutube = async () => {
     const yid = extractYouTubeId(inputUrl);
     if (!yid) {
-      alert('Đường dẫn YouTube không hợp lệ. Vui lòng dán link dạng youtube.com/watch?v=... hoặc youtu.be/...');
+      alert('Đường dẫn YouTube không hợp lệ. Vui lòng dán link dạng youtube.com/watch?v=... hoặc youtu.be/... hoặc ID 11 ký tự');
       return;
     }
     setIsLoadingMeta(true);
     setFetchSuccessMsg('');
     const meta = await fetchYouTubeMeta(yid);
-    setInputTitle(meta.title);
+    if (!inputTitle.trim()) {
+      setInputTitle(meta.title);
+    }
     setInputThumb(meta.thumbnail_url);
     if (!inputDuration) {
       setInputDuration('5 phút');
     }
     setIsLoadingMeta(false);
-    setFetchSuccessMsg('Đã tự động lấy tiêu đề và ảnh bìa từ YouTube!');
+    setFetchSuccessMsg('Đã nhận diện video thành công!');
+  };
+
+  // Chọn mẫu video có sẵn để test nhanh
+  const handleApplyPreset = (preset: typeof SAMPLE_PRESET_VIDEOS[0]) => {
+    setInputUrl(preset.url);
+    setInputTitle(preset.title);
+    setInputDuration(preset.duration);
+    setInputThumb(`https://i.ytimg.com/vi/${preset.id}/hqdefault.jpg`);
+    setFetchSuccessMsg(`Đã chọn mẫu: ${preset.title}`);
   };
 
   // Lưu video mới hoặc cập nhật video
-  const handleSaveVideoItem = () => {
-    if (!inputTitle.trim()) {
-      alert('Vui lòng nhập tên video');
+  const handleSaveVideoItem = async () => {
+    const yid = extractYouTubeId(inputUrl) || '';
+    let finalTitle = inputTitle.trim();
+    let finalThumb = inputThumb.trim();
+
+    if (!finalTitle && yid) {
+      setIsLoadingMeta(true);
+      const meta = await fetchYouTubeMeta(yid);
+      finalTitle = meta.title;
+      finalThumb = meta.thumbnail_url;
+      setIsLoadingMeta(false);
+    }
+
+    if (!finalTitle && !yid) {
+      alert('Vui lòng dán đường dẫn YouTube hoặc nhập tiêu đề video.');
       return;
     }
 
-    const yid = extractYouTubeId(inputUrl) || '';
+    if (!finalTitle) {
+      finalTitle = `Video bài học (${yid || 'Mới'})`;
+    }
+
     const newVideoItem: Video = {
       youtube_id: yid,
-      title: inputTitle.trim(),
-      duration_text: inputDuration.trim() || '4 phút',
+      title: finalTitle,
+      duration_text: inputDuration.trim() || '5 phút',
       description: inputDescription.trim() || undefined,
-      thumbnail_url: inputThumb || (yid ? `https://i.ytimg.com/vi/${yid}/hqdefault.jpg` : undefined),
+      thumbnail_url: finalThumb || (yid ? `https://i.ytimg.com/vi/${yid}/hqdefault.jpg` : undefined),
     };
 
     if (editingIndex !== null) {
@@ -142,9 +207,11 @@ export default function VideoManagerModal({
     onClose();
   };
 
+  const currentExtractedId = extractYouTubeId(inputUrl);
+
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-xs p-0 sm:p-4">
-      <div className="w-full max-w-[480px] max-h-[90vh] bg-white rounded-t-[28px] sm:rounded-[28px] flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-300">
+      <div className="w-full max-w-[480px] max-h-[92vh] bg-white rounded-t-[28px] sm:rounded-[28px] flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-300">
         {/* Nút kéo trên mobile */}
         <div className="w-12 h-1.5 bg-line-strong rounded-full mx-auto mt-3 mb-1 sm:hidden" />
 
@@ -152,10 +219,10 @@ export default function VideoManagerModal({
         <div className="flex items-start justify-between p-5 pb-3 border-b border-line">
           <div className="flex flex-col gap-1">
             <h3 className="text-[22px] font-extrabold text-ink leading-tight">
-              Danh sách video
+              Quản lý danh sách video
             </h3>
             <p className="text-[14px] text-muted leading-tight">
-              {videoList.length} video · 1 trang có thể chứa từ 1 đến nhiều video · bấm ▲ ▼ để đổi thứ tự
+              {videoList.length} video · Bấm ▲ ▼ đổi thứ tự · Sửa link YouTube để phát thật
             </p>
           </div>
           <button
@@ -169,110 +236,124 @@ export default function VideoManagerModal({
         </div>
 
         {/* Danh sách video cuộn */}
-        <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-3">
-          {videoList.map((vid, idx) => (
-            <div
-              key={idx}
-              className="flex flex-col gap-2 p-3.5 rounded-[20px] bg-white border border-line shadow-xs"
-            >
-              <div className="flex items-start gap-3">
-                {/* Thumbnail */}
-                <div className="relative w-[100px] h-[64px] rounded-[12px] bg-[#1C2735] overflow-hidden shrink-0 flex items-center justify-center">
-                  {vid.thumbnail_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={vid.thumbnail_url}
-                      alt={vid.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center w-full h-full text-white/50">
-                      <SpineIllustration className="w-8 h-8 opacity-40" />
-                    </div>
-                  )}
-                  <span className="absolute bottom-1 right-1 bg-black/70 text-white text-[12px] font-bold px-1.5 py-0.5 rounded-sm">
-                    {vid.duration_text || '04:00'}
-                  </span>
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 flex flex-col gap-3">
+          {videoList.map((vid, idx) => {
+            const thumbUrl =
+              vid.thumbnail_url ||
+              (vid.youtube_id ? `https://i.ytimg.com/vi/${vid.youtube_id}/hqdefault.jpg` : null);
+
+            return (
+              <div
+                key={idx}
+                className="flex flex-col gap-2 p-3.5 rounded-[20px] bg-white border border-line shadow-xs"
+              >
+                <div className="flex items-start gap-3">
+                  {/* Thumbnail */}
+                  <div className="relative w-[100px] h-[64px] rounded-[12px] bg-[#1C2735] overflow-hidden shrink-0 flex items-center justify-center">
+                    {thumbUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={thumbUrl}
+                        alt={vid.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center w-full h-full text-white/50">
+                        <SpineIllustration className="w-8 h-8 opacity-40" />
+                      </div>
+                    )}
+                    <span className="absolute bottom-1 right-1 bg-black/75 text-white text-[11px] font-bold px-1.5 py-0.5 rounded-sm">
+                      {vid.duration_text || '05:00'}
+                    </span>
+                  </div>
+
+                  {/* Thông tin */}
+                  <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                    <h4 className="text-[17px] font-bold text-ink leading-snug truncate">
+                      {vid.title}
+                    </h4>
+                    {vid.youtube_id ? (
+                      <span className="text-[12px] font-mono text-primary font-bold">
+                        YouTube: {vid.youtube_id}
+                      </span>
+                    ) : (
+                      <span className="text-[12px] text-red-500 font-medium">
+                        Chưa có link video
+                      </span>
+                    )}
+                    {vid.description && (
+                      <p className="text-[13px] text-muted truncate">
+                        {vid.description}
+                      </p>
+                    )}
+                  </div>
                 </div>
 
-                {/* Thông tin */}
-                <div className="flex-1 min-w-0 flex flex-col gap-0.5">
-                  <h4 className="text-[17px] font-bold text-ink leading-snug truncate">
-                    {vid.title}
-                  </h4>
-                  <span className="text-[14px] text-muted">
-                    {vid.duration_text || '4 phút'} · {vid.youtube_id ? 'YouTube' : 'Tập tin'}
-                  </span>
-                  {vid.description && (
-                    <p className="text-[13px] text-muted line-clamp-1">
-                      {vid.description}
-                    </p>
-                  )}
+                {/* Các nút thao tác */}
+                <div className="flex items-center justify-between pt-2 border-t border-line/60">
+                  <div className="flex items-center gap-1.5">
+                    {/* Di chuyển lên */}
+                    <button
+                      type="button"
+                      disabled={idx === 0}
+                      onClick={() => handleMoveUp(idx)}
+                      className="w-8 h-8 rounded-[8px] bg-surface-2 flex items-center justify-center text-ink disabled:opacity-30 border border-line"
+                      aria-label="Di chuyển lên"
+                      title="Di chuyển lên"
+                    >
+                      <ChevronUp size={16} />
+                    </button>
+
+                    {/* Di chuyển xuống */}
+                    <button
+                      type="button"
+                      disabled={idx === videoList.length - 1}
+                      onClick={() => handleMoveDown(idx)}
+                      className="w-8 h-8 rounded-[8px] bg-surface-2 flex items-center justify-center text-ink disabled:opacity-30 border border-line"
+                      aria-label="Di chuyển xuống"
+                      title="Di chuyển xuống"
+                    >
+                      <ChevronDown size={16} />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {/* Nút sửa */}
+                    <button
+                      type="button"
+                      onClick={() => handleStartEdit(idx)}
+                      className="flex items-center gap-1 h-8 px-2.5 rounded-[8px] bg-surface-2 text-ink text-[13px] font-bold border border-line hover:border-primary"
+                    >
+                      <Edit2 size={13} className="text-primary" />
+                      <span>Sửa</span>
+                    </button>
+
+                    {/* Nút xóa */}
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(idx)}
+                      className="flex items-center gap-1 h-8 px-2.5 rounded-[8px] bg-red-50 text-red-600 text-[13px] font-bold border border-red-200 hover:bg-red-100"
+                    >
+                      <Trash2 size={13} />
+                      <span>Xóa</span>
+                    </button>
+                  </div>
                 </div>
               </div>
-
-              {/* Các nút hành động: ▲, ▼, Sửa, Xóa */}
-              <div className="flex items-center justify-between pt-2 border-t border-line/60">
-                <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => handleMoveUp(idx)}
-                    disabled={idx === 0}
-                    className="w-9 h-9 rounded-[10px] bg-surface-2 flex items-center justify-center text-ink disabled:opacity-30 transition-transform active:scale-90"
-                    aria-label="Di chuyển lên"
-                  >
-                    <ChevronUp size={20} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleMoveDown(idx)}
-                    disabled={idx === videoList.length - 1}
-                    className="w-9 h-9 rounded-[10px] bg-surface-2 flex items-center justify-center text-ink disabled:opacity-30 transition-transform active:scale-90"
-                    aria-label="Di chuyển xuống"
-                  >
-                    <ChevronDown size={20} />
-                  </button>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleStartEdit(idx)}
-                    className="flex items-center gap-1 h-9 px-3 rounded-[10px] bg-surface-2 text-ink text-[14px] font-bold hover:bg-line transition-colors"
-                  >
-                    <Edit2 size={14} />
-                    <span>Sửa</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(idx)}
-                    className="flex items-center gap-1 h-9 px-3 rounded-[10px] bg-[#FBE7E1] text-[#7A2F12] text-[14px] font-bold hover:bg-[#F2B38A]/40 transition-colors"
-                  >
-                    <Trash2 size={14} />
-                    <span>Xóa</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
 
           {/* Khung + Thêm video */}
           <div className="flex flex-col gap-3 p-4 rounded-[22px] border-2 border-dashed border-primary/40 bg-primary-soft/20 mt-1">
-            <div className="flex items-center gap-2 text-primary font-bold text-[16px]">
-              <Plus size={20} strokeWidth={2.5} />
-              <span>Thêm video mới</span>
+            <div className="flex items-center justify-between text-primary font-bold text-[16px]">
+              <div className="flex items-center gap-2">
+                <Plus size={20} strokeWidth={2.5} />
+                <span>{editingIndex !== null ? 'Chỉnh sửa video đã chọn' : 'Thêm video mới'}</span>
+              </div>
             </div>
 
             {addMode === 'none' ? (
               <div className="grid grid-cols-2 gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setAddMode('upload')}
-                  className="flex items-center justify-center gap-2 h-[48px] rounded-[14px] bg-white border border-line text-ink font-bold text-[15px] hover:border-primary transition-all shadow-xs"
-                >
-                  <Upload size={18} className="text-primary" />
-                  <span>Tải file lên</span>
-                </button>
                 <button
                   type="button"
                   onClick={() => setAddMode('youtube')}
@@ -281,39 +362,80 @@ export default function VideoManagerModal({
                   <LinkIcon size={18} className="text-primary" />
                   <span>Dán link YouTube</span>
                 </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleApplyPreset(SAMPLE_PRESET_VIDEOS[0]);
+                    setAddMode('youtube');
+                  }}
+                  className="flex items-center justify-center gap-2 h-[48px] rounded-[14px] bg-white border border-line text-primary font-bold text-[15px] hover:border-primary transition-all shadow-xs"
+                >
+                  <Sparkles size={18} />
+                  <span>Dùng video mẫu</span>
+                </button>
               </div>
             ) : (
               /* Form nhập video */
               <div className="flex flex-col gap-3 bg-white p-4 rounded-[18px] border border-line shadow-xs">
-                {addMode === 'youtube' && (
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[14px] font-bold text-ink">
-                      Đường dẫn YouTube
-                    </label>
-                    <div className="flex gap-2">
-                      <input
-                        type="url"
-                        value={inputUrl}
-                        onChange={(e) => setInputUrl(e.target.value)}
-                        placeholder="https://www.youtube.com/watch?v=..."
-                        className="flex-1 h-[44px] px-3 rounded-[12px] border border-line text-[15px] text-ink focus:outline-hidden focus:border-primary"
-                      />
+                {/* Gợi ý mẫu nhanh */}
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-[12px] font-extrabold uppercase text-muted tracking-wider">
+                    Gợi ý video mẫu sẵn có (Bấm để điền nhanh):
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {SAMPLE_PRESET_VIDEOS.map((preset, pIdx) => (
                       <button
+                        key={pIdx}
                         type="button"
-                        onClick={handleFetchYoutube}
-                        disabled={isLoadingMeta || !inputUrl}
-                        className="h-[44px] px-3 rounded-[12px] bg-primary text-white font-bold text-[14px] shrink-0 disabled:opacity-50"
+                        onClick={() => handleApplyPreset(preset)}
+                        className="text-[12px] font-bold px-2.5 py-1 rounded-full bg-surface-2 text-ink border border-line hover:border-primary hover:text-primary transition-all"
                       >
-                        {isLoadingMeta ? 'Đang tải...' : 'Lấy thông tin'}
+                        {preset.title}
                       </button>
-                    </div>
-                    {fetchSuccessMsg && (
-                      <span className="text-[13px] text-primary font-semibold">
-                        ✓ {fetchSuccessMsg}
-                      </span>
-                    )}
+                    ))}
                   </div>
-                )}
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[14px] font-bold text-ink">
+                    Đường dẫn YouTube hoặc YouTube ID
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="url"
+                      value={inputUrl}
+                      onChange={(e) => setInputUrl(e.target.value)}
+                      placeholder="https://www.youtube.com/watch?v=... hoặc c9kmCxFKHPY"
+                      className="flex-1 h-[44px] px-3 rounded-[12px] border border-line text-[15px] text-ink focus:outline-hidden focus:border-primary"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleFetchYoutube}
+                      disabled={isLoadingMeta || !inputUrl}
+                      className="h-[44px] px-3.5 rounded-[12px] bg-primary text-white font-bold text-[13px] shrink-0 disabled:opacity-50"
+                    >
+                      {isLoadingMeta ? 'Đang lấy...' : 'Lấy thông tin'}
+                    </button>
+                  </div>
+                  {currentExtractedId && (
+                    <div className="flex items-center gap-2 mt-1">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={`https://i.ytimg.com/vi/${currentExtractedId}/hqdefault.jpg`}
+                        alt="Preview"
+                        className="w-16 h-10 object-cover rounded-[6px] border border-line"
+                      />
+                      <span className="text-[12px] text-primary font-bold">
+                        Đã nhận ID: {currentExtractedId}
+                      </span>
+                    </div>
+                  )}
+                  {fetchSuccessMsg && (
+                    <span className="text-[13px] text-primary font-semibold">
+                      ✓ {fetchSuccessMsg}
+                    </span>
+                  )}
+                </div>
 
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[14px] font-bold text-ink">
@@ -323,7 +445,7 @@ export default function VideoManagerModal({
                     type="text"
                     value={inputTitle}
                     onChange={(e) => setInputTitle(e.target.value)}
-                    placeholder="Ví dụ: 05. Thoát vị đĩa đệm"
+                    placeholder="Ví dụ: 01. Cấu tạo cột sống"
                     className="w-full h-[44px] px-3 rounded-[12px] border border-line text-[15px] text-ink focus:outline-hidden focus:border-primary"
                   />
                 </div>
@@ -372,7 +494,7 @@ export default function VideoManagerModal({
                     onClick={handleSaveVideoItem}
                     className="h-10 px-5 rounded-[12px] bg-primary text-white text-[14px] font-bold shadow-xs"
                   >
-                    {editingIndex !== null ? 'Cập nhật' : 'Thêm vào danh sách'}
+                    {editingIndex !== null ? 'Cập nhật video' : 'Thêm vào danh sách'}
                   </button>
                 </div>
               </div>
@@ -387,7 +509,7 @@ export default function VideoManagerModal({
             onClick={handleFinish}
             className="flex items-center justify-center h-[56px] min-h-[48px] w-full rounded-[16px] bg-primary text-white font-extrabold text-[19px] transition-transform active:scale-[0.98] shadow-sm"
           >
-            Xong
+            Xong và lưu danh sách
           </button>
         </div>
       </div>

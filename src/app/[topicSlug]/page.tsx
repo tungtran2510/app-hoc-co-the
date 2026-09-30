@@ -2,7 +2,6 @@ import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
-  ChevronLeft,
   BookOpen,
   PlaySquare,
   Clock,
@@ -15,6 +14,7 @@ import {
   getBlocksByPage,
   getContinue,
 } from '../../lib/data';
+import TopicHeaderNav from '../../components/TopicHeaderNav';
 import PageCard from '../../components/PageCard';
 import SpineIllustration from '../../components/SpineIllustration';
 import BottomNav from '../../components/BottomNav';
@@ -90,18 +90,8 @@ export default async function TopicPage({ params }: TopicPageProps) {
 
   return (
     <main className="flex-1 flex flex-col px-5 pt-3 pb-28 gap-5">
-      {/* 1. Nút quay lại: ‹ Trang chủ */}
-      <nav aria-label="Đường dẫn quay lại">
-        <Link
-          href="/"
-          prefetch={true}
-          className="inline-flex items-center gap-1 h-[48px] min-h-[48px] text-primary text-[17px] font-bold transition-opacity active:opacity-75"
-          aria-label="Quay lại Trang chủ"
-        >
-          <ChevronLeft size={24} strokeWidth={2.5} />
-          <span>Trang chủ</span>
-        </Link>
-      </nav>
+      {/* 1. Nút quay lại: ‹ Trang chủ và Lối tắt Quản trị */}
+      <TopicHeaderNav />
 
       {/* 2. Khối ảnh lớn (cover) */}
       <section className="relative w-full h-[220px] rounded-[24px] overflow-hidden p-5 flex flex-col justify-end shadow-xs" style={{ backgroundColor: topic.color_bg }}>

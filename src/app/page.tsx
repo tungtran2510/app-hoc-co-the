@@ -1,10 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
-import { BookOpen, Search, User } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { getSettings, getTopics, getPagesByTopic, getContinue } from '../lib/data';
 import ContinueCard from '../components/ContinueCard';
 import TopicCard from '../components/TopicCard';
 import BottomNav from '../components/BottomNav';
+import HomeHeader from '../components/HomeHeader';
 
 export default async function HomePage() {
   const [settings, topics, continueInfo] = await Promise.all([
@@ -30,27 +31,8 @@ export default async function HomePage() {
 
   return (
     <main className="flex-1 flex flex-col px-5 pt-4 pb-28 gap-6">
-      {/* 1. Thanh đầu trang: Logo + Tên App + Nút đại diện người dùng dẫn đến /dang-nhap */}
-      <header className="flex items-center justify-between h-[52px]">
-        <div className="flex items-center gap-2.5">
-          <div className="w-10 h-10 rounded-[12px] bg-primary flex items-center justify-center text-white shadow-xs">
-            <BookOpen size={22} strokeWidth={2.5} />
-          </div>
-          <span className="text-[20px] font-extrabold text-ink leading-tight">
-            {settings.app_name}
-          </span>
-        </div>
-
-        {/* Nút cá nhân / quản trị */}
-        <Link
-          href="/dang-nhap"
-          className="w-10 h-10 rounded-full bg-white border border-line flex items-center justify-center text-muted hover:text-primary transition-colors"
-          aria-label="Đăng nhập quản trị"
-          title="Đăng nhập quản trị"
-        >
-          <User size={20} />
-        </Link>
-      </header>
+      {/* 1. Thanh đầu trang: Logo + Tên App + Quản trị */}
+      <HomeHeader initialAppName={settings.app_name} />
 
       {/* 2. Lời chào */}
       <section className="flex flex-col gap-1">
