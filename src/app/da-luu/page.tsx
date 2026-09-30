@@ -2,15 +2,25 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, Bookmark, Trash2, ChevronRight, BookOpen } from 'lucide-react';
+import { ChevronLeft, Bookmark, Trash2, ChevronRight, BookOpen, Smartphone } from 'lucide-react';
 import { getSavedPages, SavedPageInfo, toggleSavePage } from '../../lib/learningProgress';
 import { getUserPhone, syncUserProgress, LEARNING_PROGRESS_EVENT } from '../../lib/userSync';
-import UserSyncCard from '../../components/UserSyncCard';
+import UserSyncModal from '../../components/UserSyncModal';
 import BottomNav from '../../components/BottomNav';
 
 export default function SavedPages() {
   const [savedList, setSavedList] = useState<SavedPageInfo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showPhoneSync, setShowPhoneSync] = useState(false);
+  const [userPhone, setUserPhone] = useState<string | null>(null);
+
+  const formatPhone = (p: string) => {
+    const clean = p.replace(/[^0-9]/g, '');
+    if (clean.length === 10) {
+      return `${clean.slice(0, 4)} ${clean.slice(4, 7)} ${clean.slice(7)}`;
+    }
+    return clean;
+  };
 
   const refreshList = () => {
     try {
@@ -27,6 +37,7 @@ export default function SavedPages() {
 
     // Nếu đã có số điện thoại lưu từ trước, tự động tải mới từ máy chủ
     const phone = getUserPhone();
+    setUserPhone(phone);
     if (phone) {
       syncUserProgress(phone, 'sync').then((res) => {
         if (res.success) {
@@ -37,6 +48,7 @@ export default function SavedPages() {
 
     const handleUpdate = () => {
       refreshList();
+      setUserPhone(getUserPhone());
     };
 
     window.addEventListener(LEARNING_PROGRESS_EVENT, handleUpdate);
@@ -66,9 +78,23 @@ export default function SavedPages() {
           <ChevronLeft size={24} strokeWidth={2.5} />
           <span>Trang chủ</span>
         </Link>
-        <div className="flex items-center gap-1.5">
-          <Bookmark size={20} className="text-primary fill-primary" />
-          <span className="text-[17px] font-extrabold text-ink">Đã lưu</span>
+        <div className="flex items-center gap-2">
+          {/* Nút nhỏ đồng bộ SĐT ở góc trên đầu */}
+          <button
+            type="button"
+            onClick={() => setShowPhoneSync(true)}
+            className="flex items-center gap-1.5 h-8 px-2.5 rounded-[10px] bg-white border border-line text-muted hover:text-primary text-[12px] font-bold shadow-2xs cursor-pointer active:scale-95 transition-all"
+            title="Lưu & Đồng bộ qua Số điện thoại"
+          >
+            <Smartphone size={14} />
+            <span>{userPhone ? formatPhone(userPhone) : 'Đồng bộ SĐT'}</span>
+            {userPhone && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />}
+          </button>
+
+          <div className="flex items-center gap-1.5 ml-1">
+            <Bookmark size={20} className="text-primary fill-primary" />
+            <span className="text-[17px] font-extrabold text-ink">Đã lưu</span>
+          </div>
         </div>
       </header>
 
@@ -83,9 +109,6 @@ export default function SavedPages() {
             : 'Lưu các bài học quan trọng để mở xem lại nhanh'}
         </p>
       </section>
-
-      {/* 2.5. Khối đồng bộ & lưu tiến độ theo số điện thoại */}
-      <UserSyncCard onSyncSuccess={refreshList} />
 
       {/* 3. Danh sách bài đã lưu */}
       {isLoading ? (
@@ -162,6 +185,14 @@ export default function SavedPages() {
 
       {/* 4. Thanh điều hướng dưới cùng */}
       <BottomNav />
+
+      {/* 5. Modal Lưu tiến độ & Đồng bộ qua SĐT */}
+      <UserSyncModal
+        isOpen={showPhoneSync}
+        onClose={() => setShowPhoneSync(false)}
+        reason="manual"
+        onSuccess={refreshList}
+      />
     </main>
   );
 }

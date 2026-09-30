@@ -19,6 +19,8 @@ import { getStoredAppSettings } from '../lib/storage';
 import AdminSettingsModal from './admin/AdminSettingsModal';
 import EditAppModal from './admin/EditAppModal';
 import PwaInstallModal from './PwaInstallModal';
+import UserSyncModal from './UserSyncModal';
+import { getUserPhone, LEARNING_PROGRESS_EVENT } from '../lib/userSync';
 
 interface HomeHeaderProps {
   initialAppName: string;
@@ -32,6 +34,8 @@ export default function HomeHeader({ initialAppName }: HomeHeaderProps) {
   const [showSettings, setShowSettings] = useState(false);
   const [showEditApp, setShowEditApp] = useState(false);
   const [showPwaInstall, setShowPwaInstall] = useState(false);
+  const [showPhoneSync, setShowPhoneSync] = useState(false);
+  const [userPhone, setUserPhone] = useState<string | null>(null);
   const [showMenu, setShowMenu] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -44,6 +48,18 @@ export default function HomeHeader({ initialAppName }: HomeHeaderProps) {
     if (stored.app_name) {
       setAppName(stored.app_name);
     }
+    const p = getUserPhone();
+    setUserPhone(p);
+
+    const handleUpdate = () => {
+      setUserPhone(getUserPhone());
+    };
+    window.addEventListener(LEARNING_PROGRESS_EVENT, handleUpdate);
+    window.addEventListener('learning_progress_changed', handleUpdate);
+    return () => {
+      window.removeEventListener(LEARNING_PROGRESS_EVENT, handleUpdate);
+      window.removeEventListener('learning_progress_changed', handleUpdate);
+    };
   }, []);
 
   const handleBackup = async () => {
@@ -159,12 +175,27 @@ export default function HomeHeader({ initialAppName }: HomeHeaderProps) {
           </div>
         </div>
 
-        {/* Nút ⋮ Tùy chọn trang chủ */}
-        <div className="flex items-center gap-2">
+        {/* Các nút tùy chọn ở trên đầu */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Nút icon đồng bộ SĐT bé ở trên đầu */}
+          <button
+            type="button"
+            onClick={() => setShowPhoneSync(true)}
+            className="w-10 h-10 min-w-[40px] rounded-full bg-white border border-line flex items-center justify-center text-muted hover:text-primary transition-colors shadow-2xs cursor-pointer relative"
+            title={userPhone ? `Đang đồng bộ SĐT: ${userPhone}` : 'Lưu tiến độ qua Số điện thoại'}
+            aria-label="Lưu tiến độ qua Số điện thoại"
+          >
+            <Smartphone size={18} />
+            {userPhone && (
+              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-500 ring-1 ring-white" />
+            )}
+          </button>
+
+          {/* Nút ⋮ Tùy chọn trang chủ */}
           <button
             type="button"
             onClick={() => setShowMenu(!showMenu)}
-            className="w-10 h-10 min-w-[48px] rounded-full bg-white border border-line flex items-center justify-center text-ink hover:text-primary transition-colors shadow-2xs cursor-pointer"
+            className="w-10 h-10 min-w-[40px] rounded-full bg-white border border-line flex items-center justify-center text-ink hover:text-primary transition-colors shadow-2xs cursor-pointer"
             aria-label="Tùy chọn trang chủ"
           >
             <MoreVertical size={20} />
@@ -174,6 +205,18 @@ export default function HomeHeader({ initialAppName }: HomeHeaderProps) {
         {/* Dropdown Menu ⋮ Trang chủ */}
         {showMenu && (
           <div className="absolute top-[58px] right-0 w-[240px] bg-white rounded-[20px] border border-line shadow-xl p-2 flex flex-col gap-1 z-50 animate-in fade-in duration-150">
+            <button
+              type="button"
+              onClick={() => {
+                setShowMenu(false);
+                setShowPhoneSync(true);
+              }}
+              className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-ink hover:bg-surface-2 cursor-pointer"
+            >
+              <Smartphone size={16} className="text-primary" />
+              <span>{userPhone ? 'Quản lý số điện thoại' : 'Lưu tiến độ qua SĐT'}</span>
+            </button>
+
             <button
               type="button"
               onClick={() => {
@@ -320,6 +363,14 @@ export default function HomeHeader({ initialAppName }: HomeHeaderProps) {
           onClose={() => setShowPwaInstall(false)}
         />
       )}
+
+      {/* Modal Lưu tiến độ & Đồng bộ qua SĐT */}
+      <UserSyncModal
+        isOpen={showPhoneSync}
+        onClose={() => setShowPhoneSync(false)}
+        reason="manual"
+        onSuccess={() => setUserPhone(getUserPhone())}
+      />
     </>
   );
 }

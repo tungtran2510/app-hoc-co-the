@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, Menu, MoreVertical, X, Lock, Check, Settings as SettingsIcon, Share2, Bookmark, Sun, Moon, Eye } from 'lucide-react';
+import { ChevronLeft, Menu, MoreVertical, X, Lock, Check, Settings as SettingsIcon, Share2, Bookmark, Sun, Moon, Eye, Smartphone } from 'lucide-react';
 
 export interface TocItem {
   id: string;
@@ -26,6 +26,7 @@ interface PageHeaderBarProps {
   onToggleSave?: () => void;
   themeMode?: ThemeModeOption;
   onThemeChange?: (mode: ThemeModeOption) => void;
+  onOpenPhoneSync?: () => void;
 }
 
 export default function PageHeaderBar({
@@ -42,6 +43,7 @@ export default function PageHeaderBar({
   onToggleSave,
   themeMode = 'light',
   onThemeChange,
+  onOpenPhoneSync,
 }: PageHeaderBarProps) {
   const [showToc, setShowToc] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
@@ -280,6 +282,20 @@ export default function PageHeaderBar({
               <Share2 size={16} className="text-primary" />
               <span>Chia sẻ trang này</span>
             </button>
+
+            {onOpenPhoneSync && (
+              <button
+                type="button"
+                onClick={() => {
+                  setShowOptions(false);
+                  onOpenPhoneSync();
+                }}
+                className="flex items-center justify-center gap-2 h-[44px] rounded-[12px] bg-white border border-line-strong text-ink font-bold text-[14px] shadow-2xs hover:bg-surface-2 transition-all cursor-pointer"
+              >
+                <Smartphone size={16} className="text-primary" />
+                <span>Lưu tiến độ qua SĐT</span>
+              </button>
+            )}
           </div>
 
           {/* Quản trị nội dung */}

@@ -44,6 +44,8 @@ import {
   isPageCompleted,
   togglePageCompleted,
 } from '../lib/learningProgress';
+import { getUserPhone } from '../lib/userSync';
+import UserSyncModal from './UserSyncModal';
 import { Settings as SettingsIcon } from 'lucide-react';
 
 interface ContentViewerProps {
@@ -131,6 +133,8 @@ export default function ContentViewer({
   const [isCompleted, setIsCompleted] = useState(false);
   const [themeMode, setThemeMode] = useState<ThemeModeOption>('light');
   const [consultSettings, setConsultSettings] = useState<{ zalo_url?: string; hotline?: string } | null>(null);
+  const [showPhoneSyncModal, setShowPhoneSyncModal] = useState(false);
+  const [phoneSyncReason, setPhoneSyncReason] = useState<'bookmark' | 'manual'>('bookmark');
 
   const handleToggleBookmark = () => {
     const newState = toggleSavePage({
@@ -145,6 +149,12 @@ export default function ContentViewer({
     setIsSaved(newState);
     setShareNoticeMsg(newState ? 'Đã lưu bài học vào mục Đã lưu' : 'Đã bỏ lưu bài học');
     setTimeout(() => setShareNoticeMsg(''), 2500);
+
+    // Chỉ nhảy ra khi họ ấn lưu và chưa có số điện thoại
+    if (newState && !getUserPhone()) {
+      setPhoneSyncReason('bookmark');
+      setShowPhoneSyncModal(true);
+    }
   };
 
   const handleToggleCompleted = () => {
@@ -399,6 +409,10 @@ export default function ContentViewer({
         onToggleSave={handleToggleBookmark}
         themeMode={themeMode}
         onThemeChange={handleThemeChange}
+        onOpenPhoneSync={() => {
+          setPhoneSyncReason('manual');
+          setShowPhoneSyncModal(true);
+        }}
       />
 
       {/* 3. Phần đầu bài viết: Dòng nhỏ CỘT SỐNG · 01 + Tiêu đề lớn */}
@@ -842,6 +856,13 @@ export default function ContentViewer({
           onLogout={() => setIsAdmin(false)}
         />
       )}
+
+      {/* Modal Lưu tiến độ & Đồng bộ qua SĐT */}
+      <UserSyncModal
+        isOpen={showPhoneSyncModal}
+        onClose={() => setShowPhoneSyncModal(false)}
+        reason={phoneSyncReason}
+      />
     </main>
   );
 }
