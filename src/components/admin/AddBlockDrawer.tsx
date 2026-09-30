@@ -19,6 +19,7 @@ import {
   Columns2,
 } from 'lucide-react';
 import { Block } from '../../lib/types';
+import { generateUuid } from '../../lib/uuid';
 
 interface AddBlockDrawerProps {
   isOpen: boolean;
@@ -38,7 +39,7 @@ export default function AddBlockDrawer({
   if (!isOpen) return null;
 
   const createAndAdd = (type: Block['type'], displayStyle: string) => {
-    const id = `block-custom-${Date.now()}`;
+    const id = generateUuid();
     let newBlock: Block;
 
     if (type === 'text') {

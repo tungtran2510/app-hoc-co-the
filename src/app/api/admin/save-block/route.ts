@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkIsAdminRequest } from '../../../../lib/authServer';
 import { getSupabaseServer } from '../../../../lib/supabaseServer';
+import { generateUuid, isValidUuid } from '../../../../lib/uuid';
 
 export async function POST(req: NextRequest) {
   if (!checkIsAdminRequest(req)) {
@@ -14,26 +15,44 @@ export async function POST(req: NextRequest) {
 
   try {
     const { block } = await req.json();
-    if (!block || !block.page_id) {
-      return NextResponse.json({ error: 'Dữ liệu khối không hợp lệ' }, { status: 400 });
+    if (!block || typeof block !== 'object' || !block.page_id) {
+      return NextResponse.json({ error: 'Dữ liệu khối không hợp lệ (thiếu page_id)' }, { status: 400 });
     }
 
-    const { error } = await supabase.from('blocks').upsert(
-      {
-        id: block.id,
-        workspace_id: block.workspace_id || 'default',
-        page_id: block.page_id,
-        type: block.type,
-        display_style: block.display_style,
-        data: block.data || {},
-        sort_order: block.sort_order ?? 0,
-        is_visible: block.is_visible ?? true,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'id' }
-    );
+    // 1. Chuẩn hóa page_id (bắt buộc phải là UUID hợp lệ trỏ tới bảng pages)
+    let resolvedPageId = String(block.page_id).trim();
+    if (!isValidUuid(resolvedPageId)) {
+      const { data: pageData } = await supabase.from('pages').select('id').or(`id.eq.${resolvedPageId},slug.eq.${resolvedPageId}`).maybeSingle();
+      if (!pageData) {
+        return NextResponse.json({ error: `Không tìm thấy trang tương ứng (${resolvedPageId})` }, { status: 400 });
+      }
+      resolvedPageId = pageData.id;
+    }
+
+    // 2. Chuẩn hóa block.id: nếu không phải UUID hợp lệ thì tạo mới
+    const inputBlockId = block.id ? String(block.id).trim() : '';
+    const finalBlockId = isValidUuid(inputBlockId) ? inputBlockId : generateUuid();
+
+    const payload = {
+      id: finalBlockId,
+      workspace_id: block.workspace_id || 'default',
+      page_id: resolvedPageId,
+      type: block.type,
+      display_style: block.display_style,
+      data: block.data || {},
+      sort_order: block.sort_order ?? 0,
+      is_visible: block.is_visible ?? true,
+      updated_at: new Date().toISOString(),
+    };
+
+    const { data: savedData, error } = await supabase
+      .from('blocks')
+      .upsert(payload, { onConflict: 'id' })
+      .select('*')
+      .single();
 
     if (error) {
+      console.error('[Save Block Error]', error);
       return NextResponse.json({ error: error.message || 'Chưa lưu được – chưa kết nối dữ liệu' }, { status: 500 });
     }
 
@@ -44,8 +63,9 @@ export async function POST(req: NextRequest) {
       // Bỏ qua
     }
 
-    return NextResponse.json({ success: true, block });
+    return NextResponse.json({ success: true, block: savedData || payload });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || 'Chưa lưu được – chưa kết nối dữ liệu' }, { status: 500 });
+    console.error('[Save Block Exception]', err);
+    return NextResponse.json({ error: err.message || 'Lỗi hệ thống khi lưu khối' }, { status: 500 });
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkIsAdminRequest } from '../../../../lib/authServer';
 import { getSupabaseServer } from '../../../../lib/supabaseServer';
+import { isValidUuid } from '../../../../lib/uuid';
 
 export async function POST(req: NextRequest) {
   if (!checkIsAdminRequest(req)) {
@@ -18,7 +19,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Thiếu pageId' }, { status: 400 });
     }
 
-    const { error } = await supabase.from('pages').delete().eq('id', pageId);
+    let targetId = String(pageId).trim();
+    if (!isValidUuid(targetId)) {
+      const { data: p } = await supabase.from('pages').select('id').eq('slug', targetId).maybeSingle();
+      if (p) {
+        targetId = p.id;
+      } else {
+        return NextResponse.json({ success: true, message: 'Trang không tồn tại hoặc đã được xóa' });
+      }
+    }
+
+    const { error } = await supabase.from('pages').delete().eq('id', targetId);
     if (error) {
       return NextResponse.json({ error: error.message || 'Chưa lưu được – chưa kết nối dữ liệu' }, { status: 500 });
     }
@@ -30,7 +41,7 @@ export async function POST(req: NextRequest) {
       // Bỏ qua
     }
 
-    return NextResponse.json({ success: true, pageId });
+    return NextResponse.json({ success: true, pageId: targetId });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || 'Chưa lưu được – chưa kết nối dữ liệu' }, { status: 500 });
   }

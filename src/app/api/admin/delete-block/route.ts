@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkIsAdminRequest } from '../../../../lib/authServer';
 import { getSupabaseServer } from '../../../../lib/supabaseServer';
+import { isValidUuid } from '../../../../lib/uuid';
 
 export async function POST(req: NextRequest) {
   if (!checkIsAdminRequest(req)) {
@@ -18,7 +19,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Thiếu blockId' }, { status: 400 });
     }
 
-    const { error } = await supabase.from('blocks').delete().eq('id', blockId);
+    const targetId = String(blockId).trim();
+    if (!isValidUuid(targetId)) {
+      return NextResponse.json({ success: true, message: 'Khối không tồn tại hoặc đã được xóa' });
+    }
+
+    const { error } = await supabase.from('blocks').delete().eq('id', targetId);
     if (error) {
       return NextResponse.json({ error: error.message || 'Chưa lưu được – chưa kết nối dữ liệu' }, { status: 500 });
     }
@@ -30,7 +36,7 @@ export async function POST(req: NextRequest) {
       // Bỏ qua
     }
 
-    return NextResponse.json({ success: true, blockId });
+    return NextResponse.json({ success: true, blockId: targetId });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || 'Chưa lưu được – chưa kết nối dữ liệu' }, { status: 500 });
   }

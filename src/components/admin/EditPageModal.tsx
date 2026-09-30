@@ -6,6 +6,7 @@ import { Page } from '../../lib/types';
 import { generateSlug } from '../../lib/slug';
 import { uploadImageFile } from '../../lib/storageUpload';
 import { savePageApi } from '../../lib/apiAdmin';
+import { generateUuid, isValidUuid } from '../../lib/uuid';
 
 interface EditPageModalProps {
   isOpen: boolean;
@@ -75,7 +76,7 @@ export default function EditPageModal({
       setIsSaving(true);
       setErrorMsg('');
 
-      const pageId = page?.id || (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `page-${Date.now()}`);
+      const pageId = page?.id && isValidUuid(page.id) ? page.id : generateUuid();
       const payload: Page = {
         id: pageId,
         workspace_id: 'default',
@@ -95,7 +96,7 @@ export default function EditPageModal({
         throw new Error(res.error || 'Chưa lưu được trang, thử lại');
       }
 
-      onSaved(payload);
+      onSaved(res.page || payload);
       onClose();
     } catch (err: any) {
       setErrorMsg(err.message || 'Chưa lưu được trang, thử lại');

@@ -20,6 +20,7 @@ import {
   Bookmark,
 } from 'lucide-react';
 import { Topic, Page, Block, Video } from '../lib/types';
+import { generateUuid } from '../lib/uuid';
 import PageHeaderBar, { TocItem, FontSizeOption, ThemeModeOption } from './PageHeaderBar';
 import BlockRenderer from './BlockRenderer';
 import EditBlockModal from './admin/EditBlockModal';
@@ -294,7 +295,7 @@ export default function ContentViewer({
       const target = blockList[index];
       const duplicate: Block = {
         ...JSON.parse(JSON.stringify(target)),
-        id: `block-copy-${Date.now()}`,
+        id: generateUuid(),
       };
       const updated = [...blockList];
       updated.splice(index + 1, 0, duplicate);

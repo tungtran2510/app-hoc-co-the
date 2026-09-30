@@ -6,6 +6,7 @@ import { Topic } from '../../lib/types';
 import { generateSlug } from '../../lib/slug';
 import { uploadImageFile } from '../../lib/storageUpload';
 import { saveTopicApi } from '../../lib/apiAdmin';
+import { generateUuid, isValidUuid } from '../../lib/uuid';
 import TopicIcon from '../TopicIcon';
 
 const AVAILABLE_ICONS = [
@@ -95,7 +96,7 @@ export default function EditTopicModal({
       setIsSaving(true);
       setErrorMsg('');
 
-      const topicId = topic?.id || (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `topic-${Date.now()}`);
+      const topicId = topic?.id && isValidUuid(topic.id) ? topic.id : generateUuid();
       const payload: Topic = {
         id: topicId,
         workspace_id: 'default',
@@ -116,7 +117,7 @@ export default function EditTopicModal({
         throw new Error(res.error || 'Chưa lưu được chủ đề, thử lại');
       }
 
-      onSaved(payload);
+      onSaved(res.topic || payload);
       onClose();
     } catch (err: any) {
       setErrorMsg(err.message || 'Chưa lưu được chủ đề, thử lại');

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkIsAdminRequest } from '../../../../lib/authServer';
 import { getSupabaseServer } from '../../../../lib/supabaseServer';
+import { isValidUuid } from '../../../../lib/uuid';
 
 export async function POST(req: NextRequest) {
   if (!checkIsAdminRequest(req)) {
@@ -18,7 +19,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Thiếu topicId' }, { status: 400 });
     }
 
-    const { error } = await supabase.from('topics').delete().eq('id', topicId);
+    let targetId = String(topicId).trim();
+    if (!isValidUuid(targetId)) {
+      const { data: t } = await supabase.from('topics').select('id').eq('slug', targetId).maybeSingle();
+      if (t) {
+        targetId = t.id;
+      } else {
+        return NextResponse.json({ success: true, message: 'Chủ đề không tồn tại hoặc đã được xóa' });
+      }
+    }
+
+    const { error } = await supabase.from('topics').delete().eq('id', targetId);
     if (error) {
       return NextResponse.json({ error: error.message || 'Chưa lưu được – chưa kết nối dữ liệu' }, { status: 500 });
     }
@@ -30,7 +41,7 @@ export async function POST(req: NextRequest) {
       // Bỏ qua
     }
 
-    return NextResponse.json({ success: true, topicId });
+    return NextResponse.json({ success: true, topicId: targetId });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || 'Chưa lưu được – chưa kết nối dữ liệu' }, { status: 500 });
   }
