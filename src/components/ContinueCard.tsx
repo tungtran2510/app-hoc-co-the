@@ -26,9 +26,12 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
     <Link
       href={targetUrl}
       prefetch={true}
-      className="group relative block overflow-hidden rounded-[20px] bg-gradient-to-r from-[#072146] via-[#0A3266] to-[#051833] px-4 py-3 sm:px-5 sm:py-3.5 text-white shadow-md border border-white/10 transition-all duration-150 active:scale-[0.98] cursor-pointer"
+      className="group relative block overflow-hidden rounded-[20px] bg-gradient-to-r from-[#0F4C82] via-[#145C9E] to-[#0B3A65] px-4 py-3 sm:px-5 sm:py-3.5 text-white shadow-lg border border-sky-300/35 transition-all duration-150 active:scale-[0.98] cursor-pointer"
       aria-label={`Xem tiếp ${info.topic_title} bài ${info.page_title}`}
     >
+      {/* Tia sáng ngọc viền trên */}
+      <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-sky-200/60 to-transparent" />
+
       {/* 3D Anatomy / Avatar Render bên phải */}
       <div className="absolute -right-2 top-0 bottom-0 w-[42%] sm:w-[36%] pointer-events-none overflow-hidden select-none">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -37,12 +40,12 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
           alt={info.page_title || 'Anatomy'}
           className={`w-full h-full object-cover object-center ${
             info.cover_url && !info.cover_url.endsWith('.png')
-              ? 'opacity-85'
-              : 'mix-blend-screen opacity-90 scale-105'
+              ? 'opacity-90'
+              : 'mix-blend-screen opacity-95 scale-105'
           }`}
         />
-        {/* Gradient mờ chuyển từ nền xanh đậm sang ảnh */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#072146] via-[#072146]/60 to-transparent w-16" />
+        {/* Gradient mờ chuyển từ nền xanh sapphire sang ảnh */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0F4C82] via-[#0F4C82]/60 to-transparent w-16" />
       </div>
 
       <div className="relative z-10 flex flex-col gap-1 sm:gap-1.5">

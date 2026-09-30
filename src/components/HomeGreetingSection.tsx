@@ -53,9 +53,9 @@ export default function HomeGreetingSection({
       {/* 2. "Quan điểm" & Tiêu đề chính "Hiểu đúng - Làm chuẩn" */}
       <section className="flex flex-col gap-1 relative group mt-0.5">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-[13px] font-bold text-muted">
-            <span className="w-1 h-3.5 bg-blue-600 rounded-full inline-block shrink-0" />
-            <span>{greeting || '“Quan điểm”'}</span>
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sky-50 border border-sky-200 text-sky-800 text-[11.5px] font-black uppercase tracking-wider w-fit">
+            <span className="w-1.5 h-1.5 rounded-full bg-sky-600 animate-pulse" />
+            <span>{greeting || 'Hiểu đúng'}</span>
           </div>
 
           {isAdmin && (
@@ -71,14 +71,14 @@ export default function HomeGreetingSection({
           )}
         </div>
 
-        <h1 className="text-[26px] sm:text-[30px] font-black text-ink leading-tight tracking-tight break-words">
+        <h1 className="text-[25px] sm:text-[28px] font-black text-ink leading-tight tracking-tight break-words mt-0.5">
           {title || 'Hiểu đúng - Làm chuẩn'}
         </h1>
       </section>
 
       {/* 3. Khung Tìm kiếm kết hợp Nút Hỏi AI */}
       <section>
-        <div className="w-full h-[52px] sm:h-[56px] rounded-full sm:rounded-[22px] bg-white border border-line pl-4 pr-1.5 flex items-center justify-between gap-2 shadow-2xs hover:border-blue-400 focus-within:border-blue-500 transition-colors">
+        <div className="w-full h-[52px] sm:h-[56px] rounded-full sm:rounded-[22px] bg-white border border-line pl-4 pr-1.5 flex items-center justify-between gap-2 shadow-xs hover:border-sky-400 focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-100 transition-all">
           <div className="flex items-center gap-2.5 flex-1 min-w-0">
             <Search size={19} className="text-muted shrink-0" />
             <input
