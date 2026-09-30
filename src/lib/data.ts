@@ -3,6 +3,7 @@ import {
   sampleTopics,
   samplePages,
   sampleBlocks,
+  DEFAULT_AUTHOR_PROFILE,
 } from '../data/sample';
 import {
   Settings,
@@ -10,8 +11,29 @@ import {
   Page,
   Block,
   ContinueInfo,
+  AuthorProfile,
 } from './types';
 import { getSupabaseClient } from './supabaseClient';
+
+export function normalizeAuthorProfile(raw?: any): AuthorProfile {
+  if (!raw || typeof raw !== 'object' || Object.keys(raw).length === 0) {
+    return { ...DEFAULT_AUTHOR_PROFILE };
+  }
+  return {
+    ...DEFAULT_AUTHOR_PROFILE,
+    ...raw,
+    name: raw.name?.trim() ? raw.name : DEFAULT_AUTHOR_PROFILE.name,
+    title: raw.title?.trim() ? raw.title : DEFAULT_AUTHOR_PROFILE.title,
+    bio: raw.bio !== undefined ? raw.bio : DEFAULT_AUTHOR_PROFILE.bio,
+    books: Array.isArray(raw.books) && raw.books.length > 0 ? raw.books : DEFAULT_AUTHOR_PROFILE.books,
+    phone: raw.phone !== undefined ? raw.phone : DEFAULT_AUTHOR_PROFILE.phone,
+    zalo_url: raw.zalo_url !== undefined ? raw.zalo_url : DEFAULT_AUTHOR_PROFILE.zalo_url,
+    email: raw.email !== undefined ? raw.email : DEFAULT_AUTHOR_PROFILE.email,
+    facebook_url: raw.facebook_url !== undefined ? raw.facebook_url : DEFAULT_AUTHOR_PROFILE.facebook_url,
+    address: raw.address !== undefined ? raw.address : DEFAULT_AUTHOR_PROFILE.address,
+    contact_note: raw.contact_note !== undefined ? raw.contact_note : DEFAULT_AUTHOR_PROFILE.contact_note,
+  };
+}
 
 export async function getSettings(): Promise<Settings> {
   const supabase = getSupabaseClient();
@@ -22,7 +44,12 @@ export async function getSettings(): Promise<Settings> {
         .select('*')
         .eq('workspace_id', 'default')
         .single();
-      if (data) return data as Settings;
+      if (data) {
+        return {
+          ...data,
+          author_profile: normalizeAuthorProfile(data.author_profile),
+        } as Settings;
+      }
     } catch {
       // fallback
     }

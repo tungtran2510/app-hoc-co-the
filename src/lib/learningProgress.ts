@@ -21,6 +21,16 @@ export interface TienDoMap {
 const XEM_TIEP_KEY = 'xem_tiep';
 const TIEN_DO_KEY = 'tien_do';
 
+export function notifyProgressChanged(): void {
+  if (typeof window !== 'undefined') {
+    try {
+      window.dispatchEvent(new CustomEvent('learning_progress_changed'));
+    } catch {
+      // Bỏ qua
+    }
+  }
+}
+
 export function getStoredXemTiep(): XemTiepInfo | null {
   if (typeof window === 'undefined') return null;
   try {
@@ -42,6 +52,7 @@ export function saveStoredXemTiep(info: Partial<XemTiepInfo>): void {
       updated_at: Date.now(),
     } as XemTiepInfo;
     localStorage.setItem(XEM_TIEP_KEY, JSON.stringify(updated));
+    notifyProgressChanged();
   } catch {
     // Bỏ qua
   }
@@ -85,6 +96,7 @@ export function saveVideoWatched(pageId: string, videoIndex: number): void {
       watched: Array.from(watchedSet).sort((a, b) => a - b),
     };
     localStorage.setItem(TIEN_DO_KEY, JSON.stringify(all));
+    notifyProgressChanged();
   } catch {
     // Bỏ qua
   }
@@ -141,6 +153,7 @@ export function toggleSavePage(info: SavedPageInfo): boolean {
       newState = true;
     }
     localStorage.setItem(BAI_DA_LUU_KEY, JSON.stringify(updated));
+    notifyProgressChanged();
     return newState;
   } catch {
     return false;
@@ -187,6 +200,7 @@ export function togglePageCompleted(pageId: string): boolean {
       newState = true;
     }
     localStorage.setItem(DA_HOAN_THANH_KEY, JSON.stringify(updated));
+    notifyProgressChanged();
     return newState;
   } catch {
     return false;

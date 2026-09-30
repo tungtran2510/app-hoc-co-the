@@ -27,7 +27,12 @@ export const DEFAULT_AUTHOR_PROFILE: AuthorProfile = {
   ],
   extra_title: 'Triết lý phụng sự',
   extra_content: 'Sức khỏe không đến từ sự lo sợ, mà đến từ sự thấu hiểu chính cơ thể mình. Khi bạn hiểu cơ thể, bạn sẽ biết cách yêu thương và chăm sóc đúng cách mỗi ngày.',
-  contact_note: 'Mọi thắc mắc hoặc cần tư vấn lộ trình phục hồi, vui lòng liên hệ trực tiếp qua Zalo hoặc Hotline chuyên gia ở phía dưới.',
+  contact_note: 'Mọi thắc mắc hoặc cần tư vấn lộ trình phục hồi chuyên sâu, vui lòng kết nối trực tiếp với chuyên gia qua Hotline hoặc Zalo bên dưới.',
+  phone: '0988.123.456',
+  zalo_url: 'https://zalo.me/0988123456',
+  email: 'chuyengiacotsong@gmail.com',
+  facebook_url: 'https://facebook.com',
+  address: 'Hà Nội & TP. Hồ Chí Minh',
 };
 
 export const sampleSettings: Settings = {

@@ -9,9 +9,14 @@ import {
   Sparkles,
   MessageCircle,
   Play,
+  Phone,
+  PhoneCall,
+  Mail,
+  MapPin,
+  Globe,
 } from 'lucide-react';
 import { AuthorProfile, AuthorBook } from '../lib/types';
-import { DEFAULT_AUTHOR_PROFILE } from '../data/sample';
+import { normalizeAuthorProfile } from '../lib/data';
 import { checkIsAdminClient } from '../lib/adminAuth';
 import { extractYouTubeId } from '../lib/youtube';
 import BookDetailModal from './BookDetailModal';
@@ -22,7 +27,7 @@ interface AuthorIntroSectionProps {
 }
 
 export default function AuthorIntroSection({ initialProfile }: AuthorIntroSectionProps) {
-  const [profile, setProfile] = useState<AuthorProfile>(() => initialProfile || DEFAULT_AUTHOR_PROFILE);
+  const [profile, setProfile] = useState<AuthorProfile>(() => normalizeAuthorProfile(initialProfile));
   const [isAdmin, setIsAdmin] = useState(false);
   const [selectedBook, setSelectedBook] = useState<AuthorBook | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -30,7 +35,7 @@ export default function AuthorIntroSection({ initialProfile }: AuthorIntroSectio
   useEffect(() => {
     checkIsAdminClient().then(setIsAdmin);
     if (initialProfile) {
-      setProfile(initialProfile);
+      setProfile(normalizeAuthorProfile(initialProfile));
     }
   }, [initialProfile]);
 
@@ -233,13 +238,103 @@ export default function AuthorIntroSection({ initialProfile }: AuthorIntroSectio
         </div>
       )}
 
-      {/* Khung Ghi chú liên hệ / Hướng dẫn kết nối */}
-      {profile.contact_note && (
-        <div className="p-3.5 px-4 rounded-[18px] bg-white border border-line shadow-2xs flex items-start gap-2.5">
-          <MessageCircle size={18} className="text-primary shrink-0 mt-0.5" />
-          <p className="text-[13px] text-muted leading-relaxed font-medium">
-            {profile.contact_note}
-          </p>
+      {/* Khung Thông tin liên hệ & Hỗ trợ chuyên gia ở cuối phần tác giả */}
+      {(profile.phone || profile.zalo_url || profile.email || profile.facebook_url || profile.address || profile.contact_note) && (
+        <div className="p-4 sm:p-5 rounded-[24px] bg-white border border-line shadow-xs flex flex-col gap-3.5">
+          <div className="flex items-center gap-2 border-b border-line pb-2.5">
+            <div className="w-7 h-7 rounded-[8px] bg-primary-soft text-primary flex items-center justify-center">
+              <PhoneCall size={16} strokeWidth={2.5} />
+            </div>
+            <div>
+              <h3 className="text-[16px] font-extrabold text-ink leading-tight">
+                Thông tin liên hệ & Kết nối
+              </h3>
+              <span className="text-[12px] text-muted">
+                Kết nối trực tiếp cùng chuyên gia / tác giả
+              </span>
+            </div>
+          </div>
+
+          {/* Lời nhắn kết nối */}
+          {profile.contact_note && (
+            <p className="text-[14px] text-ink/85 leading-relaxed font-normal">
+              {profile.contact_note}
+            </p>
+          )}
+
+          {/* Các nút gọi điện & nhắn tin nhanh */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-0.5">
+            {profile.phone && (
+              <a
+                href={`tel:${profile.phone.replace(/[^0-9+]/g, '')}`}
+                className="flex items-center justify-between p-3 px-4 rounded-[16px] bg-primary text-white hover:bg-primary-dark active:scale-[0.98] transition-all shadow-xs"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                    <Phone size={16} />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[11px] text-white/80 font-medium">Hotline tư vấn</span>
+                    <span className="text-[15px] font-extrabold tracking-wide">{profile.phone}</span>
+                  </div>
+                </div>
+                <span className="text-[12px] font-bold px-2.5 py-1 rounded-[8px] bg-white/20">Gọi ngay</span>
+              </a>
+            )}
+
+            {profile.zalo_url && (
+              <a
+                href={profile.zalo_url.startsWith('http') ? profile.zalo_url : `https://zalo.me/${profile.zalo_url.replace(/[^0-9]/g, '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between p-3 px-4 rounded-[16px] bg-[#0068FF] text-white hover:bg-[#0056D2] active:scale-[0.98] transition-all shadow-xs"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center font-extrabold text-[15px]">
+                    Z
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[11px] text-white/80 font-medium">Chat Zalo</span>
+                    <span className="text-[15px] font-extrabold">Nhắn tin trực tiếp</span>
+                  </div>
+                </div>
+                <span className="text-[12px] font-bold px-2.5 py-1 rounded-[8px] bg-white/20">Mở Zalo</span>
+              </a>
+            )}
+          </div>
+
+          {/* Chi tiết phụ: Facebook, Email, Địa chỉ */}
+          {(profile.address || profile.email || profile.facebook_url) && (
+            <div className="flex flex-col gap-2 pt-2 text-[13px] text-muted border-t border-line/60">
+              {profile.address && (
+                <div className="flex items-center gap-2">
+                  <MapPin size={15} className="text-primary shrink-0" />
+                  <span className="text-ink/80 font-medium">{profile.address}</span>
+                </div>
+              )}
+              {profile.email && (
+                <div className="flex items-center gap-2">
+                  <Mail size={15} className="text-primary shrink-0" />
+                  <a href={`mailto:${profile.email}`} className="text-primary font-bold hover:underline">
+                    {profile.email}
+                  </a>
+                </div>
+              )}
+              {profile.facebook_url && (
+                <div className="flex items-center gap-2">
+                  <Globe size={15} className="text-primary shrink-0" />
+                  <a
+                    href={profile.facebook_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary font-bold hover:underline"
+                  >
+                    Kênh cá nhân / Fanpage Facebook
+                  </a>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 

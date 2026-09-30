@@ -4,28 +4,54 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, Bookmark, Trash2, ChevronRight, BookOpen } from 'lucide-react';
 import { getSavedPages, SavedPageInfo, toggleSavePage } from '../../lib/learningProgress';
+import { getUserPhone, syncUserProgress, LEARNING_PROGRESS_EVENT } from '../../lib/userSync';
+import UserSyncCard from '../../components/UserSyncCard';
 import BottomNav from '../../components/BottomNav';
 
 export default function SavedPages() {
   const [savedList, setSavedList] = useState<SavedPageInfo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
+  const refreshList = () => {
     try {
       const list = getSavedPages();
       setSavedList(list);
     } catch {
       setSavedList([]);
-    } finally {
-      setIsLoading(false);
     }
+  };
+
+  useEffect(() => {
+    refreshList();
+    setIsLoading(false);
+
+    // Nếu đã có số điện thoại lưu từ trước, tự động tải mới từ máy chủ
+    const phone = getUserPhone();
+    if (phone) {
+      syncUserProgress(phone, 'sync').then((res) => {
+        if (res.success) {
+          refreshList();
+        }
+      });
+    }
+
+    const handleUpdate = () => {
+      refreshList();
+    };
+
+    window.addEventListener(LEARNING_PROGRESS_EVENT, handleUpdate);
+    window.addEventListener('learning_progress_changed', handleUpdate);
+    return () => {
+      window.removeEventListener(LEARNING_PROGRESS_EVENT, handleUpdate);
+      window.removeEventListener('learning_progress_changed', handleUpdate);
+    };
   }, []);
 
   const handleRemove = (e: React.MouseEvent, page: SavedPageInfo) => {
     e.preventDefault();
     e.stopPropagation();
     toggleSavePage(page);
-    setSavedList(getSavedPages());
+    refreshList();
   };
 
   return (
@@ -57,6 +83,9 @@ export default function SavedPages() {
             : 'Lưu các bài học quan trọng để mở xem lại nhanh'}
         </p>
       </section>
+
+      {/* 2.5. Khối đồng bộ & lưu tiến độ theo số điện thoại */}
+      <UserSyncCard onSyncSuccess={refreshList} />
 
       {/* 3. Danh sách bài đã lưu */}
       {isLoading ? (

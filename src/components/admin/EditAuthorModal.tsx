@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   X,
   User,
@@ -12,10 +12,17 @@ import {
   Loader2,
   Sliders,
   Film,
+  PhoneCall,
+  Sparkles,
+  Phone,
+  Mail,
+  MapPin,
+  Globe,
 } from 'lucide-react';
 import { AuthorProfile, AuthorBook } from '../../lib/types';
 import { uploadImageFile } from '../../lib/storageUpload';
 import { saveSettingsApi } from '../../lib/apiAdmin';
+import { normalizeAuthorProfile } from '../../lib/data';
 
 interface EditAuthorModalProps {
   isOpen: boolean;
@@ -30,8 +37,8 @@ export default function EditAuthorModal({
   onClose,
   onSaved,
 }: EditAuthorModalProps) {
-  const [activeTab, setActiveTab] = useState<'author' | 'books' | 'extra'>('author');
-  const [profile, setProfile] = useState<AuthorProfile>(() => JSON.parse(JSON.stringify(initialProfile)));
+  const [activeTab, setActiveTab] = useState<'author' | 'books' | 'contact' | 'extra'>('author');
+  const [profile, setProfile] = useState<AuthorProfile>(() => normalizeAuthorProfile(initialProfile));
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isUploadingIntroImage, setIsUploadingIntroImage] = useState(false);
   const [uploadingBookId, setUploadingBookId] = useState<string | null>(null);
@@ -42,6 +49,13 @@ export default function EditAuthorModal({
   const introImageInputRef = useRef<HTMLInputElement>(null);
   const bookCoverInputRef = useRef<HTMLInputElement>(null);
   const [activeBookForUpload, setActiveBookForUpload] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setProfile(normalizeAuthorProfile(initialProfile));
+      setErrorMsg('');
+    }
+  }, [isOpen, initialProfile]);
 
   if (!isOpen) return null;
 
@@ -142,7 +156,8 @@ export default function EditAuthorModal({
   // Lưu cấu hình
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!profile.name.trim()) {
+    const normalized = normalizeAuthorProfile(profile);
+    if (!normalized.name.trim()) {
       setErrorMsg('Vui lòng nhập tên tác giả / chuyên gia.');
       return;
     }
@@ -152,11 +167,11 @@ export default function EditAuthorModal({
       setErrorMsg('');
 
       const res = await saveSettingsApi({
-        author_profile: profile,
+        author_profile: normalized,
       });
 
       if (res.success) {
-        onSaved(profile);
+        onSaved(normalized);
         onClose();
       } else {
         setErrorMsg(res.error || 'Chưa lưu được – chưa kết nối dữ liệu');
@@ -194,43 +209,55 @@ export default function EditAuthorModal({
           </button>
         </div>
 
-        {/* 3 Tabs điều hướng */}
-        <div className="grid grid-cols-3 border-b border-line bg-surface p-1.5 gap-1 shrink-0">
+        {/* 4 Tabs điều hướng */}
+        <div className="grid grid-cols-4 border-b border-line bg-surface p-1.5 gap-1 shrink-0">
           <button
             type="button"
             onClick={() => setActiveTab('author')}
-            className={`h-10 rounded-[10px] text-[13px] font-extrabold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+            className={`h-10 rounded-[10px] text-[12px] sm:text-[13px] font-extrabold transition-all cursor-pointer flex items-center justify-center gap-1 ${
               activeTab === 'author'
                 ? 'bg-white text-primary shadow-xs'
                 : 'text-muted hover:text-ink'
             }`}
           >
-            <User size={15} />
+            <User size={14} />
             <span>Tác giả</span>
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('books')}
-            className={`h-10 rounded-[10px] text-[13px] font-extrabold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+            className={`h-10 rounded-[10px] text-[12px] sm:text-[13px] font-extrabold transition-all cursor-pointer flex items-center justify-center gap-1 ${
               activeTab === 'books'
                 ? 'bg-white text-primary shadow-xs'
                 : 'text-muted hover:text-ink'
             }`}
           >
-            <BookOpen size={15} />
-            <span>Sách ({profile.books.length})</span>
+            <BookOpen size={14} />
+            <span>Sách ({profile.books?.length || 0})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('contact')}
+            className={`h-10 rounded-[10px] text-[12px] sm:text-[13px] font-extrabold transition-all cursor-pointer flex items-center justify-center gap-1 ${
+              activeTab === 'contact'
+                ? 'bg-white text-primary shadow-xs'
+                : 'text-muted hover:text-ink'
+            }`}
+          >
+            <PhoneCall size={14} />
+            <span>Liên hệ</span>
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('extra')}
-            className={`h-10 rounded-[10px] text-[13px] font-extrabold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+            className={`h-10 rounded-[10px] text-[12px] sm:text-[13px] font-extrabold transition-all cursor-pointer flex items-center justify-center gap-1 ${
               activeTab === 'extra'
                 ? 'bg-white text-primary shadow-xs'
                 : 'text-muted hover:text-ink'
             }`}
           >
-            <Sliders size={15} />
-            <span>Thêm ở cuối</span>
+            <Sparkles size={14} />
+            <span>Triết lý</span>
           </button>
         </div>
 
@@ -564,12 +591,116 @@ export default function EditAuthorModal({
             </div>
           )}
 
-          {/* TAB 3: THÔNG TIN THÊM Ở CUỐI */}
+          {/* TAB 3: THÔNG TIN LIÊN HỆ & KẾT NỐI */}
+          {activeTab === 'contact' && (
+            <div className="flex flex-col gap-4">
+              <div className="p-3 bg-primary-soft/50 rounded-[14px] border border-primary/20 flex flex-col gap-1 text-[13px] text-ink">
+                <span className="font-extrabold text-primary flex items-center gap-1.5">
+                  <PhoneCall size={14} />
+                  <span>Kênh kết nối trực tiếp với người học</span>
+                </span>
+                <p className="text-muted text-[12px] leading-relaxed">
+                  Các thông tin này sẽ hiển thị thành nút gọi điện và nhắn tin Zalo tiện lợi ở chân trang để người học có thể kết nối ngay với bạn.
+                </p>
+              </div>
+
+              {/* Số điện thoại / Hotline */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[13px] font-bold text-ink flex items-center gap-1.5">
+                  <Phone size={14} className="text-primary" />
+                  <span>Số điện thoại / Hotline tư vấn</span>
+                </label>
+                <input
+                  type="tel"
+                  value={profile.phone || ''}
+                  onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                  placeholder="Ví dụ: 0988.123.456"
+                  className="w-full h-11 px-3.5 rounded-[12px] border border-line text-[14px] text-ink focus:border-primary font-medium"
+                />
+              </div>
+
+              {/* Link Zalo hoặc SĐT Zalo */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[13px] font-bold text-ink flex items-center gap-1.5">
+                  <span className="w-4 h-4 rounded-full bg-[#0068FF] text-white flex items-center justify-center text-[10px] font-extrabold">Z</span>
+                  <span>Link Zalo hoặc Số điện thoại Zalo</span>
+                </label>
+                <input
+                  type="text"
+                  value={profile.zalo_url || ''}
+                  onChange={(e) => setProfile({ ...profile, zalo_url: e.target.value })}
+                  placeholder="Ví dụ: https://zalo.me/0988123456 hoặc 0988123456"
+                  className="w-full h-11 px-3.5 rounded-[12px] border border-line text-[14px] text-ink focus:border-primary font-medium"
+                />
+              </div>
+
+              {/* Email liên hệ */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[13px] font-bold text-ink flex items-center gap-1.5">
+                  <Mail size={14} className="text-primary" />
+                  <span>Email liên hệ</span>
+                </label>
+                <input
+                  type="email"
+                  value={profile.email || ''}
+                  onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                  placeholder="Ví dụ: chuyengia@gmail.com"
+                  className="w-full h-11 px-3.5 rounded-[12px] border border-line text-[14px] text-ink focus:border-primary font-medium"
+                />
+              </div>
+
+              {/* Link Facebook */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[13px] font-bold text-ink flex items-center gap-1.5">
+                  <Globe size={14} className="text-primary" />
+                  <span>Link Facebook / Trang cá nhân</span>
+                </label>
+                <input
+                  type="url"
+                  value={profile.facebook_url || ''}
+                  onChange={(e) => setProfile({ ...profile, facebook_url: e.target.value })}
+                  placeholder="Ví dụ: https://facebook.com/trantunghoa"
+                  className="w-full h-11 px-3.5 rounded-[12px] border border-line text-[14px] text-ink focus:border-primary font-medium"
+                />
+              </div>
+
+              {/* Địa chỉ phòng khám / làm việc */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[13px] font-bold text-ink flex items-center gap-1.5">
+                  <MapPin size={14} className="text-primary" />
+                  <span>Địa chỉ phòng khám / văn phòng</span>
+                </label>
+                <input
+                  type="text"
+                  value={profile.address || ''}
+                  onChange={(e) => setProfile({ ...profile, address: e.target.value })}
+                  placeholder="Ví dụ: Hà Nội & TP. Hồ Chí Minh"
+                  className="w-full h-11 px-3.5 rounded-[12px] border border-line text-[14px] text-ink focus:border-primary font-medium"
+                />
+              </div>
+
+              {/* Lời nhắn kết nối */}
+              <div className="flex flex-col gap-1.5 pt-1 border-t border-line/60">
+                <label className="text-[13px] font-bold text-ink">
+                  Lời nhắn kết nối / Ghi chú tư vấn
+                </label>
+                <textarea
+                  rows={2}
+                  value={profile.contact_note || ''}
+                  onChange={(e) => setProfile({ ...profile, contact_note: e.target.value })}
+                  placeholder="Ví dụ: Mọi thắc mắc về lộ trình phục hồi, vui lòng kết nối trực tiếp với chuyên gia..."
+                  className="w-full p-3 rounded-[12px] border border-line text-[14px] text-ink focus:border-primary leading-relaxed"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* TAB 4: TRIẾT LÝ PHỤNG SỰ & LỜI NHẮN GỬI */}
           {activeTab === 'extra' && (
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="text-[14px] font-bold text-ink">
-                  Tiêu đề khung thêm (ví dụ: Triết lý phụng sự / Lời nhắn gửi)
+                  Tiêu đề khung (mặc định: Triết lý phụng sự)
                 </label>
                 <input
                   type="text"
@@ -582,27 +713,14 @@ export default function EditAuthorModal({
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-[14px] font-bold text-ink">
-                  Nội dung khung thêm
+                  Nội dung triết lý / Lời nhắn gửi
                 </label>
                 <textarea
-                  rows={3}
+                  rows={4}
                   value={profile.extra_content || ''}
                   onChange={(e) => setProfile({ ...profile, extra_content: e.target.value })}
-                  placeholder="Nhập nội dung lời nhắn gửi hoặc thông tin bổ sung..."
+                  placeholder="Nhập nội dung lời nhắn gửi của bạn gửi tới người học..."
                   className="w-full p-3 rounded-[12px] border border-line text-[15px] text-ink focus:border-primary leading-relaxed"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5 pt-2 border-t border-line">
-                <label className="text-[14px] font-bold text-ink">
-                  Ghi chú kết nối / Hướng dẫn liên hệ cuối trang
-                </label>
-                <textarea
-                  rows={2}
-                  value={profile.contact_note || ''}
-                  onChange={(e) => setProfile({ ...profile, contact_note: e.target.value })}
-                  placeholder="Ví dụ: Mọi thắc mắc vui lòng liên hệ qua Zalo hoặc Hotline phía dưới..."
-                  className="w-full p-3 rounded-[12px] border border-line text-[14px] text-ink focus:border-primary"
                 />
               </div>
             </div>

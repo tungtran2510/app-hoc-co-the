@@ -20,6 +20,11 @@ export interface AuthorProfile {
   extra_title?: string;
   extra_content?: string;
   contact_note?: string;
+  phone?: string | null;
+  zalo_url?: string | null;
+  email?: string | null;
+  facebook_url?: string | null;
+  address?: string | null;
 }
 
 export interface Settings {
@@ -162,4 +167,21 @@ export interface ContinueInfo {
   video_total: number;
   video_title: string;
   page_order_label: string;
+}
+
+export interface UserProgressSyncData {
+  phone: string;
+  xem_tiep?: any;
+  tien_do?: Record<string, { last_video: number; watched: number[] }>;
+  bai_da_luu?: Array<{
+    page_id: string;
+    topic_slug: string;
+    topic_title: string;
+    page_slug: string;
+    page_title: string;
+    page_number: number;
+    saved_at: number;
+  }>;
+  da_hoan_thanh?: string[];
+  updated_at?: string;
 }
