@@ -206,8 +206,8 @@ export default function AuthorIntroSection({
                   onClick={() => setSelectedBook(book)}
                   className="p-3.5 sm:p-5 rounded-[22px] bg-white border border-line shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-row gap-3 sm:gap-4.5 group"
                 >
-                  {/* BÊN TRÁI: Bìa sách gọn gàng chuẩn tỷ lệ 3:4 */}
-                  <div className="w-[82px] sm:w-[110px] aspect-[3/4] rounded-[14px] bg-surface-2 overflow-hidden shrink-0 shadow-md border border-line/70 relative flex items-center justify-center group-hover:scale-[1.02] transition-transform">
+                  {/* BÊN TRÁI: Bìa sách to rõ chuẩn tỷ lệ 3:4 */}
+                  <div className="w-[116px] sm:w-[138px] aspect-[3/4] rounded-[14px] bg-surface-2 overflow-hidden shrink-0 shadow-md border border-line/70 relative flex items-center justify-center group-hover:scale-[1.02] transition-transform">
                     {book.cover_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img

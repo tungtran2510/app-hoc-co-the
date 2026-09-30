@@ -206,8 +206,8 @@ export default function RecommendedBooksSection({
               onClick={() => setSelectedBook(book)}
               className="group p-3 sm:p-4 rounded-[22px] bg-white border border-line/80 hover:border-primary/40 shadow-xs hover:shadow-md transition-all duration-200 flex flex-row gap-3 sm:gap-4.5 cursor-pointer relative"
             >
-              {/* BÌA SÁCH 3D HIỆN ĐẠI BÊN TRÁI - GỌN GÀNG, KHÔNG CHIẾM HẾT MÀN HÌNH */}
-              <div className="w-[82px] sm:w-[110px] shrink-0 pt-0.5">
+              {/* BÌA SÁCH 3D HIỆN ĐẠI BÊN TRÁI - TO RÕ RÀNG THEO YÊU CẦU */}
+              <div className="w-[116px] sm:w-[138px] shrink-0 pt-0.5">
                 <ModernBookCover
                   title={book.title}
                   coverUrl={book.cover_url}
@@ -218,19 +218,19 @@ export default function RecommendedBooksSection({
 
               {/* THÔNG TIN CHI TIẾT BÊN PHẢI - RỘNG RÃI */}
               <div className="flex-1 flex flex-col justify-between min-w-0 py-0.5">
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1.5">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="px-2 py-0.5 rounded-[5px] bg-primary/10 text-primary text-[10px] font-extrabold tracking-wide uppercase">
+                    <span className="px-2 py-0.5 rounded-[5px] bg-primary/10 text-primary text-[10px] font-extrabold tracking-wide uppercase shrink-0">
                       Tài liệu khuyên đọc
                     </span>
                     {book.author && (
-                      <span className="text-[11.5px] font-bold text-muted truncate max-w-[130px] sm:max-w-none">
+                      <span className="text-[11px] font-bold text-muted truncate max-w-[110px] sm:max-w-none">
                         · {book.author}
                       </span>
                     )}
                   </div>
 
-                  <h3 className="text-[15px] sm:text-[16.5px] font-extrabold text-ink leading-snug line-clamp-2 group-hover:text-primary transition-colors">
+                  <h3 className="text-[15px] sm:text-[16.5px] font-extrabold text-ink leading-snug line-clamp-2 break-normal group-hover:text-primary transition-colors">
                     {book.title}
                   </h3>
 

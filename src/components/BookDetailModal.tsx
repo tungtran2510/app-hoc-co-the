@@ -110,7 +110,7 @@ export default function BookDetailModal({
           <div className="flex-1 overflow-y-auto p-4 sm:p-5 flex flex-col gap-4.5">
             {/* 1. HERO SÁCH: Bìa gọn gàng + Tên sách rộng rãi, không rớt chữ vụn */}
             <div className="flex gap-3.5 sm:gap-4 items-start p-3 sm:p-3.5 rounded-[20px] bg-surface-2/60 border border-line/70">
-              <div className="w-20 sm:w-24 shrink-0 pt-0.5">
+              <div className="w-24 sm:w-28 shrink-0 pt-0.5">
                 <ModernBookCover
                   title={book.title}
                   coverUrl={book.cover_url}
