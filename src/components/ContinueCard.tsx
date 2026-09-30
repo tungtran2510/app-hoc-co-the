@@ -26,11 +26,11 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
     <Link
       href={targetUrl}
       prefetch={true}
-      className="group relative block overflow-hidden rounded-[20px] bg-gradient-to-r from-[#0F4C82] via-[#145C9E] to-[#0B3A65] px-4 py-3 sm:px-5 sm:py-3.5 text-white shadow-lg border border-sky-300/35 transition-all duration-150 active:scale-[0.98] cursor-pointer"
+      className="group relative block overflow-hidden rounded-[22px] bg-gradient-to-r from-[#1845B2] via-[#2055D0] to-[#0E2C80] px-4 py-3 sm:px-5 sm:py-3.5 text-white shadow-lg border border-sky-300/40 transition-all duration-150 active:scale-[0.98] cursor-pointer"
       aria-label={`Xem tiếp ${info.topic_title} bài ${info.page_title}`}
     >
-      {/* Tia sáng ngọc viền trên */}
-      <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-sky-200/60 to-transparent" />
+      {/* Tia sáng vàng kim viền trên */}
+      <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-amber-300/60 to-transparent" />
 
       {/* 3D Anatomy / Avatar Render bên phải */}
       <div className="absolute -right-2 top-0 bottom-0 w-[42%] sm:w-[36%] pointer-events-none overflow-hidden select-none">
@@ -45,7 +45,7 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
           }`}
         />
         {/* Gradient mờ chuyển từ nền xanh sapphire sang ảnh */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0F4C82] via-[#0F4C82]/60 to-transparent w-16" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#1845B2] via-[#1845B2]/60 to-transparent w-16" />
       </div>
 
       <div className="relative z-10 flex flex-col gap-1 sm:gap-1.5">
@@ -95,23 +95,23 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
         <div className="flex items-center justify-between gap-2.5 pt-0.5 mt-0.5">
           <div className="flex-1 max-w-[56%] sm:max-w-[64%] flex items-center gap-2">
             <div
-              className="flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden"
+              className="flex-1 h-1.5 bg-black/30 rounded-full overflow-hidden p-[0.5px]"
               role="progressbar"
               aria-valuenow={progressPercent}
               aria-valuemin={0}
               aria-valuemax={100}
             >
               <div
-                className="h-full bg-sky-400 rounded-full transition-all duration-300 shadow-xs"
+                className="h-full bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 rounded-full transition-all duration-300 shadow-[0_0_8px_rgba(251,191,36,0.7)]"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <span className="text-[11px] font-bold text-white/85 shrink-0 font-mono">
+            <span className="text-[11px] font-extrabold text-amber-300 shrink-0 font-mono">
               {progressPercent}%
             </span>
           </div>
 
-          <div className="shrink-0 flex items-center gap-1 h-[28px] sm:h-[30px] px-3 sm:px-3.5 rounded-full bg-white text-[#072146] font-extrabold text-[12px] sm:text-[12.5px] shadow-sm group-hover:bg-slate-100 transition-colors">
+          <div className="shrink-0 flex items-center gap-1 h-[28px] sm:h-[30px] px-3 sm:px-3.5 rounded-full bg-white text-[#0A1E5C] font-black text-[12px] sm:text-[12.5px] shadow-sm group-hover:bg-amber-50 transition-colors">
             <span>Xem tiếp</span>
             <ArrowRight size={13} strokeWidth={2.5} />
           </div>
