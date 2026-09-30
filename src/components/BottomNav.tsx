@@ -24,8 +24,8 @@ export default function BottomNav() {
   }, [pathname]);
 
   const isHome = pathname === '/';
-  const isAi = pathname === '/tro-ly-ai';
   const isSaved = pathname === '/da-luu';
+  const isAi = pathname === '/tro-ly-ai';
   const isReading = !isHome && !isAi && !isSaved && !pathname.startsWith('/dang-nhap') && !pathname.startsWith('/tim-kiem');
 
   return (
@@ -46,7 +46,31 @@ export default function BottomNav() {
           <span className="text-[13px] sm:text-[14px] leading-tight">Trang chủ</span>
         </Link>
 
-        {/* 2. Trợ lý AI */}
+        {/* 2. Đang xem */}
+        <Link
+          href={continueUrl}
+          className={`flex flex-col items-center justify-center gap-1 transition-opacity active:opacity-80 min-h-[48px] ${
+            isReading ? 'text-primary font-bold' : 'text-muted font-medium'
+          }`}
+          aria-label="Đang xem"
+        >
+          <BookOpen size={24} strokeWidth={isReading ? 2.5 : 2} />
+          <span className="text-[13px] sm:text-[14px] leading-tight">Đang xem</span>
+        </Link>
+
+        {/* 3. Đã lưu */}
+        <Link
+          href="/da-luu"
+          className={`flex flex-col items-center justify-center gap-1 transition-opacity active:opacity-80 min-h-[48px] ${
+            isSaved ? 'text-primary font-bold' : 'text-muted font-medium'
+          }`}
+          aria-label="Bài học đã lưu"
+        >
+          <Bookmark size={24} strokeWidth={isSaved ? 2.5 : 2} className={isSaved ? 'fill-primary' : ''} />
+          <span className="text-[13px] sm:text-[14px] leading-tight">Đã lưu</span>
+        </Link>
+
+        {/* 4. Trợ lý AI (Góc ngoài cùng bên phải, cạnh Đã lưu) */}
         <Link
           href="/tro-ly-ai"
           className={`flex flex-col items-center justify-center gap-1 transition-opacity active:opacity-80 min-h-[48px] ${
@@ -59,30 +83,6 @@ export default function BottomNav() {
             <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-primary animate-pulse" />
           </div>
           <span className="text-[13px] sm:text-[14px] leading-tight">Trợ lý AI</span>
-        </Link>
-
-        {/* 3. Đang xem */}
-        <Link
-          href={continueUrl}
-          className={`flex flex-col items-center justify-center gap-1 transition-opacity active:opacity-80 min-h-[48px] ${
-            isReading ? 'text-primary font-bold' : 'text-muted font-medium'
-          }`}
-          aria-label="Đang xem"
-        >
-          <BookOpen size={24} strokeWidth={isReading ? 2.5 : 2} />
-          <span className="text-[13px] sm:text-[14px] leading-tight">Đang xem</span>
-        </Link>
-
-        {/* 4. Đã lưu */}
-        <Link
-          href="/da-luu"
-          className={`flex flex-col items-center justify-center gap-1 transition-opacity active:opacity-80 min-h-[48px] ${
-            isSaved ? 'text-primary font-bold' : 'text-muted font-medium'
-          }`}
-          aria-label="Bài học đã lưu"
-        >
-          <Bookmark size={24} strokeWidth={isSaved ? 2.5 : 2} className={isSaved ? 'fill-primary' : ''} />
-          <span className="text-[13px] sm:text-[14px] leading-tight">Đã lưu</span>
         </Link>
       </div>
     </nav>
