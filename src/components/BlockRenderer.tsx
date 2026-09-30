@@ -10,12 +10,16 @@ interface BlockRendererProps {
   block: Block;
   fontSizeMode?: 'normal' | 'large';
   defaultActiveVideoIndex?: number;
+  isAdmin?: boolean;
+  onOpenVideoManager?: () => void;
 }
 
 export default function BlockRenderer({
   block,
   fontSizeMode = 'normal',
   defaultActiveVideoIndex = 0,
+  isAdmin = false,
+  onOpenVideoManager,
 }: BlockRendererProps) {
   const blockId = `block-${block.id}`;
 
@@ -38,6 +42,8 @@ export default function BlockRenderer({
           videos={block.data.videos}
           displayStyle={block.display_style}
           defaultActiveIndex={defaultActiveVideoIndex}
+          isAdmin={isAdmin}
+          onOpenVideoManager={onOpenVideoManager}
         />
       );
 

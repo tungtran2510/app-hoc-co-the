@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Play, Check, BarChart2, MoreVertical } from 'lucide-react';
+import { Play, Check, BarChart2, MoreVertical, ArrowRight } from 'lucide-react';
 import { Video } from '../../lib/types';
 import SpineIllustration from '../SpineIllustration';
 
@@ -10,6 +10,8 @@ interface VideosBlockProps {
   displayStyle?: 'single' | 'playlist';
   defaultActiveIndex?: number;
   blockId?: string;
+  isAdmin?: boolean;
+  onOpenVideoManager?: () => void;
 }
 
 export default function VideosBlock({
@@ -17,6 +19,8 @@ export default function VideosBlock({
   displayStyle = 'playlist',
   defaultActiveIndex = 0,
   blockId,
+  isAdmin = false,
+  onOpenVideoManager,
 }: VideosBlockProps) {
   const [activeIndex, setActiveIndex] = useState(defaultActiveIndex);
 
@@ -24,7 +28,8 @@ export default function VideosBlock({
     return null;
   }
 
-  const currentVideo = videos[activeIndex] || videos[0];
+  const safeIndex = activeIndex < videos.length ? activeIndex : 0;
+  const currentVideo = videos[safeIndex];
   const isPlaylist = displayStyle === 'playlist' && videos.length > 1;
 
   return (
@@ -33,7 +38,7 @@ export default function VideosBlock({
       <div className="relative w-full aspect-video rounded-[22px] bg-ink overflow-hidden shadow-sm flex items-center justify-center">
         {currentVideo.youtube_id ? (
           <iframe
-            src={`https://www.youtube-nocookie.com/embed/${currentVideo.youtube_id}?rel=0&playsinline=1`}
+            src={`https://www.youtube-nocookie.com/embed/${currentVideo.youtube_id}?rel=0&playsinline=1&autoplay=0`}
             title={currentVideo.title}
             className="w-full h-full border-0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -42,21 +47,25 @@ export default function VideosBlock({
         ) : (
           /* Khung mô phỏng video khi chưa có youtube_id */
           <div className="relative w-full h-full flex flex-col items-center justify-center p-4 bg-gradient-to-b from-[#111A24] to-[#1C2735]">
-            {/* Hình minh họa nền */}
             <div className="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none">
               <SpineIllustration className="h-[80%] max-w-[200px]" />
             </div>
 
-            {/* Nút Play tròn trắng 76px ở giữa */}
             <button
               type="button"
+              onClick={() => {
+                if (isAdmin && onOpenVideoManager) {
+                  onOpenVideoManager();
+                } else {
+                  alert('Video đang được cập nhật.');
+                }
+              }}
               className="relative z-10 w-[76px] h-[76px] rounded-full bg-white flex items-center justify-center text-primary shadow-lg transition-transform active:scale-95"
               aria-label={`Phát video: ${currentVideo.title}`}
             >
               <Play size={34} fill="#0E6B5A" className="ml-1 text-primary" />
             </button>
 
-            {/* Dòng chữ dưới cùng */}
             <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between z-10 text-white text-[15px] font-semibold bg-black/40 px-3 py-1.5 rounded-lg backdrop-blur-xs">
               <span className="truncate pr-2">{currentVideo.title}</span>
               <span className="shrink-0 text-white/80 font-normal">
@@ -70,7 +79,7 @@ export default function VideosBlock({
       {/* Dòng phụ dưới trình phát nếu là playlist */}
       {isPlaylist && (
         <p className="text-[15px] font-semibold text-muted leading-tight px-1">
-          Đang phát {activeIndex + 1}/{videos.length} · Xem hết tự chuyển video tiếp
+          Đang phát {safeIndex + 1}/{videos.length} · Xem hết tự chuyển video tiếp
         </p>
       )}
 
@@ -83,8 +92,8 @@ export default function VideosBlock({
 
           <div className="flex flex-col gap-2">
             {videos.map((vid, idx) => {
-              const isActive = idx === activeIndex;
-              const isWatched = idx < activeIndex;
+              const isActive = idx === safeIndex;
+              const isWatched = idx < safeIndex;
 
               return (
                 <button
@@ -100,12 +109,23 @@ export default function VideosBlock({
                 >
                   {/* Thumbnail 96x64 bo 12px */}
                   <div className="relative w-[96px] h-[64px] rounded-[12px] bg-[#1C2735] shrink-0 overflow-hidden flex items-center justify-center">
-                    <div className="absolute inset-0 flex items-center justify-center opacity-40">
-                      <SpineIllustration className="w-12 h-12" />
-                    </div>
-                    <div className="relative z-10 w-7 h-7 rounded-full bg-white/90 flex items-center justify-center text-primary shadow-xs">
-                      <Play size={14} fill="#0E6B5A" className="ml-0.5 text-primary" />
-                    </div>
+                    {vid.thumbnail_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={vid.thumbnail_url}
+                        alt={vid.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <>
+                        <div className="absolute inset-0 flex items-center justify-center opacity-40">
+                          <SpineIllustration className="w-12 h-12" />
+                        </div>
+                        <div className="relative z-10 w-7 h-7 rounded-full bg-white/90 flex items-center justify-center text-primary shadow-xs">
+                          <Play size={14} fill="#0E6B5A" className="ml-0.5 text-primary" />
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   {/* Thông tin video */}
@@ -150,6 +170,18 @@ export default function VideosBlock({
               );
             })}
           </div>
+
+          {/* Nút Quản lý danh sách video (Hiện khi ở chế độ Admin - Đúng như Screenshot 1) */}
+          {isAdmin && onOpenVideoManager && (
+            <button
+              type="button"
+              onClick={onOpenVideoManager}
+              className="flex items-center justify-center gap-2 h-[52px] min-h-[48px] w-full rounded-[16px] bg-primary text-white font-extrabold text-[16px] transition-transform active:scale-[0.98] mt-1 shadow-xs"
+            >
+              <span>Quản lý danh sách video ({videos.length})</span>
+              <ArrowRight size={18} strokeWidth={2.5} />
+            </button>
+          )}
         </div>
       )}
     </div>

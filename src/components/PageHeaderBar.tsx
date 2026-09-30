@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, Menu, MoreVertical, X } from 'lucide-react';
+import { ChevronLeft, Menu, MoreVertical, X, Lock, Check } from 'lucide-react';
 
 export interface TocItem {
   id: string;
@@ -15,6 +15,8 @@ interface PageHeaderBarProps {
   tocItems: TocItem[];
   fontSizeMode: 'normal' | 'large';
   onFontSizeChange: (mode: 'normal' | 'large') => void;
+  isAdmin?: boolean;
+  onToggleAdmin?: () => void;
 }
 
 export default function PageHeaderBar({
@@ -23,6 +25,8 @@ export default function PageHeaderBar({
   tocItems,
   fontSizeMode,
   onFontSizeChange,
+  isAdmin = false,
+  onToggleAdmin,
 }: PageHeaderBarProps) {
   const [showToc, setShowToc] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
@@ -122,12 +126,12 @@ export default function PageHeaderBar({
         </div>
       )}
 
-      {/* Bảng Tùy chọn (Cỡ chữ) bung ra */}
+      {/* Bảng Tùy chọn (Cỡ chữ & Chế độ quản trị) bung ra */}
       {showOptions && (
-        <div className="absolute top-[62px] right-0 w-[240px] bg-white rounded-[20px] border-[1.5px] border-line shadow-lg p-4 flex flex-col gap-3 z-50 animate-in fade-in duration-200">
+        <div className="absolute top-[62px] right-0 w-[260px] bg-white rounded-[20px] border-[1.5px] border-line shadow-lg p-4 flex flex-col gap-4 z-50 animate-in fade-in duration-200">
           <div className="flex items-center justify-between pb-2 border-b border-line">
             <span className="text-[16px] font-extrabold text-ink uppercase tracking-[0.5px]">
-              CỠ CHỮ
+              TÙY CHỌN
             </span>
             <button
               type="button"
@@ -139,29 +143,64 @@ export default function PageHeaderBar({
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => onFontSizeChange('normal')}
-              className={`h-[48px] rounded-[14px] font-extrabold text-[16px] transition-all ${
-                fontSizeMode === 'normal'
-                  ? 'bg-primary-soft border-2 border-primary text-primary'
-                  : 'bg-surface-2 border border-line-strong text-ink hover:bg-line/40'
-              }`}
-            >
-              Vừa
-            </button>
-            <button
-              type="button"
-              onClick={() => onFontSizeChange('large')}
-              className={`h-[48px] rounded-[14px] font-extrabold text-[18px] transition-all ${
-                fontSizeMode === 'large'
-                  ? 'bg-primary-soft border-2 border-primary text-primary'
-                  : 'bg-surface-2 border border-line-strong text-ink hover:bg-line/40'
-              }`}
-            >
-              Lớn
-            </button>
+          {/* Cỡ chữ */}
+          <div className="flex flex-col gap-2">
+            <span className="text-[14px] font-bold text-muted uppercase tracking-wider">
+              Cỡ chữ
+            </span>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => onFontSizeChange('normal')}
+                className={`h-[48px] rounded-[14px] font-extrabold text-[16px] transition-all ${
+                  fontSizeMode === 'normal'
+                    ? 'bg-primary-soft border-2 border-primary text-primary'
+                    : 'bg-surface-2 border border-line-strong text-ink hover:bg-line/40'
+                }`}
+              >
+                Vừa
+              </button>
+              <button
+                type="button"
+                onClick={() => onFontSizeChange('large')}
+                className={`h-[48px] rounded-[14px] font-extrabold text-[18px] transition-all ${
+                  fontSizeMode === 'large'
+                    ? 'bg-primary-soft border-2 border-primary text-primary'
+                    : 'bg-surface-2 border border-line-strong text-ink hover:bg-line/40'
+                }`}
+              >
+                Lớn
+              </button>
+            </div>
+          </div>
+
+          {/* Quản trị nội dung */}
+          <div className="flex flex-col gap-2 pt-2 border-t border-line">
+            <span className="text-[14px] font-bold text-muted uppercase tracking-wider">
+              Quản trị
+            </span>
+            {isAdmin ? (
+              <button
+                type="button"
+                onClick={() => {
+                  if (onToggleAdmin) onToggleAdmin();
+                  setShowOptions(false);
+                }}
+                className="flex items-center justify-center gap-2 h-[48px] rounded-[14px] bg-[#FFF1E6] text-[#8A3A14] font-bold text-[15px] border border-[#F2B38A]"
+              >
+                <Check size={16} />
+                <span>Thoát chế độ sửa</span>
+              </button>
+            ) : (
+              <Link
+                href="/dang-nhap"
+                onClick={() => setShowOptions(false)}
+                className="flex items-center justify-center gap-2 h-[48px] rounded-[14px] bg-primary-soft text-primary font-bold text-[15px] border border-primary/30"
+              >
+                <Lock size={16} />
+                <span>Đăng nhập quản trị</span>
+              </Link>
+            )}
           </div>
         </div>
       )}
