@@ -92,6 +92,7 @@ export default function EditBlockModal({
   const [newVidUrl, setNewVidUrl] = useState('');
   const [newVidTitle, setNewVidTitle] = useState('');
   const [newVidDuration, setNewVidDuration] = useState('5 phút');
+  const [newVidThumb, setNewVidThumb] = useState('');
 
   // State cho comparison block
   const [leftTitle, setLeftTitle] = useState(
@@ -195,7 +196,9 @@ export default function EditBlockModal({
     if (!title && yid) {
       const meta = await fetchYouTubeMeta(yid);
       title = meta.title;
-      thumb = meta.thumbnail_url;
+      if (!newVidThumb) {
+        thumb = meta.thumbnail_url;
+      }
     }
 
     if (!title && !yid) {
@@ -209,11 +212,12 @@ export default function EditBlockModal({
         youtube_id: yid,
         title: title || `Video bài học (${yid})`,
         duration_text: newVidDuration.trim() || '5 phút',
-        thumbnail_url: thumb,
+        thumbnail_url: newVidThumb.trim() || thumb,
       },
     ]);
     setNewVidUrl('');
     setNewVidTitle('');
+    setNewVidThumb('');
   };
 
   const handleSave = () => {
@@ -859,10 +863,43 @@ export default function EditBlockModal({
                     placeholder="5 phút"
                     className="w-20 h-10 px-2 rounded-[10px] border border-line text-[14px]"
                   />
+                </div>
+                <div className="flex gap-1.5">
+                  <input
+                    type="url"
+                    value={newVidThumb}
+                    onChange={(e) => setNewVidThumb(e.target.value)}
+                    placeholder="Lớp phủ ảnh (URL ảnh bìa / thumbnail)..."
+                    className="flex-1 h-10 px-3 rounded-[10px] border border-line text-[14px]"
+                  />
+                  <label className="flex items-center gap-1 h-10 px-3 rounded-[10px] bg-primary-soft text-primary font-bold text-[13px] border border-primary/30 cursor-pointer hover:bg-primary-soft/80 shrink-0">
+                    <Upload size={14} />
+                    <span>{isUploadingMedia ? 'Đang nén...' : 'Chọn ảnh bìa'}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        try {
+                          setIsUploadingMedia(true);
+                          const res = await uploadImageFile(file);
+                          setNewVidThumb(res.url);
+                        } catch (err: any) {
+                          alert(err.message || 'Lỗi tải ảnh');
+                        } finally {
+                          setIsUploadingMedia(false);
+                          e.target.value = '';
+                        }
+                      }}
+                      disabled={isUploadingMedia}
+                      className="hidden"
+                    />
+                  </label>
                   <button
                     type="button"
                     onClick={handleAddVideoToBlock}
-                    className="h-10 px-4 rounded-[10px] bg-primary text-white font-bold text-[14px]"
+                    className="h-10 px-4 rounded-[10px] bg-primary text-white font-bold text-[14px] cursor-pointer"
                   >
                     Thêm
                   </button>

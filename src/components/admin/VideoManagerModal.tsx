@@ -13,9 +13,12 @@ import {
   Trash2,
   Edit2,
   Sparkles,
+  Image as ImageIcon,
+  RotateCcw,
 } from 'lucide-react';
 import { Video } from '../../lib/types';
 import { extractYouTubeId, fetchYouTubeMeta } from '../../lib/youtube';
+import { uploadImageFile } from '../../lib/storageUpload';
 import SpineIllustration from '../SpineIllustration';
 
 interface VideoManagerModalProps {
@@ -74,6 +77,7 @@ export default function VideoManagerModal({
   const [inputDuration, setInputDuration] = useState('');
   const [inputDescription, setInputDescription] = useState('');
   const [inputThumb, setInputThumb] = useState('');
+  const [isUploadingThumb, setIsUploadingThumb] = useState(false);
   const [isLoadingMeta, setIsLoadingMeta] = useState(false);
   const [fetchSuccessMsg, setFetchSuccessMsg] = useState('');
   const [bulkText, setBulkText] = useState('');
@@ -138,7 +142,10 @@ export default function VideoManagerModal({
     if (!inputTitle.trim()) {
       setInputTitle(meta.title);
     }
-    setInputThumb(meta.thumbnail_url);
+    // Chỉ ghi đè ảnh mặc định nếu người dùng chưa chọn lớp phủ riêng
+    if (!inputThumb || inputThumb.includes('ytimg.com')) {
+      setInputThumb(meta.thumbnail_url);
+    }
     if (!inputDuration) {
       setInputDuration('5 phút');
     }
@@ -294,11 +301,11 @@ export default function VideoManagerModal({
             return (
               <div
                 key={idx}
-                className="flex flex-col gap-2 p-3.5 rounded-[20px] bg-white border border-line shadow-xs"
+                className="flex flex-col gap-2 p-2.5 sm:p-3 rounded-[16px] bg-white border border-line shadow-2xs"
               >
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-2.5">
                   {/* Thumbnail */}
-                  <div className="relative w-[100px] h-[64px] rounded-[12px] bg-[#1C2735] overflow-hidden shrink-0 flex items-center justify-center">
+                  <div className="relative w-[88px] h-[54px] rounded-[10px] bg-[#1C2735] overflow-hidden shrink-0 flex items-center justify-center">
                     {thumbUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -308,30 +315,35 @@ export default function VideoManagerModal({
                       />
                     ) : (
                       <div className="flex items-center justify-center w-full h-full text-white/50">
-                        <SpineIllustration className="w-8 h-8 opacity-40" />
+                        <SpineIllustration className="w-6 h-6 opacity-40" />
                       </div>
                     )}
-                    <span className="absolute bottom-1 right-1 bg-black/75 text-white text-[11px] font-bold px-1.5 py-0.5 rounded-sm">
+                    {vid.thumbnail_url && !vid.thumbnail_url.includes('ytimg.com') && (
+                      <span className="absolute top-0.5 left-0.5 bg-emerald-600 text-white text-[8.5px] font-bold px-1 py-0.2 rounded-xs shadow-xs">
+                        Lớp phủ riêng
+                      </span>
+                    )}
+                    <span className="absolute bottom-0.5 right-0.5 bg-black/75 text-white text-[10px] font-bold px-1 py-0.2 rounded-xs">
                       {vid.duration_text || '05:00'}
                     </span>
                   </div>
 
                   {/* Thông tin */}
                   <div className="flex-1 min-w-0 flex flex-col gap-0.5">
-                    <h4 className="text-[17px] font-bold text-ink leading-snug truncate">
+                    <h4 className="text-[15px] font-bold text-ink leading-snug truncate">
                       {vid.title}
                     </h4>
                     {vid.youtube_id ? (
-                      <span className="text-[12px] font-mono text-primary font-bold">
+                      <span className="text-[11.5px] font-mono text-primary font-bold">
                         YouTube: {vid.youtube_id}
                       </span>
                     ) : (
-                      <span className="text-[12px] text-red-500 font-medium">
+                      <span className="text-[11.5px] text-red-500 font-medium">
                         Chưa có link video
                       </span>
                     )}
                     {vid.description && (
-                      <p className="text-[13px] text-muted truncate">
+                      <p className="text-[12px] text-muted truncate">
                         {vid.description}
                       </p>
                     )}
@@ -339,18 +351,18 @@ export default function VideoManagerModal({
                 </div>
 
                 {/* Các nút thao tác */}
-                <div className="flex items-center justify-between pt-2 border-t border-line/60">
+                <div className="flex items-center justify-between pt-1.5 border-t border-line/60">
                   <div className="flex items-center gap-1.5">
                     {/* Di chuyển lên */}
                     <button
                       type="button"
                       disabled={idx === 0}
                       onClick={() => handleMoveUp(idx)}
-                      className="w-8 h-8 rounded-[8px] bg-surface-2 flex items-center justify-center text-ink disabled:opacity-30 border border-line"
+                      className="w-7 h-7 rounded-[7px] bg-surface-2 flex items-center justify-center text-ink disabled:opacity-30 border border-line"
                       aria-label="Di chuyển lên"
                       title="Di chuyển lên"
                     >
-                      <ChevronUp size={16} />
+                      <ChevronUp size={15} />
                     </button>
 
                     {/* Di chuyển xuống */}
@@ -358,22 +370,22 @@ export default function VideoManagerModal({
                       type="button"
                       disabled={idx === videoList.length - 1}
                       onClick={() => handleMoveDown(idx)}
-                      className="w-8 h-8 rounded-[8px] bg-surface-2 flex items-center justify-center text-ink disabled:opacity-30 border border-line"
+                      className="w-7 h-7 rounded-[7px] bg-surface-2 flex items-center justify-center text-ink disabled:opacity-30 border border-line"
                       aria-label="Di chuyển xuống"
                       title="Di chuyển xuống"
                     >
-                      <ChevronDown size={16} />
+                      <ChevronDown size={15} />
                     </button>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     {/* Nút sửa */}
                     <button
                       type="button"
                       onClick={() => handleStartEdit(idx)}
-                      className="flex items-center gap-1 h-8 px-2.5 rounded-[8px] bg-surface-2 text-ink text-[13px] font-bold border border-line hover:border-primary"
+                      className="flex items-center gap-1 h-7 px-2.5 rounded-[7px] bg-surface-2 text-ink text-[12px] font-bold border border-line hover:border-primary"
                     >
-                      <Edit2 size={13} className="text-primary" />
+                      <Edit2 size={12} className="text-primary" />
                       <span>Sửa</span>
                     </button>
 
@@ -381,9 +393,9 @@ export default function VideoManagerModal({
                     <button
                       type="button"
                       onClick={() => handleDelete(idx)}
-                      className="flex items-center gap-1 h-8 px-2.5 rounded-[8px] bg-red-50 text-red-600 text-[13px] font-bold border border-red-200 hover:bg-red-100"
+                      className="flex items-center gap-1 h-7 px-2.5 rounded-[7px] bg-red-50 text-red-600 text-[12px] font-bold border border-red-200 hover:bg-red-100"
                     >
-                      <Trash2 size={13} />
+                      <Trash2 size={12} />
                       <span>Xóa</span>
                     </button>
                   </div>
@@ -562,6 +574,127 @@ export default function VideoManagerModal({
                     placeholder="Ví dụ: 01. Cấu tạo cột sống"
                     className="w-full h-[44px] px-3 rounded-[12px] border border-line text-[15px] text-ink focus:outline-hidden focus:border-primary"
                   />
+                </div>
+
+                {/* Mục Lớp phủ ảnh bên ngoài (Ảnh bìa / Thumbnail) */}
+                <div className="flex flex-col gap-2 p-3 rounded-[14px] bg-surface-2 border border-line">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[13px] font-extrabold text-ink uppercase tracking-wide flex items-center gap-1.5">
+                      <ImageIcon size={16} className="text-primary shrink-0" />
+                      <span>Lớp phủ ảnh bên ngoài (Ảnh bìa video)</span>
+                    </label>
+                    {inputThumb && (
+                      <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
+                        inputThumb.includes('ytimg.com')
+                          ? 'bg-line text-muted'
+                          : 'bg-emerald-100 text-emerald-800'
+                      }`}>
+                        {inputThumb.includes('ytimg.com') ? 'YouTube mặc định' : 'Lớp phủ riêng ✓'}
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-[12px] text-muted leading-tight">
+                    Ảnh phủ bên ngoài video trước khi bấm phát và làm ảnh đại diện trong danh sách phát (playxit).
+                  </p>
+
+                  <div className="flex items-center gap-3">
+                    {/* Preview ảnh lớp phủ */}
+                    <div className="relative w-[116px] h-[66px] rounded-[10px] bg-[#1C2735] overflow-hidden shrink-0 flex items-center justify-center border border-line">
+                      {inputThumb ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={inputThumb}
+                          alt="Lớp phủ video"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : currentExtractedId ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={`https://i.ytimg.com/vi/${currentExtractedId}/hqdefault.jpg`}
+                          alt="YouTube default"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="text-white/40 flex flex-col items-center">
+                          <ImageIcon size={20} />
+                          <span className="text-[10px] mt-0.5">Chưa có ảnh</span>
+                        </div>
+                      )}
+                      {inputThumb && (
+                        <span className="absolute bottom-1 right-1 bg-black/75 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[3px] leading-none">
+                          Xem trước
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Các nút thao tác với lớp phủ ảnh */}
+                    <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {/* Nút tải ảnh từ máy lên */}
+                        <label className="flex items-center justify-center gap-1.5 h-[36px] px-3 rounded-[9px] bg-primary text-white font-bold text-[12px] cursor-pointer hover:bg-primary-strong active:scale-95 transition-all shadow-xs shrink-0">
+                          <Upload size={13} />
+                          <span>{isUploadingThumb ? 'Đang nén & tải...' : 'Tải ảnh từ máy'}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            disabled={isUploadingThumb}
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              try {
+                                setIsUploadingThumb(true);
+                                const res = await uploadImageFile(file);
+                                setInputThumb(res.url);
+                              } catch (err: any) {
+                                alert(err.message || 'Lỗi khi tải ảnh');
+                              } finally {
+                                setIsUploadingThumb(false);
+                                e.target.value = '';
+                              }
+                            }}
+                            className="hidden"
+                          />
+                        </label>
+
+                        {/* Nút khôi phục ảnh mặc định YouTube nếu đang có link riêng */}
+                        {currentExtractedId && inputThumb && !inputThumb.includes('ytimg.com') && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setInputThumb(`https://i.ytimg.com/vi/${currentExtractedId}/hqdefault.jpg`);
+                            }}
+                            className="flex items-center gap-1 h-[36px] px-2.5 rounded-[9px] bg-white border border-line text-muted hover:text-ink font-bold text-[12px] transition-colors"
+                            title="Dùng lại ảnh mặc định YouTube"
+                          >
+                            <RotateCcw size={13} />
+                            <span>Dùng ảnh YouTube</span>
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Ô dán URL ảnh trực tiếp nếu muốn */}
+                      <div className="flex items-center gap-1 w-full">
+                        <input
+                          type="url"
+                          value={inputThumb}
+                          onChange={(e) => setInputThumb(e.target.value)}
+                          placeholder="Hoặc dán URL ảnh (https://...)..."
+                          className="flex-1 min-w-0 h-[34px] px-2.5 rounded-[8px] bg-white border border-line text-[12px] text-ink focus:outline-hidden focus:border-primary"
+                        />
+                        {inputThumb && (
+                          <button
+                            type="button"
+                            onClick={() => setInputThumb('')}
+                            className="h-[34px] px-2.5 rounded-[8px] bg-white border border-line text-red-600 hover:bg-red-50 text-[12px] font-bold shrink-0"
+                            title="Xóa ảnh lớp phủ"
+                          >
+                            Xóa
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">

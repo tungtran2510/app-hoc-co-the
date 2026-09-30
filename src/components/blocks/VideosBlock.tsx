@@ -289,10 +289,49 @@ export default function VideosBlock({
       {/* Trình phát 16:9 */}
       <div className="relative w-full aspect-video rounded-[22px] bg-ink overflow-hidden shadow-sm flex items-center justify-center">
         {currentVideo.youtube_id ? (
-          <div
-            id={`yt-player-${blockId || 'default'}`}
-            className="w-full h-full border-0"
-          />
+          <>
+            <div
+              id={`yt-player-${blockId || 'default'}`}
+              className="w-full h-full border-0"
+            />
+            {/* Lớp phủ ảnh bên ngoài khi video chưa bắt đầu phát */}
+            {!isPlaying && (
+              <div
+                onClick={() => {
+                  setIsPlaying(true);
+                  if (playerRef.current?.playVideo) {
+                    playerRef.current.playVideo();
+                  }
+                }}
+                className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 cursor-pointer group transition-all"
+                title="Bấm để phát video"
+              >
+                {(currentVideo.thumbnail_url || currentVideo.youtube_id) && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={
+                      currentVideo.thumbnail_url ||
+                      `https://i.ytimg.com/vi/${currentVideo.youtube_id}/hqdefault.jpg`
+                    }
+                    alt={currentVideo.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                )}
+                <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors" />
+
+                <div className="relative z-10 w-[64px] h-[64px] sm:w-[72px] sm:h-[72px] rounded-full bg-white/95 flex items-center justify-center text-primary shadow-2xl transition-transform group-hover:scale-105 active:scale-95">
+                  <Play size={30} fill="#0E6B5A" className="ml-1 text-primary" />
+                </div>
+
+                <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between z-10 text-white text-[13px] sm:text-[14px] font-semibold bg-black/60 px-3 py-1.5 rounded-[10px] backdrop-blur-xs">
+                  <span className="truncate pr-2">{currentVideo.title}</span>
+                  <span className="shrink-0 text-white/80 text-[11px] sm:text-[12px] font-normal">
+                    {currentVideo.duration_text || '5 phút'}
+                  </span>
+                </div>
+              </div>
+            )}
+          </>
         ) : (
           /* Khung mô phỏng video khi chưa có youtube_id */
           <div className="relative w-full h-full flex flex-col items-center justify-center p-4 bg-gradient-to-b from-[#111A24] to-[#1C2735]">
@@ -367,7 +406,7 @@ export default function VideosBlock({
             DANH SÁCH VIDEO ({videos.length})
           </div>
 
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1.5 sm:gap-2">
             {videos.map((vid, idx) => {
               const isActive = idx === safeIndex;
               const isWatched = watchedList.includes(idx + 1);
@@ -379,10 +418,10 @@ export default function VideosBlock({
                 <div
                   key={idx}
                   onClick={() => handleSelectVideo(idx)}
-                  className={`w-full flex flex-col gap-2 p-3 sm:p-3.5 rounded-[18px] text-left transition-all min-h-[48px] cursor-pointer ${
+                  className={`w-full flex items-center gap-2.5 sm:gap-3 p-2 sm:p-2.5 rounded-[14px] sm:rounded-[16px] text-left transition-all min-h-[56px] cursor-pointer ${
                     isActive
-                      ? 'bg-primary-soft border-2 border-primary shadow-xs'
-                      : 'bg-white border-[1.5px] border-line hover:border-line-strong'
+                      ? 'bg-primary-soft/80 border-[1.5px] border-primary shadow-2xs'
+                      : 'bg-white border border-line hover:border-line-strong'
                   }`}
                   role="button"
                   tabIndex={0}
@@ -393,99 +432,91 @@ export default function VideosBlock({
                   }}
                   aria-pressed={isActive}
                 >
-                  {/* HÀNG TRÊN CÙNG: TIÊU ĐỀ VIDEO ĐẦY ĐỦ, TẬN DỤNG 100% CHIỀU RỘNG KHÔNG BỊ CHIẾM DIỆN TÍCH */}
-                  <div className="flex items-start justify-between gap-2 w-full">
-                    <h4 className="text-[15px] sm:text-[16px] font-extrabold text-ink leading-snug break-words flex-1 flex items-center gap-1.5">
-                      {isActive && (
-                        <span className="inline-flex items-center text-primary shrink-0" title="Đang phát">
-                          <BarChart2 size={14} className="animate-pulse" />
-                        </span>
-                      )}
-                      <span>{vid.title}</span>
-                    </h4>
+                  {/* Thumbnail video bên trái với tỷ lệ 16:9 sắc nét, chiều cao gọn */}
+                  <div className="relative w-[86px] h-[52px] sm:w-[94px] sm:h-[56px] rounded-[8px] sm:rounded-[10px] bg-[#1C2735] shrink-0 overflow-hidden flex items-center justify-center">
+                    {thumbUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={thumbUrl}
+                        alt={vid.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <>
+                        <div className="absolute inset-0 flex items-center justify-center opacity-40">
+                          <SpineIllustration className="w-8 h-8" />
+                        </div>
+                        <div className="relative z-10 w-5 h-5 rounded-full bg-white/90 flex items-center justify-center text-primary shadow-xs">
+                          <Play size={10} fill="#0E6B5A" className="ml-0.5 text-primary" />
+                        </div>
+                      </>
+                    )}
 
-                    {isAdmin && onOpenVideoManager && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onOpenVideoManager();
-                        }}
-                        className="text-primary p-1 rounded-md hover:bg-primary-soft cursor-pointer shrink-0"
-                        aria-label="Sửa video"
-                        title="Sửa video"
-                      >
-                        <MoreVertical size={16} />
-                      </button>
+                    {/* Huy hiệu Đang phát hoặc Đã xem gọn gàng trên thumbnail */}
+                    {isActive ? (
+                      <span className="absolute top-1 left-1 bg-primary text-white text-[9px] font-black px-1.5 py-0.5 rounded-[3px] flex items-center gap-1 shadow-xs leading-none">
+                        <BarChart2 size={8} className="animate-pulse shrink-0" />
+                        <span>Phát</span>
+                      </span>
+                    ) : isWatched ? (
+                      <span className="absolute top-1 left-1 bg-emerald-700/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[3px] flex items-center gap-0.5 shadow-xs leading-none">
+                        <Check size={8} strokeWidth={3} />
+                        <span>Đã xem</span>
+                      </span>
+                    ) : null}
+
+                    {vid.duration_text && (
+                      <span className="absolute bottom-1 right-1 bg-black/80 text-white text-[9.5px] font-bold px-1 py-0.2 rounded-[2px] leading-none">
+                        {vid.duration_text}
+                      </span>
                     )}
                   </div>
 
-                  {/* HÀNG DƯỚI: THUMBNAIL + MÔ TẢ & THỜI LƯỢNG */}
-                  <div className="flex items-center gap-3 w-full">
-                    {/* Thumbnail video tỷ lệ chuẩn, sắc nét */}
-                    <div className="relative w-[96px] h-[58px] rounded-[10px] bg-[#1C2735] shrink-0 overflow-hidden flex items-center justify-center">
-                      {thumbUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={thumbUrl}
-                          alt={vid.title}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <>
-                          <div className="absolute inset-0 flex items-center justify-center opacity-40">
-                            <SpineIllustration className="w-10 h-10" />
-                          </div>
-                          <div className="relative z-10 w-6 h-6 rounded-full bg-white/90 flex items-center justify-center text-primary shadow-xs">
-                            <Play size={12} fill="#0E6B5A" className="ml-0.5 text-primary" />
-                          </div>
-                        </>
-                      )}
+                  {/* Nội dung video bên phải */}
+                  <div className="flex-1 min-w-0 flex flex-col justify-center gap-0.5 py-0.5">
+                    <div className="flex items-start justify-between gap-1.5 w-full">
+                      <h4 className={`text-[14px] sm:text-[15px] font-bold leading-snug line-clamp-2 ${
+                        isActive ? 'text-primary font-extrabold' : 'text-ink'
+                      }`}>
+                        {vid.title}
+                      </h4>
 
-                      {/* Huy hiệu Đang phát hoặc Đã xem gọn gàng trên thumbnail */}
-                      {isActive ? (
-                        <span className="absolute top-1 left-1 bg-primary text-white text-[9.5px] font-black px-1.5 py-0.5 rounded-[4px] flex items-center gap-1 shadow-xs leading-none">
-                          <BarChart2 size={9} className="animate-pulse shrink-0" />
-                          <span>Đang phát</span>
-                        </span>
-                      ) : isWatched ? (
-                        <span className="absolute top-1 left-1 bg-emerald-700/90 text-white text-[9.5px] font-bold px-1.5 py-0.5 rounded-[4px] flex items-center gap-0.5 shadow-xs leading-none">
-                          <Check size={9} strokeWidth={3} />
-                          <span>Đã xem</span>
-                        </span>
-                      ) : null}
-
-                      {vid.duration_text && (
-                        <span className="absolute bottom-1 right-1 bg-black/80 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-xs leading-none">
-                          {vid.duration_text}
-                        </span>
+                      {isAdmin && onOpenVideoManager && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onOpenVideoManager();
+                          }}
+                          className="text-muted hover:text-primary p-0.5 rounded-sm hover:bg-surface-2 cursor-pointer shrink-0 -mr-0.5 -mt-0.5"
+                          aria-label="Sửa video"
+                          title="Sửa video"
+                        >
+                          <MoreVertical size={15} />
+                        </button>
                       )}
                     </div>
 
-                    {/* Mô tả hoặc tóm tắt video */}
-                    <div className="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
-                      {vid.description ? (
-                        <p className="text-[13px] text-muted font-normal leading-snug line-clamp-2">
-                          {vid.description}
-                        </p>
-                      ) : (
-                        <p className="text-[13px] text-muted/70 italic font-normal leading-snug">
-                          Video bài giảng thực hành
-                        </p>
+                    {/* Dòng tóm tắt / mô tả ngắn */}
+                    {vid.description && (
+                      <p className="text-[12px] text-muted font-normal leading-snug line-clamp-1 truncate">
+                        {vid.description}
+                      </p>
+                    )}
+
+                    {/* Dòng thời lượng & trạng thái */}
+                    <div className="flex items-center gap-1.5 text-[11.5px] text-muted font-medium">
+                      <span>{vid.duration_text || '5 phút'}</span>
+                      {isActive && (
+                        <span className="text-primary font-bold flex items-center gap-0.5">
+                          · Đang phát
+                        </span>
                       )}
-                      <div className="flex items-center gap-1.5 text-[12px] text-muted font-medium mt-0.5">
-                        <span>Thời lượng: {vid.duration_text || '5 phút'}</span>
-                        {isActive && (
-                          <span className="text-primary font-extrabold flex items-center gap-1">
-                            · Đang phát
-                          </span>
-                        )}
-                        {isWatched && !isActive && (
-                          <span className="text-emerald-700 font-bold flex items-center gap-1">
-                            · Đã xem
-                          </span>
-                        )}
-                      </div>
+                      {isWatched && !isActive && (
+                        <span className="text-emerald-700 font-bold flex items-center gap-0.5">
+                          · Đã xem
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
