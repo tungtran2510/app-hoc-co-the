@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive 3D anatomy atlas built on Z-Anatomy">
+  <title>Atlas Giải Phẫu 3D - Human Anatomy Atlas</title>
+  <link rel="icon" type="image/svg+xml" href="/3d/favicon.svg">
+  <script type="module" crossorigin src="/3d/assets/index-CFKFonDB.js"></script>
+  <link rel="stylesheet" crossorigin href="/3d/assets/index-Y3zCtzNR.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <button id="systemsOpen" class="btn-icon drawer-open" aria-label="Open systems" title="Hệ cơ quan">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+        <h1 class="logo">Atlas 3D</h1>
+      </div>
+      <div class="header-center">
+        <div class="search-container">
+          <input type="text" id="searchInput" class="search-input" placeholder="Tìm kiếm cấu trúc giải phẫu..." autocomplete="off">
+          <div id="searchResults" class="search-results"></div>
+        </div>
+      </div>
+      <div class="header-right">
+        <button id="searchOpen" class="btn-icon drawer-open" aria-label="Search" title="Tìm kiếm" aria-expanded="false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        </button>
+        <select id="langSelect" class="lang-select" aria-label="Ngôn ngữ">
+          <option value="vi" selected>VI</option>
+          <option value="en">EN</option>
+          <option value="it">IT</option>
+        </select>
+        <button id="helpBtn" class="btn-icon" aria-label="Help" title="Help">?</button>
+        <button id="infoOpen" class="btn-icon" aria-label="Open information" title="Information">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main layout -->
+    <main class="main-layout">
+      <!-- Sidebar - Systems, Regions, Bookmarks, History -->
+      <aside class="sidebar sidebar-systems" id="systemsSidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-tabs">
+            <button class="sidebar-tab active" data-tab="systems">Hệ cơ quan</button>
+            <button class="sidebar-tab" data-tab="regions">Vùng</button>
+            <button class="sidebar-tab" data-tab="bookmarks">Đã lưu</button>
+            <button class="sidebar-tab" data-tab="history">Lịch sử</button>
+          </div>
+          <button class="sidebar-toggle" id="systemsToggle" aria-label="Close systems">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="sidebar-content">
+          <div id="tabSystemsContent" class="tab-pane active">
+            <div id="systemsList"></div>
+          </div>
+          <div id="tabRegionsContent" class="tab-pane hidden">
+            <div id="regionsList" class="regions-list"></div>
+          </div>
+          <div id="tabBookmarksContent" class="tab-pane hidden">
+            <div id="bookmarksList" class="bookmarks-list"></div>
+          </div>
+          <div id="tabHistoryContent" class="tab-pane hidden">
+            <div id="historyList" class="history-list"></div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 3D Viewer -->
+      <section class="viewer-section">
+        <div id="viewerContainer" class="viewer-container">
+          <canvas id="threeCanvas" tabindex="0" role="application"
+                  aria-label="3D anatomy viewer. Arrow keys orbit, plus and minus zoom."></canvas>
+          <div id="loadingOverlay" class="loading-overlay">
+            <div class="loading-spinner"></div>
+            <span class="loading-text">Loading 3D model...</span>
+          </div>
+
+          <!-- Preset views float over the canvas -->
+          <div class="viewer-controls" id="viewerControls">
+            <button class="control-btn" id="frontViewBtn" title="Nhìn phía trước">Trước</button>
+            <button class="control-btn" id="sideViewBtn" title="Nhìn nghiêng">Nghiêng</button>
+            <button class="control-btn" id="backViewBtn" title="Nhìn phía sau">Sau</button>
+            <button class="control-btn" id="topViewBtn" title="Nhìn từ trên">Trên</button>
+            <button class="control-btn" id="resetBtn" title="Đặt lại góc nhìn">Đặt lại</button>
+          </div>
+
+          <!-- Floating Tools Bar (Visible Body Style: Explode, Labels, Quiz) -->
+          <div class="viewer-tools" id="viewerTools">
+            <button class="tool-btn" id="btnToolExplode" title="Tách rời các xương / bộ phận">
+              <span>🧩 Tách rời</span>
+            </button>
+            <button class="tool-btn" id="btnToolLabels" title="Bật/Tắt nhãn mốc giải phẫu 3D">
+              <span>🏷️ Nhãn 3D</span>
+            </button>
+            <button class="tool-btn highlight" id="btnToolQuiz" title="Trắc nghiệm chạm cấu trúc 3D">
+              <span>🎯 Trắc nghiệm</span>
+            </button>
+          </div>
+
+          <!-- Exploded View Popover Slider -->
+          <div class="explode-popover hidden" id="explodePopover">
+            <div class="explode-popover-header">
+              <span>Độ tách rời cấu trúc</span>
+              <button class="popover-close-btn" id="explodeCloseBtn">&times;</button>
+            </div>
+            <div class="explode-slider-row">
+              <input type="range" id="explodeSlider" min="0" max="100" value="0" step="1">
+              <span id="explodeValue">0%</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sidebar - Info Panel -->
+      <aside class="sidebar sidebar-info" id="infoSidebar">
+        <div class="sidebar-header">
+          <h2>Thông tin giải phẫu</h2>
+          <button class="sidebar-toggle" id="infoToggle" aria-label="Đóng thông tin">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="sidebar-content" id="infoContent">
+          <div class="info-placeholder">
+            <svg class="placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            <p>Chọn một cấu trúc giải phẫu</p>
+            <span class="hint">Chạm hoặc click vào mô hình 3D để xem chi tiết</span>
+          </div>
+          <div id="structureInfo" class="structure-info hidden"></div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Floating Selection Card (Visible Body style) -->
+    <div class="selection-card hidden" id="selectionCard">
+      <div class="selection-card-header">
+        <div class="selection-card-text">
+          <h4 id="cardTitle">Chọn cấu trúc</h4>
+          <span id="cardSubtitle">Tên Latinh • Hệ cơ quan</span>
+        </div>
+        <button class="card-close-btn" id="cardCloseBtn" aria-label="Đóng">&times;</button>
+      </div>
+      <div class="selection-card-actions">
+        <button class="card-action-btn bookmark" id="cardBookmarkBtn" title="Lưu cấu trúc">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          Lưu
+        </button>
+        <button class="card-action-btn isolate" id="cardIsolateBtn" title="Chỉ xem bộ phận này">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+          Cô lập
+        </button>
+        <button class="card-action-btn hide" id="cardHideBtn" title="Bóc tách / Ẩn bộ phận này">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          Ẩn đi
+        </button>
+        <button class="card-action-btn ghost" id="cardGhostBtn" title="Làm mờ bộ phận xung quanh">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M6.34 17.66l-1.41 1.41"/><path d="M19.07 4.93l-1.41 1.41"/></svg>
+          Bóng mờ
+        </button>
+        <button class="card-action-btn lesson" id="cardLessonBtn" title="Học bài học tương ứng">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          Bài học
+        </button>
+        <button class="card-action-btn info" id="cardInfoBtn" title="Xem giải phẫu chi tiết">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          Chi tiết
+        </button>
+      </div>
+    </div>
+
+    <!-- Permanent Mobile Bottom Bar (Visible Body 5-action toolbar) -->
+    <nav class="mobile-bottom-bar" id="mobileBottomBar">
+      <button class="nav-item" id="btnNavSystems" aria-label="Hệ cơ quan">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span>Hệ cơ quan</span>
+      </button>
+      <button class="nav-item" id="btnNavSearch" aria-label="Tìm kiếm">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <span>Tìm kiếm</span>
+      </button>
+      <button class="nav-item dissect-toggle" id="btnNavDissect" aria-label="Bóc tách">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2l4 4-10 10-4-4z"/><path d="M4 22l4-4-4-4z"/></svg>
+        <span>Bóc tách</span>
+      </button>
+      <button class="nav-item" id="btnNavUndo" aria-label="Hoàn tác">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 14L4 9l5-5"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+        <span>Hoàn tác</span>
+      </button>
+      <button class="nav-item" id="btnNavReset" aria-label="Khôi phục">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        <span>Khôi phục</span>
+      </button>
+    </nav>
+
+    <!-- App Toast -->
+    <div id="appToast" class="app-toast hidden"></div>
+
+    <!-- Help Modal -->
+    <div class="modal hidden" id="helpModal" role="dialog" aria-labelledby="helpTitle" aria-modal="true">
+      <div class="modal-overlay"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="helpTitle" data-i18n="controls_title">Controls</h3>
+          <button class="modal-close" id="helpClose" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="help-section">
+            <h4 data-i18n="help_computer">Computer</h4>
+            <ul>
+              <li><kbd data-i18n="help_left_drag">Left drag</kbd> <span data-i18n="help_rotate">Rotate</span></li>
+              <li><kbd data-i18n="help_wheel">Wheel</kbd> <span data-i18n="help_zoom">Zoom</span></li>
+              <li><kbd data-i18n="help_right_drag">Right drag</kbd> <span data-i18n="help_pan">Pan</span></li>
+              <li><kbd data-i18n="help_double_click">Double click</kbd> <span data-i18n="help_frame">Frame structure</span></li>
+            </ul>
+          </div>
+          <div class="help-section">
+            <h4 data-i18n="help_touch">Touch</h4>
+            <ul>
+              <li><kbd data-i18n="help_one_finger">One finger</kbd> <span data-i18n="help_rotate">Rotate</span></li>
+              <li><kbd data-i18n="help_pinch">Pinch</kbd> <span data-i18n="help_zoom">Zoom</span></li>
+              <li><kbd data-i18n="help_two_finger">Two-finger drag</kbd> <span data-i18n="help_pan">Pan</span></li>
+              <li><kbd data-i18n="help_tap">Tap</kbd> <span data-i18n="help_select">Select</span></li>
+            </ul>
+          </div>
+          <div class="help-section">
+            <h4 data-i18n="help_panels">Panels</h4>
+            <ul>
+              <li data-i18n="help_left_panel">Left panel: anatomical systems</li>
+              <li data-i18n="help_right_panel">Right panel: structure details</li>
+              <li data-i18n="help_bottom_bar">Bottom bar: actions on the selection</li>
+              <li data-i18n="help_toolbar">Toolbar: preset views</li>
+            </ul>
+          </div>
+          <div class="help-section">
+            <h4 data-i18n="help_credits">Credits and licences</h4>
+            <ul>
+              <li><a href="https://lifesciencedb.jp/bp3d/" target="_blank" rel="noopener" style="color: var(--accent);">BodyParts3D</a> anatomical models, CC BY-SA 2.1 Japan</li>
+              <li><a href="https://www.z-anatomy.com/" target="_blank" rel="noopener" style="color: var(--accent);">Z-Anatomy</a> model rework, CC BY-SA 4.0</li>
+              <li><a href="https://en.wikipedia.org/wiki/Wikipedia:Copyrights" target="_blank" rel="noopener" style="color: var(--accent);">Wikipedia</a> structure definitions, CC BY-SA 3.0 and GFDL</li>
+              <li>University of Dundee, CAHID: cranial nerves and foramina, CC BY 4.0</li>
+              <li>University of Dundee: inner ear, CC BY-NC-SA 4.0</li>
+              <li>lissiecowley: kidney, CC BY-NC 4.0</li>
+            </ul>
+            <p class="hint" style="margin-top: 12px;">Mixed-licence derivative work, distributed NON-COMMERCIALLY (CC BY-NC-SA 4.0): the NC clause comes from the inner ear and kidney models. Attribution and share-alike are required. See LICENSE and NOTICE in the repository.</p>
+          </div>
+        </div>
+    <!-- Video Player Modal -->
+    <div class="modal hidden" id="videoModal" role="dialog" aria-modal="true">
+      <div class="modal-overlay" id="videoModalOverlay"></div>
+      <div class="modal-content video-modal-content">
+        <div class="modal-header">
+          <h3 id="videoModalTitle">Video Bài Giảng Giải Phẫu</h3>
+          <button class="modal-close" id="videoModalClose" aria-label="Đóng">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="video-container" id="videoFrameContainer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

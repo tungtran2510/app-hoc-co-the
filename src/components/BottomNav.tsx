@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookOpen, Bookmark, Sparkles } from 'lucide-react';
+import { Home, BookOpen, Bookmark, Sparkles, Box } from 'lucide-react';
 import { getStoredXemTiep } from '../lib/learningProgress';
 
 export default function BottomNav() {
@@ -25,16 +25,17 @@ export default function BottomNav() {
   }, [pathname]);
 
   const isHome = pathname === '/';
+  const is3D = pathname.startsWith('/giai-phau-3d');
   const isSaved = pathname === '/da-luu';
   const isAi = pathname === '/tro-ly-ai';
-  const isReading = !isHome && !isAi && !isSaved && !pathname.startsWith('/dang-nhap') && !pathname.startsWith('/tim-kiem');
+  const isReading = !isHome && !is3D && !isAi && !isSaved && !pathname.startsWith('/dang-nhap') && !pathname.startsWith('/tim-kiem');
 
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-30 flex justify-center bg-white border-t border-line"
       aria-label="Điều hướng chính"
     >
-      <div className="w-full max-w-[480px] h-[80px] pb-2 grid grid-cols-4 select-none">
+      <div className="w-full max-w-[480px] h-[80px] pb-2 grid grid-cols-5 select-none">
         {/* 1. Trang chủ */}
         <Link
           href="/"
@@ -44,11 +45,24 @@ export default function BottomNav() {
           }`}
           aria-label="Trang chủ"
         >
-          <Home size={24} strokeWidth={isHome ? 2.5 : 2} />
-          <span className="text-[13px] sm:text-[14px] leading-tight">Trang chủ</span>
+          <Home size={22} strokeWidth={isHome ? 2.5 : 2} />
+          <span className="text-[11px] sm:text-[12px] leading-tight">Trang chủ</span>
         </Link>
 
-        {/* 2. Đang xem */}
+        {/* 2. Mô hình 3D */}
+        <Link
+          href="/giai-phau-3d"
+          prefetch={true}
+          className={`flex flex-col items-center justify-center gap-1 transition-all duration-100 active:scale-90 active:opacity-70 min-h-[48px] cursor-pointer ${
+            is3D ? 'text-primary font-bold' : 'text-muted font-medium'
+          }`}
+          aria-label="Mô hình 3D"
+        >
+          <Box size={22} strokeWidth={is3D ? 2.5 : 2} className={is3D ? 'fill-primary/20' : ''} />
+          <span className="text-[11px] sm:text-[12px] leading-tight font-semibold">Mô hình 3D</span>
+        </Link>
+
+        {/* 3. Đang xem */}
         <Link
           href={continueUrl}
           prefetch={true}
@@ -57,11 +71,11 @@ export default function BottomNav() {
           }`}
           aria-label="Đang xem"
         >
-          <BookOpen size={24} strokeWidth={isReading ? 2.5 : 2} />
-          <span className="text-[13px] sm:text-[14px] leading-tight">Đang xem</span>
+          <BookOpen size={22} strokeWidth={isReading ? 2.5 : 2} />
+          <span className="text-[11px] sm:text-[12px] leading-tight">Đang xem</span>
         </Link>
 
-        {/* 3. Đã lưu */}
+        {/* 4. Đã lưu */}
         <Link
           href="/da-luu"
           prefetch={true}
@@ -70,11 +84,11 @@ export default function BottomNav() {
           }`}
           aria-label="Bài học đã lưu"
         >
-          <Bookmark size={24} strokeWidth={isSaved ? 2.5 : 2} className={isSaved ? 'fill-primary' : ''} />
-          <span className="text-[13px] sm:text-[14px] leading-tight">Đã lưu</span>
+          <Bookmark size={22} strokeWidth={isSaved ? 2.5 : 2} className={isSaved ? 'fill-primary' : ''} />
+          <span className="text-[11px] sm:text-[12px] leading-tight">Đã lưu</span>
         </Link>
 
-        {/* 4. Trợ lý AI (Góc ngoài cùng bên phải, cạnh Đã lưu) */}
+        {/* 5. Trợ lý AI */}
         <Link
           href="/tro-ly-ai"
           prefetch={true}
@@ -84,10 +98,10 @@ export default function BottomNav() {
           aria-label="Trợ lý AI"
         >
           <div className="relative">
-            <Sparkles size={24} strokeWidth={isAi ? 2.5 : 2} className={isAi ? 'fill-primary/20 text-primary' : ''} />
+            <Sparkles size={22} strokeWidth={isAi ? 2.5 : 2} className={isAi ? 'fill-primary/20 text-primary' : ''} />
             <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-primary animate-pulse" />
           </div>
-          <span className="text-[13px] sm:text-[14px] leading-tight">Trợ lý AI</span>
+          <span className="text-[11px] sm:text-[12px] leading-tight">Trợ lý AI</span>
         </Link>
       </div>
     </nav>

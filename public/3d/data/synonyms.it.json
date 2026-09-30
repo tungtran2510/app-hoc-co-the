@@ -1,0 +1,665 @@
+{
+  "abdominal aorta": [
+    "aorta addominale",
+    "aorta"
+  ],
+  "abducens nerve (vi)": [
+    "nervo abducente"
+  ],
+  "accessory nerve (xi)": [
+    "nervo accessorio"
+  ],
+  "adductor brevis": [
+    "adduttore breve"
+  ],
+  "adductor longus": [
+    "adduttore lungo"
+  ],
+  "adductor magnus": [
+    "grande adduttore"
+  ],
+  "adenohypophysis": [
+    "adenoipofisi",
+    "ipofisi"
+  ],
+  "amygdaloid body": [
+    "amigdala"
+  ],
+  "aortic arch": [
+    "arco aortico"
+  ],
+  "arytenoid cartilage": [
+    "cartilagine aritenoidea"
+  ],
+  "ascending aorta": [
+    "aorta ascendente"
+  ],
+  "ascending colon": [
+    "colon ascendente"
+  ],
+  "atlas (c1)": [
+    "atlante",
+    "prima vertebra cervicale"
+  ],
+  "axis (c2)": [
+    "epistrofeo",
+    "seconda vertebra cervicale"
+  ],
+  "biceps brachii": [
+    "bicipite brachiale",
+    "bicipite"
+  ],
+  "biceps femoris": [
+    "bicipite femorale"
+  ],
+  "body of sternum": [
+    "corpo dello sterno",
+    "sterno"
+  ],
+  "brachial artery": [
+    "arteria brachiale"
+  ],
+  "brachial plexus": [
+    "plesso brachiale"
+  ],
+  "brachialis": [
+    "brachiale"
+  ],
+  "brachioradialis": [
+    "brachioradiale"
+  ],
+  "calcaneal tendon": [
+    "tendine di achille",
+    "tendine calcaneale"
+  ],
+  "calcaneus": [
+    "calcagno",
+    "calcaneo"
+  ],
+  "capitate bone": [
+    "capitato"
+  ],
+  "cerebellum": [
+    "cervelletto"
+  ],
+  "clavicle": [
+    "clavicola"
+  ],
+  "coccyx": [
+    "coccige"
+  ],
+  "cochlea": [
+    "coclea"
+  ],
+  "common carotid artery": [
+    "arteria carotide comune",
+    "carotide"
+  ],
+  "cornea": [
+    "cornea"
+  ],
+  "coronary sinus": [
+    "seno coronarico"
+  ],
+  "corpus callosum": [
+    "corpo calloso"
+  ],
+  "cricoid cartilage": [
+    "cartilagine cricoidea"
+  ],
+  "cuboid bone": [
+    "osso cuboide"
+  ],
+  "deltoid muscle": [
+    "deltoide"
+  ],
+  "descending colon": [
+    "colon discendente"
+  ],
+  "diaphragm": [
+    "diaframma"
+  ],
+  "duodenum": [
+    "duodeno"
+  ],
+  "eighth rib": [
+    "ottava costa"
+  ],
+  "eleventh rib": [
+    "undicesima costa"
+  ],
+  "epiglottis": [
+    "epiglottide"
+  ],
+  "ethmoid bone": [
+    "osso etmoide",
+    "etmoide"
+  ],
+  "extensor digitorum": [
+    "estensore delle dita"
+  ],
+  "external carotid artery": [
+    "arteria carotide esterna"
+  ],
+  "external oblique": [
+    "obliquo esterno"
+  ],
+  "eyeball": [
+    "bulbo oculare",
+    "occhio"
+  ],
+  "facial nerve (vii)": [
+    "nervo facciale"
+  ],
+  "femoral artery": [
+    "arteria femorale"
+  ],
+  "femoral nerve": [
+    "nervo femorale"
+  ],
+  "femoral vein": [
+    "vena femorale"
+  ],
+  "femur": [
+    "femore"
+  ],
+  "fibula": [
+    "perone",
+    "fibula"
+  ],
+  "fifth rib": [
+    "quinta costa"
+  ],
+  "first rib": [
+    "prima costa",
+    "costola"
+  ],
+  "flexor digitorum profundus": [
+    "flessore profondo delle dita"
+  ],
+  "fourth rib": [
+    "quarta costa"
+  ],
+  "frontal bone": [
+    "osso frontale"
+  ],
+  "gallbladder": [
+    "cistifellea",
+    "colecisti"
+  ],
+  "gastrocnemius": [
+    "gastrocnemio",
+    "polpaccio"
+  ],
+  "gluteus maximus": [
+    "grande gluteo",
+    "gluteo"
+  ],
+  "gluteus medius": [
+    "medio gluteo"
+  ],
+  "gluteus minimus": [
+    "piccolo gluteo"
+  ],
+  "gracilis": [
+    "gracile"
+  ],
+  "great saphenous vein": [
+    "grande safena",
+    "safena"
+  ],
+  "hamate bone": [
+    "uncinato"
+  ],
+  "hepatic portal vein": [
+    "vena porta"
+  ],
+  "hip bone": [
+    "osso dell'anca",
+    "osso iliaco",
+    "bacino"
+  ],
+  "hippocampus": [
+    "ippocampo"
+  ],
+  "humerus": [
+    "omero"
+  ],
+  "hyoid bone": [
+    "osso ioide",
+    "ioide"
+  ],
+  "hypoglossal nerve (xii)": [
+    "nervo ipoglosso"
+  ],
+  "hypothalamus": [
+    "ipotalamo"
+  ],
+  "iliacus": [
+    "iliaco"
+  ],
+  "incus": [
+    "incudine"
+  ],
+  "inferior vena cava": [
+    "vena cava inferiore"
+  ],
+  "infraspinatus": [
+    "sottospinato"
+  ],
+  "internal carotid artery": [
+    "arteria carotide interna"
+  ],
+  "internal jugular vein": [
+    "vena giugulare interna",
+    "giugulare"
+  ],
+  "internal oblique": [
+    "obliquo interno"
+  ],
+  "jejunum": [
+    "digiuno"
+  ],
+  "kidney": [
+    "rene"
+  ],
+  "lacrimal bone": [
+    "osso lacrimale"
+  ],
+  "latissimus dorsi": [
+    "gran dorsale",
+    "grande dorsale"
+  ],
+  "left atrium": [
+    "atrio sinistro",
+    "cuore"
+  ],
+  "left coronary artery": [
+    "arteria coronaria sinistra",
+    "coronaria"
+  ],
+  "lens": [
+    "cristallino"
+  ],
+  "levator scapulae": [
+    "elevatore della scapola"
+  ],
+  "liver": [
+    "fegato"
+  ],
+  "lunate bone": [
+    "semilunare"
+  ],
+  "malleus": [
+    "martello"
+  ],
+  "mandible": [
+    "mandibola"
+  ],
+  "manubrium of sternum": [
+    "manubrio dello sterno"
+  ],
+  "masseter": [
+    "massetere"
+  ],
+  "maxilla": [
+    "mascella",
+    "mascellare"
+  ],
+  "median nerve": [
+    "nervo mediano"
+  ],
+  "medulla oblongata": [
+    "bulbo",
+    "midollo allungato"
+  ],
+  "midbrain": [
+    "mesencefalo",
+    "encefalo"
+  ],
+  "nasal bone": [
+    "osso nasale"
+  ],
+  "nasal septal cartilage": [
+    "cartilagine del setto nasale",
+    "setto nasale"
+  ],
+  "navicular bone": [
+    "osso navicolare",
+    "scafoide del piede"
+  ],
+  "neurohypophysis": [
+    "neuroipofisi",
+    "ipofisi"
+  ],
+  "ninth rib": [
+    "nona costa"
+  ],
+  "occipital bone": [
+    "osso occipitale"
+  ],
+  "oculomotor nerve (iii)": [
+    "nervo oculomotore"
+  ],
+  "oesophagus": [
+    "esofago"
+  ],
+  "optic nerve (ii)": [
+    "nervo ottico"
+  ],
+  "orbicularis oculi": [
+    "orbicolare dell'occhio"
+  ],
+  "orbicularis oris": [
+    "orbicolare della bocca"
+  ],
+  "palatine bone": [
+    "osso palatino"
+  ],
+  "palatine tonsil": [
+    "tonsilla palatina"
+  ],
+  "pancreas": [
+    "pancreas"
+  ],
+  "parathyroid gland": [
+    "paratiroide"
+  ],
+  "parietal bone": [
+    "osso parietale"
+  ],
+  "parotid gland": [
+    "ghiandola parotide",
+    "parotide"
+  ],
+  "patella": [
+    "rotula",
+    "patella"
+  ],
+  "pectoralis major muscle": [
+    "grande pettorale",
+    "pettorale"
+  ],
+  "pectoralis minor muscle": [
+    "piccolo pettorale"
+  ],
+  "pharynx": [
+    "faringe"
+  ],
+  "phrenic nerve": [
+    "nervo frenico"
+  ],
+  "pineal gland": [
+    "epifisi",
+    "ghiandola pineale"
+  ],
+  "pisiform bone": [
+    "pisiforme"
+  ],
+  "pons": [
+    "ponte"
+  ],
+  "popliteal artery": [
+    "arteria poplitea"
+  ],
+  "prostate": [
+    "prostata"
+  ],
+  "psoas major": [
+    "grande psoas",
+    "psoas"
+  ],
+  "pulmonary trunk": [
+    "tronco polmonare"
+  ],
+  "radial artery": [
+    "arteria radiale"
+  ],
+  "radial nerve": [
+    "nervo radiale"
+  ],
+  "radius": [
+    "radio"
+  ],
+  "rectus abdominis": [
+    "retto dell'addome",
+    "addominali"
+  ],
+  "rectus femoris": [
+    "retto femorale"
+  ],
+  "renal artery": [
+    "arteria renale"
+  ],
+  "retina": [
+    "retina"
+  ],
+  "rhomboid major": [
+    "grande romboide"
+  ],
+  "right atrium": [
+    "atrio destro",
+    "cuore"
+  ],
+  "right coronary artery": [
+    "arteria coronaria destra"
+  ],
+  "sacrum": [
+    "sacro",
+    "osso sacro"
+  ],
+  "sartorius": [
+    "sartorio"
+  ],
+  "scaphoid bone": [
+    "scafoide"
+  ],
+  "scapula": [
+    "scapola"
+  ],
+  "sciatic nerve": [
+    "nervo sciatico",
+    "sciatico"
+  ],
+  "second rib": [
+    "seconda costa"
+  ],
+  "semimembranosus": [
+    "semimembranoso"
+  ],
+  "semitendinosus": [
+    "semitendinoso"
+  ],
+  "seventh rib": [
+    "settima costa"
+  ],
+  "sigmoid colon": [
+    "colon sigmoideo",
+    "sigma"
+  ],
+  "sixth rib": [
+    "sesta costa"
+  ],
+  "soleus": [
+    "soleo"
+  ],
+  "sphenoid bone": [
+    "osso sfenoide",
+    "sfenoide"
+  ],
+  "spinal cord": [
+    "midollo spinale"
+  ],
+  "spleen": [
+    "milza"
+  ],
+  "stapes": [
+    "staffa"
+  ],
+  "sternocleidomastoid": [
+    "sternocleidomastoideo"
+  ],
+  "stomach": [
+    "stomaco"
+  ],
+  "subclavian artery": [
+    "arteria succlavia"
+  ],
+  "subclavian vein": [
+    "vena succlavia"
+  ],
+  "subscapularis muscle": [
+    "sottoscapolare"
+  ],
+  "superior mesenteric artery": [
+    "arteria mesenterica superiore"
+  ],
+  "superior vena cava": [
+    "vena cava superiore"
+  ],
+  "suprarenal gland": [
+    "surrene",
+    "ghiandola surrenale"
+  ],
+  "supraspinatus": [
+    "sovraspinato"
+  ],
+  "talus": [
+    "astragalo",
+    "talo"
+  ],
+  "temporal bone": [
+    "osso temporale"
+  ],
+  "temporalis": [
+    "temporale muscolo"
+  ],
+  "tenth rib": [
+    "decima costa"
+  ],
+  "teres major": [
+    "grande rotondo"
+  ],
+  "teres minor": [
+    "piccolo rotondo"
+  ],
+  "testis": [
+    "testicolo"
+  ],
+  "thalamus": [
+    "talamo"
+  ],
+  "third rib": [
+    "terza costa"
+  ],
+  "thoracic aorta": [
+    "aorta toracica"
+  ],
+  "thymus": [
+    "timo"
+  ],
+  "thyroid cartilage": [
+    "cartilagine tiroidea",
+    "pomo d'adamo"
+  ],
+  "thyroid gland": [
+    "tiroide",
+    "ghiandola tiroidea"
+  ],
+  "tibia": [
+    "tibia"
+  ],
+  "tibialis anterior": [
+    "tibiale anteriore"
+  ],
+  "tongue": [
+    "lingua"
+  ],
+  "tonsil": [
+    "tonsilla"
+  ],
+  "trachea": [
+    "trachea"
+  ],
+  "transverse colon": [
+    "colon trasverso"
+  ],
+  "transversus abdominis": [
+    "trasverso dell'addome"
+  ],
+  "trapezium bone": [
+    "trapezio"
+  ],
+  "trapezius": [
+    "trapezio muscolo"
+  ],
+  "trapezoid bone": [
+    "trapezoide"
+  ],
+  "triceps brachii": [
+    "tricipite brachiale",
+    "tricipite"
+  ],
+  "trigeminal nerve (v)": [
+    "nervo trigemino",
+    "trigemino"
+  ],
+  "triquetrum bone": [
+    "piramidale"
+  ],
+  "twelfth rib": [
+    "dodicesima costa"
+  ],
+  "tympanic membrane": [
+    "membrana timpanica",
+    "timpano"
+  ],
+  "ulna": [
+    "ulna"
+  ],
+  "ulnar artery": [
+    "arteria ulnare"
+  ],
+  "ulnar nerve": [
+    "nervo ulnare"
+  ],
+  "ureter": [
+    "uretere"
+  ],
+  "urethra": [
+    "uretra"
+  ],
+  "urinary bladder": [
+    "vescica"
+  ],
+  "vagus nerve (x)": [
+    "nervo vago",
+    "vago"
+  ],
+  "vastus intermedius": [
+    "vasto intermedio"
+  ],
+  "vastus lateralis": [
+    "vasto laterale"
+  ],
+  "vastus medialis": [
+    "vasto mediale"
+  ],
+  "ventricle": [
+    "ventricolo",
+    "cuore"
+  ],
+  "vermiform appendix": [
+    "appendice"
+  ],
+  "vomer": [
+    "vomere"
+  ],
+  "xiphoid process": [
+    "processo xifoideo"
+  ],
+  "zygomatic bone": [
+    "osso zigomatico",
+    "zigomo"
+  ]
+}
