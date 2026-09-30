@@ -27,6 +27,15 @@ export interface AuthorProfile {
   address?: string | null;
 }
 
+export interface RecommendedBook {
+  id: string;
+  title: string;
+  cover_url: string | null;
+  description: string;
+  author?: string | null;
+  link_url?: string | null;
+}
+
 export interface Settings {
   workspace_id: string;
   app_name: string;
@@ -43,6 +52,9 @@ export interface Settings {
   home_title?: string | null;
   search_placeholder?: string | null;
   topics_title?: string | null;
+  recommended_books_title?: string | null;
+  recommended_books_subtitle?: string | null;
+  recommended_books?: RecommendedBook[];
 }
 
 export interface Topic {

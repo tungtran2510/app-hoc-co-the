@@ -1,4 +1,4 @@
-import { Settings, Topic, Page, Block, AuthorProfile } from '../lib/types';
+import { Settings, Topic, Page, Block, AuthorProfile, RecommendedBook } from '../lib/types';
 
 export const DEFAULT_AUTHOR_PROFILE: AuthorProfile = {
   name: 'Bác sĩ / Chuyên gia Trị liệu',
@@ -35,6 +35,41 @@ export const DEFAULT_AUTHOR_PROFILE: AuthorProfile = {
   address: 'Hà Nội & TP. Hồ Chí Minh',
 };
 
+export const DEFAULT_RECOMMENDED_BOOKS: RecommendedBook[] = [
+  {
+    id: 'rec-book-1',
+    title: 'Lắng Nghe Cơ Thể Để Tự Chữa Lành',
+    cover_url: null,
+    description: 'Hướng dẫn nhận diện các tín hiệu cảnh báo sớm từ hệ cơ xương khớp và phương pháp phục hồi tự nhiên.',
+    author: 'Bs. Chuyên khoa Phục hồi Chức năng',
+    link_url: '',
+  },
+  {
+    id: 'rec-book-2',
+    title: 'Giải Mã Cột Sống & Vận Động Đúng',
+    cover_url: null,
+    description: 'Phân tích cơ sinh học cột sống, các sai lầm trong sinh hoạt hằng ngày và bài tập điều chỉnh tư thế.',
+    author: 'Chuyên gia Trị liệu Cột sống',
+    link_url: '',
+  },
+  {
+    id: 'rec-book-3',
+    title: 'Dinh Dưỡng Kháng Viêm & Tái Tạo Khớp',
+    cover_url: null,
+    description: 'Chế độ ăn uống khoa học giúp nuôi dưỡng sụn khớp, đĩa đệm và giảm phản ứng viêm đau mạn tính.',
+    author: 'Viện Dinh dưỡng Ứng dụng',
+    link_url: '',
+  },
+  {
+    id: 'rec-book-4',
+    title: 'Cẩm Nang Bảo Vệ Đốt Sống Cổ',
+    cover_url: null,
+    description: 'Dành riêng cho người làm việc văn phòng, lái xe và những người thường xuyên bị đau mỏi vai gáy.',
+    author: 'Hội Phục hồi Chức năng',
+    link_url: '',
+  },
+];
+
 export const sampleSettings: Settings = {
   workspace_id: 'default',
   app_name: 'Sống Khỏe Mỗi Ngày',
@@ -50,6 +85,9 @@ export const sampleSettings: Settings = {
   home_title: 'Hôm nay mình học gì?',
   search_placeholder: 'Tìm bài, ví dụ: đĩa đệm',
   topics_title: 'Chọn chủ đề',
+  recommended_books_title: 'Sách nên đọc',
+  recommended_books_subtitle: 'Tài liệu tham khảo chuyên sâu giúp bạn hiểu và chăm sóc cơ thể mỗi ngày',
+  recommended_books: DEFAULT_RECOMMENDED_BOOKS,
 };
 
 export const sampleTopics: Topic[] = [

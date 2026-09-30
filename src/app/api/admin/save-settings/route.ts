@@ -33,6 +33,9 @@ export async function POST(req: NextRequest) {
       home_title: settings.home_title !== undefined ? settings.home_title : (existingBlockStyles.home_title ?? 'Hôm nay mình học gì?'),
       search_placeholder: settings.search_placeholder !== undefined ? settings.search_placeholder : (existingBlockStyles.search_placeholder ?? 'Tìm bài, ví dụ: đĩa đệm'),
       topics_title: settings.topics_title !== undefined ? settings.topics_title : (existingBlockStyles.topics_title ?? 'Chọn chủ đề'),
+      recommended_books_title: settings.recommended_books_title !== undefined ? settings.recommended_books_title : (existingBlockStyles.recommended_books_title ?? 'Sách nên đọc'),
+      recommended_books_subtitle: settings.recommended_books_subtitle !== undefined ? settings.recommended_books_subtitle : (existingBlockStyles.recommended_books_subtitle ?? 'Tài liệu tham khảo chuyên sâu giúp bạn hiểu và chăm sóc cơ thể mỗi ngày'),
+      recommended_books: settings.recommended_books !== undefined ? settings.recommended_books : (existingBlockStyles.recommended_books ?? []),
     };
 
     const merged = {
