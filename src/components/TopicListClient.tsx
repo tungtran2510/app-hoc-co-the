@@ -127,11 +127,16 @@ export default function TopicListClient({
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-[22px] font-extrabold text-ink leading-tight">
+        <h2 className="text-[20px] sm:text-[22px] font-black text-ink leading-tight">
           {topicsTitle}
         </h2>
 
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-[13px] font-bold text-blue-600 hover:text-blue-700 flex items-center gap-0.5 cursor-pointer">
+            <span>Xem tất cả</span>
+            <span className="text-[15px]">›</span>
+          </span>
+
           {isAdmin && onMoveUp && onMoveDown && onOpenReorderModal && typeof sectionIndex === 'number' && typeof totalSections === 'number' && (
             <SectionOrderControls
               sectionIndex={sectionIndex}

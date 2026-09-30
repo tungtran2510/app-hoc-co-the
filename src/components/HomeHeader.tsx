@@ -13,6 +13,8 @@ import {
   Edit2,
   X,
   Sparkles,
+  Bell,
+  Search,
 } from 'lucide-react';
 import { checkAdminStatus, logoutAdmin } from '../lib/adminAuth';
 import { getStoredAppSettings } from '../lib/storage';
@@ -147,62 +149,89 @@ export default function HomeHeader({ initialAppName, initialLogoUrl }: HomeHeade
       )}
 
       {/* Header chính */}
-      <header className="relative flex items-center justify-between h-[52px]">
+      <header className="relative flex items-center justify-between min-h-[52px] py-1 gap-2">
         {/* Tên App & Logo: khi là Admin bấm vào để sửa */}
         <div
           onClick={() => {
             if (isAdmin) setShowEditApp(true);
           }}
-          className={`flex items-center gap-2.5 ${
+          className={`flex items-center gap-2.5 min-w-0 ${
             isAdmin ? 'cursor-pointer group' : ''
           }`}
           title={isAdmin ? 'Bấm để đổi tên app & logo' : undefined}
         >
-          <div className="w-10 h-10 rounded-[12px] bg-primary flex items-center justify-center text-white shadow-xs overflow-hidden shrink-0">
-            {logoUrl ? (
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-[14px] bg-gradient-to-br from-[#0066FF] to-[#0047AB] flex items-center justify-center text-white shadow-xs overflow-hidden shrink-0 border border-blue-500/20">
+            {logoUrl && !logoUrl.includes('5513d9c5') && !logoUrl.includes('author') && !logoUrl.includes('avatar') ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
             ) : (
-              <BookOpen size={22} strokeWidth={2.5} />
-            )}
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-[20px] font-extrabold text-ink leading-tight">
-              {appName}
-            </span>
-            {isAdmin && (
-              <Edit2
-                size={13}
-                className="text-primary opacity-60 group-hover:opacity-100 transition-opacity"
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src="/app_logo.png"
+                alt="Logo"
+                className="w-full h-full object-cover"
               />
             )}
           </div>
+          <div className="flex flex-col min-w-0">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[16px] sm:text-[18px] font-black text-ink leading-tight whitespace-nowrap">
+                {appName || 'Sống Khỏe Mỗi Ngày'}
+              </span>
+              {isAdmin && (
+                <Edit2
+                  size={12}
+                  className="text-primary opacity-60 group-hover:opacity-100 transition-opacity shrink-0"
+                />
+              )}
+            </div>
+            <span className="text-[11px] sm:text-[12px] text-muted font-medium leading-tight whitespace-nowrap mt-0.5">
+              Kiến thức đúng · Sức khỏe bền vững
+            </span>
+          </div>
         </div>
 
-        {/* Các nút tùy chọn ở trên đầu */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Nút icon đồng bộ SĐT bé ở trên đầu */}
+        {/* 3 Nút tròn bên phải: Tìm kiếm, Thông báo (Chuông), Tùy chọn (⋮) */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {/* Nút 1: Kính lúp (Focus ô tìm kiếm) */}
+          <button
+            type="button"
+            onClick={() => {
+              const el = document.getElementById('home-search-input');
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.focus();
+              }
+            }}
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-surface-2 hover:bg-surface-3 flex items-center justify-center text-ink hover:text-blue-600 transition-colors shadow-2xs cursor-pointer"
+            aria-label="Tìm bài học"
+            title="Tìm kiếm bài học"
+          >
+            <Search size={16} />
+          </button>
+
+          {/* Nút 2: Chuông thông báo / Lưu tiến độ */}
           <button
             type="button"
             onClick={() => setShowPhoneSync(true)}
-            className="w-10 h-10 min-w-[40px] rounded-full bg-white border border-line flex items-center justify-center text-muted hover:text-primary transition-colors shadow-2xs cursor-pointer relative"
-            title={userPhone ? `Đang đồng bộ SĐT: ${userPhone}` : 'Lưu tiến độ qua Số điện thoại'}
-            aria-label="Lưu tiến độ qua Số điện thoại"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-surface-2 hover:bg-surface-3 flex items-center justify-center text-ink hover:text-blue-600 transition-colors shadow-2xs cursor-pointer relative"
+            title={userPhone ? `Đang đồng bộ SĐT: ${userPhone}` : 'Nhận thông báo & Lưu tiến độ qua SĐT'}
+            aria-label="Thông báo & Đồng bộ"
           >
-            <Smartphone size={18} />
+            <Bell size={16} />
             {userPhone && (
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-500 ring-1 ring-white" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white" />
             )}
           </button>
 
-          {/* Nút ⋮ Tùy chọn trang chủ */}
+          {/* Nút 3: ⋮ Tùy chọn trang chủ */}
           <button
             type="button"
             onClick={() => setShowMenu(!showMenu)}
-            className="w-10 h-10 min-w-[40px] rounded-full bg-white border border-line flex items-center justify-center text-ink hover:text-primary transition-colors shadow-2xs cursor-pointer"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-surface-2 hover:bg-surface-3 flex items-center justify-center text-ink hover:text-blue-600 transition-colors shadow-2xs cursor-pointer"
             aria-label="Tùy chọn trang chủ"
           >
-            <MoreVertical size={20} />
+            <MoreVertical size={16} />
           </button>
         </div>
 

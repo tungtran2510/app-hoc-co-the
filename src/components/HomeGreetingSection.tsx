@@ -19,8 +19,12 @@ export default function HomeGreetingSection({
   initialSearchPlaceholder,
   initialTopicsTitle,
 }: HomeGreetingSectionProps) {
-  const [greeting, setGreeting] = useState(initialGreeting || 'Xin chào!');
-  const [title, setTitle] = useState(initialTitle || 'Hôm nay mình học gì?');
+  const [greeting, setGreeting] = useState(
+    initialGreeting && initialGreeting !== 'Xin chào!' ? initialGreeting : '“Quan điểm”'
+  );
+  const [title, setTitle] = useState(
+    initialTitle && initialTitle !== 'Hôm nay mình học gì?' ? initialTitle : 'Hiểu đúng - Làm chuẩn'
+  );
   const [searchPlaceholder, setSearchPlaceholder] = useState(
     initialSearchPlaceholder || 'Tìm bài, ví dụ: đĩa đệm'
   );
@@ -30,72 +34,81 @@ export default function HomeGreetingSection({
 
   useEffect(() => {
     checkIsAdminClient().then(setIsAdmin);
-    if (initialGreeting) setGreeting(initialGreeting);
-    if (initialTitle) setTitle(initialTitle);
+    if (initialGreeting && initialGreeting !== 'Xin chào!') {
+      setGreeting(initialGreeting);
+    } else {
+      setGreeting('“Quan điểm”');
+    }
+    if (initialTitle && initialTitle !== 'Hôm nay mình học gì?') {
+      setTitle(initialTitle);
+    } else {
+      setTitle('Hiểu đúng - Làm chuẩn');
+    }
     if (initialSearchPlaceholder) setSearchPlaceholder(initialSearchPlaceholder);
     if (initialTopicsTitle) setTopicsTitle(initialTopicsTitle);
   }, [initialGreeting, initialTitle, initialSearchPlaceholder, initialTopicsTitle]);
 
   return (
     <>
-      {/* 2. Lời chào + Tiêu đề chính + Nút sửa cho Quản trị viên */}
-      <section className="flex flex-col gap-1 relative group">
+      {/* 2. "Quan điểm" & Tiêu đề chính "Hiểu đúng - Làm chuẩn" */}
+      <section className="flex flex-col gap-1 relative group mt-0.5">
         <div className="flex items-center justify-between">
-          <span className="text-[16px] text-muted font-normal leading-normal">
-            {greeting}
-          </span>
+          <div className="flex items-center gap-1.5 text-[13px] font-bold text-muted">
+            <span className="w-1 h-3.5 bg-blue-600 rounded-full inline-block shrink-0" />
+            <span>{greeting || '“Quan điểm”'}</span>
+          </div>
 
           {isAdmin && (
             <button
               type="button"
               onClick={() => setShowEditModal(true)}
-              className="flex items-center gap-1.5 h-7 px-2.5 rounded-[8px] bg-primary-soft text-primary text-[12px] font-extrabold hover:bg-primary-soft/80 cursor-pointer shadow-2xs transition-all"
+              className="flex items-center gap-1 h-6 px-2 rounded-[7px] bg-primary-soft text-primary text-[11px] font-extrabold hover:bg-primary-soft/80 cursor-pointer shadow-2xs transition-all"
               title="Chỉnh sửa câu chào, tiêu đề & ô tìm kiếm"
             >
-              <Edit2 size={12} />
-              <span>Sửa lời chào</span>
+              <Edit2 size={11} />
+              <span>Sửa</span>
             </button>
           )}
         </div>
 
-        <h1 className="text-[28px] font-extrabold text-ink leading-[1.2] break-words">
-          {title}
+        <h1 className="text-[26px] sm:text-[30px] font-black text-ink leading-tight tracking-tight break-words">
+          {title || 'Hiểu đúng - Làm chuẩn'}
         </h1>
       </section>
 
-      {/* 3. Ô Hỏi Trợ lý AI & Tìm kiếm thông minh */}
+      {/* 3. Khung Tìm kiếm kết hợp Nút Hỏi AI */}
       <section>
-        <Link
-          href="/tro-ly-ai"
-          className="relative block w-full group cursor-pointer"
-          aria-label="Mở Trợ lý AI Cơ Thể"
-        >
-          <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-primary">
-            <Sparkles size={22} className="animate-pulse" />
+        <div className="w-full h-[52px] sm:h-[56px] rounded-full sm:rounded-[22px] bg-white border border-line pl-4 pr-1.5 flex items-center justify-between gap-2 shadow-2xs hover:border-blue-400 focus-within:border-blue-500 transition-colors">
+          <div className="flex items-center gap-2.5 flex-1 min-w-0">
+            <Search size={19} className="text-muted shrink-0" />
+            <input
+              id="home-search-input"
+              type="text"
+              placeholder={searchPlaceholder || 'Tìm bài, ví dụ: đĩa đệm'}
+              className="w-full bg-transparent border-none outline-none text-[14.5px] text-ink placeholder:text-muted"
+            />
           </div>
-          <input
-            type="text"
-            readOnly
-            placeholder={searchPlaceholder || 'Hỏi Trợ lý AI về cơ thể, bài học...'}
-            className="w-full h-[58px] min-h-[48px] pl-12 pr-24 rounded-[20px] bg-white border-[1.5px] border-line text-[16px] text-ink placeholder:text-muted focus:outline-hidden cursor-pointer shadow-2xs group-hover:border-primary/50 transition-colors"
-            tabIndex={-1}
-          />
-          <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-            <span className="flex items-center gap-1 px-3 py-1.5 rounded-[12px] bg-primary-soft text-primary text-[12px] font-extrabold shadow-2xs group-hover:bg-primary group-hover:text-white transition-colors">
-              <span>Hỏi AI</span>
-              <span>→</span>
-            </span>
-          </div>
-        </Link>
+
+          <Link
+            href="/tro-ly-ai"
+            className="shrink-0 flex items-center gap-1 px-3.5 py-2 rounded-full bg-[#EBF3FF] hover:bg-[#DCEBFF] text-[#0066FF] text-[13px] font-extrabold shadow-2xs transition-all active:scale-95 whitespace-nowrap cursor-pointer"
+            aria-label="Hỏi Trợ lý AI"
+          >
+            <Sparkles size={14} className="text-[#0066FF]" />
+            <span>Hỏi AI</span>
+            <span>→</span>
+          </Link>
+        </div>
+
         {isAdmin && (
           <div className="flex items-center justify-between px-1.5 pt-1.5">
-            <span className="text-[12px] text-muted flex items-center gap-1 font-medium">
-              <Sparkles size={12} className="text-primary" />
+            <span className="text-[11.5px] text-muted flex items-center gap-1 font-medium">
+              <Sparkles size={12} className="text-blue-600" />
               <span>Trợ lý AI sẵn sàng</span>
             </span>
             <Link
               href="/tro-ly-ai"
-              className="flex items-center gap-1 text-[12px] font-bold text-primary hover:underline cursor-pointer"
+              className="flex items-center gap-1 text-[11.5px] font-bold text-blue-600 hover:underline cursor-pointer"
             >
               <span>Huấn luyện & Nạp tài liệu AI →</span>
             </Link>
