@@ -11,7 +11,15 @@ export function getSupabaseClient(): SupabaseClient | null {
   }
 
   if (!browserClient) {
-    browserClient = createClient(url, anonKey);
+    browserClient = createClient(url, anonKey, {
+      global: {
+        fetch: (input, init = {}) =>
+          fetch(input, {
+            ...init,
+            cache: 'no-store',
+          }),
+      },
+    });
   }
 
   return browserClient;
