@@ -23,8 +23,15 @@ export default function LoginPage() {
 
     const res = await loginAdmin(password);
     if (res.success) {
-      router.push('/cot-song/tong-quan-ve-cot-song');
-      router.refresh();
+      let targetUrl = '/';
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const fromParam = params.get('from') || params.get('redirect');
+        if (fromParam && fromParam.startsWith('/')) {
+          targetUrl = fromParam;
+        }
+      }
+      window.location.href = targetUrl;
     } else {
       setErrorMsg(res.error || 'Mật khẩu quản trị không đúng. Vui lòng thử lại.');
       setIsSubmitting(false);

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { ChevronLeft, Menu, MoreVertical, X, Lock, Check, Settings as SettingsIcon, Share2, Bookmark, Sun, Moon, Eye, Smartphone } from 'lucide-react';
 
 export interface TocItem {
@@ -45,6 +46,7 @@ export default function PageHeaderBar({
   onThemeChange,
   onOpenPhoneSync,
 }: PageHeaderBarProps) {
+  const pathname = usePathname();
   const [showToc, setShowToc] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
 
@@ -332,7 +334,7 @@ export default function PageHeaderBar({
               </div>
             ) : (
               <Link
-                href="/dang-nhap"
+                href={`/dang-nhap?from=${encodeURIComponent(pathname || '/')}`}
                 onClick={() => setShowOptions(false)}
                 className="flex items-center justify-center gap-2 h-[44px] rounded-[12px] bg-primary-soft text-primary font-bold text-[14px] border border-primary/30"
               >
