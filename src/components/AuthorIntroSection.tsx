@@ -79,52 +79,87 @@ export function AuthorProfileSection({
         </div>
       )}
 
-      {/* Thẻ trắng hồ sơ tác giả */}
-      <div className="p-4 sm:p-5 rounded-[24px] bg-white border border-line shadow-xs flex flex-col gap-3.5">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-3.5 min-w-0">
-            {/* Ảnh / Logo không khung tròn */}
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-[12px] flex items-center justify-center overflow-hidden shrink-0">
+      {/* THẺ MASTER INSTRUCTOR PROFILE CARD CAO CẤP */}
+      <div className="relative p-5 sm:p-6 rounded-[24px] bg-gradient-to-br from-[#06332A] via-[#094135] to-[#0E6B5A] text-white shadow-md border border-emerald-900/40 overflow-hidden flex flex-col gap-3.5">
+        {/* Họa tiết trang trí nền y sinh học */}
+        <div className="absolute top-0 right-0 w-[180px] h-[180px] bg-emerald-400/10 rounded-full blur-2xl pointer-events-none" />
+
+        {/* 1. Phần Đầu: Chân dung, Tên & Huy hiệu Chuyên gia */}
+        <div className="relative z-10 flex items-center gap-3.5 sm:gap-4">
+          {/* Avatar với viền sáng tròn */}
+          <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full p-0.5 bg-gradient-to-br from-emerald-300 to-emerald-600 shadow-md shrink-0">
+            <div className="w-full h-full rounded-full overflow-hidden bg-slate-900 flex items-center justify-center">
               {profile.avatar_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={profile.avatar_url}
                   alt={profile.name}
-                  className="w-full h-full object-cover rounded-[12px]"
+                  className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-primary-soft rounded-[12px] flex items-center justify-center">
-                  <User size={34} className="text-primary" />
+                <div className="w-full h-full bg-emerald-900/60 rounded-full flex items-center justify-center">
+                  <User size={32} className="text-emerald-300" />
                 </div>
               )}
             </div>
-
-            <div className="flex-1 flex flex-col gap-0.5 min-w-0">
-              <span className="text-[12px] font-extrabold uppercase text-primary tracking-wider truncate">
-                Tác giả / Chuyên gia
-              </span>
-              <h3 className="text-[20px] font-extrabold text-ink leading-tight truncate">
-                {profile.name}
-              </h3>
-              {profile.title && (
-                <p className="text-[13.5px] text-muted font-bold leading-tight line-clamp-2">
-                  {profile.title}
-                </p>
-              )}
+            {/* Huy hiệu Verified tick */}
+            <div className="absolute bottom-0 right-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-xs border-2 border-[#06332A]" title="Chuyên gia xác thực">
+              <Sparkles size={11} className="fill-white" />
             </div>
+          </div>
+
+          <div className="flex-1 flex flex-col gap-0.5 min-w-0">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] sm:text-[10.5px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-200 border border-emerald-400/30 w-fit">
+                CHUYÊN GIA SỨC KHỎE
+              </span>
+            </div>
+            <h3 className="text-[20px] sm:text-[22px] font-black text-white leading-tight truncate">
+              {profile.name || 'Tùng dinh dưỡng'}
+            </h3>
+            <p className="text-[12.5px] sm:text-[13px] text-emerald-100/90 font-medium leading-tight">
+              {profile.title || 'Hỗ trợ kiến thức nền tảng & Sức khỏe'}
+            </p>
           </div>
         </div>
 
-        {/* Lời giới thiệu chi tiết (Bio) */}
+        {/* 2. Tôn chỉ / Cam kết sứ mệnh */}
         {profile.bio && (
-          <div className="pt-2 text-[14.5px] text-ink/90 leading-relaxed font-normal whitespace-pre-line border-t border-line/60">
-            {profile.bio}
+          <div className="relative z-10 p-3 sm:p-3.5 rounded-[16px] bg-black/25 backdrop-blur-xs border border-white/10 text-[13px] sm:text-[13.5px] text-emerald-50 leading-relaxed font-normal whitespace-pre-line">
+            &ldquo;{profile.bio}&rdquo;
           </div>
         )}
 
+        {/* 3. Nút hành động trực diện: Nhắn Zalo & Gọi Hotline */}
+        <div className="relative z-10 flex flex-col sm:flex-row items-center gap-2 pt-2 border-t border-white/15">
+          {profile.zalo_url && (
+            <a
+              href={profile.zalo_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:flex-1 h-[46px] rounded-[14px] bg-[#0068FF] hover:bg-[#0055D4] text-white font-extrabold text-[13.5px] sm:text-[14px] flex items-center justify-center gap-2 shadow-md active:scale-[0.98] transition-all cursor-pointer"
+            >
+              <div className="w-5 h-5 rounded-full bg-white text-[#0068FF] flex items-center justify-center font-black text-[9.5px]">
+                Zalo
+              </div>
+              <span>Nhắn Zalo cùng Tùng Dinh Dưỡng</span>
+            </a>
+          )}
+
+          {profile.phone && (
+            <a
+              href={`tel:${profile.phone.replace(/[^0-9+]/g, '')}`}
+              className="w-full sm:w-auto h-[46px] px-3.5 rounded-[14px] bg-white/15 hover:bg-white/25 border border-white/20 text-white font-bold text-[13px] flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all whitespace-nowrap cursor-pointer"
+            >
+              <Phone size={14} className="text-emerald-300" />
+              <span>Hotline: {profile.phone}</span>
+            </a>
+          )}
+        </div>
+
         {/* Ảnh minh họa thêm (nếu có) */}
         {profile.intro_image_url && (
-          <div className="w-full rounded-[16px] overflow-hidden border border-line shadow-2xs mt-1">
+          <div className="w-full rounded-[16px] overflow-hidden border border-white/15 shadow-2xs mt-1">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={profile.intro_image_url}
@@ -137,11 +172,11 @@ export function AuthorProfileSection({
         {/* Video giới thiệu YouTube (nếu có) */}
         {introVideoId && (
           <div className="flex flex-col gap-1.5 pt-1">
-            <span className="text-[13px] font-bold text-ink flex items-center gap-1.5">
-              <Film size={15} className="text-primary" />
+            <span className="text-[13px] font-bold text-white flex items-center gap-1.5">
+              <Film size={15} className="text-emerald-300" />
               <span>Video giới thiệu</span>
             </span>
-            <div className="relative w-full aspect-video rounded-[16px] overflow-hidden border border-line bg-black shadow-xs">
+            <div className="relative w-full aspect-video rounded-[16px] overflow-hidden border border-white/15 bg-black shadow-xs">
               <iframe
                 src={`https://www.youtube-nocookie.com/embed/${introVideoId}?rel=0`}
                 title="Video giới thiệu tác giả"
