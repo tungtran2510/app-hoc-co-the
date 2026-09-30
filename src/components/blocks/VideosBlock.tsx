@@ -444,44 +444,41 @@ export default function VideosBlock({
         </div>
       </div>
 
-      {/* 2. HỆ THỐNG 3 TAB CHUẨN TRƯỜNG HỌC (MOCKUP 1) */}
-      <div className="flex items-center border-b border-line mt-3 mb-1 bg-white rounded-t-[14px]">
+      {/* 2. HỆ THỐNG 3 KHUNG TAB PHÂN TÁCH VỚI ĐƯỜNG KẺ NGĂN CÁCH (THEO GÓP Ý CỦA ANH) */}
+      <div className="grid grid-cols-3 items-stretch rounded-[14px] bg-white border border-line mt-3 mb-2 shadow-2xs divide-x divide-line overflow-hidden">
         <button
           type="button"
           onClick={() => handleTabChange('syllabus')}
-          className={`flex items-center justify-center gap-1.5 flex-1 py-3 text-[14px] sm:text-[14.5px] font-extrabold transition-all border-b-2 cursor-pointer ${
+          className={`flex items-center justify-center py-2.5 px-1.5 text-[13px] sm:text-[14px] font-extrabold transition-all cursor-pointer text-center leading-tight min-h-[44px] ${
             currentTab === 'syllabus'
-              ? 'text-primary border-primary bg-primary-soft/30'
-              : 'text-muted border-transparent hover:text-ink'
+              ? 'bg-primary text-white font-black shadow-xs'
+              : 'text-muted bg-white hover:text-ink hover:bg-surface-2'
           }`}
         >
-          <span>🎬</span>
           <span>Giáo trình ({videos.length})</span>
         </button>
 
         <button
           type="button"
           onClick={() => handleTabChange('summary')}
-          className={`flex items-center justify-center gap-1.5 flex-1 py-3 text-[14px] sm:text-[14.5px] font-extrabold transition-all border-b-2 cursor-pointer ${
+          className={`flex items-center justify-center py-2.5 px-1.5 text-[13px] sm:text-[14px] font-extrabold transition-all cursor-pointer text-center leading-tight min-h-[44px] ${
             currentTab === 'summary'
-              ? 'text-primary border-primary bg-primary-soft/30'
-              : 'text-muted border-transparent hover:text-ink'
+              ? 'bg-primary text-white font-black shadow-xs'
+              : 'text-muted bg-white hover:text-ink hover:bg-surface-2'
           }`}
         >
-          <span>📝</span>
           <span>Tóm tắt cốt lõi</span>
         </button>
 
         <button
           type="button"
           onClick={() => handleTabChange('resources')}
-          className={`flex items-center justify-center gap-1.5 flex-1 py-3 text-[14px] sm:text-[14.5px] font-extrabold transition-all border-b-2 cursor-pointer ${
+          className={`flex items-center justify-center py-2.5 px-1.5 text-[13px] sm:text-[14px] font-extrabold transition-all cursor-pointer text-center leading-tight min-h-[44px] ${
             currentTab === 'resources'
-              ? 'text-primary border-primary bg-primary-soft/30'
-              : 'text-muted border-transparent hover:text-ink'
+              ? 'bg-primary text-white font-black shadow-xs'
+              : 'text-muted bg-white hover:text-ink hover:bg-surface-2'
           }`}
         >
-          <span>📚</span>
           <span>Tài liệu</span>
         </button>
       </div>
