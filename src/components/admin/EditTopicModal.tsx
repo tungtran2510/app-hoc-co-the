@@ -77,6 +77,7 @@ export default function EditTopicModal({
       setErrorMsg(err.message || 'Lỗi khi tải ảnh lên.');
     } finally {
       setIsUploading(false);
+      e.target.value = '';
     }
   };
 
@@ -263,9 +264,43 @@ export default function EditTopicModal({
 
           {/* Ảnh bìa */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[14px] font-bold text-ink">
-              Ảnh bìa chủ đề
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="text-[14px] font-bold text-ink">
+                Ảnh bìa chủ đề (tùy chọn)
+              </label>
+              {coverUrl && (
+                <button
+                  type="button"
+                  onClick={() => setCoverUrl('')}
+                  className="text-[12px] font-bold text-red-600 hover:underline cursor-pointer"
+                >
+                  Gỡ ảnh bìa
+                </button>
+              )}
+            </div>
+
+            {/* Thumbnail xem trước nếu đã có ảnh */}
+            {coverUrl && (
+              <div className="flex items-center gap-3 p-2.5 rounded-[14px] bg-surface-2 border border-line">
+                <div className="w-14 h-14 rounded-[10px] overflow-hidden bg-white border border-line shrink-0 shadow-2xs">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={coverUrl}
+                    alt="Xem trước ảnh bìa"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className="text-[12px] font-bold text-ink block truncate">
+                    Đã chọn ảnh bìa
+                  </span>
+                  <span className="text-[11px] text-muted block truncate font-mono">
+                    {coverUrl}
+                  </span>
+                </div>
+              </div>
+            )}
+
             <div className="flex gap-2">
               <input
                 type="text"
@@ -274,9 +309,9 @@ export default function EditTopicModal({
                 placeholder="Dán link ảnh hoặc tải từ máy..."
                 className="flex-1 h-10 px-3 rounded-[12px] border border-line text-[14px] focus:border-primary"
               />
-              <label className="flex items-center gap-1 h-10 px-3 rounded-[12px] bg-primary-soft text-primary font-bold text-[13px] border border-primary/30 cursor-pointer hover:bg-primary-soft/80">
-                <Upload size={14} />
-                <span>{isUploading ? 'Đang nén...' : 'Chọn ảnh'}</span>
+              <label className="flex items-center gap-1.5 h-10 px-3.5 rounded-[12px] bg-primary text-white font-bold text-[13px] cursor-pointer hover:bg-primary-hover shadow-xs transition-colors shrink-0">
+                <Upload size={14} strokeWidth={2.5} />
+                <span>{isUploading ? 'Đang tải...' : 'Chọn ảnh'}</span>
                 <input
                   type="file"
                   accept="image/*"

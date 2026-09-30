@@ -24,13 +24,14 @@ import { getUserPhone, LEARNING_PROGRESS_EVENT } from '../lib/userSync';
 
 interface HomeHeaderProps {
   initialAppName: string;
+  initialLogoUrl?: string | null;
 }
 
-export default function HomeHeader({ initialAppName }: HomeHeaderProps) {
+export default function HomeHeader({ initialAppName, initialLogoUrl }: HomeHeaderProps) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [supabaseOk, setSupabaseOk] = useState(false);
   const [appName, setAppName] = useState(initialAppName);
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoUrl, setLogoUrl] = useState<string | null>(initialLogoUrl || null);
   const [showSettings, setShowSettings] = useState(false);
   const [showEditApp, setShowEditApp] = useState(false);
   const [showPwaInstall, setShowPwaInstall] = useState(false);
@@ -47,6 +48,9 @@ export default function HomeHeader({ initialAppName }: HomeHeaderProps) {
     const stored = getStoredAppSettings();
     if (stored.app_name) {
       setAppName(stored.app_name);
+    }
+    if (initialLogoUrl) {
+      setLogoUrl(initialLogoUrl);
     }
     const p = getUserPhone();
     setUserPhone(p);

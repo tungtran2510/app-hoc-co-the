@@ -89,6 +89,7 @@ export default function EditRecommendedBooksModal({
       setUploadingBookId(null);
       setActiveBookForUpload(null);
       if (coverInputRef.current) coverInputRef.current.value = '';
+      e.target.value = '';
     }
   };
 

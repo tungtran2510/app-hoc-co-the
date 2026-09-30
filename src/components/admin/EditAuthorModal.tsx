@@ -79,6 +79,7 @@ export default function EditAuthorModal({
       setErrorMsg(err.message || 'Lỗi khi tải ảnh đại diện.');
     } finally {
       setIsUploadingAvatar(false);
+      e.target.value = '';
     }
   };
 
@@ -99,6 +100,7 @@ export default function EditAuthorModal({
       setErrorMsg(err.message || 'Lỗi khi tải ảnh minh họa.');
     } finally {
       setIsUploadingIntroImage(false);
+      e.target.value = '';
     }
   };
 
@@ -123,6 +125,7 @@ export default function EditAuthorModal({
     } finally {
       setUploadingBookId(null);
       setActiveBookForUpload(null);
+      e.target.value = '';
     }
   };
 

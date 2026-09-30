@@ -19,6 +19,7 @@ import PageListClient from '../../components/PageListClient';
 import SpineIllustration from '../../components/SpineIllustration';
 import BottomNav from '../../components/BottomNav';
 import TopicMainButton from '../../components/TopicMainButton';
+import TopicIcon from '../../components/TopicIcon';
 import { getSettings } from '../../lib/data';
 import { Metadata } from 'next';
 
@@ -141,12 +142,19 @@ export default async function TopicPage({ params }: TopicPageProps) {
         </div>
 
         {/* Minh họa thu nhỏ tinh tế góc phải */}
-        <div className="shrink-0 w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center pointer-events-none">
-          {topic.slug === 'cot-song' ? (
-            <SpineIllustration className="h-full w-auto object-contain" />
+        <div className="shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-[16px] overflow-hidden flex items-center justify-center bg-white/70 shadow-xs border border-white/60">
+          {topic.cover_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={topic.cover_url}
+              alt={topic.title}
+              className="w-full h-full object-cover"
+            />
+          ) : topic.slug === 'cot-song' ? (
+            <SpineIllustration className="h-full w-auto object-contain p-1" />
           ) : (
-            <div className="w-14 h-14 rounded-full bg-white/60 flex items-center justify-center">
-              <BookOpen size={24} style={{ color: topic.color_fg }} />
+            <div className="w-12 h-12 flex items-center justify-center" style={{ color: topic.color_fg }}>
+              <TopicIcon name={topic.icon || 'body'} size={28} />
             </div>
           )}
         </div>

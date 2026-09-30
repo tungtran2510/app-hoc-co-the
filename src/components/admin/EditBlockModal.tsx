@@ -464,6 +464,7 @@ export default function EditBlockModal({
                               alert(err.message || 'Lỗi tải ảnh');
                             } finally {
                               setIsUploadingMedia(false);
+                              e.target.value = '';
                             }
                           }}
                           disabled={isUploadingMedia}
@@ -654,6 +655,7 @@ export default function EditBlockModal({
                           alert(err.message || 'Lỗi tải ảnh');
                         } finally {
                           setIsUploadingMedia(false);
+                          e.target.value = '';
                         }
                       }}
                       disabled={isUploadingMedia}
