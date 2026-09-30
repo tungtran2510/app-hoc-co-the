@@ -393,44 +393,31 @@ export default function VideosBlock({
                   }}
                   aria-pressed={isActive}
                 >
-                  {/* HÀNG TRÊN CÙNG: TIÊU ĐỀ VIDEO ĐẦY ĐỦ, KHÔNG BAO GIỜ BỊ CẮT BA CHẤM */}
+                  {/* HÀNG TRÊN CÙNG: TIÊU ĐỀ VIDEO ĐẦY ĐỦ, TẬN DỤNG 100% CHIỀU RỘNG KHÔNG BỊ CHIẾM DIỆN TÍCH */}
                   <div className="flex items-start justify-between gap-2 w-full">
-                    <h4 className="text-[15px] sm:text-[16px] font-extrabold text-ink leading-snug break-words flex-1">
-                      {vid.title}
+                    <h4 className="text-[15px] sm:text-[16px] font-extrabold text-ink leading-snug break-words flex-1 flex items-center gap-1.5">
+                      {isActive && (
+                        <span className="inline-flex items-center text-primary shrink-0" title="Đang phát">
+                          <BarChart2 size={14} className="animate-pulse" />
+                        </span>
+                      )}
+                      <span>{vid.title}</span>
                     </h4>
 
-                    <div className="flex items-center gap-1 shrink-0 mt-0.5">
-                      {isActive ? (
-                        <span className="flex items-center gap-1 text-[11px] font-black text-primary bg-white px-2 py-0.5 rounded-[6px] border border-primary/30 shadow-2xs">
-                          <BarChart2 size={12} className="animate-pulse" />
-                          Đang phát
-                        </span>
-                      ) : isWatched ? (
-                        <span className="flex items-center gap-1 text-[11px] font-bold text-primary bg-primary-soft px-2 py-0.5 rounded-[6px]">
-                          <Check size={12} strokeWidth={3} />
-                          Đã xem
-                        </span>
-                      ) : null}
-
-                      {isAdmin && onOpenVideoManager ? (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onOpenVideoManager();
-                          }}
-                          className="text-primary p-1 rounded-md hover:bg-primary-soft cursor-pointer"
-                          aria-label="Sửa video"
-                          title="Sửa video"
-                        >
-                          <MoreVertical size={16} />
-                        </button>
-                      ) : (
-                        <div className="text-muted p-1 rounded-md" aria-hidden="true">
-                          <MoreVertical size={16} />
-                        </div>
-                      )}
-                    </div>
+                    {isAdmin && onOpenVideoManager && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onOpenVideoManager();
+                        }}
+                        className="text-primary p-1 rounded-md hover:bg-primary-soft cursor-pointer shrink-0"
+                        aria-label="Sửa video"
+                        title="Sửa video"
+                      >
+                        <MoreVertical size={16} />
+                      </button>
+                    )}
                   </div>
 
                   {/* HÀNG DƯỚI: THUMBNAIL + MÔ TẢ & THỜI LƯỢNG */}
@@ -454,6 +441,20 @@ export default function VideosBlock({
                           </div>
                         </>
                       )}
+
+                      {/* Huy hiệu Đang phát hoặc Đã xem gọn gàng trên thumbnail */}
+                      {isActive ? (
+                        <span className="absolute top-1 left-1 bg-primary text-white text-[9.5px] font-black px-1.5 py-0.5 rounded-[4px] flex items-center gap-1 shadow-xs leading-none">
+                          <BarChart2 size={9} className="animate-pulse shrink-0" />
+                          <span>Đang phát</span>
+                        </span>
+                      ) : isWatched ? (
+                        <span className="absolute top-1 left-1 bg-emerald-700/90 text-white text-[9.5px] font-bold px-1.5 py-0.5 rounded-[4px] flex items-center gap-0.5 shadow-xs leading-none">
+                          <Check size={9} strokeWidth={3} />
+                          <span>Đã xem</span>
+                        </span>
+                      ) : null}
+
                       {vid.duration_text && (
                         <span className="absolute bottom-1 right-1 bg-black/80 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-xs leading-none">
                           {vid.duration_text}
@@ -472,8 +473,18 @@ export default function VideosBlock({
                           Video bài giảng thực hành
                         </p>
                       )}
-                      <div className="text-[12px] text-muted font-medium mt-0.5">
-                        Thời lượng: {vid.duration_text || '5 phút'}
+                      <div className="flex items-center gap-1.5 text-[12px] text-muted font-medium mt-0.5">
+                        <span>Thời lượng: {vid.duration_text || '5 phút'}</span>
+                        {isActive && (
+                          <span className="text-primary font-extrabold flex items-center gap-1">
+                            · Đang phát
+                          </span>
+                        )}
+                        {isWatched && !isActive && (
+                          <span className="text-emerald-700 font-bold flex items-center gap-1">
+                            · Đã xem
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>

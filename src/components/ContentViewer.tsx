@@ -20,7 +20,7 @@ import {
   Bookmark,
 } from 'lucide-react';
 import { Topic, Page, Block, Video } from '../lib/types';
-import PageHeaderBar, { TocItem, FontSizeOption } from './PageHeaderBar';
+import PageHeaderBar, { TocItem, FontSizeOption, ThemeModeOption } from './PageHeaderBar';
 import BlockRenderer from './BlockRenderer';
 import EditBlockModal from './admin/EditBlockModal';
 import VideoManagerModal from './admin/VideoManagerModal';
@@ -113,7 +113,8 @@ export default function ContentViewer({
       // 5. Trạng thái đã lưu, đã hoàn thành, theme & cài đặt tư vấn
       setIsSaved(isPageSaved(page.id));
       setIsCompleted(isPageCompleted(page.id));
-      const savedTheme = localStorage.getItem('giao_dien') === 'dark' ? 'dark' : 'light';
+      const rawTheme = localStorage.getItem('giao_dien');
+      const savedTheme: ThemeModeOption = rawTheme === 'dark' || rawTheme === 'gray' ? rawTheme : 'light';
       setThemeMode(savedTheme);
       const appSet = getStoredAppSettings();
       if (appSet) {
@@ -128,7 +129,7 @@ export default function ContentViewer({
   const [shareNoticeMsg, setShareNoticeMsg] = useState('');
   const [isSaved, setIsSaved] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [themeMode, setThemeMode] = useState<'light' | 'dark'>('light');
+  const [themeMode, setThemeMode] = useState<ThemeModeOption>('light');
   const [consultSettings, setConsultSettings] = useState<{ zalo_url?: string; hotline?: string } | null>(null);
 
   const handleToggleBookmark = () => {
@@ -153,16 +154,18 @@ export default function ContentViewer({
     setTimeout(() => setShareNoticeMsg(''), 2500);
   };
 
-  const handleThemeChange = (mode: 'light' | 'dark') => {
+  const handleThemeChange = (mode: ThemeModeOption) => {
     setThemeMode(mode);
     try {
       localStorage.setItem('giao_dien', mode);
+      document.documentElement.classList.remove('dark', 'gray');
+      document.body.classList.remove('dark', 'gray');
       if (mode === 'dark') {
         document.documentElement.classList.add('dark');
         document.body.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-        document.body.classList.remove('dark');
+      } else if (mode === 'gray') {
+        document.documentElement.classList.add('gray');
+        document.body.classList.add('gray');
       }
     } catch {
       // Bỏ qua

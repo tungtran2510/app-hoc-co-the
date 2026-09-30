@@ -35,46 +35,142 @@ body {
 }
 
 /* ============================================================================
-   CHẾ ĐỘ DỊU MẮT / TỐI (DARK / DIM MODE)
+   1. CHẾ ĐỘ TỐI (DARK MODE - TỐI SÂU, CHỮ TRẮNG SÁNG RÕ RÀNG)
    ============================================================================ */
-html.dark, body.dark {
-  background-color: #0F172A !important;
+html.dark, html.dark body, body.dark {
+  background-color: #0B1120 !important;
   color: #F8FAFC !important;
 }
 
 html.dark body {
-  background-color: #0F172A !important;
+  background-color: #0B1120 !important;
   color: #F8FAFC !important;
 }
 
 html.dark .bg-bg {
-  background-color: #0F172A !important;
+  background-color: #0B1120 !important;
 }
 
-html.dark .bg-white {
+html.dark .bg-white,
+html.dark .bg-surface {
   background-color: #1E293B !important;
   color: #F8FAFC !important;
 }
 
 html.dark .bg-surface-2 {
-  background-color: #0B1120 !important;
-}
-
-html.dark .text-ink {
+  background-color: #162032 !important;
   color: #F8FAFC !important;
 }
 
+html.dark .block-styled-card {
+  background-color: #1E293B !important;
+  border: 1px solid #334155 !important;
+}
+
+/* Khắc phục triệt để lỗi chữ bị đen trong chế độ tối */
+html.dark .text-ink,
+html.dark .text-ink-2,
+html.dark p,
+html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6,
+html.dark li,
+html.dark strong,
+html.dark span:not([class*="bg-"]):not([class*="text-white"]):not([class*="text-emerald"]):not([class*="text-red"]) {
+  color: #F8FAFC !important;
+}
+
+html.dark .text-ink-2 {
+  color: #E2E8F0 !important;
+}
+
 html.dark .text-muted {
-  color: #94A3B8 !important;
+  color: #CBD5E1 !important;
 }
 
 html.dark .border-line,
+html.dark .border-line-strong,
 html.dark .border-line\/40,
 html.dark .border-line\/60 {
   border-color: #334155 !important;
 }
 
+html.dark input,
+html.dark textarea {
+  background-color: #1E293B !important;
+  color: #F8FAFC !important;
+  border-color: #334155 !important;
+}
+
 html.dark ::-webkit-scrollbar-thumb {
   background: #334155;
+}
+
+/* ============================================================================
+   2. CHẾ ĐỘ XÁM (GRAY MODE - DỊU MẮT, KHÔNG TỐI HẲN, CHỮ RÕ NÉT)
+   ============================================================================ */
+html.gray, html.gray body, body.gray {
+  background-color: #374151 !important; /* Xám trung tính ấm dịu */
+  color: #F9FAFB !important;
+}
+
+html.gray body {
+  background-color: #374151 !important;
+  color: #F9FAFB !important;
+}
+
+html.gray .bg-bg {
+  background-color: #374151 !important;
+}
+
+html.gray .bg-white,
+html.gray .bg-surface {
+  background-color: #4B5563 !important; /* Thẻ màu xám slate */
+  color: #F9FAFB !important;
+}
+
+html.gray .bg-surface-2 {
+  background-color: #3F4958 !important;
+  color: #F9FAFB !important;
+}
+
+html.gray .block-styled-card {
+  background-color: #4B5563 !important;
+  border: 1px solid #64748B !important;
+}
+
+/* Chữ trong chế độ xám luôn sáng rõ, tương phản cao, êm mắt */
+html.gray .text-ink,
+html.gray .text-ink-2,
+html.gray p,
+html.gray h1, html.gray h2, html.gray h3, html.gray h4, html.gray h5, html.gray h6,
+html.gray li,
+html.gray strong,
+html.gray span:not([class*="bg-"]):not([class*="text-white"]):not([class*="text-emerald"]):not([class*="text-red"]) {
+  color: #F9FAFB !important;
+}
+
+html.gray .text-ink-2 {
+  color: #E5E7EB !important;
+}
+
+html.gray .text-muted {
+  color: #D1D5DB !important;
+}
+
+html.gray .border-line,
+html.gray .border-line-strong,
+html.gray .border-line\/40,
+html.gray .border-line\/60 {
+  border-color: #64748B !important;
+}
+
+html.gray input,
+html.gray textarea {
+  background-color: #4B5563 !important;
+  color: #F9FAFB !important;
+  border-color: #64748B !important;
+}
+
+html.gray ::-webkit-scrollbar-thumb {
+  background: #64748B;
 }
 

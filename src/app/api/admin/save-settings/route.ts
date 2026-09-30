@@ -25,13 +25,23 @@ export async function POST(req: NextRequest) {
       .eq('workspace_id', settings.workspace_id || 'default')
       .maybeSingle();
 
+    const existingBlockStyles = existing?.block_styles || {};
+    const updatedBlockStyles = {
+      ...existingBlockStyles,
+      ...(settings.block_styles || {}),
+      home_greeting: settings.home_greeting !== undefined ? settings.home_greeting : (existingBlockStyles.home_greeting ?? 'Xin chào!'),
+      home_title: settings.home_title !== undefined ? settings.home_title : (existingBlockStyles.home_title ?? 'Hôm nay mình học gì?'),
+      search_placeholder: settings.search_placeholder !== undefined ? settings.search_placeholder : (existingBlockStyles.search_placeholder ?? 'Tìm bài, ví dụ: đĩa đệm'),
+      topics_title: settings.topics_title !== undefined ? settings.topics_title : (existingBlockStyles.topics_title ?? 'Chọn chủ đề'),
+    };
+
     const merged = {
       workspace_id: settings.workspace_id || existing?.workspace_id || 'default',
       app_name: settings.app_name ?? existing?.app_name ?? 'Sống Khỏe Mỗi Ngày',
       logo_url: settings.logo_url !== undefined ? settings.logo_url : (existing?.logo_url ?? null),
       primary_color: settings.primary_color ?? existing?.primary_color ?? '#0E6B5A',
       access_mode: settings.access_mode ?? existing?.access_mode ?? 'OPEN',
-      block_styles: settings.block_styles ?? existing?.block_styles ?? {},
+      block_styles: updatedBlockStyles,
       expert_title: settings.expert_title !== undefined ? settings.expert_title : (existing?.expert_title ?? null),
       hotline: settings.hotline !== undefined ? settings.hotline : (existing?.hotline ?? null),
       zalo_url: settings.zalo_url !== undefined ? settings.zalo_url : (existing?.zalo_url ?? null),

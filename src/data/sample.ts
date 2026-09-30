@@ -46,6 +46,10 @@ export const sampleSettings: Settings = {
   hotline: '0988.123.456',
   zalo_url: 'https://zalo.me',
   author_profile: DEFAULT_AUTHOR_PROFILE,
+  home_greeting: 'Xin chào!',
+  home_title: 'Hôm nay mình học gì?',
+  search_placeholder: 'Tìm bài, ví dụ: đĩa đệm',
+  topics_title: 'Chọn chủ đề',
 };
 
 export const sampleTopics: Topic[] = [

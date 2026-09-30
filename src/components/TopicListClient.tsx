@@ -14,17 +14,28 @@ interface TopicListClientProps {
     topic: Topic;
     pageCount: number;
   }[];
+  initialTopicsTitle?: string | null;
 }
 
-export default function TopicListClient({ initialTopics }: TopicListClientProps) {
+export default function TopicListClient({ initialTopics, initialTopicsTitle }: TopicListClientProps) {
   const [topicsWithCounts, setTopicsWithCounts] = useState(initialTopics);
+  const [topicsTitle, setTopicsTitle] = useState(initialTopicsTitle || 'Chọn chủ đề');
   const [isAdmin, setIsAdmin] = useState(false);
   const [editingTopic, setEditingTopic] = useState<Topic | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
     checkIsAdminClient().then((admin) => setIsAdmin(admin));
-  }, []);
+    if (initialTopicsTitle) setTopicsTitle(initialTopicsTitle);
+
+    const handleTextsUpdated = (e: any) => {
+      if (e.detail?.topicsTitle) {
+        setTopicsTitle(e.detail.topicsTitle);
+      }
+    };
+    window.addEventListener('home_texts_updated', handleTextsUpdated);
+    return () => window.removeEventListener('home_texts_updated', handleTextsUpdated);
+  }, [initialTopicsTitle]);
 
   const handleMove = async (index: number, direction: 'up' | 'down') => {
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
@@ -103,7 +114,7 @@ export default function TopicListClient({ initialTopics }: TopicListClientProps)
     <section className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <h2 className="text-[22px] font-extrabold text-ink leading-tight">
-          Chọn chủ đề
+          {topicsTitle}
         </h2>
 
         {isAdmin && (

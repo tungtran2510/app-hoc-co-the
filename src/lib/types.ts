@@ -39,6 +39,10 @@ export interface Settings {
   expert_title?: string | null;
   zalo_url?: string | null;
   author_profile?: AuthorProfile | null;
+  home_greeting?: string | null;
+  home_title?: string | null;
+  search_placeholder?: string | null;
+  topics_title?: string | null;
 }
 
 export interface Topic {

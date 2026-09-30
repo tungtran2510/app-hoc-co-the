@@ -37,7 +37,7 @@ export default function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{if(localStorage.getItem('giao_dien')==='dark'){document.documentElement.classList.add('dark')}}catch(e){}`,
+            __html: `try{var t=localStorage.getItem('giao_dien');if(t==='dark'){document.documentElement.classList.add('dark')}else if(t==='gray'){document.documentElement.classList.add('gray')}}catch(e){}`,
           }}
         />
       </head>

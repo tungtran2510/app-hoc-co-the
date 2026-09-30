@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, Menu, MoreVertical, X, Lock, Check, Settings as SettingsIcon, Share2, Bookmark, Sun, Moon } from 'lucide-react';
+import { ChevronLeft, Menu, MoreVertical, X, Lock, Check, Settings as SettingsIcon, Share2, Bookmark, Sun, Moon, Eye } from 'lucide-react';
 
 export interface TocItem {
   id: string;
@@ -10,6 +10,7 @@ export interface TocItem {
 }
 
 export type FontSizeOption = 'small' | 'normal' | 'large';
+export type ThemeModeOption = 'light' | 'gray' | 'dark';
 
 interface PageHeaderBarProps {
   topicTitle: string;
@@ -23,8 +24,8 @@ interface PageHeaderBarProps {
   onShare?: () => void;
   isSaved?: boolean;
   onToggleSave?: () => void;
-  themeMode?: 'light' | 'dark';
-  onThemeChange?: (mode: 'light' | 'dark') => void;
+  themeMode?: ThemeModeOption;
+  onThemeChange?: (mode: ThemeModeOption) => void;
 }
 
 export default function PageHeaderBar({
@@ -221,35 +222,47 @@ export default function PageHeaderBar({
             </div>
           </div>
 
-          {/* Giao diện: Sáng / Dịu mắt */}
+          {/* Giao diện: Sáng / Xám dịu / Tối */}
           <div className="flex flex-col gap-2 pt-2 border-t border-line">
             <span className="text-[13px] font-bold text-muted uppercase tracking-wider">
               Giao diện
             </span>
-            <div className="grid grid-cols-2 gap-1.5">
+            <div className="grid grid-cols-3 gap-1.5">
               <button
                 type="button"
                 onClick={() => onThemeChange && onThemeChange('light')}
-                className={`h-[44px] rounded-[12px] font-bold text-[14px] flex items-center justify-center gap-1.5 transition-all ${
+                className={`h-[42px] rounded-[12px] font-bold text-[13px] flex items-center justify-center gap-1 transition-all ${
                   themeMode === 'light'
                     ? 'bg-primary-soft border-2 border-primary text-primary'
                     : 'bg-surface-2 border border-line-strong text-ink hover:bg-line/40'
                 }`}
               >
-                <Sun size={16} />
+                <Sun size={15} />
                 <span>Sáng</span>
               </button>
               <button
                 type="button"
+                onClick={() => onThemeChange && onThemeChange('gray')}
+                className={`h-[42px] rounded-[12px] font-bold text-[13px] flex items-center justify-center gap-1 transition-all ${
+                  themeMode === 'gray'
+                    ? 'bg-primary-soft border-2 border-primary text-primary'
+                    : 'bg-surface-2 border border-line-strong text-ink hover:bg-line/40'
+                }`}
+              >
+                <Eye size={15} />
+                <span>Xám dịu</span>
+              </button>
+              <button
+                type="button"
                 onClick={() => onThemeChange && onThemeChange('dark')}
-                className={`h-[44px] rounded-[12px] font-bold text-[14px] flex items-center justify-center gap-1.5 transition-all ${
+                className={`h-[42px] rounded-[12px] font-bold text-[13px] flex items-center justify-center gap-1 transition-all ${
                   themeMode === 'dark'
                     ? 'bg-primary-soft border-2 border-primary text-primary'
                     : 'bg-surface-2 border border-line-strong text-ink hover:bg-line/40'
                 }`}
               >
-                <Moon size={16} />
-                <span>Dịu mắt</span>
+                <Moon size={15} />
+                <span>Tối</span>
               </button>
             </div>
           </div>

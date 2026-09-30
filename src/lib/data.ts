@@ -48,6 +48,10 @@ export async function getSettings(): Promise<Settings> {
         return {
           ...data,
           author_profile: normalizeAuthorProfile(data.author_profile),
+          home_greeting: data.home_greeting || data.block_styles?.home_greeting || 'Xin chào!',
+          home_title: data.home_title || data.block_styles?.home_title || 'Hôm nay mình học gì?',
+          search_placeholder: data.search_placeholder || data.block_styles?.search_placeholder || 'Tìm bài, ví dụ: đĩa đệm',
+          topics_title: data.topics_title || data.block_styles?.topics_title || 'Chọn chủ đề',
         } as Settings;
       }
     } catch {

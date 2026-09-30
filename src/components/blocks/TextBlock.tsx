@@ -125,7 +125,7 @@ export default function TextBlock({
   return (
     <div
       id={blockId}
-      className="w-full rounded-[22px] p-[18px] flex flex-col gap-2.5 transition-colors scroll-mt-20"
+      className="w-full rounded-[22px] p-[18px] flex flex-col gap-2.5 transition-colors scroll-mt-20 block-styled-card"
       style={{
         backgroundColor: style.bg || '#F1EEE6',
       }}
