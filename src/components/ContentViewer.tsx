@@ -609,6 +609,7 @@ export default function ContentViewer({
                 pageSlug={page.slug}
                 pageTitle={currentPage.title}
                 pageNumber={pageIndex}
+                pageCoverUrl={currentPage.cover_url}
                 nextPage={
                   nextPage
                     ? {

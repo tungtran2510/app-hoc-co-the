@@ -1,12 +1,39 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Save, Edit, Upload } from 'lucide-react';
+import { X, Save, Edit, Upload, Check, Sparkles } from 'lucide-react';
 import { Page } from '../../lib/types';
 import { generateSlug } from '../../lib/slug';
 import { uploadImageFile } from '../../lib/storageUpload';
 import { savePageApi } from '../../lib/apiAdmin';
 import { generateUuid, isValidUuid } from '../../lib/uuid';
+
+const ANATOMY_PRESETS = [
+  {
+    name: 'Tổng quan cột sống',
+    url: '/images/lessons/tong-quan-ve-cot-song.png',
+  },
+  {
+    name: 'Đĩa đệm',
+    url: '/images/lessons/dia-dem.jpg',
+  },
+  {
+    name: 'Cơ & dây chằng',
+    url: '/images/lessons/co-gan-day-chang.jpg',
+  },
+  {
+    name: 'Tủy sống & thần kinh',
+    url: '/images/lessons/than-kinh.jpg',
+  },
+  {
+    name: 'Tư thế & vận động',
+    url: '/images/lessons/tu-the-va-van-dong.jpg',
+  },
+  {
+    name: 'Bệnh lý & phục hồi',
+    url: '/images/lessons/cac-van-de-thuong-gap.jpg',
+  },
+];
 
 interface EditPageModalProps {
   isOpen: boolean;
@@ -179,11 +206,11 @@ export default function EditPageModal({
             />
           </div>
 
-          {/* Ảnh bìa */}
-          <div className="flex flex-col gap-1.5">
+          {/* Ảnh đại diện bài học */}
+          <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <label className="text-[14px] font-bold text-ink">
-                Ảnh bìa bài học (tùy chọn)
+                Ảnh đại diện bài học (Avatar / Thumbnail)
               </label>
               {coverUrl && (
                 <button
@@ -191,7 +218,7 @@ export default function EditPageModal({
                   onClick={() => setCoverUrl('')}
                   className="text-[12px] font-bold text-red-600 hover:underline cursor-pointer"
                 >
-                  Gỡ ảnh bìa
+                  Gỡ ảnh đại diện
                 </button>
               )}
             </div>
@@ -203,13 +230,13 @@ export default function EditPageModal({
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={coverUrl}
-                    alt="Xem trước ảnh bìa bài học"
+                    alt="Xem trước ảnh bài học"
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="flex-1 min-w-0">
                   <span className="text-[12px] font-bold text-ink block truncate">
-                    Đã chọn ảnh bìa
+                    Đang dùng ảnh này
                   </span>
                   <span className="text-[11px] text-muted block truncate font-mono">
                     {coverUrl}
@@ -218,7 +245,50 @@ export default function EditPageModal({
               </div>
             )}
 
-            <div className="flex gap-2">
+            {/* Chọn nhanh ảnh mẫu y khoa 3D 1 chạm */}
+            <div className="flex flex-col gap-1.5 pt-0.5">
+              <div className="flex items-center gap-1.5 text-[12.5px] font-bold text-primary">
+                <Sparkles size={13} />
+                <span>Gợi ý ảnh giải phẫu y khoa 3D (chọn nhanh 1 chạm):</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {ANATOMY_PRESETS.map((preset) => {
+                  const isSelected = coverUrl === preset.url;
+                  return (
+                    <button
+                      key={preset.url}
+                      type="button"
+                      onClick={() => setCoverUrl(preset.url)}
+                      className={`relative flex flex-col items-center gap-1 p-1.5 rounded-[12px] border text-left transition-all cursor-pointer ${
+                        isSelected
+                          ? 'border-primary bg-primary/5 ring-2 ring-primary/30'
+                          : 'border-line bg-white hover:border-primary/40'
+                      }`}
+                    >
+                      <div className="w-full h-12 rounded-[8px] overflow-hidden bg-slate-100 relative">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={preset.url}
+                          alt={preset.name}
+                          className="w-full h-full object-cover"
+                        />
+                        {isSelected && (
+                          <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-primary text-white flex items-center justify-center shadow-xs">
+                            <Check size={10} strokeWidth={3} />
+                          </div>
+                        )}
+                      </div>
+                      <span className="text-[11px] font-bold text-ink text-center line-clamp-1 w-full">
+                        {preset.name}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Hoặc nhập link / tải từ máy */}
+            <div className="flex gap-2 mt-1">
               <input
                 type="text"
                 value={coverUrl}

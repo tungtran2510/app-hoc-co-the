@@ -2,14 +2,16 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Play, ArrowRight } from 'lucide-react';
+import { Play, ArrowRight, Edit2 } from 'lucide-react';
 import { XemTiepInfo } from '../lib/learningProgress';
 
 interface ContinueCardProps {
   info: XemTiepInfo;
+  isAdmin?: boolean;
+  onEditPage?: () => void;
 }
 
-export default function ContinueCard({ info }: ContinueCardProps) {
+export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCardProps) {
   const total = info.video_total || 1;
   const current = info.video_index || 1;
   const progressPercent =
@@ -27,20 +29,24 @@ export default function ContinueCard({ info }: ContinueCardProps) {
       className="group relative block overflow-hidden rounded-[22px] bg-gradient-to-r from-[#0047AB] via-[#0055D4] to-[#00388A] p-4 sm:p-5 text-white shadow-md border border-blue-400/20 transition-all duration-150 active:scale-[0.98] cursor-pointer"
       aria-label={`Xem tiếp ${info.topic_title} bài ${info.page_title}`}
     >
-      {/* 3D Anatomy Spine Render bên phải */}
+      {/* 3D Anatomy / Avatar Render bên phải */}
       <div className="absolute -right-2 top-0 bottom-0 w-[44%] sm:w-[38%] pointer-events-none overflow-hidden select-none">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/spine_hero_clean.png"
-          alt="Spine Anatomy"
-          className="w-full h-full object-cover object-center mix-blend-screen opacity-95 scale-110"
+          src={info.cover_url || '/images/lessons/tong-quan-ve-cot-song.png'}
+          alt={info.page_title || 'Anatomy'}
+          className={`w-full h-full object-cover object-center ${
+            info.cover_url && !info.cover_url.endsWith('.png')
+              ? 'opacity-90'
+              : 'mix-blend-screen opacity-95 scale-110'
+          }`}
         />
         {/* Gradient mờ nhẹ chuyển từ nền xanh sang ảnh */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0047AB] via-[#0047AB]/40 to-transparent w-16" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0047AB] via-[#0047AB]/50 to-transparent w-20" />
       </div>
 
       <div className="relative z-10 flex flex-col gap-2">
-        {/* Dòng 1: Huy hiệu chủ đề có icon Play + Vị trí video */}
+        {/* Dòng 1: Huy hiệu chủ đề có icon Play + Nút sửa ảnh (nếu Admin) + Vị trí video */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-white/95 text-[12px] sm:text-[12.5px] font-bold">
             <span className="w-5 h-5 rounded-full bg-[#0066FF] flex items-center justify-center text-white shrink-0 shadow-2xs">
@@ -49,9 +55,27 @@ export default function ContinueCard({ info }: ContinueCardProps) {
             <span>Đang xem · {info.topic_title || 'Cột sống'}</span>
           </div>
 
-          <span className="text-[11.5px] sm:text-[12px] font-bold text-white/80 pr-1">
-            Video {String(current).padStart(2, '0')}/{String(total).padStart(2, '0')}
-          </span>
+          <div className="flex items-center gap-2">
+            {isAdmin && onEditPage && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onEditPage();
+                }}
+                className="px-2 py-0.5 rounded-full bg-white/20 hover:bg-white/35 text-white text-[11px] font-bold flex items-center gap-1 backdrop-blur-xs cursor-pointer transition-colors shadow-2xs"
+                title="Cài đặt ảnh đại diện & thông tin bài học này"
+              >
+                <Edit2 size={11} />
+                <span>Đổi ảnh</span>
+              </button>
+            )}
+
+            <span className="text-[11.5px] sm:text-[12px] font-bold text-white/80 pr-1">
+              Video {String(current).padStart(2, '0')}/{String(total).padStart(2, '0')}
+            </span>
+          </div>
         </div>
 
         {/* Dòng 2: Tiêu đề bài học */}

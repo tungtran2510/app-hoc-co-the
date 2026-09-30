@@ -35,6 +35,7 @@ interface VideosBlockProps {
   pageSlug?: string;
   pageTitle?: string;
   pageNumber?: number;
+  pageCoverUrl?: string | null;
   nextPage?: { slug: string; title: string; orderNumber: number } | null;
 }
 
@@ -51,6 +52,7 @@ export default function VideosBlock({
   pageSlug = '',
   pageTitle = '',
   pageNumber = 1,
+  pageCoverUrl,
   nextPage,
 }: VideosBlockProps) {
   const searchParams = useSearchParams();
@@ -150,6 +152,7 @@ export default function VideosBlock({
       video_index: vidIndex + 1,
       video_total: videos.length,
       video_title: vid.title,
+      cover_url: pageCoverUrl || vid.thumbnail_url || null,
     });
   };
 

@@ -20,6 +20,7 @@ interface BlockRendererProps {
   pageSlug?: string;
   pageTitle?: string;
   pageNumber?: number;
+  pageCoverUrl?: string | null;
   nextPage?: { slug: string; title: string; orderNumber: number } | null;
 }
 
@@ -35,6 +36,7 @@ export default function BlockRenderer({
   pageSlug,
   pageTitle,
   pageNumber,
+  pageCoverUrl,
   nextPage,
 }: BlockRendererProps) {
   const blockId = `block-${block.id}`;
@@ -69,6 +71,7 @@ export default function BlockRenderer({
           pageSlug={pageSlug}
           pageTitle={pageTitle}
           pageNumber={pageNumber}
+          pageCoverUrl={pageCoverUrl}
           nextPage={nextPage}
         />
       );

@@ -7,6 +7,7 @@ export interface XemTiepInfo {
   video_index: number;
   video_total: number;
   video_title: string;
+  cover_url?: string | null;
   scroll_y?: number;
   updated_at: number;
 }

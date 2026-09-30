@@ -51,53 +51,72 @@ export default function PageCard({
   return (
     <Link
       href={targetUrl}
-      className="flex flex-col gap-2 p-3.5 sm:p-4 bg-white rounded-[18px] border-[1.5px] border-line transition-all active:scale-[0.99] shadow-xs hover:border-primary/40"
+      className="flex items-center gap-3 p-3 sm:p-3.5 bg-white rounded-[18px] border-[1.5px] border-line transition-all active:scale-[0.99] shadow-xs hover:border-primary/40 group"
     >
-      {/* HÀNG TRÊN CÙNG: Ô SỐ THỨ TỰ + TIÊU ĐỀ ĐẦY ĐỦ + MŨI TÊN (KHÔNG BỊ CẮT BA CHẤM) */}
-      <div className="flex items-start gap-2.5 w-full">
-        {/* Badge số thứ tự gọn gàng, nổi bật */}
-        <span
-          className="h-6 px-2 rounded-[7px] text-[12px] font-black flex items-center justify-center shrink-0 mt-0.5 tracking-wide"
-          style={{ backgroundColor: topic.color_bg, color: topic.color_fg }}
-        >
-          {formattedOrder}
-        </span>
-
-        {/* Tiêu đề nằm trên cùng, chiếm trọn chiều ngang, KHÔNG BAO GIỜ BỊ CẮT BA CHẤM (...) */}
-        <h3 className="text-[17px] sm:text-[18px] font-extrabold text-ink leading-[1.35] flex-1 break-words">
-          {page.title}
-        </h3>
-
-        {/* Mũi tên điều hướng nhỏ gọn */}
-        <div className="shrink-0 text-muted mt-1">
-          <ChevronRight size={18} strokeWidth={2.5} />
-        </div>
-      </div>
-
-      {/* HÀNG DƯỚI: TRẠNG THÁI / TIẾN ĐỘ VÀ SỐ VIDEO */}
-      <div className="flex items-center justify-between pl-8 gap-2">
-        <p className="text-[14px] text-muted font-medium">
-          {subtitle}
-        </p>
-
-        {/* Thanh tiến độ nếu đang học */}
-        {hasStarted && (
+      {/* Ô ẢNH ĐẠI DIỆN BÀI HỌC (AVATAR / THUMBNAIL) */}
+      <div className="relative w-[68px] h-[68px] sm:w-[74px] sm:h-[74px] rounded-[14px] overflow-hidden bg-surface-2 border border-line shrink-0 shadow-2xs group-hover:border-primary/50 transition-colors">
+        {page.cover_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={page.cover_url}
+            alt={page.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+          />
+        ) : (
           <div
-            className="w-24 sm:w-32 h-1.5 bg-line rounded-full overflow-hidden shrink-0"
-            role="progressbar"
-            aria-valuenow={progressPercent}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label="Tiến độ bài học"
+            className="w-full h-full flex flex-col items-center justify-center"
+            style={{ backgroundColor: topic.color_bg, color: topic.color_fg }}
           >
-            <div
-              className={`h-full rounded-full transition-all duration-300 ${
-                isAllWatched ? 'bg-[#0E6B5A]' : 'bg-primary'
-              }`}
-              style={{ width: `${progressPercent}%` }}
-            />
+            <span className="text-[18px] font-black">{formattedOrder}</span>
           </div>
         )}
+
+        {/* Badge số thứ tự nhỏ gọn ở góc trên của ảnh (nếu có ảnh) */}
+        {page.cover_url && (
+          <span
+            className="absolute top-1 left-1 h-5 px-1.5 rounded-[5px] text-[11px] font-black flex items-center justify-center tracking-wide shadow-xs"
+            style={{ backgroundColor: topic.color_bg, color: topic.color_fg }}
+          >
+            {formattedOrder}
+          </span>
+        )}
+      </div>
+
+      {/* NỘI DUNG BÊN PHẢI: TIÊU ĐỀ + TRẠNG THÁI TIẾN ĐỘ */}
+      <div className="flex-1 flex flex-col justify-between min-w-0 py-0.5 self-stretch">
+        <div className="flex items-start justify-between gap-1.5">
+          <h3 className="text-[15.5px] sm:text-[17px] font-extrabold text-ink leading-snug line-clamp-2">
+            {page.title}
+          </h3>
+          <div className="shrink-0 text-muted mt-0.5 group-hover:text-primary transition-colors">
+            <ChevronRight size={18} strokeWidth={2.5} />
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-2 mt-1">
+          <p className="text-[13px] text-muted font-medium truncate">
+            {subtitle}
+          </p>
+
+          {/* Thanh tiến độ nếu đang học */}
+          {hasStarted && (
+            <div
+              className="w-20 sm:w-28 h-1.5 bg-line rounded-full overflow-hidden shrink-0"
+              role="progressbar"
+              aria-valuenow={progressPercent}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label="Tiến độ bài học"
+            >
+              <div
+                className={`h-full rounded-full transition-all duration-300 ${
+                  isAllWatched ? 'bg-[#0E6B5A]' : 'bg-primary'
+                }`}
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+          )}
+        </div>
       </div>
     </Link>
   );
