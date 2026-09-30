@@ -87,6 +87,20 @@ export default function HomeGreetingSection({
             </span>
           </div>
         </Link>
+        {isAdmin && (
+          <div className="flex items-center justify-between px-1.5 pt-1.5">
+            <span className="text-[12px] text-muted flex items-center gap-1 font-medium">
+              <Sparkles size={12} className="text-primary" />
+              <span>Trợ lý AI sẵn sàng</span>
+            </span>
+            <Link
+              href="/tro-ly-ai"
+              className="flex items-center gap-1 text-[12px] font-bold text-primary hover:underline cursor-pointer"
+            >
+              <span>Huấn luyện & Nạp tài liệu AI →</span>
+            </Link>
+          </div>
+        )}
       </section>
 
       {/* Modal sửa tiêu đề dành cho Admin */}

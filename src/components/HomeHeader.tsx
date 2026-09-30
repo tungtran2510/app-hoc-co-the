@@ -12,6 +12,7 @@ import {
   LogOut,
   Edit2,
   X,
+  Sparkles,
 } from 'lucide-react';
 import { checkAdminStatus, logoutAdmin } from '../lib/adminAuth';
 import { getStoredAppSettings } from '../lib/storage';
@@ -242,6 +243,15 @@ export default function HomeHeader({ initialAppName }: HomeHeaderProps) {
                   <Settings size={16} className="text-primary" />
                   <span>Cài đặt quản trị</span>
                 </button>
+
+                <Link
+                  href="/tro-ly-ai"
+                  onClick={() => setShowMenu(false)}
+                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-ink hover:bg-surface-2 cursor-pointer"
+                >
+                  <Sparkles size={16} className="text-primary" />
+                  <span>Huấn luyện Trợ lý AI</span>
+                </Link>
 
                 <div className="border-t border-line my-1" />
 

@@ -15,8 +15,12 @@ import {
   User,
   HelpCircle,
   CheckCircle2,
+  Sliders,
 } from 'lucide-react';
 import BottomNav from '../../components/BottomNav';
+import { checkAdminStatus } from '../../lib/adminAuth';
+import { AiTrainingConfig } from '../../lib/types';
+import EditAiTrainingModal from '../../components/admin/EditAiTrainingModal';
 
 interface SuggestedPage {
   title: string;
@@ -90,8 +94,31 @@ export default function AiAssistantPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showTrainingModal, setShowTrainingModal] = useState(false);
+  const [trainingConfig, setTrainingConfig] = useState<AiTrainingConfig | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const fetchTrainingConfig = () => {
+    fetch('/api/ai/training')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.ai_training) {
+          setTrainingConfig(data.ai_training);
+        }
+      })
+      .catch(() => {});
+  };
+
+  useEffect(() => {
+    checkAdminStatus().then(({ isAdmin: adminOk }) => {
+      setIsAdmin(adminOk);
+      if (adminOk) {
+        fetchTrainingConfig();
+      }
+    });
+  }, []);
 
   // Load lịch sử chat từ localStorage
   useEffect(() => {
@@ -224,21 +251,76 @@ export default function AiAssistantPage() {
           </div>
         </div>
 
-        {messages.length > 0 && (
-          <button
-            type="button"
-            onClick={handleClearChat}
-            className="flex items-center gap-1 h-8 px-2.5 rounded-[10px] bg-surface-2 hover:bg-surface-3 text-muted hover:text-ink text-[12px] font-bold transition-colors cursor-pointer"
-            title="Làm mới cuộc trò chuyện"
-          >
-            <RotateCcw size={13} />
-            <span className="hidden sm:inline">Làm mới</span>
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={() => setShowTrainingModal(true)}
+              className="flex items-center gap-1.5 h-8 px-2.5 sm:px-3 rounded-[10px] bg-primary-soft hover:bg-primary/20 text-primary border border-primary/25 text-[12px] font-extrabold transition-all cursor-pointer shadow-2xs active:scale-95"
+              title="Cài đặt & Huấn luyện tri thức AI"
+            >
+              <Sliders size={13} strokeWidth={2.5} />
+              <span>Cài đặt AI</span>
+              {(trainingConfig?.documents?.length || 0) > 0 && (
+                <span className="ml-0.5 px-1.5 py-0.2 rounded-full bg-primary text-white text-[10px] font-bold">
+                  {trainingConfig?.documents?.length}
+                </span>
+              )}
+            </button>
+          )}
+
+          {messages.length > 0 && (
+            <button
+              type="button"
+              onClick={handleClearChat}
+              className="flex items-center gap-1 h-8 px-2.5 rounded-[10px] bg-surface-2 hover:bg-surface-3 text-muted hover:text-ink text-[12px] font-bold transition-colors cursor-pointer"
+              title="Làm mới cuộc trò chuyện"
+            >
+              <RotateCcw size={13} />
+              <span className="hidden sm:inline">Làm mới</span>
+            </button>
+          )}
+        </div>
       </header>
 
       {/* 2. KHUNG NỘI DUNG TIN NHẮN */}
       <main className="flex-1 flex flex-col px-4 py-4 max-w-[640px] w-full mx-auto gap-4">
+        {/* BANNER QUẢN TRỊ VIÊN: HUẤN LUYỆN KIẾN THỨC AI */}
+        {isAdmin && (
+          <div className="p-3.5 sm:p-4 rounded-[20px] bg-emerald-50/90 border border-emerald-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+            <div className="flex items-start gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 mt-0.5">
+                <Sparkles size={16} />
+              </div>
+              <div>
+                <div className="text-[13.5px] font-extrabold text-emerald-950 flex items-center gap-1.5">
+                  <span>Trang quản trị: Huấn luyện tri thức AI</span>
+                  <span className="px-1.5 py-0.2 rounded text-[9.5px] font-black uppercase bg-emerald-600 text-white">
+                    Admin
+                  </span>
+                </div>
+                <p className="text-[12px] text-emerald-800 leading-snug mt-0.5">
+                  Nạp tài liệu, sách, phác đồ điều trị và bộ câu hỏi mẫu. AI sẽ học sâu và trả lời siêu ngắn gọn đúng theo tài liệu của bạn.
+                </p>
+                {trainingConfig?.documents && trainingConfig.documents.length > 0 && (
+                  <div className="flex items-center gap-2 mt-1.5 text-[11px] text-emerald-700 font-bold">
+                    <span>📚 Đã nạp: {trainingConfig.documents.length} tài liệu/sách</span>
+                    <span>•</span>
+                    <span>💬 {trainingConfig.faqs?.length || 0} câu hỏi - đáp</span>
+                  </div>
+                )}
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowTrainingModal(true)}
+              className="self-end sm:self-center shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-[12px] bg-emerald-700 hover:bg-emerald-800 text-white text-[12.5px] font-bold shadow-xs cursor-pointer transition-all active:scale-98"
+            >
+              <Sliders size={14} />
+              <span>Nạp tài liệu & Cài đặt</span>
+            </button>
+          </div>
+        )}
         {/* MÀN HÌNH CHÀO MỪNG NẾU CHƯA CÓ TIN NHẮN */}
         {messages.length === 0 ? (
           <div className="flex flex-col gap-5 pt-3 animate-in fade-in duration-300">
@@ -446,6 +528,25 @@ export default function AiAssistantPage() {
 
       {/* 4. THANH ĐIỀU HƯỚNG DƯỚI CÙNG */}
       <BottomNav />
+
+      {/* 5. MODAL HUẤN LUYỆN KIẾN THỨC CHO AI (DÀNH CHO ADMIN) */}
+      {isAdmin && (
+        <EditAiTrainingModal
+          isOpen={showTrainingModal}
+          initialConfig={trainingConfig}
+          onClose={() => setShowTrainingModal(false)}
+          onSaved={(newConfig) => {
+            setTrainingConfig(newConfig);
+            const sysMsg: ChatMessage = {
+              id: `sys-${Date.now()}`,
+              role: 'assistant',
+              text: '✨ **Đã cập nhật kho tri thức huấn luyện AI thành công!** Mình đã ghi nhớ toàn bộ tài liệu và nguyên tắc mới bạn vừa nạp. Hãy thử đặt câu hỏi liên quan để kiểm tra câu trả lời nhé!',
+              timestamp: Date.now(),
+            };
+            saveMessages([...messages, sysMsg]);
+          }}
+        />
+      )}
     </div>
   );
 }

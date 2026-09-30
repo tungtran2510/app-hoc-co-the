@@ -36,6 +36,25 @@ export interface RecommendedBook {
   link_url?: string | null;
 }
 
+export interface AiKnowledgeDoc {
+  id: string;
+  title: string;
+  content: string;
+  updated_at?: string;
+}
+
+export interface AiFaqItem {
+  id: string;
+  question: string;
+  answer: string;
+}
+
+export interface AiTrainingConfig {
+  guidelines?: string;
+  documents?: AiKnowledgeDoc[];
+  faqs?: AiFaqItem[];
+}
+
 export interface Settings {
   workspace_id: string;
   app_name: string;
@@ -55,6 +74,7 @@ export interface Settings {
   recommended_books_title?: string | null;
   recommended_books_subtitle?: string | null;
   recommended_books?: RecommendedBook[];
+  ai_training?: AiTrainingConfig | null;
 }
 
 export interface Topic {

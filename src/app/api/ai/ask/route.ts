@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getTopics, getPagesByTopic, getBlocksByPage } from '../../../../lib/data';
+import { getTopics, getPagesByTopic, getBlocksByPage, getSettings } from '../../../../lib/data';
 
 export const dynamic = 'force-dynamic';
 
@@ -93,15 +93,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Vui lòng nhập câu hỏi.' }, { status: 400 });
     }
 
-    const catalog = await buildLessonCatalog();
+    const [catalog, settings] = await Promise.all([
+      buildLessonCatalog(),
+      getSettings(),
+    ]);
+
     const apiKey = process.env.GEMINI_API_KEY;
+    const aiTraining = settings?.ai_training;
 
     if (!apiKey) {
       const fallbackResult = fallbackSearch(question, catalog);
       return NextResponse.json(fallbackResult);
     }
 
-    // Danh sách bài học và nội dung thực tế do tác giả viết
+    // 1. Danh sách bài học và nội dung thực tế do tác giả viết
     const catalogText = catalog
       .map(
         (c, idx) =>
@@ -109,10 +114,36 @@ export async function POST(req: NextRequest) {
       )
       .join('\n\n');
 
+    // 2. Tài liệu chuyên sâu do tác giả nạp thêm vào
+    const authorDocsText =
+      aiTraining?.documents && aiTraining.documents.length > 0
+        ? '\n\nCÁC TÀI LIỆU & SÁCH CHUYÊN SÂU TÁC GIẢ NẠP THÊM:\n' +
+          aiTraining.documents
+            .map((d, i) => `=== [Tài liệu ${i + 1}: ${d.title}] ===\n${d.content}`)
+            .join('\n\n')
+        : '';
+
+    // 3. Câu hỏi và trả lời mẫu do tác giả định sẵn
+    const authorFaqsText =
+      aiTraining?.faqs && aiTraining.faqs.length > 0
+        ? '\n\nCÁC CÂU HỎI & TRẢ LỜI MẪU CỦA TÁC GIẢ:\n' +
+          aiTraining.faqs.map((f) => `Q: "${f.question}" -> A: "${f.answer}"`).join('\n')
+        : '';
+
+    // 4. Lời dặn và nguyên tắc cốt lõi
+    const authorGuidelines =
+      aiTraining?.guidelines ||
+      '1. Luôn nói ngắn gọn 1-2 câu theo phương pháp tác giả.\n2. Hướng dẫn người học xem các bài học cụ thể trong ứng dụng.';
+
     const prompt = `Bạn là Trợ lý AI đồng hành, hướng dẫn người học DỰA TRÊN CHÍNH TÀI LIỆU VÀ BÀI GIẢNG CỦA TÁC GIẢ trong ứng dụng "Học Cơ Thể".
+
+NGUYÊN TẮC VÀ LỜI DẶN CỐT LÕI CỦA TÁC GIẢ:
+${authorGuidelines}
 
 TOÀN BỘ TÀI LIỆU & NỘI DUNG TÁC GIẢ HƯỚNG DẪN TRONG HỆ THỐNG:
 ${catalogText}
+${authorDocsText}
+${authorFaqsText}
 
 CÂU HỎI CỦA NGƯỜI HỌC: "${question}"
 

@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
       recommended_books_title: settings.recommended_books_title !== undefined ? settings.recommended_books_title : (existingBlockStyles.recommended_books_title ?? 'Sách nên đọc'),
       recommended_books_subtitle: settings.recommended_books_subtitle !== undefined ? settings.recommended_books_subtitle : (existingBlockStyles.recommended_books_subtitle ?? 'Tài liệu tham khảo chuyên sâu giúp bạn hiểu và chăm sóc cơ thể mỗi ngày'),
       recommended_books: settings.recommended_books !== undefined ? settings.recommended_books : (existingBlockStyles.recommended_books ?? []),
+      ai_training: settings.ai_training !== undefined ? settings.ai_training : (existingBlockStyles.ai_training ?? null),
     };
 
     const merged = {

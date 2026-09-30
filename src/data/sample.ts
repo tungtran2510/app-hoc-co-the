@@ -1,4 +1,4 @@
-import { Settings, Topic, Page, Block, AuthorProfile, RecommendedBook } from '../lib/types';
+import { Settings, Topic, Page, Block, AuthorProfile, RecommendedBook, AiTrainingConfig } from '../lib/types';
 
 export const DEFAULT_AUTHOR_PROFILE: AuthorProfile = {
   name: 'Bác sĩ / Chuyên gia Trị liệu',
@@ -70,6 +70,30 @@ export const DEFAULT_RECOMMENDED_BOOKS: RecommendedBook[] = [
   },
 ];
 
+export const DEFAULT_AI_TRAINING: AiTrainingConfig = {
+  guidelines: `1. Luôn trả lời ngắn gọn (1-2 câu), đi thẳng vào kết luận theo phương pháp sinh cơ học của tác giả.
+2. Tuyệt đối không khuyên uống thuốc bừa bãi hoặc gây hoang mang lo sợ.
+3. Luôn nhấn mạnh việc thấu hiểu cấu trúc cơ thể, điều chỉnh tư thế và phục hồi tự nhiên.
+4. Điều hướng người học mở các bài học liên quan trong hệ thống để xem chi tiết.`,
+  documents: [
+    {
+      id: 'doc-1',
+      title: 'Triết lý phục hồi cột sống tự nhiên & Sinh cơ học',
+      content: `Cột sống không tự nhiên bị hỏng hay thoái hóa nhanh chóng, mà là kết quả của việc chịu áp lực sai tư thế tích tụ qua nhiều năm.
+Cơ chế tự phục hồi: Đĩa đệm không có mạch máu trực tiếp nuôi dưỡng ở người trưởng thành, nó nhận dinh dưỡng qua cơ chế thẩm thấu khi chúng ta vận động nhịp nhàng (bơm hút dịch). Khi ngồi yên một chỗ quá lâu, đĩa đệm bị thiếu nước và xơ cứng.
+Nguyên tắc điều trị: Giảm áp lực nén ép xấu -> Tăng cường tuần hoàn thẩm thấu -> Củng cố hệ cơ lõi (core) và dây chằng để giữ vững trục sinh lý.`,
+      updated_at: new Date().toISOString(),
+    },
+  ],
+  faqs: [
+    {
+      id: 'faq-1',
+      question: 'Thoát vị đĩa đệm có tập xà đơn được không?',
+      answer: 'Tác giả lưu ý chỉ nên treo người thả lỏng nhẹ nhàng để giải áp lực cột sống, tuyệt đối không đu gập người hay nhảy tiếp đất mạnh gây sốc đĩa đệm.',
+    },
+  ],
+};
+
 export const sampleSettings: Settings = {
   workspace_id: 'default',
   app_name: 'Sống Khỏe Mỗi Ngày',
@@ -88,6 +112,7 @@ export const sampleSettings: Settings = {
   recommended_books_title: 'Sách nên đọc',
   recommended_books_subtitle: 'Tài liệu tham khảo chuyên sâu giúp bạn hiểu và chăm sóc cơ thể mỗi ngày',
   recommended_books: DEFAULT_RECOMMENDED_BOOKS,
+  ai_training: DEFAULT_AI_TRAINING,
 };
 
 export const sampleTopics: Topic[] = [

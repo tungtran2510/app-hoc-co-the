@@ -5,6 +5,7 @@ import {
   sampleBlocks,
   DEFAULT_AUTHOR_PROFILE,
   DEFAULT_RECOMMENDED_BOOKS,
+  DEFAULT_AI_TRAINING,
 } from '../data/sample';
 import {
   Settings,
@@ -14,8 +15,20 @@ import {
   ContinueInfo,
   AuthorProfile,
   RecommendedBook,
+  AiTrainingConfig,
 } from './types';
 import { getSupabaseClient } from './supabaseClient';
+
+export function normalizeAiTraining(raw?: any): AiTrainingConfig {
+  if (!raw || typeof raw !== 'object') {
+    return { ...DEFAULT_AI_TRAINING };
+  }
+  return {
+    guidelines: typeof raw.guidelines === 'string' ? raw.guidelines : (DEFAULT_AI_TRAINING.guidelines || ''),
+    documents: Array.isArray(raw.documents) ? raw.documents : (DEFAULT_AI_TRAINING.documents || []),
+    faqs: Array.isArray(raw.faqs) ? raw.faqs : (DEFAULT_AI_TRAINING.faqs || []),
+  };
+}
 
 export function normalizeRecommendedBooks(raw?: any): RecommendedBook[] {
   if (!raw || !Array.isArray(raw) || raw.length === 0) {
@@ -71,6 +84,7 @@ export async function getSettings(): Promise<Settings> {
           recommended_books_title: data.recommended_books_title || data.block_styles?.recommended_books_title || 'Sách nên đọc',
           recommended_books_subtitle: data.recommended_books_subtitle || data.block_styles?.recommended_books_subtitle || 'Tài liệu tham khảo chuyên sâu giúp bạn hiểu và chăm sóc cơ thể mỗi ngày',
           recommended_books: normalizeRecommendedBooks(data.recommended_books || data.block_styles?.recommended_books),
+          ai_training: normalizeAiTraining(data.ai_training || data.block_styles?.ai_training),
         } as Settings;
       }
     } catch {
