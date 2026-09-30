@@ -23,6 +23,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: error.message || 'Chưa lưu được – chưa kết nối dữ liệu' }, { status: 500 });
     }
 
+    try {
+      const { clearDataCache } = await import('../../../../lib/data');
+      clearDataCache();
+    } catch {
+      // Bỏ qua
+    }
+
     return NextResponse.json({ success: true, blockId });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || 'Chưa lưu được – chưa kết nối dữ liệu' }, { status: 500 });

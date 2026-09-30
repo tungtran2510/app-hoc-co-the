@@ -62,6 +62,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: error.message || 'Chưa lưu được – chưa kết nối dữ liệu' }, { status: 500 });
     }
 
+    // Xóa bộ nhớ đệm để các trang cập nhật tức thì
+    try {
+      const { clearDataCache } = await import('../../../../lib/data');
+      clearDataCache();
+    } catch {
+      // Bỏ qua
+    }
+
     return NextResponse.json({ success: true, settings: merged });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || 'Chưa lưu được – chưa kết nối dữ liệu' }, { status: 500 });

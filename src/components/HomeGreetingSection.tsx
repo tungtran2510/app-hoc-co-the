@@ -91,6 +91,7 @@ export default function HomeGreetingSection({
 
           <Link
             href="/tro-ly-ai"
+            prefetch={true}
             className="shrink-0 flex items-center gap-1 px-3.5 py-2 rounded-full bg-[#EBF3FF] hover:bg-[#DCEBFF] text-[#0066FF] text-[13px] font-extrabold shadow-2xs transition-all active:scale-95 whitespace-nowrap cursor-pointer"
             aria-label="Hỏi Trợ lý AI"
           >

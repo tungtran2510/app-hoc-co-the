@@ -18,7 +18,8 @@ export default function TopicCard({ topic, pageCount }: TopicCardProps) {
   return (
     <Link
       href={`/${topic.slug}`}
-      className="flex flex-col justify-between h-[172px] rounded-[22px] p-4 transition-transform active:scale-[0.98] border border-line/40 group overflow-hidden relative"
+      prefetch={true}
+      className="flex flex-col justify-between h-[172px] rounded-[22px] p-4 transition-all duration-150 active:scale-[0.97] border border-line/40 group overflow-hidden relative cursor-pointer"
       style={{ backgroundColor: topic.color_bg }}
     >
       {/* Ô trắng chứa ảnh bìa chủ đề hoặc icon vector */}

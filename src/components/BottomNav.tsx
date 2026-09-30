@@ -8,18 +8,19 @@ import { getStoredXemTiep } from '../lib/learningProgress';
 
 export default function BottomNav() {
   const pathname = usePathname();
-  const [continueUrl, setContinueUrl] = useState<string>('/');
+  const [continueUrl, setContinueUrl] = useState<string>('/cot-song/tu-the-va-van-dong?v=1');
 
   useEffect(() => {
     try {
       const stored = getStoredXemTiep();
       if (stored && stored.topic_slug && stored.page_slug) {
-        setContinueUrl(`/${stored.topic_slug}/${stored.page_slug}?v=${stored.video_index || 1}`);
+        const cleanTopic = stored.topic_slug.replace('cot-song-that-lung', 'cot-song');
+        setContinueUrl(`/${cleanTopic}/${stored.page_slug}?v=${stored.video_index || 1}`);
       } else {
-        setContinueUrl('/');
+        setContinueUrl('/cot-song/tu-the-va-van-dong?v=1');
       }
     } catch {
-      setContinueUrl('/');
+      setContinueUrl('/cot-song/tu-the-va-van-dong?v=1');
     }
   }, [pathname]);
 
@@ -33,11 +34,12 @@ export default function BottomNav() {
       className="fixed bottom-0 left-0 right-0 z-30 flex justify-center bg-white border-t border-line"
       aria-label="Điều hướng chính"
     >
-      <div className="w-full max-w-[480px] h-[80px] pb-2 grid grid-cols-4">
+      <div className="w-full max-w-[480px] h-[80px] pb-2 grid grid-cols-4 select-none">
         {/* 1. Trang chủ */}
         <Link
           href="/"
-          className={`flex flex-col items-center justify-center gap-1 transition-opacity active:opacity-80 min-h-[48px] ${
+          prefetch={true}
+          className={`flex flex-col items-center justify-center gap-1 transition-all duration-100 active:scale-90 active:opacity-70 min-h-[48px] cursor-pointer ${
             isHome ? 'text-primary font-bold' : 'text-muted font-medium'
           }`}
           aria-label="Trang chủ"
@@ -49,7 +51,8 @@ export default function BottomNav() {
         {/* 2. Đang xem */}
         <Link
           href={continueUrl}
-          className={`flex flex-col items-center justify-center gap-1 transition-opacity active:opacity-80 min-h-[48px] ${
+          prefetch={true}
+          className={`flex flex-col items-center justify-center gap-1 transition-all duration-100 active:scale-90 active:opacity-70 min-h-[48px] cursor-pointer ${
             isReading ? 'text-primary font-bold' : 'text-muted font-medium'
           }`}
           aria-label="Đang xem"
@@ -61,7 +64,8 @@ export default function BottomNav() {
         {/* 3. Đã lưu */}
         <Link
           href="/da-luu"
-          className={`flex flex-col items-center justify-center gap-1 transition-opacity active:opacity-80 min-h-[48px] ${
+          prefetch={true}
+          className={`flex flex-col items-center justify-center gap-1 transition-all duration-100 active:scale-90 active:opacity-70 min-h-[48px] cursor-pointer ${
             isSaved ? 'text-primary font-bold' : 'text-muted font-medium'
           }`}
           aria-label="Bài học đã lưu"
@@ -73,7 +77,8 @@ export default function BottomNav() {
         {/* 4. Trợ lý AI (Góc ngoài cùng bên phải, cạnh Đã lưu) */}
         <Link
           href="/tro-ly-ai"
-          className={`flex flex-col items-center justify-center gap-1 transition-opacity active:opacity-80 min-h-[48px] ${
+          prefetch={true}
+          className={`flex flex-col items-center justify-center gap-1 transition-all duration-100 active:scale-90 active:opacity-70 min-h-[48px] cursor-pointer ${
             isAi ? 'text-primary font-bold' : 'text-muted font-medium'
           }`}
           aria-label="Trợ lý AI"

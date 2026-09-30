@@ -16,12 +16,15 @@ export default function ContinueCard({ info }: ContinueCardProps) {
     info.video_total && info.video_total > 1
       ? Math.min(100, Math.round((current / total) * 100))
       : 60;
-  const targetUrl = `/${info.topic_slug}/${info.page_slug}?v=${current}`;
+  const cleanTopicSlug = (info.topic_slug || 'cot-song').replace('cot-song-that-lung', 'cot-song');
+  const cleanPageSlug = info.page_slug || 'tu-the-va-van-dong';
+  const targetUrl = `/${cleanTopicSlug}/${cleanPageSlug}?v=${current}`;
 
   return (
     <Link
       href={targetUrl}
-      className="group relative block overflow-hidden rounded-[22px] bg-gradient-to-r from-[#0047AB] via-[#0055D4] to-[#00388A] p-4 sm:p-5 text-white shadow-md border border-blue-400/20 transition-transform active:scale-[0.99] cursor-pointer"
+      prefetch={true}
+      className="group relative block overflow-hidden rounded-[22px] bg-gradient-to-r from-[#0047AB] via-[#0055D4] to-[#00388A] p-4 sm:p-5 text-white shadow-md border border-blue-400/20 transition-all duration-150 active:scale-[0.98] cursor-pointer"
       aria-label={`Xem tiếp ${info.topic_title} bài ${info.page_title}`}
     >
       {/* 3D Anatomy Spine Render bên phải */}

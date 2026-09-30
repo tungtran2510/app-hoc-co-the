@@ -132,10 +132,15 @@ export default function TopicListClient({
         </h2>
 
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-[13px] font-bold text-blue-600 hover:text-blue-700 flex items-center gap-0.5 cursor-pointer">
+          <Link
+            href="/cot-song"
+            prefetch={true}
+            className="text-[13px] font-bold text-blue-600 hover:text-blue-700 flex items-center gap-0.5 cursor-pointer active:opacity-75 transition-opacity"
+            title="Xem danh sách bài học chủ đề Cột sống"
+          >
             <span>Xem tất cả</span>
             <span className="text-[15px]">›</span>
-          </span>
+          </Link>
 
           {isAdmin && onMoveUp && onMoveDown && onOpenReorderModal && typeof sectionIndex === 'number' && typeof totalSections === 'number' && (
             <SectionOrderControls

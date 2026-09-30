@@ -7,7 +7,7 @@ import { getUserPhone, LEARNING_PROGRESS_EVENT, syncUserProgress } from '../lib/
 
 const DEFAULT_FEATURED_LESSON: XemTiepInfo = {
   topic_title: 'Cột sống',
-  topic_slug: 'cot-song-that-lung',
+  topic_slug: 'cot-song',
   page_title: 'Tư thế và vận động',
   page_slug: 'tu-the-va-van-dong',
   page_number: 5,
@@ -24,6 +24,7 @@ export default function HomeContinueSection() {
     try {
       const data = getStoredXemTiep();
       if (data && data.topic_slug && data.page_slug) {
+        data.topic_slug = data.topic_slug.replace('cot-song-that-lung', 'cot-song');
         setContinueInfo(data);
       } else {
         setContinueInfo(null);

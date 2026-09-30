@@ -71,92 +71,169 @@ export function normalizeAuthorProfile(raw?: any): AuthorProfile {
   };
 }
 
-export async function getSettings(): Promise<Settings> {
-  const supabase = getSupabaseClient();
-  if (supabase) {
-    try {
-      const { data } = await supabase
-        .from('settings')
-        .select('*')
-        .eq('workspace_id', 'default')
-        .single();
-      if (data) {
-        return {
-          ...data,
-          author_profile: normalizeAuthorProfile(data.author_profile),
-          home_greeting: data.home_greeting || data.block_styles?.home_greeting || 'Xin chào!',
-          home_title: data.home_title || data.block_styles?.home_title || 'Hôm nay mình học gì?',
-          search_placeholder: data.search_placeholder || data.block_styles?.search_placeholder || 'Tìm bài, ví dụ: đĩa đệm',
-          topics_title: data.topics_title || data.block_styles?.topics_title || 'Chọn chủ đề',
-          recommended_books_title: data.recommended_books_title || data.block_styles?.recommended_books_title || 'Sách nên đọc',
-          recommended_books: normalizeRecommendedBooks(data.recommended_books || data.block_styles?.recommended_books),
-          recommended_books_layout: data.recommended_books_layout || data.block_styles?.recommended_books_layout || 'grid',
-          home_sections_order: data.home_sections_order || data.block_styles?.home_sections_order || ['topics', 'author', 'recommended_books'],
-          ai_training: normalizeAiTraining(data.ai_training || data.block_styles?.ai_training),
-        } as Settings;
+// ================= BỘ NHỚ ĐỆM NHANH (IN-MEMORY CACHE) =================
+interface CacheEntry<T> {
+  data: T;
+  expiry: number;
+}
+const dataCache = new Map<string, CacheEntry<any>>();
+const CACHE_TTL_MS = 60 * 1000; // 60 giây, tự động làm mới hoặc xóa khi Quản trị viên lưu
+
+export function clearDataCache(keyPrefix?: string): void {
+  if (!keyPrefix) {
+    dataCache.clear();
+  } else {
+    dataCache.forEach((_, key) => {
+      if (key.startsWith(keyPrefix)) {
+        dataCache.delete(key);
       }
-    } catch {
-      // fallback
-    }
+    });
   }
-  return sampleSettings;
+}
+
+async function getCachedOrFetch<T>(key: string, fetcher: () => Promise<T>, ttlMs = CACHE_TTL_MS): Promise<T> {
+  const cached = dataCache.get(key);
+  if (cached && cached.expiry > Date.now()) {
+    return cached.data;
+  }
+  const data = await fetcher();
+  dataCache.set(key, { data, expiry: Date.now() + ttlMs });
+  return data;
+}
+
+export async function getSettings(): Promise<Settings> {
+  return getCachedOrFetch('settings', async () => {
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      try {
+        const { data } = await supabase
+          .from('settings')
+          .select('*')
+          .eq('workspace_id', 'default')
+          .single();
+        if (data) {
+          return {
+            ...data,
+            author_profile: normalizeAuthorProfile(data.author_profile),
+            home_greeting: data.home_greeting || data.block_styles?.home_greeting || 'Xin chào!',
+            home_title: data.home_title || data.block_styles?.home_title || 'Hôm nay mình học gì?',
+            search_placeholder: data.search_placeholder || data.block_styles?.search_placeholder || 'Tìm bài, ví dụ: đĩa đệm',
+            topics_title: data.topics_title || data.block_styles?.topics_title || 'Chọn chủ đề',
+            recommended_books_title: data.recommended_books_title || data.block_styles?.recommended_books_title || 'Sách nên đọc',
+            recommended_books: normalizeRecommendedBooks(data.recommended_books || data.block_styles?.recommended_books),
+            recommended_books_layout: data.recommended_books_layout || data.block_styles?.recommended_books_layout || 'grid',
+            home_sections_order: data.home_sections_order || data.block_styles?.home_sections_order || ['topics', 'author', 'recommended_books'],
+            ai_training: normalizeAiTraining(data.ai_training || data.block_styles?.ai_training),
+          } as Settings;
+        }
+      } catch {
+        // fallback
+      }
+    }
+    return sampleSettings;
+  });
 }
 
 export async function getTopics(includeHidden = false): Promise<Topic[]> {
-  const supabase = getSupabaseClient();
-  if (supabase) {
-    try {
-      let query = supabase.from('topics').select('*').eq('workspace_id', 'default');
-      if (!includeHidden) {
-        query = query.eq('is_visible', true);
+  const cacheKey = `topics:${includeHidden}`;
+  return getCachedOrFetch(cacheKey, async () => {
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      try {
+        let query = supabase.from('topics').select('*').eq('workspace_id', 'default');
+        if (!includeHidden) {
+          query = query.eq('is_visible', true);
+        }
+        const { data } = await query.order('sort_order', { ascending: true });
+        if (data && data.length > 0) return data as Topic[];
+      } catch {
+        // fallback
       }
-      const { data } = await query.order('sort_order', { ascending: true });
-      if (data && data.length > 0) return data as Topic[];
-    } catch {
-      // fallback
     }
-  }
-  return sampleTopics
-    .filter((t) => includeHidden || t.is_visible)
-    .sort((a, b) => a.sort_order - b.sort_order);
+    return sampleTopics
+      .filter((t) => includeHidden || t.is_visible)
+      .sort((a, b) => a.sort_order - b.sort_order);
+  });
 }
 
 export async function getTopicBySlug(slug: string): Promise<Topic | null> {
-  const supabase = getSupabaseClient();
-  if (supabase) {
-    try {
-      const { data } = await supabase
-        .from('topics')
-        .select('*')
-        .eq('workspace_id', 'default')
-        .eq('slug', slug)
-        .single();
-      if (data) return data as Topic;
-    } catch {
-      // fallback
+  const cacheKey = `topic_by_slug:${slug}`;
+  return getCachedOrFetch(cacheKey, async () => {
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      try {
+        const { data } = await supabase
+          .from('topics')
+          .select('*')
+          .eq('workspace_id', 'default')
+          .eq('slug', slug)
+          .single();
+        if (data) return data as Topic;
+      } catch {
+        // fallback
+      }
     }
-  }
-  const topic = sampleTopics.find((t) => t.slug === slug);
-  return topic || null;
+    const topic = sampleTopics.find((t) => t.slug === slug);
+    return topic || null;
+  });
 }
 
 export async function getPagesByTopic(topicId: string, includeHidden = false): Promise<Page[]> {
-  const supabase = getSupabaseClient();
-  if (supabase) {
-    try {
-      let query = supabase.from('pages').select('*').eq('topic_id', topicId);
-      if (!includeHidden) {
-        query = query.eq('is_visible', true).eq('status', 'published');
+  const cacheKey = `pages_by_topic:${topicId}:${includeHidden}`;
+  return getCachedOrFetch(cacheKey, async () => {
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      try {
+        let query = supabase.from('pages').select('*').eq('topic_id', topicId);
+        if (!includeHidden) {
+          query = query.eq('is_visible', true).eq('status', 'published');
+        }
+        const { data } = await query.order('sort_order', { ascending: true });
+        if (data) return data as Page[];
+      } catch {
+        // fallback
       }
-      const { data } = await query.order('sort_order', { ascending: true });
-      if (data) return data as Page[];
-    } catch {
-      // fallback
     }
-  }
-  return samplePages
-    .filter((p) => p.topic_id === topicId && (includeHidden || (p.is_visible && p.status === 'published')))
-    .sort((a, b) => a.sort_order - b.sort_order);
+    return samplePages
+      .filter((p) => p.topic_id === topicId && (includeHidden || (p.is_visible && p.status === 'published')))
+      .sort((a, b) => a.sort_order - b.sort_order);
+  });
+}
+
+/**
+ * Tối ưu hóa siêu tốc cho Trang chủ: Lấy toàn bộ chủ đề kèm số lượng bài học chỉ trong 1 lần truy vấn
+ */
+export async function getTopicsWithCounts(includeHidden = false): Promise<{ topic: Topic; pageCount: number }[]> {
+  const cacheKey = `topics_with_counts:${includeHidden}`;
+  return getCachedOrFetch(cacheKey, async () => {
+    const topics = await getTopics(includeHidden);
+    const supabase = getSupabaseClient();
+    const pageCounts: Record<string, number> = {};
+
+    if (supabase) {
+      try {
+        let query = supabase.from('pages').select('id, topic_id, is_visible, status');
+        if (!includeHidden) {
+          query = query.eq('is_visible', true).eq('status', 'published');
+        }
+        const { data } = await query;
+        if (data) {
+          for (const row of data) {
+            if (row.topic_id) {
+              pageCounts[row.topic_id] = (pageCounts[row.topic_id] || 0) + 1;
+            }
+          }
+        }
+      } catch {
+        // fallback
+      }
+    }
+
+    return topics.map((topic) => ({
+      topic,
+      pageCount: pageCounts[topic.id] ?? samplePages.filter((p) => p.topic_id === topic.id).length,
+    }));
+  });
 }
 
 export async function getPageBySlug(
@@ -194,22 +271,25 @@ export async function getPageById(id: string): Promise<Page | null> {
 }
 
 export async function getBlocksByPage(pageId: string, includeHidden = false): Promise<Block[]> {
-  const supabase = getSupabaseClient();
-  if (supabase) {
-    try {
-      let query = supabase.from('blocks').select('*').eq('page_id', pageId);
-      if (!includeHidden) {
-        query = query.eq('is_visible', true);
+  const cacheKey = `blocks_by_page:${pageId}:${includeHidden}`;
+  return getCachedOrFetch(cacheKey, async () => {
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      try {
+        let query = supabase.from('blocks').select('*').eq('page_id', pageId);
+        if (!includeHidden) {
+          query = query.eq('is_visible', true);
+        }
+        const { data } = await query.order('sort_order', { ascending: true });
+        if (data && data.length > 0) return data as Block[];
+      } catch {
+        // fallback
       }
-      const { data } = await query.order('sort_order', { ascending: true });
-      if (data && data.length > 0) return data as Block[];
-    } catch {
-      // fallback
     }
-  }
-  return sampleBlocks
-    .filter((b) => b.page_id === pageId && (includeHidden || b.is_visible))
-    .sort((a, b) => a.sort_order - b.sort_order);
+    return sampleBlocks
+      .filter((b) => b.page_id === pageId && (includeHidden || b.is_visible))
+      .sort((a, b) => a.sort_order - b.sort_order);
+  });
 }
 
 export async function getTopicPageCount(topicId: string): Promise<number> {

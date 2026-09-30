@@ -1,5 +1,5 @@
 import React from 'react';
-import { getSettings, getTopics, getPagesByTopic } from '../lib/data';
+import { getSettings, getTopicsWithCounts } from '../lib/data';
 import HomeHeader from '../components/HomeHeader';
 import HomeGreetingSection from '../components/HomeGreetingSection';
 import HomeContinueSection from '../components/HomeContinueSection';
@@ -19,21 +19,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const [settings, topics] = await Promise.all([
+  const [settings, topicsWithCounts] = await Promise.all([
     getSettings(),
-    getTopics(true),
+    getTopicsWithCounts(true),
   ]);
-
-  // Lấy số trang của từng chủ đề
-  const topicsWithCounts = await Promise.all(
-    topics.map(async (topic) => {
-      const pages = await getPagesByTopic(topic.id);
-      return {
-        topic,
-        pageCount: pages.length,
-      };
-    })
-  );
 
   return (
     <main className="flex-1 flex flex-col px-4 sm:px-5 pt-3 pb-28 gap-4 sm:gap-5">
