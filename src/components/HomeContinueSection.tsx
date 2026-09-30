@@ -12,14 +12,14 @@ import EditPageModal from './admin/EditPageModal';
 const DEFAULT_FEATURED_LESSON: XemTiepInfo = {
   topic_title: 'Cột sống',
   topic_slug: 'cot-song',
-  page_title: 'Tư thế và vận động',
-  page_slug: 'tu-the-va-van-dong',
-  page_number: 5,
-  video_title: 'Tư thế sinh hoạt và vận động đúng giúp bảo vệ cột sống, giảm đau và phòng ngừa chấn thương.',
+  page_title: 'Tổng quan về cột sống',
+  page_slug: 'tong-quan-ve-cot-song',
+  page_number: 1,
+  video_title: '01. Cấu tạo & chức năng cột sống',
   video_index: 1,
-  video_total: 1,
+  video_total: 4,
   updated_at: Date.now(),
-  cover_url: '/images/lessons/tu-the-va-van-dong.jpg',
+  cover_url: '/images/lessons/tong-quan-ve-cot-song.png',
 };
 
 export default function HomeContinueSection() {

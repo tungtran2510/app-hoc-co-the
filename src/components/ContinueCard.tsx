@@ -26,31 +26,31 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
     <Link
       href={targetUrl}
       prefetch={true}
-      className="group relative block overflow-hidden rounded-[22px] bg-gradient-to-r from-[#0047AB] via-[#0055D4] to-[#00388A] p-4 sm:p-5 text-white shadow-md border border-blue-400/20 transition-all duration-150 active:scale-[0.98] cursor-pointer"
+      className="group relative block overflow-hidden rounded-[20px] bg-gradient-to-r from-[#072146] via-[#0A3266] to-[#051833] px-4 py-3 sm:px-5 sm:py-3.5 text-white shadow-md border border-white/10 transition-all duration-150 active:scale-[0.98] cursor-pointer"
       aria-label={`Xem tiếp ${info.topic_title} bài ${info.page_title}`}
     >
       {/* 3D Anatomy / Avatar Render bên phải */}
-      <div className="absolute -right-2 top-0 bottom-0 w-[44%] sm:w-[38%] pointer-events-none overflow-hidden select-none">
+      <div className="absolute -right-2 top-0 bottom-0 w-[42%] sm:w-[36%] pointer-events-none overflow-hidden select-none">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={info.cover_url || '/images/lessons/tong-quan-ve-cot-song.png'}
           alt={info.page_title || 'Anatomy'}
           className={`w-full h-full object-cover object-center ${
             info.cover_url && !info.cover_url.endsWith('.png')
-              ? 'opacity-90'
-              : 'mix-blend-screen opacity-95 scale-110'
+              ? 'opacity-85'
+              : 'mix-blend-screen opacity-90 scale-105'
           }`}
         />
-        {/* Gradient mờ nhẹ chuyển từ nền xanh sang ảnh */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0047AB] via-[#0047AB]/50 to-transparent w-20" />
+        {/* Gradient mờ chuyển từ nền xanh đậm sang ảnh */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#072146] via-[#072146]/60 to-transparent w-16" />
       </div>
 
-      <div className="relative z-10 flex flex-col gap-2">
+      <div className="relative z-10 flex flex-col gap-1 sm:gap-1.5">
         {/* Dòng 1: Huy hiệu chủ đề có icon Play + Nút sửa ảnh (nếu Admin) + Vị trí video */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-white/95 text-[12px] sm:text-[12.5px] font-bold">
-            <span className="w-5 h-5 rounded-full bg-[#0066FF] flex items-center justify-center text-white shrink-0 shadow-2xs">
-              <Play size={10} fill="currentColor" className="ml-0.5" />
+          <div className="flex items-center gap-1.5 text-white/90 text-[11.5px] sm:text-[12px] font-bold">
+            <span className="w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full bg-sky-500 flex items-center justify-center text-white shrink-0 shadow-2xs">
+              <Play size={8} fill="currentColor" className="ml-0.5" />
             </span>
             <span>Đang xem · {info.topic_title || 'Cột sống'}</span>
           </div>
@@ -64,57 +64,53 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
                   e.stopPropagation();
                   onEditPage();
                 }}
-                className="px-2 py-0.5 rounded-full bg-white/20 hover:bg-white/35 text-white text-[11px] font-bold flex items-center gap-1 backdrop-blur-xs cursor-pointer transition-colors shadow-2xs"
+                className="px-2 py-0.5 rounded-full bg-white/20 hover:bg-white/35 text-white text-[10.5px] font-bold flex items-center gap-1 backdrop-blur-xs cursor-pointer transition-colors shadow-2xs"
                 title="Cài đặt ảnh đại diện & thông tin bài học này"
               >
-                <Edit2 size={11} />
+                <Edit2 size={10} />
                 <span>Đổi ảnh</span>
               </button>
             )}
 
-            <span className="text-[11.5px] sm:text-[12px] font-bold text-white/80 pr-1">
+            <span className="text-[11px] sm:text-[11.5px] font-bold text-white/75 pr-1">
               Video {String(current).padStart(2, '0')}/{String(total).padStart(2, '0')}
             </span>
           </div>
         </div>
 
-        {/* Dòng 2: Tiêu đề bài học */}
-        <h2 className="text-[17px] sm:text-[19px] font-black text-white leading-tight line-clamp-1 max-w-[70%] sm:max-w-[75%]">
-          {String(info.page_number || 5).padStart(2, '0')} - {info.page_title || 'Tư thế và vận động'}
+        {/* Dòng 2: Tiêu đề bài học chính - TO RÕ CHO DỄ NHÌN */}
+        <h2 className="text-[17.5px] sm:text-[20px] font-black text-white leading-tight tracking-tight line-clamp-1 max-w-[84%] sm:max-w-[86%]">
+          {String(info.page_number || 1).padStart(2, '0')} - {info.page_title || 'Tổng quan về cột sống'}
         </h2>
 
-        {/* Dòng 3: Mô tả bài học */}
-        <p className="text-[11px] sm:text-[12px] text-white/85 leading-snug line-clamp-2 max-w-[76%] sm:max-w-[80%]">
-          {info.video_title || (
-            <>
-              Tư thế sinh hoạt và vận động đúng giúp<br className="sm:hidden" /> bảo vệ cột sống, giảm đau và phòng ngừa chấn thương.
-            </>
-          )}
+        {/* Dòng 3: Mô tả/Tiêu đề video - 1 dòng gọn gàng để chiều cao bé lại */}
+        <p className="text-[11.5px] sm:text-[12px] text-white/80 leading-tight line-clamp-1 max-w-[70%] sm:max-w-[76%] font-medium">
+          {info.video_title || 'Cấu tạo & chức năng cột sống'}
         </p>
 
         {/* Dòng 4: Thanh tiến độ + Phần trăm + Nút Xem tiếp */}
-        <div className="flex items-center justify-between gap-3 pt-1 mt-0.5">
-          <div className="flex-1 max-w-[58%] sm:max-w-[64%] flex items-center gap-2.5">
+        <div className="flex items-center justify-between gap-2.5 pt-0.5 mt-0.5">
+          <div className="flex-1 max-w-[56%] sm:max-w-[64%] flex items-center gap-2">
             <div
-              className="flex-1 h-1.5 bg-white/25 rounded-full overflow-hidden"
+              className="flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden"
               role="progressbar"
               aria-valuenow={progressPercent}
               aria-valuemin={0}
               aria-valuemax={100}
             >
               <div
-                className="h-full bg-[#00D2FF] rounded-full transition-all duration-300 shadow-xs"
+                className="h-full bg-sky-400 rounded-full transition-all duration-300 shadow-xs"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <span className="text-[11.5px] font-bold text-white/90 shrink-0">
+            <span className="text-[11px] font-bold text-white/85 shrink-0 font-mono">
               {progressPercent}%
             </span>
           </div>
 
-          <div className="shrink-0 flex items-center gap-1 h-[32px] sm:h-[34px] px-3.5 sm:px-4 rounded-full bg-white text-[#0047AB] font-extrabold text-[12.5px] sm:text-[13px] shadow-sm group-hover:bg-slate-50 transition-colors">
+          <div className="shrink-0 flex items-center gap-1 h-[28px] sm:h-[30px] px-3 sm:px-3.5 rounded-full bg-white text-[#072146] font-extrabold text-[12px] sm:text-[12.5px] shadow-sm group-hover:bg-slate-100 transition-colors">
             <span>Xem tiếp</span>
-            <ArrowRight size={14} strokeWidth={2.5} />
+            <ArrowRight size={13} strokeWidth={2.5} />
           </div>
         </div>
       </div>
