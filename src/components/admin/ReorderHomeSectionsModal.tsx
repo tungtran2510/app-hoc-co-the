@@ -12,8 +12,11 @@ import {
   UserCheck,
   FolderTree,
   Loader2,
+  Sparkles,
+  PhoneCall,
 } from 'lucide-react';
 import { saveSettingsApi } from '../../lib/apiAdmin';
+import { normalizeHomeSectionsOrder } from '../../lib/data';
 
 interface SectionMeta {
   key: string;
@@ -29,21 +32,37 @@ const SECTION_DEFS: Record<string, SectionMeta> = {
     desc: 'Lưới các chủ đề chính (Cột sống, Dinh dưỡng, Nước...)',
     icon: FolderTree,
   },
-  author: {
-    key: 'author',
-    name: 'Tác giả & Chuyên gia',
-    desc: 'Hồ sơ chuyên gia, video giới thiệu, sách đã làm, triết lý & liên hệ',
+  author_profile: {
+    key: 'author_profile',
+    name: 'Hồ sơ Tác giả & Chuyên gia',
+    desc: 'Ảnh đại diện/logo, tên, định vị, lời giới thiệu và video',
     icon: UserCheck,
+  },
+  author_books: {
+    key: 'author_books',
+    name: 'Sách & Tác phẩm đã làm',
+    desc: 'Các ấn phẩm, công trình sách của tác giả và video',
+    icon: BookOpen,
+  },
+  author_philosophy: {
+    key: 'author_philosophy',
+    name: 'Triết lý phụng sự',
+    desc: 'Thông điệp sứ mệnh, tâm huyết và triết lý vì sức khỏe',
+    icon: Sparkles,
+  },
+  author_contact: {
+    key: 'author_contact',
+    name: 'Thông tin liên hệ & Kết nối',
+    desc: 'Hotline, nút chat Zalo, địa chỉ, email và kênh cá nhân',
+    icon: PhoneCall,
   },
   recommended_books: {
     key: 'recommended_books',
-    name: 'Sách nên đọc',
+    name: 'Tài liệu nên đọc (Sách khuyên đọc)',
     desc: 'Bộ sưu tập các cuốn sách khuyên đọc chuyên sâu về cơ thể',
     icon: BookOpen,
   },
 };
-
-const DEFAULT_ORDER = ['topics', 'author', 'recommended_books'];
 
 interface ReorderHomeSectionsModalProps {
   isOpen: boolean;
@@ -59,15 +78,19 @@ export default function ReorderHomeSectionsModal({
   onSaved,
 }: ReorderHomeSectionsModalProps) {
   const [order, setOrder] = useState<string[]>(() => {
-    const valid = currentOrder.filter((k) => SECTION_DEFS[k]);
-    DEFAULT_ORDER.forEach((k) => {
-      if (!valid.includes(k)) valid.push(k);
-    });
-    return valid;
+    return normalizeHomeSectionsOrder(currentOrder);
   });
   const [isSaving, setIsSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setOrder(normalizeHomeSectionsOrder(currentOrder));
+      setErrorMsg('');
+      setSuccessMsg('');
+    }
+  }, [isOpen, currentOrder]);
 
   if (!isOpen) return null;
 

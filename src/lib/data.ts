@@ -71,6 +71,40 @@ export function normalizeAuthorProfile(raw?: any): AuthorProfile {
   };
 }
 
+export const DEFAULT_HOME_SECTIONS_ORDER = [
+  'topics',
+  'author_profile',
+  'author_books',
+  'author_philosophy',
+  'author_contact',
+  'recommended_books',
+];
+
+export function normalizeHomeSectionsOrder(raw?: any): string[] {
+  if (!Array.isArray(raw) || raw.length === 0) {
+    return [...DEFAULT_HOME_SECTIONS_ORDER];
+  }
+
+  const expanded: string[] = [];
+  for (const item of raw) {
+    if (item === 'author') {
+      expanded.push('author_profile', 'author_books', 'author_philosophy', 'author_contact');
+    } else if (typeof item === 'string') {
+      expanded.push(item);
+    }
+  }
+
+  const validSet = new Set(DEFAULT_HOME_SECTIONS_ORDER);
+  const unique = Array.from(new Set(expanded)).filter((k) => validSet.has(k));
+
+  for (const item of DEFAULT_HOME_SECTIONS_ORDER) {
+    if (!unique.includes(item)) {
+      unique.push(item);
+    }
+  }
+  return unique;
+}
+
 // ================= BỘ NHỚ ĐỆM NHANH (IN-MEMORY CACHE) =================
 interface CacheEntry<T> {
   data: T;
@@ -122,7 +156,7 @@ export async function getSettings(): Promise<Settings> {
             recommended_books_title: data.recommended_books_title || data.block_styles?.recommended_books_title || 'Sách nên đọc',
             recommended_books: normalizeRecommendedBooks(data.recommended_books || data.block_styles?.recommended_books),
             recommended_books_layout: data.recommended_books_layout || data.block_styles?.recommended_books_layout || 'grid',
-            home_sections_order: data.home_sections_order || data.block_styles?.home_sections_order || ['topics', 'author', 'recommended_books'],
+            home_sections_order: normalizeHomeSectionsOrder(data.home_sections_order || data.block_styles?.home_sections_order),
             ai_training: normalizeAiTraining(data.ai_training || data.block_styles?.ai_training),
           } as Settings;
         }

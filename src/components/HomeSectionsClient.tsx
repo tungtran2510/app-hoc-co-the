@@ -1,13 +1,21 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Topic, AuthorProfile, RecommendedBook } from '../lib/types';
+import { Topic, AuthorProfile, RecommendedBook, AuthorBook } from '../lib/types';
 import { checkIsAdminClient } from '../lib/adminAuth';
 import { saveSettingsApi } from '../lib/apiAdmin';
+import { normalizeAuthorProfile, normalizeHomeSectionsOrder } from '../lib/data';
 import TopicListClient from './TopicListClient';
-import AuthorIntroSection from './AuthorIntroSection';
+import AuthorIntroSection, {
+  AuthorProfileSection,
+  AuthorBooksSection,
+  AuthorPhilosophySection,
+  AuthorContactSection,
+} from './AuthorIntroSection';
 import RecommendedBooksSection from './RecommendedBooksSection';
 import ReorderHomeSectionsModal from './admin/ReorderHomeSectionsModal';
+import EditAuthorModal from './admin/EditAuthorModal';
+import BookDetailModal from './BookDetailModal';
 
 interface HomeSectionsClientProps {
   initialSectionsOrder?: string[] | null;
@@ -23,42 +31,47 @@ interface HomeSectionsClientProps {
   initialBooksLayout?: 'grid' | 'lookbook' | null;
 }
 
-const DEFAULT_SECTIONS_ORDER = ['topics', 'author', 'recommended_books'];
-
 export default function HomeSectionsClient({
   initialSectionsOrder,
   topicsWithCounts,
   topicsTitle,
-  authorProfile,
+  authorProfile: initialAuthorProfile,
   recommendedBooksTitle,
   recommendedBooksSubtitle,
   recommendedBooks = [],
   initialBooksLayout,
 }: HomeSectionsClientProps) {
-  const [sectionsOrder, setSectionsOrder] = useState<string[]>(() => {
-    if (Array.isArray(initialSectionsOrder) && initialSectionsOrder.length > 0) {
-      const valid = initialSectionsOrder.filter((k) => DEFAULT_SECTIONS_ORDER.includes(k));
-      DEFAULT_SECTIONS_ORDER.forEach((k) => {
-        if (!valid.includes(k)) valid.push(k);
-      });
-      return valid;
-    }
-    return DEFAULT_SECTIONS_ORDER;
-  });
+  const [sectionsOrder, setSectionsOrder] = useState<string[]>(() =>
+    normalizeHomeSectionsOrder(initialSectionsOrder)
+  );
+
+  const [authorProfile, setAuthorProfile] = useState<AuthorProfile>(() =>
+    normalizeAuthorProfile(initialAuthorProfile)
+  );
 
   const [isAdmin, setIsAdmin] = useState(false);
   const [showReorderModal, setShowReorderModal] = useState(false);
+  const [showAuthorModal, setShowAuthorModal] = useState(false);
+  const [authorModalTab, setAuthorModalTab] = useState<'author' | 'books' | 'contact' | 'extra'>('author');
+  const [selectedAuthorBook, setSelectedAuthorBook] = useState<AuthorBook | null>(null);
 
   useEffect(() => {
     checkIsAdminClient().then(setIsAdmin);
-    if (initialSectionsOrder && initialSectionsOrder.length > 0) {
-      const valid = initialSectionsOrder.filter((k) => DEFAULT_SECTIONS_ORDER.includes(k));
-      DEFAULT_SECTIONS_ORDER.forEach((k) => {
-        if (!valid.includes(k)) valid.push(k);
-      });
-      setSectionsOrder(valid);
+    if (initialSectionsOrder) {
+      setSectionsOrder(normalizeHomeSectionsOrder(initialSectionsOrder));
     }
   }, [initialSectionsOrder]);
+
+  useEffect(() => {
+    if (initialAuthorProfile) {
+      setAuthorProfile(normalizeAuthorProfile(initialAuthorProfile));
+    }
+  }, [initialAuthorProfile]);
+
+  const openAuthorModal = (tab: 'author' | 'books' | 'contact' | 'extra') => {
+    setAuthorModalTab(tab);
+    setShowAuthorModal(true);
+  };
 
   const handleMoveSection = async (index: number, direction: 'up' | 'down') => {
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
@@ -106,6 +119,71 @@ export default function HomeSectionsClient({
           );
         }
 
+        if (sectionKey === 'author_profile') {
+          return (
+            <AuthorProfileSection
+              key="author_profile"
+              profile={authorProfile}
+              isAdmin={isAdmin}
+              sectionIndex={index}
+              totalSections={sectionsOrder.length}
+              onMoveUp={() => handleMoveSection(index, 'up')}
+              onMoveDown={() => handleMoveSection(index, 'down')}
+              onOpenReorderModal={() => setShowReorderModal(true)}
+              onEdit={() => openAuthorModal('author')}
+            />
+          );
+        }
+
+        if (sectionKey === 'author_books') {
+          return (
+            <AuthorBooksSection
+              key="author_books"
+              profile={authorProfile}
+              isAdmin={isAdmin}
+              sectionIndex={index}
+              totalSections={sectionsOrder.length}
+              onMoveUp={() => handleMoveSection(index, 'up')}
+              onMoveDown={() => handleMoveSection(index, 'down')}
+              onOpenReorderModal={() => setShowReorderModal(true)}
+              onEdit={() => openAuthorModal('books')}
+              onSelectBook={(b) => setSelectedAuthorBook(b)}
+            />
+          );
+        }
+
+        if (sectionKey === 'author_philosophy') {
+          return (
+            <AuthorPhilosophySection
+              key="author_philosophy"
+              profile={authorProfile}
+              isAdmin={isAdmin}
+              sectionIndex={index}
+              totalSections={sectionsOrder.length}
+              onMoveUp={() => handleMoveSection(index, 'up')}
+              onMoveDown={() => handleMoveSection(index, 'down')}
+              onOpenReorderModal={() => setShowReorderModal(true)}
+              onEdit={() => openAuthorModal('extra')}
+            />
+          );
+        }
+
+        if (sectionKey === 'author_contact') {
+          return (
+            <AuthorContactSection
+              key="author_contact"
+              profile={authorProfile}
+              isAdmin={isAdmin}
+              sectionIndex={index}
+              totalSections={sectionsOrder.length}
+              onMoveUp={() => handleMoveSection(index, 'up')}
+              onMoveDown={() => handleMoveSection(index, 'down')}
+              onOpenReorderModal={() => setShowReorderModal(true)}
+              onEdit={() => openAuthorModal('contact')}
+            />
+          );
+        }
+
         if (sectionKey === 'author') {
           return (
             <AuthorIntroSection
@@ -139,6 +217,36 @@ export default function HomeSectionsClient({
 
         return null;
       })}
+
+      {/* Modal chi tiết sách của tác giả */}
+      {selectedAuthorBook && (
+        <BookDetailModal
+          book={{
+            ...selectedAuthorBook,
+            author: authorProfile.name || 'Tác giả',
+            type: 'author',
+          }}
+          isAdmin={isAdmin}
+          onClose={() => setSelectedAuthorBook(null)}
+          onEdit={() => {
+            setSelectedAuthorBook(null);
+            openAuthorModal('books');
+          }}
+        />
+      )}
+
+      {/* Modal chỉnh sửa tác giả */}
+      {showAuthorModal && (
+        <EditAuthorModal
+          isOpen={true}
+          initialProfile={authorProfile}
+          initialTab={authorModalTab}
+          onClose={() => setShowAuthorModal(false)}
+          onSaved={(newProfile) => {
+            setAuthorProfile(newProfile);
+          }}
+        />
+      )}
 
       {/* Modal Sắp xếp thứ tự các khối */}
       <ReorderHomeSectionsModal

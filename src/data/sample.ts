@@ -112,6 +112,14 @@ export const sampleSettings: Settings = {
   recommended_books_title: 'Sách nên đọc',
   recommended_books_subtitle: 'Tài liệu tham khảo chuyên sâu giúp bạn hiểu và chăm sóc cơ thể mỗi ngày',
   recommended_books: DEFAULT_RECOMMENDED_BOOKS,
+  home_sections_order: [
+    'topics',
+    'author_profile',
+    'author_books',
+    'author_philosophy',
+    'author_contact',
+    'recommended_books',
+  ],
   ai_training: DEFAULT_AI_TRAINING,
 };
 
