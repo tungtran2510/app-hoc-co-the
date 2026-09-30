@@ -160,10 +160,14 @@ export default function HomeHeader({ initialAppName, initialLogoUrl }: HomeHeade
           }`}
           title={isAdmin ? 'Bấm để đổi tên app & logo' : undefined}
         >
-          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-[14px] bg-gradient-to-br from-[#0066FF] to-[#0047AB] flex items-center justify-center text-white shadow-xs overflow-hidden shrink-0 border border-blue-500/20">
+          <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-[12px] flex items-center justify-center overflow-hidden shrink-0 ${
+            logoUrl && !logoUrl.includes('5513d9c5') && !logoUrl.includes('author') && !logoUrl.includes('avatar')
+              ? ''
+              : 'bg-gradient-to-br from-[#0066FF] to-[#0047AB] text-white shadow-xs border border-blue-500/20'
+          }`}>
             {logoUrl && !logoUrl.includes('5513d9c5') && !logoUrl.includes('author') && !logoUrl.includes('avatar') ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+              <img src={logoUrl} alt="Logo" className="w-full h-full object-contain rounded-[12px]" />
             ) : (
               // eslint-disable-next-line @next/next/no-img-element
               <img

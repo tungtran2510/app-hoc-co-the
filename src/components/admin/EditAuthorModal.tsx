@@ -372,22 +372,24 @@ export default function EditAuthorModal({
           {/* TAB 1: THÔNG TIN TÁC GIẢ */}
           {activeTab === 'author' && (
             <div className="flex flex-col gap-4">
-              {/* Ảnh đại diện (Avatar) */}
+              {/* Ảnh tác giả / Logo */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-[14px] font-bold text-ink">
-                  Ảnh đại diện (Avatar)
+                  Ảnh tác giả / Logo (không khung tròn)
                 </label>
                 <div className="flex items-center gap-3">
-                  <div className="w-16 h-16 rounded-full bg-primary-soft flex items-center justify-center overflow-hidden border-2 border-line shrink-0 shadow-xs">
+                  <div className="w-16 h-16 rounded-[12px] flex items-center justify-center overflow-hidden shrink-0 border border-line bg-surface">
                     {profile.avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={profile.avatar_url}
-                        alt="Avatar"
-                        className="w-full h-full object-cover"
+                        alt="Avatar/Logo"
+                        className="w-full h-full object-cover rounded-[12px]"
                       />
                     ) : (
-                      <User size={30} className="text-primary" />
+                      <div className="w-full h-full bg-primary-soft rounded-[12px] flex items-center justify-center">
+                        <User size={30} className="text-primary" />
+                      </div>
                     )}
                   </div>
 
@@ -406,7 +408,7 @@ export default function EditAuthorModal({
                       ) : (
                         <>
                           <ImageIcon size={14} className="text-primary" />
-                          <span>Chọn ảnh avatar mới</span>
+                          <span>Chọn ảnh tác giả / logo mới</span>
                         </>
                       )}
                     </button>

@@ -64,31 +64,19 @@ export default function AuthorIntroSection({
 
   return (
     <section className="flex flex-col gap-4 mt-2">
-      {/* TIÊU ĐỀ CHÍNH CỦA KHỐI & NÚT SỬA TỔNG QUAN (2 HÀNG GỌN GÀNG, KHÔNG RỚT CHỮ) */}
-      <div className="flex flex-col gap-1.5">
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="text-[20px] font-extrabold text-ink leading-tight whitespace-nowrap">
-            Tác giả & Chuyên gia
-          </h2>
+      {/* NÚT ĐIỀU KHIỂN DÀNH CHO ADMIN (NẾU CÓ) */}
+      {isAdmin && (
+        <div className="flex items-center justify-end gap-2 -mb-2">
+          <button
+            type="button"
+            onClick={() => openModalWithTab('author')}
+            className="flex items-center gap-1.5 h-7 px-2.5 rounded-[9px] bg-primary-soft text-primary text-[11.5px] font-extrabold hover:bg-primary-soft/80 cursor-pointer shadow-2xs shrink-0 whitespace-nowrap"
+          >
+            <Edit2 size={11} />
+            <span>Sửa tác giả</span>
+          </button>
 
-          {isAdmin && (
-            <button
-              type="button"
-              onClick={() => openModalWithTab('author')}
-              className="flex items-center gap-1.5 h-7 px-2.5 rounded-[9px] bg-primary-soft text-primary text-[11.5px] font-extrabold hover:bg-primary-soft/80 cursor-pointer shadow-2xs shrink-0 whitespace-nowrap"
-            >
-              <Edit2 size={11} />
-              <span>Sửa tác giả</span>
-            </button>
-          )}
-        </div>
-
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-[12.5px] text-muted leading-snug line-clamp-1">
-            Người đồng hành & các công trình nghiên cứu
-          </p>
-
-          {isAdmin && onMoveUp && onMoveDown && onOpenReorderModal && typeof sectionIndex === 'number' && typeof totalSections === 'number' && (
+          {onMoveUp && onMoveDown && onOpenReorderModal && typeof sectionIndex === 'number' && typeof totalSections === 'number' && (
             <SectionOrderControls
               sectionIndex={sectionIndex}
               totalSections={totalSections}
@@ -99,23 +87,25 @@ export default function AuthorIntroSection({
             />
           )}
         </div>
-      </div>
+      )}
 
       {/* 1. KHỐI GIỚI THIỆU BẢN THÂN (CÓ NÚT SỬA TRỰC TIẾP) */}
       <div className="p-4 sm:p-5 rounded-[24px] bg-white border border-line shadow-xs flex flex-col gap-3.5">
-        {/* Avatar + Tên + Chức danh + Nút sửa khối */}
+        {/* Avatar/Logo + Tên + Chức danh + Nút sửa khối */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3.5 min-w-0">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-primary-soft flex items-center justify-center overflow-hidden border-2 border-primary/20 shrink-0 shadow-sm">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-[12px] flex items-center justify-center overflow-hidden shrink-0">
               {profile.avatar_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={profile.avatar_url}
                   alt={profile.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover rounded-[12px]"
                 />
               ) : (
-                <User size={34} className="text-primary" />
+                <div className="w-full h-full bg-primary-soft rounded-[12px] flex items-center justify-center">
+                  <User size={34} className="text-primary" />
+                </div>
               )}
             </div>
 
@@ -134,17 +124,6 @@ export default function AuthorIntroSection({
             </div>
           </div>
 
-          {isAdmin && (
-            <button
-              type="button"
-              onClick={() => openModalWithTab('author')}
-              className="flex items-center gap-1 h-7 px-2.5 rounded-[8px] bg-surface-2 hover:bg-primary-soft text-muted hover:text-primary text-[11.5px] font-bold transition-colors cursor-pointer shrink-0 whitespace-nowrap"
-              title="Sửa thông tin tác giả"
-            >
-              <Edit2 size={12} />
-              <span>Sửa</span>
-            </button>
-          )}
         </div>
 
         {/* Lời giới thiệu chi tiết (Bio) */}
