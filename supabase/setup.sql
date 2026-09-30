@@ -15,6 +15,7 @@ create table if not exists settings (
   hotline      text,
   zalo_url     text,
   author_profile jsonb not null default '{}'::jsonb,
+  admin_password text,
   updated_at   timestamptz not null default now()
 );
 

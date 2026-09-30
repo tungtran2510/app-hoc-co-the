@@ -8,6 +8,8 @@ import {
   Download,
   LogOut,
   Sliders,
+  Key,
+  Loader2,
 } from 'lucide-react';
 import {
   getStoredAppSettings,
@@ -36,12 +38,65 @@ export default function AdminSettingsModal({
   const [saveSuccessMsg, setSaveSuccessMsg] = useState('');
   const [isExporting, setIsExporting] = useState(false);
 
+  // Đổi mật khẩu Admin
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
+
   useEffect(() => {
     if (isOpen) {
       setSettings(getStoredAppSettings());
       setSaveSuccessMsg('');
+      setPasswordError('');
+      setPasswordSuccess('');
     }
   }, [isOpen]);
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError('');
+    setPasswordSuccess('');
+
+    if (!newPassword || newPassword.trim().length < 4) {
+      setPasswordError('Mật khẩu mới phải có tối thiểu 4 ký tự.');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError('Mật khẩu xác nhận không khớp.');
+      return;
+    }
+
+    try {
+      setIsChangingPassword(true);
+      const res = await fetch('/api/admin/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPassword: currentPassword.trim(),
+          newPassword: newPassword.trim(),
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setPasswordError(data.error || 'Đổi mật khẩu thất bại.');
+        return;
+      }
+
+      setPasswordSuccess('Đã đổi mật khẩu thành công! Mật khẩu mới có hiệu lực ngay.');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err: any) {
+      setPasswordError(err.message || 'Lỗi mạng khi đổi mật khẩu.');
+    } finally {
+      setIsChangingPassword(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -148,7 +203,7 @@ export default function AdminSettingsModal({
                 : 'text-muted hover:text-ink'
             }`}
           >
-            Dữ liệu & Sao lưu
+            Dữ liệu & Bảo mật
           </button>
         </div>
 
@@ -298,6 +353,87 @@ export default function AdminSettingsModal({
                   <Download size={16} />
                   <span>{isExporting ? 'Đang xuất tệp...' : 'Tải file sao lưu (JSON)'}</span>
                 </button>
+              </div>
+
+              {/* Đổi mật khẩu Admin */}
+              <div className="flex flex-col gap-3 p-4 rounded-[16px] bg-surface-2 border border-line">
+                <div className="flex items-center gap-2">
+                  <Key size={16} className="text-primary" />
+                  <span className="text-[14px] font-bold text-ink">
+                    Đổi mật khẩu quản trị (Admin)
+                  </span>
+                </div>
+
+                {passwordError && (
+                  <div className="p-2.5 rounded-[10px] bg-red-50 border border-red-200 text-red-700 text-[13px] font-bold">
+                    {passwordError}
+                  </div>
+                )}
+
+                {passwordSuccess && (
+                  <div className="p-2.5 rounded-[10px] bg-emerald-50 border border-emerald-200 text-emerald-800 text-[13px] font-bold">
+                    {passwordSuccess}
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[12px] font-bold text-ink">
+                      Mật khẩu hiện tại
+                    </label>
+                    <input
+                      type="password"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      placeholder="Nhập mật khẩu đang dùng"
+                      className="w-full h-9 px-3 rounded-[10px] border border-line text-[14px] text-ink focus:border-primary bg-white"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[12px] font-bold text-ink">
+                        Mật khẩu mới
+                      </label>
+                      <input
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="Tối thiểu 4 ký tự"
+                        className="w-full h-9 px-3 rounded-[10px] border border-line text-[14px] text-ink focus:border-primary bg-white"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[12px] font-bold text-ink">
+                        Nhập lại mật khẩu
+                      </label>
+                      <input
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="Xác nhận lại"
+                        className="w-full h-9 px-3 rounded-[10px] border border-line text-[14px] text-ink focus:border-primary bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleChangePassword}
+                    disabled={isChangingPassword || !newPassword}
+                    className="mt-1 flex items-center justify-center gap-1.5 h-9 rounded-[10px] bg-primary text-white font-bold text-[13px] hover:bg-primary-dark cursor-pointer disabled:opacity-50 transition-colors"
+                  >
+                    {isChangingPassword ? (
+                      <>
+                        <Loader2 size={13} className="animate-spin" />
+                        <span>Đang cập nhật...</span>
+                      </>
+                    ) : (
+                      <span>Cập nhật mật khẩu mới</span>
+                    )}
+                  </button>
+                </div>
               </div>
 
               {/* Đăng xuất */}

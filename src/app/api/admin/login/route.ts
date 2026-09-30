@@ -1,10 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateAdminHmac, COOKIE_NAME } from '../../../../lib/authServer';
+import { getSupabaseServer } from '../../../../lib/supabaseServer';
 
 export async function POST(req: NextRequest) {
   try {
     const { password } = await req.json();
-    const serverPassword = process.env.ADMIN_PASSWORD;
+    let serverPassword = process.env.ADMIN_PASSWORD;
+
+    // Ưu tiên mật khẩu quản trị lưu trong Supabase
+    const supabase = getSupabaseServer();
+    if (supabase) {
+      try {
+        const { data } = await supabase
+          .from('settings')
+          .select('admin_password')
+          .eq('workspace_id', 'default')
+          .single();
+        if (data?.admin_password) {
+          serverPassword = data.admin_password;
+        }
+      } catch {
+        // Fallback sang biến môi trường
+      }
+    }
 
     if (!serverPassword) {
       return NextResponse.json(
