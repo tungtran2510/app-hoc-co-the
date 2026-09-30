@@ -470,22 +470,22 @@ export function AuthorContactSection({
         )}
 
         {/* Các nút gọi điện & nhắn tin nhanh */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-0.5">
+        <div className="flex flex-col gap-2.5 pt-0.5">
           {profile.phone && (
             <a
               href={`tel:${profile.phone.replace(/[^0-9+]/g, '')}`}
-              className="flex items-center justify-between p-3 px-4 rounded-[16px] bg-primary text-white hover:bg-primary-dark active:scale-[0.98] transition-all shadow-xs"
+              className="flex items-center justify-between p-3 px-3.5 rounded-[16px] bg-primary text-white hover:bg-primary-dark active:scale-[0.98] transition-all shadow-xs gap-2"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center shrink-0">
                   <Phone size={16} />
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-[11px] text-white/80 font-medium">Hotline tư vấn</span>
-                  <span className="text-[15px] font-extrabold tracking-wide">{profile.phone}</span>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-[11px] text-white/80 font-medium leading-tight">Hotline tư vấn</span>
+                  <span className="text-[14px] sm:text-[15px] font-extrabold tracking-wide truncate">{profile.phone}</span>
                 </div>
               </div>
-              <span className="text-[12px] font-bold px-2.5 py-1 rounded-[8px] bg-white/20">Gọi ngay</span>
+              <span className="text-[12px] font-bold px-2.5 py-1 rounded-[8px] bg-white/20 shrink-0 whitespace-nowrap">Gọi ngay</span>
             </a>
           )}
 
@@ -494,18 +494,18 @@ export function AuthorContactSection({
               href={profile.zalo_url.startsWith('http') ? profile.zalo_url : `https://zalo.me/${profile.zalo_url.replace(/[^0-9]/g, '')}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between p-3 px-4 rounded-[16px] bg-[#0068FF] text-white hover:bg-[#0056D2] active:scale-[0.98] transition-all shadow-xs"
+              className="flex items-center justify-between p-3 px-3.5 rounded-[16px] bg-[#0068FF] text-white hover:bg-[#0056D2] active:scale-[0.98] transition-all shadow-xs gap-2"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center font-extrabold text-[15px]">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center font-extrabold text-[15px] shrink-0">
                   Z
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-[11px] text-white/80 font-medium">Chat Zalo</span>
-                  <span className="text-[15px] font-extrabold">Nhắn tin trực tiếp</span>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-[11px] text-white/80 font-medium leading-tight">Chat Zalo</span>
+                  <span className="text-[14px] sm:text-[15px] font-extrabold truncate">Nhắn tin trực tiếp</span>
                 </div>
               </div>
-              <span className="text-[12px] font-bold px-2.5 py-1 rounded-[8px] bg-white/20">Mở Zalo</span>
+              <span className="text-[12px] font-bold px-2.5 py-1 rounded-[8px] bg-white/20 shrink-0 whitespace-nowrap">Mở Zalo</span>
             </a>
           )}
         </div>
