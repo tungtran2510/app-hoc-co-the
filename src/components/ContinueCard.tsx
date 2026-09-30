@@ -42,10 +42,10 @@ export default function ContinueCard({ info }: ContinueCardProps) {
 
         {/* Dòng 2: Tiêu đề trang gọn gàng & mô tả bài đang xem */}
         <div className="flex flex-col gap-0.5">
-          <h2 className="text-[18px] sm:text-[19px] font-extrabold leading-snug text-white truncate">
+          <h2 className="text-[17px] sm:text-[18px] font-extrabold leading-snug text-white line-clamp-2 break-words">
             {String(info.page_number || 1).padStart(2, '0')} · {info.page_title}
           </h2>
-          <p className="text-[14px] text-on-primary-muted font-normal truncate">
+          <p className="text-[13px] text-on-primary-muted font-normal line-clamp-1">
             Đang ở: {info.video_title || 'Video bài học'}
           </p>
         </div>

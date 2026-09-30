@@ -32,12 +32,12 @@ export default function TopicMainButton({ topic, firstPage }: TopicMainButtonPro
     return (
       <Link
         href={`/${topic.slug}/${continueInfo.page_slug}?v=${continueInfo.video_index || 1}`}
-        className="flex items-center justify-center gap-2 h-[58px] min-h-[48px] w-full rounded-[16px] bg-primary text-white font-extrabold text-[19px] transition-transform active:scale-[0.98] shadow-sm"
+        className="flex items-center justify-between px-4 h-[44px] min-h-[44px] w-full rounded-[13px] bg-primary text-white font-bold text-[14px] sm:text-[15px] transition-transform active:scale-[0.99] shadow-2xs"
       >
-        <span>
-          Xem tiếp: {formattedNum} {continueInfo.page_title}
+        <span className="truncate pr-2">
+          ▶ Xem tiếp: Bài {formattedNum} · {continueInfo.page_title}
         </span>
-        <ArrowRight size={20} strokeWidth={2.5} />
+        <ArrowRight size={17} strokeWidth={2.5} className="shrink-0" />
       </Link>
     );
   }
@@ -45,10 +45,12 @@ export default function TopicMainButton({ topic, firstPage }: TopicMainButtonPro
   return (
     <Link
       href={`/${topic.slug}/${firstPage.slug}`}
-      className="flex items-center justify-center gap-2 h-[58px] min-h-[48px] w-full rounded-[16px] bg-primary text-white font-extrabold text-[19px] transition-transform active:scale-[0.98] shadow-sm"
+      className="flex items-center justify-between px-4 h-[44px] min-h-[44px] w-full rounded-[13px] bg-primary text-white font-bold text-[14px] sm:text-[15px] transition-transform active:scale-[0.99] shadow-2xs"
     >
-      <span>Bắt đầu: 01 {firstPage.title}</span>
-      <ArrowRight size={20} strokeWidth={2.5} />
+      <span className="truncate pr-2">
+        ▶ Bắt đầu học: Bài 01 · {firstPage.title}
+      </span>
+      <ArrowRight size={17} strokeWidth={2.5} className="shrink-0" />
     </Link>
   );
 }

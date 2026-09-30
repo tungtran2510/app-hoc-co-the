@@ -682,10 +682,10 @@ export default function ContentViewer({
                 <MessageCircle size={20} />
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-[14px] font-extrabold text-ink leading-tight truncate">
+                <span className="text-[14px] font-extrabold text-ink leading-tight">
                   Cần tư vấn thêm về cơ thể?
                 </span>
-                <span className="text-[12px] text-muted leading-tight truncate">
+                <span className="text-[12px] text-muted leading-tight">
                   Trao đổi cùng chuyên gia qua Zalo
                 </span>
               </div>

@@ -51,31 +51,39 @@ export default function PageCard({
   return (
     <Link
       href={targetUrl}
-      className="flex items-center gap-4 min-h-[112px] p-4 bg-white rounded-[22px] border-[1.5px] border-line transition-transform active:scale-[0.99] shadow-xs"
+      className="flex flex-col gap-2 p-3.5 sm:p-4 bg-white rounded-[18px] border-[1.5px] border-line transition-all active:scale-[0.99] shadow-xs hover:border-primary/40"
     >
-      {/* Ô số lớn 64x64 bo 18px */}
-      <div
-        className="w-16 h-16 rounded-[18px] flex items-center justify-center shrink-0"
-        style={{ backgroundColor: topic.color_bg, color: topic.color_fg }}
-      >
-        <span className="text-[24px] font-extrabold leading-none">
+      {/* HÀNG TRÊN CÙNG: Ô SỐ THỨ TỰ + TIÊU ĐỀ ĐẦY ĐỦ + MŨI TÊN (KHÔNG BỊ CẮT BA CHẤM) */}
+      <div className="flex items-start gap-2.5 w-full">
+        {/* Badge số thứ tự gọn gàng, nổi bật */}
+        <span
+          className="h-6 px-2 rounded-[7px] text-[12px] font-black flex items-center justify-center shrink-0 mt-0.5 tracking-wide"
+          style={{ backgroundColor: topic.color_bg, color: topic.color_fg }}
+        >
           {formattedOrder}
         </span>
-      </div>
 
-      {/* Thông tin ở giữa */}
-      <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-        <h3 className="text-[19px] font-extrabold text-ink leading-[1.3] truncate">
+        {/* Tiêu đề nằm trên cùng, chiếm trọn chiều ngang, KHÔNG BAO GIỜ BỊ CẮT BA CHẤM (...) */}
+        <h3 className="text-[17px] sm:text-[18px] font-extrabold text-ink leading-[1.35] flex-1 break-words">
           {page.title}
         </h3>
-        <p className="text-[16px] text-muted font-normal leading-[1.45]">
+
+        {/* Mũi tên điều hướng nhỏ gọn */}
+        <div className="shrink-0 text-muted mt-1">
+          <ChevronRight size={18} strokeWidth={2.5} />
+        </div>
+      </div>
+
+      {/* HÀNG DƯỚI: TRẠNG THÁI / TIẾN ĐỘ VÀ SỐ VIDEO */}
+      <div className="flex items-center justify-between pl-8 gap-2">
+        <p className="text-[14px] text-muted font-medium">
           {subtitle}
         </p>
 
-        {/* Thanh tiến độ theo số video đã xem */}
+        {/* Thanh tiến độ nếu đang học */}
         {hasStarted && (
           <div
-            className="w-full h-2 bg-line rounded-full overflow-hidden mt-1 max-w-[180px]"
+            className="w-24 sm:w-32 h-1.5 bg-line rounded-full overflow-hidden shrink-0"
             role="progressbar"
             aria-valuenow={progressPercent}
             aria-valuemin={0}
@@ -90,11 +98,6 @@ export default function PageCard({
             />
           </div>
         )}
-      </div>
-
-      {/* ChevronRight */}
-      <div className="shrink-0 text-muted">
-        <ChevronRight size={22} strokeWidth={2.5} />
       </div>
     </Link>
   );

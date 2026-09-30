@@ -98,62 +98,60 @@ export default async function TopicPage({ params }: TopicPageProps) {
       {/* 1. Nút quay lại: ‹ Trang chủ và Lối tắt Quản trị */}
       <TopicHeaderNav />
 
-      {/* 2. Khối ảnh lớn (cover) */}
-      <section className="relative w-full h-[220px] rounded-[24px] overflow-hidden p-5 flex flex-col justify-end shadow-xs" style={{ backgroundColor: topic.color_bg }}>
-        {/* Hình minh hoạ góc phải */}
-        <div className="absolute right-0 top-0 bottom-0 w-[55%] flex items-center justify-end pointer-events-none pr-2">
-          {topic.slug === 'cot-song' ? (
-            <SpineIllustration className="h-[92%] w-auto object-contain" />
+      {/* 2. Header Chủ đề: Tinh gọn, chuyên nghiệp, không chiếm diện tích */}
+      <section
+        className="w-full rounded-[20px] p-4 flex items-center justify-between gap-3 shadow-xs border border-line/40 overflow-hidden relative"
+        style={{ backgroundColor: topic.color_bg }}
+      >
+        <div className="flex flex-col z-10 flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span
+              className="text-[11px] font-black tracking-wider uppercase px-2 py-0.5 rounded-[6px] bg-white/70"
+              style={{ color: topic.color_fg }}
+            >
+              CHỦ ĐỀ
+            </span>
+            {hasPages && (
+              <span className="text-[13px] font-bold text-ink/75">
+                {pages.length} bài học · {totalVideos} video
+              </span>
+            )}
+          </div>
+
+          <h1 className="text-[22px] sm:text-[24px] font-black text-ink leading-tight mt-1">
+            {topic.title}
+          </h1>
+
+          {topic.description ? (
+            <p className="text-[13px] sm:text-[14px] text-ink-2 font-normal leading-snug line-clamp-2 mt-1">
+              {topic.description}
+            </p>
           ) : (
-            <div className="w-28 h-28 rounded-full bg-white/40 flex items-center justify-center mr-4" />
+            <p className="text-[13px] text-ink-2 font-normal mt-0.5">
+              Kiến thức chuyên sâu và thực hành chăm sóc sức khỏe.
+            </p>
+          )}
+
+          {topic.meta_note && (
+            <span className="text-[12px] font-medium text-ink/65 mt-1">
+              ⏱ {topic.meta_note}
+            </span>
           )}
         </div>
 
-        {/* Chữ góc trái dưới */}
-        <div className="relative z-10 flex flex-col max-w-[65%]">
-          <span className="text-[14px] font-bold tracking-[0.5px] uppercase text-ink/70">
-            CHỦ ĐỀ
-          </span>
-          <h1 className="text-[30px] font-extrabold text-ink leading-[1.15]">
-            {topic.title}
-          </h1>
+        {/* Minh họa thu nhỏ tinh tế góc phải */}
+        <div className="shrink-0 w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center pointer-events-none">
+          {topic.slug === 'cot-song' ? (
+            <SpineIllustration className="h-full w-auto object-contain" />
+          ) : (
+            <div className="w-14 h-14 rounded-full bg-white/60 flex items-center justify-center">
+              <BookOpen size={24} style={{ color: topic.color_fg }} />
+            </div>
+          )}
         </div>
       </section>
 
-      {/* 3. Mô tả */}
-      {topic.description ? (
-        <p className="text-[17px] text-ink-2 leading-[1.55] font-normal">
-          {topic.description}
-        </p>
-      ) : (
-        <p className="text-[17px] text-muted leading-[1.55] font-normal">
-          Kiến thức chuyên sâu và thực hành chăm sóc sức khỏe.
-        </p>
-      )}
-
-      {/* 4. Các nhãn nhỏ (chip) */}
-      {hasPages && (
-        <section className="flex flex-wrap items-center gap-2" aria-label="Thông tin tổng quan">
-          <div className="h-[34px] px-3.5 rounded-full bg-white border border-line-strong flex items-center gap-1.5 text-[15px] font-semibold text-ink shadow-2xs">
-            <BookOpen size={16} className="text-primary" />
-            <span>{pages.length} nội dung</span>
-          </div>
-
-          <div className="h-[34px] px-3.5 rounded-full bg-white border border-line-strong flex items-center gap-1.5 text-[15px] font-semibold text-ink shadow-2xs">
-            <PlaySquare size={16} className="text-primary" />
-            <span>{totalVideos} video</span>
-          </div>
-
-          {topic.meta_note && (
-            <div className="h-[34px] px-3.5 rounded-full bg-white border border-line-strong flex items-center gap-1.5 text-[15px] font-semibold text-ink shadow-2xs">
-              <Clock size={16} className="text-primary" />
-              <span>{topic.meta_note}</span>
-            </div>
-          )}
-        </section>
-      )}
-
-      {/* 5. Nút chính Xem tiếp / Bắt đầu */}
+      {/* 3. Nút chính Xem tiếp / Bắt đầu (nhỏ gọn, thanh thoát) */}
       {hasPages && (
         <section>
           <TopicMainButton topic={topic} firstPage={firstPage} />

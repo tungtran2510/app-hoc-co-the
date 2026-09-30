@@ -102,7 +102,7 @@ export default function SavedPages() {
                   <span className="text-[12px] font-extrabold text-primary uppercase tracking-wide truncate">
                     {item.topic_title}
                   </span>
-                  <h3 className="text-[17px] font-extrabold text-ink leading-snug truncate">
+                  <h3 className="text-[17px] font-extrabold text-ink leading-snug break-words">
                     {item.page_title}
                   </h3>
                 </div>
