@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Lightbulb,
   SquareCheck,
@@ -14,6 +14,7 @@ import {
 import { getBlockStyle } from '../../lib/blockStyles';
 import { Image as ImageType, FileItem, Video } from '../../lib/types';
 import { FontSizeOption } from '../PageHeaderBar';
+import Lightbox from '../Lightbox';
 
 interface TextBlockProps {
   displayStyle: string;
@@ -60,6 +61,9 @@ export default function TextBlock({
   files,
   videos,
 }: TextBlockProps) {
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [selectedImgIndex, setSelectedImgIndex] = useState(0);
+
   const style = getBlockStyle(displayStyle);
 
   // 3 Cỡ chữ: Nhỏ (16px), Vừa (19px), Lớn (22px)
@@ -84,13 +88,33 @@ export default function TextBlock({
         {images && images.length > 0 && (
           <div className="flex flex-col gap-2 mt-2">
             {images.map((img, i) => (
-              <div key={i} className="rounded-[16px] overflow-hidden border border-line bg-white">
+              <div
+                key={i}
+                onClick={() => {
+                  setSelectedImgIndex(i);
+                  setLightboxOpen(true);
+                }}
+                className="rounded-[16px] overflow-hidden border border-line bg-white cursor-zoom-in group"
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={img.url} alt={img.caption || ''} className="w-full h-auto object-cover max-h-[300px]" />
+                <img
+                  src={img.url}
+                  alt={img.caption || ''}
+                  className="w-full h-auto object-cover max-h-[300px] group-hover:opacity-95 transition-opacity"
+                />
                 {img.caption && <p className="text-[13px] text-muted italic p-2 text-center">{img.caption}</p>}
               </div>
             ))}
           </div>
+        )}
+
+        {images && images.length > 0 && (
+          <Lightbox
+            isOpen={lightboxOpen}
+            images={images}
+            initialIndex={selectedImgIndex}
+            onClose={() => setLightboxOpen(false)}
+          />
         )}
       </div>
     );
@@ -151,13 +175,33 @@ export default function TextBlock({
       {images && images.length > 0 && (
         <div className="flex flex-col gap-2 mt-2 pt-2 border-t border-line/40">
           {images.map((img, i) => (
-            <div key={i} className="rounded-[14px] overflow-hidden border border-line bg-white shadow-xs">
+            <div
+              key={i}
+              onClick={() => {
+                setSelectedImgIndex(i);
+                setLightboxOpen(true);
+              }}
+              className="rounded-[14px] overflow-hidden border border-line bg-white shadow-xs cursor-zoom-in group"
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={img.url} alt={img.caption || ''} className="w-full h-auto object-cover max-h-[260px]" />
+              <img
+                src={img.url}
+                alt={img.caption || ''}
+                className="w-full h-auto object-cover max-h-[260px] group-hover:opacity-95 transition-opacity"
+              />
               {img.caption && <p className="text-[13px] text-muted italic px-2.5 py-1.5">{img.caption}</p>}
             </div>
           ))}
         </div>
+      )}
+
+      {images && images.length > 0 && (
+        <Lightbox
+          isOpen={lightboxOpen}
+          images={images}
+          initialIndex={selectedImgIndex}
+          onClose={() => setLightboxOpen(false)}
+        />
       )}
 
       {/* Đính kèm file PDF nếu có */}

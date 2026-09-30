@@ -18,6 +18,7 @@ import TopicHeaderNav from '../../components/TopicHeaderNav';
 import PageListClient from '../../components/PageListClient';
 import SpineIllustration from '../../components/SpineIllustration';
 import BottomNav from '../../components/BottomNav';
+import TopicMainButton from '../../components/TopicMainButton';
 
 interface TopicPageProps {
   params: {
@@ -35,10 +36,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
     notFound();
   }
 
-  const [pages, continueInfo] = await Promise.all([
-    getPagesByTopic(topic.id, true),
-    getContinue(),
-  ]);
+  const pages = await getPagesByTopic(topic.id, true);
 
   // Lấy số video cho từng trang
   const pagesWithVideoCount = await Promise.all(
@@ -80,10 +78,6 @@ export default async function TopicPage({ params }: TopicPageProps) {
 
   const hasPages = pages.length > 0;
   const firstPage = pages[0];
-
-  const continueUrl = continueInfo
-    ? `/${continueInfo.topic_slug}/${continueInfo.page_slug}`
-    : '/cot-song/tong-quan-ve-cot-song';
 
   return (
     <main className="flex-1 flex flex-col px-5 pt-3 pb-28 gap-5">
@@ -148,14 +142,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
       {/* 5. Nút chính Xem tiếp / Bắt đầu */}
       {hasPages && (
         <section>
-          <Link
-            href={`/${topic.slug}/${firstPage.slug}`}
-            prefetch={true}
-            className="flex items-center justify-center gap-2 h-[58px] min-h-[48px] w-full rounded-[16px] bg-primary text-white font-extrabold text-[19px] transition-transform active:scale-[0.98] shadow-sm"
-          >
-            <span>Xem tiếp: 01 {firstPage.title.replace('Tổng quan về cột sống', 'Tổng quan')}</span>
-            <ArrowRight size={20} strokeWidth={2.5} />
-          </Link>
+          <TopicMainButton topic={topic} firstPage={firstPage} />
         </section>
       )}
 
@@ -163,7 +150,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
       <PageListClient initialPages={pagesWithVideoCount} topic={topic} />
 
       {/* Thanh điều hướng dưới cùng */}
-      <BottomNav continueUrl={continueUrl} />
+      <BottomNav />
     </main>
   );
 }

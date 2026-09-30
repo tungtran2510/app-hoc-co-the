@@ -13,6 +13,13 @@ interface BlockRendererProps {
   defaultActiveVideoIndex?: number;
   isAdmin?: boolean;
   onOpenVideoManager?: () => void;
+  pageId?: string;
+  topicSlug?: string;
+  topicTitle?: string;
+  pageSlug?: string;
+  pageTitle?: string;
+  pageNumber?: number;
+  nextPage?: { slug: string; title: string; orderNumber: number } | null;
 }
 
 export default function BlockRenderer({
@@ -21,6 +28,13 @@ export default function BlockRenderer({
   defaultActiveVideoIndex = 0,
   isAdmin = false,
   onOpenVideoManager,
+  pageId,
+  topicSlug,
+  topicTitle,
+  pageSlug,
+  pageTitle,
+  pageNumber,
+  nextPage,
 }: BlockRendererProps) {
   const blockId = `block-${block.id}`;
 
@@ -48,6 +62,13 @@ export default function BlockRenderer({
           defaultActiveIndex={defaultActiveVideoIndex}
           isAdmin={isAdmin}
           onOpenVideoManager={onOpenVideoManager}
+          pageId={pageId}
+          topicSlug={topicSlug}
+          topicTitle={topicTitle}
+          pageSlug={pageSlug}
+          pageTitle={pageTitle}
+          pageNumber={pageNumber}
+          nextPage={nextPage}
         />
       );
 

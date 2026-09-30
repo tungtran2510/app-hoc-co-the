@@ -13,6 +13,7 @@ import {
   Copy,
   Eye,
   EyeOff,
+  Share2,
 } from 'lucide-react';
 import { Topic, Page, Block, Video } from '../lib/types';
 import PageHeaderBar, { TocItem, FontSizeOption } from './PageHeaderBar';
@@ -98,6 +99,30 @@ export default function ContentViewer({
   }, [page.id, initialBlocks, page.status, page]);
 
   const [saveErrorMsg, setSaveErrorMsg] = useState('');
+  const [shareNoticeMsg, setShareNoticeMsg] = useState('');
+
+  const handleShare = async () => {
+    const shareData = {
+      title: currentPage.title,
+      text: currentPage.summary || `${topic.title} - ${currentPage.title}`,
+      url: typeof window !== 'undefined' ? window.location.href : '',
+    };
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch {
+        // Người dùng hủy chia sẻ
+      }
+    } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        setShareNoticeMsg('Đã chép link');
+        setTimeout(() => setShareNoticeMsg(''), 3000);
+      } catch {
+        // Bỏ qua
+      }
+    }
+  };
 
   const handleFontSizeChange = (mode: FontSizeOption) => {
     setFontSizeMode(mode);
@@ -288,6 +313,7 @@ export default function ContentViewer({
         isAdmin={isAdmin}
         onToggleAdmin={handleToggleAdmin}
         onOpenSettings={() => setShowAdminSettingsModal(true)}
+        onShare={handleShare}
       />
 
       {/* 3. Phần đầu bài viết: Dòng nhỏ CỘT SỐNG · 01 + Tiêu đề lớn */}
@@ -470,6 +496,21 @@ export default function ContentViewer({
                 defaultActiveVideoIndex={defaultActiveVideoIndex}
                 isAdmin={isAdmin}
                 onOpenVideoManager={() => setShowVideoManager(true)}
+                pageId={page.id}
+                topicSlug={topic.slug}
+                topicTitle={topic.title}
+                pageSlug={page.slug}
+                pageTitle={currentPage.title}
+                pageNumber={pageIndex}
+                nextPage={
+                  nextPage
+                    ? {
+                        slug: nextPage.slug,
+                        title: nextPage.title,
+                        orderNumber: nextPageIndex || 0,
+                      }
+                    : null
+                }
               />
             </div>
           );
@@ -490,7 +531,7 @@ export default function ContentViewer({
         </div>
       )}
 
-      {/* 6. Cuối trang: Gợi ý theo lộ trình + Nút Tiếp theo */}
+      {/* 6. Cuối trang: Gợi ý theo lộ trình + Nút Tiếp theo + Nút Chia sẻ */}
       <section className="flex flex-col gap-2 mt-6 pt-4 border-t border-line/60">
         <p className="text-[15px] text-muted font-medium">
           Gợi ý theo lộ trình
@@ -517,6 +558,16 @@ export default function ContentViewer({
             <ArrowRight size={20} strokeWidth={2.5} />
           </Link>
         )}
+
+        {/* Nút Chia sẻ trang này (Cuối trang) */}
+        <button
+          type="button"
+          onClick={handleShare}
+          className="flex items-center justify-center gap-2 h-[52px] min-h-[48px] w-full rounded-[16px] bg-white border-[1.5px] border-line-strong text-ink font-extrabold text-[16px] transition-transform active:scale-[0.98] shadow-2xs hover:bg-surface-2 cursor-pointer mt-1"
+        >
+          <Share2 size={18} className="text-primary" />
+          <span>Chia sẻ trang này</span>
+        </button>
       </section>
 
       {/* 7. Bảng điều khiển quản trị trang (Hiện khi isAdmin = true) */}
@@ -567,6 +618,13 @@ export default function ContentViewer({
       {saveErrorMsg && (
         <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full bg-red-600 text-white font-extrabold text-[14px] shadow-lg animate-in fade-in slide-in-from-bottom-2">
           {saveErrorMsg}
+        </div>
+      )}
+
+      {/* Thông báo chia sẻ / chép link */}
+      {shareNoticeMsg && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full bg-[#0E6B5A] text-white font-extrabold text-[14px] shadow-lg animate-in fade-in slide-in-from-bottom-2">
+          {shareNoticeMsg}
         </div>
       )}
 

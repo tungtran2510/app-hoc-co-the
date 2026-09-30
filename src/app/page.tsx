@@ -1,8 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { Search } from 'lucide-react';
-import { getSettings, getTopics, getPagesByTopic, getContinue } from '../lib/data';
-import ContinueCard from '../components/ContinueCard';
+import { getSettings, getTopics, getPagesByTopic } from '../lib/data';
+import HomeContinueSection from '../components/HomeContinueSection';
 import TopicListClient from '../components/TopicListClient';
 import BottomNav from '../components/BottomNav';
 import HomeHeader from '../components/HomeHeader';
@@ -10,10 +10,9 @@ import HomeHeader from '../components/HomeHeader';
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const [settings, topics, continueInfo] = await Promise.all([
+  const [settings, topics] = await Promise.all([
     getSettings(),
     getTopics(true),
-    getContinue(),
   ]);
 
   // Lấy số trang của từng chủ đề
@@ -26,10 +25,6 @@ export default async function HomePage() {
       };
     })
   );
-
-  const continueUrl = continueInfo
-    ? `/${continueInfo.topic_slug}/${continueInfo.page_slug}`
-    : '/cot-song/tong-quan-ve-cot-song';
 
   return (
     <main className="flex-1 flex flex-col px-5 pt-4 pb-28 gap-6">
@@ -46,9 +41,13 @@ export default async function HomePage() {
         </h1>
       </section>
 
-      {/* 3. Ô tìm kiếm (Lệnh 01: chỉ hiển thị) */}
+      {/* 3. Ô tìm kiếm (bấm vào mở /tim-kiem) */}
       <section>
-        <div className="relative w-full">
+        <Link
+          href="/tim-kiem"
+          className="relative block w-full group cursor-pointer"
+          aria-label="Mở trang tìm kiếm"
+        >
           <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-muted">
             <Search size={22} />
           </div>
@@ -56,24 +55,20 @@ export default async function HomePage() {
             type="text"
             readOnly
             placeholder="Tìm bài, ví dụ: đĩa đệm"
-            className="w-full h-[58px] min-h-[48px] pl-12 pr-4 rounded-[20px] bg-white border-[1.5px] border-line text-[17px] text-ink placeholder:text-muted focus:outline-hidden cursor-default shadow-2xs"
-            aria-label="Tìm kiếm nội dung"
+            className="w-full h-[58px] min-h-[48px] pl-12 pr-4 rounded-[20px] bg-white border-[1.5px] border-line text-[17px] text-ink placeholder:text-muted focus:outline-hidden cursor-pointer shadow-2xs group-hover:border-primary/50 transition-colors"
+            tabIndex={-1}
           />
-        </div>
+        </Link>
       </section>
 
-      {/* 4. Thẻ Xem tiếp (hiển thị khi có dữ liệu) */}
-      {continueInfo && (
-        <section>
-          <ContinueCard info={continueInfo} />
-        </section>
-      )}
+      {/* 4. Thẻ Xem tiếp (đọc từ localStorage client, chưa có -> ẩn) */}
+      <HomeContinueSection />
 
       {/* 5 & 6. Lưới 2 cột các thẻ Chủ đề kèm quản trị */}
       <TopicListClient initialTopics={topicsWithCounts} />
 
       {/* 7. Thanh điều hướng dưới cùng */}
-      <BottomNav continueUrl={continueUrl} />
+      <BottomNav />
     </main>
   );
 }

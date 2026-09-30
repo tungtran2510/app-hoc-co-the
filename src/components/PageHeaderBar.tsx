@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, Menu, MoreVertical, X, Lock, Check, Settings as SettingsIcon } from 'lucide-react';
+import { ChevronLeft, Menu, MoreVertical, X, Lock, Check, Settings as SettingsIcon, Share2 } from 'lucide-react';
 
 export interface TocItem {
   id: string;
@@ -20,6 +20,7 @@ interface PageHeaderBarProps {
   isAdmin?: boolean;
   onToggleAdmin?: () => void;
   onOpenSettings?: () => void;
+  onShare?: () => void;
 }
 
 export default function PageHeaderBar({
@@ -31,6 +32,7 @@ export default function PageHeaderBar({
   isAdmin = false,
   onToggleAdmin,
   onOpenSettings,
+  onShare,
 }: PageHeaderBarProps) {
   const [showToc, setShowToc] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
@@ -188,6 +190,21 @@ export default function PageHeaderBar({
                 Lớn
               </button>
             </div>
+          </div>
+
+          {/* Chia sẻ trang này */}
+          <div className="flex flex-col gap-1.5 pt-2 border-t border-line">
+            <button
+              type="button"
+              onClick={() => {
+                setShowOptions(false);
+                if (onShare) onShare();
+              }}
+              className="flex items-center justify-center gap-2 h-[44px] rounded-[12px] bg-white border border-line-strong text-ink font-bold text-[14px] shadow-2xs hover:bg-surface-2 transition-all cursor-pointer"
+            >
+              <Share2 size={16} className="text-primary" />
+              <span>Chia sẻ trang này</span>
+            </button>
           </div>
 
           {/* Quản trị nội dung */}

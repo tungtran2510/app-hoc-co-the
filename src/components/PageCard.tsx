@@ -8,8 +8,8 @@ interface PageCardProps {
   topic: Topic;
   orderNumber: number;
   videoCount: number;
-  isContinuing?: boolean;
-  activeVideoIndex?: number;
+  watchedVideos?: number[];
+  lastVideo?: number;
 }
 
 export default function PageCard({
@@ -17,22 +17,38 @@ export default function PageCard({
   topic,
   orderNumber,
   videoCount,
-  isContinuing = false,
-  activeVideoIndex = 1,
+  watchedVideos = [],
+  lastVideo,
 }: PageCardProps) {
   const formattedOrder = String(orderNumber).padStart(2, '0');
 
-  const subtitle = isContinuing
-    ? `${videoCount} video · Đang ở video ${String(activeVideoIndex).padStart(2, '0')}`
-    : `${videoCount} video · Chưa xem`;
+  const count = videoCount || 1;
+  const watchedCount = watchedVideos.length;
+  const isAllWatched = count > 0 && watchedCount >= count;
+  const hasStarted = watchedCount > 0 || (lastVideo !== undefined && lastVideo > 0);
 
-  const progressPercent = isContinuing && videoCount > 0
-    ? Math.round((activeVideoIndex / videoCount) * 100)
-    : 0;
+  let subtitle = `${count} video · Chưa xem`;
+  let progressPercent = 0;
+
+  if (isAllWatched) {
+    subtitle = `${count} video · Đã xem hết`;
+    progressPercent = 100;
+  } else if (hasStarted) {
+    const currentVideo = lastVideo || (watchedVideos.length > 0 ? Math.max(...watchedVideos) : 1);
+    subtitle = `${count} video · Đang ở video ${String(currentVideo).padStart(2, '0')}`;
+    progressPercent = Math.min(100, Math.round((watchedCount / count) * 100));
+    if (progressPercent === 0 && currentVideo > 0) {
+      progressPercent = Math.round((1 / count) * 100);
+    }
+  }
+
+  const targetUrl = lastVideo
+    ? `/${topic.slug}/${page.slug}?v=${lastVideo}`
+    : `/${topic.slug}/${page.slug}`;
 
   return (
     <Link
-      href={`/${topic.slug}/${page.slug}`}
+      href={targetUrl}
       className="flex items-center gap-4 min-h-[112px] p-4 bg-white rounded-[22px] border-[1.5px] border-line transition-transform active:scale-[0.99] shadow-xs"
     >
       {/* Ô số lớn 64x64 bo 18px */}
@@ -54,8 +70,8 @@ export default function PageCard({
           {subtitle}
         </p>
 
-        {/* Thanh tiến độ nếu đang xem */}
-        {isContinuing && (
+        {/* Thanh tiến độ theo số video đã xem */}
+        {hasStarted && (
           <div
             className="w-full h-2 bg-line rounded-full overflow-hidden mt-1 max-w-[180px]"
             role="progressbar"
@@ -65,7 +81,9 @@ export default function PageCard({
             aria-label="Tiến độ bài học"
           >
             <div
-              className="h-full bg-primary rounded-full transition-all duration-300"
+              className={`h-full rounded-full transition-all duration-300 ${
+                isAllWatched ? 'bg-[#0E6B5A]' : 'bg-primary'
+              }`}
               style={{ width: `${progressPercent}%` }}
             />
           </div>

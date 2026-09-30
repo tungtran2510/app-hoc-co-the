@@ -1,10 +1,11 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
+import { Metadata } from 'next';
 import {
   getPageBySlug,
   getBlocksByPage,
   getPagesByTopic,
-  getTopics,
+  getSettings,
 } from '../../../lib/data';
 import ContentViewer from '../../../components/ContentViewer';
 
@@ -14,6 +15,55 @@ interface PageProps {
   params: {
     topicSlug: string;
     pageSlug: string;
+  };
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { topicSlug, pageSlug } = params;
+  const [result, settings] = await Promise.all([
+    getPageBySlug(topicSlug, pageSlug),
+    getSettings(),
+  ]);
+
+  if (!result) {
+    return {
+      title: 'Không tìm thấy trang · ' + (settings?.app_name || 'Học Cơ Thể'),
+    };
+  }
+
+  const { page, topic } = result;
+  const blocks = await getBlocksByPage(page.id);
+
+  let imageUrl = page.cover_url || topic.cover_url || '';
+  if (!imageUrl) {
+    const videoBlock = blocks.find((b) => b.type === 'videos');
+    if (videoBlock && videoBlock.type === 'videos' && videoBlock.data.videos.length > 0) {
+      const firstVid = videoBlock.data.videos[0];
+      if (firstVid.thumbnail_url) {
+        imageUrl = firstVid.thumbnail_url;
+      } else if (firstVid.youtube_id) {
+        imageUrl = `https://i.ytimg.com/vi/${firstVid.youtube_id}/hqdefault.jpg`;
+      }
+    }
+  }
+
+  const title = `${page.title} · ${settings.app_name}`;
+  const description = page.summary || `${topic.title} - Kiến thức cấu trúc cơ thể và sức khỏe`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: imageUrl ? [{ url: imageUrl }] : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: imageUrl ? [imageUrl] : undefined,
+    },
   };
 }
 

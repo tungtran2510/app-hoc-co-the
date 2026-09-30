@@ -1,18 +1,31 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, BookOpen, Search } from 'lucide-react';
+import { getStoredXemTiep } from '../lib/learningProgress';
 
-interface BottomNavProps {
-  continueUrl?: string;
-}
-
-export default function BottomNav({ continueUrl = '/cot-song/tong-quan-ve-cot-song' }: BottomNavProps) {
+export default function BottomNav() {
   const pathname = usePathname();
+  const [continueUrl, setContinueUrl] = useState<string>('/');
+
+  useEffect(() => {
+    try {
+      const stored = getStoredXemTiep();
+      if (stored && stored.topic_slug && stored.page_slug) {
+        setContinueUrl(`/${stored.topic_slug}/${stored.page_slug}?v=${stored.video_index || 1}`);
+      } else {
+        setContinueUrl('/');
+      }
+    } catch {
+      setContinueUrl('/');
+    }
+  }, [pathname]);
+
   const isHome = pathname === '/';
-  const isReading = pathname.includes('/cot-song/');
+  const isSearch = pathname === '/tim-kiem';
+  const isReading = !isHome && !isSearch && !pathname.startsWith('/dang-nhap');
 
   return (
     <nav
@@ -45,17 +58,16 @@ export default function BottomNav({ continueUrl = '/cot-song/tong-quan-ve-cot-so
         </Link>
 
         {/* Tìm kiếm */}
-        <button
-          type="button"
-          onClick={() => {
-            // Lệnh 01: chỉ hiển thị, bấm chưa cần làm gì
-          }}
-          className="flex flex-col items-center justify-center gap-1 text-muted font-medium transition-opacity active:opacity-80 min-h-[48px]"
+        <Link
+          href="/tim-kiem"
+          className={`flex flex-col items-center justify-center gap-1 transition-opacity active:opacity-80 min-h-[48px] ${
+            isSearch ? 'text-primary font-bold' : 'text-muted font-medium'
+          }`}
           aria-label="Tìm kiếm"
         >
-          <Search size={26} strokeWidth={2} />
+          <Search size={26} strokeWidth={isSearch ? 2.5 : 2} />
           <span className="text-[15px] leading-tight">Tìm kiếm</span>
-        </button>
+        </Link>
       </div>
     </nav>
   );

@@ -7,6 +7,7 @@ import { Page, Topic } from '../lib/types';
 import { checkIsAdminClient } from '../lib/adminAuth';
 import { savePageApi, deletePageApi } from '../lib/apiAdmin';
 import EditPageModal from './admin/EditPageModal';
+import { getStoredTienDo, TienDoMap } from '../lib/learningProgress';
 
 interface PageItemData {
   page: Page;
@@ -24,9 +25,15 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
   const [isAdmin, setIsAdmin] = useState(false);
   const [editingPage, setEditingPage] = useState<Page | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [tienDo, setTienDo] = useState<TienDoMap>({});
 
   useEffect(() => {
     checkIsAdminClient().then((admin) => setIsAdmin(admin));
+    try {
+      setTienDo(getStoredTienDo());
+    } catch {
+      // Bỏ qua
+    }
   }, []);
 
   const handleMove = async (index: number, direction: 'up' | 'down') => {
@@ -149,8 +156,9 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
 
           <div className="flex flex-col gap-3 mt-0.5">
             {visiblePages.map(({ page, orderNumber, videoCount }, index) => {
-              const isContinuing = orderNumber === 1;
-              const activeVideoIndex = isContinuing ? 3 : 1;
+              const pageTienDo = tienDo[page.id];
+              const watchedVideos = pageTienDo?.watched || [];
+              const lastVideo = pageTienDo?.last_video;
 
               return (
                 <div key={page.id} className="relative flex flex-col group">
@@ -160,8 +168,8 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
                       topic={topic}
                       orderNumber={orderNumber}
                       videoCount={videoCount}
-                      isContinuing={isContinuing}
-                      activeVideoIndex={activeVideoIndex}
+                      watchedVideos={watchedVideos}
+                      lastVideo={lastVideo}
                     />
 
                     {/* Huy hiệu Quản trị: Bản nháp / Đang ẩn */}

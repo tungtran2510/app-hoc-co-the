@@ -1,23 +1,28 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { Clock, ArrowRight } from 'lucide-react';
 import SpineIllustration from './SpineIllustration';
-import { ContinueInfo } from '../lib/types';
+import { XemTiepInfo } from '../lib/learningProgress';
 
 interface ContinueCardProps {
-  info: ContinueInfo;
+  info: XemTiepInfo;
 }
 
 export default function ContinueCard({ info }: ContinueCardProps) {
-  const progressPercent = Math.round((info.video_index / info.video_total) * 100);
+  const total = info.video_total || 1;
+  const current = info.video_index || 1;
+  const progressPercent = Math.min(100, Math.round((current / total) * 100));
+  const targetUrl = `/${info.topic_slug}/${info.page_slug}?v=${current}`;
 
   return (
     <Link
-      href={`/${info.topic_slug}/${info.page_slug}`}
+      href={targetUrl}
       className="group relative block overflow-hidden rounded-[20px] bg-gradient-to-br from-[#0E6B5A] to-[#0A4F43] p-4 text-white shadow-sm border border-primary-dark/40 transition-transform active:scale-[0.99]"
       aria-label={`Xem tiếp ${info.topic_title} bài ${info.page_title}`}
     >
-      {/* Hình minh họa chìm mờ tinh tế phía sau (không bị che nút hay đè chữ) */}
+      {/* Hình minh họa chìm mờ tinh tế phía sau */}
       <div className="absolute -right-4 -bottom-6 w-[110px] h-[150px] pointer-events-none opacity-15">
         <SpineIllustration className="w-full h-full object-contain" />
       </div>
@@ -31,21 +36,21 @@ export default function ContinueCard({ info }: ContinueCardProps) {
           </div>
 
           <span className="text-[13px] font-bold text-on-primary-muted">
-            Video {info.video_index}/{info.video_total}
+            Video {String(current).padStart(2, '0')}/{String(total).padStart(2, '0')}
           </span>
         </div>
 
         {/* Dòng 2: Tiêu đề trang gọn gàng & mô tả bài đang xem */}
         <div className="flex flex-col gap-0.5">
           <h2 className="text-[18px] sm:text-[19px] font-extrabold leading-snug text-white truncate">
-            {info.page_order_label} · {info.page_title}
+            {String(info.page_number || 1).padStart(2, '0')} · {info.page_title}
           </h2>
           <p className="text-[14px] text-on-primary-muted font-normal truncate">
-            Đang ở: {info.video_title}
+            Đang ở: {info.video_title || 'Video bài học'}
           </p>
         </div>
 
-        {/* Dòng 3: Thanh tiến độ thanh mảnh + Nút Xem tiếp nhỏ gọn */}
+        {/* Dòng 3: Thanh tiến độ thanh mảnh + Nút Xem tiếp */}
         <div className="flex items-center justify-between gap-3 pt-0.5">
           <div
             className="flex-1 h-[6px] bg-primary-track/80 rounded-full overflow-hidden"
