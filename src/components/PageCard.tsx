@@ -10,6 +10,7 @@ interface PageCardProps {
   videoCount: number;
   watchedVideos?: number[];
   lastVideo?: number;
+  isCompleted?: boolean;
 }
 
 export default function PageCard({
@@ -19,19 +20,20 @@ export default function PageCard({
   videoCount,
   watchedVideos = [],
   lastVideo,
+  isCompleted = false,
 }: PageCardProps) {
   const formattedOrder = String(orderNumber).padStart(2, '0');
 
   const count = videoCount || 1;
   const watchedCount = watchedVideos.length;
   const isAllWatched = count > 0 && watchedCount >= count;
-  const hasStarted = watchedCount > 0 || (lastVideo !== undefined && lastVideo > 0);
+  const hasStarted = isCompleted || watchedCount > 0 || (lastVideo !== undefined && lastVideo > 0);
 
   let subtitle = `${count} video · Chưa xem`;
   let progressPercent = 0;
 
-  if (isAllWatched) {
-    subtitle = `${count} video · Đã xem hết`;
+  if (isCompleted || isAllWatched) {
+    subtitle = `Đã hiểu bài học ✓`;
     progressPercent = 100;
   } else if (hasStarted) {
     const currentVideo = lastVideo || (watchedVideos.length > 0 ? Math.max(...watchedVideos) : 1);

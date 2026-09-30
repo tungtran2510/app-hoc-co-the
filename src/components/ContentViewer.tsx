@@ -14,6 +14,10 @@ import {
   Eye,
   EyeOff,
   Share2,
+  CheckCircle2,
+  Circle,
+  MessageCircle,
+  Bookmark,
 } from 'lucide-react';
 import { Topic, Page, Block, Video } from '../lib/types';
 import PageHeaderBar, { TocItem, FontSizeOption } from './PageHeaderBar';
@@ -31,7 +35,14 @@ import {
   saveStoredPageStatus,
   getStoredPage,
   saveStoredPage,
+  getStoredAppSettings,
 } from '../lib/storage';
+import {
+  isPageSaved,
+  toggleSavePage,
+  isPageCompleted,
+  togglePageCompleted,
+} from '../lib/learningProgress';
 import { Settings as SettingsIcon } from 'lucide-react';
 
 interface ContentViewerProps {
@@ -93,6 +104,16 @@ export default function ContentViewer({
       // 4. Khối nội dung đã sửa
       const loadedBlocks = getStoredBlocks(page.id, initialBlocks);
       setBlockList(loadedBlocks);
+
+      // 5. Trạng thái đã lưu, đã hoàn thành, theme & cài đặt tư vấn
+      setIsSaved(isPageSaved(page.id));
+      setIsCompleted(isPageCompleted(page.id));
+      const savedTheme = localStorage.getItem('giao_dien') === 'dark' ? 'dark' : 'light';
+      setThemeMode(savedTheme);
+      const appSet = getStoredAppSettings();
+      if (appSet) {
+        setConsultSettings({ zalo_url: appSet.zalo_url, hotline: appSet.hotline });
+      }
     } catch {
       // Bỏ qua lỗi truy cập client storage
     }
@@ -100,6 +121,48 @@ export default function ContentViewer({
 
   const [saveErrorMsg, setSaveErrorMsg] = useState('');
   const [shareNoticeMsg, setShareNoticeMsg] = useState('');
+  const [isSaved, setIsSaved] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [themeMode, setThemeMode] = useState<'light' | 'dark'>('light');
+  const [consultSettings, setConsultSettings] = useState<{ zalo_url?: string; hotline?: string } | null>(null);
+
+  const handleToggleBookmark = () => {
+    const newState = toggleSavePage({
+      page_id: page.id,
+      topic_slug: topic.slug,
+      topic_title: topic.title,
+      page_slug: page.slug,
+      page_title: currentPage.title,
+      page_number: pageIndex,
+      saved_at: Date.now(),
+    });
+    setIsSaved(newState);
+    setShareNoticeMsg(newState ? 'Đã lưu bài học vào mục Đã lưu' : 'Đã bỏ lưu bài học');
+    setTimeout(() => setShareNoticeMsg(''), 2500);
+  };
+
+  const handleToggleCompleted = () => {
+    const newState = togglePageCompleted(page.id);
+    setIsCompleted(newState);
+    setShareNoticeMsg(newState ? 'Tuyệt vời! Đã hiểu bài học này ✓' : 'Đã hủy đánh dấu hoàn thành');
+    setTimeout(() => setShareNoticeMsg(''), 2500);
+  };
+
+  const handleThemeChange = (mode: 'light' | 'dark') => {
+    setThemeMode(mode);
+    try {
+      localStorage.setItem('giao_dien', mode);
+      if (mode === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.body.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.body.classList.remove('dark');
+      }
+    } catch {
+      // Bỏ qua
+    }
+  };
 
   const handleShare = async () => {
     const shareData = {
@@ -314,6 +377,10 @@ export default function ContentViewer({
         onToggleAdmin={handleToggleAdmin}
         onOpenSettings={() => setShowAdminSettingsModal(true)}
         onShare={handleShare}
+        isSaved={isSaved}
+        onToggleSave={handleToggleBookmark}
+        themeMode={themeMode}
+        onThemeChange={handleThemeChange}
       />
 
       {/* 3. Phần đầu bài viết: Dòng nhỏ CỘT SỐNG · 01 + Tiêu đề lớn */}
@@ -539,8 +606,33 @@ export default function ContentViewer({
         </div>
       )}
 
+      {/* Nút Đã hiểu bài này (Tự đánh dấu 1 chạm) */}
+      <div className="mt-3">
+        <button
+          type="button"
+          onClick={handleToggleCompleted}
+          className={`flex items-center justify-center gap-2.5 h-[54px] min-h-[48px] w-full rounded-[18px] border-[1.5px] font-extrabold text-[16px] transition-all active:scale-[0.98] shadow-xs cursor-pointer ${
+            isCompleted
+              ? 'bg-[#E6F2EF] text-[#0A4F43] border-[#0E6B5A]'
+              : 'bg-white border-line text-ink hover:border-primary'
+          }`}
+        >
+          {isCompleted ? (
+            <>
+              <CheckCircle2 size={22} className="text-[#0E6B5A]" />
+              <span>Đã hiểu bài học này ✓</span>
+            </>
+          ) : (
+            <>
+              <Circle size={22} className="text-muted" />
+              <span>Đánh dấu đã hiểu bài này</span>
+            </>
+          )}
+        </button>
+      </div>
+
       {/* 6. Cuối trang: Gợi ý theo lộ trình + Nút Tiếp theo + Nút Chia sẻ */}
-      <section className="flex flex-col gap-2 mt-6 pt-4 border-t border-line/60">
+      <section className="flex flex-col gap-2 mt-4 pt-4 border-t border-line/60">
         <p className="text-[15px] text-muted font-medium">
           Gợi ý theo lộ trình
         </p>
@@ -576,6 +668,33 @@ export default function ContentViewer({
           <Share2 size={18} className="text-primary" />
           <span>Chia sẻ trang này</span>
         </button>
+
+        {/* Thẻ tư vấn Chuyên gia / Zalo (nếu có cấu hình) */}
+        {(consultSettings?.zalo_url || consultSettings?.hotline) && (
+          <a
+            href={consultSettings.zalo_url || `https://zalo.me/${consultSettings.hotline}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between p-3.5 rounded-[18px] bg-primary-soft/40 border border-primary/30 text-ink hover:border-primary transition-all shadow-2xs mt-2"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-[12px] bg-primary text-white flex items-center justify-center shrink-0 shadow-xs">
+                <MessageCircle size={20} />
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className="text-[14px] font-extrabold text-ink leading-tight truncate">
+                  Cần tư vấn thêm về cơ thể?
+                </span>
+                <span className="text-[12px] text-muted leading-tight truncate">
+                  Trao đổi cùng chuyên gia qua Zalo
+                </span>
+              </div>
+            </div>
+            <span className="text-[13px] font-bold text-primary shrink-0 ml-2">
+              Nhắn Zalo ›
+            </span>
+          </a>
+        )}
       </section>
 
       {/* 7. Bảng điều khiển quản trị trang (Hiện khi isAdmin = true) */}

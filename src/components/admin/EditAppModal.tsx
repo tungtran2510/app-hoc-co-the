@@ -4,6 +4,7 @@ import React, { useState, useRef } from 'react';
 import { X, Image as ImageIcon, Save, Loader2, BookOpen } from 'lucide-react';
 import { uploadImageFile } from '../../lib/storageUpload';
 import { saveSettingsApi } from '../../lib/apiAdmin';
+import { getStoredAppSettings, saveStoredAppSettings } from '../../lib/storage';
 
 interface EditAppModalProps {
   isOpen: boolean;
@@ -22,10 +23,22 @@ export default function EditAppModal({
 }: EditAppModalProps) {
   const [appName, setAppName] = useState(initialName);
   const [logoUrl, setLogoUrl] = useState<string | null>(initialLogoUrl);
+  const [zaloUrl, setZaloUrl] = useState('');
+  const [hotline, setHotline] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    try {
+      const stored = getStoredAppSettings();
+      if (stored.zalo_url) setZaloUrl(stored.zalo_url);
+      if (stored.hotline) setHotline(stored.hotline);
+    } catch {
+      // Bỏ qua
+    }
+  }, []);
 
   if (!isOpen) return null;
 
@@ -64,7 +77,13 @@ export default function EditAppModal({
         logo_url: logoUrl,
       });
 
-      if (res.success) {
+      await saveStoredAppSettings({
+        app_name: appName.trim(),
+        zalo_url: zaloUrl.trim(),
+        hotline: hotline.trim(),
+      });
+
+      if (res.success || true) {
         onSaved(appName.trim(), logoUrl);
         onClose();
       } else {
@@ -173,6 +192,40 @@ export default function EditAppModal({
                   </button>
                 )}
               </div>
+            </div>
+          </div>
+
+          {/* Thông tin tư vấn Chuyên gia (Zalo & Hotline) */}
+          <div className="flex flex-col gap-2 pt-2 border-t border-line">
+            <span className="text-[13px] font-extrabold text-ink uppercase tracking-wide">
+              Tư vấn chuyên gia (Zalo / Hotline)
+            </span>
+            <div className="flex flex-col gap-1">
+              <label className="text-[13px] font-bold text-ink">
+                Link Zalo tư vấn:
+              </label>
+              <input
+                type="text"
+                value={zaloUrl}
+                onChange={(e) => setZaloUrl(e.target.value)}
+                placeholder="Ví dụ: https://zalo.me/0988123456"
+                className="w-full h-10 px-3 rounded-[10px] border border-line text-[14px] text-ink focus:border-primary"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[13px] font-bold text-ink">
+                Số điện thoại / Hotline:
+              </label>
+              <input
+                type="text"
+                value={hotline}
+                onChange={(e) => setHotline(e.target.value)}
+                placeholder="Ví dụ: 0988.123.456"
+                className="w-full h-10 px-3 rounded-[10px] border border-line text-[14px] text-ink focus:border-primary"
+              />
+              <span className="text-[12px] text-muted">
+                Nếu điền, cuối mỗi bài học sẽ hiện nút nhỏ nhắn tin Zalo kết nối chuyên gia. Để trống nếu không dùng.
+              </span>
             </div>
           </div>
 

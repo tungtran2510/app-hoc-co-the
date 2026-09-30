@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, Menu, MoreVertical, X, Lock, Check, Settings as SettingsIcon, Share2 } from 'lucide-react';
+import { ChevronLeft, Menu, MoreVertical, X, Lock, Check, Settings as SettingsIcon, Share2, Bookmark, Sun, Moon } from 'lucide-react';
 
 export interface TocItem {
   id: string;
@@ -21,6 +21,10 @@ interface PageHeaderBarProps {
   onToggleAdmin?: () => void;
   onOpenSettings?: () => void;
   onShare?: () => void;
+  isSaved?: boolean;
+  onToggleSave?: () => void;
+  themeMode?: 'light' | 'dark';
+  onThemeChange?: (mode: 'light' | 'dark') => void;
 }
 
 export default function PageHeaderBar({
@@ -33,6 +37,10 @@ export default function PageHeaderBar({
   onToggleAdmin,
   onOpenSettings,
   onShare,
+  isSaved = false,
+  onToggleSave,
+  themeMode = 'light',
+  onThemeChange,
 }: PageHeaderBarProps) {
   const [showToc, setShowToc] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
@@ -59,8 +67,8 @@ export default function PageHeaderBar({
           <span>{topicTitle}</span>
         </Link>
 
-        {/* Nút Mục lục + Nút Tuỳ chọn */}
-        <div className="flex items-center gap-2">
+        {/* Nút Mục lục + Nút Lưu + Nút Tuỳ chọn */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {/* Nút Mục lục */}
           <button
             type="button"
@@ -68,7 +76,7 @@ export default function PageHeaderBar({
               setShowToc(!showToc);
               setShowOptions(false);
             }}
-            className={`flex items-center gap-1.5 h-[48px] min-w-[48px] px-3.5 rounded-[16px] border-[1.5px] text-[15px] font-bold transition-all shadow-xs ${
+            className={`flex items-center gap-1.5 h-[48px] min-w-[48px] px-3 rounded-[16px] border-[1.5px] text-[15px] font-bold transition-all shadow-xs ${
               showToc
                 ? 'bg-primary-soft border-primary text-primary'
                 : 'bg-white border-line text-ink hover:border-line-strong'
@@ -78,6 +86,27 @@ export default function PageHeaderBar({
           >
             <Menu size={18} strokeWidth={2.5} />
             <span>Mục lục</span>
+          </button>
+
+          {/* Nút Lưu bài học */}
+          <button
+            type="button"
+            onClick={() => {
+              if (onToggleSave) onToggleSave();
+            }}
+            className={`flex items-center justify-center w-[48px] h-[48px] min-w-[48px] rounded-[16px] border-[1.5px] transition-all shadow-xs ${
+              isSaved
+                ? 'bg-primary-soft border-primary text-primary'
+                : 'bg-white border-line text-ink hover:border-line-strong'
+            }`}
+            aria-label={isSaved ? 'Bỏ lưu bài học này' : 'Lưu bài học này'}
+            title={isSaved ? 'Đã lưu (Bấm để bỏ lưu)' : 'Lưu bài học'}
+          >
+            <Bookmark
+              size={20}
+              className={isSaved ? 'fill-primary text-primary' : 'text-ink'}
+              strokeWidth={2.5}
+            />
           </button>
 
           {/* Nút Tuỳ chọn ⋮ */}
@@ -188,6 +217,39 @@ export default function PageHeaderBar({
                 }`}
               >
                 Lớn
+              </button>
+            </div>
+          </div>
+
+          {/* Giao diện: Sáng / Dịu mắt */}
+          <div className="flex flex-col gap-2 pt-2 border-t border-line">
+            <span className="text-[13px] font-bold text-muted uppercase tracking-wider">
+              Giao diện
+            </span>
+            <div className="grid grid-cols-2 gap-1.5">
+              <button
+                type="button"
+                onClick={() => onThemeChange && onThemeChange('light')}
+                className={`h-[44px] rounded-[12px] font-bold text-[14px] flex items-center justify-center gap-1.5 transition-all ${
+                  themeMode === 'light'
+                    ? 'bg-primary-soft border-2 border-primary text-primary'
+                    : 'bg-surface-2 border border-line-strong text-ink hover:bg-line/40'
+                }`}
+              >
+                <Sun size={16} />
+                <span>Sáng</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => onThemeChange && onThemeChange('dark')}
+                className={`h-[44px] rounded-[12px] font-bold text-[14px] flex items-center justify-center gap-1.5 transition-all ${
+                  themeMode === 'dark'
+                    ? 'bg-primary-soft border-2 border-primary text-primary'
+                    : 'bg-surface-2 border border-line-strong text-ink hover:bg-line/40'
+                }`}
+              >
+                <Moon size={16} />
+                <span>Dịu mắt</span>
               </button>
             </div>
           </div>

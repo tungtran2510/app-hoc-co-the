@@ -93,6 +93,20 @@ export default function EditBlockModal({
   const [newVidTitle, setNewVidTitle] = useState('');
   const [newVidDuration, setNewVidDuration] = useState('5 phút');
 
+  // State cho comparison block
+  const [leftTitle, setLeftTitle] = useState(
+    block.type === 'comparison' ? block.data.left_title || 'Nên làm / Đốt sống khỏe' : 'Nên làm'
+  );
+  const [leftLinesText, setLeftLinesText] = useState(
+    block.type === 'comparison' && block.data.left_lines ? block.data.left_lines.join('\n') : ''
+  );
+  const [rightTitle, setRightTitle] = useState(
+    block.type === 'comparison' ? block.data.right_title || 'Tránh làm / Nguy cơ thoái hóa' : 'Tránh làm'
+  );
+  const [rightLinesText, setRightLinesText] = useState(
+    block.type === 'comparison' && block.data.right_lines ? block.data.right_lines.join('\n') : ''
+  );
+
   if (!isOpen) return null;
 
   // Thêm ảnh đính kèm trong text
@@ -250,6 +264,25 @@ export default function EditBlockModal({
         ...block,
         data: {
           videos: videoList,
+        },
+      };
+      onSaveBlock(updated);
+    } else if (block.type === 'comparison') {
+      const leftLines = leftLinesText
+        .split('\n')
+        .map((l) => l.trim())
+        .filter((l) => l.length > 0);
+      const rightLines = rightLinesText
+        .split('\n')
+        .map((l) => l.trim())
+        .filter((l) => l.length > 0);
+      const updated: Block = {
+        ...block,
+        data: {
+          left_title: leftTitle.trim() || 'Nên làm / Đốt sống khỏe',
+          left_lines: leftLines.length > 0 ? leftLines : ['Nội dung cột 1'],
+          right_title: rightTitle.trim() || 'Tránh làm / Nguy cơ thoái hóa',
+          right_lines: rightLines.length > 0 ? rightLines : ['Nội dung cột 2'],
         },
       };
       onSaveBlock(updated);
@@ -859,6 +892,65 @@ export default function EditBlockModal({
                     </button>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Form chỉnh sửa So sánh 2 mặt (Comparison) */}
+          {block.type === 'comparison' && (
+            <div className="flex flex-col gap-4">
+              {/* Cột 1: Bên trái */}
+              <div className="p-3.5 rounded-[18px] bg-[#E6F2EF] border border-[#0E6B5A]/30 flex flex-col gap-2.5 shadow-2xs">
+                <label className="text-[13px] font-extrabold text-[#0A4F43] uppercase tracking-wide">
+                  Cột 1: Nên làm / Bình thường (Màu xanh ngọc)
+                </label>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[12px] font-bold text-[#0A4F43]">Tiêu đề cột 1:</span>
+                  <input
+                    type="text"
+                    value={leftTitle}
+                    onChange={(e) => setLeftTitle(e.target.value)}
+                    placeholder="Ví dụ: Nên làm / Đốt sống khỏe"
+                    className="w-full h-10 px-3 rounded-[10px] bg-white border border-[#0E6B5A]/30 text-[15px] font-bold text-[#0A4F43] focus:border-primary"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[12px] font-bold text-[#0A4F43]">Các ý (mỗi dòng một ý):</span>
+                  <textarea
+                    rows={4}
+                    value={leftLinesText}
+                    onChange={(e) => setLeftLinesText(e.target.value)}
+                    placeholder="Nhập các ý cần làm, mỗi dòng một ý..."
+                    className="w-full p-3 rounded-[10px] bg-white border border-[#0E6B5A]/30 text-[15px] text-ink leading-relaxed"
+                  />
+                </div>
+              </div>
+
+              {/* Cột 2: Bên phải */}
+              <div className="p-3.5 rounded-[18px] bg-[#FBE7E1] border border-[#9B3B32]/30 flex flex-col gap-2.5 shadow-2xs">
+                <label className="text-[13px] font-extrabold text-[#7A2F12] uppercase tracking-wide">
+                  Cột 2: Tránh làm / Bệnh lý (Màu đỏ gạch)
+                </label>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[12px] font-bold text-[#7A2F12]">Tiêu đề cột 2:</span>
+                  <input
+                    type="text"
+                    value={rightTitle}
+                    onChange={(e) => setRightTitle(e.target.value)}
+                    placeholder="Ví dụ: Tránh làm / Nguy cơ thoái hóa"
+                    className="w-full h-10 px-3 rounded-[10px] bg-white border border-[#9B3B32]/30 text-[15px] font-bold text-[#7A2F12] focus:border-accent"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[12px] font-bold text-[#7A2F12]">Các ý (mỗi dòng một ý):</span>
+                  <textarea
+                    rows={4}
+                    value={rightLinesText}
+                    onChange={(e) => setRightLinesText(e.target.value)}
+                    placeholder="Nhập các ý cần tránh, mỗi dòng một ý..."
+                    className="w-full p-3 rounded-[10px] bg-white border border-[#9B3B32]/30 text-[15px] text-ink leading-relaxed"
+                  />
+                </div>
               </div>
             </div>
           )}

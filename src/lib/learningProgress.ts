@@ -89,3 +89,106 @@ export function saveVideoWatched(pageId: string, videoIndex: number): void {
     // Bỏ qua
   }
 }
+
+// -----------------------------------------------------------------------------
+// BÀI HỌC ĐÃ LƯU (BOOKMARKS)
+// -----------------------------------------------------------------------------
+export interface SavedPageInfo {
+  page_id: string;
+  topic_slug: string;
+  topic_title: string;
+  page_slug: string;
+  page_title: string;
+  page_number: number;
+  saved_at: number;
+}
+
+const BAI_DA_LUU_KEY = 'bai_da_luu';
+
+export function getSavedPages(): SavedPageInfo[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(BAI_DA_LUU_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw) as SavedPageInfo[];
+  } catch {
+    return [];
+  }
+}
+
+export function isPageSaved(pageId: string): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    const list = getSavedPages();
+    return list.some((p) => p.page_id === pageId);
+  } catch {
+    return false;
+  }
+}
+
+export function toggleSavePage(info: SavedPageInfo): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    const list = getSavedPages();
+    const exists = list.some((p) => p.page_id === info.page_id);
+    let updated: SavedPageInfo[];
+    let newState: boolean;
+    if (exists) {
+      updated = list.filter((p) => p.page_id !== info.page_id);
+      newState = false;
+    } else {
+      updated = [info, ...list];
+      newState = true;
+    }
+    localStorage.setItem(BAI_DA_LUU_KEY, JSON.stringify(updated));
+    return newState;
+  } catch {
+    return false;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// ĐÃ HIỂU BÀI NÀY (ĐÁNH DẤU HOÀN THÀNH 1 CHẠM)
+// -----------------------------------------------------------------------------
+const DA_HOAN_THANH_KEY = 'da_hoan_thanh';
+
+export function getCompletedPages(): string[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(DA_HOAN_THANH_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw) as string[];
+  } catch {
+    return [];
+  }
+}
+
+export function isPageCompleted(pageId: string): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    const list = getCompletedPages();
+    return list.includes(pageId);
+  } catch {
+    return false;
+  }
+}
+
+export function togglePageCompleted(pageId: string): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    const list = getCompletedPages();
+    let updated: string[];
+    let newState: boolean;
+    if (list.includes(pageId)) {
+      updated = list.filter((id) => id !== pageId);
+      newState = false;
+    } else {
+      updated = [...list, pageId];
+      newState = true;
+    }
+    localStorage.setItem(DA_HOAN_THANH_KEY, JSON.stringify(updated));
+    return newState;
+  } catch {
+    return false;
+  }
+}

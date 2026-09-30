@@ -7,6 +7,8 @@ export interface Settings {
   primary_color: string;
   access_mode: AccessMode;
   block_styles: Record<string, { label: string | null; icon: string | null; bg: string | null; fg: string }>;
+  zalo_consult_url?: string | null;
+  hotline?: string | null;
 }
 
 export interface Topic {
@@ -110,6 +112,20 @@ export type Block =
       sort_order: number;
       is_visible: boolean;
       data: { files: FileItem[] };
+    }
+  | {
+      id: string;
+      page_id: string;
+      type: 'comparison';
+      display_style: 'two_column';
+      sort_order: number;
+      is_visible: boolean;
+      data: {
+        left_title?: string;
+        left_lines: string[];
+        right_title?: string;
+        right_lines: string[];
+      };
     };
 
 export interface ContinueInfo {

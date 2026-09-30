@@ -5,6 +5,7 @@ import VideosBlock from './blocks/VideosBlock';
 import ImagesBlock from './blocks/ImagesBlock';
 import LinksBlock from './blocks/LinksBlock';
 import FilesBlock from './blocks/FilesBlock';
+import ComparisonBlock from './blocks/ComparisonBlock';
 import { FontSizeOption } from './PageHeaderBar';
 
 interface BlockRendererProps {
@@ -95,6 +96,18 @@ export default function BlockRenderer({
         <FilesBlock
           blockId={blockId}
           files={block.data.files}
+        />
+      );
+
+    case 'comparison':
+      return (
+        <ComparisonBlock
+          blockId={blockId}
+          leftTitle={block.data.left_title}
+          leftLines={block.data.left_lines}
+          rightTitle={block.data.right_title}
+          rightLines={block.data.right_lines}
+          fontSizeMode={fontSizeMode}
         />
       );
 

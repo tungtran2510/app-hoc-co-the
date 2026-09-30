@@ -68,7 +68,7 @@ export default function VideoManagerModal({
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
   // Form thêm video
-  const [addMode, setAddMode] = useState<'none' | 'youtube' | 'upload'>('none');
+  const [addMode, setAddMode] = useState<'none' | 'youtube' | 'upload' | 'bulk'>('none');
   const [inputUrl, setInputUrl] = useState('');
   const [inputTitle, setInputTitle] = useState('');
   const [inputDuration, setInputDuration] = useState('');
@@ -76,6 +76,9 @@ export default function VideoManagerModal({
   const [inputThumb, setInputThumb] = useState('');
   const [isLoadingMeta, setIsLoadingMeta] = useState(false);
   const [fetchSuccessMsg, setFetchSuccessMsg] = useState('');
+  const [bulkText, setBulkText] = useState('');
+  const [isBulkLoading, setIsBulkLoading] = useState(false);
+  const [bulkFeedback, setBulkFeedback] = useState('');
 
   if (!isOpen) return null;
 
@@ -200,6 +203,52 @@ export default function VideoManagerModal({
     setInputDescription('');
     setInputThumb('');
     setFetchSuccessMsg('');
+  };
+
+  const handleBulkImport = async () => {
+    if (!bulkText.trim()) return;
+    setIsBulkLoading(true);
+    setBulkFeedback('Đang xử lý và tải thông tin video...');
+    const rawLines = bulkText
+      .split('\n')
+      .map((l) => l.trim())
+      .filter((l) => l.length > 0);
+
+    const added: Video[] = [];
+    for (const line of rawLines) {
+      const yid = extractYouTubeId(line);
+      if (yid && !videoList.some((v) => v.youtube_id === yid) && !added.some((v) => v.youtube_id === yid)) {
+        try {
+          const meta = await fetchYouTubeMeta(yid);
+          added.push({
+            youtube_id: yid,
+            title: meta.title || `Video ${yid}`,
+            thumbnail_url: meta.thumbnail_url || `https://i.ytimg.com/vi/${yid}/hqdefault.jpg`,
+            duration_text: '5 phút',
+          });
+        } catch {
+          added.push({
+            youtube_id: yid,
+            title: `Video ${yid}`,
+            thumbnail_url: `https://i.ytimg.com/vi/${yid}/hqdefault.jpg`,
+            duration_text: '5 phút',
+          });
+        }
+      }
+    }
+
+    if (added.length > 0) {
+      setVideoList([...videoList, ...added]);
+      setBulkFeedback(`Đã thêm thành công ${added.length} video mới!`);
+      setTimeout(() => {
+        setBulkText('');
+        setBulkFeedback('');
+        setAddMode('none');
+      }, 1500);
+    } else {
+      setBulkFeedback('Không tìm thấy link YouTube mới hợp lệ.');
+    }
+    setIsBulkLoading(false);
   };
 
   const handleFinish = () => {
@@ -353,14 +402,22 @@ export default function VideoManagerModal({
             </div>
 
             {addMode === 'none' ? (
-              <div className="grid grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-3 gap-2">
                 <button
                   type="button"
                   onClick={() => setAddMode('youtube')}
-                  className="flex items-center justify-center gap-2 h-[48px] rounded-[14px] bg-white border border-line text-ink font-bold text-[15px] hover:border-primary transition-all shadow-xs"
+                  className="flex items-center justify-center gap-1.5 h-[48px] rounded-[14px] bg-white border border-line text-ink font-bold text-[13px] hover:border-primary transition-all shadow-xs"
                 >
-                  <LinkIcon size={18} className="text-primary" />
-                  <span>Dán link YouTube</span>
+                  <LinkIcon size={16} className="text-primary shrink-0" />
+                  <span>Dán 1 link</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAddMode('bulk')}
+                  className="flex items-center justify-center gap-1.5 h-[48px] rounded-[14px] bg-white border border-line text-ink font-bold text-[13px] hover:border-primary transition-all shadow-xs"
+                >
+                  <Upload size={16} className="text-primary shrink-0" />
+                  <span>Dán nhiều link</span>
                 </button>
                 <button
                   type="button"
@@ -368,11 +425,68 @@ export default function VideoManagerModal({
                     handleApplyPreset(SAMPLE_PRESET_VIDEOS[0]);
                     setAddMode('youtube');
                   }}
-                  className="flex items-center justify-center gap-2 h-[48px] rounded-[14px] bg-white border border-line text-primary font-bold text-[15px] hover:border-primary transition-all shadow-xs"
+                  className="flex items-center justify-center gap-1.5 h-[48px] rounded-[14px] bg-white border border-line text-primary font-bold text-[13px] hover:border-primary transition-all shadow-xs"
                 >
-                  <Sparkles size={18} />
-                  <span>Dùng video mẫu</span>
+                  <Sparkles size={16} className="shrink-0" />
+                  <span>Video mẫu</span>
                 </button>
+              </div>
+            ) : addMode === 'bulk' ? (
+              /* Form nhập nhiều link cùng lúc */
+              <div className="flex flex-col gap-3 bg-white p-4 rounded-[18px] border border-line shadow-xs">
+                <div className="flex items-center justify-between pb-2 border-b border-line">
+                  <span className="text-[14px] font-extrabold text-ink uppercase tracking-wide">
+                    Nhập nhiều video cùng lúc
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAddMode('none');
+                      setBulkText('');
+                      setBulkFeedback('');
+                    }}
+                    className="p-1 rounded-md text-muted hover:bg-surface-2"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[13px] font-bold text-ink">
+                    Dán danh sách link YouTube (mỗi link trên 1 dòng):
+                  </label>
+                  <textarea
+                    rows={5}
+                    value={bulkText}
+                    onChange={(e) => setBulkText(e.target.value)}
+                    placeholder="https://www.youtube.com/watch?v=...&#10;https://youtu.be/...&#10;https://www.youtube.com/shorts/..."
+                    className="w-full p-3 rounded-[12px] bg-surface-2 border border-line text-[14px] font-mono text-ink leading-relaxed"
+                  />
+                  <span className="text-[12px] text-muted">
+                    Hệ thống sẽ tự động nhận diện ID và tải thông tin tiêu đề, ảnh bìa tự động.
+                  </span>
+                </div>
+                {bulkFeedback && (
+                  <div className="p-2.5 rounded-[10px] bg-primary-soft text-primary font-bold text-[13px]">
+                    {bulkFeedback}
+                  </div>
+                )}
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-line">
+                  <button
+                    type="button"
+                    onClick={() => setAddMode('none')}
+                    className="h-10 px-3.5 rounded-[10px] bg-surface-2 text-ink font-bold text-[13px]"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleBulkImport}
+                    disabled={isBulkLoading || !bulkText.trim()}
+                    className="flex items-center justify-center gap-1.5 h-10 px-4 rounded-[10px] bg-primary text-white font-bold text-[13px] shadow-sm disabled:opacity-50"
+                  >
+                    {isBulkLoading ? 'Đang trích xuất...' : 'Nạp tự động toàn bộ'}
+                  </button>
+                </div>
               </div>
             ) : (
               /* Form nhập video */

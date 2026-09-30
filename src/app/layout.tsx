@@ -34,6 +34,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="vi" className={beVietnamPro.variable}>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(localStorage.getItem('giao_dien')==='dark'){document.documentElement.classList.add('dark')}}catch(e){}`,
+          }}
+        />
+      </head>
       <body className="bg-bg text-ink min-h-screen flex justify-center selection:bg-primary-soft selection:text-primary-dark">
         <PwaRegistrar />
         <div className="w-full max-w-[480px] min-h-screen bg-bg relative flex flex-col">

@@ -33,3 +33,48 @@ body {
   background: #D9D4C7;
   border-radius: 999px;
 }
+
+/* ============================================================================
+   CHẾ ĐỘ DỊU MẮT / TỐI (DARK / DIM MODE)
+   ============================================================================ */
+html.dark, body.dark {
+  background-color: #0F172A !important;
+  color: #F8FAFC !important;
+}
+
+html.dark body {
+  background-color: #0F172A !important;
+  color: #F8FAFC !important;
+}
+
+html.dark .bg-bg {
+  background-color: #0F172A !important;
+}
+
+html.dark .bg-white {
+  background-color: #1E293B !important;
+  color: #F8FAFC !important;
+}
+
+html.dark .bg-surface-2 {
+  background-color: #0B1120 !important;
+}
+
+html.dark .text-ink {
+  color: #F8FAFC !important;
+}
+
+html.dark .text-muted {
+  color: #94A3B8 !important;
+}
+
+html.dark .border-line,
+html.dark .border-line\/40,
+html.dark .border-line\/60 {
+  border-color: #334155 !important;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+

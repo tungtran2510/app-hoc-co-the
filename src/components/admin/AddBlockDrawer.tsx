@@ -16,6 +16,7 @@ import {
   Link2,
   ExternalLink,
   FileArchive,
+  Columns2,
 } from 'lucide-react';
 import { Block } from '../../lib/types';
 
@@ -113,6 +114,29 @@ export default function AddBlockDrawer({
             displayStyle === 'related'
               ? [{ page_id: 'page-cot-song-2', label: 'Cột sống · 02 Đĩa đệm' }]
               : [{ url: 'https://moh.gov.vn', label: 'Cổng thông tin Bộ Y tế' }],
+        },
+      };
+    } else if (type === 'comparison') {
+      newBlock = {
+        id,
+        page_id: pageId,
+        type: 'comparison',
+        display_style: 'two_column',
+        sort_order: nextSortOrder,
+        is_visible: true,
+        data: {
+          left_title: 'Nên làm / Đốt sống khỏe',
+          left_lines: [
+            'Ngồi thẳng lưng, giữ vai thả lỏng',
+            'Đổi tư thế sau mỗi 30–45 phút',
+            'Uống đủ nước để nuôi dưỡng đĩa đệm',
+          ],
+          right_title: 'Tránh làm / Nguy cơ thoái hóa',
+          right_lines: [
+            'Cúi gập cổ nhìn điện thoại quá lâu',
+            'Ngồi vắt chéo chân hoặc gù lưng',
+            'Mang vác vật nặng sai tư thế',
+          ],
         },
       };
     } else {
@@ -261,6 +285,14 @@ export default function AddBlockDrawer({
               >
                 <Wrench size={20} className="text-[#4E6B2A] shrink-0" />
                 <span>Giải pháp</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => createAndAdd('comparison', 'two_column')}
+                className="col-span-2 flex items-center justify-center gap-2.5 p-3 rounded-[16px] bg-gradient-to-r from-[#E6F2EF] to-[#FBE7E1] hover:opacity-95 transition-all font-bold text-[15px] border border-line shadow-2xs"
+              >
+                <Columns2 size={20} className="text-[#0E6B5A] shrink-0" />
+                <span className="text-ink">So sánh 2 mặt (Đúng – Sai / Khỏe – Bệnh)</span>
               </button>
             </div>
           </div>

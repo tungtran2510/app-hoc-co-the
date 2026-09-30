@@ -7,7 +7,7 @@ import { Page, Topic } from '../lib/types';
 import { checkIsAdminClient } from '../lib/adminAuth';
 import { savePageApi, deletePageApi } from '../lib/apiAdmin';
 import EditPageModal from './admin/EditPageModal';
-import { getStoredTienDo, TienDoMap } from '../lib/learningProgress';
+import { getStoredTienDo, TienDoMap, getCompletedPages } from '../lib/learningProgress';
 
 interface PageItemData {
   page: Page;
@@ -26,11 +26,13 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
   const [editingPage, setEditingPage] = useState<Page | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [tienDo, setTienDo] = useState<TienDoMap>({});
+  const [completedPages, setCompletedPages] = useState<string[]>([]);
 
   useEffect(() => {
     checkIsAdminClient().then((admin) => setIsAdmin(admin));
     try {
       setTienDo(getStoredTienDo());
+      setCompletedPages(getCompletedPages());
     } catch {
       // Bỏ qua
     }
@@ -170,6 +172,7 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
                       videoCount={videoCount}
                       watchedVideos={watchedVideos}
                       lastVideo={lastVideo}
+                      isCompleted={completedPages.includes(page.id)}
                     />
 
                     {/* Huy hiệu Quản trị: Bản nháp / Đang ẩn */}
