@@ -8,6 +8,7 @@ import { Topic } from '../lib/types';
 import { checkIsAdminClient } from '../lib/adminAuth';
 import { saveTopicApi, deleteTopicApi } from '../lib/apiAdmin';
 import EditTopicModal from './admin/EditTopicModal';
+import SectionOrderControls from './admin/SectionOrderControls';
 
 interface TopicListClientProps {
   initialTopics: {
@@ -15,9 +16,22 @@ interface TopicListClientProps {
     pageCount: number;
   }[];
   initialTopicsTitle?: string | null;
+  sectionIndex?: number;
+  totalSections?: number;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  onOpenReorderModal?: () => void;
 }
 
-export default function TopicListClient({ initialTopics, initialTopicsTitle }: TopicListClientProps) {
+export default function TopicListClient({
+  initialTopics,
+  initialTopicsTitle,
+  sectionIndex,
+  totalSections,
+  onMoveUp,
+  onMoveDown,
+  onOpenReorderModal,
+}: TopicListClientProps) {
   const [topicsWithCounts, setTopicsWithCounts] = useState(initialTopics);
   const [topicsTitle, setTopicsTitle] = useState(initialTopicsTitle || 'Chọn chủ đề');
   const [isAdmin, setIsAdmin] = useState(false);
@@ -112,21 +126,33 @@ export default function TopicListClient({ initialTopics, initialTopicsTitle }: T
 
   return (
     <section className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <h2 className="text-[22px] font-extrabold text-ink leading-tight">
           {topicsTitle}
         </h2>
 
-        {isAdmin && (
-          <button
-            type="button"
-            onClick={() => setIsCreating(true)}
-            className="flex items-center gap-1.5 h-9 px-3 rounded-full bg-primary text-white font-bold text-[13px] shadow-xs hover:bg-primary-dark cursor-pointer transition-all"
-          >
-            <Plus size={16} strokeWidth={2.5} />
-            <span>Thêm chủ đề</span>
-          </button>
-        )}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {isAdmin && onMoveUp && onMoveDown && onOpenReorderModal && typeof sectionIndex === 'number' && typeof totalSections === 'number' && (
+            <SectionOrderControls
+              sectionIndex={sectionIndex}
+              totalSections={totalSections}
+              onMoveUp={onMoveUp}
+              onMoveDown={onMoveDown}
+              onOpenReorderModal={onOpenReorderModal}
+            />
+          )}
+
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={() => setIsCreating(true)}
+              className="flex items-center gap-1.5 h-8 px-3 rounded-full bg-primary text-white font-bold text-[13px] shadow-xs hover:bg-primary-dark cursor-pointer transition-all"
+            >
+              <Plus size={15} strokeWidth={2.5} />
+              <span>Thêm chủ đề</span>
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3 mt-1">

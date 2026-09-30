@@ -34,6 +34,8 @@ export interface RecommendedBook {
   description: string;
   author?: string | null;
   link_url?: string | null;
+  tag?: string | null;
+  color_theme?: string | null;
 }
 
 export interface AiKnowledgeDoc {
@@ -74,6 +76,8 @@ export interface Settings {
   recommended_books_title?: string | null;
   recommended_books_subtitle?: string | null;
   recommended_books?: RecommendedBook[];
+  recommended_books_layout?: 'grid' | 'lookbook' | null;
+  home_sections_order?: string[] | null;
   ai_training?: AiTrainingConfig | null;
 }
 

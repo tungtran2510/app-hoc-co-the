@@ -3,9 +3,7 @@ import { getSettings, getTopics, getPagesByTopic } from '../lib/data';
 import HomeHeader from '../components/HomeHeader';
 import HomeGreetingSection from '../components/HomeGreetingSection';
 import HomeContinueSection from '../components/HomeContinueSection';
-import TopicListClient from '../components/TopicListClient';
-import AuthorIntroSection from '../components/AuthorIntroSection';
-import RecommendedBooksSection from '../components/RecommendedBooksSection';
+import HomeSectionsClient from '../components/HomeSectionsClient';
 import BottomNav from '../components/BottomNav';
 import { Metadata } from 'next';
 
@@ -53,20 +51,16 @@ export default async function HomePage() {
       {/* 4. Thẻ Xem tiếp (đọc từ localStorage client, chưa có -> ẩn) */}
       <HomeContinueSection />
 
-      {/* 5 & 6. Lưới 2 cột các thẻ Chủ đề kèm quản trị */}
-      <TopicListClient
-        initialTopics={topicsWithCounts}
-        initialTopicsTitle={settings.topics_title}
-      />
-
-      {/* 7. Khối giới thiệu tác giả & các sách đã làm ở cuối trang chủ */}
-      <AuthorIntroSection initialProfile={settings.author_profile} />
-
-      {/* 8. Khối Sách Nên Đọc (Lưới 2 cột · Tỷ lệ ảnh dọc 3:4 · Sửa được mọi thông tin) */}
-      <RecommendedBooksSection
-        initialTitle={settings.recommended_books_title}
-        initialSubtitle={settings.recommended_books_subtitle}
-        initialBooks={settings.recommended_books}
+      {/* 5, 6, 7, 8. Các khối nội dung có thể sắp xếp thứ tự: Chủ đề, Tác giả, Sách nên đọc */}
+      <HomeSectionsClient
+        initialSectionsOrder={settings.home_sections_order}
+        topicsWithCounts={topicsWithCounts}
+        topicsTitle={settings.topics_title}
+        authorProfile={settings.author_profile}
+        recommendedBooksTitle={settings.recommended_books_title}
+        recommendedBooksSubtitle={settings.recommended_books_subtitle}
+        recommendedBooks={settings.recommended_books}
+        initialBooksLayout={settings.recommended_books_layout}
       />
 
       {/* 9. Thanh điều hướng dưới cùng */}

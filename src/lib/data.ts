@@ -82,8 +82,9 @@ export async function getSettings(): Promise<Settings> {
           search_placeholder: data.search_placeholder || data.block_styles?.search_placeholder || 'Tìm bài, ví dụ: đĩa đệm',
           topics_title: data.topics_title || data.block_styles?.topics_title || 'Chọn chủ đề',
           recommended_books_title: data.recommended_books_title || data.block_styles?.recommended_books_title || 'Sách nên đọc',
-          recommended_books_subtitle: data.recommended_books_subtitle || data.block_styles?.recommended_books_subtitle || 'Tài liệu tham khảo chuyên sâu giúp bạn hiểu và chăm sóc cơ thể mỗi ngày',
           recommended_books: normalizeRecommendedBooks(data.recommended_books || data.block_styles?.recommended_books),
+          recommended_books_layout: data.recommended_books_layout || data.block_styles?.recommended_books_layout || 'grid',
+          home_sections_order: data.home_sections_order || data.block_styles?.home_sections_order || ['topics', 'author', 'recommended_books'],
           ai_training: normalizeAiTraining(data.ai_training || data.block_styles?.ai_training),
         } as Settings;
       }

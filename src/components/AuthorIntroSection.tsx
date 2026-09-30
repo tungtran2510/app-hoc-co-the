@@ -22,11 +22,25 @@ import { extractYouTubeId } from '../lib/youtube';
 import BookDetailModal from './BookDetailModal';
 import EditAuthorModal from './admin/EditAuthorModal';
 
+import SectionOrderControls from './admin/SectionOrderControls';
+
 interface AuthorIntroSectionProps {
   initialProfile?: AuthorProfile | null;
+  sectionIndex?: number;
+  totalSections?: number;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  onOpenReorderModal?: () => void;
 }
 
-export default function AuthorIntroSection({ initialProfile }: AuthorIntroSectionProps) {
+export default function AuthorIntroSection({
+  initialProfile,
+  sectionIndex,
+  totalSections,
+  onMoveUp,
+  onMoveDown,
+  onOpenReorderModal,
+}: AuthorIntroSectionProps) {
   const [profile, setProfile] = useState<AuthorProfile>(() => normalizeAuthorProfile(initialProfile));
   const [isAdmin, setIsAdmin] = useState(false);
   const [selectedBook, setSelectedBook] = useState<AuthorBook | null>(null);
@@ -49,27 +63,41 @@ export default function AuthorIntroSection({ initialProfile }: AuthorIntroSectio
 
   return (
     <section className="flex flex-col gap-4 mt-2">
-      {/* TIÊU ĐỀ CHÍNH CỦA KHỐI & NÚT SỬA TỔNG QUAN (KHÔNG BỊ XUỐNG DÒNG) */}
-      <div className="flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <h2 className="text-[20px] font-extrabold text-ink leading-tight truncate">
+      {/* TIÊU ĐỀ CHÍNH CỦA KHỐI & NÚT SỬA TỔNG QUAN (2 HÀNG GỌN GÀNG, KHÔNG RỚT CHỮ) */}
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="text-[20px] font-extrabold text-ink leading-tight whitespace-nowrap">
             Tác giả & Chuyên gia
           </h2>
-          <p className="text-[13px] text-muted truncate">
-            Người đồng hành & các công trình nghiên cứu
-          </p>
+
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={() => openModalWithTab('author')}
+              className="flex items-center gap-1.5 h-7 px-2.5 rounded-[9px] bg-primary-soft text-primary text-[11.5px] font-extrabold hover:bg-primary-soft/80 cursor-pointer shadow-2xs shrink-0 whitespace-nowrap"
+            >
+              <Edit2 size={11} />
+              <span>Sửa tác giả</span>
+            </button>
+          )}
         </div>
 
-        {isAdmin && (
-          <button
-            type="button"
-            onClick={() => openModalWithTab('author')}
-            className="flex items-center gap-1.5 h-8 px-3 rounded-[10px] bg-primary-soft text-primary text-[12.5px] font-extrabold hover:bg-primary-soft/80 cursor-pointer shadow-2xs shrink-0 whitespace-nowrap"
-          >
-            <Edit2 size={13} />
-            <span>Sửa tác giả</span>
-          </button>
-        )}
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-[12.5px] text-muted leading-snug line-clamp-1">
+            Người đồng hành & các công trình nghiên cứu
+          </p>
+
+          {isAdmin && onMoveUp && onMoveDown && onOpenReorderModal && typeof sectionIndex === 'number' && typeof totalSections === 'number' && (
+            <SectionOrderControls
+              sectionIndex={sectionIndex}
+              totalSections={totalSections}
+              onMoveUp={onMoveUp}
+              onMoveDown={onMoveDown}
+              onOpenReorderModal={onOpenReorderModal}
+              className="ml-auto"
+            />
+          )}
+        </div>
       </div>
 
       {/* 1. KHỐI GIỚI THIỆU BẢN THÂN (CÓ NÚT SỬA TRỰC TIẾP) */}
