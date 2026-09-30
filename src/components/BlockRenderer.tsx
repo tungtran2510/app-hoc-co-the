@@ -5,10 +5,11 @@ import VideosBlock from './blocks/VideosBlock';
 import ImagesBlock from './blocks/ImagesBlock';
 import LinksBlock from './blocks/LinksBlock';
 import FilesBlock from './blocks/FilesBlock';
+import { FontSizeOption } from './PageHeaderBar';
 
 interface BlockRendererProps {
   block: Block;
-  fontSizeMode?: 'normal' | 'large';
+  fontSizeMode?: FontSizeOption;
   defaultActiveVideoIndex?: number;
   isAdmin?: boolean;
   onOpenVideoManager?: () => void;
@@ -32,6 +33,9 @@ export default function BlockRenderer({
           lines={block.data.lines}
           format={block.data.format}
           fontSizeMode={fontSizeMode}
+          images={block.data.images}
+          files={block.data.files}
+          videos={block.data.videos}
         />
       );
 

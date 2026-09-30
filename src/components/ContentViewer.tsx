@@ -16,9 +16,8 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { Topic, Page, Block, Video } from '../lib/types';
-import PageHeaderBar, { TocItem } from './PageHeaderBar';
+import PageHeaderBar, { TocItem, FontSizeOption } from './PageHeaderBar';
 import BlockRenderer from './BlockRenderer';
-import AdminBar from './admin/AdminBar';
 import EditBlockModal from './admin/EditBlockModal';
 import VideoManagerModal from './admin/VideoManagerModal';
 import AddBlockDrawer from './admin/AddBlockDrawer';
@@ -52,7 +51,7 @@ export default function ContentViewer({
   nextPageIndex,
   defaultActiveVideoIndex = 0,
 }: ContentViewerProps) {
-  const [fontSizeMode, setFontSizeMode] = useState<'normal' | 'large'>('normal');
+  const [fontSizeMode, setFontSizeMode] = useState<FontSizeOption>('normal');
   const [isAdmin, setIsAdmin] = useState(false);
   const [pageStatus, setPageStatus] = useState<'draft' | 'published'>(page.status);
   const [blockList, setBlockList] = useState<Block[]>(initialBlocks);
@@ -66,10 +65,14 @@ export default function ContentViewer({
   // Đọc dữ liệu từ localStorage khi client mount
   useEffect(() => {
     try {
-      // 1. Cỡ chữ
+      // 1. Cỡ chữ (3 kiểu: small, normal, large)
       const savedFontSize = localStorage.getItem('co_chu');
-      if (savedFontSize === 'large' || savedFontSize === 'lon') {
+      if (savedFontSize === 'small' || savedFontSize === 'nho') {
+        setFontSizeMode('small');
+      } else if (savedFontSize === 'large' || savedFontSize === 'lon') {
         setFontSizeMode('large');
+      } else {
+        setFontSizeMode('normal');
       }
 
       // 2. Quyền Admin
@@ -86,7 +89,7 @@ export default function ContentViewer({
     }
   }, [page.id, initialBlocks, page.status]);
 
-  const handleFontSizeChange = (mode: 'normal' | 'large') => {
+  const handleFontSizeChange = (mode: FontSizeOption) => {
     setFontSizeMode(mode);
     try {
       localStorage.setItem('co_chu', mode);
@@ -248,15 +251,8 @@ export default function ContentViewer({
   const currentVideos = videoBlock && videoBlock.type === 'videos' ? videoBlock.data.videos : [];
 
   return (
-    <main className="flex-1 flex flex-col px-5 pt-2 pb-16 gap-5">
-      {/* 1. Thanh công cụ Admin trên cùng nếu đang bật chế độ sửa */}
-      {isAdmin && (
-        <AdminBar
-          onExitAdmin={handleToggleAdmin}
-          status={pageStatus}
-          onToggleStatus={handleToggleStatus}
-        />
-      )}
+    <main className="flex-1 flex flex-col px-5 pt-2 pb-16 gap-4">
+      {/* 1. ĐÃ BỎ THANH ĐEN ĐỈNH ĐẦU ĐỂ TIẾT KIỆM DIỆN TÍCH THEO YÊU CẦU CỦA ANH */}
 
       {/* 2. Thanh điều hướng trang: ‹ [Chủ đề] + [Mục lục] + [⋮] */}
       <PageHeaderBar
@@ -270,24 +266,27 @@ export default function ContentViewer({
       />
 
       {/* 3. Phần đầu bài viết: Dòng nhỏ CỘT SỐNG · 01 + Tiêu đề lớn */}
-      <section className="flex flex-col gap-1.5 mt-1">
+      <section className="flex flex-col gap-1 mt-0.5">
         <div className="flex items-center justify-between">
-          <span className="text-[15px] font-extrabold tracking-[0.5px] uppercase text-muted">
+          <span className="text-[14px] font-extrabold tracking-[0.5px] uppercase text-muted">
             {topic.title.toUpperCase()} · {formattedOrder}
           </span>
           {isAdmin && (
-            <span
-              className={`text-[12px] font-bold px-2 py-0.5 rounded-full ${
+            <button
+              type="button"
+              onClick={handleToggleStatus}
+              className={`text-[12px] font-bold px-2.5 py-0.5 rounded-full border transition-all ${
                 pageStatus === 'published'
-                  ? 'bg-[#E6F2EF] text-[#0A4F43]'
-                  : 'bg-[#FFF1E6] text-[#8A3A14]'
+                  ? 'bg-[#E6F2EF] text-[#0A4F43] border-[#0E6B5A]/30'
+                  : 'bg-[#FFF1E6] text-[#8A3A14] border-[#F2B38A]'
               }`}
+              title="Bấm để đổi trạng thái"
             >
-              {pageStatus === 'published' ? 'Đang hiện' : 'Bản nháp'}
-            </span>
+              {pageStatus === 'published' ? '● Đang hiện' : '○ Bản nháp'}
+            </button>
           )}
         </div>
-        <h1 className="text-[30px] font-extrabold text-ink leading-[1.2]">
+        <h1 className="text-[28px] sm:text-[30px] font-extrabold text-ink leading-[1.2]">
           {page.title}
         </h1>
       </section>
@@ -314,11 +313,11 @@ export default function ContentViewer({
               key={block.id}
               className={`relative transition-all ${
                 isAdmin
-                  ? 'p-2.5 rounded-[24px] border-2 border-dashed border-[#2D5B94]/30 bg-white/40'
+                  ? 'p-2.5 rounded-[22px] border-2 border-dashed border-[#2D5B94]/30 bg-white/40'
                   : ''
               } ${!block.is_visible ? 'opacity-50' : ''}`}
             >
-              {/* Thanh điều khiển của Admin trên từng khối (Đúng như Screenshot 1) */}
+              {/* Thanh điều khiển của Admin trên từng khối */}
               {isAdmin && (
                 <div className="flex items-center justify-between pb-2 mb-2 border-b border-line/60">
                   <span className="text-[12px] font-extrabold text-muted uppercase tracking-wider">
@@ -435,24 +434,24 @@ export default function ContentViewer({
         })}
       </div>
 
-      {/* 5. Nút "+ Thêm nội dung" (Hiện khi ở chế độ Admin - Đúng như Screenshot 1) */}
+      {/* 5. Nút "+ Thêm nội dung" (Hiện khi ở chế độ Admin) */}
       {isAdmin && (
         <div className="flex flex-col gap-2 mt-2">
           <button
             type="button"
             onClick={() => setShowAddDrawer(true)}
-            className="flex items-center justify-center gap-2 h-[56px] min-h-[48px] w-full rounded-[18px] border-2 border-dashed border-primary bg-primary-soft/30 text-primary font-extrabold text-[18px] transition-transform active:scale-[0.98] shadow-2xs hover:bg-primary-soft/50"
+            className="flex items-center justify-center gap-2 h-[52px] min-h-[48px] w-full rounded-[16px] border-2 border-dashed border-primary bg-primary-soft/30 text-primary font-extrabold text-[17px] transition-transform active:scale-[0.98] shadow-2xs hover:bg-primary-soft/50"
           >
-            <Plus size={22} strokeWidth={2.5} />
+            <Plus size={20} strokeWidth={2.5} />
             <span>Thêm nội dung</span>
           </button>
 
           <button
             type="button"
             onClick={handleResetToDefault}
-            className="self-center flex items-center gap-1.5 text-[14px] text-muted hover:text-ink font-semibold mt-1 py-1"
+            className="self-center flex items-center gap-1.5 text-[13px] text-muted hover:text-ink font-semibold mt-1 py-1"
           >
-            <RotateCcw size={14} />
+            <RotateCcw size={13} />
             <span>Khôi phục dữ liệu mẫu ban đầu</span>
           </button>
         </div>
@@ -460,27 +459,29 @@ export default function ContentViewer({
 
       {/* 6. Cuối trang: Gợi ý theo lộ trình + Nút Tiếp theo */}
       <section className="flex flex-col gap-2 mt-6 pt-4 border-t border-line/60">
-        <p className="text-[16px] text-muted font-medium">
+        <p className="text-[15px] text-muted font-medium">
           Gợi ý theo lộ trình
         </p>
 
         {nextPage ? (
           <Link
             href={`/${topic.slug}/${nextPage.slug}`}
-            className="flex items-center justify-center gap-2.5 h-[64px] min-h-[48px] w-full rounded-[18px] bg-primary text-white font-extrabold text-[20px] transition-transform active:scale-[0.98] shadow-sm"
+            prefetch={true}
+            className="flex items-center justify-center gap-2 h-[58px] min-h-[48px] w-full rounded-[16px] bg-primary text-white font-extrabold text-[19px] transition-transform active:scale-[0.98] shadow-sm"
           >
             <span>
               Tiếp theo: {String(nextPageIndex).padStart(2, '0')} {nextPage.title}
             </span>
-            <ArrowRight size={22} strokeWidth={2.5} />
+            <ArrowRight size={20} strokeWidth={2.5} />
           </Link>
         ) : (
           <Link
             href={`/${topic.slug}`}
-            className="flex items-center justify-center gap-2.5 h-[64px] min-h-[48px] w-full rounded-[18px] bg-primary text-white font-extrabold text-[20px] transition-transform active:scale-[0.98] shadow-sm"
+            prefetch={true}
+            className="flex items-center justify-center gap-2 h-[58px] min-h-[48px] w-full rounded-[16px] bg-primary text-white font-extrabold text-[19px] transition-transform active:scale-[0.98] shadow-sm"
           >
             <span>Về danh sách {topic.title}</span>
-            <ArrowRight size={22} strokeWidth={2.5} />
+            <ArrowRight size={20} strokeWidth={2.5} />
           </Link>
         )}
       </section>

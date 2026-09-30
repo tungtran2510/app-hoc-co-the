@@ -67,7 +67,13 @@ export type Block =
       display_style: string;
       sort_order: number;
       is_visible: boolean;
-      data: { lines: string[]; format?: 'paragraph' | 'numbered' | 'bullet' };
+      data: {
+        lines: string[];
+        format?: 'paragraph' | 'numbered' | 'bullet';
+        images?: Image[];
+        files?: FileItem[];
+        videos?: Video[];
+      };
     }
   | {
       id: string;

@@ -6,8 +6,6 @@ import ContinueCard from '../components/ContinueCard';
 import TopicCard from '../components/TopicCard';
 import BottomNav from '../components/BottomNav';
 
-export const revalidate = 0;
-
 export default async function HomePage() {
   const [settings, topics, continueInfo] = await Promise.all([
     getSettings(),

@@ -4,10 +4,24 @@ import {
   getPageBySlug,
   getBlocksByPage,
   getPagesByTopic,
+  getTopics,
 } from '../../../lib/data';
 import ContentViewer from '../../../components/ContentViewer';
 
-export const revalidate = 0;
+export async function generateStaticParams() {
+  const topics = await getTopics();
+  const params: { topicSlug: string; pageSlug: string }[] = [];
+  for (const topic of topics) {
+    const pages = await getPagesByTopic(topic.id);
+    for (const page of pages) {
+      params.push({
+        topicSlug: topic.slug,
+        pageSlug: page.slug,
+      });
+    }
+  }
+  return params;
+}
 
 interface PageProps {
   params: {

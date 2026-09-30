@@ -9,34 +9,46 @@ interface ContinueCardProps {
 }
 
 export default function ContinueCard({ info }: ContinueCardProps) {
-  // Tiến độ: video 3 trên 4 => 75%
   const progressPercent = Math.round((info.video_index / info.video_total) * 100);
 
   return (
-    <div className="relative overflow-hidden rounded-[24px] bg-primary p-[22px] text-white shadow-sm">
-      {/* Hình minh họa cột sống bên phải mờ / lồng */}
-      <div className="absolute -right-2 -bottom-2 w-[140px] h-[190px] pointer-events-none opacity-90">
+    <Link
+      href={`/${info.topic_slug}/${info.page_slug}`}
+      className="group relative block overflow-hidden rounded-[20px] bg-gradient-to-br from-[#0E6B5A] to-[#0A4F43] p-4 text-white shadow-sm border border-primary-dark/40 transition-transform active:scale-[0.99]"
+      aria-label={`Xem tiếp ${info.topic_title} bài ${info.page_title}`}
+    >
+      {/* Hình minh họa chìm mờ tinh tế phía sau (không bị che nút hay đè chữ) */}
+      <div className="absolute -right-4 -bottom-6 w-[110px] h-[150px] pointer-events-none opacity-15">
         <SpineIllustration className="w-full h-full object-contain" />
       </div>
 
-      <div className="relative z-10 flex flex-col gap-[14px] pr-16 sm:pr-24">
-        {/* Dòng nhỏ: Xem tiếp · [Chủ đề] */}
-        <div className="flex items-center gap-1.5 text-on-primary-muted text-[16px] font-semibold">
-          <Clock size={18} strokeWidth={2.5} />
-          <span>
-            Xem tiếp · {info.topic_title}
+      <div className="relative z-10 flex flex-col gap-2.5">
+        {/* Dòng 1: Huy hiệu chủ đề + Vị trí video */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/12 text-on-primary-muted text-[13px] font-bold">
+            <Clock size={14} strokeWidth={2.5} />
+            <span>Xem tiếp · {info.topic_title}</span>
+          </div>
+
+          <span className="text-[13px] font-bold text-on-primary-muted">
+            Video {info.video_index}/{info.video_total}
           </span>
         </div>
 
-        {/* Tiêu đề trang: 01 · Tổng quan về cột sống */}
-        <h2 className="text-[24px] font-extrabold leading-[1.25] text-white">
-          {info.page_order_label} · {info.page_title}
-        </h2>
+        {/* Dòng 2: Tiêu đề trang gọn gàng & mô tả bài đang xem */}
+        <div className="flex flex-col gap-0.5">
+          <h2 className="text-[18px] sm:text-[19px] font-extrabold leading-snug text-white truncate">
+            {info.page_order_label} · {info.page_title}
+          </h2>
+          <p className="text-[14px] text-on-primary-muted font-normal truncate">
+            Đang ở: {info.video_title}
+          </p>
+        </div>
 
-        {/* Thanh tiến độ + Dòng vị trí */}
-        <div className="flex flex-col gap-1.5">
+        {/* Dòng 3: Thanh tiến độ thanh mảnh + Nút Xem tiếp nhỏ gọn */}
+        <div className="flex items-center justify-between gap-3 pt-0.5">
           <div
-            className="w-full h-[10px] bg-primary-track rounded-full overflow-hidden"
+            className="flex-1 h-[6px] bg-primary-track/80 rounded-full overflow-hidden"
             role="progressbar"
             aria-valuenow={progressPercent}
             aria-valuemin={0}
@@ -48,20 +60,13 @@ export default function ContinueCard({ info }: ContinueCardProps) {
               style={{ width: `${progressPercent}%` }}
             />
           </div>
-          <p className="text-[16px] text-on-primary-muted font-normal leading-normal">
-            Đang ở video {String(info.video_index).padStart(2, '0')} · {info.video_title}
-          </p>
-        </div>
 
-        {/* Nút Xem tiếp */}
-        <Link
-          href={`/${info.topic_slug}/${info.page_slug}`}
-          className="mt-1 flex items-center justify-center gap-2 h-[58px] min-h-[48px] w-full rounded-[16px] bg-white text-primary font-extrabold text-[20px] transition-transform active:scale-[0.98] shadow-sm"
-        >
-          <span>Xem tiếp</span>
-          <ArrowRight size={22} strokeWidth={2.5} />
-        </Link>
+          <div className="shrink-0 flex items-center gap-1 h-[34px] px-3.5 rounded-full bg-white text-primary text-[14px] font-extrabold shadow-2xs group-hover:bg-[#F6F4EF] transition-colors">
+            <span>Xem tiếp</span>
+            <ArrowRight size={16} strokeWidth={2.5} />
+          </div>
+        </div>
       </div>
-    </div>
+    </Link>
   );
 }
