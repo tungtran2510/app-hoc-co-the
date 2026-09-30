@@ -12,7 +12,7 @@ export async function GET() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: '#0E6B5A',
+          backgroundColor: '#1D58D8',
           borderRadius: 36,
         }}
       >

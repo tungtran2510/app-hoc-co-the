@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
       {
         workspace_id: syncKey,
         app_name: `Học viên: ${cleanPhone}`,
-        primary_color: '#0E6B5A',
+        primary_color: '#1D58D8',
         access_mode: 'OPEN',
         block_styles: { user_progress: mergedPayload },
         updated_at: new Date().toISOString(),

@@ -127,7 +127,7 @@ export default function TextBlock({
       id={blockId}
       className="w-full rounded-[22px] p-[18px] flex flex-col gap-2.5 transition-colors scroll-mt-20 block-styled-card"
       style={{
-        backgroundColor: style.bg || '#F1EEE6',
+        backgroundColor: style.bg || '#F1F5F9',
       }}
     >
       {/* Đầu thẻ: icon + nhãn IN HOA */}

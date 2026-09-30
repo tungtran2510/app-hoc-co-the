@@ -468,18 +468,21 @@ export function AuthorContactSection({
           {profile.phone && (
             <a
               href={`tel:${profile.phone.replace(/[^0-9+]/g, '')}`}
-              className="flex items-center justify-between p-3 px-3.5 rounded-[16px] bg-primary text-white hover:bg-primary-dark active:scale-[0.98] transition-all shadow-xs gap-2"
+              className="group relative flex items-center justify-between p-3 px-3.5 rounded-[18px] bg-gradient-to-r from-[#0F2A66] via-[#1D4ED8] to-[#2563EB] text-white hover:opacity-95 active:scale-[0.98] transition-all shadow-md border border-amber-300/40 overflow-hidden gap-2 cursor-pointer"
             >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-                  <Phone size={16} />
+              {/* Tia sáng vàng kim viền trên */}
+              <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-amber-300/60 to-transparent" />
+
+              <div className="flex items-center gap-2.5 min-w-0 z-10">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-200 to-amber-500 text-slate-900 flex items-center justify-center shrink-0 shadow-xs">
+                  <Phone size={16} strokeWidth={2.5} />
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[11px] text-white/80 font-medium leading-tight">Hotline tư vấn</span>
-                  <span className="text-[14px] sm:text-[15px] font-extrabold tracking-wide truncate">{profile.phone}</span>
+                  <span className="text-[11px] text-amber-200 font-bold uppercase tracking-wider leading-tight">Hotline tư vấn</span>
+                  <span className="text-[14.5px] sm:text-[15.5px] font-black tracking-wide truncate text-white drop-shadow-xs">{profile.phone}</span>
                 </div>
               </div>
-              <span className="text-[12px] font-bold px-2.5 py-1 rounded-[8px] bg-white/20 shrink-0 whitespace-nowrap">Gọi ngay</span>
+              <span className="z-10 text-[12px] font-black px-3 py-1 rounded-[9px] bg-gradient-to-b from-amber-300 to-amber-500 text-slate-900 shrink-0 whitespace-nowrap shadow-xs group-hover:scale-105 transition-transform">Gọi ngay</span>
             </a>
           )}
 

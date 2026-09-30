@@ -88,9 +88,12 @@ export default async function TopicPage({ params }: TopicPageProps) {
 
       {/* 2. Header Chủ đề: Tinh gọn, chuyên nghiệp, không chiếm diện tích */}
       {/* 2. Header Chủ đề: Thẻ Chuyên Đề Đào Tạo cao cấp chuẩn EdTech (Mockup 2) */}
-      <section className="w-full rounded-[24px] p-5 sm:p-6 bg-gradient-to-br from-[#06332A] via-[#0E6B5A] to-[#147D6A] text-white shadow-md border border-white/20 relative overflow-hidden flex flex-col gap-3">
+      <section className="w-full rounded-[24px] p-5 sm:p-6 bg-gradient-to-br from-[#0A1E5C] via-[#1D4ED8] to-[#2563EB] text-white shadow-lg border border-sky-300/40 relative overflow-hidden flex flex-col gap-3">
+        {/* Tia sáng vàng kim viền trên */}
+        <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-amber-300/60 to-transparent" />
+
         {/* Họa tiết trang trí nền */}
-        <div className="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-white/5 pointer-events-none blur-2xl" />
+        <div className="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-white/10 pointer-events-none blur-2xl" />
         <div className="absolute right-3 bottom-3 opacity-20 pointer-events-none">
           {topic.slug === 'cot-song' ? (
             <SpineIllustration className="w-24 h-24 text-white" />
@@ -136,7 +139,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
             <span className="text-white/80">Lộ trình {pages.length} bước</span>
           </div>
           <div className="w-full h-2 rounded-full bg-black/30 overflow-hidden p-0.5">
-            <div className="h-full rounded-full bg-emerald-300 w-1/3 transition-all duration-500" />
+            <div className="h-full rounded-full bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 shadow-[0_0_10px_rgba(251,191,36,0.9)] w-1/3 transition-all duration-500" />
           </div>
         </div>
       </section>

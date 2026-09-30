@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
       workspace_id: settings.workspace_id || existing?.workspace_id || 'default',
       app_name: settings.app_name ?? existing?.app_name ?? 'Sống Khỏe Mỗi Ngày',
       logo_url: settings.logo_url !== undefined ? settings.logo_url : (existing?.logo_url ?? null),
-      primary_color: settings.primary_color ?? existing?.primary_color ?? '#0E6B5A',
+      primary_color: settings.primary_color ?? existing?.primary_color ?? '#1D58D8',
       access_mode: settings.access_mode ?? existing?.access_mode ?? 'OPEN',
       block_styles: updatedBlockStyles,
       expert_title: settings.expert_title !== undefined ? settings.expert_title : (existing?.expert_title ?? null),

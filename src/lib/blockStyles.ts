@@ -25,7 +25,7 @@ export function getBlockStyle(styleKey: string, customStyles?: Record<string, Bl
   return {
     label: styleKey.toUpperCase(),
     icon: "FileText",
-    bg: "#F1EEE6",
+    bg: "#F1F5F9",
     fg: "#3A4250",
   };
 }

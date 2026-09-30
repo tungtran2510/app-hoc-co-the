@@ -292,7 +292,7 @@ export default function AddBlockDrawer({
                 onClick={() => createAndAdd('comparison', 'two_column')}
                 className="col-span-2 flex items-center justify-center gap-2.5 p-3 rounded-[16px] bg-gradient-to-r from-[#E6F2EF] to-[#FBE7E1] hover:opacity-95 transition-all font-bold text-[15px] border border-line shadow-2xs"
               >
-                <Columns2 size={20} className="text-[#0E6B5A] shrink-0" />
+                <Columns2 size={20} className="text-primary shrink-0" />
                 <span className="text-ink">So sánh 2 mặt (Đúng – Sai / Khỏe – Bệnh)</span>
               </button>
             </div>

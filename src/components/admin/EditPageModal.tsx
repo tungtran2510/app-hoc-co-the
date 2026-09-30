@@ -321,7 +321,7 @@ export default function EditPageModal({
                 onClick={() => setStatus('published')}
                 className={`h-11 rounded-[12px] font-bold text-[14px] border transition-all cursor-pointer ${
                   status === 'published'
-                    ? 'bg-[#E6F2EF] text-[#0A4F43] border-primary'
+                    ? 'bg-emerald-100 text-emerald-800 border-primary'
                     : 'bg-white border-line text-muted hover:border-line-strong'
                 }`}
               >

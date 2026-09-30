@@ -33,7 +33,7 @@ export default function AdminBar({
           onClick={onToggleStatus}
           className={`flex items-center gap-1.5 h-[36px] px-3 rounded-full text-[14px] font-bold transition-all ${
             isPublished
-              ? 'bg-[#E6F2EF] text-[#0A4F43]'
+              ? 'bg-emerald-100 text-emerald-800'
               : 'bg-[#FFF1E6] text-[#8A3A14]'
           }`}
           title="Bấm để đổi trạng thái trang"

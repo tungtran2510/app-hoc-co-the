@@ -658,7 +658,7 @@ export default function ContentViewer({
                 onClick={handleToggleStatus}
                 className={`text-[12px] font-bold px-2.5 py-0.5 rounded-full border transition-all ${
                   pageStatus === 'published'
-                    ? 'bg-[#E6F2EF] text-[#0A4F43] border-[#0E6B5A]/30'
+                    ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                     : 'bg-[#FFF1E6] text-[#8A3A14] border-[#F2B38A]'
                 }`}
                 title="Bấm để đổi trạng thái"
@@ -730,13 +730,13 @@ export default function ContentViewer({
           onClick={handleToggleCompleted}
           className={`flex items-center justify-center gap-2.5 h-[54px] min-h-[48px] w-full rounded-[18px] border-[1.5px] font-extrabold text-[16px] transition-all active:scale-[0.98] shadow-xs cursor-pointer ${
             isCompleted
-              ? 'bg-[#E6F2EF] text-[#0A4F43] border-[#0E6B5A]'
+              ? 'bg-emerald-50 text-emerald-800 border-emerald-500'
               : 'bg-white border-line text-ink hover:border-primary'
           }`}
         >
           {isCompleted ? (
             <>
-              <CheckCircle2 size={22} className="text-[#0E6B5A]" />
+              <CheckCircle2 size={22} className="text-emerald-600" />
               <span>Đã hiểu bài học này ✓</span>
             </>
           ) : (
@@ -887,7 +887,7 @@ export default function ContentViewer({
 
       {/* Thông báo chia sẻ / chép link */}
       {shareNoticeMsg && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full bg-[#0E6B5A] text-white font-extrabold text-[14px] shadow-lg animate-in fade-in slide-in-from-bottom-2">
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full bg-primary text-white font-extrabold text-[14px] shadow-lg animate-in fade-in slide-in-from-bottom-2">
           {shareNoticeMsg}
         </div>
       )}

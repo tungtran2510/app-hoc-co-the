@@ -14,10 +14,10 @@ interface ModernBookCoverProps {
 
 const LUXURY_PALETTES = [
   {
-    bg: 'from-[#0B463A] via-[#0E6B5A] to-[#062821]',
-    border: 'border-amber-300/40',
-    accent: 'text-amber-200',
-    badge: 'bg-amber-400/20 text-amber-100 border-amber-300/30',
+    bg: 'from-[#0A1E5C] via-[#1D4ED8] to-[#08123B]',
+    border: 'border-amber-400/40',
+    accent: 'text-amber-300',
+    badge: 'bg-amber-400/20 text-amber-200 border-amber-300/30',
   },
   {
     bg: 'from-[#0F1E36] via-[#1A335B] to-[#091322]',

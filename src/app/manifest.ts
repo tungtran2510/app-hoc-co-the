@@ -14,8 +14,8 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
     description: 'Ứng dụng học cấu trúc cơ thể và chăm sóc sức khỏe chủ động',
     start_url: '/',
     display: 'standalone',
-    background_color: '#F6F4EF',
-    theme_color: '#0E6B5A',
+    background_color: '#F8FAFC',
+    theme_color: '#1D58D8',
     lang: 'vi',
     icons: [
       {

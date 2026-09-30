@@ -126,7 +126,7 @@ export default function PageCard({
             >
               <div
                 className={`h-full rounded-full transition-all duration-300 ${
-                  isAllWatched ? 'bg-[#0E6B5A]' : 'bg-primary'
+                  isAllWatched ? 'bg-emerald-500' : 'bg-primary'
                 }`}
                 style={{ width: `${progressPercent}%` }}
               />

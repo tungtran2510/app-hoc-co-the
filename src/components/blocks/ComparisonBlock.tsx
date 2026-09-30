@@ -31,11 +31,11 @@ export default function ComparisonBlock({
   return (
     <div id={blockId} className="w-full scroll-mt-20">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-        {/* Cột 1: Nên làm / Bình thường (Màu xanh ngọc) */}
-        <div className="p-4 sm:p-5 rounded-[22px] bg-[#E6F2EF] border border-[#0E6B5A]/30 flex flex-col gap-3 shadow-2xs">
-          <div className="flex items-center gap-2 pb-2 border-b border-[#0E6B5A]/20">
-            <CheckCircle2 size={22} className="text-[#0E6B5A] shrink-0" strokeWidth={2.5} />
-            <h3 className="text-[16px] sm:text-[17px] font-extrabold text-[#0A4F43] uppercase tracking-wide leading-tight">
+        {/* Cột 1: Nên làm / Bình thường (Màu xanh lá y khoa chuẩn) */}
+        <div className="p-4 sm:p-5 rounded-[22px] bg-emerald-50 border border-emerald-300/60 flex flex-col gap-3 shadow-2xs">
+          <div className="flex items-center gap-2 pb-2 border-b border-emerald-200">
+            <CheckCircle2 size={22} className="text-emerald-600 shrink-0" strokeWidth={2.5} />
+            <h3 className="text-[16px] sm:text-[17px] font-extrabold text-emerald-950 uppercase tracking-wide leading-tight">
               {leftTitle}
             </h3>
           </div>
@@ -43,10 +43,10 @@ export default function ComparisonBlock({
           <ul className="flex flex-col gap-2.5">
             {leftLines.map((line, index) => (
               <li key={index} className="flex items-start gap-2.5">
-                <span className="w-5 h-5 rounded-full bg-[#0E6B5A]/15 text-[#0E6B5A] flex items-center justify-center shrink-0 mt-0.5">
+                <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
                   <Check size={13} strokeWidth={3} />
                 </span>
-                <span className={`${textSizeClass} text-[#0A4F43] font-medium leading-relaxed`}>
+                <span className={`${textSizeClass} text-emerald-950 font-medium leading-relaxed`}>
                   {line}
                 </span>
               </li>

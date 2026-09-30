@@ -197,9 +197,9 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
                     <div
                       className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center shrink-0 transition-transform ${
                         isCompleted
-                          ? 'bg-[#0E6B5A] text-white shadow-xs'
+                          ? 'bg-emerald-600 text-white shadow-xs'
                           : hasStarted
-                          ? 'bg-[#0E6B5A] text-white ring-4 ring-[#0E6B5A]/25 shadow-xs'
+                          ? 'bg-primary text-white ring-4 ring-primary/25 shadow-xs'
                           : 'bg-white border-2 border-line text-muted font-bold text-[12px] sm:text-[13px]'
                       }`}
                     >

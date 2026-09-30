@@ -100,7 +100,7 @@ export const sampleSettings: Settings = {
   app_name: 'Sống Khỏe Mỗi Ngày',
   app_subtitle: 'Kiến thức đúng · Sức khỏe bền vững',
   logo_url: null,
-  primary_color: '#0E6B5A',
+  primary_color: '#1D58D8',
   access_mode: 'OPEN',
   block_styles: {},
   expert_title: 'Hỗ trợ kiến thức nền tảng & Sức khỏe',

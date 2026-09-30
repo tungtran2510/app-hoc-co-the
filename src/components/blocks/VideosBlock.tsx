@@ -341,7 +341,7 @@ export default function VideosBlock({
                 <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors" />
 
                 <div className="relative z-10 w-[64px] h-[64px] sm:w-[72px] sm:h-[72px] rounded-full bg-white/95 flex items-center justify-center text-primary shadow-2xl transition-transform group-hover:scale-105 active:scale-95">
-                  <Play size={30} fill="#0E6B5A" className="ml-1 text-primary" />
+                  <Play size={30} fill="currentColor" className="ml-1 text-primary" />
                 </div>
 
                 <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between z-10 text-white text-[13px] sm:text-[14px] font-semibold bg-black/60 px-3 py-1.5 rounded-[10px] backdrop-blur-xs">
@@ -372,7 +372,7 @@ export default function VideosBlock({
               className="relative z-10 w-[76px] h-[76px] rounded-full bg-white flex items-center justify-center text-primary shadow-lg transition-transform active:scale-95"
               aria-label={`Phát video: ${currentVideo.title}`}
             >
-              <Play size={34} fill="#0E6B5A" className="ml-1 text-primary" />
+              <Play size={34} fill="currentColor" className="ml-1 text-primary" />
             </button>
 
             <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between z-10 text-white text-[15px] font-semibold bg-black/40 px-3 py-1.5 rounded-lg backdrop-blur-xs">
@@ -387,10 +387,10 @@ export default function VideosBlock({
 
       {/* Thông báo khi đã xem hết danh sách */}
       {isEndedPlaylist && (
-        <div className="p-3.5 rounded-[16px] bg-[#E6F2EF] border border-[#0E6B5A]/30 text-ink flex items-center justify-between gap-3 animate-in fade-in">
+        <div className="p-3.5 rounded-[16px] bg-primary-soft border border-primary/30 text-ink flex items-center justify-between gap-3 animate-in fade-in">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#0E6B5A]" />
-            <span className="text-[15px] font-bold text-[#0A4F43]">
+            <span className="w-2.5 h-2.5 rounded-full bg-primary" />
+            <span className="text-[15px] font-bold text-primary-dark">
               Đã xem hết danh sách
             </span>
           </div>
@@ -398,7 +398,7 @@ export default function VideosBlock({
           {nextPage && topicSlug ? (
             <Link
               href={`/${topicSlug}/${nextPage.slug}`}
-              className="flex items-center gap-1 text-[14px] font-extrabold text-[#0E6B5A] hover:underline"
+              className="flex items-center gap-1 text-[14px] font-extrabold text-primary hover:underline"
             >
               <span>
                 Tiếp theo: {String(nextPage.orderNumber).padStart(2, '0')} {nextPage.title}
@@ -433,7 +433,7 @@ export default function VideosBlock({
         </div>
         <div className="w-full h-2 rounded-full bg-line overflow-hidden p-0.5">
           <div
-            className="h-full rounded-full bg-[#0E6B5A] transition-all duration-500"
+            className="h-full rounded-full bg-primary transition-all duration-500"
             style={{
               width: `${Math.max(
                 Math.min(100, Math.round(((videos.filter((_, idx) => watchedList.includes(idx + 1)).length) / (videos.length || 1)) * 100)),
@@ -525,13 +525,13 @@ export default function VideosBlock({
                   {isActive ? (
                     <div className="absolute inset-0 bg-primary/40 flex items-center justify-center backdrop-blur-[0.5px]">
                       <div className="w-7 h-7 rounded-full bg-white text-primary flex items-center justify-center shadow-md ring-2 ring-white/80">
-                        <Play size={13} fill="#0E6B5A" className="ml-0.5 text-primary" />
+                        <Play size={13} fill="currentColor" className="ml-0.5 text-primary" />
                       </div>
                     </div>
                   ) : (
                     <div className="absolute inset-0 bg-black/25 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
                       <div className="w-6 h-6 rounded-full bg-white/90 text-primary flex items-center justify-center shadow-xs">
-                        <Play size={11} fill="#0E6B5A" className="ml-0.5 text-primary" />
+                        <Play size={11} fill="currentColor" className="ml-0.5 text-primary" />
                       </div>
                     </div>
                   )}
@@ -543,7 +543,7 @@ export default function VideosBlock({
 
                   {/* Huy hiệu Đã xem góc trên bên trái */}
                   {isWatched && (
-                    <div className="absolute top-1 left-1 w-5 h-5 rounded-full bg-[#0E6B5A] text-white flex items-center justify-center shadow-xs" title="Đã học">
+                    <div className="absolute top-1 left-1 w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-xs" title="Đã học">
                       <Check size={12} strokeWidth={3} />
                     </div>
                   )}
@@ -560,7 +560,7 @@ export default function VideosBlock({
                         ● ĐANG PHÁT
                       </span>
                     ) : isWatched ? (
-                      <span className="text-[9.5px] font-bold text-[#0E6B5A] bg-[#E6F2EF] px-1.5 py-0.2 rounded-sm">
+                      <span className="text-[9.5px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded-sm">
                         ĐÃ XEM
                       </span>
                     ) : null}

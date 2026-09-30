@@ -939,28 +939,28 @@ export default function EditBlockModal({
           {block.type === 'comparison' && (
             <div className="flex flex-col gap-4">
               {/* Cột 1: Bên trái */}
-              <div className="p-3.5 rounded-[18px] bg-[#E6F2EF] border border-[#0E6B5A]/30 flex flex-col gap-2.5 shadow-2xs">
-                <label className="text-[13px] font-extrabold text-[#0A4F43] uppercase tracking-wide">
-                  Cột 1: Nên làm / Bình thường (Màu xanh ngọc)
+              <div className="p-3.5 rounded-[18px] bg-emerald-50 border border-emerald-300 flex flex-col gap-2.5 shadow-2xs">
+                <label className="text-[13px] font-extrabold text-emerald-950 uppercase tracking-wide">
+                  Cột 1: Nên làm / Bình thường (Màu xanh lá)
                 </label>
                 <div className="flex flex-col gap-1">
-                  <span className="text-[12px] font-bold text-[#0A4F43]">Tiêu đề cột 1:</span>
+                  <span className="text-[12px] font-bold text-emerald-950">Tiêu đề cột 1:</span>
                   <input
                     type="text"
                     value={leftTitle}
                     onChange={(e) => setLeftTitle(e.target.value)}
                     placeholder="Ví dụ: Nên làm / Đốt sống khỏe"
-                    className="w-full h-10 px-3 rounded-[10px] bg-white border border-[#0E6B5A]/30 text-[15px] font-bold text-[#0A4F43] focus:border-primary"
+                    className="w-full h-10 px-3 rounded-[10px] bg-white border border-emerald-300 text-[15px] font-bold text-emerald-950 focus:border-primary"
                   />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-[12px] font-bold text-[#0A4F43]">Các ý (mỗi dòng một ý):</span>
+                  <span className="text-[12px] font-bold text-emerald-950">Các ý (mỗi dòng một ý):</span>
                   <textarea
                     rows={4}
                     value={leftLinesText}
                     onChange={(e) => setLeftLinesText(e.target.value)}
                     placeholder="Nhập các ý cần làm, mỗi dòng một ý..."
-                    className="w-full p-3 rounded-[10px] bg-white border border-[#0E6B5A]/30 text-[15px] text-ink leading-relaxed"
+                    className="w-full p-3 rounded-[10px] bg-white border border-emerald-300 text-[15px] text-ink leading-relaxed"
                   />
                 </div>
               </div>
