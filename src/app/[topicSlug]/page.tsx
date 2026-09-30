@@ -60,29 +60,15 @@ export default async function TopicPage({ params }: TopicPageProps) {
       const blocks = await getBlocksByPage(page.id);
       let count = 0;
       for (const b of blocks) {
-        if (b.type === 'videos') {
+        if (b.type === 'videos' && Array.isArray(b.data?.videos)) {
           count += b.data.videos.length;
         }
       }
-      const displayCount =
-        page.slug === 'tong-quan-ve-cot-song'
-          ? 4
-          : page.slug === 'dia-dem'
-          ? 5
-          : page.slug === 'co-gan-day-chang'
-          ? 6
-          : page.slug === 'than-kinh'
-          ? 4
-          : page.slug === 'tu-the-va-van-dong'
-          ? 5
-          : page.slug === 'cac-van-de-thuong-gap'
-          ? 7
-          : Math.max(count, 1);
 
       return {
         page,
         orderNumber: index + 1,
-        videoCount: displayCount,
+        videoCount: count,
       };
     })
   );

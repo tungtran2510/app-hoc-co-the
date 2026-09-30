@@ -24,17 +24,20 @@ export default function PageCard({
 }: PageCardProps) {
   const formattedOrder = String(orderNumber).padStart(2, '0');
 
-  const count = videoCount || 1;
+  const count = typeof videoCount === 'number' ? videoCount : 0;
   const watchedCount = watchedVideos.length;
   const isAllWatched = count > 0 && watchedCount >= count;
   const hasStarted = isCompleted || watchedCount > 0 || (lastVideo !== undefined && lastVideo > 0);
 
-  let subtitle = `${count} video · Chưa xem`;
+  let subtitle = count > 0 ? `${count} video · Chưa xem` : `Bài học · Chưa xem`;
   let progressPercent = 0;
 
   if (isCompleted || isAllWatched) {
     subtitle = `Đã hiểu bài học ✓`;
     progressPercent = 100;
+  } else if (count === 0) {
+    subtitle = hasStarted ? `Đang học bài` : `Bài học lý thuyết`;
+    progressPercent = hasStarted ? 50 : 0;
   } else if (hasStarted) {
     const currentVideo = lastVideo || (watchedVideos.length > 0 ? Math.max(...watchedVideos) : 1);
     subtitle = `${count} video · Đang ở video ${String(currentVideo).padStart(2, '0')}`;
