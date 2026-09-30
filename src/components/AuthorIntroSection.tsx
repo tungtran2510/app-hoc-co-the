@@ -114,32 +114,7 @@ export function AuthorProfileSection({
           </div>
         </div>
 
-        {/* 2. Nút hành động trực diện: Nhắn Zalo & Gọi Hotline */}
-        <div className="relative z-10 flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-line">
-          {profile.zalo_url && (
-            <a
-              href={profile.zalo_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="h-10 px-4 rounded-full bg-[#0068FF] hover:bg-[#0055D4] text-white font-extrabold text-[13px] flex items-center gap-1.5 shadow-xs active:scale-[0.98] transition-all cursor-pointer"
-            >
-              <div className="w-4.5 h-4.5 rounded-full bg-white text-[#0068FF] flex items-center justify-center font-black text-[9px]">
-                Zalo
-              </div>
-              <span>Nhắn Zalo tư vấn 1-1</span>
-            </a>
-          )}
-
-          {profile.phone && (
-            <a
-              href={`tel:${profile.phone.replace(/[^0-9+]/g, '')}`}
-              className="text-[13.5px] font-bold text-ink hover:text-primary transition-colors flex items-center gap-1 py-1"
-            >
-              <span className="text-muted font-normal">Hotline:</span>
-              <span className="font-extrabold text-[#7A4B00]">{profile.phone}</span>
-            </a>
-          )}
-        </div>
+        {/* ĐÃ BỎ NÚT ZALO VÀ HOTLINE THEO YÊU CẦU CỦA BẠN */}
 
         {/* Ảnh minh họa thêm (nếu có) */}
         {profile.intro_image_url && (
