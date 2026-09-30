@@ -1,4 +1,4 @@
-import { Block, Page, Topic, Settings } from './types';
+import { Block, Page, Topic, Settings, AuthorProfile } from './types';
 
 export async function saveBlockApi(block: Block): Promise<{ success: boolean; error?: string; block?: Block }> {
   try {
@@ -102,7 +102,9 @@ export async function deleteTopicApi(topicId: string): Promise<{ success: boolea
   }
 }
 
-export async function saveSettingsApi(settings: Partial<Settings>): Promise<{ success: boolean; error?: string; settings?: Settings }> {
+export async function saveSettingsApi(
+  settings: Partial<Omit<Settings, 'author_profile'>> & { author_profile?: Partial<AuthorProfile> | null }
+): Promise<{ success: boolean; error?: string; settings?: Settings }> {
   try {
     const res = await fetch('/api/admin/save-settings', {
       method: 'POST',

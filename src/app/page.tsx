@@ -27,7 +27,13 @@ export default async function HomePage() {
   return (
     <main className="flex-1 flex flex-col px-4 sm:px-5 pt-3 pb-28 gap-4 sm:gap-5">
       {/* 1. Thanh đầu trang: Logo + Tên App + Quản trị */}
-      <HomeHeader initialAppName={settings.app_name} initialLogoUrl={settings.logo_url} />
+      <HomeHeader
+        initialAppName={settings.app_name}
+        initialAppSubtitle={settings.app_subtitle}
+        initialLogoUrl={settings.logo_url}
+        initialHotline={settings.hotline}
+        initialZaloUrl={settings.zalo_url}
+      />
 
       {/* 2 & 3. Lời chào, Tiêu đề chính & Ô tìm kiếm (có nút sửa cho Quản trị viên) */}
       <HomeGreetingSection

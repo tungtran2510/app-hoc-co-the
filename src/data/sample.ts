@@ -97,6 +97,7 @@ Nguyên tắc điều trị: Giảm áp lực nén ép xấu -> Tăng cường t
 export const sampleSettings: Settings = {
   workspace_id: 'default',
   app_name: 'Sống Khỏe Mỗi Ngày',
+  app_subtitle: 'Kiến thức đúng · Sức khỏe bền vững',
   logo_url: null,
   primary_color: '#0E6B5A',
   access_mode: 'OPEN',

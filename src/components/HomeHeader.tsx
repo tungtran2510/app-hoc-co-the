@@ -26,14 +26,26 @@ import { getUserPhone, LEARNING_PROGRESS_EVENT } from '../lib/userSync';
 
 interface HomeHeaderProps {
   initialAppName: string;
+  initialAppSubtitle?: string | null;
   initialLogoUrl?: string | null;
+  initialHotline?: string | null;
+  initialZaloUrl?: string | null;
 }
 
-export default function HomeHeader({ initialAppName, initialLogoUrl }: HomeHeaderProps) {
+export default function HomeHeader({
+  initialAppName,
+  initialAppSubtitle = 'Kiến thức đúng · Sức khỏe bền vững',
+  initialLogoUrl,
+  initialHotline,
+  initialZaloUrl,
+}: HomeHeaderProps) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [supabaseOk, setSupabaseOk] = useState(false);
   const [appName, setAppName] = useState(initialAppName);
+  const [appSubtitle, setAppSubtitle] = useState(initialAppSubtitle || 'Kiến thức đúng · Sức khỏe bền vững');
   const [logoUrl, setLogoUrl] = useState<string | null>(initialLogoUrl || null);
+  const [hotline, setHotline] = useState<string | null>(initialHotline || null);
+  const [zaloUrl, setZaloUrl] = useState<string | null>(initialZaloUrl || null);
   const [showSettings, setShowSettings] = useState(false);
   const [showEditApp, setShowEditApp] = useState(false);
   const [showPwaInstall, setShowPwaInstall] = useState(false);
@@ -47,13 +59,11 @@ export default function HomeHeader({ initialAppName, initialLogoUrl }: HomeHeade
       setIsAdmin(isAdmin);
       setSupabaseOk(supabaseOk);
     });
-    const stored = getStoredAppSettings();
-    if (stored.app_name) {
-      setAppName(stored.app_name);
-    }
-    if (initialLogoUrl) {
-      setLogoUrl(initialLogoUrl);
-    }
+    setAppName(initialAppName);
+    if (initialAppSubtitle) setAppSubtitle(initialAppSubtitle);
+    if (initialLogoUrl) setLogoUrl(initialLogoUrl);
+    if (initialHotline) setHotline(initialHotline);
+    if (initialZaloUrl) setZaloUrl(initialZaloUrl);
     const p = getUserPhone();
     setUserPhone(p);
 
@@ -190,7 +200,7 @@ export default function HomeHeader({ initialAppName, initialLogoUrl }: HomeHeade
               )}
             </div>
             <span className="text-[11px] sm:text-[12px] text-muted font-medium leading-tight whitespace-nowrap mt-0.5">
-              Kiến thức đúng · Sức khỏe bền vững
+              {appSubtitle || 'Kiến thức đúng · Sức khỏe bền vững'}
             </span>
           </div>
         </div>
@@ -371,11 +381,18 @@ export default function HomeHeader({ initialAppName, initialLogoUrl }: HomeHeade
         <EditAppModal
           isOpen={true}
           initialName={appName}
+          initialSubtitle={appSubtitle}
           initialLogoUrl={logoUrl}
+          initialHotline={hotline || ''}
+          initialZaloUrl={zaloUrl || ''}
           onClose={() => setShowEditApp(false)}
-          onSaved={(newName, newLogo) => {
+          onSaved={(newName, newSubtitle, newLogo, newHotline, newZalo) => {
             setAppName(newName);
+            setAppSubtitle(newSubtitle);
             setLogoUrl(newLogo);
+            setHotline(newHotline);
+            setZaloUrl(newZalo);
+            window.location.reload();
           }}
         />
       )}

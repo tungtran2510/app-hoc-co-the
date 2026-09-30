@@ -9,36 +9,47 @@ import { getStoredAppSettings, saveStoredAppSettings } from '../../lib/storage';
 interface EditAppModalProps {
   isOpen: boolean;
   initialName: string;
+  initialSubtitle?: string | null;
   initialLogoUrl?: string | null;
+  initialHotline?: string | null;
+  initialZaloUrl?: string | null;
   onClose: () => void;
-  onSaved: (newName: string, newLogoUrl: string | null) => void;
+  onSaved: (
+    newName: string,
+    newSubtitle: string,
+    newLogoUrl: string | null,
+    newHotline: string,
+    newZaloUrl: string
+  ) => void;
 }
 
 export default function EditAppModal({
   isOpen,
   initialName,
+  initialSubtitle = 'Kiến thức đúng · Sức khỏe bền vững',
   initialLogoUrl = null,
+  initialHotline = '',
+  initialZaloUrl = '',
   onClose,
   onSaved,
 }: EditAppModalProps) {
   const [appName, setAppName] = useState(initialName);
+  const [appSubtitle, setAppSubtitle] = useState(initialSubtitle || 'Kiến thức đúng · Sức khỏe bền vững');
   const [logoUrl, setLogoUrl] = useState<string | null>(initialLogoUrl);
-  const [zaloUrl, setZaloUrl] = useState('');
-  const [hotline, setHotline] = useState('');
+  const [zaloUrl, setZaloUrl] = useState(initialZaloUrl || '');
+  const [hotline, setHotline] = useState(initialHotline || '');
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
-    try {
-      const stored = getStoredAppSettings();
-      if (stored.zalo_url) setZaloUrl(stored.zalo_url);
-      if (stored.hotline) setHotline(stored.hotline);
-    } catch {
-      // Bỏ qua
-    }
-  }, []);
+    setAppName(initialName);
+    setAppSubtitle(initialSubtitle || 'Kiến thức đúng · Sức khỏe bền vững');
+    setLogoUrl(initialLogoUrl || null);
+    setZaloUrl(initialZaloUrl || '');
+    setHotline(initialHotline || '');
+  }, [isOpen, initialName, initialSubtitle, initialLogoUrl, initialHotline, initialZaloUrl]);
 
   if (!isOpen) return null;
 
@@ -72,23 +83,36 @@ export default function EditAppModal({
     try {
       setIsSaving(true);
       setErrorMsg('');
+
+      const cleanName = appName.trim();
+      const cleanSubtitle = appSubtitle.trim() || 'Kiến thức đúng · Sức khỏe bền vững';
+      const cleanHotline = hotline.trim();
+      const cleanZalo = zaloUrl.trim();
+
       const res = await saveSettingsApi({
-        app_name: appName.trim(),
+        app_name: cleanName,
+        app_subtitle: cleanSubtitle,
         logo_url: logoUrl,
+        hotline: cleanHotline || null,
+        zalo_url: cleanZalo || null,
+        author_profile: {
+          phone: cleanHotline || null,
+          zalo_url: cleanZalo || null,
+        },
       });
+
+      if (!res.success) {
+        throw new Error(res.error || 'Chưa lưu được cài đặt, thử lại');
+      }
 
       await saveStoredAppSettings({
-        app_name: appName.trim(),
-        zalo_url: zaloUrl.trim(),
-        hotline: hotline.trim(),
+        app_name: cleanName,
+        zalo_url: cleanZalo,
+        hotline: cleanHotline,
       });
 
-      if (res.success) {
-        onSaved(appName.trim(), logoUrl);
-        onClose();
-      } else {
-        setErrorMsg(res.error || 'Chưa lưu được cài đặt, thử lại');
-      }
+      onSaved(cleanName, cleanSubtitle, logoUrl, cleanHotline, cleanZalo);
+      onClose();
     } catch (err: any) {
       setErrorMsg(err.message || 'Lỗi kết nối máy chủ.');
     } finally {
@@ -139,6 +163,23 @@ export default function EditAppModal({
               className="w-full h-11 px-3.5 rounded-[12px] border border-line text-[16px] text-ink font-bold focus:border-primary"
               required
             />
+          </div>
+
+          {/* Khẩu hiệu / Phụ đề trang chủ */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[14px] font-bold text-ink">
+              Khẩu hiệu / Phụ đề trang chủ
+            </label>
+            <input
+              type="text"
+              value={appSubtitle}
+              onChange={(e) => setAppSubtitle(e.target.value)}
+              placeholder="Kiến thức đúng · Sức khỏe bền vững"
+              className="w-full h-11 px-3.5 rounded-[12px] border border-line text-[15px] text-ink font-semibold focus:border-primary"
+            />
+            <span className="text-[12px] text-muted">
+              Dòng chữ nhỏ hiển thị ngay dưới tên ứng dụng ở thanh đầu trang.
+            </span>
           </div>
 
           {/* Logo ứng dụng */}

@@ -63,6 +63,7 @@ export interface AiTrainingConfig {
 export interface Settings {
   workspace_id: string;
   app_name: string;
+  app_subtitle?: string | null;
   logo_url: string | null;
   primary_color: string;
   access_mode: AccessMode;

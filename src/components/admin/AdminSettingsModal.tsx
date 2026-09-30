@@ -17,6 +17,7 @@ import {
   AppCustomSettings,
 } from '../../lib/storage';
 import { logoutAdmin } from '../../lib/adminAuth';
+import { saveSettingsApi } from '../../lib/apiAdmin';
 
 interface AdminSettingsModalProps {
   isOpen: boolean;
@@ -101,12 +102,30 @@ export default function AdminSettingsModal({
   if (!isOpen) return null;
 
   const handleSaveSettings = async () => {
-    await saveStoredAppSettings(settings);
-    setSaveSuccessMsg('Đã lưu cài đặt thành công!');
-    setTimeout(() => {
-      setSaveSuccessMsg('');
-      if (onSettingsSaved) onSettingsSaved();
-    }, 1200);
+    try {
+      await saveStoredAppSettings(settings);
+      const res = await saveSettingsApi({
+        app_name: settings.app_name?.trim(),
+        expert_title: settings.expert_title?.trim() || null,
+        hotline: settings.hotline?.trim() || null,
+        zalo_url: settings.zalo_url?.trim() || null,
+        author_profile: {
+          phone: settings.hotline?.trim() || null,
+          zalo_url: settings.zalo_url?.trim() || null,
+        },
+      });
+      if (!res.success) {
+        throw new Error(res.error || 'Chưa lưu được cài đặt');
+      }
+      setSaveSuccessMsg('Đã lưu cài đặt thành công vào hệ thống!');
+      setTimeout(() => {
+        setSaveSuccessMsg('');
+        if (onSettingsSaved) onSettingsSaved();
+        window.location.reload();
+      }, 1000);
+    } catch (err: any) {
+      alert(err.message || 'Lỗi khi lưu cài đặt vào hệ thống.');
+    }
   };
 
   const handleExportBackup = async () => {

@@ -148,6 +148,7 @@ export async function getSettings(): Promise<Settings> {
         if (data) {
           return {
             ...data,
+            app_subtitle: data.app_subtitle || data.block_styles?.app_subtitle || 'Kiến thức đúng · Sức khỏe bền vững',
             author_profile: normalizeAuthorProfile(data.author_profile),
             home_greeting: data.home_greeting || data.block_styles?.home_greeting || 'Xin chào!',
             home_title: data.home_title || data.block_styles?.home_title || 'Hôm nay mình học gì?',
