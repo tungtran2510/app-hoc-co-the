@@ -488,75 +488,118 @@ export default function VideosBlock({
 
       {/* 3. NỘI DUNG THEO TAB */}
       {currentTab === 'syllabus' && (
-        <div className="flex flex-col gap-2 mt-2 animate-in fade-in duration-150">
+        <div className="flex flex-col gap-2.5 mt-2 animate-in fade-in duration-150">
           {videos.map((vid, idx) => {
             const isActive = idx === safeIndex;
             const isWatched = watchedList.includes(idx + 1);
+            const thumbUrl =
+              vid.thumbnail_url ||
+              (vid.youtube_id ? `https://i.ytimg.com/vi/${vid.youtube_id}/hqdefault.jpg` : null);
 
             return (
               <div
                 key={idx}
                 onClick={() => handleSelectVideo(idx)}
-                className={`w-full flex items-center justify-between gap-3 p-3.5 sm:p-4 rounded-[16px] text-left transition-all cursor-pointer ${
+                className={`w-full flex items-center gap-3 p-2.5 sm:p-3 rounded-[16px] text-left transition-all cursor-pointer group active:scale-[0.99] ${
                   isActive
-                    ? 'bg-primary-soft/90 border-[1.5px] border-primary shadow-xs'
-                    : 'bg-white border border-line hover:border-line-strong'
+                    ? 'bg-primary-soft/90 border-[1.5px] border-primary shadow-xs ring-1 ring-primary/20'
+                    : 'bg-white border border-line hover:border-line-strong hover:shadow-2xs'
                 }`}
                 role="button"
                 tabIndex={0}
               >
-                <div className="flex items-center gap-3 min-w-0 flex-1">
-                  {/* Icon trạng thái */}
-                  {isWatched ? (
-                    <div className="w-7 h-7 rounded-full bg-[#0E6B5A] text-white flex items-center justify-center shrink-0 shadow-2xs">
-                      <Check size={15} strokeWidth={3} />
+                {/* 1. KHUNG ẢNH THUMBNAIL VIDEO (16:9) */}
+                <div className="relative w-[114px] sm:w-[126px] aspect-video rounded-[10px] overflow-hidden bg-ink shrink-0 border border-black/10 shadow-2xs">
+                  {thumbUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={thumbUrl}
+                      alt={vid.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-surface-3 text-muted">
+                      <Play size={20} className="text-muted/60" />
                     </div>
-                  ) : isActive ? (
-                    <div className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center shrink-0 shadow-xs ring-4 ring-primary/20">
-                      <Play size={12} fill="white" className="ml-0.5" />
+                  )}
+
+                  {/* Lớp phủ & Nút Play khi Active hoặc Hover */}
+                  {isActive ? (
+                    <div className="absolute inset-0 bg-primary/40 flex items-center justify-center backdrop-blur-[0.5px]">
+                      <div className="w-7 h-7 rounded-full bg-white text-primary flex items-center justify-center shadow-md ring-2 ring-white/80">
+                        <Play size={13} fill="#0E6B5A" className="ml-0.5 text-primary" />
+                      </div>
                     </div>
                   ) : (
-                    <div className="w-7 h-7 rounded-full bg-surface-2 text-muted font-black text-[12px] flex items-center justify-center shrink-0 border border-line">
-                      {String(idx + 1).padStart(2, '0')}
+                    <div className="absolute inset-0 bg-black/25 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                      <div className="w-6 h-6 rounded-full bg-white/90 text-primary flex items-center justify-center shadow-xs">
+                        <Play size={11} fill="#0E6B5A" className="ml-0.5 text-primary" />
+                      </div>
                     </div>
                   )}
 
-                  {/* Tiêu đề & Huy hiệu */}
-                  <div className="flex flex-col gap-0.5 min-w-0">
-                    {isActive && (
-                      <span className="w-fit text-[9.5px] font-black uppercase tracking-wider text-primary bg-white/80 px-1.5 py-0.2 rounded border border-primary/25">
-                        ĐANG HỌC
-                      </span>
-                    )}
-                    <h4 className={`text-[15px] sm:text-[15.5px] font-bold leading-snug line-clamp-1 ${
-                      isActive ? 'text-primary' : 'text-ink'
-                    }`}>
-                      {vid.title}
-                    </h4>
-                  </div>
-                </div>
-
-                {/* Thời lượng & Nút Admin */}
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-[12.5px] sm:text-[13px] text-muted font-bold">
+                  {/* Thời lượng video ở góc dưới bên phải thumbnail */}
+                  <div className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded-[4px] bg-black/75 backdrop-blur-xs text-white text-[10px] font-bold tracking-tight">
                     {vid.duration_text || '05:00'}
-                  </span>
+                  </div>
 
-                  {isAdmin && onOpenVideoManager && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onOpenVideoManager();
-                      }}
-                      className="text-muted hover:text-primary p-1 rounded-sm hover:bg-surface-2 cursor-pointer"
-                      aria-label="Sửa video"
-                      title="Sửa video"
-                    >
-                      <MoreVertical size={16} />
-                    </button>
+                  {/* Huy hiệu Đã xem góc trên bên trái */}
+                  {isWatched && (
+                    <div className="absolute top-1 left-1 w-5 h-5 rounded-full bg-[#0E6B5A] text-white flex items-center justify-center shadow-xs" title="Đã học">
+                      <Check size={12} strokeWidth={3} />
+                    </div>
                   )}
                 </div>
+
+                {/* 2. NỘI DUNG CHI TIẾT: SỐ THỨ TỰ, TIÊU ĐỀ, TRẠNG THÁI */}
+                <div className="flex flex-col gap-1 min-w-0 flex-1 justify-center py-0.5">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-muted">
+                      VIDEO {String(idx + 1).padStart(2, '0')}
+                    </span>
+                    {isActive ? (
+                      <span className="text-[9.5px] font-black uppercase tracking-wider text-primary bg-primary-soft border border-primary/25 px-1.5 py-0.2 rounded-sm">
+                        ● ĐANG PHÁT
+                      </span>
+                    ) : isWatched ? (
+                      <span className="text-[9.5px] font-bold text-[#0E6B5A] bg-[#E6F2EF] px-1.5 py-0.2 rounded-sm">
+                        ĐÃ XEM
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <h4
+                    className={`text-[13.5px] sm:text-[14.5px] font-bold leading-snug line-clamp-2 transition-colors ${
+                      isActive ? 'text-primary' : 'text-ink group-hover:text-primary'
+                    }`}
+                    title={vid.title}
+                  >
+                    {vid.title}
+                  </h4>
+
+                  {vid.description && (
+                    <p className="text-[11.5px] text-muted line-clamp-1 font-normal">
+                      {vid.description}
+                    </p>
+                  )}
+                </div>
+
+                {/* 3. NÚT ADMIN SỬA VIDEO (NẾU CÓ) */}
+                {isAdmin && onOpenVideoManager && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpenVideoManager();
+                    }}
+                    className="text-muted hover:text-primary p-2 rounded-lg hover:bg-surface-2 cursor-pointer shrink-0 self-center"
+                    aria-label="Sửa video"
+                    title="Sửa video"
+                  >
+                    <MoreVertical size={16} />
+                  </button>
+                )}
               </div>
             );
           })}
