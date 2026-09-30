@@ -16,6 +16,7 @@ import RecommendedBooksSection from './RecommendedBooksSection';
 import ReorderHomeSectionsModal from './admin/ReorderHomeSectionsModal';
 import EditAuthorModal from './admin/EditAuthorModal';
 import BookDetailModal from './BookDetailModal';
+import HomeContinueSection from './HomeContinueSection';
 
 interface HomeSectionsClientProps {
   initialSectionsOrder?: string[] | null;
@@ -106,16 +107,28 @@ export default function HomeSectionsClient({
       {sectionsOrder.map((sectionKey, index) => {
         if (sectionKey === 'topics') {
           return (
-            <TopicListClient
-              key="topics"
-              initialTopics={topicsWithCounts}
-              initialTopicsTitle={topicsTitle}
-              sectionIndex={index}
-              totalSections={sectionsOrder.length}
-              onMoveUp={() => handleMoveSection(index, 'up')}
-              onMoveDown={() => handleMoveSection(index, 'down')}
-              onOpenReorderModal={() => setShowReorderModal(true)}
-            />
+            <React.Fragment key="topics">
+              <TopicListClient
+                initialTopics={topicsWithCounts}
+                initialTopicsTitle={topicsTitle}
+                sectionIndex={index}
+                totalSections={sectionsOrder.length}
+                onMoveUp={() => handleMoveSection(index, 'up')}
+                onMoveDown={() => handleMoveSection(index, 'down')}
+                onOpenReorderModal={() => setShowReorderModal(true)}
+              />
+
+              {/* Khối Hoạt động gần đây (Recent Activity theo chuẩn ảnh tham chiếu iPhone) */}
+              <div className="flex flex-col gap-2 mt-1">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-[17.5px] sm:text-[18.5px] font-black text-slate-900 tracking-tight">
+                    Hoạt động gần đây
+                  </h3>
+                  <span className="text-[11.5px] font-bold text-blue-600">Đang học dở</span>
+                </div>
+                <HomeContinueSection />
+              </div>
+            </React.Fragment>
           );
         }
 

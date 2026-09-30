@@ -33,14 +33,20 @@ export default function TopicListClient({
   onOpenReorderModal,
 }: TopicListClientProps) {
   const [topicsWithCounts, setTopicsWithCounts] = useState(initialTopics);
-  const [topicsTitle, setTopicsTitle] = useState(initialTopicsTitle || 'Chọn chủ đề');
+  const [topicsTitle, setTopicsTitle] = useState(
+    initialTopicsTitle && initialTopicsTitle !== 'Chọn chủ đề' ? initialTopicsTitle : 'Chuyên Đề Học'
+  );
   const [isAdmin, setIsAdmin] = useState(false);
   const [editingTopic, setEditingTopic] = useState<Topic | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
     checkIsAdminClient().then((admin) => setIsAdmin(admin));
-    if (initialTopicsTitle) setTopicsTitle(initialTopicsTitle);
+    if (initialTopicsTitle && initialTopicsTitle !== 'Chọn chủ đề') {
+      setTopicsTitle(initialTopicsTitle);
+    } else {
+      setTopicsTitle('Chuyên Đề Học');
+    }
 
     const handleTextsUpdated = (e: any) => {
       if (e.detail?.topicsTitle) {
@@ -127,8 +133,8 @@ export default function TopicListClient({
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-[19px] sm:text-[21px] font-bold font-serif tracking-wider uppercase text-ink leading-tight">
-          {topicsTitle}
+        <h2 className="text-[19px] sm:text-[20px] font-black text-slate-900 tracking-tight leading-tight">
+          {topicsTitle || 'Chuyên Đề Học'}
         </h2>
 
         <div className="flex items-center gap-2 shrink-0">

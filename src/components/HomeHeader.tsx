@@ -11,7 +11,6 @@ import {
   Smartphone,
   LogOut,
   Edit2,
-  X,
   Sparkles,
   Bell,
   Search,
@@ -110,7 +109,7 @@ export default function HomeHeader({
     <>
       {/* Thanh đen Admin ở Trang chủ (hiện khi là Admin) */}
       {isAdmin && (
-        <div className="w-full flex items-center justify-between px-3.5 py-2 rounded-[14px] bg-black/90 text-white text-[13px] font-bold shadow-md -mb-2">
+        <div className="w-full flex items-center justify-between px-3.5 py-2 rounded-[14px] bg-black/90 text-white text-[13px] font-bold shadow-md -mb-1">
           <div className="flex items-center gap-2">
             <span
               className={`w-2 h-2 rounded-full shrink-0 ${
@@ -158,100 +157,113 @@ export default function HomeHeader({
         </div>
       )}
 
-      {/* Header chính */}
-      <header className="relative flex items-center justify-between min-h-[52px] py-1 gap-2">
-        {/* Tên App & Logo: khi là Admin bấm vào để sửa */}
+      {/* HEADER PHONG CÁCH IPHONE CHUẨN (HELLO + BRAND CARD) */}
+      <header className="relative flex flex-col gap-2.5 pt-1">
+        {/* DÒNG 1: "Hello, Dr. Anya!" + CHUÔNG XANH + KÍNH LÚP TÌM KIẾM + AVATAR VIỀN VÀNG KIM */}
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[17px] sm:text-[18px] font-black text-slate-900 tracking-tight">
+                Hello, Dr. Tùng!
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowPhoneSync(true)}
+                className="w-5 h-5 flex items-center justify-center text-blue-600 hover:text-blue-700 transition-colors relative"
+                title="Thông báo & Đồng bộ tiến độ"
+                aria-label="Thông báo"
+              >
+                <Bell size={15} fill="currentColor" />
+                <span className="absolute top-0 right-0 w-1.5 h-1.5 rounded-full bg-blue-600" />
+              </button>
+            </div>
+            <span className="text-[11px] sm:text-[11.5px] text-slate-500 font-medium">
+              Kiến thức giải phẫu & Sức khỏe
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* Kính lúp tìm kiếm */}
+            <Link
+              href="/tim-kiem"
+              prefetch={true}
+              className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-700 transition-colors shadow-2xs"
+              title="Tìm kiếm bài học"
+              aria-label="Tìm kiếm"
+            >
+              <Search size={18} strokeWidth={2.2} />
+            </Link>
+
+            {/* Avatar Bác sĩ / Quản trị viền vàng kim */}
+            <button
+              type="button"
+              onClick={() => setShowMenu(!showMenu)}
+              className="w-9 h-9 rounded-full p-[2px] bg-gradient-to-b from-amber-300 via-amber-400 to-amber-600 shadow-sm cursor-pointer hover:scale-105 transition-transform"
+              title="Tài khoản & Quản trị"
+              aria-label="Quản trị"
+            >
+              <img
+                src={logoUrl || "/images/author_tung.png"}
+                alt="Tác giả"
+                className="w-full h-full rounded-full object-cover"
+              />
+            </button>
+          </div>
+        </div>
+
+        {/* DÒNG 2: BRAND CARD NỔI BẬT ("MEDICA LEARN" STYLE) */}
         <div
           onClick={() => {
             if (isAdmin) setShowEditApp(true);
           }}
-          className={`flex items-center gap-2.5 min-w-0 ${
+          className={`w-full rounded-[22px] bg-white border border-slate-100 shadow-[0_4px_16px_rgba(0,0,0,0.05)] p-3 sm:p-3.5 flex items-center justify-between gap-3 ${
             isAdmin ? 'cursor-pointer group' : ''
           }`}
-          title={isAdmin ? 'Bấm để đổi tên app & logo' : undefined}
+          title={isAdmin ? 'Bấm để sửa tên & thương hiệu app' : undefined}
         >
-          <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-[12px] flex items-center justify-center overflow-hidden shrink-0 ${
-            logoUrl && !logoUrl.includes('5513d9c5') && !logoUrl.includes('author') && !logoUrl.includes('avatar')
-              ? ''
-              : 'bg-gradient-to-br from-[#0066FF] to-[#0047AB] text-white shadow-xs border border-blue-500/20'
-          }`}>
-            {logoUrl && !logoUrl.includes('5513d9c5') && !logoUrl.includes('author') && !logoUrl.includes('avatar') ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={logoUrl} alt="Logo" className="w-full h-full object-contain rounded-[12px]" />
-            ) : (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src="/app_logo.png"
-                alt="Logo"
-                className="w-full h-full object-cover"
-              />
-            )}
+          {/* Avatar Bác sĩ / Tác giả bên trái */}
+          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-sky-100 shadow-2xs shrink-0">
+            <img
+              src="/images/author_tung.png"
+              alt="Tùng Dinh Dưỡng"
+              className="w-full h-full object-cover"
+            />
           </div>
-          <div className="flex flex-col min-w-0">
+
+          {/* Khối chữ thương hiệu ở giữa */}
+          <div className="flex flex-col flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
-              <span className="text-[16px] sm:text-[18px] font-black text-ink leading-tight whitespace-nowrap">
-                {appName || 'Sống Khỏe Mỗi Ngày'}
+              <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-slate-900 uppercase">
+                {appName && appName !== 'QBIZ BOOK' && appName !== 'Sống Khỏe Mỗi Ngày' ? appName.split(' ')[0] : 'HỌC'}
               </span>
-              {isAdmin && (
-                <Edit2
-                  size={12}
-                  className="text-primary opacity-60 group-hover:opacity-100 transition-opacity shrink-0"
-                />
-              )}
+              <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-blue-600 uppercase">
+                {appName && appName !== 'QBIZ BOOK' && appName !== 'Sống Khỏe Mỗi Ngày' ? appName.split(' ').slice(1).join(' ') : 'CƠ THỂ'}
+              </span>
+              {isAdmin && <Edit2 size={12} className="text-primary opacity-60" />}
             </div>
-            <span className="text-[11px] sm:text-[12px] text-muted font-medium leading-tight whitespace-nowrap mt-0.5">
-              {appSubtitle || 'Kiến thức đúng · Sức khỏe bền vững'}
+            <span className="text-[9.5px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 mt-0.5">
+              EMPOWERING MEDICAL KNOWLEDGE
+            </span>
+            <span className="text-[10.5px] sm:text-[11px] text-slate-600 font-medium line-clamp-1">
+              {appSubtitle || 'Advanced Anatomy & Health'}
             </span>
           </div>
-        </div>
 
-        {/* 3 Nút tròn bên phải: Tìm kiếm, Thông báo (Chuông), Tùy chọn (⋮) */}
-        <div className="flex items-center gap-1.5 shrink-0">
-          {/* Nút 1: Kính lúp (Focus ô tìm kiếm) */}
-          <button
-            type="button"
-            onClick={() => {
-              const el = document.getElementById('home-search-input');
-              if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                el.focus();
-              }
-            }}
-            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-surface-2 hover:bg-surface-3 flex items-center justify-center text-ink hover:text-blue-600 transition-colors shadow-2xs cursor-pointer"
-            aria-label="Tìm bài học"
-            title="Tìm kiếm bài học"
-          >
-            <Search size={16} />
-          </button>
-
-          {/* Nút 2: Chuông thông báo / Lưu tiến độ */}
-          <button
-            type="button"
-            onClick={() => setShowPhoneSync(true)}
-            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-surface-2 hover:bg-surface-3 flex items-center justify-center text-ink hover:text-blue-600 transition-colors shadow-2xs cursor-pointer relative"
-            title={userPhone ? `Đang đồng bộ SĐT: ${userPhone}` : 'Nhận thông báo & Lưu tiến độ qua SĐT'}
-            aria-label="Thông báo & Đồng bộ"
-          >
-            <Bell size={16} />
-            {userPhone && (
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white" />
-            )}
-          </button>
-
-          {/* Nút 3: ⋮ Tùy chọn trang chủ */}
-          <button
-            type="button"
-            onClick={() => setShowMenu(!showMenu)}
-            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-surface-2 hover:bg-surface-3 flex items-center justify-center text-ink hover:text-blue-600 transition-colors shadow-2xs cursor-pointer"
-            aria-label="Tùy chọn trang chủ"
-          >
-            <MoreVertical size={16} />
-          </button>
+          {/* Huy hiệu Xanh Sapphire dát vàng kim bên phải (Royal Crest 1:1 theo ảnh mẫu) */}
+          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[15px] bg-gradient-to-br from-[#1E40AF] via-[#1D4ED8] to-[#0A1A4A] p-[2px] shadow-md border border-amber-300/60 shrink-0 flex items-center justify-center relative overflow-hidden">
+            <div className="flex flex-col items-center justify-center text-amber-300">
+              <svg className="w-5 h-5 text-amber-300 drop-shadow-[0_1px_3px_rgba(245,158,11,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" fill="currentColor" fillOpacity="0.25" />
+                <path d="M3.5 12h3l2-3 3 6 2-3h7" stroke="white" strokeWidth="1.8" />
+              </svg>
+              <span className="text-[7px] font-black tracking-widest text-amber-200 uppercase mt-0.5">MEDICA</span>
+            </div>
+          </div>
         </div>
 
         {/* Dropdown Menu ⋮ Trang chủ */}
         {showMenu && (
-          <div className="absolute top-[58px] right-0 w-[240px] bg-white rounded-[20px] border border-line shadow-xl p-2 flex flex-col gap-1 z-50 animate-in fade-in duration-150">
+          <div className="absolute top-[48px] right-0 w-[240px] bg-white rounded-[20px] border border-line shadow-xl p-2 flex flex-col gap-1 z-50 animate-in fade-in duration-150">
             <button
               type="button"
               onClick={() => {
@@ -278,7 +290,6 @@ export default function HomeHeader({
 
             {isAdmin ? (
               <>
-                {/* Trạng thái kết nối Supabase */}
                 <div
                   className={`px-3 py-2 rounded-[12px] text-[12px] font-extrabold flex items-center gap-2 ${
                     supabaseOk
@@ -367,7 +378,6 @@ export default function HomeHeader({
           </div>
         )}
 
-        {/* Overlay đóng menu khi bấm ra ngoài */}
         {showMenu && (
           <div
             className="fixed inset-0 z-40 bg-transparent"

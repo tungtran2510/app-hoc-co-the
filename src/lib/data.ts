@@ -76,8 +76,8 @@ export const DEFAULT_HOME_SECTIONS_ORDER = [
   'author_profile',
   'author_books',
   'author_philosophy',
-  'author_contact',
   'recommended_books',
+  'author_contact',
 ];
 
 export function normalizeHomeSectionsOrder(raw?: any): string[] {
@@ -153,7 +153,7 @@ export async function getSettings(): Promise<Settings> {
             home_greeting: data.home_greeting || data.block_styles?.home_greeting || 'Xin chào!',
             home_title: data.home_title || data.block_styles?.home_title || 'Hôm nay mình học gì?',
             search_placeholder: data.search_placeholder || data.block_styles?.search_placeholder || 'Tìm bài, ví dụ: đĩa đệm',
-            topics_title: data.topics_title || data.block_styles?.topics_title || 'Chọn chủ đề',
+            topics_title: (data.topics_title && data.topics_title !== 'Chọn chủ đề') ? data.topics_title : (data.block_styles?.topics_title || 'Chuyên Đề Học'),
             recommended_books_title: data.recommended_books_title || data.block_styles?.recommended_books_title || 'Sách nên đọc',
             recommended_books: normalizeRecommendedBooks(data.recommended_books || data.block_styles?.recommended_books),
             recommended_books_layout: data.recommended_books_layout || data.block_styles?.recommended_books_layout || 'grid',

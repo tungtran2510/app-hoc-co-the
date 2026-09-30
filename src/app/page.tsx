@@ -1,8 +1,6 @@
 import React from 'react';
 import { getSettings, getTopicsWithCounts } from '../lib/data';
 import HomeHeader from '../components/HomeHeader';
-import HomeGreetingSection from '../components/HomeGreetingSection';
-import HomeContinueSection from '../components/HomeContinueSection';
 import HomeSectionsClient from '../components/HomeSectionsClient';
 import BottomNav from '../components/BottomNav';
 import { Metadata } from 'next';
@@ -26,7 +24,7 @@ export default async function HomePage() {
 
   return (
     <main className="flex-1 flex flex-col px-4 sm:px-5 pt-3 pb-28 gap-4 sm:gap-5">
-      {/* 1. Thanh đầu trang: Logo + Tên App + Quản trị */}
+      {/* 1. Header chuẩn iPhone: Lời chào Dr. Tùng + Tìm kiếm + Avatar + Brand Card phong cách MEDICA LEARN */}
       <HomeHeader
         initialAppName={settings.app_name}
         initialAppSubtitle={settings.app_subtitle}
@@ -35,22 +33,11 @@ export default async function HomePage() {
         initialZaloUrl={settings.zalo_url}
       />
 
-      {/* 2 & 3. Lời chào, Tiêu đề chính & Ô tìm kiếm (có nút sửa cho Quản trị viên) */}
-      <HomeGreetingSection
-        initialGreeting={settings.home_greeting}
-        initialTitle={settings.home_title}
-        initialSearchPlaceholder={settings.search_placeholder}
-        initialTopicsTitle={settings.topics_title}
-      />
-
-      {/* 4. Thẻ Xem tiếp (đọc từ localStorage client, chưa có -> ẩn) */}
-      <HomeContinueSection />
-
-      {/* 5, 6, 7, 8. Các khối nội dung có thể sắp xếp thứ tự: Chủ đề, Tác giả, Sách nên đọc */}
+      {/* 2. Lưới chuyên đề học (Learning Paths) & Các khối nội dung sắp xếp */}
       <HomeSectionsClient
         initialSectionsOrder={settings.home_sections_order}
         topicsWithCounts={topicsWithCounts}
-        topicsTitle={settings.topics_title}
+        topicsTitle={settings.topics_title || 'Chuyên Đề Học'}
         authorProfile={settings.author_profile}
         recommendedBooksTitle={settings.recommended_books_title}
         recommendedBooksSubtitle={settings.recommended_books_subtitle}
@@ -58,7 +45,7 @@ export default async function HomePage() {
         initialBooksLayout={settings.recommended_books_layout}
       />
 
-      {/* 9. Thanh điều hướng dưới cùng */}
+      {/* 3. Thanh điều hướng dưới cùng */}
       <BottomNav />
     </main>
   );
