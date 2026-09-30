@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookOpen, Bookmark, Search } from 'lucide-react';
+import { Home, BookOpen, Bookmark, Sparkles } from 'lucide-react';
 import { getStoredXemTiep } from '../lib/learningProgress';
 
 export default function BottomNav() {
@@ -24,9 +24,9 @@ export default function BottomNav() {
   }, [pathname]);
 
   const isHome = pathname === '/';
+  const isAi = pathname === '/tro-ly-ai';
   const isSaved = pathname === '/da-luu';
-  const isSearch = pathname === '/tim-kiem';
-  const isReading = !isHome && !isSaved && !isSearch && !pathname.startsWith('/dang-nhap');
+  const isReading = !isHome && !isAi && !isSaved && !pathname.startsWith('/dang-nhap') && !pathname.startsWith('/tim-kiem');
 
   return (
     <nav
@@ -34,7 +34,7 @@ export default function BottomNav() {
       aria-label="Điều hướng chính"
     >
       <div className="w-full max-w-[480px] h-[80px] pb-2 grid grid-cols-4">
-        {/* Trang chủ */}
+        {/* 1. Trang chủ */}
         <Link
           href="/"
           className={`flex flex-col items-center justify-center gap-1 transition-opacity active:opacity-80 min-h-[48px] ${
@@ -46,7 +46,22 @@ export default function BottomNav() {
           <span className="text-[13px] sm:text-[14px] leading-tight">Trang chủ</span>
         </Link>
 
-        {/* Đang xem */}
+        {/* 2. Trợ lý AI */}
+        <Link
+          href="/tro-ly-ai"
+          className={`flex flex-col items-center justify-center gap-1 transition-opacity active:opacity-80 min-h-[48px] ${
+            isAi ? 'text-primary font-bold' : 'text-muted font-medium'
+          }`}
+          aria-label="Trợ lý AI"
+        >
+          <div className="relative">
+            <Sparkles size={24} strokeWidth={isAi ? 2.5 : 2} className={isAi ? 'fill-primary/20 text-primary' : ''} />
+            <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-primary animate-pulse" />
+          </div>
+          <span className="text-[13px] sm:text-[14px] leading-tight">Trợ lý AI</span>
+        </Link>
+
+        {/* 3. Đang xem */}
         <Link
           href={continueUrl}
           className={`flex flex-col items-center justify-center gap-1 transition-opacity active:opacity-80 min-h-[48px] ${
@@ -58,7 +73,7 @@ export default function BottomNav() {
           <span className="text-[13px] sm:text-[14px] leading-tight">Đang xem</span>
         </Link>
 
-        {/* Đã lưu */}
+        {/* 4. Đã lưu */}
         <Link
           href="/da-luu"
           className={`flex flex-col items-center justify-center gap-1 transition-opacity active:opacity-80 min-h-[48px] ${
@@ -68,18 +83,6 @@ export default function BottomNav() {
         >
           <Bookmark size={24} strokeWidth={isSaved ? 2.5 : 2} className={isSaved ? 'fill-primary' : ''} />
           <span className="text-[13px] sm:text-[14px] leading-tight">Đã lưu</span>
-        </Link>
-
-        {/* Tìm kiếm */}
-        <Link
-          href="/tim-kiem"
-          className={`flex flex-col items-center justify-center gap-1 transition-opacity active:opacity-80 min-h-[48px] ${
-            isSearch ? 'text-primary font-bold' : 'text-muted font-medium'
-          }`}
-          aria-label="Tìm kiếm"
-        >
-          <Search size={24} strokeWidth={isSearch ? 2.5 : 2} />
-          <span className="text-[13px] sm:text-[14px] leading-tight">Tìm kiếm</span>
         </Link>
       </div>
     </nav>

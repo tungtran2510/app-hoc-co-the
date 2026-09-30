@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, Edit2 } from 'lucide-react';
+import { Search, Edit2, Sparkles } from 'lucide-react';
 import { checkIsAdminClient } from '../lib/adminAuth';
 import EditGreetingModal from './admin/EditGreetingModal';
 
@@ -63,23 +63,29 @@ export default function HomeGreetingSection({
         </h1>
       </section>
 
-      {/* 3. Ô tìm kiếm */}
+      {/* 3. Ô Hỏi Trợ lý AI & Tìm kiếm thông minh */}
       <section>
         <Link
-          href="/tim-kiem"
+          href="/tro-ly-ai"
           className="relative block w-full group cursor-pointer"
-          aria-label="Mở trang tìm kiếm"
+          aria-label="Mở Trợ lý AI Cơ Thể"
         >
-          <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-muted">
-            <Search size={22} />
+          <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-primary">
+            <Sparkles size={22} className="animate-pulse" />
           </div>
           <input
             type="text"
             readOnly
-            placeholder={searchPlaceholder}
-            className="w-full h-[58px] min-h-[48px] pl-12 pr-4 rounded-[20px] bg-white border-[1.5px] border-line text-[17px] text-ink placeholder:text-muted focus:outline-hidden cursor-pointer shadow-2xs group-hover:border-primary/50 transition-colors"
+            placeholder={searchPlaceholder || 'Hỏi Trợ lý AI về cơ thể, bài học...'}
+            className="w-full h-[58px] min-h-[48px] pl-12 pr-24 rounded-[20px] bg-white border-[1.5px] border-line text-[16px] text-ink placeholder:text-muted focus:outline-hidden cursor-pointer shadow-2xs group-hover:border-primary/50 transition-colors"
             tabIndex={-1}
           />
+          <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+            <span className="flex items-center gap-1 px-3 py-1.5 rounded-[12px] bg-primary-soft text-primary text-[12px] font-extrabold shadow-2xs group-hover:bg-primary group-hover:text-white transition-colors">
+              <span>Hỏi AI</span>
+              <span>→</span>
+            </span>
+          </div>
         </Link>
       </section>
 

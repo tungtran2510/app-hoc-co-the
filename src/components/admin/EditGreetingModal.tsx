@@ -132,16 +132,16 @@ export default function EditGreetingModal({
             />
           </div>
 
-          {/* Gợi ý ô tìm kiếm */}
+          {/* Gợi ý ô Trợ lý AI & Tìm kiếm */}
           <div className="flex flex-col gap-1.5 pt-2 border-t border-line/60">
             <label className="text-[13px] font-bold text-ink flex items-center justify-between">
-              <span>Gợi ý trong ô tìm kiếm (Placeholder)</span>
+              <span>Gợi ý trong ô Trợ lý AI (Placeholder)</span>
             </label>
             <input
               type="text"
               value={searchPlaceholder}
               onChange={(e) => setSearchPlaceholder(e.target.value)}
-              placeholder="Ví dụ: Tìm bài, ví dụ: đĩa đệm"
+              placeholder="Ví dụ: Hỏi Trợ lý AI về cơ thể, bài học..."
               className="w-full h-11 px-3.5 rounded-[12px] border border-line text-[14px] font-medium text-ink focus:border-primary"
             />
           </div>
