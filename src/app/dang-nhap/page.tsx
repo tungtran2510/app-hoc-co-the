@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Lock, ArrowRight, ChevronLeft, ShieldCheck } from 'lucide-react';
-import { setAdminClient, DEFAULT_ADMIN_PASSWORD } from '../../lib/adminAuth';
+import { Lock, ArrowRight, ChevronLeft } from 'lucide-react';
+import { loginAdmin } from '../../lib/adminAuth';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -12,24 +12,17 @@ export default function LoginPage() {
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setErrorMsg('');
 
-    const savedPin = typeof window !== 'undefined' ? localStorage.getItem('app_admin_pin') || 'admin123' : 'admin123';
-    if (
-      password === savedPin ||
-      password === DEFAULT_ADMIN_PASSWORD ||
-      password === 'admin123' ||
-      password === '1234'
-    ) {
-      setAdminClient(true);
-      // Chuyển hướng về trang nội dung để trải nghiệm chế độ sửa
+    const res = await loginAdmin(password);
+    if (res.success) {
       router.push('/cot-song/tong-quan-ve-cot-song');
       router.refresh();
     } else {
-      setErrorMsg('Mật khẩu không đúng. Vui lòng nhập lại (Mật khẩu mặc định: admin123 hoặc 1234).');
+      setErrorMsg(res.error || 'Mật khẩu quản trị không đúng. Vui lòng thử lại.');
       setIsSubmitting(false);
     }
   };
@@ -59,7 +52,7 @@ export default function LoginPage() {
             Quản trị nội dung
           </h1>
           <p className="text-[17px] text-muted font-normal leading-relaxed">
-            Nhập mật khẩu để bật chế độ chỉnh sửa, thêm video, hình ảnh và tài liệu.
+            Nhập mật khẩu quản trị để thực hiện chỉnh sửa, thêm chủ đề, bài học và đa phương tiện.
           </p>
         </div>
 
@@ -77,7 +70,7 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Nhập mật khẩu (mặc định: admin123)"
+              placeholder="Nhập mật khẩu quản trị"
               className="w-full h-[58px] min-h-[48px] px-4 rounded-[18px] bg-white border-[1.5px] border-line text-[18px] text-ink placeholder:text-muted focus:outline-hidden focus:border-primary transition-colors shadow-2xs"
               autoFocus
               required
@@ -93,24 +86,18 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex items-center justify-center gap-2 h-[62px] min-h-[48px] w-full rounded-[18px] bg-primary text-white font-extrabold text-[20px] transition-transform active:scale-[0.98] shadow-sm disabled:opacity-60 mt-2"
+            className="flex items-center justify-center gap-2 h-[62px] min-h-[48px] w-full rounded-[18px] bg-primary text-white font-extrabold text-[20px] transition-transform active:scale-[0.98] shadow-sm disabled:opacity-60 mt-2 cursor-pointer"
           >
             <span>{isSubmitting ? 'Đang kiểm tra...' : 'Vào chế độ chỉnh sửa'}</span>
             <ArrowRight size={22} strokeWidth={2.5} />
           </button>
         </form>
-
-        {/* Thông tin hỗ trợ */}
-        <div className="flex items-center gap-2 p-3.5 rounded-[16px] bg-surface-2 border border-line text-muted text-[14px] mt-4">
-          <ShieldCheck size={20} className="text-primary shrink-0" />
-          <span>
-            Hệ thống bảo mật 1 mật khẩu nhanh gọn, thao tác trực tiếp trên giao diện điện thoại.
-          </span>
-        </div>
       </div>
 
-      <div className="text-center text-[14px] text-muted">
-        Ứng dụng học hiểu cơ thể · Phiên bản 1.0
+      <div className="text-center">
+        <p className="text-[14px] text-muted leading-relaxed">
+          Bảo mật an toàn bằng phiên mã hóa HTTPOnly từ máy chủ.
+        </p>
       </div>
     </main>
   );

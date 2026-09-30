@@ -15,7 +15,7 @@ import {
   getContinue,
 } from '../../lib/data';
 import TopicHeaderNav from '../../components/TopicHeaderNav';
-import PageCard from '../../components/PageCard';
+import PageListClient from '../../components/PageListClient';
 import SpineIllustration from '../../components/SpineIllustration';
 import BottomNav from '../../components/BottomNav';
 
@@ -25,10 +25,7 @@ interface TopicPageProps {
   };
 }
 
-export async function generateStaticParams() {
-  const topics = await getTopics();
-  return topics.map((t) => ({ topicSlug: t.slug }));
-}
+export const dynamic = 'force-dynamic';
 
 export default async function TopicPage({ params }: TopicPageProps) {
   const { topicSlug } = params;
@@ -39,7 +36,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
   }
 
   const [pages, continueInfo] = await Promise.all([
-    getPagesByTopic(topic.id),
+    getPagesByTopic(topic.id, true),
     getContinue(),
   ]);
 
@@ -162,45 +159,8 @@ export default async function TopicPage({ params }: TopicPageProps) {
         </section>
       )}
 
-      {/* 6 & 7. Danh sách nội dung */}
-      <section className="flex flex-col gap-3 mt-0.5">
-        <h2 className="text-[22px] font-extrabold text-ink leading-tight">
-          Danh sách nội dung
-        </h2>
-
-        {hasPages ? (
-          <>
-            <p className="text-[15px] text-muted font-medium leading-normal">
-              Gợi ý: nếu mới bắt đầu, nên xem theo thứ tự 01 → 02 → 03.
-            </p>
-
-            <div className="flex flex-col gap-2.5 mt-0.5">
-              {pagesWithVideoCount.map(({ page, orderNumber, videoCount }) => {
-                const isContinuing = orderNumber === 1;
-                const activeVideoIndex = isContinuing ? 3 : 1;
-
-                return (
-                  <PageCard
-                    key={page.id}
-                    page={page}
-                    topic={topic}
-                    orderNumber={orderNumber}
-                    videoCount={videoCount}
-                    isContinuing={isContinuing}
-                    activeVideoIndex={activeVideoIndex}
-                  />
-                );
-              })}
-            </div>
-          </>
-        ) : (
-          <div className="p-8 text-center bg-white rounded-[22px] border border-line my-4">
-            <p className="text-[17px] text-muted font-medium">
-              Nội dung đang được cập nhật.
-            </p>
-          </div>
-        )}
-      </section>
+      {/* 6 & 7. Danh sách nội dung kèm thanh công cụ quản trị */}
+      <PageListClient initialPages={pagesWithVideoCount} topic={topic} />
 
       {/* Thanh điều hướng dưới cùng */}
       <BottomNav continueUrl={continueUrl} />

@@ -11,7 +11,7 @@ export default function TopicHeaderNav() {
   const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
-    setIsAdmin(checkIsAdminClient());
+    checkIsAdminClient().then(setIsAdmin);
   }, []);
 
   return (

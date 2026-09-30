@@ -5,28 +5,16 @@ import {
   X,
   Settings,
   Save,
-  Shield,
   Download,
-  Upload,
-  RotateCcw,
   LogOut,
-  Check,
-  Smartphone,
-  Eye,
-  Bell,
   Sliders,
 } from 'lucide-react';
 import {
   getStoredAppSettings,
   saveStoredAppSettings,
-  getAdminPin,
-  setAdminPin,
-  exportAllData,
-  importAllData,
-  resetAllToDefault,
   AppCustomSettings,
 } from '../../lib/storage';
-import { setAdminClient } from '../../lib/adminAuth';
+import { logoutAdmin } from '../../lib/adminAuth';
 
 interface AdminSettingsModalProps {
   isOpen: boolean;
@@ -45,23 +33,20 @@ export default function AdminSettingsModal({
 
   // Cài đặt chung
   const [settings, setSettings] = useState<AppCustomSettings>(getStoredAppSettings());
-  const [adminPinInput, setAdminPinInput] = useState('');
-  const [pinChangeMsg, setPinChangeMsg] = useState('');
   const [saveSuccessMsg, setSaveSuccessMsg] = useState('');
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setSettings(getStoredAppSettings());
-      setAdminPinInput(getAdminPin());
-      setPinChangeMsg('');
       setSaveSuccessMsg('');
     }
   }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const handleSaveSettings = () => {
-    saveStoredAppSettings(settings);
+  const handleSaveSettings = async () => {
+    await saveStoredAppSettings(settings);
     setSaveSuccessMsg('Đã lưu cài đặt thành công!');
     setTimeout(() => {
       setSaveSuccessMsg('');
@@ -69,60 +54,29 @@ export default function AdminSettingsModal({
     }, 1200);
   };
 
-  const handleSavePin = () => {
-    if (!adminPinInput.trim() || adminPinInput.trim().length < 4) {
-      alert('Mã PIN cần ít nhất 4 ký tự');
-      return;
-    }
-    setAdminPin(adminPinInput.trim());
-    setPinChangeMsg('✓ Đã cập nhật mã PIN mới thành công!');
-    setTimeout(() => setPinChangeMsg(''), 2500);
-  };
-
-  const handleExportBackup = () => {
-    const jsonStr = exportAllData();
-    const blob = new Blob([jsonStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `sao-luu-app-hoc-co-the-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const handleImportBackup = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const content = event.target?.result as string;
-      if (content) {
-        const success = importAllData(content);
-        if (success) {
-          alert('Đã khôi phục dữ liệu sao lưu thành công! Trang sẽ tải lại.');
-          window.location.reload();
-        } else {
-          alert('Tệp sao lưu không hợp lệ.');
-        }
+  const handleExportBackup = async () => {
+    try {
+      setIsExporting(true);
+      const res = await fetch('/api/admin/sao-luu');
+      if (!res.ok) {
+        throw new Error('Chưa lưu được sao lưu hoặc chưa đăng nhập');
       }
-    };
-    reader.readAsText(file);
-  };
-
-  const handleResetDefaults = () => {
-    if (
-      confirm(
-        'Bạn có chắc chắn muốn khôi phục toàn bộ cài đặt và nội dung về dữ liệu chuẩn y khoa gốc ban đầu? Mọi chỉnh sửa tạm thời sẽ được xóa.'
-      )
-    ) {
-      resetAllToDefault();
-      alert('Đã khôi phục dữ liệu gốc thành công! Trang sẽ tải lại.');
-      window.location.reload();
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `sao-luu-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err: any) {
+      alert(err.message || 'Lỗi khi sao lưu dữ liệu.');
+    } finally {
+      setIsExporting(false);
     }
   };
 
-  const handleLogout = () => {
-    setAdminClient(false);
+  const handleLogout = async () => {
+    await logoutAdmin();
     if (onLogout) {
       onLogout();
     }
@@ -154,7 +108,7 @@ export default function AdminSettingsModal({
           <button
             type="button"
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-surface-2 flex items-center justify-center text-muted hover:text-ink"
+            className="w-9 h-9 rounded-full bg-surface-2 flex items-center justify-center text-muted hover:text-ink cursor-pointer"
             aria-label="Đóng"
           >
             <X size={18} />
@@ -166,7 +120,7 @@ export default function AdminSettingsModal({
           <button
             type="button"
             onClick={() => setActiveTab('chung')}
-            className={`h-10 rounded-[10px] text-[13px] font-extrabold transition-all ${
+            className={`h-10 rounded-[10px] text-[13px] font-extrabold transition-all cursor-pointer ${
               activeTab === 'chung'
                 ? 'bg-white text-primary shadow-xs'
                 : 'text-muted hover:text-ink'
@@ -177,7 +131,7 @@ export default function AdminSettingsModal({
           <button
             type="button"
             onClick={() => setActiveTab('trai_nghiem')}
-            className={`h-10 rounded-[10px] text-[13px] font-extrabold transition-all ${
+            className={`h-10 rounded-[10px] text-[13px] font-extrabold transition-all cursor-pointer ${
               activeTab === 'trai_nghiem'
                 ? 'bg-white text-primary shadow-xs'
                 : 'text-muted hover:text-ink'
@@ -188,13 +142,13 @@ export default function AdminSettingsModal({
           <button
             type="button"
             onClick={() => setActiveTab('du_lieu')}
-            className={`h-10 rounded-[10px] text-[13px] font-extrabold transition-all ${
+            className={`h-10 rounded-[10px] text-[13px] font-extrabold transition-all cursor-pointer ${
               activeTab === 'du_lieu'
                 ? 'bg-white text-primary shadow-xs'
                 : 'text-muted hover:text-ink'
             }`}
           >
-            Dữ liệu & Bảo mật
+            Dữ liệu & Sao lưu
           </button>
         </div>
 
@@ -218,85 +172,82 @@ export default function AdminSettingsModal({
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-[14px] font-bold text-ink">
-                  Chuyên gia / Đơn vị phụ trách
+                  Thông tin chuyên gia / Bác sĩ phụ trách
                 </label>
                 <input
                   type="text"
                   value={settings.expert_title}
                   onChange={(e) => setSettings({ ...settings, expert_title: e.target.value })}
-                  placeholder="Ví dụ: Bác sĩ Trị liệu Cột sống"
-                  className="w-full h-11 px-3.5 rounded-[12px] border border-line text-[15px] text-ink font-semibold focus:border-primary"
+                  placeholder="Ví dụ: Chuyên gia Phục hồi chức năng Cột sống"
+                  className="w-full h-11 px-3.5 rounded-[12px] border border-line text-[15px] text-ink focus:border-primary"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[14px] font-bold text-ink">
-                    Hotline tư vấn
+                    Số Hotline tư vấn
                   </label>
                   <input
                     type="text"
                     value={settings.hotline}
                     onChange={(e) => setSettings({ ...settings, hotline: e.target.value })}
-                    placeholder="0988.xxx.xxx"
-                    className="w-full h-11 px-3.5 rounded-[12px] border border-line text-[15px] text-ink font-semibold focus:border-primary"
+                    placeholder="0988..."
+                    className="w-full h-11 px-3.5 rounded-[12px] border border-line text-[15px] text-ink focus:border-primary"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[14px] font-bold text-ink">
-                    Link Zalo hỗ trợ
+                    Đường dẫn Zalo
                   </label>
                   <input
-                    type="url"
+                    type="text"
                     value={settings.zalo_url}
                     onChange={(e) => setSettings({ ...settings, zalo_url: e.target.value })}
                     placeholder="https://zalo.me/..."
-                    className="w-full h-11 px-3.5 rounded-[12px] border border-line text-[15px] text-ink font-semibold focus:border-primary"
+                    className="w-full h-11 px-3.5 rounded-[12px] border border-line text-[15px] text-ink focus:border-primary"
                   />
                 </div>
-              </div>
-
-              <div className="p-3.5 rounded-[16px] bg-[#E6F2EF] border border-[#0E6B5A]/20 flex flex-col gap-1 text-[13px] text-[#0A4F43]">
-                <span className="font-extrabold">💡 Mẹo hiển thị</span>
-                <span>Thông tin này sẽ xuất hiện trên thanh tiêu đề và chân trang hỗ trợ học viên.</span>
               </div>
             </div>
           )}
 
-          {/* TAB 2: HỌC TẬP & GIAO DIỆN */}
+          {/* TAB 2: TRẢI NGHIỆM HỌC TẬP */}
           {activeTab === 'trai_nghiem' && (
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <label className="text-[14px] font-bold text-ink">
-                  Cỡ chữ mặc định khi mở app
-                </label>
+              {/* Cỡ chữ mặc định */}
+              <div className="flex flex-col gap-2 p-3.5 rounded-[16px] bg-surface-2 border border-line">
+                <span className="text-[14px] font-bold text-ink flex items-center gap-1.5">
+                  <Sliders size={16} className="text-primary" />
+                  <span>Cỡ chữ mặc định khi mở bài học</span>
+                </span>
                 <div className="grid grid-cols-3 gap-2">
-                  {(['small', 'normal', 'large'] as const).map((size) => (
+                  {(['small', 'normal', 'large'] as const).map((mode) => (
                     <button
-                      key={size}
+                      key={mode}
                       type="button"
-                      onClick={() => setSettings({ ...settings, default_font_size: size })}
-                      className={`h-11 rounded-[12px] font-bold text-[14px] border transition-all ${
-                        settings.default_font_size === size
-                          ? 'bg-primary-soft border-primary text-primary shadow-xs'
-                          : 'bg-white border-line text-ink'
+                      onClick={() => setSettings({ ...settings, default_font_size: mode })}
+                      className={`h-10 rounded-[10px] font-extrabold text-[13px] border transition-all cursor-pointer ${
+                        settings.default_font_size === mode
+                          ? 'bg-primary text-white border-primary shadow-xs'
+                          : 'bg-white text-ink border-line hover:border-primary/40'
                       }`}
                     >
-                      {size === 'small' ? 'Nhỏ' : size === 'normal' ? 'Vừa' : 'Lớn'}
+                      {mode === 'small' ? 'Nhỏ' : mode === 'normal' ? 'Vừa' : 'Lớn'}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Tự chuyển bài */}
+              {/* Tự động chuyển video */}
               <div className="flex items-center justify-between p-3.5 rounded-[16px] bg-surface-2 border border-line">
                 <div className="flex flex-col gap-0.5 max-w-[80%]">
                   <span className="text-[15px] font-bold text-ink">
-                    Tự động chuyển bài tiếp theo
+                    Tự động chuyển video kế tiếp
                   </span>
                   <span className="text-[13px] text-muted">
-                    Sau khi xem hết danh sách video của bài hiện tại
+                    Sau khi phát xong 1 video, trình phát tự chọn video tiếp theo trong danh sách
                   </span>
                 </div>
                 <input
@@ -330,78 +281,31 @@ export default function AdminSettingsModal({
           {/* TAB 3: DỮ LIỆU & BẢO MẬT */}
           {activeTab === 'du_lieu' && (
             <div className="flex flex-col gap-4">
-              {/* Đổi mã PIN */}
+              {/* Sao lưu 1 chạm */}
               <div className="flex flex-col gap-2 p-3.5 rounded-[16px] bg-surface-2 border border-line">
-                <span className="text-[14px] font-bold text-ink flex items-center gap-1.5">
-                  <Shield size={16} className="text-primary" />
-                  <span>Đổi mã PIN quản trị</span>
-                </span>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={adminPinInput}
-                    onChange={(e) => setAdminPinInput(e.target.value)}
-                    placeholder="Nhập mã PIN mới (vd: 1234)..."
-                    className="flex-1 h-10 px-3 rounded-[10px] border border-line text-[15px] font-mono focus:border-primary"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleSavePin}
-                    className="h-10 px-4 rounded-[10px] bg-primary text-white font-bold text-[13px] shrink-0"
-                  >
-                    Lưu mã
-                  </button>
-                </div>
-                {pinChangeMsg && (
-                  <span className="text-[12px] text-primary font-semibold">
-                    {pinChangeMsg}
-                  </span>
-                )}
-              </div>
-
-              {/* Sao lưu và Khôi phục */}
-              <div className="flex flex-col gap-2">
                 <span className="text-[14px] font-bold text-ink">
-                  Sao lưu & Khôi phục nội dung
+                  Sao lưu dữ liệu 1 chạm
                 </span>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={handleExportBackup}
-                    className="flex items-center justify-center gap-1.5 h-11 rounded-[12px] bg-white border border-line text-ink font-bold text-[13px] hover:border-primary shadow-xs"
-                  >
-                    <Download size={16} className="text-primary" />
-                    <span>Xuất file JSON</span>
-                  </button>
-
-                  <label className="flex items-center justify-center gap-1.5 h-11 rounded-[12px] bg-white border border-line text-ink font-bold text-[13px] hover:border-primary shadow-xs cursor-pointer">
-                    <Upload size={16} className="text-primary" />
-                    <span>Nhập file JSON</span>
-                    <input
-                      type="file"
-                      accept=".json"
-                      onChange={handleImportBackup}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
+                <p className="text-[13px] text-muted leading-relaxed">
+                  Tải toàn bộ 4 bảng dữ liệu (chủ đề, bài học, các khối và cấu hình) về máy tính để lưu trữ dự phòng.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleExportBackup}
+                  disabled={isExporting}
+                  className="flex items-center justify-center gap-1.5 h-11 rounded-[12px] bg-primary text-white font-bold text-[14px] shadow-xs cursor-pointer hover:bg-primary-dark"
+                >
+                  <Download size={16} />
+                  <span>{isExporting ? 'Đang xuất tệp...' : 'Tải file sao lưu (JSON)'}</span>
+                </button>
               </div>
 
-              {/* Khôi phục gốc & Đăng xuất */}
+              {/* Đăng xuất */}
               <div className="flex flex-col gap-2 pt-2 border-t border-line">
                 <button
                   type="button"
-                  onClick={handleResetDefaults}
-                  className="flex items-center justify-center gap-1.5 h-11 rounded-[12px] bg-[#FFF1E6] text-[#8A3A14] font-bold text-[14px] border border-[#F2B38A]"
-                >
-                  <RotateCcw size={16} />
-                  <span>Khôi phục dữ liệu gốc ban đầu</span>
-                </button>
-
-                <button
-                  type="button"
                   onClick={handleLogout}
-                  className="flex items-center justify-center gap-1.5 h-11 rounded-[12px] bg-red-50 text-red-600 font-bold text-[14px] border border-red-200 hover:bg-red-100 mt-1"
+                  className="flex items-center justify-center gap-1.5 h-11 rounded-[12px] bg-red-50 text-red-600 font-bold text-[14px] border border-red-200 hover:bg-red-100 cursor-pointer"
                 >
                   <LogOut size={16} />
                   <span>Thoát quyền quản trị (Đăng xuất)</span>
@@ -424,14 +328,14 @@ export default function AdminSettingsModal({
             <button
               type="button"
               onClick={onClose}
-              className="h-[44px] px-4 rounded-[12px] bg-surface-2 text-ink font-bold text-[14px]"
+              className="h-[44px] px-4 rounded-[12px] bg-surface-2 text-ink font-bold text-[14px] cursor-pointer"
             >
               Đóng
             </button>
             <button
               type="button"
               onClick={handleSaveSettings}
-              className="flex items-center justify-center gap-1.5 h-[44px] px-5 rounded-[12px] bg-primary text-white font-extrabold text-[14px] shadow-sm"
+              className="flex items-center justify-center gap-1.5 h-[44px] px-5 rounded-[12px] bg-primary text-white font-extrabold text-[14px] shadow-sm cursor-pointer hover:bg-primary-dark"
             >
               <Save size={16} />
               <span>Lưu cài đặt</span>

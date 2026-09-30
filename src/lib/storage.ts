@@ -1,10 +1,10 @@
 import { Block, Page, Topic, Video } from './types';
+import { saveBlockApi, savePageApi, saveSettingsApi } from './apiAdmin';
 
 const STORAGE_BLOCKS_PREFIX = 'app_page_blocks_';
 const STORAGE_PAGE_STATUS_PREFIX = 'app_page_status_';
 const STORAGE_PAGE_DATA_PREFIX = 'app_page_data_';
 const STORAGE_SETTINGS_KEY = 'app_custom_settings';
-const STORAGE_ADMIN_PIN_KEY = 'app_admin_pin';
 
 export interface AppCustomSettings {
   app_name: string;
@@ -27,8 +27,7 @@ export const DEFAULT_APP_SETTINGS: AppCustomSettings = {
 };
 
 /**
- * Lấy danh sách khối của trang từ localStorage (nếu có lưu thay đổi từ admin)
- * Tự động bù đắp youtube_id nếu block video cũ bị rỗng link.
+ * Lấy danh sách khối của trang
  */
 export function getStoredBlocks(pageId: string, fallbackBlocks: Block[]): Block[] {
   if (typeof window === 'undefined') return fallbackBlocks;
@@ -37,7 +36,6 @@ export function getStoredBlocks(pageId: string, fallbackBlocks: Block[]): Block[
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        // Tự động kiểm tra và bù youtube_id từ fallbackBlocks nếu trong storage đang rỗng
         return parsed.map((b) => {
           if (b.type === 'videos' && b.data && Array.isArray(b.data.videos)) {
             const fallbackVideoBlock = fallbackBlocks.find(
@@ -74,38 +72,35 @@ export function getStoredBlocks(pageId: string, fallbackBlocks: Block[]): Block[
       }
     }
   } catch {
-    // Dùng fallback nếu lỗi parse
+    // fallback
   }
   return fallbackBlocks;
 }
 
 /**
- * Lưu danh sách khối đã chỉnh sửa vào localStorage
+ * Lưu danh sách khối: gọi API Supabase và cập nhật local state
  */
-export function saveStoredBlocks(pageId: string, blocks: Block[]): void {
-  if (typeof window === 'undefined') return;
+export async function saveStoredBlocks(pageId: string, blocks: Block[]): Promise<boolean> {
+  if (typeof window === 'undefined') return true;
   try {
     localStorage.setItem(`${STORAGE_BLOCKS_PREFIX}${pageId}`, JSON.stringify(blocks));
   } catch {
-    // Bỏ qua lỗi lưu
+    // ignore
   }
+
+  // Gọi API ghi vào Supabase
+  let hasError = false;
+  for (const block of blocks) {
+    const res = await saveBlockApi(block);
+    if (!res.success) {
+      hasError = true;
+    }
+  }
+  return !hasError;
 }
 
 /**
- * Xóa dữ liệu chỉnh sửa của trang để khôi phục về mặc định
- */
-export function resetStoredBlocks(pageId: string): void {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.removeItem(`${STORAGE_BLOCKS_PREFIX}${pageId}`);
-    localStorage.removeItem(`${STORAGE_PAGE_DATA_PREFIX}${pageId}`);
-  } catch {
-    // Bỏ qua
-  }
-}
-
-/**
- * Lấy thông tin trang đã sửa (Tiêu đề, Tóm tắt)
+ * Lấy thông tin trang đã sửa
  */
 export function getStoredPage(pageId: string, fallbackPage: Page): Page {
   if (typeof window === 'undefined') return fallbackPage;
@@ -119,16 +114,16 @@ export function getStoredPage(pageId: string, fallbackPage: Page): Page {
       };
     }
   } catch {
-    // Bỏ qua
+    // fallback
   }
   return fallbackPage;
 }
 
 /**
- * Lưu thông tin trang đã sửa
+ * Lưu thông tin trang
  */
-export function saveStoredPage(pageId: string, pageData: Partial<Page>): void {
-  if (typeof window === 'undefined') return;
+export async function saveStoredPage(pageId: string, pageData: Partial<Page>): Promise<boolean> {
+  if (typeof window === 'undefined') return true;
   try {
     const existing = localStorage.getItem(`${STORAGE_PAGE_DATA_PREFIX}${pageId}`);
     const parsed = existing ? JSON.parse(existing) : {};
@@ -137,12 +132,15 @@ export function saveStoredPage(pageId: string, pageData: Partial<Page>): void {
       JSON.stringify({ ...parsed, ...pageData })
     );
   } catch {
-    // Bỏ qua
+    // ignore
   }
+
+  const res = await savePageApi({ id: pageId, ...pageData });
+  return res.success;
 }
 
 /**
- * Lấy trạng thái xuất bản của trang (draft hoặc published)
+ * Lấy trạng thái trang (draft hoặc published)
  */
 export function getStoredPageStatus(
   pageId: string,
@@ -155,21 +153,23 @@ export function getStoredPageStatus(
       return val;
     }
   } catch {
-    // Bỏ qua
+    // ignore
   }
   return defaultStatus;
 }
 
 /**
- * Lưu trạng thái xuất bản của trang
+ * Lưu trạng thái trang
  */
-export function saveStoredPageStatus(pageId: string, status: 'draft' | 'published'): void {
-  if (typeof window === 'undefined') return;
+export async function saveStoredPageStatus(pageId: string, status: 'draft' | 'published'): Promise<boolean> {
+  if (typeof window === 'undefined') return true;
   try {
     localStorage.setItem(`${STORAGE_PAGE_STATUS_PREFIX}${pageId}`, status);
   } catch {
-    // Bỏ qua
+    // ignore
   }
+  const res = await savePageApi({ id: pageId, status });
+  return res.success;
 }
 
 /**
@@ -183,91 +183,23 @@ export function getStoredAppSettings(): AppCustomSettings {
       return { ...DEFAULT_APP_SETTINGS, ...JSON.parse(raw) };
     }
   } catch {
-    // Bỏ qua
+    // ignore
   }
   return DEFAULT_APP_SETTINGS;
 }
 
-export function saveStoredAppSettings(settings: Partial<AppCustomSettings>): void {
-  if (typeof window === 'undefined') return;
+export async function saveStoredAppSettings(settings: Partial<AppCustomSettings>): Promise<boolean> {
+  if (typeof window === 'undefined') return true;
   try {
     const current = getStoredAppSettings();
     localStorage.setItem(STORAGE_SETTINGS_KEY, JSON.stringify({ ...current, ...settings }));
   } catch {
-    // Bỏ qua
+    // ignore
   }
-}
 
-/**
- * Mã PIN quản trị
- */
-export function getAdminPin(): string {
-  if (typeof window === 'undefined') return 'admin123';
-  try {
-    return localStorage.getItem(STORAGE_ADMIN_PIN_KEY) || 'admin123';
-  } catch {
-    return 'admin123';
-  }
-}
-
-export function setAdminPin(pin: string): void {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(STORAGE_ADMIN_PIN_KEY, pin);
-  } catch {
-    // Bỏ qua
-  }
-}
-
-/**
- * Sao lưu toàn bộ dữ liệu ra JSON
- */
-export function exportAllData(): string {
-  if (typeof window === 'undefined') return '{}';
-  const dump: Record<string, any> = {};
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key && (key.startsWith('app_') || key === 'co_chu')) {
-      dump[key] = localStorage.getItem(key);
-    }
-  }
-  return JSON.stringify(dump, null, 2);
-}
-
-/**
- * Khôi phục dữ liệu từ JSON
- */
-export function importAllData(jsonStr: string): boolean {
-  if (typeof window === 'undefined') return false;
-  try {
-    const data = JSON.parse(jsonStr);
-    if (typeof data === 'object' && data !== null) {
-      Object.keys(data).forEach((key) => {
-        localStorage.setItem(key, data[key]);
-      });
-      return true;
-    }
-  } catch {
-    return false;
-  }
-  return false;
-}
-
-/**
- * Khôi phục toàn bộ cài đặt và nội dung về dữ liệu chuẩn gốc
- */
-export function resetAllToDefault(): void {
-  if (typeof window === 'undefined') return;
-  try {
-    const keysToRemove: string[] = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && (key.startsWith('app_') || key === 'co_chu')) {
-        keysToRemove.push(key);
-      }
-    }
-    keysToRemove.forEach((k) => localStorage.removeItem(k));
-  } catch {
-    // Bỏ qua
-  }
+  const res = await saveSettingsApi({
+    app_name: settings.app_name,
+    workspace_id: 'default',
+  });
+  return res.success;
 }

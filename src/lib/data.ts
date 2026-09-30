@@ -11,36 +11,91 @@ import {
   Block,
   ContinueInfo,
 } from './types';
+import { getSupabaseClient } from './supabaseClient';
 
 export async function getSettings(): Promise<Settings> {
+  const supabase = getSupabaseClient();
+  if (supabase) {
+    try {
+      const { data } = await supabase
+        .from('settings')
+        .select('*')
+        .eq('workspace_id', 'default')
+        .single();
+      if (data) return data as Settings;
+    } catch {
+      // fallback
+    }
+  }
   return sampleSettings;
 }
 
-export async function getTopics(): Promise<Topic[]> {
+export async function getTopics(includeHidden = false): Promise<Topic[]> {
+  const supabase = getSupabaseClient();
+  if (supabase) {
+    try {
+      let query = supabase.from('topics').select('*').eq('workspace_id', 'default');
+      if (!includeHidden) {
+        query = query.eq('is_visible', true);
+      }
+      const { data } = await query.order('sort_order', { ascending: true });
+      if (data && data.length > 0) return data as Topic[];
+    } catch {
+      // fallback
+    }
+  }
   return sampleTopics
-    .filter((t) => t.is_visible)
+    .filter((t) => includeHidden || t.is_visible)
     .sort((a, b) => a.sort_order - b.sort_order);
 }
 
 export async function getTopicBySlug(slug: string): Promise<Topic | null> {
-  const topic = sampleTopics.find((t) => t.slug === slug && t.is_visible);
+  const supabase = getSupabaseClient();
+  if (supabase) {
+    try {
+      const { data } = await supabase
+        .from('topics')
+        .select('*')
+        .eq('workspace_id', 'default')
+        .eq('slug', slug)
+        .single();
+      if (data) return data as Topic;
+    } catch {
+      // fallback
+    }
+  }
+  const topic = sampleTopics.find((t) => t.slug === slug);
   return topic || null;
 }
 
-export async function getPagesByTopic(topicId: string): Promise<Page[]> {
+export async function getPagesByTopic(topicId: string, includeHidden = false): Promise<Page[]> {
+  const supabase = getSupabaseClient();
+  if (supabase) {
+    try {
+      let query = supabase.from('pages').select('*').eq('topic_id', topicId);
+      if (!includeHidden) {
+        query = query.eq('is_visible', true).eq('status', 'published');
+      }
+      const { data } = await query.order('sort_order', { ascending: true });
+      if (data) return data as Page[];
+    } catch {
+      // fallback
+    }
+  }
   return samplePages
-    .filter((p) => p.topic_id === topicId && p.is_visible && p.status === 'published')
+    .filter((p) => p.topic_id === topicId && (includeHidden || (p.is_visible && p.status === 'published')))
     .sort((a, b) => a.sort_order - b.sort_order);
 }
 
 export async function getPageBySlug(
   topicSlug: string,
-  pageSlug: string
+  pageSlug: string,
+  includeHidden = false
 ): Promise<{ topic: Topic; page: Page; pageIndex: number; totalPages: number } | null> {
   const topic = await getTopicBySlug(topicSlug);
   if (!topic) return null;
 
-  const pages = await getPagesByTopic(topic.id);
+  const pages = await getPagesByTopic(topic.id, includeHidden);
   const pageIndex = pages.findIndex((p) => p.slug === pageSlug);
   if (pageIndex === -1) return null;
 
@@ -53,15 +108,35 @@ export async function getPageBySlug(
 }
 
 export async function getPageById(id: string): Promise<Page | null> {
-  const page = samplePages.find(
-    (p) => p.id === id && p.is_visible && p.status === 'published'
-  );
+  const supabase = getSupabaseClient();
+  if (supabase) {
+    try {
+      const { data } = await supabase.from('pages').select('*').eq('id', id).single();
+      if (data) return data as Page;
+    } catch {
+      // fallback
+    }
+  }
+  const page = samplePages.find((p) => p.id === id);
   return page || null;
 }
 
-export async function getBlocksByPage(pageId: string): Promise<Block[]> {
+export async function getBlocksByPage(pageId: string, includeHidden = false): Promise<Block[]> {
+  const supabase = getSupabaseClient();
+  if (supabase) {
+    try {
+      let query = supabase.from('blocks').select('*').eq('page_id', pageId);
+      if (!includeHidden) {
+        query = query.eq('is_visible', true);
+      }
+      const { data } = await query.order('sort_order', { ascending: true });
+      if (data && data.length > 0) return data as Block[];
+    } catch {
+      // fallback
+    }
+  }
   return sampleBlocks
-    .filter((b) => b.page_id === pageId && b.is_visible)
+    .filter((b) => b.page_id === pageId && (includeHidden || b.is_visible))
     .sort((a, b) => a.sort_order - b.sort_order);
 }
 
@@ -85,7 +160,6 @@ export async function getTopicVideoCount(topicId: string): Promise<number> {
 }
 
 export async function getContinue(): Promise<ContinueInfo | null> {
-  // Lệnh 01: Dữ liệu cứng = trang tong-quan-ve-cot-song, video thứ 3
   return {
     topic_slug: 'cot-song',
     topic_title: 'Cột sống',

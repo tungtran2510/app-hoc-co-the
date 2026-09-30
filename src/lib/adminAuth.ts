@@ -1,36 +1,49 @@
-export const ADMIN_COOKIE_NAME = 'app_admin_auth';
-export const DEFAULT_ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin123';
-
 /**
- * Kiểm tra trạng thái admin phía client
+ * Quản lý trạng thái Admin phía Client
+ * Mọi xác thực bảo mật được xử lý qua Cookie HTTPOnly tại Server Route /api/admin/*
  */
-export function checkIsAdminClient(): boolean {
+
+export async function checkIsAdminClient(): Promise<boolean> {
   if (typeof window === 'undefined') return false;
   try {
-    const fromStorage = localStorage.getItem('is_admin') === 'true';
-    const fromCookie = document.cookie
-      .split('; ')
-      .some((row) => row.startsWith(`${ADMIN_COOKIE_NAME}=true`));
-    return fromStorage || fromCookie;
+    const res = await fetch('/api/admin/me', { cache: 'no-store' });
+    if (!res.ok) return false;
+    const data = await res.json();
+    return Boolean(data.isAdmin);
   } catch {
     return false;
   }
 }
 
-/**
- * Bật hoặc tắt trạng thái admin phía client
- */
-export function setAdminClient(status: boolean) {
-  if (typeof window === 'undefined') return;
+export async function loginAdmin(password: string): Promise<{ success: boolean; error?: string }> {
   try {
-    if (status) {
-      localStorage.setItem('is_admin', 'true');
-      document.cookie = `${ADMIN_COOKIE_NAME}=true; path=/; max-age=86400; SameSite=Lax`;
-    } else {
-      localStorage.removeItem('is_admin');
-      document.cookie = `${ADMIN_COOKIE_NAME}=; path=/; max-age=0; SameSite=Lax`;
+    const res = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password }),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      return { success: false, error: data.error || 'Mật khẩu quản trị không chính xác' };
     }
-  } catch {
-    // Bỏ qua lỗi truy cập storage
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Lỗi kết nối máy chủ' };
   }
 }
+
+export async function logoutAdmin(): Promise<void> {
+  try {
+    await fetch('/api/admin/logout', { method: 'POST' });
+  } catch {
+    // Bỏ qua lỗi mạng
+  }
+}
+
+export function setAdminClient(status: boolean) {
+  if (typeof window === 'undefined') return;
+  if (!status) {
+    logoutAdmin();
+  }
+}
+

@@ -13,7 +13,6 @@ import {
   Copy,
   Eye,
   EyeOff,
-  RotateCcw,
 } from 'lucide-react';
 import { Topic, Page, Block, Video } from '../lib/types';
 import PageHeaderBar, { TocItem, FontSizeOption } from './PageHeaderBar';
@@ -27,7 +26,6 @@ import { checkIsAdminClient, setAdminClient } from '../lib/adminAuth';
 import {
   getStoredBlocks,
   saveStoredBlocks,
-  resetStoredBlocks,
   getStoredPageStatus,
   saveStoredPageStatus,
   getStoredPage,
@@ -84,7 +82,7 @@ export default function ContentViewer({
       }
 
       // 2. Quyền Admin
-      setIsAdmin(checkIsAdminClient());
+      checkIsAdminClient().then((status) => setIsAdmin(status));
 
       // 3. Trạng thái và thông tin trang
       const storedPage = getStoredPage(page.id, page);
@@ -98,6 +96,8 @@ export default function ContentViewer({
       // Bỏ qua lỗi truy cập client storage
     }
   }, [page.id, initialBlocks, page.status, page]);
+
+  const [saveErrorMsg, setSaveErrorMsg] = useState('');
 
   const handleFontSizeChange = (mode: FontSizeOption) => {
     setFontSizeMode(mode);
@@ -120,113 +120,117 @@ export default function ContentViewer({
     saveStoredPageStatus(page.id, nextStatus);
   };
 
-  const handleSavePage = (updated: Partial<Page>) => {
-    const newPage = { ...currentPage, ...updated };
-    setCurrentPage(newPage);
-    saveStoredPage(page.id, updated);
-    if (updated.status) {
-      setPageStatus(updated.status);
-      saveStoredPageStatus(page.id, updated.status);
-    }
-  };
-
-  // Di chuyển khối lên
-  const handleMoveBlockUp = (index: number) => {
-    if (index === 0) return;
-    const updated = [...blockList];
-    const temp = updated[index - 1];
-    updated[index - 1] = updated[index];
-    updated[index] = temp;
-    setBlockList(updated);
-    saveStoredBlocks(page.id, updated);
-  };
-
-  // Di chuyển khối xuống
-  const handleMoveBlockDown = (index: number) => {
-    if (index === blockList.length - 1) return;
-    const updated = [...blockList];
-    const temp = updated[index + 1];
-    updated[index + 1] = updated[index];
-    updated[index] = temp;
-    setBlockList(updated);
-    saveStoredBlocks(page.id, updated);
-  };
-
-  // Xóa khối
-  const handleDeleteBlock = (blockId: string) => {
-    if (!confirm('Bạn có chắc chắn muốn xóa khối nội dung này?')) return;
-    const updated = blockList.filter((b) => b.id !== blockId);
-    setBlockList(updated);
-    saveStoredBlocks(page.id, updated);
-    setActiveMenuBlockId(null);
-  };
-
-  // Nhân bản khối
-  const handleDuplicateBlock = (index: number) => {
-    const target = blockList[index];
-    const duplicate: Block = {
-      ...JSON.parse(JSON.stringify(target)),
-      id: `block-copy-${Date.now()}`,
+    const triggerSaveBlocks = async (blocks: Block[]) => {
+      const ok = await saveStoredBlocks(page.id, blocks);
+      if (!ok) {
+        setSaveErrorMsg('Chưa lưu được, thử lại');
+        setTimeout(() => setSaveErrorMsg(''), 3500);
+      }
     };
-    const updated = [...blockList];
-    updated.splice(index + 1, 0, duplicate);
-    setBlockList(updated);
-    saveStoredBlocks(page.id, updated);
-    setActiveMenuBlockId(null);
-  };
 
-  // Bật tắt ẩn/hiện khối
-  const handleToggleVisibility = (blockId: string) => {
-    const updated = blockList.map((b) => {
-      if (b.id === blockId) {
-        return { ...b, is_visible: !b.is_visible };
+    const handleSavePage = async (updated: Partial<Page>) => {
+      const newPage = { ...currentPage, ...updated };
+      setCurrentPage(newPage);
+      const ok = await saveStoredPage(page.id, updated);
+      if (!ok) {
+        setSaveErrorMsg('Chưa lưu được, thử lại');
+        setTimeout(() => setSaveErrorMsg(''), 3500);
       }
-      return b;
-    });
-    setBlockList(updated);
-    saveStoredBlocks(page.id, updated);
-    setActiveMenuBlockId(null);
-  };
-
-  // Lưu khối sau khi sửa
-  const handleSaveBlock = (updatedBlock: Block) => {
-    const updated = blockList.map((b) => (b.id === updatedBlock.id ? updatedBlock : b));
-    setBlockList(updated);
-    saveStoredBlocks(page.id, updated);
-  };
-
-  // Thêm khối mới
-  const handleAddBlock = (newBlock: Block) => {
-    const updated = [...blockList, newBlock];
-    setBlockList(updated);
-    saveStoredBlocks(page.id, updated);
-  };
-
-  // Lưu video sau khi quản lý
-  const handleSaveVideos = (newVideos: Video[]) => {
-    const updated = blockList.map((b) => {
-      if (b.type === 'videos') {
-        return {
-          ...b,
-          data: {
-            ...b.data,
-            videos: newVideos,
-          },
-        };
+      if (updated.status) {
+        setPageStatus(updated.status);
+        await saveStoredPageStatus(page.id, updated.status);
       }
-      return b;
-    });
-    setBlockList(updated);
-    saveStoredBlocks(page.id, updated);
-  };
+    };
 
-  // Khôi phục mặc định
-  const handleResetToDefault = () => {
-    if (confirm('Khôi phục toàn bộ khối về dữ liệu ban đầu?')) {
-      resetStoredBlocks(page.id);
-      setBlockList(initialBlocks);
-    }
-  };
+    // Di chuyển khối lên
+    const handleMoveBlockUp = (index: number) => {
+      if (index === 0) return;
+      const updated = [...blockList];
+      const temp = updated[index - 1];
+      updated[index - 1] = updated[index];
+      updated[index] = temp;
+      setBlockList(updated);
+      triggerSaveBlocks(updated);
+    };
+
+    // Di chuyển khối xuống
+    const handleMoveBlockDown = (index: number) => {
+      if (index === blockList.length - 1) return;
+      const updated = [...blockList];
+      const temp = updated[index + 1];
+      updated[index + 1] = updated[index];
+      updated[index] = temp;
+      setBlockList(updated);
+      triggerSaveBlocks(updated);
+    };
+
+    // Xóa khối
+    const handleDeleteBlock = (blockId: string) => {
+      if (!confirm('Bạn có chắc chắn muốn xóa khối nội dung này?')) return;
+      const updated = blockList.filter((b) => b.id !== blockId);
+      setBlockList(updated);
+      triggerSaveBlocks(updated);
+      setActiveMenuBlockId(null);
+    };
+
+    // Nhân bản khối
+    const handleDuplicateBlock = (index: number) => {
+      const target = blockList[index];
+      const duplicate: Block = {
+        ...JSON.parse(JSON.stringify(target)),
+        id: `block-copy-${Date.now()}`,
+      };
+      const updated = [...blockList];
+      updated.splice(index + 1, 0, duplicate);
+      setBlockList(updated);
+      triggerSaveBlocks(updated);
+      setActiveMenuBlockId(null);
+    };
+
+    // Bật tắt ẩn/hiện khối
+    const handleToggleVisibility = (blockId: string) => {
+      const updated = blockList.map((b) => {
+        if (b.id === blockId) {
+          return { ...b, is_visible: !b.is_visible };
+        }
+        return b;
+      });
+      setBlockList(updated);
+      triggerSaveBlocks(updated);
+      setActiveMenuBlockId(null);
+    };
+
+    // Lưu khối sau khi sửa
+    const handleSaveBlock = (updatedBlock: Block) => {
+      const updated = blockList.map((b) => (b.id === updatedBlock.id ? updatedBlock : b));
+      setBlockList(updated);
+      triggerSaveBlocks(updated);
+    };
+
+    // Thêm khối mới
+    const handleAddBlock = (newBlock: Block) => {
+      const updated = [...blockList, newBlock];
+      setBlockList(updated);
+      triggerSaveBlocks(updated);
+    };
+
+    // Lưu video sau khi quản lý
+    const handleSaveVideos = (newVideos: Video[]) => {
+      const updated = blockList.map((b) => {
+        if (b.type === 'videos') {
+          return {
+            ...b,
+            data: {
+              ...b.data,
+              videos: newVideos,
+            },
+          };
+        }
+        return b;
+      });
+      setBlockList(updated);
+      triggerSaveBlocks(updated);
+    };
 
   // Tạo danh sách mục lục từ các khối hiển thị
   const tocItems: TocItem[] = blockList
@@ -478,19 +482,10 @@ export default function ContentViewer({
           <button
             type="button"
             onClick={() => setShowAddDrawer(true)}
-            className="flex items-center justify-center gap-2 h-[52px] min-h-[48px] w-full rounded-[16px] border-2 border-dashed border-primary bg-primary-soft/30 text-primary font-extrabold text-[17px] transition-transform active:scale-[0.98] shadow-2xs hover:bg-primary-soft/50"
+            className="flex items-center justify-center gap-2 h-[52px] min-h-[48px] w-full rounded-[16px] border-2 border-dashed border-primary bg-primary-soft/30 text-primary font-extrabold text-[17px] transition-transform active:scale-[0.98] shadow-2xs hover:bg-primary-soft/50 cursor-pointer"
           >
             <Plus size={20} strokeWidth={2.5} />
             <span>Thêm nội dung</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleResetToDefault}
-            className="self-center flex items-center gap-1.5 text-[13px] text-muted hover:text-ink font-semibold mt-1 py-1"
-          >
-            <RotateCcw size={13} />
-            <span>Khôi phục dữ liệu mẫu ban đầu</span>
           </button>
         </div>
       )}
@@ -556,25 +551,23 @@ export default function ContentViewer({
             </button>
           </div>
 
-          <div className="flex items-center justify-between pt-1 text-[13px]">
-            <button
-              type="button"
-              onClick={handleResetToDefault}
-              className="flex items-center gap-1 text-muted hover:text-red-600 font-medium py-1"
-            >
-              <RotateCcw size={13} />
-              <span>Khôi phục dữ liệu bài này</span>
-            </button>
-
+          <div className="flex items-center justify-end pt-1 text-[13px]">
             <button
               type="button"
               onClick={handleToggleAdmin}
-              className="text-[#8A3A14] font-bold py-1 hover:underline"
+              className="text-[#8A3A14] font-bold py-1 hover:underline cursor-pointer"
             >
               Thoát sửa
             </button>
           </div>
         </section>
+      )}
+
+      {/* Thông báo lỗi khi lưu thất bại (không im lặng) */}
+      {saveErrorMsg && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full bg-red-600 text-white font-extrabold text-[14px] shadow-lg animate-in fade-in slide-in-from-bottom-2">
+          {saveErrorMsg}
+        </div>
       )}
 
       {/* Modals của Admin */}
@@ -611,7 +604,11 @@ export default function ContentViewer({
           isOpen={true}
           onClose={() => setShowEditPageModal(false)}
           page={currentPage}
-          onSavePage={handleSavePage}
+          topicId={topic.id}
+          onSaved={(updated) => {
+            setCurrentPage(updated);
+            setPageStatus(updated.status);
+          }}
         />
       )}
 

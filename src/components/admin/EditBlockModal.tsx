@@ -13,9 +13,11 @@ import {
   Check,
   ChevronUp,
   ChevronDown,
+  Upload,
 } from 'lucide-react';
 import { Block, Image as ImageType, FileItem, Video } from '../../lib/types';
 import { extractYouTubeId, fetchYouTubeMeta } from '../../lib/youtube';
+import { uploadImageFile, uploadPdfFile } from '../../lib/storageUpload';
 
 interface EditBlockModalProps {
   isOpen: boolean;
@@ -60,6 +62,7 @@ export default function EditBlockModal({
   const [inputFileUrl, setInputFileUrl] = useState('');
   const [inputVideoUrl, setInputVideoUrl] = useState('');
   const [isLoadingVideo, setIsLoadingVideo] = useState(false);
+  const [isUploadingMedia, setIsUploadingMedia] = useState(false);
 
   // State cho images block gốc
   const [imageList, setImageList] = useState<ImageType[]>(
@@ -403,13 +406,38 @@ export default function EditBlockModal({
                 {/* Form thêm Ảnh nhỏ gọn */}
                 {activeAttachTab === 'image' && (
                   <div className="flex flex-col gap-1.5 p-3 rounded-[12px] bg-surface-2 border border-line text-[13px] animate-in fade-in">
-                    <input
-                      type="url"
-                      value={inputImageUrl}
-                      onChange={(e) => setInputImageUrl(e.target.value)}
-                      placeholder="Dán đường dẫn ảnh..."
-                      className="w-full h-9 px-2.5 rounded-[8px] border border-line text-[14px]"
-                    />
+                    <div className="flex gap-1.5">
+                      <input
+                        type="url"
+                        value={inputImageUrl}
+                        onChange={(e) => setInputImageUrl(e.target.value)}
+                        placeholder="Dán đường dẫn ảnh..."
+                        className="flex-1 h-9 px-2.5 rounded-[8px] border border-line text-[14px]"
+                      />
+                      <label className="flex items-center gap-1 h-9 px-2.5 rounded-[8px] bg-primary-soft text-primary font-bold text-[12px] border border-primary/30 cursor-pointer shrink-0">
+                        <Upload size={13} />
+                        <span>{isUploadingMedia ? 'Đang nén...' : 'Chọn từ máy'}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            try {
+                              setIsUploadingMedia(true);
+                              const res = await uploadImageFile(file);
+                              setInputImageUrl(res.url);
+                            } catch (err: any) {
+                              alert(err.message || 'Lỗi tải ảnh');
+                            } finally {
+                              setIsUploadingMedia(false);
+                            }
+                          }}
+                          disabled={isUploadingMedia}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
                     <div className="flex gap-2">
                       <input
                         type="text"
@@ -432,13 +460,39 @@ export default function EditBlockModal({
                 {/* Form thêm PDF nhỏ gọn */}
                 {activeAttachTab === 'file' && (
                   <div className="flex flex-col gap-1.5 p-3 rounded-[12px] bg-surface-2 border border-line text-[13px] animate-in fade-in">
-                    <input
-                      type="text"
-                      value={inputFileName}
-                      onChange={(e) => setInputFileName(e.target.value)}
-                      placeholder="Tên tài liệu (vd: Hướng dẫn chăm sóc.pdf)..."
-                      className="w-full h-9 px-2.5 rounded-[8px] border border-line text-[14px]"
-                    />
+                    <div className="flex gap-1.5">
+                      <input
+                        type="text"
+                        value={inputFileName}
+                        onChange={(e) => setInputFileName(e.target.value)}
+                        placeholder="Tên tài liệu..."
+                        className="flex-1 h-9 px-2.5 rounded-[8px] border border-line text-[14px]"
+                      />
+                      <label className="flex items-center gap-1 h-9 px-2.5 rounded-[8px] bg-primary-soft text-primary font-bold text-[12px] border border-primary/30 cursor-pointer shrink-0">
+                        <Upload size={13} />
+                        <span>{isUploadingMedia ? 'Đang tải...' : 'Chọn file PDF'}</span>
+                        <input
+                          type="file"
+                          accept=".pdf,application/pdf"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            try {
+                              setIsUploadingMedia(true);
+                              const res = await uploadPdfFile(file);
+                              setInputFileName(res.fileName);
+                              setInputFileUrl(res.url);
+                            } catch (err: any) {
+                              alert(err.message || 'Lỗi tải file PDF');
+                            } finally {
+                              setIsUploadingMedia(false);
+                            }
+                          }}
+                          disabled={isUploadingMedia}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
                     <div className="flex gap-2">
                       <input
                         type="url"
@@ -542,13 +596,38 @@ export default function EditBlockModal({
             <div className="flex flex-col gap-3">
               <div className="flex flex-col gap-1.5 p-3 rounded-[14px] bg-surface-2 border border-line">
                 <span className="text-[13px] font-bold text-ink">+ Thêm ảnh mới</span>
-                <input
-                  type="url"
-                  value={newImgUrl}
-                  onChange={(e) => setNewImgUrl(e.target.value)}
-                  placeholder="Dán đường dẫn ảnh..."
-                  className="h-10 px-3 rounded-[10px] border border-line text-[14px]"
-                />
+                <div className="flex gap-1.5">
+                  <input
+                    type="url"
+                    value={newImgUrl}
+                    onChange={(e) => setNewImgUrl(e.target.value)}
+                    placeholder="Dán đường dẫn ảnh..."
+                    className="flex-1 h-10 px-3 rounded-[10px] border border-line text-[14px]"
+                  />
+                  <label className="flex items-center gap-1 h-10 px-3 rounded-[10px] bg-primary-soft text-primary font-bold text-[13px] border border-primary/30 cursor-pointer hover:bg-primary-soft/80 shrink-0">
+                    <Upload size={14} />
+                    <span>{isUploadingMedia ? 'Đang nén...' : 'Chọn từ máy'}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        try {
+                          setIsUploadingMedia(true);
+                          const res = await uploadImageFile(file);
+                          setNewImgUrl(res.url);
+                        } catch (err: any) {
+                          alert(err.message || 'Lỗi tải ảnh');
+                        } finally {
+                          setIsUploadingMedia(false);
+                        }
+                      }}
+                      disabled={isUploadingMedia}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
                 <div className="flex gap-2">
                   <input
                     type="text"
@@ -560,7 +639,7 @@ export default function EditBlockModal({
                   <button
                     type="button"
                     onClick={handleAddImageToBlock}
-                    className="h-10 px-4 rounded-[10px] bg-primary text-white font-bold text-[14px]"
+                    className="h-10 px-4 rounded-[10px] bg-primary text-white font-bold text-[14px] cursor-pointer"
                   >
                     Thêm
                   </button>
@@ -579,7 +658,7 @@ export default function EditBlockModal({
                     <button
                       type="button"
                       onClick={() => setImageList(imageList.filter((_, i) => i !== idx))}
-                      className="p-1.5 text-red-600 hover:bg-red-50 rounded-md"
+                      className="p-1.5 text-red-600 hover:bg-red-50 rounded-md cursor-pointer"
                     >
                       <Trash2 size={16} />
                     </button>
@@ -601,7 +680,7 @@ export default function EditBlockModal({
                   placeholder="Tên tài liệu..."
                   className="h-10 px-3 rounded-[10px] border border-line text-[14px]"
                 />
-                <div className="flex gap-2">
+                <div className="flex gap-1.5">
                   <input
                     type="url"
                     value={newFileUrl}
@@ -609,12 +688,38 @@ export default function EditBlockModal({
                     placeholder="Đường dẫn file (https://...)..."
                     className="flex-1 h-10 px-3 rounded-[10px] border border-line text-[14px]"
                   />
+                  <label className="flex items-center gap-1 h-10 px-3 rounded-[10px] bg-primary-soft text-primary font-bold text-[13px] border border-primary/30 cursor-pointer hover:bg-primary-soft/80 shrink-0">
+                    <Upload size={14} />
+                    <span>{isUploadingMedia ? 'Đang tải...' : 'Chọn file PDF'}</span>
+                    <input
+                      type="file"
+                      accept=".pdf,application/pdf"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        try {
+                          setIsUploadingMedia(true);
+                          const res = await uploadPdfFile(file);
+                          setNewFileName(res.fileName);
+                          setNewFileUrl(res.url);
+                        } catch (err: any) {
+                          alert(err.message || 'Lỗi tải file PDF');
+                        } finally {
+                          setIsUploadingMedia(false);
+                        }
+                      }}
+                      disabled={isUploadingMedia}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                <div className="flex justify-end">
                   <button
                     type="button"
                     onClick={handleAddFileToBlock}
-                    className="h-10 px-4 rounded-[10px] bg-primary text-white font-bold text-[14px]"
+                    className="h-10 px-5 rounded-[10px] bg-primary text-white font-bold text-[14px] cursor-pointer"
                   >
-                    Thêm
+                    Thêm vào danh sách
                   </button>
                 </div>
               </div>

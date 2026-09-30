@@ -96,7 +96,8 @@ Bấm nút `+ Thêm nội dung` ở cuối trang mở modal chọn dạng khối
 
 ---
 
-## 5. Lưu trữ & Đồng bộ Dữ liệu
-- Hỗ trợ lưu trữ bền vững:
-  1. **Local Persistent Storage:** Lưu trữ vào bộ nhớ trình duyệt để người dùng có thể thao tác và kiểm tra ngay lập tức.
-  2. **Supabase Database & Storage:** Khi cấu hình biến môi trường (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`), tự động đồng bộ 2 chiều vào Supabase.
+## 5. Lưu trữ & Đồng bộ Dữ liệu (LENH_02 Hoàn tất)
+- Toàn bộ dữ liệu nằm ở Supabase PostgreSQL (4 bảng: `settings`, `topics`, `pages`, `blocks`).
+- Mọi thao tác ghi (thêm, sửa, xóa, di chuyển) đi qua Route Handler `/api/admin/*` kiểm tra cookie HMAC-SHA256 bảo mật phía server, ghi bằng `SUPABASE_SERVICE_ROLE_KEY`.
+- Không còn lưu `localStorage` cho nội dung bài học. Khi sửa 1 lần, bất kỳ người dùng nào mở ứng dụng cũng thấy nội dung cập nhật ngay lập tức.
+- Bucket Storage `media` lưu ảnh WebP đã nén và file PDF tải lên qua Signed Upload URL.

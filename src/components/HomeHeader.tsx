@@ -17,7 +17,7 @@ export default function HomeHeader({ initialAppName }: HomeHeaderProps) {
   const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
-    setIsAdmin(checkIsAdminClient());
+    checkIsAdminClient().then(setIsAdmin);
     const stored = getStoredAppSettings();
     if (stored.app_name) {
       setAppName(stored.app_name);
