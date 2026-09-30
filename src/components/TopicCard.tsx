@@ -7,14 +7,14 @@ import { Topic } from '../lib/types';
 import { Play, ArrowRight } from 'lucide-react';
 
 export const DEFAULT_TOPIC_COVERS: Record<string, string> = {
-  'cot-song': '/spine_hero_clean.png',
-  'dinh-duong': 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=600&auto=format&fit=crop',
-  'nuoc': 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?q=80&w=600&auto=format&fit=crop',
-  'tieu-hoa': 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?q=80&w=600&auto=format&fit=crop',
-  'co-the-nguoi': 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=600&auto=format&fit=crop',
-  'noi-tiet-chuyen-hoa': 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=600&auto=format&fit=crop',
-  'gan-mat-tuy': 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?q=80&w=600&auto=format&fit=crop',
-  'mien-dich': 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=600&auto=format&fit=crop',
+  'cot-song': '/images/topics/cot-song.png',
+  'dinh-duong': '/images/topics/dinh-duong.png',
+  'nuoc': '/images/topics/nuoc.png',
+  'tieu-hoa': '/images/topics/tieu-hoa.png',
+  'co-the-nguoi': '/images/topics/co-the-nguoi.png',
+  'noi-tiet-chuyen-hoa': '/images/topics/noi-tiet-chuyen-hoa.png',
+  'gan-mat-tuy': '/images/topics/gan-mat-tuy.png',
+  'mien-dich': '/images/topics/mien-dich.png',
 };
 
 interface TopicCardProps {
@@ -32,12 +32,10 @@ export default function TopicCard({ topic, pageCount }: TopicCardProps) {
     <Link
       href={`/${topic.slug}`}
       prefetch={true}
-      className={`flex flex-col rounded-[20px] bg-white border transition-all duration-200 active:scale-[0.98] group overflow-hidden relative cursor-pointer shadow-xs hover:shadow-md ${
-        isAvailable ? 'border-primary/40 ring-1 ring-primary/10' : 'border-line hover:border-line-strong'
-      }`}
+      className="flex flex-col p-2.5 sm:p-3 rounded-[20px] bg-[#131A26] hover:bg-[#182232] border border-white/10 hover:border-amber-400/40 transition-all duration-200 active:scale-[0.98] group overflow-hidden relative cursor-pointer shadow-md"
     >
-      {/* 1. KHUNG ẢNH BÌA Y HỌC / ANATOMY 16:10 */}
-      <div className="relative w-full aspect-[16/10] sm:h-[110px] overflow-hidden bg-slate-900 shrink-0">
+      {/* 1. KHUNG ẢNH 3D CÓ VIỀN VÀNG SÂM PANH TINH TẾ (THEO ẢNH MẪU CỦA BẠN) */}
+      <div className="relative w-full aspect-[4/3] rounded-[14px] overflow-hidden bg-[#0A0F17] border border-amber-300/35 shrink-0 flex items-center justify-center shadow-inner">
         {hasCoverImage ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -52,47 +50,27 @@ export default function TopicCard({ topic, pageCount }: TopicCardProps) {
             <TopicIcon name={topic.icon} size={36} />
           </div>
         )}
-
-        {/* Lớp phủ chuyển màu gradient nhẹ */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
-
-        {/* Huy hiệu trạng thái trên góc ảnh */}
-        <div className="absolute top-2 right-2">
-          {isAvailable ? (
-            <span className="px-2 py-0.5 rounded-full bg-[#0E6B5A] text-white text-[10px] font-black uppercase tracking-wider shadow-xs backdrop-blur-xs">
-              {pageCount} BÀI HỌC
-            </span>
-          ) : (
-            <span className="px-2 py-0.5 rounded-full bg-black/60 text-white/80 text-[10px] font-bold backdrop-blur-xs border border-white/10">
-              SẮP CÓ
-            </span>
-          )}
-        </div>
-
-        {/* Icon Play mờ khi có bài học */}
-        {isAvailable && (
-          <div className="absolute bottom-2 left-2 w-6 h-6 rounded-full bg-white/90 text-primary flex items-center justify-center shadow-xs">
-            <Play size={10} fill="#0E6B5A" className="ml-0.5 text-primary" />
-          </div>
-        )}
       </div>
 
-      {/* 2. PHẦN CHỮ NẰM DƯỚI NỀN TRẮNG SẠCH SẼ */}
-      <div className="p-3 sm:p-3.5 flex flex-col justify-between flex-1 bg-white min-w-0">
-        <h3 className="text-[15.5px] sm:text-[16.5px] font-extrabold text-ink leading-snug line-clamp-1 group-hover:text-primary transition-colors">
+      {/* 2. PHẦN CHỮ NẰM DƯỚI NỀN TỐI SANG TRỌNG */}
+      <div className="mt-2.5 px-0.5 flex flex-col justify-between flex-1 min-w-0">
+        <h3 className="text-[15px] sm:text-[16px] font-extrabold text-white leading-snug line-clamp-1 group-hover:text-amber-200 transition-colors">
           {topic.title}
         </h3>
 
-        <div className="flex items-center justify-between mt-1 text-[12px]">
+        <div className="mt-1 flex items-center">
           {isAvailable ? (
-            <span className="text-primary font-bold flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#0E6B5A] animate-pulse" />
-              <span>Sẵn sàng học</span>
+            <span className="flex items-center gap-1.5 text-slate-300 text-[12px] font-medium">
+              <span className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-xs bg-white/15 text-white/90">
+                <Play size={8} fill="currentColor" />
+              </span>
+              <span>{pageCount} bài học{topic.slug === 'cot-song' ? ' · 9 video' : ''}</span>
             </span>
           ) : (
-            <span className="text-muted font-medium">Đang biên soạn</span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-[#06332A]/90 border border-[#0E6B5A]/60 text-emerald-400 text-[11px] font-bold">
+              Sắp ra mắt
+            </span>
           )}
-          <ArrowRight size={13} className="text-muted group-hover:text-primary group-hover:translate-x-0.5 transition-transform" />
         </div>
       </div>
     </Link>

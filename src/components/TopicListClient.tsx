@@ -127,7 +127,7 @@ export default function TopicListClient({
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-[20px] sm:text-[22px] font-black text-ink leading-tight">
+        <h2 className="text-[19px] sm:text-[21px] font-bold font-serif tracking-wider uppercase text-ink leading-tight">
           {topicsTitle}
         </h2>
 

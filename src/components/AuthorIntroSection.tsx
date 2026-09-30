@@ -79,80 +79,64 @@ export function AuthorProfileSection({
         </div>
       )}
 
-      {/* THẺ MASTER INSTRUCTOR PROFILE CARD CAO CẤP */}
-      <div className="relative p-5 sm:p-6 rounded-[24px] bg-gradient-to-br from-[#06332A] via-[#094135] to-[#0E6B5A] text-white shadow-md border border-emerald-900/40 overflow-hidden flex flex-col gap-3.5">
-        {/* Họa tiết trang trí nền y sinh học */}
-        <div className="absolute top-0 right-0 w-[180px] h-[180px] bg-emerald-400/10 rounded-full blur-2xl pointer-events-none" />
+      {/* THẺ MASTER INSTRUCTOR PROFILE CARD CAO CẤP (THEO ẢNH MẪU CỦA BẠN) */}
+      <div className="relative p-4 sm:p-5 rounded-[22px] bg-white text-ink shadow-xs border border-amber-300/50 overflow-hidden flex flex-col gap-3">
+        {/* Họa tiết trang trí viền vàng kim cao cấp góc phải */}
+        <div className="absolute top-0 right-0 w-32 h-32 opacity-20 pointer-events-none bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-amber-400 via-transparent to-transparent" />
 
-        {/* 1. Phần Đầu: Chân dung, Tên & Huy hiệu Chuyên gia */}
-        <div className="relative z-10 flex items-center gap-3.5 sm:gap-4">
-          {/* Avatar với viền sáng tròn */}
-          <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full p-0.5 bg-gradient-to-br from-emerald-300 to-emerald-600 shadow-md shrink-0">
-            <div className="w-full h-full rounded-full overflow-hidden bg-slate-900 flex items-center justify-center">
-              {profile.avatar_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={profile.avatar_url}
-                  alt={profile.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-emerald-900/60 rounded-full flex items-center justify-center">
-                  <User size={32} className="text-emerald-300" />
-                </div>
-              )}
-            </div>
-            {/* Huy hiệu Verified tick */}
-            <div className="absolute bottom-0 right-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-xs border-2 border-[#06332A]" title="Chuyên gia xác thực">
-              <Sparkles size={11} className="fill-white" />
-            </div>
+        {/* 1. Phần Đầu: Chân dung bên trái + Tên & Sứ mệnh bên phải */}
+        <div className="relative z-10 flex items-start gap-3.5 sm:gap-4">
+          {/* Ảnh chân dung chuyên gia */}
+          <div className="w-[96px] sm:w-[110px] aspect-[4/5] rounded-[14px] overflow-hidden bg-slate-100 shrink-0 border border-slate-200 shadow-2xs">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/author_tung.png"
+              alt={profile.name || 'Tùng Dinh Dưỡng'}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                if (profile.avatar_url) (e.target as HTMLImageElement).src = profile.avatar_url;
+              }}
+            />
           </div>
 
-          <div className="flex-1 flex flex-col gap-0.5 min-w-0">
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] sm:text-[10.5px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-200 border border-emerald-400/30 w-fit">
-                CHUYÊN GIA SỨC KHỎE
-              </span>
-            </div>
-            <h3 className="text-[20px] sm:text-[22px] font-black text-white leading-tight truncate">
-              {profile.name || 'Tùng dinh dưỡng'}
+          <div className="flex-1 flex flex-col gap-1 min-w-0">
+            <h3 className="text-[19px] sm:text-[21px] font-black text-ink leading-tight truncate">
+              {profile.name || 'Tùng Dinh Dưỡng'}
             </h3>
-            <p className="text-[12.5px] sm:text-[13px] text-emerald-100/90 font-medium leading-tight">
-              {profile.title || 'Hỗ trợ kiến thức nền tảng & Sức khỏe'}
+            <p className="text-[10.5px] sm:text-[11.5px] font-black tracking-wider text-muted uppercase leading-tight">
+              {profile.title || 'CHUYÊN GIA DINH DƯỠNG & ĐÀO TẠO Y KHOA'}
             </p>
+            {profile.bio && (
+              <p className="text-[12.5px] sm:text-[13px] text-muted leading-relaxed line-clamp-4 mt-1 font-normal">
+                {profile.bio}
+              </p>
+            )}
           </div>
         </div>
 
-        {/* 2. Tôn chỉ / Cam kết sứ mệnh */}
-        {profile.bio && (
-          <div className="relative z-10 p-3 sm:p-3.5 rounded-[16px] bg-black/25 backdrop-blur-xs border border-white/10 text-[13px] sm:text-[13.5px] text-emerald-50 leading-relaxed font-normal whitespace-pre-line">
-            &ldquo;{profile.bio}&rdquo;
-          </div>
-        )}
-
-        {/* 3. Nút hành động trực diện: Nhắn Zalo & Gọi Hotline */}
-        <div className="relative z-10 flex flex-col sm:flex-row items-center gap-2 pt-2 border-t border-white/15">
+        {/* 2. Nút hành động trực diện: Nhắn Zalo & Gọi Hotline */}
+        <div className="relative z-10 flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-line">
           {profile.zalo_url && (
             <a
               href={profile.zalo_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:flex-1 h-[46px] rounded-[14px] bg-[#0068FF] hover:bg-[#0055D4] text-white font-extrabold text-[13.5px] sm:text-[14px] flex items-center justify-center gap-2 shadow-md active:scale-[0.98] transition-all cursor-pointer"
+              className="h-10 px-4 rounded-full bg-[#0068FF] hover:bg-[#0055D4] text-white font-extrabold text-[13px] flex items-center gap-1.5 shadow-xs active:scale-[0.98] transition-all cursor-pointer"
             >
-              <div className="w-5 h-5 rounded-full bg-white text-[#0068FF] flex items-center justify-center font-black text-[9.5px]">
+              <div className="w-4.5 h-4.5 rounded-full bg-white text-[#0068FF] flex items-center justify-center font-black text-[9px]">
                 Zalo
               </div>
-              <span>Nhắn Zalo cùng Tùng Dinh Dưỡng</span>
+              <span>Nhắn Zalo tư vấn 1-1</span>
             </a>
           )}
 
           {profile.phone && (
             <a
               href={`tel:${profile.phone.replace(/[^0-9+]/g, '')}`}
-              className="w-full sm:w-auto h-[46px] px-3.5 rounded-[14px] bg-white/15 hover:bg-white/25 border border-white/20 text-white font-bold text-[13px] flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all whitespace-nowrap cursor-pointer"
+              className="text-[13.5px] font-bold text-ink hover:text-primary transition-colors flex items-center gap-1 py-1"
             >
-              <Phone size={14} className="text-emerald-300" />
-              <span>Hotline: {profile.phone}</span>
+              <span className="text-muted font-normal">Hotline:</span>
+              <span className="font-extrabold text-[#7A4B00]">{profile.phone}</span>
             </a>
           )}
         </div>
