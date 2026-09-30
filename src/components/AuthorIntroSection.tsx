@@ -7,13 +7,13 @@ import {
   Edit2,
   Film,
   Sparkles,
-  MessageCircle,
   Play,
   Phone,
   PhoneCall,
   Mail,
   MapPin,
   Globe,
+  Plus,
 } from 'lucide-react';
 import { AuthorProfile, AuthorBook } from '../lib/types';
 import { normalizeAuthorProfile } from '../lib/data';
@@ -31,6 +31,7 @@ export default function AuthorIntroSection({ initialProfile }: AuthorIntroSectio
   const [isAdmin, setIsAdmin] = useState(false);
   const [selectedBook, setSelectedBook] = useState<AuthorBook | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [modalTab, setModalTab] = useState<'author' | 'books' | 'contact' | 'extra'>('author');
 
   useEffect(() => {
     checkIsAdminClient().then(setIsAdmin);
@@ -39,17 +40,22 @@ export default function AuthorIntroSection({ initialProfile }: AuthorIntroSectio
     }
   }, [initialProfile]);
 
+  const openModalWithTab = (tab: 'author' | 'books' | 'contact' | 'extra') => {
+    setModalTab(tab);
+    setShowEditModal(true);
+  };
+
   const introVideoId = profile.intro_video_url ? extractYouTubeId(profile.intro_video_url) : null;
 
   return (
     <section className="flex flex-col gap-4 mt-2">
-      {/* Tiêu đề mục & Nút Quản trị */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-[20px] font-extrabold text-ink leading-tight">
-            Giới thiệu & Tác phẩm
+      {/* TIÊU ĐỀ CHÍNH CỦA KHỐI & NÚT SỬA TỔNG QUAN (KHÔNG BỊ XUỐNG DÒNG) */}
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <h2 className="text-[20px] font-extrabold text-ink leading-tight truncate">
+            Tác giả & Chuyên gia
           </h2>
-          <p className="text-[13px] text-muted">
+          <p className="text-[13px] text-muted truncate">
             Người đồng hành & các công trình nghiên cứu
           </p>
         </div>
@@ -57,50 +63,64 @@ export default function AuthorIntroSection({ initialProfile }: AuthorIntroSectio
         {isAdmin && (
           <button
             type="button"
-            onClick={() => setShowEditModal(true)}
-            className="flex items-center gap-1.5 h-8 px-3 rounded-[10px] bg-primary-soft text-primary text-[13px] font-extrabold hover:bg-primary-soft/80 cursor-pointer shadow-2xs"
+            onClick={() => openModalWithTab('author')}
+            className="flex items-center gap-1.5 h-8 px-3 rounded-[10px] bg-primary-soft text-primary text-[12.5px] font-extrabold hover:bg-primary-soft/80 cursor-pointer shadow-2xs shrink-0 whitespace-nowrap"
           >
             <Edit2 size={13} />
-            <span>Sửa giới thiệu</span>
+            <span>Sửa tác giả</span>
           </button>
         )}
       </div>
 
-      {/* 1. KHỐI GIỚI THIỆU BẢN THÂN */}
+      {/* 1. KHỐI GIỚI THIỆU BẢN THÂN (CÓ NÚT SỬA TRỰC TIẾP) */}
       <div className="p-4 sm:p-5 rounded-[24px] bg-white border border-line shadow-xs flex flex-col gap-3.5">
-        {/* Avatar + Tên + Chức danh */}
-        <div className="flex items-center gap-3.5">
-          <div className="w-18 h-18 rounded-full bg-primary-soft flex items-center justify-center overflow-hidden border-2 border-primary/20 shrink-0 shadow-sm">
-            {profile.avatar_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={profile.avatar_url}
-                alt={profile.name}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <User size={34} className="text-primary" />
-            )}
+        {/* Avatar + Tên + Chức danh + Nút sửa khối */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3.5 min-w-0">
+            <div className="w-18 h-18 rounded-full bg-primary-soft flex items-center justify-center overflow-hidden border-2 border-primary/20 shrink-0 shadow-sm">
+              {profile.avatar_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={profile.avatar_url}
+                  alt={profile.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User size={34} className="text-primary" />
+              )}
+            </div>
+
+            <div className="flex-1 flex flex-col gap-0.5 min-w-0">
+              <span className="text-[12px] font-extrabold uppercase text-primary tracking-wider truncate">
+                Tác giả / Chuyên gia
+              </span>
+              <h3 className="text-[20px] font-extrabold text-ink leading-tight truncate">
+                {profile.name}
+              </h3>
+              {profile.title && (
+                <p className="text-[13.5px] text-muted font-bold leading-tight line-clamp-2">
+                  {profile.title}
+                </p>
+              )}
+            </div>
           </div>
 
-          <div className="flex-1 flex flex-col gap-0.5">
-            <span className="text-[12px] font-extrabold uppercase text-primary tracking-wider">
-              Tác giả / Chuyên gia
-            </span>
-            <h3 className="text-[20px] font-extrabold text-ink leading-tight">
-              {profile.name}
-            </h3>
-            {profile.title && (
-              <p className="text-[14px] text-muted font-bold leading-tight">
-                {profile.title}
-              </p>
-            )}
-          </div>
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={() => openModalWithTab('author')}
+              className="flex items-center gap-1 h-7 px-2.5 rounded-[8px] bg-surface-2 hover:bg-primary-soft text-muted hover:text-primary text-[11.5px] font-bold transition-colors cursor-pointer shrink-0 whitespace-nowrap"
+              title="Sửa thông tin tác giả"
+            >
+              <Edit2 size={12} />
+              <span>Sửa</span>
+            </button>
+          )}
         </div>
 
         {/* Lời giới thiệu chi tiết (Bio) */}
         {profile.bio && (
-          <div className="pt-1 text-[15px] text-ink/90 leading-relaxed font-normal whitespace-pre-line border-t border-line/60">
+          <div className="pt-2 text-[14.5px] text-ink/90 leading-relaxed font-normal whitespace-pre-line border-t border-line/60">
             {profile.bio}
           </div>
         )}
@@ -137,40 +157,49 @@ export default function AuthorIntroSection({ initialProfile }: AuthorIntroSectio
         )}
       </div>
 
-      {/* 2. KHUNG CÁC SÁCH ĐÃ LÀM */}
-      {profile.books && profile.books.length > 0 && (
-        <div className="p-4 sm:p-5 rounded-[24px] bg-white border border-line shadow-xs flex flex-col gap-3.5">
-          <div className="flex items-center justify-between border-b border-line pb-2.5">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-[8px] bg-primary-soft text-primary flex items-center justify-center">
-                <BookOpen size={16} strokeWidth={2.5} />
-              </div>
-              <div>
-                <h3 className="text-[16px] font-extrabold text-ink leading-tight">
-                  Sách & Tác phẩm đã làm
-                </h3>
-                <span className="text-[12px] text-muted">
-                  Bấm vào từng cuốn để xem chi tiết & video
+      {/* 2. KHỐI SÁCH & TÁC PHẨM ĐÃ LÀM (KHÔNG KHUNG CHỒNG KHUNG · ẢNH TO RÕ 3:4 · MỘT BÊN SÁCH MỘT BÊN MIÊU TẢ) */}
+      <div className="flex flex-col gap-3 pt-1">
+        {/* Tiêu đề mục sách & Nút Sửa sách */}
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h3 className="text-[19px] font-extrabold text-ink leading-tight flex items-center gap-2">
+              <span>Sách & Tác phẩm đã làm</span>
+              {profile.books && profile.books.length > 0 && (
+                <span className="text-[11.5px] font-extrabold text-primary bg-primary-soft px-2.5 py-0.5 rounded-full shrink-0">
+                  {profile.books.length} cuốn
                 </span>
-              </div>
-            </div>
-            <span className="px-2.5 py-0.5 rounded-full bg-surface-2 text-muted font-extrabold text-[12px]">
-              {profile.books.length} cuốn
-            </span>
+              )}
+            </h3>
+            <p className="text-[12.5px] text-muted truncate mt-0.5">
+              Một bên là sách, một bên là mô tả chi tiết & video
+            </p>
           </div>
 
-          {/* Lưới các cuốn sách */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={() => openModalWithTab('books')}
+              className="flex items-center gap-1.5 h-8 px-3 rounded-[10px] bg-primary-soft text-primary text-[12.5px] font-extrabold hover:bg-primary-soft/80 cursor-pointer shadow-2xs shrink-0 whitespace-nowrap"
+            >
+              <Edit2 size={13} />
+              <span>Sửa sách</span>
+            </button>
+          )}
+        </div>
+
+        {/* Danh sách các cuốn sách (Từng thẻ riêng biệt, phẳng, không lồng khung) */}
+        {profile.books && profile.books.length > 0 ? (
+          <div className="flex flex-col gap-3.5">
             {profile.books.map((book) => {
               const hasVideo = Boolean(book.youtube_url);
               return (
                 <div
                   key={book.id}
                   onClick={() => setSelectedBook(book)}
-                  className="flex gap-3 p-3 rounded-[18px] bg-surface-2/60 hover:bg-surface-2 border border-line/80 hover:border-primary/40 transition-all cursor-pointer shadow-2xs group"
+                  className="p-4 sm:p-5 rounded-[22px] bg-white border border-line shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-row gap-4 sm:gap-5 group"
                 >
-                  {/* Bìa sách */}
-                  <div className="w-[68px] h-[92px] rounded-[10px] bg-white border border-line overflow-hidden shrink-0 shadow-xs flex items-center justify-center group-hover:scale-[1.02] transition-transform">
+                  {/* BÊN TRÁI: Bìa sách TO, RÕ RÀNG tỷ lệ 3:4 */}
+                  <div className="w-[110px] sm:w-[130px] aspect-[3/4] rounded-[14px] bg-surface-2 overflow-hidden shrink-0 shadow-md border border-line/70 relative flex items-center justify-center group-hover:scale-[1.02] transition-transform">
                     {book.cover_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -179,80 +208,146 @@ export default function AuthorIntroSection({ initialProfile }: AuthorIntroSectio
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="flex flex-col items-center justify-center gap-1 text-muted text-center p-1">
-                        <BookOpen size={20} className="text-primary/70" />
-                        <span className="text-[9px] font-bold">Bìa sách</span>
+                      <div className="flex flex-col items-center justify-center gap-1 text-muted text-center p-2">
+                        <BookOpen size={28} className="text-primary/70" />
+                        <span className="text-[10px] font-bold">Bìa sách 3:4</span>
                       </div>
                     )}
+
+                    {/* Hiệu ứng bóng gáy sách tạo cảm giác sách thật */}
+                    <div className="absolute inset-y-0 left-0 w-2.5 bg-gradient-to-r from-black/25 via-white/10 to-transparent pointer-events-none" />
                   </div>
 
-                  {/* Thông tin sách */}
-                  <div className="flex-1 flex flex-col justify-between py-0.5 min-w-0">
-                    <div className="flex flex-col gap-1">
+                  {/* BÊN PHẢI: Miêu tả, tiêu đề, năm phát hành & nút xem chi tiết */}
+                  <div className="flex-1 flex flex-col justify-between min-w-0 py-0.5">
+                    <div className="flex flex-col gap-1.5">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         {book.year && (
-                          <span className="px-2 py-0.5 rounded-[6px] bg-primary/10 text-primary text-[10px] font-extrabold">
+                          <span className="px-2.5 py-0.5 rounded-[6px] bg-primary/10 text-primary text-[11px] font-extrabold">
                             Năm {book.year}
                           </span>
                         )}
                         {hasVideo && (
-                          <span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-[6px] bg-red-100 text-red-600 text-[10px] font-extrabold">
+                          <span className="flex items-center gap-1 px-2 py-0.5 rounded-[6px] bg-red-100 text-red-600 text-[11px] font-extrabold">
                             <Play size={10} className="fill-red-600" />
                             <span>Có video</span>
                           </span>
                         )}
                       </div>
-                      <h4 className="text-[15px] font-extrabold text-ink leading-snug line-clamp-2 group-hover:text-primary transition-colors">
+
+                      <h4 className="text-[16px] sm:text-[17px] font-extrabold text-ink leading-snug line-clamp-2 group-hover:text-primary transition-colors">
                         {book.title}
                       </h4>
-                      <p className="text-[12px] text-muted line-clamp-2 leading-relaxed">
+
+                      <p className="text-[13px] sm:text-[13.5px] text-muted leading-relaxed line-clamp-3 sm:line-clamp-4">
                         {book.description}
                       </p>
                     </div>
 
-                    <span className="text-[12px] text-primary font-bold inline-flex items-center gap-1 pt-1">
-                      <span>Xem nội dung</span>
-                      <span>→</span>
-                    </span>
+                    <div className="pt-2 flex items-center justify-between">
+                      <span className="text-[12.5px] text-primary font-bold inline-flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                        <span>Xem chi tiết & video</span>
+                        <span>→</span>
+                      </span>
+
+                      {isAdmin && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openModalWithTab('books');
+                          }}
+                          className="flex items-center gap-1 h-6 px-2 rounded-[6px] bg-surface-2 hover:bg-primary-soft text-muted hover:text-primary text-[11px] font-bold cursor-pointer shrink-0"
+                          title="Sửa cuốn sách này"
+                        >
+                          <Edit2 size={10} />
+                          <span>Sửa</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
             })}
           </div>
-        </div>
-      )}
+        ) : (
+          isAdmin && (
+            <div
+              onClick={() => openModalWithTab('books')}
+              className="p-6 rounded-[22px] bg-white border-2 border-dashed border-primary/30 flex flex-col items-center justify-center gap-2 text-center cursor-pointer hover:bg-primary-soft/20 transition-colors shadow-2xs"
+            >
+              <div className="w-10 h-10 rounded-full bg-primary-soft text-primary flex items-center justify-center">
+                <Plus size={20} />
+              </div>
+              <h4 className="text-[15px] font-extrabold text-ink">
+                Chưa có sách nào trong danh sách
+              </h4>
+              <p className="text-[12.5px] text-muted">
+                Bấm vào đây để thêm các sách đã làm (Ảnh to 3:4 bên trái, miêu tả bên phải).
+              </p>
+            </div>
+          )
+        )}
+      </div>
 
-      {/* 3. CÁC TRƯỜNG THÊM Ở DƯỚI CUỐI */}
-      {/* Khung Triết lý / Lời nhắn gửi */}
+      {/* 3. KHỐI TRIẾT LÝ PHỤNG SỰ (CÓ NÚT SỬA TRỰC TIẾP) */}
       {profile.extra_content && (
         <div className="p-4 sm:p-5 rounded-[22px] bg-linear-to-br from-primary-soft/40 to-surface-2 border border-primary/20 shadow-2xs flex flex-col gap-2">
-          <div className="flex items-center gap-1.5 text-primary">
-            <Sparkles size={16} strokeWidth={2.5} />
-            <h4 className="text-[14px] font-extrabold uppercase tracking-wide">
-              {profile.extra_title || 'Triết lý phụng sự'}
-            </h4>
+          <div className="flex items-center justify-between border-b border-primary/10 pb-2">
+            <div className="flex items-center gap-1.5 text-primary">
+              <Sparkles size={16} strokeWidth={2.5} />
+              <h4 className="text-[13.5px] font-extrabold uppercase tracking-wider">
+                {profile.extra_title || 'Triết lý phụng sự'}
+              </h4>
+            </div>
+
+            {isAdmin && (
+              <button
+                type="button"
+                onClick={() => openModalWithTab('extra')}
+                className="flex items-center gap-1 h-6 px-2.5 rounded-[7px] bg-white hover:bg-primary-soft text-muted hover:text-primary text-[11px] font-bold cursor-pointer shrink-0 whitespace-nowrap shadow-2xs transition-colors"
+                title="Sửa triết lý phụng sự"
+              >
+                <Edit2 size={11} />
+                <span>Sửa</span>
+              </button>
+            )}
           </div>
-          <p className="text-[15px] text-ink leading-relaxed italic font-medium">
+
+          <p className="text-[15px] text-ink leading-relaxed italic font-medium pt-1">
             &ldquo;{profile.extra_content}&rdquo;
           </p>
         </div>
       )}
 
-      {/* Khung Thông tin liên hệ & Hỗ trợ chuyên gia ở cuối phần tác giả */}
+      {/* 4. KHỐI THÔNG TIN LIÊN HỆ & KẾT NỐI (CÓ NÚT SỬA TRỰC TIẾP) */}
       {(profile.phone || profile.zalo_url || profile.email || profile.facebook_url || profile.address || profile.contact_note) && (
         <div className="p-4 sm:p-5 rounded-[24px] bg-white border border-line shadow-xs flex flex-col gap-3.5">
-          <div className="flex items-center gap-2 border-b border-line pb-2.5">
-            <div className="w-7 h-7 rounded-[8px] bg-primary-soft text-primary flex items-center justify-center">
-              <PhoneCall size={16} strokeWidth={2.5} />
+          <div className="flex items-center justify-between border-b border-line pb-2.5">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-7 h-7 rounded-[8px] bg-primary-soft text-primary flex items-center justify-center shrink-0">
+                <PhoneCall size={16} strokeWidth={2.5} />
+              </div>
+              <div className="min-w-0">
+                <h3 className="text-[16px] font-extrabold text-ink leading-tight truncate">
+                  Thông tin liên hệ & Kết nối
+                </h3>
+                <span className="text-[12px] text-muted truncate block">
+                  Kết nối trực tiếp cùng chuyên gia / tác giả
+                </span>
+              </div>
             </div>
-            <div>
-              <h3 className="text-[16px] font-extrabold text-ink leading-tight">
-                Thông tin liên hệ & Kết nối
-              </h3>
-              <span className="text-[12px] text-muted">
-                Kết nối trực tiếp cùng chuyên gia / tác giả
-              </span>
-            </div>
+
+            {isAdmin && (
+              <button
+                type="button"
+                onClick={() => openModalWithTab('contact')}
+                className="flex items-center gap-1.5 h-7 px-2.5 rounded-[8px] bg-primary-soft text-primary text-[12px] font-extrabold hover:bg-primary-soft/80 cursor-pointer shadow-2xs shrink-0 whitespace-nowrap"
+              >
+                <Edit2 size={12} />
+                <span>Sửa liên hệ</span>
+              </button>
+            )}
           </div>
 
           {/* Lời nhắn kết nối */}
@@ -346,11 +441,12 @@ export default function AuthorIntroSection({ initialProfile }: AuthorIntroSectio
         />
       )}
 
-      {/* Modal chỉnh sửa của Admin */}
+      {/* Modal chỉnh sửa của Admin (Hỗ trợ mở thẳng vào đúng tab của khối) */}
       {showEditModal && (
         <EditAuthorModal
           isOpen={true}
           initialProfile={profile}
+          initialTab={modalTab}
           onClose={() => setShowEditModal(false)}
           onSaved={(newProfile) => {
             setProfile(newProfile);

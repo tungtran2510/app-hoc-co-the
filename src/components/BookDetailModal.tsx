@@ -50,7 +50,7 @@ export default function BookDetailModal({ book, onClose }: BookDetailModalProps)
         <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-4.5">
           {/* Ảnh bìa + Tên sách */}
           <div className="flex gap-4 items-start">
-            <div className="w-24 h-32 rounded-[14px] bg-surface-2 border border-line overflow-hidden shrink-0 shadow-sm flex items-center justify-center">
+            <div className="w-28 aspect-[3/4] rounded-[16px] bg-surface-2 border border-line/70 overflow-hidden shrink-0 shadow-md relative flex items-center justify-center">
               {book.cover_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -61,9 +61,11 @@ export default function BookDetailModal({ book, onClose }: BookDetailModalProps)
               ) : (
                 <div className="flex flex-col items-center justify-center gap-1 text-muted p-2 text-center">
                   <BookOpen size={28} className="text-primary/70" />
-                  <span className="text-[10px] font-bold">Bìa sách</span>
+                  <span className="text-[10px] font-bold">Bìa sách 3:4</span>
                 </div>
               )}
+              {/* Bóng gáy sách */}
+              <div className="absolute inset-y-0 left-0 w-2.5 bg-gradient-to-r from-black/25 via-white/10 to-transparent pointer-events-none" />
             </div>
 
             <div className="flex-1 flex flex-col gap-1.5 pt-0.5">

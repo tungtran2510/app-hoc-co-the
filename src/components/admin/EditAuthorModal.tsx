@@ -27,6 +27,7 @@ import { normalizeAuthorProfile } from '../../lib/data';
 interface EditAuthorModalProps {
   isOpen: boolean;
   initialProfile: AuthorProfile;
+  initialTab?: 'author' | 'books' | 'contact' | 'extra';
   onClose: () => void;
   onSaved: (newProfile: AuthorProfile) => void;
 }
@@ -34,10 +35,11 @@ interface EditAuthorModalProps {
 export default function EditAuthorModal({
   isOpen,
   initialProfile,
+  initialTab = 'author',
   onClose,
   onSaved,
 }: EditAuthorModalProps) {
-  const [activeTab, setActiveTab] = useState<'author' | 'books' | 'contact' | 'extra'>('author');
+  const [activeTab, setActiveTab] = useState<'author' | 'books' | 'contact' | 'extra'>(initialTab);
   const [profile, setProfile] = useState<AuthorProfile>(() => normalizeAuthorProfile(initialProfile));
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isUploadingIntroImage, setIsUploadingIntroImage] = useState(false);
@@ -53,9 +55,10 @@ export default function EditAuthorModal({
   useEffect(() => {
     if (isOpen) {
       setProfile(normalizeAuthorProfile(initialProfile));
+      setActiveTab(initialTab);
       setErrorMsg('');
     }
-  }, [isOpen, initialProfile]);
+  }, [isOpen, initialProfile, initialTab]);
 
   if (!isOpen) return null;
 
