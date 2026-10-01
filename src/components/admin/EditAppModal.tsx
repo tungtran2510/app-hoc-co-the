@@ -138,6 +138,7 @@ export default function EditAppModal({
             type="button"
             onClick={onClose}
             className="w-9 h-9 rounded-full bg-surface-2 flex items-center justify-center text-muted hover:text-ink cursor-pointer"
+            aria-label="Đóng"
           >
             <X size={18} />
           </button>

@@ -6,8 +6,8 @@
   <meta name="description" content="Interactive 3D anatomy atlas built on Z-Anatomy">
   <title>Atlas Giải Phẫu 3D - Human Anatomy Atlas</title>
   <link rel="icon" type="image/svg+xml" href="/3d/favicon.svg">
-  <script type="module" crossorigin src="/3d/assets/index-DNIygmL_.js"></script>
-  <link rel="stylesheet" crossorigin href="/3d/assets/index-DG1d-pat.css">
+  <script type="module" crossorigin src="/3d/assets/index-66wtpzkl.js"></script>
+  <link rel="stylesheet" crossorigin href="/3d/assets/index-hh0VAt2K.css">
 </head>
 <body>
   <div id="app">
@@ -49,6 +49,7 @@
           <div class="sidebar-tabs">
             <button class="sidebar-tab active" data-tab="systems">Hệ cơ quan</button>
             <button class="sidebar-tab" data-tab="regions">Vùng</button>
+            <button class="sidebar-tab" data-tab="roadmap">Lộ trình</button>
             <button class="sidebar-tab" data-tab="bookmarks">Đã lưu</button>
             <button class="sidebar-tab" data-tab="notes">Ghi chú</button>
             <button class="sidebar-tab" data-tab="history">Lịch sử</button>
@@ -63,6 +64,9 @@
           </div>
           <div id="tabRegionsContent" class="tab-pane hidden">
             <div id="regionsList" class="regions-list"></div>
+          </div>
+          <div id="tabRoadmapContent" class="tab-pane hidden">
+            <div id="roadmapContent" class="roadmap-container"></div>
           </div>
           <div id="tabBookmarksContent" class="tab-pane hidden">
             <div id="bookmarksList" class="bookmarks-list"></div>
@@ -97,6 +101,9 @@
 
           <!-- Floating Tools Bar (Visible Body Style: Explode, Labels, Clipping, Measurement, Study, Quiz) -->
           <div class="viewer-tools" id="viewerTools">
+            <button class="tool-btn highlight" id="btnToolAI" title="Trợ lý AI Giải Phẫu 3D (Hỏi đáp & Điều khiển giọng nói / văn bản)">
+              <span>🤖 Trợ lý AI</span>
+            </button>
             <button class="tool-btn" id="btnToolExplode" title="Tách rời các xương / bộ phận">
               <span>🧩 Tách rời</span>
             </button>
@@ -218,6 +225,10 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           Ghi chú
         </button>
+        <button class="card-action-btn ai" id="cardAIBtn" title="Hỏi AI Giải Phẫu về cấu trúc này">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/><path d="M8 15s1.5 2 4 2 4-2 4-2"/></svg>
+          Hỏi AI
+        </button>
         <button class="card-action-btn lesson" id="cardLessonBtn" title="Học bài học tương ứng">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
           Bài học
@@ -314,6 +325,9 @@
             <p class="hint" style="margin-top: 12px;">Mixed-licence derivative work, distributed NON-COMMERCIALLY (CC BY-NC-SA 4.0): the NC clause comes from the inner ear and kidney models. Attribution and share-alike are required. See LICENSE and NOTICE in the repository.</p>
           </div>
         </div>
+      </div>
+    </div>
+
     <!-- Video Player Modal -->
     <div class="modal hidden" id="videoModal" role="dialog" aria-modal="true">
       <div class="modal-overlay" id="videoModalOverlay"></div>
@@ -327,6 +341,9 @@
         </div>
       </div>
     </div>
+
+    <!-- AI Assistant Copilot Modal -->
+    <div class="ai-assistant-modal hidden" id="aiAssistantModal" role="dialog" aria-modal="true"></div>
   </div>
 
 </body>
