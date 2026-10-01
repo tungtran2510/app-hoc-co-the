@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Maximize2, Minimize2 } from 'lucide-react';
+import { ArrowLeft, Maximize2, Minimize2, Activity } from 'lucide-react';
 
 export default function GiaiPhau3DPage() {
   const router = useRouter();
@@ -50,7 +50,15 @@ export default function GiaiPhau3DPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
+          <Link
+            href="/chan-doan-hinh-anh"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#21262d] text-[#58a6ff] hover:text-white hover:bg-[#30363d] transition-colors text-xs font-semibold"
+            title="Chẩn đoán hình ảnh & Lâm sàng"
+          >
+            <Activity size={14} className="text-emerald-400" />
+            <span className="hidden sm:inline">Chẩn đoán hình ảnh</span>
+          </Link>
           <button
             type="button"
             onClick={toggleFullscreen}

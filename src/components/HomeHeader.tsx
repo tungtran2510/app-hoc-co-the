@@ -17,6 +17,7 @@ import {
   Sun,
   Moon,
   GraduationCap,
+  Activity,
 } from 'lucide-react';
 import { checkAdminStatus, logoutAdmin } from '../lib/adminAuth';
 import { getStoredAppSettings } from '../lib/storage';
@@ -344,6 +345,15 @@ export default function HomeHeader({
             >
               <GraduationCap size={16} className="text-[#F8DF7B]" />
               <span>Lớp học & Bài tập 3D</span>
+            </Link>
+
+            <Link
+              href="/chan-doan-hinh-anh"
+              onClick={() => setShowMenu(false)}
+              className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-white hover:bg-[#25154D] cursor-pointer"
+            >
+              <Activity size={16} className="text-emerald-400" />
+              <span>Chẩn đoán hình ảnh & Lâm sàng</span>
             </Link>
 
             {isAdmin ? (
