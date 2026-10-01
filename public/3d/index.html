@@ -12,10 +12,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Atlas 3D">
-  <script type="module" crossorigin src="./assets/index-DC-n1tCw.js"></script>
+  <script type="module" crossorigin src="./assets/index-BNHZL0Si.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/three.core-DHN0CKgI.js">
   <link rel="modulepreload" crossorigin href="./assets/createScene-DqoovLGC.js">
-  <link rel="stylesheet" crossorigin href="./assets/index-B2xa8LLw.css">
+  <link rel="stylesheet" crossorigin href="./assets/index-BXlt2X50.css">
 </head>
 <body>
   <div id="app">
@@ -110,46 +110,74 @@
             <span class="loading-text">Loading 3D model...</span>
           </div>
 
-          <!-- Preset views float over the canvas -->
-          <div class="viewer-controls" id="viewerControls">
-            <button class="control-btn" id="frontViewBtn" title="Nhìn phía trước">Trước</button>
-            <button class="control-btn" id="sideViewBtn" title="Nhìn nghiêng">Nghiêng</button>
-            <button class="control-btn" id="backViewBtn" title="Nhìn phía sau">Sau</button>
-            <button class="control-btn" id="topViewBtn" title="Nhìn từ trên">Trên</button>
-            <button class="control-btn" id="resetBtn" title="Đặt lại góc nhìn">Đặt lại</button>
+          <!-- Preset views float over the canvas (Compact Icon-Only on side) -->
+          <div class="viewer-controls" id="viewerControls" role="toolbar" aria-label="Góc nhìn 3D">
+            <button class="control-btn" id="frontViewBtn" title="Nhìn phía trước (Front)">
+              <span class="ctrl-icon">👁️</span>
+              <span class="ctrl-text">Trước</span>
+            </button>
+            <button class="control-btn" id="sideViewBtn" title="Nhìn nghiêng (Side)">
+              <span class="ctrl-icon">📐</span>
+              <span class="ctrl-text">Nghiêng</span>
+            </button>
+            <button class="control-btn" id="backViewBtn" title="Nhìn phía sau (Back)">
+              <span class="ctrl-icon">🔄</span>
+              <span class="ctrl-text">Sau</span>
+            </button>
+            <button class="control-btn" id="topViewBtn" title="Nhìn từ trên (Top)">
+              <span class="ctrl-icon">⬇️</span>
+              <span class="ctrl-text">Trên</span>
+            </button>
+            <button class="control-btn" id="resetBtn" title="Đặt lại góc nhìn (Reset)">
+              <span class="ctrl-icon">↺</span>
+              <span class="ctrl-text">Đặt lại</span>
+            </button>
           </div>
 
-          <!-- Floating Tools Bar (Visible Body Style: Explode, Labels, Clipping, Measurement, Study, Quiz) -->
-          <div class="viewer-tools" id="viewerTools">
+          <!-- Floating Tools Bar (Compact Icon-Only on side) -->
+          <div class="viewer-tools" id="viewerTools" role="toolbar" aria-label="Thanh công cụ 3D">
+            <button type="button" class="tool-collapse-btn" id="btnToggleTools" title="Ẩn/Hiện thanh công cụ">
+              <span class="collapse-icon">◀</span>
+            </button>
             <button class="tool-btn highlight" id="btnToolAI" title="Trợ lý AI Giải Phẫu 3D (Hỏi đáp & Điều khiển giọng nói / văn bản)">
-              <span>🤖 Trợ lý AI</span>
+              <span class="tool-icon">🤖</span>
+              <span class="tool-text">Trợ lý AI</span>
             </button>
             <button class="tool-btn" id="btnToolExplode" title="Tách rời các xương / bộ phận">
-              <span>🧩 Tách rời</span>
+              <span class="tool-icon">🧩</span>
+              <span class="tool-text">Tách rời</span>
             </button>
             <button class="tool-btn" id="btnToolLabels" title="Bật/Tắt nhãn mốc giải phẫu 3D">
-              <span>🏷️ Nhãn 3D</span>
+              <span class="tool-icon">🏷️</span>
+              <span class="tool-text">Nhãn 3D</span>
             </button>
             <button class="tool-btn" id="btnToolClipping" title="Mặt cắt 3D giải phẫu (Sagittal, Coronal, Axial)">
-              <span>🔪 Mặt cắt</span>
+              <span class="tool-icon">🔪</span>
+              <span class="tool-text">Mặt cắt</span>
             </button>
             <button class="tool-btn" id="btnToolMeasure" title="Thước đo khoảng cách & kích thước 3D">
-              <span>📏 Thước đo</span>
+              <span class="tool-icon">📏</span>
+              <span class="tool-text">Thước đo</span>
             </button>
             <button class="tool-btn" id="btnToolStudy" title="Chế độ học tập tương tác & Thẻ ghi nhớ 3D">
-              <span>📚 Tự học</span>
+              <span class="tool-icon">📚</span>
+              <span class="tool-text">Tự học</span>
             </button>
             <button class="tool-btn highlight" id="btnToolQuiz" title="Bài kiểm tra trắc nghiệm chạm cấu trúc 3D">
-              <span>🎯 Kiểm tra</span>
+              <span class="tool-icon">🎯</span>
+              <span class="tool-text">Kiểm tra</span>
             </button>
             <button type="button" class="tool-btn highlight-motion" id="btnToolMotion" title="Giải phẫu động & Chuyển động sinh lý (Tim đập, Hô hấp, Khớp gối, Khuỷu...)">
-              <span>🎬 Chuyển động</span>
+              <span class="tool-icon">🎬</span>
+              <span class="tool-text">Chuyển động</span>
             </button>
             <button type="button" class="tool-btn highlight-ar" id="btnToolAR" title="Thực tế tăng cường AR - Đặt mô hình vào không gian phòng thật">
-              <span>📱 AR Không gian</span>
+              <span class="tool-icon">📱</span>
+              <span class="tool-text">AR Không gian</span>
             </button>
             <button type="button" class="tool-btn highlight-offline" id="btnToolOffline" title="Tải mô hình 3D từng hệ & Quản lý ngoại tuyến PWA">
-              <span>⚡ Tải Offline</span>
+              <span class="tool-icon">⚡</span>
+              <span class="tool-text">Tải Offline</span>
             </button>
           </div>
 
