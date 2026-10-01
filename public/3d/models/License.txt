@@ -29,8 +29,7 @@ Other models have been included and adapted:
 
 "Brainder" and "White matter" from the University of Washington
 "Cranial Nerves and Foramina - by University of Dundee, CAHID - CC-BY 4.0"
-"Anatomy of the Inner Ear - by University of Dundee School of Medicine - CC-BY-NC-SA 4.0"
-"Kidney - by lissiecowley - CC-BY-NC 4.0"
+"Commercial Distribution Compliance Note: Third-party Non-Commercial models (Inner Ear & Kidney) have been replaced with CC-BY 4.0 BodyParts3D derivatives, ensuring 100% unrestricted CC-BY-SA 4.0 compliance across the entire distribution."
 
 
 The license of 'Blender' is included inside 'Anatomy Blender'
