@@ -34,5 +34,21 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
         type: 'image/png',
       },
     ],
+    shortcuts: [
+      {
+        name: 'Atlas Giải Phẫu 3D',
+        short_name: 'Atlas 3D',
+        description: 'Mô hình 3D tương tác, bóc tách & chuyển động sinh lý',
+        url: '/giai-phau-3d',
+        icons: [{ src: '/icon-192.png', sizes: '192x192' }],
+      },
+      {
+        name: 'Trợ lý AI Y Khoa',
+        short_name: 'Trợ lý AI',
+        description: 'Hỏi đáp giải phẫu & chăm sóc sức khỏe chủ động',
+        url: '/tro-ly-ai',
+        icons: [{ src: '/icon-192.png', sizes: '192x192' }],
+      },
+    ],
   };
 }

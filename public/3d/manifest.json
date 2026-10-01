@@ -1,0 +1,43 @@
+{
+  "name": "Atlas Giải Phẫu 3D - Y Học Trực Quan",
+  "short_name": "Atlas 3D",
+  "description": "Ứng dụng giải phẫu học 3D chuẩn Y khoa, hỗ trợ xoay 360°, bóc tách, chuyển động sinh lý và thực tế tăng cường AR hoạt động ngoại tuyến.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#0f172a",
+  "background_color": "#0b0f19",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Hệ xương khớp",
+      "short_name": "Xương khớp",
+      "description": "Mở atlas hệ xương và khớp nối",
+      "url": "./?system=skeletal",
+      "icons": [{ "src": "./favicon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Tim đập & Tuần hoàn",
+      "short_name": "Tim mạch",
+      "description": "Quan sát chu kỳ co bóp tim và mạch máu",
+      "url": "./?motion=cardiac",
+      "icons": [{ "src": "./favicon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Thực tế tăng cường AR",
+      "short_name": "AR 3D",
+      "description": "Chiếu mô hình giải phẫu vào phòng thật",
+      "url": "./?ar=true",
+      "icons": [{ "src": "./favicon.svg", "sizes": "192x192" }]
+    }
+  ],
+  "categories": ["education", "medical"]
+}

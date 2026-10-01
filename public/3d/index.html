@@ -1,14 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Interactive 3D anatomy atlas built on Z-Anatomy">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="description" content="Atlas Giải Phẫu 3D - Human Anatomy Atlas & Chuyển động sinh lý 3D PWA Offline">
   <title>Atlas Giải Phẫu 3D - Human Anatomy Atlas</title>
-  <link rel="icon" type="image/svg+xml" href="/3d/favicon.svg">
-  <script type="module" crossorigin src="/3d/assets/index-CIZe__ad.js"></script>
-  <link rel="modulepreload" crossorigin href="/3d/assets/three.core-DHN0CKgI.js">
-  <link rel="stylesheet" crossorigin href="/3d/assets/index-CsTFT-WW.css">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Atlas 3D">
+  <script type="module" crossorigin src="./assets/index-DYC07YdG.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/three.core-DHN0CKgI.js">
+  <link rel="modulepreload" crossorigin href="./assets/createScene-DqoovLGC.js">
+  <link rel="stylesheet" crossorigin href="./assets/index-B2xa8LLw.css">
 </head>
 <body>
   <div id="app">
@@ -27,6 +34,12 @@
         </div>
       </div>
       <div class="header-right">
+        <!-- Live Offline / Sync Badge -->
+        <button type="button" id="netStatusBadge" class="net-status-badge online" title="Trạng thái mạng & Đồng bộ ngoại tuyến">
+          <span class="status-dot"></span>
+          <span class="status-text" id="netStatusText">Trực tuyến</span>
+        </button>
+
         <button id="searchOpen" class="btn-icon drawer-open" aria-label="Search" title="Tìm kiếm" aria-expanded="false">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
         </button>
@@ -128,6 +141,9 @@
             </button>
             <button type="button" class="tool-btn highlight-ar" id="btnToolAR" title="Thực tế tăng cường AR - Đặt mô hình vào không gian phòng thật">
               <span>📱 AR Không gian</span>
+            </button>
+            <button type="button" class="tool-btn highlight-offline" id="btnToolOffline" title="Tải mô hình 3D từng hệ & Quản lý ngoại tuyến PWA">
+              <span>⚡ Tải Offline</span>
             </button>
           </div>
 
