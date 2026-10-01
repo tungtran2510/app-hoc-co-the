@@ -6,8 +6,9 @@
   <meta name="description" content="Interactive 3D anatomy atlas built on Z-Anatomy">
   <title>Atlas Giải Phẫu 3D - Human Anatomy Atlas</title>
   <link rel="icon" type="image/svg+xml" href="/3d/favicon.svg">
-  <script type="module" crossorigin src="/3d/assets/index-66wtpzkl.js"></script>
-  <link rel="stylesheet" crossorigin href="/3d/assets/index-hh0VAt2K.css">
+  <script type="module" crossorigin src="/3d/assets/index-CIZe__ad.js"></script>
+  <link rel="modulepreload" crossorigin href="/3d/assets/three.core-DHN0CKgI.js">
+  <link rel="stylesheet" crossorigin href="/3d/assets/index-CsTFT-WW.css">
 </head>
 <body>
   <div id="app">
@@ -122,6 +123,12 @@
             <button class="tool-btn highlight" id="btnToolQuiz" title="Bài kiểm tra trắc nghiệm chạm cấu trúc 3D">
               <span>🎯 Kiểm tra</span>
             </button>
+            <button type="button" class="tool-btn highlight-motion" id="btnToolMotion" title="Giải phẫu động & Chuyển động sinh lý (Tim đập, Hô hấp, Khớp gối, Khuỷu...)">
+              <span>🎬 Chuyển động</span>
+            </button>
+            <button type="button" class="tool-btn highlight-ar" id="btnToolAR" title="Thực tế tăng cường AR - Đặt mô hình vào không gian phòng thật">
+              <span>📱 AR Không gian</span>
+            </button>
           </div>
 
           <!-- Exploded View Popover Slider -->
@@ -171,6 +178,12 @@
               <button type="button" class="clip-action-btn primary" id="measureSaveNoteBtn">Lưu vào ghi chú</button>
             </div>
           </div>
+
+          <!-- Motion Popover Container -->
+          <div class="explode-popover motion-popover hidden" id="motionPopover"></div>
+
+          <!-- AR HUD Overlay Container -->
+          <div class="ar-hud hidden" id="arHud"></div>
         </div>
       </section>
 
