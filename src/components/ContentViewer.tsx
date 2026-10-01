@@ -194,10 +194,12 @@ export default function ContentViewer({
       if (mode === 'dark') {
         document.documentElement.classList.add('dark');
         document.body.classList.add('dark');
-      } else if (mode === 'gray') {
-        document.documentElement.classList.add('gray');
-        document.body.classList.add('gray');
       }
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) {
+        meta.setAttribute('content', mode === 'dark' ? '#0C0817' : '#F5F6FA');
+      }
+      window.dispatchEvent(new Event('giao_dien_changed'));
     } catch {
       // Bỏ qua
     }
@@ -281,8 +283,9 @@ export default function ContentViewer({
     const temp = updated[index - 1];
     updated[index - 1] = updated[index];
     updated[index] = temp;
-    setBlockList(updated);
-    triggerSaveBlocks(updated);
+    const reindexed = updated.map((b, idx) => ({ ...b, sort_order: idx + 1 }));
+    setBlockList(reindexed);
+    triggerSaveBlocks(reindexed);
   };
 
   // Di chuyển khối xuống
@@ -292,8 +295,9 @@ export default function ContentViewer({
     const temp = updated[index + 1];
     updated[index + 1] = updated[index];
     updated[index] = temp;
-    setBlockList(updated);
-    triggerSaveBlocks(updated);
+    const reindexed = updated.map((b, idx) => ({ ...b, sort_order: idx + 1 }));
+    setBlockList(reindexed);
+    triggerSaveBlocks(reindexed);
   };
 
   // Xóa khối
@@ -306,50 +310,53 @@ export default function ContentViewer({
       return;
     }
     const updated = blockList.filter((b) => b.id !== blockId);
-    setBlockList(updated);
+    const reindexed = updated.map((b, idx) => ({ ...b, sort_order: idx + 1 }));
+    setBlockList(reindexed);
     setActiveMenuBlockId(null);
+    triggerSaveBlocks(reindexed);
   };
 
   // Nhân bản khối
-    const handleDuplicateBlock = (index: number) => {
-      const target = blockList[index];
-      const duplicate: Block = {
-        ...JSON.parse(JSON.stringify(target)),
-        id: generateUuid(),
-      };
-      const updated = [...blockList];
-      updated.splice(index + 1, 0, duplicate);
-      setBlockList(updated);
-      triggerSaveBlocks(updated);
-      setActiveMenuBlockId(null);
+  const handleDuplicateBlock = (index: number) => {
+    const target = blockList[index];
+    const duplicate: Block = {
+      ...JSON.parse(JSON.stringify(target)),
+      id: generateUuid(),
     };
+    const updated = [...blockList];
+    updated.splice(index + 1, 0, duplicate);
+    const reindexed = updated.map((b, idx) => ({ ...b, sort_order: idx + 1 }));
+    setBlockList(reindexed);
+    triggerSaveBlocks(reindexed);
+    setActiveMenuBlockId(null);
+  };
 
-    // Bật tắt ẩn/hiện khối
-    const handleToggleVisibility = (blockId: string) => {
-      const updated = blockList.map((b) => {
-        if (b.id === blockId) {
-          return { ...b, is_visible: !b.is_visible };
-        }
-        return b;
-      });
-      setBlockList(updated);
-      triggerSaveBlocks(updated);
-      setActiveMenuBlockId(null);
-    };
+  // Bật tắt ẩn/hiện khối
+  const handleToggleVisibility = (blockId: string) => {
+    const updated = blockList.map((b) => {
+      if (b.id === blockId) {
+        return { ...b, is_visible: !b.is_visible };
+      }
+      return b;
+    });
+    setBlockList(updated);
+    triggerSaveBlocks(updated);
+    setActiveMenuBlockId(null);
+  };
 
-    // Lưu khối sau khi sửa
-    const handleSaveBlock = (updatedBlock: Block) => {
-      const updated = blockList.map((b) => (b.id === updatedBlock.id ? updatedBlock : b));
-      setBlockList(updated);
-      triggerSaveBlocks(updated);
-    };
+  // Lưu khối sau khi sửa
+  const handleSaveBlock = (updatedBlock: Block) => {
+    const updated = blockList.map((b) => (b.id === updatedBlock.id ? updatedBlock : b));
+    setBlockList(updated);
+    triggerSaveBlocks(updated);
+  };
 
-    // Thêm khối mới
-    const handleAddBlock = (newBlock: Block) => {
-      const updated = [...blockList, newBlock];
-      setBlockList(updated);
-      triggerSaveBlocks(updated);
-    };
+  // Thêm khối mới
+  const handleAddBlock = (newBlock: Block) => {
+    const updated = [...blockList, { ...newBlock, sort_order: blockList.length + 1 }];
+    setBlockList(updated);
+    triggerSaveBlocks(updated);
+  };
 
     // Lưu video sau khi quản lý
     const handleSaveVideos = (newVideos: Video[]) => {
@@ -444,7 +451,7 @@ export default function ContentViewer({
         id={`block-${block.id}`}
         className={`relative transition-all ${
           isAdmin
-            ? 'p-2.5 rounded-[22px] border-2 border-dashed border-[#2D5B94]/30 bg-white/40'
+            ? 'p-2.5 rounded-[22px] border-2 border-dashed border-[#2D5B94]/30 dark:border-purple-500/40 bg-white/40 dark:bg-[#160E2E]/40'
             : ''
         } ${!block.is_visible ? 'opacity-50' : ''}`}
       >
@@ -466,7 +473,7 @@ export default function ContentViewer({
                     setEditingBlock(block);
                   }
                 }}
-                className="flex items-center gap-1 h-8 px-3 rounded-[10px] bg-white border border-line text-ink font-bold text-[13px] hover:border-primary shadow-2xs cursor-pointer"
+                className="flex items-center gap-1 h-8 px-3 rounded-[10px] bg-white dark:bg-[#1C123D] border border-line text-ink font-bold text-[13px] hover:border-primary shadow-2xs cursor-pointer"
               >
                 <Edit2 size={13} className="text-primary" />
                 <span>Sửa</span>
@@ -477,7 +484,7 @@ export default function ContentViewer({
                 type="button"
                 onClick={() => handleMoveBlockUp(idx)}
                 disabled={idx === 0}
-                className="w-8 h-8 rounded-[10px] bg-white border border-line flex items-center justify-center text-ink disabled:opacity-30 shadow-2xs cursor-pointer"
+                className="w-8 h-8 rounded-[10px] bg-white dark:bg-[#1C123D] border border-line flex items-center justify-center text-ink disabled:opacity-30 shadow-2xs cursor-pointer"
                 aria-label="Di chuyển khối lên"
               >
                 <ChevronUp size={16} />
@@ -488,7 +495,7 @@ export default function ContentViewer({
                 type="button"
                 onClick={() => handleMoveBlockDown(idx)}
                 disabled={idx === blockList.length - 1}
-                className="w-8 h-8 rounded-[10px] bg-white border border-line flex items-center justify-center text-ink disabled:opacity-30 shadow-2xs cursor-pointer"
+                className="w-8 h-8 rounded-[10px] bg-white dark:bg-[#1C123D] border border-line flex items-center justify-center text-ink disabled:opacity-30 shadow-2xs cursor-pointer"
                 aria-label="Di chuyển khối xuống"
               >
                 <ChevronDown size={16} />
@@ -503,7 +510,7 @@ export default function ContentViewer({
                       activeMenuBlockId === block.id ? null : block.id
                     )
                   }
-                  className="w-8 h-8 rounded-[10px] bg-white border border-line flex items-center justify-center text-ink shadow-2xs cursor-pointer"
+                  className="w-8 h-8 rounded-[10px] bg-white dark:bg-[#1C123D] border border-line flex items-center justify-center text-ink shadow-2xs cursor-pointer"
                   aria-label="Tùy chọn khối"
                 >
                   <MoreVertical size={16} />
@@ -511,11 +518,11 @@ export default function ContentViewer({
 
                 {/* Dropdown Menu ⋮ */}
                 {activeMenuBlockId === block.id && (
-                  <div className="absolute right-0 top-9 w-[180px] bg-white rounded-[16px] border border-line shadow-xl py-1.5 z-50 animate-in fade-in duration-150">
+                  <div className="absolute right-0 top-9 w-[180px] bg-white dark:bg-[#1C123D] rounded-[16px] border border-line shadow-xl py-1.5 z-50 animate-in fade-in duration-150">
                     <button
                       type="button"
                       onClick={() => handleToggleVisibility(block.id)}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[14px] font-bold text-ink hover:bg-surface-2 cursor-pointer"
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[14px] font-bold text-ink hover:bg-surface-2 dark:hover:bg-white/10 cursor-pointer"
                     >
                       {block.is_visible ? (
                         <>
@@ -532,7 +539,7 @@ export default function ContentViewer({
                     <button
                       type="button"
                       onClick={() => handleDuplicateBlock(idx)}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[14px] font-bold text-ink hover:bg-surface-2 cursor-pointer"
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[14px] font-bold text-ink hover:bg-surface-2 dark:hover:bg-white/10 cursor-pointer"
                     >
                       <Copy size={16} />
                       <span>Nhân bản khối</span>
@@ -540,7 +547,7 @@ export default function ContentViewer({
                     <button
                       type="button"
                       onClick={() => handleDeleteBlock(block.id)}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[14px] font-bold text-[#7A2F12] hover:bg-[#FBE7E1] cursor-pointer"
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[14px] font-bold text-[#E5484D] dark:text-[#FFA099] hover:bg-[#FBE7E1] dark:hover:bg-red-950/40 cursor-pointer"
                     >
                       <Trash2 size={16} />
                       <span>Xóa khối</span>
@@ -635,10 +642,10 @@ export default function ContentViewer({
       {/* 3. Phần đầu bài viết: Badge BÀI 01 / 04 + Tiêu đề lớn (Không lặp lại tên chủ đề) */}
       <section className="flex flex-col gap-1.5 mt-1">
         <div className="flex items-center justify-between">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary-soft/60 border border-primary/20 text-primary text-[12px] font-black tracking-wider uppercase">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-[#1E3A8A] dark:bg-purple-950/60 dark:border-purple-800/40 dark:text-purple-300 text-[12px] font-black tracking-wider uppercase">
             <span>BÀI {formattedOrder}</span>
             {totalPages > 0 && (
-              <span className="text-primary/60 font-semibold">/ {String(totalPages).padStart(2, '0')}</span>
+              <span className="text-[#1E3A8A]/70 dark:text-purple-300/60 font-semibold">/ {String(totalPages).padStart(2, '0')}</span>
             )}
           </div>
           {isAdmin && (
@@ -816,9 +823,9 @@ export default function ContentViewer({
 
       {/* 7. Bảng điều khiển quản trị trang (Hiện khi isAdmin = true) */}
       {isAdmin && (
-        <section className="flex flex-col gap-2.5 mt-6 p-4 rounded-[22px] bg-primary-soft/30 border-2 border-dashed border-primary/40">
+        <section className="flex flex-col gap-2.5 mt-6 p-4 rounded-[22px] bg-primary-soft/30 dark:bg-[#160E2E]/60 border-2 border-dashed border-primary/40">
           <div className="flex items-center justify-between">
-            <span className="text-[13px] font-extrabold uppercase text-primary tracking-wider">
+            <span className="text-[13px] font-extrabold uppercase text-primary dark:text-[#A78BFA] tracking-wider">
               Quản trị nhanh
             </span>
             <span className="text-[12px] text-muted font-bold">
@@ -830,8 +837,8 @@ export default function ContentViewer({
           <div
             className={`px-3 py-2 rounded-[12px] text-[12px] font-extrabold flex items-center gap-2 ${
               supabaseOk
-                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                : 'bg-red-50 text-red-700 border border-red-200'
+                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/40'
+                : 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-800/40'
             }`}
           >
             <span
@@ -850,7 +857,7 @@ export default function ContentViewer({
             <button
               type="button"
               onClick={() => setShowAddDrawer(true)}
-              className="flex items-center justify-center gap-1.5 h-11 rounded-[12px] bg-white border border-line text-ink font-bold text-[14px] hover:border-primary shadow-2xs"
+              className="flex items-center justify-center gap-1.5 h-11 rounded-[12px] bg-white dark:bg-[#1C123D] border border-line text-ink font-bold text-[14px] hover:border-primary shadow-2xs cursor-pointer"
             >
               <Plus size={16} className="text-primary" />
               <span>+ Thêm khối</span>
@@ -859,7 +866,7 @@ export default function ContentViewer({
             <button
               type="button"
               onClick={() => setShowAdminSettingsModal(true)}
-              className="flex items-center justify-center gap-1.5 h-11 rounded-[12px] bg-white border border-line text-ink font-bold text-[14px] hover:border-primary shadow-2xs"
+              className="flex items-center justify-center gap-1.5 h-11 rounded-[12px] bg-white dark:bg-[#1C123D] border border-line text-ink font-bold text-[14px] hover:border-primary shadow-2xs cursor-pointer"
             >
               <SettingsIcon size={16} className="text-primary" />
               <span>Cài đặt app</span>
@@ -870,7 +877,7 @@ export default function ContentViewer({
             <button
               type="button"
               onClick={handleToggleAdmin}
-              className="text-[#8A3A14] font-bold py-1 hover:underline cursor-pointer"
+              className="text-[#8A3A14] dark:text-[#F8DF7B] font-bold py-1 hover:underline cursor-pointer"
             >
               Thoát sửa
             </button>

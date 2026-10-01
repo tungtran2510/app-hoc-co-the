@@ -14,28 +14,28 @@ interface ModernBookCoverProps {
 
 const LUXURY_PALETTES = [
   {
-    bg: 'from-[#0A1E5C] via-[#1D4ED8] to-[#08123B]',
-    border: 'border-amber-400/40',
-    accent: 'text-amber-300',
-    badge: 'bg-amber-400/20 text-amber-200 border-amber-300/30',
+    bg: 'from-[#1C123D] via-[#160D30] to-[#0E0720]',
+    border: 'border-[#F8DF7B]/50',
+    accent: 'text-[#F8DF7B]',
+    badge: 'bg-[#F8DF7B] text-[#160C2C]',
   },
   {
-    bg: 'from-[#0F1E36] via-[#1A335B] to-[#091322]',
-    border: 'border-sky-300/40',
-    accent: 'text-sky-200',
-    badge: 'bg-sky-400/20 text-sky-100 border-sky-300/30',
+    bg: 'from-[#241548] via-[#1A0E38] to-[#100724]',
+    border: 'border-purple-400/40',
+    accent: 'text-purple-200',
+    badge: 'bg-purple-950/80 text-purple-200 border-purple-700/40',
   },
   {
-    bg: 'from-[#421422] via-[#631F34] to-[#2E0E18]',
-    border: 'border-rose-300/40',
+    bg: 'from-[#2A1030] via-[#1E0B24] to-[#120516]',
+    border: 'border-rose-400/40',
     accent: 'text-rose-200',
-    badge: 'bg-rose-400/20 text-rose-100 border-rose-300/30',
+    badge: 'bg-rose-950/80 text-rose-200 border-rose-700/40',
   },
   {
-    bg: 'from-[#1E2530] via-[#2F3B4C] to-[#13171F]',
-    border: 'border-emerald-300/40',
-    accent: 'text-emerald-200',
-    badge: 'bg-emerald-400/20 text-emerald-100 border-emerald-300/30',
+    bg: 'from-[#152033] via-[#0E1624] to-[#0A0E17]',
+    border: 'border-cyan-400/40',
+    accent: 'text-cyan-200',
+    badge: 'bg-cyan-950/80 text-cyan-200 border-cyan-700/40',
   },
 ];
 

@@ -62,30 +62,29 @@ export default function TopicListClient({
     if (targetIndex < 0 || targetIndex >= topicsWithCounts.length) return;
 
     const list = [...topicsWithCounts];
-    const current = list[index];
-    const target = list[targetIndex];
+    const temp = list[index];
+    list[index] = list[targetIndex];
+    list[targetIndex] = temp;
 
-    const currentOrder = current.topic.sort_order;
-    current.topic.sort_order = target.topic.sort_order;
-    target.topic.sort_order = currentOrder;
+    // Chuẩn hóa và gán lại sort_order liên tục 1, 2, 3...
+    const reordered = list.map((item, idx) => ({
+      ...item,
+      topic: {
+        ...item.topic,
+        sort_order: idx + 1,
+      },
+    }));
 
-    list[index] = target;
-    list[targetIndex] = current;
-
-    setTopicsWithCounts(list);
+    setTopicsWithCounts(reordered);
 
     const [res1, res2] = await Promise.all([
-      saveTopicApi(current.topic),
-      saveTopicApi(target.topic),
+      saveTopicApi(reordered[index].topic),
+      saveTopicApi(reordered[targetIndex].topic),
     ]);
     if (!res1.success || !res2.success) {
       alert('Chưa lưu được – chưa kết nối dữ liệu');
       // Phục hồi lại vị trí cũ
-      current.topic.sort_order = target.topic.sort_order;
-      target.topic.sort_order = currentOrder;
-      list[index] = current;
-      list[targetIndex] = target;
-      setTopicsWithCounts([...list]);
+      setTopicsWithCounts(topicsWithCounts);
     }
   };
 
@@ -133,7 +132,7 @@ export default function TopicListClient({
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-[19px] sm:text-[20px] font-black text-slate-900 tracking-tight leading-tight">
+        <h2 className="text-[19px] sm:text-[20px] font-black text-ink tracking-tight leading-tight">
           {topicsTitle || 'Chuyên Đề Học'}
         </h2>
 
@@ -141,7 +140,7 @@ export default function TopicListClient({
           <Link
             href="/cot-song"
             prefetch={true}
-            className="text-[13px] font-bold text-blue-600 hover:text-blue-700 flex items-center gap-0.5 cursor-pointer active:opacity-75 transition-opacity"
+            className="text-[13px] font-black uppercase tracking-wider text-[#1E3A8A] hover:text-[#172554] dark:text-[#F8DF7B] dark:hover:text-amber-200 flex items-center gap-0.5 cursor-pointer active:opacity-75 transition-colors"
             title="Xem danh sách bài học chủ đề Cột sống"
           >
             <span>Xem tất cả</span>
@@ -171,7 +170,7 @@ export default function TopicListClient({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 mt-1">
+      <div className="grid grid-cols-2 gap-3 sm:gap-3.5 mt-2">
         {topicsWithCounts.map(({ topic, pageCount }, index) => {
           // Người xem bình thường không thấy chủ đề bị ẩn
           if (!topic.is_visible && !isAdmin) return null;

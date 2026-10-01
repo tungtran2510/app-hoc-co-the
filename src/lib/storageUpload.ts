@@ -1,5 +1,17 @@
 import { compressImageClient } from './imageCompressor';
 import { generateUuid } from './uuid';
+import { getAdminHeaders } from './apiAdmin';
+
+function getAdminAuthHeadersOnly(): Record<string, string> {
+  const headers: Record<string, string> = {};
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('app_admin_token');
+    if (token) {
+      headers['x-admin-token'] = token;
+    }
+  }
+  return headers;
+}
 
 function getYearMonth(): string {
   const d = new Date();
@@ -36,7 +48,7 @@ export async function uploadImageFile(file: File): Promise<{ url: string; thumb_
     // 2. Xin signed upload URL từ Supabase Storage (bucket 'media')
     const mainRes = await fetch('/api/admin/upload-url', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAdminHeaders(),
       body: JSON.stringify({ filePath: mainPath }),
     });
 
@@ -55,7 +67,7 @@ export async function uploadImageFile(file: File): Promise<{ url: string; thumb_
         if (thumbBlob) {
           const thumbRes = await fetch('/api/admin/upload-url', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getAdminHeaders(),
             body: JSON.stringify({ filePath: thumbPath }),
           });
 
@@ -90,6 +102,7 @@ export async function uploadImageFile(file: File): Promise<{ url: string; thumb_
 
   const serverRes = await fetch('/api/admin/upload', {
     method: 'POST',
+    headers: getAdminAuthHeadersOnly(),
     body: formData,
   });
 
@@ -117,7 +130,7 @@ export async function uploadPdfFile(file: File): Promise<{ url: string; fileName
 
     const res = await fetch('/api/admin/upload-url', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAdminHeaders(),
       body: JSON.stringify({ filePath }),
     });
 
@@ -148,6 +161,7 @@ export async function uploadPdfFile(file: File): Promise<{ url: string; fileName
 
   const serverRes = await fetch('/api/admin/upload', {
     method: 'POST',
+    headers: getAdminAuthHeadersOnly(),
     body: formData,
   });
 

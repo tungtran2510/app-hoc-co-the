@@ -43,36 +43,30 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
     if (targetIndex < 0 || targetIndex >= pagesWithCount.length) return;
 
     const list = [...pagesWithCount];
-    const current = list[index];
-    const target = list[targetIndex];
+    const temp = list[index];
+    list[index] = list[targetIndex];
+    list[targetIndex] = temp;
 
-    const currentOrder = current.page.sort_order;
-    current.page.sort_order = target.page.sort_order;
-    target.page.sort_order = currentOrder;
-
-    list[index] = target;
-    list[targetIndex] = current;
-
-    // Cập nhật lại số thứ tự hiển thị
+    // Cập nhật lại số thứ tự hiển thị và sort_order liên tục 1, 2, 3...
     const reordered = list.map((item, idx) => ({
       ...item,
       orderNumber: idx + 1,
+      page: {
+        ...item.page,
+        sort_order: idx + 1,
+      },
     }));
 
     setPagesWithCount(reordered);
 
     const [res1, res2] = await Promise.all([
-      savePageApi(current.page),
-      savePageApi(target.page),
+      savePageApi(reordered[index].page),
+      savePageApi(reordered[targetIndex].page),
     ]);
     if (!res1.success || !res2.success) {
       alert('Chưa lưu được – chưa kết nối dữ liệu');
       // Phục hồi lại vị trí cũ
-      current.page.sort_order = target.page.sort_order;
-      target.page.sort_order = currentOrder;
-      list[index] = current;
-      list[targetIndex] = target;
-      setPagesWithCount(list.map((item, idx) => ({ ...item, orderNumber: idx + 1 })));
+      setPagesWithCount(pagesWithCount);
     }
   };
 
@@ -151,13 +145,13 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
   );
 
   return (
-    <section className="flex flex-col gap-3.5 mt-1">
+    <section className="flex flex-col gap-2.5 mt-1">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h2 className="text-[18px] sm:text-[20px] font-black text-ink uppercase tracking-wide">
+          <h2 className="text-[17px] sm:text-[19px] font-black text-ink uppercase tracking-wide">
             LỘ TRÌNH ĐÀO TẠO THEO BƯỚC
           </h2>
-          <span className="text-[11px] font-black text-primary bg-primary-soft px-2 py-0.5 rounded-full border border-primary/20">
+          <span className="text-[11px] font-black text-[#1E3A8A] bg-blue-50 dark:text-[#F8DF7B] dark:bg-purple-900/50 px-2.5 py-0.5 rounded-full border border-blue-200 dark:border-purple-500/30">
             {visiblePages.length} BƯỚC
           </span>
         </div>
@@ -166,7 +160,7 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
           <button
             type="button"
             onClick={() => setIsCreating(true)}
-            className="flex items-center gap-1.5 h-8 px-3 rounded-full bg-primary text-white font-bold text-[12px] shadow-xs hover:bg-primary-dark cursor-pointer transition-all"
+            className="flex items-center gap-1.5 h-8 px-3 rounded-full bg-[#1E3A8A] hover:bg-[#172554] text-white font-bold text-[12px] shadow-xs cursor-pointer transition-all"
           >
             <Plus size={15} strokeWidth={2.5} />
             <span>Thêm bài</span>
@@ -176,81 +170,48 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
 
       {visiblePages.length > 0 ? (
         <>
-          <p className="text-[14px] text-muted font-medium leading-normal -mt-1">
+          <p className="text-[13px] sm:text-[13.5px] text-muted font-medium leading-normal -mt-0.5">
             Gợi ý: nếu mới bắt đầu, nên xem theo thứ tự 01 → 02 → 03.
           </p>
 
-          <div className="flex flex-col mt-1">
+          <div className="flex flex-col gap-2 mt-1">
             {visiblePages.map(({ page, orderNumber, videoCount }, index) => {
               const pageTienDo = tienDo[page.id];
               const watchedVideos = pageTienDo?.watched || [];
               const lastVideo = pageTienDo?.last_video;
               const isCompleted = completedPages.includes(page.id);
-              const hasStarted = isCompleted || watchedVideos.length > 0 || (lastVideo !== undefined && lastVideo > 0);
-              const isLast = index === visiblePages.length - 1;
 
               return (
-                <div key={page.id} className="relative flex gap-2.5 sm:gap-3.5 group">
-                  {/* CỘT TIMELINE BÊN TRÁI (Mockup 2) */}
-                  <div className="flex flex-col items-center shrink-0 w-8 sm:w-9 pt-3.5">
-                    {/* Node hình tròn */}
-                    <div
-                      className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center shrink-0 transition-transform ${
-                        isCompleted
-                          ? 'bg-emerald-600 text-white shadow-xs'
-                          : hasStarted
-                          ? 'bg-primary text-white ring-4 ring-primary/25 shadow-xs'
-                          : 'bg-white border-2 border-line text-muted font-bold text-[12px] sm:text-[13px]'
-                      }`}
-                    >
-                      {isCompleted ? (
-                        <Check size={16} strokeWidth={3} />
-                      ) : hasStarted ? (
-                        <Play size={13} fill="currentColor" className="ml-0.5" />
-                      ) : (
-                        <span>{String(orderNumber).padStart(2, '0')}</span>
+                <div key={page.id} className="w-full relative group">
+                  <PageCard
+                    page={page}
+                    topic={topic}
+                    orderNumber={orderNumber}
+                    videoCount={videoCount}
+                    watchedVideos={watchedVideos}
+                    lastVideo={lastVideo}
+                    isCompleted={isCompleted}
+                  />
+
+                  {/* Huy hiệu Quản trị: Bản nháp / Đang ẩn */}
+                  {isAdmin && (
+                    <div className="absolute top-2 right-12 flex items-center gap-1.5">
+                      {page.status === 'draft' && (
+                        <span className="px-2 py-0.5 rounded-md bg-amber-500 text-white text-[11px] font-extrabold">
+                          Bản nháp
+                        </span>
+                      )}
+                      {!page.is_visible && (
+                        <span className="px-2 py-0.5 rounded-md bg-zinc-800 text-white text-[11px] font-extrabold">
+                          Đang ẩn
+                        </span>
                       )}
                     </div>
-
-                    {/* Đường nối Timeline dọc */}
-                    {!isLast && (
-                      <div className="w-0.5 flex-1 min-h-[36px] bg-line-strong/60 my-1 group-hover:bg-primary/40 transition-colors" />
-                    )}
-                  </div>
-
-                  {/* THẺ BÀI HỌC BÊN PHẢI */}
-                  <div className="flex-1 min-w-0 pb-3">
-                    <div className="relative">
-                      <PageCard
-                        page={page}
-                        topic={topic}
-                        orderNumber={orderNumber}
-                        videoCount={videoCount}
-                        watchedVideos={watchedVideos}
-                        lastVideo={lastVideo}
-                        isCompleted={isCompleted}
-                      />
-
-                      {/* Huy hiệu Quản trị: Bản nháp / Đang ẩn */}
-                      {isAdmin && (
-                        <div className="absolute top-2 right-12 flex items-center gap-1.5">
-                          {page.status === 'draft' && (
-                            <span className="px-2 py-0.5 rounded-md bg-amber-500 text-white text-[11px] font-extrabold">
-                              Bản nháp
-                            </span>
-                          )}
-                          {!page.is_visible && (
-                            <span className="px-2 py-0.5 rounded-md bg-zinc-800 text-white text-[11px] font-extrabold">
-                              Đang ẩn
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
+                  )}
 
                   {/* Thanh công cụ Admin trên mỗi thẻ trang */}
                   {isAdmin && (
-                    <div className="flex items-center justify-between mt-1 px-2.5 py-1.5 rounded-[12px] bg-black/85 text-white text-[12px] font-bold shadow-xs">
+                    <div className="flex items-center justify-between mt-1 px-2.5 py-1.5 rounded-[12px] bg-slate-900 text-white text-[12px] font-bold shadow-xs">
                       <button
                         type="button"
                         onClick={() => setEditingPage(page)}
@@ -315,9 +276,8 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
                     </div>
                   )}
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
           </div>
         </>
       ) : (

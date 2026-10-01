@@ -84,7 +84,7 @@ export default function PageHeaderBar({
           <Link
             href={`/${topicSlug}`}
             prefetch={true}
-            className="flex items-center gap-1 text-primary hover:text-primary-dark text-[16px] sm:text-[17px] font-extrabold min-h-[44px] transition-colors truncate"
+            className="flex items-center gap-1 text-[#1E3A8A] hover:text-[#172554] dark:text-purple-300 text-[16px] sm:text-[17px] font-extrabold min-h-[44px] transition-colors truncate"
             aria-label={`Về chủ đề ${topicTitle}`}
             title={`Về chủ đề ${topicTitle}`}
           >
@@ -92,7 +92,7 @@ export default function PageHeaderBar({
           </Link>
         </div>
 
-        {/* 2. Nút Lưu + Nút Tuỳ chọn (Chỉ 2 nút tròn gọn gàng, thoáng đãng) */}
+        {/* 2. Nút Lưu + Nút Tuỳ chọn (Gọn gàng, thích ứng nền sáng / tối) */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {/* Nút Lưu bài học */}
           <button
@@ -102,16 +102,16 @@ export default function PageHeaderBar({
             }}
             className={`flex items-center justify-center w-[44px] h-[44px] rounded-[14px] border-[1.5px] transition-all shadow-2xs cursor-pointer active:scale-95 ${
               isSaved
-                ? 'bg-primary-soft border-primary text-primary'
-                : 'bg-white border-line text-ink hover:border-line-strong'
+                ? 'bg-amber-50 border-amber-400 text-amber-600 dark:bg-purple-900/50 dark:border-[#F8DF7B] dark:text-[#F8DF7B]'
+                : 'bg-white border-slate-200 text-slate-700 hover:border-[#1E3A8A] hover:text-[#1E3A8A] dark:bg-[#160D30] dark:border-purple-900/50 dark:text-purple-200 dark:hover:border-purple-600'
             }`}
             aria-label={isSaved ? 'Bỏ lưu bài học này' : 'Lưu bài học này'}
             title={isSaved ? 'Đã lưu (Bấm để bỏ lưu)' : 'Lưu bài học'}
           >
             <Bookmark
               size={19}
-              className={isSaved ? 'fill-primary text-primary' : 'text-ink'}
-              strokeWidth={2.5}
+              className={isSaved ? 'fill-amber-500 text-amber-500 dark:fill-[#F8DF7B] dark:text-[#F8DF7B]' : 'text-slate-600 dark:text-purple-300'}
+              strokeWidth={2.3}
             />
           </button>
 
@@ -123,32 +123,32 @@ export default function PageHeaderBar({
             }}
             className={`flex items-center justify-center w-[44px] h-[44px] rounded-[14px] border-[1.5px] transition-all shadow-2xs cursor-pointer active:scale-95 ${
               showOptions
-                ? 'bg-primary-soft border-primary text-primary'
-                : 'bg-white border-line text-ink hover:border-line-strong'
+                ? 'bg-blue-50 border-[#1E3A8A] text-[#1E3A8A] dark:bg-purple-900/50 dark:border-purple-500 dark:text-purple-200'
+                : 'bg-white border-slate-200 text-slate-700 hover:border-[#1E3A8A] hover:text-[#1E3A8A] dark:bg-[#160D30] dark:border-purple-900/50 dark:text-purple-200 dark:hover:border-purple-600'
             }`}
             aria-expanded={showOptions}
             aria-label="Tùy chọn"
           >
-            <MoreVertical size={19} strokeWidth={2.5} />
+            <MoreVertical size={19} strokeWidth={2.3} />
           </button>
         </div>
       </div>
 
-      {/* 3. Nút Mục lục nổi góc dưới (Floating TOC - Tiện lợi mở bất cứ khi nào cuộn trang) */}
+      {/* 3. Nút Mục lục nổi góc dưới (Icon tròn tinh tế, không chữ cồng kềnh) */}
       {tocItems.length > 0 && (
-        <div className="fixed bottom-6 right-4 sm:right-6 z-40">
+        <div className="fixed bottom-6 right-4 sm:right-6 z-40" style={{ transform: 'translateZ(0)' }}>
           <button
             type="button"
             onClick={() => {
               setShowToc(!showToc);
               setShowOptions(false);
             }}
-            className="flex items-center gap-2 h-11 px-4 rounded-full bg-primary hover:bg-primary-dark text-white font-extrabold text-[13.5px] shadow-lg active:scale-95 transition-all cursor-pointer border border-white/20"
+            className="relative w-12 h-12 rounded-full bg-[#1E3A8A] hover:bg-[#172554] dark:bg-purple-900 dark:hover:bg-purple-800 text-white flex items-center justify-center shadow-[0_6px_20px_rgba(30,58,138,0.35)] active:scale-95 transition-all cursor-pointer border-2 border-white/40 group"
+            title="Mục lục bài học"
             aria-label="Mở mục lục bài học"
           >
-            <ListOrdered size={16} strokeWidth={2.5} />
-            <span>Mục lục</span>
-            <span className="w-5 h-5 rounded-full bg-white/25 text-white text-[11px] font-black flex items-center justify-center">
+            <ListOrdered size={21} strokeWidth={2.3} className="group-hover:scale-110 transition-transform" />
+            <span className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 rounded-full bg-amber-400 text-slate-900 text-[10.5px] font-black flex items-center justify-center shadow-sm ring-2 ring-white dark:ring-[#160D30]">
               {tocItems.length}
             </span>
           </button>
@@ -157,15 +157,15 @@ export default function PageHeaderBar({
 
       {/* 4. Bảng Mục lục dạng Bottom Sheet trượt lên khi bấm nút nổi */}
       {showToc && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-xs p-0 sm:p-4 animate-in fade-in duration-150">
-          <div className="w-full max-w-[480px] bg-white rounded-t-[24px] sm:rounded-[24px] p-4 flex flex-col gap-2 shadow-2xl animate-in slide-in-from-bottom duration-200 border border-line">
-            <div className="flex items-center justify-between pb-2.5 border-b border-line">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4 animate-in fade-in duration-150">
+          <div className="w-full max-w-[480px] bg-white dark:bg-[#160D30] rounded-t-[24px] sm:rounded-[24px] p-4 flex flex-col gap-2 shadow-2xl animate-in slide-in-from-bottom duration-200 border border-slate-200 dark:border-purple-900/60">
+            <div className="flex items-center justify-between pb-2.5 border-b border-line dark:border-purple-900/50">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-[10px] bg-primary-soft text-primary flex items-center justify-center">
+                <div className="w-8 h-8 rounded-[10px] bg-primary-soft dark:bg-purple-900/60 text-primary dark:text-[#F8DF7B] flex items-center justify-center">
                   <ListOrdered size={18} strokeWidth={2.5} />
                 </div>
                 <div>
-                  <h3 className="text-[16px] font-extrabold text-ink leading-tight">
+                  <h3 className="text-[16px] font-extrabold text-ink dark:text-white leading-tight">
                     MỤC LỤC BÀI HỌC
                   </h3>
                   <span className="text-[12px] text-muted font-medium">
@@ -176,28 +176,28 @@ export default function PageHeaderBar({
               <button
                 type="button"
                 onClick={() => setShowToc(false)}
-                className="w-8 h-8 rounded-full bg-surface-2 flex items-center justify-center text-muted hover:text-ink cursor-pointer"
+                className="w-8 h-8 rounded-full bg-surface-2 dark:bg-purple-950/60 flex items-center justify-center text-muted hover:text-ink dark:text-purple-300 dark:hover:text-white cursor-pointer"
                 aria-label="Đóng mục lục"
               >
                 <X size={18} />
               </button>
             </div>
 
-            <div className="max-h-[380px] overflow-y-auto flex flex-col divide-y divide-line/60 py-1">
+            <div className="max-h-[380px] overflow-y-auto flex flex-col divide-y divide-line dark:divide-purple-900/40 py-1">
               {tocItems.map((item, idx) => (
                 <button
                   key={item.id}
                   type="button"
                   onClick={() => handleScrollToBlock(item.id)}
-                  className="w-full flex items-center justify-between h-[48px] px-2.5 rounded-[12px] text-left text-[15px] font-bold text-ink hover:bg-primary-soft hover:text-primary transition-colors cursor-pointer group"
+                  className="w-full flex items-center justify-between h-[48px] px-2.5 rounded-[12px] text-left text-[15px] font-bold text-ink dark:text-white hover:bg-blue-50 dark:hover:bg-purple-900/40 hover:text-primary dark:hover:text-[#F8DF7B] transition-colors cursor-pointer group"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="w-5 h-5 rounded-full bg-surface-2 group-hover:bg-primary group-hover:text-white text-muted text-[11px] font-extrabold flex items-center justify-center shrink-0 transition-colors">
+                    <span className="w-5 h-5 rounded-full bg-surface-2 dark:bg-purple-950 group-hover:bg-[#1E3A8A] group-hover:text-white text-muted dark:text-purple-300 text-[11px] font-extrabold flex items-center justify-center shrink-0 transition-colors">
                       {idx + 1}
                     </span>
                     <span className="truncate">{item.label}</span>
                   </div>
-                  <span className="text-muted text-[14px] shrink-0 ml-2 group-hover:text-primary transition-colors">›</span>
+                  <span className="text-muted/60 dark:text-purple-400/60 text-[14px] shrink-0 ml-2 group-hover:text-primary dark:group-hover:text-[#F8DF7B] transition-colors">›</span>
                 </button>
               ))}
             </div>
@@ -207,15 +207,15 @@ export default function PageHeaderBar({
 
       {/* Bảng Tùy chọn: 3 cỡ chữ & Quản trị */}
       {showOptions && (
-        <div className="absolute top-[58px] right-0 w-[270px] bg-white rounded-[20px] border-[1.5px] border-line shadow-xl p-4 flex flex-col gap-4 z-50 animate-in fade-in duration-150">
-          <div className="flex items-center justify-between pb-2 border-b border-line">
-            <span className="text-[15px] font-extrabold text-ink uppercase tracking-[0.5px]">
+        <div className="absolute top-[58px] right-0 w-[270px] bg-white dark:bg-[#160D30] rounded-[20px] border border-slate-200 dark:border-purple-900/60 shadow-2xl p-4 flex flex-col gap-4 z-50 animate-in fade-in duration-150">
+          <div className="flex items-center justify-between pb-2 border-b border-line dark:border-purple-900/50">
+            <span className="text-[15px] font-extrabold text-ink dark:text-white uppercase tracking-[0.5px]">
               TÙY CHỌN
             </span>
             <button
               type="button"
               onClick={() => setShowOptions(false)}
-              className="p-1 rounded-lg text-muted hover:bg-surface-2"
+              className="p-1 rounded-lg text-muted hover:bg-surface-2 dark:text-purple-300 dark:hover:bg-purple-900/40"
               aria-label="Đóng bảng tùy chọn"
             >
               <X size={18} />
@@ -267,44 +267,32 @@ export default function PageHeaderBar({
           {/* Giao diện: Sáng / Xám dịu / Tối */}
           <div className="flex flex-col gap-2 pt-2 border-t border-line">
             <span className="text-[13px] font-bold text-muted uppercase tracking-wider">
-              Giao diện
+              Nền giao diện
             </span>
-            <div className="grid grid-cols-3 gap-1.5">
+            <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => onThemeChange && onThemeChange('light')}
-                className={`h-[42px] rounded-[12px] font-bold text-[13px] flex items-center justify-center gap-1 transition-all ${
+                className={`h-[42px] rounded-[12px] font-bold text-[13.5px] flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                   themeMode === 'light'
-                    ? 'bg-primary-soft border-2 border-primary text-primary'
+                    ? 'bg-primary text-white font-extrabold shadow-xs'
                     : 'bg-surface-2 border border-line-strong text-ink hover:bg-line/40'
                 }`}
               >
-                <Sun size={15} />
-                <span>Sáng</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => onThemeChange && onThemeChange('gray')}
-                className={`h-[42px] rounded-[12px] font-bold text-[13px] flex items-center justify-center gap-1 transition-all ${
-                  themeMode === 'gray'
-                    ? 'bg-primary-soft border-2 border-primary text-primary'
-                    : 'bg-surface-2 border border-line-strong text-ink hover:bg-line/40'
-                }`}
-              >
-                <Eye size={15} />
-                <span>Xám dịu</span>
+                <Sun size={16} />
+                <span>Nền Sáng</span>
               </button>
               <button
                 type="button"
                 onClick={() => onThemeChange && onThemeChange('dark')}
-                className={`h-[42px] rounded-[12px] font-bold text-[13px] flex items-center justify-center gap-1 transition-all ${
+                className={`h-[42px] rounded-[12px] font-bold text-[13.5px] flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                   themeMode === 'dark'
-                    ? 'bg-primary-soft border-2 border-primary text-primary'
+                    ? 'bg-primary text-white font-extrabold shadow-xs'
                     : 'bg-surface-2 border border-line-strong text-ink hover:bg-line/40'
                 }`}
               >
-                <Moon size={15} />
-                <span>Tối</span>
+                <Moon size={16} />
+                <span>Nền Tối</span>
               </button>
             </div>
           </div>
@@ -317,7 +305,7 @@ export default function PageHeaderBar({
                 setShowOptions(false);
                 if (onShare) onShare();
               }}
-              className="flex items-center justify-center gap-2 h-[44px] rounded-[12px] bg-white border border-line-strong text-ink font-bold text-[14px] shadow-2xs hover:bg-surface-2 transition-all cursor-pointer"
+              className="flex items-center justify-center gap-2 h-[44px] rounded-[12px] bg-surface border border-line text-ink font-bold text-[14px] shadow-2xs hover:bg-surface-2 transition-all cursor-pointer"
             >
               <Share2 size={16} className="text-primary" />
               <span>Chia sẻ trang này</span>
@@ -330,7 +318,7 @@ export default function PageHeaderBar({
                   setShowOptions(false);
                   onOpenPhoneSync();
                 }}
-                className="flex items-center justify-center gap-2 h-[44px] rounded-[12px] bg-white border border-line-strong text-ink font-bold text-[14px] shadow-2xs hover:bg-surface-2 transition-all cursor-pointer"
+                className="flex items-center justify-center gap-2 h-[44px] rounded-[12px] bg-surface border border-line text-ink font-bold text-[14px] shadow-2xs hover:bg-surface-2 transition-all cursor-pointer"
               >
                 <Smartphone size={16} className="text-primary" />
                 <span>Lưu tiến độ qua SĐT</span>

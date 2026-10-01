@@ -27,6 +27,9 @@ export function checkIsAdminRequest(request?: NextRequest): boolean {
   let token: string | undefined;
   if (request) {
     token = request.cookies.get(COOKIE_NAME)?.value;
+    if (!token) {
+      token = request.headers.get('x-admin-token') || undefined;
+    }
   } else {
     try {
       token = cookies().get(COOKIE_NAME)?.value;

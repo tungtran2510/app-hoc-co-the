@@ -16,8 +16,6 @@ import {
   Search,
   Sun,
   Moon,
-  GraduationCap,
-  Activity,
 } from 'lucide-react';
 import { checkAdminStatus, logoutAdmin } from '../lib/adminAuth';
 import { getStoredAppSettings } from '../lib/storage';
@@ -226,7 +224,7 @@ export default function HomeHeader({
             <Link
               href="/tim-kiem"
               prefetch={true}
-              className="w-9 h-9 rounded-full bg-white dark:bg-[#1E1342] hover:bg-purple-50 dark:hover:bg-[#281855] border border-purple-200 dark:border-purple-800/40 flex items-center justify-center text-purple-700 dark:text-purple-200 transition-colors shadow-2xs"
+              className="w-9 h-9 rounded-full bg-white dark:bg-[#1E1342] hover:bg-slate-100 dark:hover:bg-[#281855] border border-slate-200 dark:border-purple-800/40 flex items-center justify-center text-[#1E3A8A] dark:text-purple-200 transition-colors shadow-2xs"
               title="Tìm kiếm bài học"
               aria-label="Tìm kiếm"
             >
@@ -237,7 +235,7 @@ export default function HomeHeader({
             <button
               type="button"
               onClick={toggleTheme}
-              className="w-9 h-9 rounded-full bg-white dark:bg-[#1E1342] hover:bg-purple-50 dark:hover:bg-[#281855] border border-purple-200 dark:border-purple-800/40 flex items-center justify-center text-amber-500 dark:text-[#F8DF7B] transition-colors shadow-2xs cursor-pointer"
+              className="w-9 h-9 rounded-full bg-white dark:bg-[#1E1342] hover:bg-slate-100 dark:hover:bg-[#281855] border border-slate-200 dark:border-purple-800/40 flex items-center justify-center text-amber-500 dark:text-[#F8DF7B] transition-colors shadow-2xs cursor-pointer"
               title={isDark ? "Chuyển sang nền sáng" : "Chuyển sang nền tối"}
               aria-label="Chuyển chế độ Sáng / Tối"
             >
@@ -266,13 +264,13 @@ export default function HomeHeader({
           onClick={() => {
             if (isAdmin) setShowEditApp(true);
           }}
-          className={`w-full rounded-[20px] bg-gradient-to-br from-[#1C123D] via-[#160D30] to-[#0E0720] border-l-[3.5px] border-l-[#A78BFA] border-t border-t-white/15 border-r border-r-black/50 border-b border-b-black/70 shadow-[0_12px_24px_-4px_rgba(0,0,0,0.85)] p-3 sm:p-3.5 flex items-center justify-between gap-3 ${
+          className={`w-full rounded-[20px] bg-white text-slate-900 border border-slate-200 border-l-[4px] border-l-[#1E3A8A] shadow-md hover:shadow-lg dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] dark:border-t-white/15 dark:border-r-black/50 dark:border-b-black/70 dark:border-l-[#A78BFA] dark:text-white p-3 sm:p-3.5 flex items-center justify-between gap-3 ${
             isAdmin ? 'cursor-pointer group' : ''
           }`}
           title={isAdmin ? 'Bấm để sửa tên & thương hiệu app' : undefined}
         >
           {/* Avatar Bác sĩ / Tác giả bên trái */}
-          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-purple-400/60 shadow-md shrink-0">
+          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-blue-200 dark:border-purple-400/60 shadow-md shrink-0">
             <img
               src="/images/author_tung.png"
               alt="Tùng Dinh Dưỡng"
@@ -283,46 +281,46 @@ export default function HomeHeader({
           {/* Khối chữ thương hiệu ở giữa */}
           <div className="flex flex-col flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
-              <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-white uppercase">
+              <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-[#1E3A8A] dark:text-white uppercase">
                 {appName && appName !== 'QBIZ BOOK' && appName !== 'Sống Khỏe Mỗi Ngày' ? appName.split(' ')[0] : 'HỌC'}
               </span>
-              <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-[#F8DF7B] uppercase">
+              <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-amber-600 dark:text-[#F8DF7B] uppercase">
                 {appName && appName !== 'QBIZ BOOK' && appName !== 'Sống Khỏe Mỗi Ngày' ? appName.split(' ').slice(1).join(' ') : 'CƠ THỂ'}
               </span>
-              {isAdmin && <Edit2 size={12} className="text-purple-300 opacity-60" />}
+              {isAdmin && <Edit2 size={12} className="text-[#1E3A8A] dark:text-purple-300 opacity-60" />}
             </div>
-            <span className="text-[9.5px] sm:text-[10px] font-black uppercase tracking-wider text-purple-300/70 mt-0.5">
+            <span className="text-[9.5px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-purple-300/70 mt-0.5">
               EMPOWERING MEDICAL KNOWLEDGE
             </span>
-            <span className="text-[10.5px] sm:text-[11px] text-purple-100/90 font-medium line-clamp-1">
+            <span className="text-[10.5px] sm:text-[11px] text-slate-600 dark:text-purple-100/90 font-medium line-clamp-1">
               {appSubtitle || 'Advanced Anatomy & Health'}
             </span>
           </div>
 
-          {/* Huy hiệu Xanh Sapphire dát vàng kim bên phải (Royal Crest 1:1 theo ảnh mẫu) */}
-          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[15px] bg-gradient-to-br from-[#3B1F7A] via-[#281358] to-[#12062C] p-[2px] shadow-md border border-amber-300/70 shrink-0 flex items-center justify-center relative overflow-hidden">
-            <div className="flex flex-col items-center justify-center text-amber-300">
-              <svg className="w-5 h-5 text-amber-300 drop-shadow-[0_1px_3px_rgba(245,158,11,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          {/* Huy hiệu Xanh Sapphire dát vàng kim bên phải */}
+          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[15px] bg-gradient-to-br from-blue-50 via-slate-50 to-blue-100 border border-blue-200 dark:bg-gradient-to-br dark:from-[#3B1F7A] dark:via-[#281358] dark:to-[#12062C] dark:border-amber-300/70 p-[2px] shadow-md shrink-0 flex items-center justify-center relative overflow-hidden">
+            <div className="flex flex-col items-center justify-center text-[#1E3A8A] dark:text-amber-300">
+              <svg className="w-5 h-5 text-[#1E3A8A] dark:text-amber-300 drop-shadow-xs dark:drop-shadow-[0_1px_3px_rgba(245,158,11,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" fill="currentColor" fillOpacity="0.25" />
-                <path d="M3.5 12h3l2-3 3 6 2-3h7" stroke="white" strokeWidth="1.8" />
+                <path d="M3.5 12h3l2-3 3 6 2-3h7" stroke="currentColor" strokeWidth="1.8" />
               </svg>
-              <span className="text-[7px] font-black tracking-widest text-amber-200 uppercase mt-0.5">MEDICA</span>
+              <span className="text-[7px] font-black tracking-widest text-[#1E3A8A] dark:text-amber-200 uppercase mt-0.5">MEDICA</span>
             </div>
           </div>
         </div>
 
         {/* Dropdown Menu ⋮ Trang chủ */}
         {showMenu && (
-          <div className="absolute top-[48px] right-0 w-[240px] bg-[#180E32] rounded-[20px] border border-[#3A2268] shadow-2xl p-2 flex flex-col gap-1 z-50 animate-in fade-in duration-150">
+          <div className="absolute top-[48px] right-0 w-[240px] bg-white text-slate-900 border border-slate-200 rounded-[20px] shadow-2xl p-2 flex flex-col gap-1 z-50 animate-in fade-in duration-150 dark:bg-[#180E32] dark:border-[#3A2268] dark:text-white">
             <button
               type="button"
               onClick={() => {
                 setShowMenu(false);
                 setShowPhoneSync(true);
               }}
-              className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-white hover:bg-[#25154D] cursor-pointer"
+              className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-white dark:hover:bg-[#25154D] cursor-pointer"
             >
-              <Smartphone size={16} className="text-[#F8DF7B]" />
+              <Smartphone size={16} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
               <span>{userPhone ? 'Quản lý số điện thoại' : 'Lưu tiến độ qua SĐT'}</span>
             </button>
 
@@ -332,37 +330,19 @@ export default function HomeHeader({
                 setShowMenu(false);
                 setShowPwaInstall(true);
               }}
-              className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-white hover:bg-[#25154D] cursor-pointer"
+              className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-white dark:hover:bg-[#25154D] cursor-pointer"
             >
-              <Smartphone size={16} className="text-[#F8DF7B]" />
+              <Smartphone size={16} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
               <span>Cài app ra màn hình</span>
             </button>
-
-            <Link
-              href="/lop-hoc"
-              onClick={() => setShowMenu(false)}
-              className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-white hover:bg-[#25154D] cursor-pointer"
-            >
-              <GraduationCap size={16} className="text-[#F8DF7B]" />
-              <span>Lớp học & Bài tập 3D</span>
-            </Link>
-
-            <Link
-              href="/chan-doan-hinh-anh"
-              onClick={() => setShowMenu(false)}
-              className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-white hover:bg-[#25154D] cursor-pointer"
-            >
-              <Activity size={16} className="text-emerald-400" />
-              <span>Chẩn đoán hình ảnh & Lâm sàng</span>
-            </Link>
 
             {isAdmin ? (
               <>
                 <div
                   className={`px-3 py-2 rounded-[12px] text-[12px] font-extrabold flex items-center gap-2 ${
                     supabaseOk
-                      ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800'
-                      : 'bg-red-950/60 text-red-300 border border-red-800'
+                      ? 'bg-emerald-50 text-emerald-800 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800'
+                      : 'bg-red-50 text-red-800 border border-red-200 dark:bg-red-950/60 dark:text-red-300 dark:border-red-800'
                   }`}
                 >
                   <span
@@ -383,9 +363,9 @@ export default function HomeHeader({
                     setShowMenu(false);
                     handleBackup();
                   }}
-                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-white hover:bg-[#25154D] cursor-pointer"
+                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-white dark:hover:bg-[#25154D] cursor-pointer"
                 >
-                  <Download size={16} className="text-purple-300" />
+                  <Download size={16} className="text-[#1E3A8A] dark:text-purple-300" />
                   <span>Sao lưu dữ liệu</span>
                 </button>
 
@@ -395,9 +375,9 @@ export default function HomeHeader({
                     setShowMenu(false);
                     setShowEditApp(true);
                   }}
-                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-white hover:bg-[#25154D] cursor-pointer"
+                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-white dark:hover:bg-[#25154D] cursor-pointer"
                 >
-                  <Edit2 size={16} className="text-purple-300" />
+                  <Edit2 size={16} className="text-[#1E3A8A] dark:text-purple-300" />
                   <span>Sửa tên & logo app</span>
                 </button>
 
@@ -407,22 +387,22 @@ export default function HomeHeader({
                     setShowMenu(false);
                     setShowSettings(true);
                   }}
-                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-white hover:bg-[#25154D] cursor-pointer"
+                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-white dark:hover:bg-[#25154D] cursor-pointer"
                 >
-                  <Settings size={16} className="text-purple-300" />
+                  <Settings size={16} className="text-[#1E3A8A] dark:text-purple-300" />
                   <span>Cài đặt quản trị</span>
                 </button>
 
                 <Link
                   href="/tro-ly-ai"
                   onClick={() => setShowMenu(false)}
-                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-white hover:bg-[#25154D] cursor-pointer"
+                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-white dark:hover:bg-[#25154D] cursor-pointer"
                 >
-                  <Sparkles size={16} className="text-primary" />
+                  <Sparkles size={16} className="text-[#1E3A8A] dark:text-primary" />
                   <span>Huấn luyện Trợ lý AI</span>
                 </Link>
 
-                <div className="border-t border-line my-1" />
+                <div className="border-t border-slate-200 dark:border-line my-1" />
 
                 <button
                   type="button"
@@ -437,9 +417,9 @@ export default function HomeHeader({
               <Link
                 href="/dang-nhap"
                 onClick={() => setShowMenu(false)}
-                className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-ink hover:bg-surface-2 cursor-pointer"
+                className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-ink dark:hover:bg-surface-2 cursor-pointer"
               >
-                <User size={16} className="text-primary" />
+                <User size={16} className="text-[#1E3A8A] dark:text-primary" />
                 <span>Đăng nhập quản trị</span>
               </Link>
             )}

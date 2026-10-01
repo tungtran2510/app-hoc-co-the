@@ -32,14 +32,13 @@ export function getStoredBlocks(_pageId: string, fallbackBlocks: Block[]): Block
  * Lưu danh sách khối: gọi trực tiếp API Supabase, KHÔNG lưu tạm trên localStorage
  */
 export async function saveStoredBlocks(_pageId: string, blocks: Block[]): Promise<boolean> {
-  // Gọi API ghi trực tiếp vào Supabase
-  for (const block of blocks) {
-    const res = await saveBlockApi(block);
-    if (!res.success) {
-      return false;
-    }
+  // Gọi API ghi đồng thời các khối vào Supabase qua Promise.all
+  try {
+    const results = await Promise.all(blocks.map((block) => saveBlockApi(block)));
+    return results.every((res) => res.success);
+  } catch {
+    return false;
   }
-  return true;
 }
 
 /**

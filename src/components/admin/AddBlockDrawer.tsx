@@ -166,7 +166,7 @@ export default function AddBlockDrawer({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-xs p-0 sm:p-4">
-      <div className="w-full max-w-[480px] max-h-[85vh] bg-white rounded-t-[28px] sm:rounded-[28px] flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-300">
+      <div className="w-full max-w-[480px] max-h-[85vh] bg-white dark:bg-[#160E2E] rounded-t-[28px] sm:rounded-[28px] flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-300 border dark:border-white/10">
         {/* Nút kéo */}
         <div className="w-12 h-1.5 bg-line-strong rounded-full mx-auto mt-3 mb-1 sm:hidden" />
 
@@ -183,7 +183,7 @@ export default function AddBlockDrawer({
           <button
             type="button"
             onClick={onClose}
-            className="w-10 h-10 rounded-full bg-surface-2 flex items-center justify-center text-muted hover:text-ink"
+            className="w-10 h-10 rounded-full bg-surface-2 flex items-center justify-center text-muted hover:text-ink cursor-pointer"
             aria-label="Đóng"
           >
             <X size={20} />
@@ -250,50 +250,50 @@ export default function AddBlockDrawer({
               <button
                 type="button"
                 onClick={() => createAndAdd('text', 'y_nghia')}
-                className="flex items-center gap-2.5 p-3 rounded-[16px] bg-[#E6F2EF] text-[#0A4F43] transition-all text-left font-bold text-[15px] border border-[#0E6B5A]/20"
+                className="flex items-center gap-2.5 p-3 rounded-[16px] bg-[#E6F2EF] dark:bg-[#062D26] text-[#0A4F43] dark:text-[#5EEAD4] transition-all text-left font-bold text-[15px] border border-[#0E6B5A]/20 dark:border-teal-500/40"
               >
-                <Lightbulb size={20} className="text-[#0E6B5A] shrink-0" />
+                <Lightbulb size={20} className="text-[#0E6B5A] dark:text-[#5EEAD4] shrink-0" />
                 <span>Ý nghĩa</span>
               </button>
               <button
                 type="button"
                 onClick={() => createAndAdd('text', 'diem_can_nho')}
-                className="flex items-center gap-2.5 p-3 rounded-[16px] bg-[#E3ECF7] text-[#244A78] transition-all text-left font-bold text-[15px] border border-[#2D5B94]/20"
+                className="flex items-center gap-2.5 p-3 rounded-[16px] bg-[#E3ECF7] dark:bg-[#12243D] text-[#244A78] dark:text-[#93C5FD] transition-all text-left font-bold text-[15px] border border-[#2D5B94]/20 dark:border-blue-500/40"
               >
-                <SquareCheck size={20} className="text-[#2D5B94] shrink-0" />
+                <SquareCheck size={20} className="text-[#2D5B94] dark:text-[#93C5FD] shrink-0" />
                 <span>Điểm cần nhớ</span>
               </button>
               <button
                 type="button"
                 onClick={() => createAndAdd('text', 'chu_y')}
-                className="flex items-center gap-2.5 p-3 rounded-[16px] bg-[#FFF1E6] text-[#8A3A14] transition-all text-left font-bold text-[15px] border border-[#B4501F]/20"
+                className="flex items-center gap-2.5 p-3 rounded-[16px] bg-[#FFF1E6] dark:bg-[#381A0B] text-[#8A3A14] dark:text-[#FDBA74] transition-all text-left font-bold text-[15px] border border-[#B4501F]/20 dark:border-orange-500/40"
               >
-                <TriangleAlert size={20} className="text-[#B4501F] shrink-0" />
+                <TriangleAlert size={20} className="text-[#B4501F] dark:text-[#FDBA74] shrink-0" />
                 <span>Chú ý</span>
               </button>
               <button
                 type="button"
                 onClick={() => createAndAdd('text', 'sai_lam')}
-                className="flex items-center gap-2.5 p-3 rounded-[16px] bg-[#FBE7E1] text-[#7A2F12] transition-all text-left font-bold text-[15px] border border-[#9B3B32]/20"
+                className="flex items-center gap-2.5 p-3 rounded-[16px] bg-[#FBE7E1] dark:bg-[#38110D] text-[#7A2F12] dark:text-[#FCA5A5] transition-all text-left font-bold text-[15px] border border-[#9B3B32]/20 dark:border-red-500/40"
               >
-                <CircleX size={20} className="text-[#9B3B32] shrink-0" />
+                <CircleX size={20} className="text-[#9B3B32] dark:text-[#FCA5A5] shrink-0" />
                 <span>Sai lầm thường gặp</span>
               </button>
               <button
                 type="button"
                 onClick={() => createAndAdd('text', 'giai_phap')}
-                className="flex items-center gap-2.5 p-3 rounded-[16px] bg-[#EDF3E4] text-[#3C5420] transition-all text-left font-bold text-[15px] border border-[#4E6B2A]/20"
+                className="flex items-center gap-2.5 p-3 rounded-[16px] bg-[#EDF3E4] dark:bg-[#1E2E0E] text-[#3C5420] dark:text-[#BEF264] transition-all text-left font-bold text-[15px] border border-[#4E6B2A]/20 dark:border-lime-500/40"
               >
-                <Wrench size={20} className="text-[#4E6B2A] shrink-0" />
+                <Wrench size={20} className="text-[#4E6B2A] dark:text-[#BEF264] shrink-0" />
                 <span>Giải pháp</span>
               </button>
               <button
                 type="button"
                 onClick={() => createAndAdd('comparison', 'two_column')}
-                className="col-span-2 flex items-center justify-center gap-2.5 p-3 rounded-[16px] bg-gradient-to-r from-[#E6F2EF] to-[#FBE7E1] hover:opacity-95 transition-all font-bold text-[15px] border border-line shadow-2xs"
+                className="col-span-2 flex items-center justify-center gap-2.5 p-3 rounded-[16px] bg-gradient-to-r from-[#E6F2EF] to-[#FBE7E1] dark:from-[#062D26]/80 dark:to-[#38110D]/80 hover:opacity-95 transition-all font-bold text-[15px] border border-line dark:border-purple-500/40 shadow-2xs"
               >
-                <Columns2 size={20} className="text-primary shrink-0" />
-                <span className="text-ink">So sánh 2 mặt (Đúng – Sai / Khỏe – Bệnh)</span>
+                <Columns2 size={20} className="text-primary dark:text-[#C4B5FD] shrink-0" />
+                <span className="text-ink dark:text-white">So sánh 2 mặt (Đúng – Sai / Khỏe – Bệnh)</span>
               </button>
             </div>
           </div>

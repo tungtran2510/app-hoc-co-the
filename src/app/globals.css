@@ -4,21 +4,41 @@
 
 :root {
   --font-be-vietnam-pro: 'Be Vietnam Pro', sans-serif;
+  --color-bg: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #F1F5F9;
+  --color-ink: #0F172A;
+  --color-ink-2: #1E293B;
+  --color-muted: #475569;
+  --color-line: #E2E8F0;
+  --color-line-strong: #CBD5E1;
+  --color-primary: #1E3A8A;
+  --color-primary-dark: #172554;
+  --color-primary-soft: #EFF6FF;
+  --color-primary-track: #DBEAFE;
+  --color-on-primary-muted: #1E40AF;
 }
 
 html {
-  background-color: #F8FAFC;
-  color: #0F172A;
+  background-color: var(--color-bg);
+  color: var(--color-ink);
   -webkit-tap-highlight-color: transparent;
-  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: #F8FAFC;
+  background-color: var(--color-bg);
+  background-image: 
+    radial-gradient(ellipse 90% 40% at 50% -10%, rgba(30, 58, 138, 0.04), transparent 70%),
+    radial-gradient(ellipse 60% 30% at 100% 50%, rgba(15, 23, 42, 0.03), transparent 60%);
+  background-repeat: no-repeat;
   font-family: var(--font-be-vietnam-pro), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--color-ink);
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 /* Tối ưu thanh cuộn */
@@ -30,78 +50,96 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: #94A3B8;
   border-radius: 999px;
 }
 
 /* ============================================================================
-   1. CHẾ ĐỘ TỐI (DARK MODE - TỐI SÂU, CHỮ TRẮNG SÁNG RÕ RÀNG)
+   1. CHẾ ĐỘ TỐI (DARK MODE - OBSIDIAN VIOLET MỜ TÍM THEO YÊU CẦU NGƯỜI DÙNG)
    ============================================================================ */
+html.dark {
+  --color-bg: #0C0817;
+  --color-surface: #170F2F;
+  --color-surface-2: #1F143D;
+  --color-ink: #FFFFFF;
+  --color-ink-2: #DDD6FE;
+  --color-muted: #A599C2;
+  --color-line: #2D1C52;
+  --color-line-strong: #442A7A;
+  --color-primary: #8B5CF6;
+  --color-primary-dark: #6D28D9;
+  --color-primary-soft: #26164A;
+  --color-primary-track: #4C1D95;
+  --color-on-primary-muted: #DDD6FE;
+}
+
 html.dark, html.dark body, body.dark {
-  background-color: #0B1120 !important;
-  color: #F8FAFC !important;
+  background-color: #0C0817 !important;
+  color: #FFFFFF !important;
 }
 
 html.dark body {
-  background-color: #0B1120 !important;
-  color: #F8FAFC !important;
+  background-color: #0C0817 !important;
+  background-image: 
+    radial-gradient(ellipse 90% 40% at 50% -10%, rgba(139, 92, 246, 0.18), transparent 70%),
+    radial-gradient(ellipse 60% 30% at 100% 50%, rgba(124, 58, 237, 0.09), transparent 60%) !important;
+  color: #FFFFFF !important;
 }
 
 html.dark .bg-bg {
-  background-color: #0B1120 !important;
+  background-color: #0C0817 !important;
 }
 
 html.dark .bg-white,
 html.dark .bg-surface {
-  background-color: #1E293B !important;
-  color: #F8FAFC !important;
+  background-color: #170F2F !important;
+  color: #FFFFFF !important;
 }
 
 html.dark .bg-surface-2 {
-  background-color: #162032 !important;
-  color: #F8FAFC !important;
+  background-color: #1F143D !important;
+  color: #FFFFFF !important;
 }
 
 html.dark .block-styled-card {
-  background-color: #1E293B !important;
-  border: 1px solid #334155 !important;
+  background-color: #170F2F !important;
+  border: 1px solid #33205E !important;
 }
 
 /* Khắc phục triệt để lỗi chữ bị đen trong chế độ tối */
 html.dark .text-ink,
-html.dark .text-ink-2,
 html.dark p,
 html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6,
 html.dark li,
-html.dark strong,
-html.dark span:not([class*="bg-"]):not([class*="text-white"]):not([class*="text-emerald"]):not([class*="text-red"]) {
+html.dark strong {
   color: #F8FAFC !important;
 }
 
 html.dark .text-ink-2 {
-  color: #E2E8F0 !important;
+  color: #DDD6FE !important;
 }
 
 html.dark .text-muted {
-  color: #CBD5E1 !important;
+  color: #A599C2 !important;
 }
 
 html.dark .border-line,
 html.dark .border-line-strong,
 html.dark .border-line\/40,
 html.dark .border-line\/60 {
-  border-color: #334155 !important;
+  border-color: #2D1C52 !important;
 }
 
 html.dark input,
-html.dark textarea {
-  background-color: #1E293B !important;
-  color: #F8FAFC !important;
-  border-color: #334155 !important;
+html.dark textarea,
+html.dark select {
+  background-color: #170F2F !important;
+  color: #FFFFFF !important;
+  border-color: #2D1C52 !important;
 }
 
 html.dark ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #3B256B;
 }
 
 /* ============================================================================
@@ -164,7 +202,8 @@ html.gray .border-line\/60 {
 }
 
 html.gray input,
-html.gray textarea {
+html.gray textarea,
+html.gray select {
   background-color: #4B5563 !important;
   color: #F9FAFB !important;
   border-color: #64748B !important;

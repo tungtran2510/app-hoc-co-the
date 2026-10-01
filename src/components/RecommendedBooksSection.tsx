@@ -108,7 +108,7 @@ export default function RecommendedBooksSection({
               {title}
             </h2>
             {books.length > 0 && (
-              <span className="text-[11.5px] font-extrabold text-primary bg-primary-soft px-2.5 py-0.5 rounded-full shrink-0">
+              <span className="text-[11.5px] font-extrabold text-[#1E3A8A] bg-blue-100 dark:text-[#F8DF7B] dark:bg-[#2E1B58] px-2.5 py-0.5 rounded-full shrink-0">
                 {books.length} cuốn
               </span>
             )}
@@ -116,14 +116,14 @@ export default function RecommendedBooksSection({
 
           <div className="flex items-center gap-1.5 shrink-0">
             {/* Nút chuyển đổi kiểu hiển thị: Lưới hoặc Lookbook */}
-            <div className="inline-flex items-center bg-surface-2 border border-line rounded-[10px] p-0.5 shadow-2xs">
+            <div className="inline-flex items-center bg-white dark:bg-[#180E32] border border-slate-200 dark:border-[#3A2268] rounded-[10px] p-0.5 shadow-2xs">
               <button
                 type="button"
                 onClick={() => toggleLayoutMode('grid')}
                 className={`w-7 h-7 rounded-[7px] flex items-center justify-center transition-all cursor-pointer ${
                   layoutMode === 'grid'
-                    ? 'bg-white text-primary shadow-xs font-bold'
-                    : 'text-muted hover:text-ink'
+                    ? 'bg-[#1E3A8A] text-white dark:bg-[#F8DF7B] dark:text-[#160C2C] shadow-xs font-bold'
+                    : 'text-slate-400 hover:text-slate-700 dark:text-purple-300 dark:hover:text-white'
                 }`}
                 title="Xem dạng lưới 2 cột"
                 aria-label="Xem dạng lưới 2 cột"
@@ -135,8 +135,8 @@ export default function RecommendedBooksSection({
                 onClick={() => toggleLayoutMode('lookbook')}
                 className={`w-7 h-7 rounded-[7px] flex items-center justify-center transition-all cursor-pointer ${
                   layoutMode === 'lookbook'
-                    ? 'bg-white text-primary shadow-xs font-bold'
-                    : 'text-muted hover:text-ink'
+                    ? 'bg-[#1E3A8A] text-white dark:bg-[#F8DF7B] dark:text-[#160C2C] shadow-xs font-bold'
+                    : 'text-slate-400 hover:text-slate-700 dark:text-purple-300 dark:hover:text-white'
                 }`}
                 title="Xem dạng thẻ chi tiết (Lookbook)"
                 aria-label="Xem dạng thẻ chi tiết (Lookbook)"
@@ -149,7 +149,7 @@ export default function RecommendedBooksSection({
               <button
                 type="button"
                 onClick={() => setShowEditModal(true)}
-                className="flex items-center gap-1 h-7 px-2.5 rounded-[9px] bg-primary-soft text-primary text-[11.5px] font-extrabold hover:bg-primary-soft/80 cursor-pointer shadow-2xs shrink-0 whitespace-nowrap"
+                className="flex items-center gap-1 h-7 px-2.5 rounded-[9px] bg-blue-50 text-[#1E3A8A] border border-blue-200 hover:bg-blue-100 dark:bg-purple-950/80 dark:text-purple-200 dark:border-purple-800/40 dark:hover:bg-purple-900 text-[11.5px] font-extrabold cursor-pointer shadow-2xs shrink-0 whitespace-nowrap"
               >
                 <Edit2 size={11} />
                 <span>Sửa sách</span>
@@ -204,7 +204,7 @@ export default function RecommendedBooksSection({
             <div
               key={book.id || idx}
               onClick={() => setSelectedBook(book)}
-              className="group p-3 sm:p-4 rounded-[22px] bg-white border border-line/80 hover:border-primary/40 shadow-xs hover:shadow-md transition-all duration-200 flex flex-row gap-3 sm:gap-4.5 cursor-pointer relative"
+              className="group p-3 sm:p-4 rounded-[20px] bg-white text-slate-900 border border-slate-200 border-l-[4px] border-l-[#1E3A8A] shadow-md hover:shadow-lg hover:border-slate-300 dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] dark:border-t-white/15 dark:border-r-black/50 dark:border-b-black/70 dark:border-l-[#A78BFA] dark:text-white transition-all duration-200 flex flex-row gap-3 sm:gap-4.5 cursor-pointer relative"
             >
               {/* BÌA SÁCH 3D HIỆN ĐẠI BÊN TRÁI - TO RÕ RÀNG THEO YÊU CẦU */}
               <div className="w-[116px] sm:w-[138px] shrink-0 pt-0.5">
@@ -220,29 +220,29 @@ export default function RecommendedBooksSection({
               <div className="flex-1 flex flex-col justify-between min-w-0 py-0.5">
                 <div className="flex flex-col gap-1.5">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="px-2 py-0.5 rounded-[5px] bg-primary/10 text-primary text-[10px] font-extrabold tracking-wide uppercase shrink-0">
+                    <span className="px-2 py-0.5 rounded-[5px] bg-blue-50 text-[#1E3A8A] border border-blue-200 dark:bg-purple-950/80 dark:text-purple-200 dark:border-purple-800/40 text-[10px] font-extrabold tracking-wide uppercase shrink-0">
                       Tài liệu khuyên đọc
                     </span>
                     {book.author && (
-                      <span className="text-[11px] font-bold text-muted truncate max-w-[110px] sm:max-w-none">
+                      <span className="text-[11px] font-bold text-slate-500 dark:text-purple-300/80 truncate max-w-[110px] sm:max-w-none">
                         · {book.author}
                       </span>
                     )}
                   </div>
 
-                  <h3 className="text-[15px] sm:text-[16.5px] font-extrabold text-ink leading-snug line-clamp-2 break-normal group-hover:text-primary transition-colors">
+                  <h3 className="text-[15px] sm:text-[16.5px] font-extrabold text-slate-900 dark:text-white leading-snug line-clamp-2 break-normal group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] transition-colors">
                     {book.title}
                   </h3>
 
                   {book.description && (
-                    <p className="text-[12px] sm:text-[12.5px] text-muted leading-relaxed line-clamp-2">
+                    <p className="text-[12px] sm:text-[12.5px] text-slate-600 dark:text-purple-200/90 leading-relaxed line-clamp-2">
                       {book.description}
                     </p>
                   )}
                 </div>
 
-                <div className="pt-2 flex items-center justify-between border-t border-line/50 mt-1.5">
-                  <span className="text-[12px] font-extrabold text-primary inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap">
+                <div className="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-purple-800/40 mt-1.5">
+                  <span className="text-[12px] font-black text-[#1E3A8A] dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap">
                     <span>Xem chi tiết & video</span>
                     <ChevronRight size={13} strokeWidth={2.5} />
                   </span>
@@ -254,7 +254,7 @@ export default function RecommendedBooksSection({
                         e.stopPropagation();
                         setShowEditModal(true);
                       }}
-                      className="flex items-center gap-1 h-6 px-2 rounded-[6px] bg-surface-2 hover:bg-primary-soft text-muted hover:text-primary text-[11px] font-bold cursor-pointer shrink-0 ml-auto transition-colors"
+                      className="flex items-center gap-1 h-6 px-2 rounded-[6px] bg-blue-50 text-[#1E3A8A] border border-blue-200 hover:bg-blue-100 dark:bg-purple-950/80 dark:text-purple-200 dark:border-purple-800/40 text-[11px] font-bold cursor-pointer shrink-0 ml-auto transition-colors"
                       title="Sửa danh sách sách"
                     >
                       <Edit2 size={10} />
@@ -273,7 +273,7 @@ export default function RecommendedBooksSection({
             <div
               key={book.id || idx}
               onClick={() => setSelectedBook(book)}
-              className="group p-3 sm:p-3.5 rounded-[20px] bg-white border border-line/70 hover:border-primary/40 shadow-xs hover:shadow-lg transition-all duration-200 flex flex-col cursor-pointer relative"
+              className="group p-3 sm:p-3.5 rounded-[20px] bg-white text-slate-900 border border-slate-200 border-l-[4px] border-l-[#1E3A8A] shadow-md hover:shadow-lg hover:border-slate-300 dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] dark:border-t-white/15 dark:border-r-black/50 dark:border-b-black/70 dark:border-l-[#A78BFA] dark:text-white transition-all duration-200 flex flex-col cursor-pointer relative"
             >
               {/* BÌA SÁCH 3D HIỆN ĐẠI */}
               <div className="w-full px-1 pt-1 pb-1.5 flex justify-center">
@@ -288,23 +288,23 @@ export default function RecommendedBooksSection({
               {/* NỘI DUNG CHÂN THẺ */}
               <div className="flex-1 flex flex-col pt-1.5 gap-1">
                 {book.author && (
-                  <p className="text-[10.5px] font-extrabold text-primary uppercase tracking-wider line-clamp-1">
+                  <p className="text-[10.5px] font-extrabold text-[#1E3A8A] dark:text-[#F8DF7B] uppercase tracking-wider line-clamp-1">
                     {book.author}
                   </p>
                 )}
 
-                <h3 className="text-[14px] sm:text-[15px] font-extrabold text-ink leading-snug line-clamp-2 group-hover:text-primary transition-colors">
+                <h3 className="text-[14px] sm:text-[15px] font-extrabold text-slate-900 dark:text-white leading-snug line-clamp-2 group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] transition-colors">
                   {book.title}
                 </h3>
 
                 {book.description && (
-                  <p className="text-[11.5px] text-muted leading-relaxed line-clamp-2 mt-0.5">
+                  <p className="text-[11.5px] text-slate-600 dark:text-purple-200/90 leading-relaxed line-clamp-2 mt-0.5">
                     {book.description}
                   </p>
                 )}
 
-                <div className="mt-auto pt-2 flex items-center justify-between border-t border-line/40">
-                  <span className="text-[11.5px] font-extrabold text-primary inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap">
+                <div className="mt-auto pt-2 flex items-center justify-between border-t border-slate-100 dark:border-purple-800/40">
+                  <span className="text-[11.5px] font-black text-[#1E3A8A] dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap">
                     <span>Khám phá</span>
                     <ChevronRight size={13} strokeWidth={2.5} />
                   </span>

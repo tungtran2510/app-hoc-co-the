@@ -267,7 +267,7 @@ export default function VideoManagerModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-xs p-0 sm:p-4">
-      <div className="w-full max-w-[480px] max-h-[92vh] bg-white rounded-t-[28px] sm:rounded-[28px] flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-300">
+      <div className="w-full max-w-[480px] max-h-[92vh] bg-white dark:bg-[#160E2E] rounded-t-[28px] sm:rounded-[28px] flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-300 border dark:border-white/10">
         {/* Nút kéo trên mobile */}
         <div className="w-12 h-1.5 bg-line-strong rounded-full mx-auto mt-3 mb-1 sm:hidden" />
 
@@ -284,7 +284,7 @@ export default function VideoManagerModal({
           <button
             type="button"
             onClick={onClose}
-            className="w-10 h-10 rounded-full bg-surface-2 flex items-center justify-center text-muted hover:text-ink transition-colors shrink-0"
+            className="w-10 h-10 rounded-full bg-surface-2 flex items-center justify-center text-muted hover:text-ink transition-colors shrink-0 cursor-pointer"
             aria-label="Đóng"
           >
             <X size={20} />
@@ -301,7 +301,7 @@ export default function VideoManagerModal({
             return (
               <div
                 key={idx}
-                className="flex flex-col gap-2 p-2.5 sm:p-3 rounded-[16px] bg-white border border-line shadow-2xs"
+                className="flex flex-col gap-2 p-2.5 sm:p-3 rounded-[16px] bg-white dark:bg-[#1C123D] border border-line shadow-2xs"
               >
                 <div className="flex items-start gap-2.5">
                   {/* Thumbnail */}

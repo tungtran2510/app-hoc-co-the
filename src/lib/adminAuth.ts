@@ -8,10 +8,20 @@ export interface AdminStatus {
   supabaseOk: boolean;
 }
 
+export function getAdminTokenClient(): string {
+  if (typeof window === 'undefined') return '';
+  return localStorage.getItem('app_admin_token') || '';
+}
+
 export async function checkAdminStatus(): Promise<AdminStatus> {
   if (typeof window === 'undefined') return { isAdmin: false, supabaseOk: false };
   try {
-    const res = await fetch('/api/admin/me', { cache: 'no-store' });
+    const token = getAdminTokenClient();
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['x-admin-token'] = token;
+    }
+    const res = await fetch('/api/admin/me', { headers, cache: 'no-store' });
     if (!res.ok) return { isAdmin: false, supabaseOk: false };
     const data = await res.json();
     return {
@@ -39,6 +49,10 @@ export async function loginAdmin(password: string): Promise<{ success: boolean; 
       const data = await res.json().catch(() => ({}));
       return { success: false, error: data.error || 'Mật khẩu quản trị không chính xác' };
     }
+    const data = await res.json().catch(() => ({}));
+    if (data.token && typeof window !== 'undefined') {
+      localStorage.setItem('app_admin_token', data.token);
+    }
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || 'Lỗi kết nối máy chủ' };
@@ -47,7 +61,15 @@ export async function loginAdmin(password: string): Promise<{ success: boolean; 
 
 export async function logoutAdmin(): Promise<void> {
   try {
-    await fetch('/api/admin/logout', { method: 'POST' });
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('app_admin_token');
+    }
+    const token = getAdminTokenClient();
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['x-admin-token'] = token;
+    }
+    await fetch('/api/admin/logout', { method: 'POST', headers });
   } catch {
     // Bỏ qua lỗi mạng
   }

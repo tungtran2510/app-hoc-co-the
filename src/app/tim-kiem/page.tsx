@@ -121,7 +121,7 @@ export default function SearchPage() {
         <button
           type="button"
           onClick={() => router.back()}
-          className="w-12 h-12 min-w-[48px] rounded-[16px] bg-white border border-line flex items-center justify-center text-ink hover:text-primary transition-colors cursor-pointer shadow-2xs"
+          className="w-12 h-12 min-w-[48px] rounded-[16px] bg-white border border-slate-200 dark:border-purple-900/60 flex items-center justify-center text-ink hover:text-primary transition-colors cursor-pointer shadow-2xs"
           aria-label="Quay lại"
         >
           <ArrowLeft size={22} />
@@ -137,7 +137,7 @@ export default function SearchPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Tìm bài, ví dụ: cột sống, đĩa đệm"
-            className="w-full h-[52px] min-h-[48px] pl-11 pr-11 rounded-[18px] bg-white border-[1.5px] border-line focus:border-primary text-[17px] text-ink placeholder:text-muted focus:outline-hidden shadow-2xs transition-colors"
+            className="w-full h-[52px] min-h-[48px] pl-11 pr-11 rounded-[18px] bg-white border-[1.5px] border-slate-200 dark:border-purple-900/60 focus:border-[#1E3A8A] dark:focus:border-[#A78BFA] text-[17px] text-ink placeholder:text-muted focus:outline-hidden shadow-2xs transition-colors"
             aria-label="Nhập từ khóa tìm kiếm"
           />
           {query && (

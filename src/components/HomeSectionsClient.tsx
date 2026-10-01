@@ -119,12 +119,12 @@ export default function HomeSectionsClient({
               />
 
               {/* Khối Hoạt động gần đây (Recent Activity theo chuẩn ảnh tham chiếu iPhone) */}
-              <div className="flex flex-col gap-2 mt-1">
+              <div className="flex flex-col gap-2 mt-2">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-[17.5px] sm:text-[18.5px] font-black text-slate-900 tracking-tight">
+                  <h3 className="text-[17.5px] sm:text-[18.5px] font-black text-ink tracking-tight">
                     Hoạt động gần đây
                   </h3>
-                  <span className="text-[11.5px] font-bold text-blue-600">Đang học dở</span>
+                  <span className="text-[11.5px] font-black uppercase tracking-wider text-[#1E3A8A] dark:text-[#F8DF7B]">Đang học dở</span>
                 </div>
                 <HomeContinueSection />
               </div>

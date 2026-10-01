@@ -26,11 +26,11 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
     <Link
       href={targetUrl}
       prefetch={true}
-      className="group relative block overflow-hidden rounded-[22px] bg-gradient-to-r from-[#1845B2] via-[#2055D0] to-[#0E2C80] px-4 py-3 sm:px-5 sm:py-3.5 text-white shadow-lg border border-sky-300/40 transition-all duration-150 active:scale-[0.98] cursor-pointer"
+      className="group relative block overflow-hidden rounded-[20px] bg-white text-slate-900 border border-slate-200 border-l-[4px] border-l-[#1E3A8A] shadow-md hover:shadow-lg dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] dark:border-t-white/15 dark:border-r-black/50 dark:border-b-black/70 dark:border-l-[#A78BFA] dark:text-white px-4 py-3 sm:px-5 sm:py-3.5 transition-all duration-150 active:scale-[0.98] cursor-pointer"
       aria-label={`Xem tiếp ${info.topic_title} bài ${info.page_title}`}
     >
-      {/* Tia sáng vàng kim viền trên */}
-      <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-amber-300/60 to-transparent" />
+      {/* Tia sáng vàng kim viền trên (dark mode) */}
+      <div className="hidden dark:block absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#F8DF7B]/60 to-transparent" />
 
       {/* 3D Anatomy / Avatar Render bên phải */}
       <div className="absolute -right-2 top-0 bottom-0 w-[42%] sm:w-[36%] pointer-events-none overflow-hidden select-none">
@@ -41,18 +41,18 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
           className={`w-full h-full object-cover object-center ${
             info.cover_url && !info.cover_url.endsWith('.png')
               ? 'opacity-90'
-              : 'mix-blend-screen opacity-95 scale-105'
+              : 'mix-blend-multiply opacity-80 dark:mix-blend-screen dark:opacity-95 scale-105'
           }`}
         />
-        {/* Gradient mờ chuyển từ nền xanh sapphire sang ảnh */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#1845B2] via-[#1845B2]/60 to-transparent w-16" />
+        {/* Gradient mờ chuyển từ nền sang ảnh */}
+        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent dark:from-[#1C123D] dark:via-[#1C123D]/60 dark:to-transparent w-16" />
       </div>
 
       <div className="relative z-10 flex flex-col gap-1 sm:gap-1.5">
         {/* Dòng 1: Huy hiệu chủ đề có icon Play + Nút sửa ảnh (nếu Admin) + Vị trí video */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-white/90 text-[11.5px] sm:text-[12px] font-bold">
-            <span className="w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full bg-sky-500 flex items-center justify-center text-white shrink-0 shadow-2xs">
+          <div className="flex items-center gap-1.5 text-[#1E3A8A] dark:text-white/90 text-[11.5px] sm:text-[12px] font-bold">
+            <span className="w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full bg-blue-100 text-[#1E3A8A] dark:bg-[#F8DF7B] dark:text-[#160C2C] flex items-center justify-center shrink-0 shadow-2xs">
               <Play size={8} fill="currentColor" className="ml-0.5" />
             </span>
             <span>Đang xem · {info.topic_title || 'Cột sống'}</span>
@@ -67,7 +67,7 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
                   e.stopPropagation();
                   onEditPage();
                 }}
-                className="px-2 py-0.5 rounded-full bg-white/20 hover:bg-white/35 text-white text-[10.5px] font-bold flex items-center gap-1 backdrop-blur-xs cursor-pointer transition-colors shadow-2xs"
+                className="px-2 py-0.5 rounded-full bg-blue-50 text-[#1E3A8A] border border-blue-200 hover:bg-blue-100 dark:bg-white/20 dark:hover:bg-white/35 dark:text-white text-[10.5px] font-bold flex items-center gap-1 backdrop-blur-xs cursor-pointer transition-colors shadow-2xs"
                 title="Cài đặt ảnh đại diện & thông tin bài học này"
               >
                 <Edit2 size={10} />
@@ -75,19 +75,19 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
               </button>
             )}
 
-            <span className="text-[11px] sm:text-[11.5px] font-bold text-white/75 pr-1">
+            <span className="text-[11px] sm:text-[11.5px] font-bold text-slate-500 dark:text-white/75 pr-1">
               Video {String(current).padStart(2, '0')}/{String(total).padStart(2, '0')}
             </span>
           </div>
         </div>
 
         {/* Dòng 2: Tiêu đề bài học chính - TO RÕ CHO DỄ NHÌN */}
-        <h2 className="text-[17.5px] sm:text-[20px] font-black text-white leading-tight tracking-tight line-clamp-1 max-w-[84%] sm:max-w-[86%]">
+        <h2 className="text-[17.5px] sm:text-[20px] font-black text-slate-900 dark:text-white leading-tight tracking-tight line-clamp-1 max-w-[84%] sm:max-w-[86%]">
           {String(info.page_number || 1).padStart(2, '0')} - {info.page_title || 'Tổng quan về cột sống'}
         </h2>
 
         {/* Dòng 3: Mô tả/Tiêu đề video - 1 dòng gọn gàng để chiều cao bé lại */}
-        <p className="text-[11.5px] sm:text-[12px] text-white/80 leading-tight line-clamp-1 max-w-[70%] sm:max-w-[76%] font-medium">
+        <p className="text-[11.5px] sm:text-[12px] text-slate-600 dark:text-white/80 leading-tight line-clamp-1 max-w-[70%] sm:max-w-[76%] font-medium">
           {info.video_title || 'Cấu tạo & chức năng cột sống'}
         </p>
 
@@ -95,23 +95,23 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
         <div className="flex items-center justify-between gap-2.5 pt-0.5 mt-0.5">
           <div className="flex-1 max-w-[56%] sm:max-w-[64%] flex items-center gap-2">
             <div
-              className="flex-1 h-1.5 bg-black/30 rounded-full overflow-hidden p-[0.5px]"
+              className="flex-1 h-1.5 bg-slate-200 dark:bg-black/30 rounded-full overflow-hidden p-[0.5px]"
               role="progressbar"
               aria-valuenow={progressPercent}
               aria-valuemin={0}
               aria-valuemax={100}
             >
               <div
-                className="h-full bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 rounded-full transition-all duration-300 shadow-[0_0_8px_rgba(251,191,36,0.7)]"
+                className="h-full bg-[#1E3A8A] dark:bg-gradient-to-r dark:from-amber-300 dark:via-amber-400 dark:to-amber-500 rounded-full transition-all duration-300 shadow-xs"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <span className="text-[11px] font-extrabold text-amber-300 shrink-0 font-mono">
+            <span className="text-[11px] font-extrabold text-[#1E3A8A] dark:text-amber-300 shrink-0 font-mono">
               {progressPercent}%
             </span>
           </div>
 
-          <div className="shrink-0 flex items-center gap-1 h-[28px] sm:h-[30px] px-3 sm:px-3.5 rounded-full bg-white text-[#0A1E5C] font-black text-[12px] sm:text-[12.5px] shadow-sm group-hover:bg-amber-50 transition-colors">
+          <div className="shrink-0 flex items-center gap-1 h-[28px] sm:h-[30px] px-3 sm:px-3.5 rounded-full bg-[#1E3A8A] text-white hover:bg-[#172554] dark:bg-[#F8DF7B] dark:text-[#160C2C] dark:group-hover:bg-[#FDE68A] font-black text-[12px] sm:text-[12.5px] shadow-sm transition-colors">
             <span>Xem tiếp</span>
             <ArrowRight size={13} strokeWidth={2.5} />
           </div>

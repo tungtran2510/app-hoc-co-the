@@ -1,10 +1,23 @@
 import { Block, Page, Topic, Settings, AuthorProfile } from './types';
 
+export function getAdminHeaders(): Record<string, string> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('app_admin_token');
+    if (token) {
+      headers['x-admin-token'] = token;
+    }
+  }
+  return headers;
+}
+
 export async function saveBlockApi(block: Block): Promise<{ success: boolean; error?: string; block?: Block }> {
   try {
     const res = await fetch('/api/admin/save-block', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAdminHeaders(),
       body: JSON.stringify({ block }),
     });
     const data = await res.json().catch(() => ({}));
@@ -21,7 +34,7 @@ export async function deleteBlockApi(blockId: string): Promise<{ success: boolea
   try {
     const res = await fetch('/api/admin/delete-block', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAdminHeaders(),
       body: JSON.stringify({ blockId }),
     });
     if (!res.ok) {
@@ -38,7 +51,7 @@ export async function savePageApi(page: Partial<Page> & { id?: string }): Promis
   try {
     const res = await fetch('/api/admin/save-page', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAdminHeaders(),
       body: JSON.stringify({ page }),
     });
     const data = await res.json().catch(() => ({}));
@@ -55,7 +68,7 @@ export async function deletePageApi(pageId: string): Promise<{ success: boolean;
   try {
     const res = await fetch('/api/admin/delete-page', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAdminHeaders(),
       body: JSON.stringify({ pageId }),
     });
     if (!res.ok) {
@@ -72,7 +85,7 @@ export async function saveTopicApi(topic: Partial<Topic> & { id?: string }): Pro
   try {
     const res = await fetch('/api/admin/save-topic', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAdminHeaders(),
       body: JSON.stringify({ topic }),
     });
     const data = await res.json().catch(() => ({}));
@@ -89,7 +102,7 @@ export async function deleteTopicApi(topicId: string): Promise<{ success: boolea
   try {
     const res = await fetch('/api/admin/delete-topic', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAdminHeaders(),
       body: JSON.stringify({ topicId }),
     });
     if (!res.ok) {
@@ -108,7 +121,7 @@ export async function saveSettingsApi(
   try {
     const res = await fetch('/api/admin/save-settings', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAdminHeaders(),
       body: JSON.stringify({ settings }),
     });
     const data = await res.json().catch(() => ({}));
@@ -118,6 +131,29 @@ export async function saveSettingsApi(
     return { success: true, settings: data.settings };
   } catch (err: any) {
     return { success: false, error: err.message || 'Lỗi mạng, chưa lưu được cài đặt' };
+  }
+}
+
+export async function changePasswordApi(
+  currentPassword: string,
+  newPassword: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const res = await fetch('/api/admin/change-password', {
+      method: 'POST',
+      headers: getAdminHeaders(),
+      body: JSON.stringify({
+        currentPassword: currentPassword.trim(),
+        newPassword: newPassword.trim(),
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      return { success: false, error: data.error || 'Đổi mật khẩu thất bại' };
+    }
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Lỗi mạng khi đổi mật khẩu' };
   }
 }
 

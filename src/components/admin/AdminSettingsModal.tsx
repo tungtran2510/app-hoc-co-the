@@ -17,7 +17,7 @@ import {
   AppCustomSettings,
 } from '../../lib/storage';
 import { logoutAdmin } from '../../lib/adminAuth';
-import { saveSettingsApi } from '../../lib/apiAdmin';
+import { saveSettingsApi, changePasswordApi, getAdminHeaders } from '../../lib/apiAdmin';
 
 interface AdminSettingsModalProps {
   isOpen: boolean;
@@ -73,18 +73,9 @@ export default function AdminSettingsModal({
 
     try {
       setIsChangingPassword(true);
-      const res = await fetch('/api/admin/change-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          currentPassword: currentPassword.trim(),
-          newPassword: newPassword.trim(),
-        }),
-      });
-
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setPasswordError(data.error || 'Đổi mật khẩu thất bại.');
+      const res = await changePasswordApi(currentPassword, newPassword);
+      if (!res.success) {
+        setPasswordError(res.error || 'Đổi mật khẩu thất bại.');
         return;
       }
 
@@ -131,7 +122,9 @@ export default function AdminSettingsModal({
   const handleExportBackup = async () => {
     try {
       setIsExporting(true);
-      const res = await fetch('/api/admin/sao-luu');
+      const res = await fetch('/api/admin/sao-luu', {
+        headers: getAdminHeaders(),
+      });
       if (!res.ok) {
         throw new Error('Chưa lưu được sao lưu hoặc chưa đăng nhập');
       }

@@ -39,13 +39,13 @@ export async function POST(req: NextRequest) {
     }
 
     const token = generateAdminHmac();
-    const response = NextResponse.json({ success: true });
+    const response = NextResponse.json({ success: true, token });
 
     response.cookies.set({
       name: COOKIE_NAME,
       value: token,
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false, // Cho phép hoạt động trên cả HTTP (localhost / IP LAN di động 192.168.x.x) lẫn HTTPS
       sameSite: 'lax',
       maxAge: 30 * 24 * 60 * 60, // 30 ngày
       path: '/',
