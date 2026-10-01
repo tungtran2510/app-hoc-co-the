@@ -52,15 +52,15 @@ export default function TopicCard({ topic, pageCount }: TopicCardProps) {
       {/* 2. VẦNG SÁNG HUYỀN ẢO TÍM GÓC TRÊN BÊN PHẢI */}
       <div className="absolute -top-8 -right-8 w-28 h-28 bg-purple-600/25 rounded-full blur-xl pointer-events-none group-hover:bg-purple-500/35 transition-all" />
 
-      {/* 3. ẢNH GIẢI PHẪU 3D BÊN PHẢI (MIX-BLEND-SCREEN XÓA HOÀN TOÀN VIỀN ĐEN) */}
-      <div className="absolute right-0 top-2 bottom-7 w-[46%] sm:w-[44%] flex items-center justify-center pointer-events-none overflow-visible select-none z-0">
+      {/* 3. ẢNH GIẢI PHẪU 3D BÊN PHẢI (RADIAL MASK + MIX-BLEND-SCREEN XÓA 100% VIỀN HỘP) */}
+      <div className="absolute right-0 top-1.5 bottom-6 w-[48%] sm:w-[46%] flex items-center justify-center pointer-events-none overflow-visible select-none z-0">
         {hasCoverImage ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={coverUrl!}
             alt={topic.title}
-            className={`w-full h-full max-h-[105px] sm:max-h-[115px] object-contain mix-blend-screen opacity-100 drop-shadow-[0_10px_18px_rgba(0,0,0,0.9)] group-hover:drop-shadow-[0_0_14px_rgba(167,139,250,0.55)] transition-all duration-300 ${
-              topic.slug === 'cot-song' ? 'scale-110' : ''
+            className={`w-full h-full max-h-[110px] sm:max-h-[120px] object-contain mix-blend-screen opacity-100 [-webkit-mask-image:radial-gradient(circle_at_50%_50%,black_28%,transparent_68%)] [mask-image:radial-gradient(circle_at_50%_50%,black_28%,transparent_68%)] group-hover:scale-105 transition-all duration-300 ${
+              topic.slug === 'cot-song' ? 'scale-110 group-hover:scale-115' : ''
             }`}
             onError={() => setImgError(true)}
             loading="lazy"
