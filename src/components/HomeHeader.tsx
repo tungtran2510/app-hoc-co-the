@@ -14,6 +14,9 @@ import {
   Sparkles,
   Bell,
   Search,
+  Sun,
+  Moon,
+  GraduationCap,
 } from 'lucide-react';
 import { checkAdminStatus, logoutAdmin } from '../lib/adminAuth';
 import { getStoredAppSettings } from '../lib/storage';
@@ -52,6 +55,41 @@ export default function HomeHeader({
   const [userPhone, setUserPhone] = useState<string | null>(null);
   const [showMenu, setShowMenu] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('giao_dien');
+      const darkActive = stored === 'dark';
+      setIsDark(darkActive);
+      if (darkActive) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    } catch {
+      setIsDark(false);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const nextDark = !isDark;
+    setIsDark(nextDark);
+    try {
+      if (nextDark) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('giao_dien', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('giao_dien', 'light');
+      }
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) {
+        meta.setAttribute('content', nextDark ? '#0C0817' : '#F5F6FA');
+      }
+      window.dispatchEvent(new Event('giao_dien_changed'));
+    } catch {}
+  };
 
   useEffect(() => {
     checkAdminStatus().then(({ isAdmin, supabaseOk }) => {
@@ -163,21 +201,21 @@ export default function HomeHeader({
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
-              <span className="text-[17px] sm:text-[18px] font-black text-slate-900 tracking-tight">
+              <span className="text-[17px] sm:text-[18px] font-black text-ink tracking-tight">
                 Hello, Dr. Tùng!
               </span>
               <button
                 type="button"
                 onClick={() => setShowPhoneSync(true)}
-                className="w-5 h-5 flex items-center justify-center text-blue-600 hover:text-blue-700 transition-colors relative"
+                className="w-5 h-5 flex items-center justify-center text-amber-500 dark:text-[#F8DF7B] hover:text-amber-400 transition-colors relative"
                 title="Thông báo & Đồng bộ tiến độ"
                 aria-label="Thông báo"
               >
                 <Bell size={15} fill="currentColor" />
-                <span className="absolute top-0 right-0 w-1.5 h-1.5 rounded-full bg-blue-600" />
+                <span className="absolute top-0 right-0 w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-[#F8DF7B]" />
               </button>
             </div>
-            <span className="text-[11px] sm:text-[11.5px] text-slate-500 font-medium">
+            <span className="text-[11px] sm:text-[11.5px] text-muted font-medium">
               Kiến thức giải phẫu & Sức khỏe
             </span>
           </div>
@@ -187,12 +225,23 @@ export default function HomeHeader({
             <Link
               href="/tim-kiem"
               prefetch={true}
-              className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-700 transition-colors shadow-2xs"
+              className="w-9 h-9 rounded-full bg-white dark:bg-[#1E1342] hover:bg-purple-50 dark:hover:bg-[#281855] border border-purple-200 dark:border-purple-800/40 flex items-center justify-center text-purple-700 dark:text-purple-200 transition-colors shadow-2xs"
               title="Tìm kiếm bài học"
               aria-label="Tìm kiếm"
             >
               <Search size={18} strokeWidth={2.2} />
             </Link>
+
+            {/* Nút chuyển chế độ Sáng / Tối trực tiếp 1 chạm */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="w-9 h-9 rounded-full bg-white dark:bg-[#1E1342] hover:bg-purple-50 dark:hover:bg-[#281855] border border-purple-200 dark:border-purple-800/40 flex items-center justify-center text-amber-500 dark:text-[#F8DF7B] transition-colors shadow-2xs cursor-pointer"
+              title={isDark ? "Chuyển sang nền sáng" : "Chuyển sang nền tối"}
+              aria-label="Chuyển chế độ Sáng / Tối"
+            >
+              {isDark ? <Sun size={18} strokeWidth={2.2} /> : <Moon size={18} strokeWidth={2.2} />}
+            </button>
 
             {/* Avatar Bác sĩ / Quản trị viền vàng kim */}
             <button
@@ -216,13 +265,13 @@ export default function HomeHeader({
           onClick={() => {
             if (isAdmin) setShowEditApp(true);
           }}
-          className={`w-full rounded-[22px] bg-white border border-slate-100 shadow-[0_4px_16px_rgba(0,0,0,0.05)] p-3 sm:p-3.5 flex items-center justify-between gap-3 ${
+          className={`w-full rounded-[20px] bg-gradient-to-br from-[#1C123D] via-[#160D30] to-[#0E0720] border-l-[3.5px] border-l-[#A78BFA] border-t border-t-white/15 border-r border-r-black/50 border-b border-b-black/70 shadow-[0_12px_24px_-4px_rgba(0,0,0,0.85)] p-3 sm:p-3.5 flex items-center justify-between gap-3 ${
             isAdmin ? 'cursor-pointer group' : ''
           }`}
           title={isAdmin ? 'Bấm để sửa tên & thương hiệu app' : undefined}
         >
           {/* Avatar Bác sĩ / Tác giả bên trái */}
-          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-sky-100 shadow-2xs shrink-0">
+          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-purple-400/60 shadow-md shrink-0">
             <img
               src="/images/author_tung.png"
               alt="Tùng Dinh Dưỡng"
@@ -233,24 +282,24 @@ export default function HomeHeader({
           {/* Khối chữ thương hiệu ở giữa */}
           <div className="flex flex-col flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
-              <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-slate-900 uppercase">
+              <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-white uppercase">
                 {appName && appName !== 'QBIZ BOOK' && appName !== 'Sống Khỏe Mỗi Ngày' ? appName.split(' ')[0] : 'HỌC'}
               </span>
-              <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-blue-600 uppercase">
+              <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-[#F8DF7B] uppercase">
                 {appName && appName !== 'QBIZ BOOK' && appName !== 'Sống Khỏe Mỗi Ngày' ? appName.split(' ').slice(1).join(' ') : 'CƠ THỂ'}
               </span>
-              {isAdmin && <Edit2 size={12} className="text-primary opacity-60" />}
+              {isAdmin && <Edit2 size={12} className="text-purple-300 opacity-60" />}
             </div>
-            <span className="text-[9.5px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 mt-0.5">
+            <span className="text-[9.5px] sm:text-[10px] font-black uppercase tracking-wider text-purple-300/70 mt-0.5">
               EMPOWERING MEDICAL KNOWLEDGE
             </span>
-            <span className="text-[10.5px] sm:text-[11px] text-slate-600 font-medium line-clamp-1">
+            <span className="text-[10.5px] sm:text-[11px] text-purple-100/90 font-medium line-clamp-1">
               {appSubtitle || 'Advanced Anatomy & Health'}
             </span>
           </div>
 
           {/* Huy hiệu Xanh Sapphire dát vàng kim bên phải (Royal Crest 1:1 theo ảnh mẫu) */}
-          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[15px] bg-gradient-to-br from-[#1E40AF] via-[#1D4ED8] to-[#0A1A4A] p-[2px] shadow-md border border-amber-300/60 shrink-0 flex items-center justify-center relative overflow-hidden">
+          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[15px] bg-gradient-to-br from-[#3B1F7A] via-[#281358] to-[#12062C] p-[2px] shadow-md border border-amber-300/70 shrink-0 flex items-center justify-center relative overflow-hidden">
             <div className="flex flex-col items-center justify-center text-amber-300">
               <svg className="w-5 h-5 text-amber-300 drop-shadow-[0_1px_3px_rgba(245,158,11,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" fill="currentColor" fillOpacity="0.25" />
@@ -263,16 +312,16 @@ export default function HomeHeader({
 
         {/* Dropdown Menu ⋮ Trang chủ */}
         {showMenu && (
-          <div className="absolute top-[48px] right-0 w-[240px] bg-white rounded-[20px] border border-line shadow-xl p-2 flex flex-col gap-1 z-50 animate-in fade-in duration-150">
+          <div className="absolute top-[48px] right-0 w-[240px] bg-[#180E32] rounded-[20px] border border-[#3A2268] shadow-2xl p-2 flex flex-col gap-1 z-50 animate-in fade-in duration-150">
             <button
               type="button"
               onClick={() => {
                 setShowMenu(false);
                 setShowPhoneSync(true);
               }}
-              className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-ink hover:bg-surface-2 cursor-pointer"
+              className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-white hover:bg-[#25154D] cursor-pointer"
             >
-              <Smartphone size={16} className="text-primary" />
+              <Smartphone size={16} className="text-[#F8DF7B]" />
               <span>{userPhone ? 'Quản lý số điện thoại' : 'Lưu tiến độ qua SĐT'}</span>
             </button>
 
@@ -282,19 +331,28 @@ export default function HomeHeader({
                 setShowMenu(false);
                 setShowPwaInstall(true);
               }}
-              className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-ink hover:bg-surface-2 cursor-pointer"
+              className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-white hover:bg-[#25154D] cursor-pointer"
             >
-              <Smartphone size={16} className="text-primary" />
+              <Smartphone size={16} className="text-[#F8DF7B]" />
               <span>Cài app ra màn hình</span>
             </button>
+
+            <Link
+              href="/lop-hoc"
+              onClick={() => setShowMenu(false)}
+              className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-white hover:bg-[#25154D] cursor-pointer"
+            >
+              <GraduationCap size={16} className="text-[#F8DF7B]" />
+              <span>Lớp học & Bài tập 3D</span>
+            </Link>
 
             {isAdmin ? (
               <>
                 <div
                   className={`px-3 py-2 rounded-[12px] text-[12px] font-extrabold flex items-center gap-2 ${
                     supabaseOk
-                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                      : 'bg-red-50 text-red-700 border border-red-200'
+                      ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800'
+                      : 'bg-red-950/60 text-red-300 border border-red-800'
                   }`}
                 >
                   <span
@@ -315,9 +373,9 @@ export default function HomeHeader({
                     setShowMenu(false);
                     handleBackup();
                   }}
-                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-ink hover:bg-surface-2 cursor-pointer"
+                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-white hover:bg-[#25154D] cursor-pointer"
                 >
-                  <Download size={16} className="text-primary" />
+                  <Download size={16} className="text-purple-300" />
                   <span>Sao lưu dữ liệu</span>
                 </button>
 
@@ -327,9 +385,9 @@ export default function HomeHeader({
                     setShowMenu(false);
                     setShowEditApp(true);
                   }}
-                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-ink hover:bg-surface-2 cursor-pointer"
+                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-white hover:bg-[#25154D] cursor-pointer"
                 >
-                  <Edit2 size={16} className="text-primary" />
+                  <Edit2 size={16} className="text-purple-300" />
                   <span>Sửa tên & logo app</span>
                 </button>
 
@@ -339,16 +397,16 @@ export default function HomeHeader({
                     setShowMenu(false);
                     setShowSettings(true);
                   }}
-                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-ink hover:bg-surface-2 cursor-pointer"
+                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-white hover:bg-[#25154D] cursor-pointer"
                 >
-                  <Settings size={16} className="text-primary" />
+                  <Settings size={16} className="text-purple-300" />
                   <span>Cài đặt quản trị</span>
                 </button>
 
                 <Link
                   href="/tro-ly-ai"
                   onClick={() => setShowMenu(false)}
-                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-ink hover:bg-surface-2 cursor-pointer"
+                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-white hover:bg-[#25154D] cursor-pointer"
                 >
                   <Sparkles size={16} className="text-primary" />
                   <span>Huấn luyện Trợ lý AI</span>

@@ -1,0 +1,231 @@
+{
+  "users": [
+    {
+      "id": "usr_lecturer_1",
+      "name": "BS.CKII Trần Hoàng",
+      "role": "lecturer",
+      "email": "tranhoang.md@med.edu.vn",
+      "phone": "0912345678",
+      "avatar": "👨‍⚕️",
+      "specialty": "Bộ môn Giải phẫu & Ngoại chấn thương",
+      "joinedClasses": [
+        "cls_gp_co_ban",
+        "cls_co_xuong_khop"
+      ]
+    },
+    {
+      "id": "usr_student_1",
+      "name": "Nguyễn Văn An",
+      "role": "student",
+      "email": "vanan.yk24@student.med.vn",
+      "phone": "0987654321",
+      "avatar": "🧑‍🎓",
+      "specialty": "Sinh viên Y Đa Khoa K24",
+      "joinedClasses": [
+        "cls_gp_co_ban",
+        "cls_co_xuong_khop"
+      ]
+    },
+    {
+      "id": "usr_student_2",
+      "name": "Lê Thị Mai",
+      "role": "student",
+      "email": "maile.yk24@student.med.vn",
+      "phone": "0977889900",
+      "avatar": "👩‍🎓",
+      "specialty": "Sinh viên Y Đa Khoa K24",
+      "joinedClasses": [
+        "cls_gp_co_ban"
+      ]
+    },
+    {
+      "id": "usr_admin",
+      "name": "Quản trị viên Trung tâm",
+      "role": "admin",
+      "email": "admin.atlas@hoc-co-the.vn",
+      "phone": "0909999888",
+      "avatar": "🛡️",
+      "specialty": "Ban Thẩm định & Quản trị Hệ thống",
+      "joinedClasses": [
+        "cls_gp_co_ban",
+        "cls_co_xuong_khop"
+      ]
+    }
+  ],
+  "classrooms": [
+    {
+      "id": "cls_gp_co_ban",
+      "name": "Giải Phẫu Đại Cương - Y Khoa K24",
+      "code": "GP-YK24",
+      "description": "Chương trình chuẩn hóa giải phẫu hệ vận động, tuần hoàn và thần kinh theo TA2 cho sinh viên năm 1-2.",
+      "lecturerId": "usr_lecturer_1",
+      "lecturerName": "BS.CKII Trần Hoàng",
+      "createdAt": "2026-09-25T08:00:00.000Z",
+      "students": [
+        {
+          "id": "usr_student_1",
+          "name": "Nguyễn Văn An",
+          "joinedAt": "2026-09-25T09:00:00.000Z",
+          "progressPercent": 100,
+          "averageScore": 95
+        },
+        {
+          "id": "usr_student_2",
+          "name": "Lê Thị Mai",
+          "joinedAt": "2026-09-26T10:30:00.000Z",
+          "progressPercent": 50,
+          "averageScore": 80
+        }
+      ]
+    },
+    {
+      "id": "cls_co_xuong_khop",
+      "name": "Chuyên đề Cơ - Xương - Khớp Lâm Sàng",
+      "code": "CXK-01",
+      "description": "Khảo sát 4 liên quan giải phẫu lâm sàng và chấn thương chỉnh hình trên mô hình 3D tương tác.",
+      "lecturerId": "usr_lecturer_1",
+      "lecturerName": "BS.CKII Trần Hoàng",
+      "createdAt": "2026-09-28T14:00:00.000Z",
+      "students": [
+        {
+          "id": "usr_student_1",
+          "name": "Nguyễn Văn An",
+          "joinedAt": "2026-09-28T15:00:00.000Z",
+          "progressPercent": 100,
+          "averageScore": 100
+        }
+      ]
+    }
+  ],
+  "assignments": [
+    {
+      "id": "asg_femur_1",
+      "classId": "cls_gp_co_ban",
+      "className": "Giải Phẫu Đại Cương - Y Khoa K24",
+      "title": "Khảo sát Xương đùi & Cơ sinh học Khớp háng",
+      "description": "Xoay mô hình 3D, cô lập (Isolate) Xương đùi, kiểm tra góc nghiêng cổ - thân và vị trí dây thần kinh ngồi phía sau.",
+      "targetPartId": "femur",
+      "targetPartNameVi": "Xương đùi",
+      "targetSystem": "skeletal",
+      "shareViewUrl": "/giai-phau-3d#sys=skeletal&sel=femur&iso=femur",
+      "dueDate": "2026-10-10T23:59:59.000Z",
+      "createdAt": "2026-09-27T08:00:00.000Z",
+      "quizQuestions": [
+        {
+          "question": "Góc nghiêng sinh lý giữa cổ và thân xương đùi ở người trưởng thành bình thường là bao nhiêu?",
+          "options": [
+            "Khoảng 90° - 100°",
+            "Khoảng 125° - 130°",
+            "Khoảng 145° - 160°",
+            "Khoảng 170° - 180°"
+          ],
+          "correctIndex": 1,
+          "explanation": "Góc cổ - thân xương đùi bình thường khoảng 125°-130°. Dưới 120° là coxa vara, trên 135° là coxa valga."
+        },
+        {
+          "question": "Dây thần kinh lớn nhất cơ thể chạy ngay phía sau xương đùi là gì?",
+          "options": [
+            "Dây thần kinh đùi",
+            "Dây thần kinh bịt",
+            "Dây thần kinh ngồi (thần kinh tọa)",
+            "Dây thần kinh chày"
+          ],
+          "correctIndex": 2,
+          "explanation": "Dây thần kinh ngồi (Sciatic nerve) là dây thần kinh lớn nhất cơ thể, chạy ở mặt sau khớp háng và đùi."
+        }
+      ],
+      "submissions": [
+        {
+          "studentId": "usr_student_1",
+          "studentName": "Nguyễn Văn An",
+          "submittedAt": "2026-09-29T10:15:00.000Z",
+          "score": 100,
+          "answers": [
+            1,
+            2
+          ],
+          "notes": "Đã hoàn thành khảo sát 3D và đối chiếu lồi cầu trong - lồi cầu ngoài.",
+          "teacherFeedback": "Rất tốt! Cần chú ý thêm vùng mấu chuyển lớn nơi bám cơ mông nhỡ."
+        },
+        {
+          "studentId": "usr_student_2",
+          "studentName": "Lê Thị Mai",
+          "submittedAt": "2026-09-30T16:20:00.000Z",
+          "score": 50,
+          "answers": [
+            1,
+            0
+          ],
+          "notes": "Em đã nộp bài, câu 2 em chọn nhầm thần kinh đùi.",
+          "teacherFeedback": "Thần kinh đùi chạy phía trước; thần kinh ngồi mới chạy phía sau. Hãy xem lại góc nhìn 3D hệ thần kinh nhé."
+        }
+      ]
+    },
+    {
+      "id": "asg_heart_1",
+      "classId": "cls_gp_co_ban",
+      "className": "Giải Phẫu Đại Cương - Y Khoa K24",
+      "title": "Giải phẫu buồng tim: Tâm thất trái & Động mạch chủ",
+      "description": "Khảo sát cấu trúc thành cơ dày của tâm thất trái và đối chiếu nhánh động mạch vành nuôi tim trên mô hình 3D.",
+      "targetPartId": "left_ventricle",
+      "targetPartNameVi": "Tâm thất trái",
+      "targetSystem": "cardiovascular",
+      "shareViewUrl": "/giai-phau-3d#sys=cardiovascular&sel=left_ventricle&iso=left_ventricle",
+      "dueDate": "2026-10-15T23:59:59.000Z",
+      "createdAt": "2026-09-29T09:00:00.000Z",
+      "quizQuestions": [
+        {
+          "question": "Tại sao thành cơ của tâm thất trái lại dày gấp 3 lần tâm thất phải?",
+          "options": [
+            "Vì tâm thất trái phải bơm máu thắng sức cản tuần hoàn hệ thống toàn thân",
+            "Vì tâm thất trái chứa máu nghèo oxy",
+            "Vì áp lực động mạch phổi cao hơn động mạch chủ",
+            "Do van hai lá dày hơn van ba lá"
+          ],
+          "correctIndex": 0,
+          "explanation": "Tâm thất trái bơm máu vào động mạch chủ với áp lực tâm thu ~120 mmHg để đi nuôi toàn cơ thể, nên thành cơ phát triển dày hơn."
+        }
+      ],
+      "submissions": [
+        {
+          "studentId": "usr_student_1",
+          "studentName": "Nguyễn Văn An",
+          "submittedAt": "2026-09-30T09:00:00.000Z",
+          "score": 100,
+          "answers": [
+            0
+          ],
+          "notes": "Đã quan sát rõ cột cơ và thừng gân van hai lá trên mô hình 3D.",
+          "teacherFeedback": "Chính xác! Nắm rất vững sinh lý tuần hoàn."
+        }
+      ]
+    }
+  ],
+  "sharedViews": [
+    {
+      "id": "view_femur_neck",
+      "title": "Góc nhìn cổ xương đùi & Khớp háng (125°)",
+      "authorName": "BS.CKII Trần Hoàng",
+      "authorRole": "Giảng viên",
+      "createdAt": "2026-09-28T10:00:00.000Z",
+      "partId": "femur",
+      "partNameVi": "Xương đùi",
+      "system": "skeletal",
+      "urlHash": "#sys=skeletal&cam=0.18,0.92,1.85,0,0.85,0&sel=femur&iso=femur",
+      "description": "Góc nghiêng trực diện để đo góc cổ - thân xương đùi phục vụ chẩn đoán thoái hóa khớp háng."
+    },
+    {
+      "id": "view_biceps_cubital",
+      "title": "Cơ nhị đầu cánh tay & Hố khuỷu",
+      "authorName": "BS.CKII Trần Hoàng",
+      "authorRole": "Giảng viên",
+      "createdAt": "2026-09-29T14:30:00.000Z",
+      "partId": "biceps_brachii",
+      "partNameVi": "Cơ nhị đầu cánh tay",
+      "system": "muscular",
+      "urlHash": "#sys=muscular&sel=biceps_brachii&iso=biceps_brachii",
+      "description": "Quan sát gân cơ nhị đầu bám tận củ quay và trẽ cân nhị đầu che phủ động mạch cánh tay."
+    }
+  ],
+  "activeUserId": "usr_student_1"
+}
