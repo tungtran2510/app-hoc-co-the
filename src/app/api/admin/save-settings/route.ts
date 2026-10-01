@@ -40,8 +40,12 @@ export async function POST(req: NextRequest) {
       recommended_books_subtitle: settings.recommended_books_subtitle !== undefined ? settings.recommended_books_subtitle : (existingBlockStyles.recommended_books_subtitle ?? 'Tài liệu tham khảo chuyên sâu giúp bạn hiểu và chăm sóc cơ thể mỗi ngày'),
       recommended_books: settings.recommended_books !== undefined ? settings.recommended_books : (existingBlockStyles.recommended_books ?? []),
       recommended_books_layout: settings.recommended_books_layout !== undefined ? settings.recommended_books_layout : (existingBlockStyles.recommended_books_layout ?? 'grid'),
-      home_sections_order: settings.home_sections_order !== undefined ? settings.home_sections_order : (existingBlockStyles.home_sections_order ?? ['topics', 'author_profile', 'author_books', 'author_philosophy', 'author_contact', 'recommended_books']),
+      home_sections_order: settings.home_sections_order !== undefined ? settings.home_sections_order : (existingBlockStyles.home_sections_order ?? ['brand_card', 'topics', 'recent_activity', 'author_profile', 'author_books', 'author_philosophy', 'recommended_books', 'author_contact']),
+      hidden_home_sections: settings.hidden_home_sections !== undefined ? settings.hidden_home_sections : (existingBlockStyles.hidden_home_sections ?? []),
       ai_training: settings.ai_training !== undefined ? settings.ai_training : (existingBlockStyles.ai_training ?? null),
+      welcome_title: settings.welcome_title !== undefined ? settings.welcome_title : (existingBlockStyles.welcome_title ?? 'Chào mừng bạn đến với Qbiz Books'),
+      welcome_message: settings.welcome_message !== undefined ? settings.welcome_message : (existingBlockStyles.welcome_message ?? 'Hi vọng nền tảng học hiểu cơ thể và chăm sóc sức khỏe chủ động này sẽ giúp bạn hiểu sâu hơn về cơ thể mình, nuôi dưỡng hệ cơ xương khớp và sống khỏe mỗi ngày.'),
+      welcome_video_url: settings.welcome_video_url !== undefined ? settings.welcome_video_url : (existingBlockStyles.welcome_video_url ?? null),
     };
 
     const existingAuthorProfile = existing?.author_profile || {};

@@ -3,9 +3,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Play, Check, BarChart2, MoreVertical, ArrowRight, Sparkles } from 'lucide-react';
+import { Play, Check, BarChart2, MoreVertical, ArrowRight, Sparkles, Gauge, Edit2, Plus } from 'lucide-react';
 import { Video } from '../../lib/types';
 import SpineIllustration from '../SpineIllustration';
+import EditSingleVideoModal from '../admin/EditSingleVideoModal';
 import {
   saveStoredXemTiep,
   saveVideoWatched,
@@ -13,6 +14,7 @@ import {
   updateScrollPosition,
   getStoredXemTiep,
 } from '../../lib/learningProgress';
+import { playTapSound } from '../../lib/audioFeedback';
 
 // Khai báo kiểu YT toàn cục cho YouTube IFrame Player API
 declare global {
@@ -29,6 +31,7 @@ interface VideosBlockProps {
   blockId?: string;
   isAdmin?: boolean;
   onOpenVideoManager?: () => void;
+  onSaveVideos?: (newVideos: Video[]) => void;
   pageId?: string;
   topicSlug?: string;
   topicTitle?: string;
@@ -50,6 +53,7 @@ export default function VideosBlock({
   blockId,
   isAdmin = false,
   onOpenVideoManager,
+  onSaveVideos,
   pageId = '',
   topicSlug = '',
   topicTitle = '',
@@ -63,6 +67,52 @@ export default function VideosBlock({
   activeTab,
   onTabChange,
 }: VideosBlockProps) {
+  const [videoList, setVideoList] = useState<Video[]>(videos);
+  useEffect(() => {
+    setVideoList(videos);
+  }, [videos]);
+
+  const [editingVideoIndex, setEditingVideoIndex] = useState<number | null>(null);
+  const [isAddingVideo, setIsAddingVideo] = useState(false);
+
+  const handleSaveSingleVideo = (updated: Video, index: number) => {
+    let nextList: Video[];
+    if (index < 0 || index >= videoList.length) {
+      nextList = [...videoList, updated];
+    } else {
+      nextList = [...videoList];
+      nextList[index] = updated;
+    }
+    setVideoList(nextList);
+    if (onSaveVideos) {
+      onSaveVideos(nextList);
+    }
+  };
+
+  const handleDeleteSingleVideo = (index: number) => {
+    const nextList = videoList.filter((_, i) => i !== index);
+    setVideoList(nextList);
+    if (activeIndex >= nextList.length) {
+      setActiveIndex(Math.max(0, nextList.length - 1));
+    }
+    if (onSaveVideos) {
+      onSaveVideos(nextList);
+    }
+  };
+
+  const handleMoveSingleVideo = (index: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= videoList.length) return;
+    const nextList = [...videoList];
+    const temp = nextList[index];
+    nextList[index] = nextList[targetIndex];
+    nextList[targetIndex] = temp;
+    setVideoList(nextList);
+    if (onSaveVideos) {
+      onSaveVideos(nextList);
+    }
+  };
+
   const searchParams = useSearchParams();
   const vParam = searchParams.get('v');
 
@@ -70,11 +120,11 @@ export default function VideosBlock({
   const initialIndex = (() => {
     if (vParam) {
       const parsed = parseInt(vParam, 10);
-      if (!isNaN(parsed) && parsed >= 1 && parsed <= videos.length) {
+      if (!isNaN(parsed) && parsed >= 1 && parsed <= videoList.length) {
         return parsed - 1;
       }
     }
-    return defaultActiveIndex < videos.length ? defaultActiveIndex : 0;
+    return defaultActiveIndex < videoList.length ? defaultActiveIndex : 0;
   })();
 
   const [activeIndex, setActiveIndex] = useState(initialIndex);
@@ -83,8 +133,14 @@ export default function VideosBlock({
   const [watchedList, setWatchedList] = useState<number[]>([]);
   const [localTab, setLocalTab] = useState<'syllabus' | 'summary' | 'resources'>('syllabus');
 
+  // Tỷ lệ khung hình đã tự động nhận diện: 'vertical' (9:16) hoặc 'horizontal' (16:9)
+  const [aspectMap, setAspectMap] = useState<Record<string, 'vertical' | 'horizontal'>>({});
+  // Cho phép người dùng chuyển đổi chế độ hiển thị thủ công ('auto' | 'vertical' | 'horizontal')
+  const [manualOverrideAspect, setManualOverrideAspect] = useState<'auto' | 'vertical' | 'horizontal'>('auto');
+
   const currentTab = activeTab || localTab;
   const handleTabChange = (tab: 'syllabus' | 'summary' | 'resources') => {
+    playTapSound();
     if (onTabChange) {
       onTabChange(tab);
     } else {
@@ -95,6 +151,22 @@ export default function VideosBlock({
   const playerRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<any>(null);
+
+  const [playbackRate, setPlaybackRate] = useState<number>(1);
+  const playbackRateRef = useRef<number>(1);
+
+  const handleSetSpeed = (speed: number) => {
+    playTapSound();
+    setPlaybackRate(speed);
+    playbackRateRef.current = speed;
+    try {
+      if (playerRef.current && typeof playerRef.current.setPlaybackRate === 'function') {
+        playerRef.current.setPlaybackRate(speed);
+      }
+    } catch {
+      // Bỏ qua
+    }
+  };
 
   // Đọc danh sách video đã xem từ localStorage
   useEffect(() => {
@@ -109,12 +181,66 @@ export default function VideosBlock({
     }
   }, [pageId]);
 
-  // Cuộn tới khối video nếu có param ?v= hoặc khôi phục scroll_y
+  // Tự động nhận diện video dạng dọc (Shorts/Reels 9:16) hay dạng ngang (16:9)
   useEffect(() => {
-    if (vParam && containerRef.current) {
-      setTimeout(() => {
-        containerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 300);
+    const curVid = videoList[activeIndex < videoList.length ? activeIndex : 0];
+    if (!curVid) return;
+    const yid = curVid.youtube_id;
+    if (!yid) return;
+
+    // 1. Kiểm tra thuộc tính có sẵn
+    if (
+      curVid.is_vertical ||
+      curVid.aspect_ratio === 'vertical' ||
+      curVid.aspect_ratio === '9:16'
+    ) {
+      setAspectMap((prev) => (prev[yid] === 'vertical' ? prev : { ...prev, [yid]: 'vertical' }));
+      return;
+    }
+
+    if (aspectMap[yid]) return;
+
+    // 2. Tự động nhận diện qua API endpoint
+    let isCancelled = false;
+    fetch(`/api/video/detect-aspect?id=${encodeURIComponent(yid)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (isCancelled) return;
+        if (data?.is_vertical) {
+          setAspectMap((prev) => ({ ...prev, [yid]: 'vertical' }));
+        } else {
+          setAspectMap((prev) => ({ ...prev, [yid]: 'horizontal' }));
+        }
+      })
+      .catch(() => {
+        if (isCancelled) return;
+        const thumb = curVid.thumbnail_url || `https://i.ytimg.com/vi/${yid}/hqdefault.jpg`;
+        const img = new Image();
+        img.src = thumb;
+        img.onload = () => {
+          if (isCancelled) return;
+          if (img.naturalHeight > img.naturalWidth) {
+            setAspectMap((prev) => ({ ...prev, [yid]: 'vertical' }));
+          } else {
+            setAspectMap((prev) => ({ ...prev, [yid]: 'horizontal' }));
+          }
+        };
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [activeIndex, videoList]);
+
+  // Cuộn tới khối video nếu có param ?v= hoặc khôi phục scroll_y, đồng thời kích hoạt Auto-play
+  useEffect(() => {
+    if (vParam) {
+      setIsPlaying(true);
+      if (containerRef.current) {
+        setTimeout(() => {
+          containerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+      }
     } else {
       // Nếu vào từ Xem tiếp có lưu vị trí cuộn
       try {
@@ -149,18 +275,18 @@ export default function VideosBlock({
     };
   }, []);
 
-  if (!videos || videos.length === 0) {
+  if (!videoList || videoList.length === 0) {
     return null;
   }
 
-  const safeIndex = activeIndex < videos.length ? activeIndex : 0;
-  const currentVideo = videos[safeIndex];
-  const isPlaylist = displayStyle === 'playlist' && videos.length > 1;
+  const safeIndex = activeIndex < videoList.length ? activeIndex : 0;
+  const currentVideo = videoList[safeIndex];
+  const isPlaylist = displayStyle === 'playlist' && videoList.length > 1;
 
   // Cập nhật xem_tiep vào localStorage khi chọn video hoặc bắt đầu phát
   const recordXemTiep = (vidIndex: number) => {
     if (!topicSlug || !pageSlug) return;
-    const vid = videos[vidIndex] || videos[0];
+    const vid = videoList[vidIndex] || videoList[0];
     saveStoredXemTiep({
       topic_slug: topicSlug,
       topic_title: topicTitle,
@@ -168,7 +294,7 @@ export default function VideosBlock({
       page_title: pageTitle,
       page_number: pageNumber,
       video_index: vidIndex + 1,
-      video_total: videos.length,
+      video_total: videoList.length,
       video_title: vid.title,
       cover_url: pageCoverUrl || vid.thumbnail_url || null,
     });
@@ -215,6 +341,9 @@ export default function VideosBlock({
         events: {
           onReady: (event: any) => {
             try {
+              if (playbackRateRef.current && typeof event.target.setPlaybackRate === 'function') {
+                event.target.setPlaybackRate(playbackRateRef.current);
+              }
               event.target.playVideo();
             } catch {
               // Bỏ qua
@@ -249,14 +378,17 @@ export default function VideosBlock({
               markWatched(safeIndex);
 
               // Tự chuyển video kế tiếp trong cùng khối
-              if (safeIndex + 1 < videos.length) {
+              if (safeIndex + 1 < videoList.length) {
                 const nextIdx = safeIndex + 1;
                 setActiveIndex(nextIdx);
                 setIsPlaying(true);
                 recordXemTiep(nextIdx);
-                const nextVideo = videos[nextIdx];
+                const nextVideo = videoList[nextIdx];
                 if (nextVideo?.youtube_id && playerRef.current?.loadVideoById) {
                   playerRef.current.loadVideoById(nextVideo.youtube_id);
+                  if (typeof playerRef.current.setPlaybackRate === 'function') {
+                    playerRef.current.setPlaybackRate(playbackRateRef.current);
+                  }
                 }
               } else {
                 // Video cuối cùng trong danh sách
@@ -290,42 +422,92 @@ export default function VideosBlock({
     };
   }, [isPlaying, currentVideo.youtube_id, safeIndex]);
 
-  // Đổi video khi bấm vào dòng trong danh sách
+  // Đổi video khi bấm vào dòng trong danh sách + tự động Auto-play
   const handleSelectVideo = (idx: number) => {
+    playTapSound();
     setActiveIndex(idx);
     setIsPlaying(true);
+    setManualOverrideAspect('auto');
     setIsEndedPlaylist(false);
     recordXemTiep(idx);
 
-    const targetVid = videos[idx];
+    const targetVid = videoList[idx];
     if (targetVid?.youtube_id && playerRef.current?.loadVideoById) {
       playerRef.current.loadVideoById(targetVid.youtube_id);
+      if (typeof playerRef.current.setPlaybackRate === 'function') {
+        playerRef.current.setPlaybackRate(playbackRateRef.current);
+      }
     }
   };
+
+  const isDetectedVertical =
+    currentVideo?.is_vertical === true ||
+    currentVideo?.aspect_ratio === 'vertical' ||
+    currentVideo?.aspect_ratio === '9:16' ||
+    (currentVideo?.youtube_id ? aspectMap[currentVideo.youtube_id] === 'vertical' : false);
+
+  const isVertical =
+    manualOverrideAspect === 'vertical'
+      ? true
+      : manualOverrideAspect === 'horizontal'
+      ? false
+      : isDetectedVertical;
 
   return (
     <div
       ref={containerRef}
       id={blockId}
-      className="w-full flex flex-col gap-3.5 scroll-mt-20"
+      className="w-full flex flex-col gap-2 sm:gap-2.5 scroll-mt-20"
     >
-      {/* KHUNG TRÌNH PHÁT VIDEO ĐẲNG CẤP (VIỀN NỔI BEZEL STUDIO + HEADER TRẠNG THÁI) */}
-      <div className="relative w-full p-2 sm:p-2.5 rounded-[22px] sm:rounded-[26px] bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 border-[2px] border-slate-700/80 shadow-[0_12px_28px_rgba(15,23,42,0.22)] dark:border-purple-800/50">
-        {/* Header thông tin màn hình */}
-        <div className="flex items-center justify-between px-2 pb-1.5 text-[11px] font-semibold text-slate-300">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="tracking-wide uppercase text-[10px] font-extrabold text-slate-200">
-              VIDEO BÀI GIẢNG Y KHOA
+      {/* KHUNG TRÌNH PHÁT VIDEO ĐẲNG CẤP (TỰ ĐỘNG THÍCH ỨNG DẠNG DỌC 9:16 HOẶC DẠNG NGANG 16:9 + TỰ ĐỘNG PHÁT) */}
+      <div
+        className={`relative w-full p-2 sm:p-2.5 rounded-[22px] sm:rounded-[26px] bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 border-[2px] border-slate-700/80 shadow-[0_12px_28px_rgba(15,23,42,0.22)] dark:border-purple-800/50 transition-all duration-300 ${
+          isVertical ? 'max-w-[340px] sm:max-w-[360px] mx-auto' : 'max-w-full'
+        }`}
+      >
+        {/* Header thông tin màn hình & nút đổi dạng khung: Luôn nằm trên 1 dòng duy nhất, không xuống dòng */}
+        <div className="flex items-center justify-between gap-1.5 px-2 pb-1.5 text-[11px] font-semibold text-slate-300 flex-nowrap overflow-hidden">
+          <div className="flex items-center gap-1.5 min-w-0 shrink">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+            <span className="tracking-wide uppercase text-[10px] font-extrabold text-slate-200 whitespace-nowrap">
+              {isVertical ? 'VIDEO DỌC · SHORTS' : 'VIDEO BÀI GIẢNG'}
             </span>
           </div>
-          <span className="text-[10px] px-1.5 py-0.2 rounded-xs bg-slate-800 text-slate-300 font-mono border border-slate-700/60">
-            HD 1080p
-          </span>
+
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* Nút bấm chuyển đổi nhanh tỷ lệ khung hình Dọc / Ngang */}
+            <button
+              type="button"
+              onClick={() => {
+                playTapSound();
+                setManualOverrideAspect((prev) => {
+                  if (prev === 'vertical') return 'horizontal';
+                  if (prev === 'horizontal') return 'vertical';
+                  return isDetectedVertical ? 'horizontal' : 'vertical';
+                });
+              }}
+              className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border transition-colors cursor-pointer whitespace-nowrap ${
+                isVertical
+                  ? 'bg-purple-900/70 text-purple-200 border-purple-500/50 hover:bg-purple-800'
+                  : 'bg-blue-950/70 text-blue-200 border-blue-500/40 hover:bg-blue-900'
+              }`}
+              title="Bấm để chuyển đổi giữa khung dọc và khung ngang"
+            >
+              <span>{isVertical ? '↕ Dạng dọc' : '↔ Dạng ngang'}</span>
+            </button>
+
+            <span className="text-[10px] px-1.5 py-0.2 rounded-xs bg-slate-800 text-slate-300 font-mono border border-slate-700/60 whitespace-nowrap shrink-0">
+              HD 1080p
+            </span>
+          </div>
         </div>
 
-        {/* Khung màn hình hiển thị 16:9 */}
-        <div className="relative w-full aspect-video rounded-[15px] sm:rounded-[18px] bg-black overflow-hidden shadow-inner flex items-center justify-center border border-white/10">
+        {/* Khung màn hình hiển thị: Tự động co giãn theo dạng dọc (9:16) hoặc dạng ngang (16:9) */}
+        <div
+          className={`relative w-full rounded-[15px] sm:rounded-[18px] bg-black overflow-hidden shadow-inner flex items-center justify-center border border-white/10 transition-all duration-300 ${
+            isVertical ? 'aspect-[9/16] max-h-[68vh]' : 'aspect-video'
+          }`}
+        >
           {currentVideo.youtube_id ? (
             <>
               {isPlaying ? (
@@ -430,30 +612,55 @@ export default function VideosBlock({
         </div>
       )}
 
-      {/* 1. THANH TIẾN ĐỘ HỌC TẬP (MOCKUP 1) */}
-      <div className="flex flex-col gap-1.5 px-0.5 mt-2.5 mb-1">
-        <div className="flex items-center justify-between text-[13px] font-bold text-ink">
+      {/* 1. THANH TÙY CHỈNH TỐC ĐỘ PHÁT VIDEO CHUYÊN NGHIỆP (ĐẶT Ở TRÊN, SÁT DƯỚI KHUNG VIDEO THEO YÊU CẦU) */}
+      <div className="flex items-center justify-between gap-1.5 px-2.5 py-1 rounded-[11px] bg-slate-50 dark:bg-[#160D30]/80 border border-slate-200/80 dark:border-purple-900/40 text-[11px] font-bold">
+        <span className="flex items-center gap-1.5 text-slate-700 dark:text-purple-300 font-extrabold shrink-0">
+          <Gauge size={13} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
+          <span>Tốc độ phát:</span>
+        </span>
+        <div className="flex items-center gap-1 shrink-0 overflow-x-auto">
+          {[0.75, 1, 1.25, 1.5, 2].map((spd) => (
+            <button
+              key={spd}
+              type="button"
+              onClick={() => handleSetSpeed(spd)}
+              className={`px-2 py-0.5 rounded-[6px] text-[10.5px] font-extrabold transition-all cursor-pointer ${
+                playbackRate === spd
+                  ? 'bg-[#1E3A8A] text-white dark:bg-[#F8DF7B] dark:text-[#160C2C] shadow-2xs font-black'
+                  : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200/80 dark:bg-purple-950/60 dark:text-purple-200 dark:border-purple-800/40'
+              }`}
+              title={`Phát video ở tốc độ ${spd}x`}
+            >
+              {spd}x
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 2. THANH TIẾN ĐỘ HỌC TẬP (GỌN GÀNG, SÁT DƯỚI TỐC ĐỘ PHÁT, BỎ KHOẢNG HỞ THỪA) */}
+      <div className="flex flex-col gap-1 px-0.5">
+        <div className="flex items-center justify-between text-[12.5px] font-bold text-ink">
           <span className="flex items-center gap-1.5 text-muted">
             <span>Tiến độ bài học:</span>
             <strong className="text-[#1E3A8A] dark:text-[#F8DF7B] font-black">
-              {Math.min(100, Math.round(((videos.filter((_, idx) => watchedList.includes(idx + 1)).length) / (videos.length || 1)) * 100))}%
+              {Math.min(100, Math.round(((videoList.filter((_, idx) => watchedList.includes(idx + 1)).length) / (videoList.length || 1)) * 100))}%
             </strong>
             <span>
-              ({videos.filter((_, idx) => watchedList.includes(idx + 1)).length}/{videos.length} video)
+              ({videoList.filter((_, idx) => watchedList.includes(idx + 1)).length}/{videoList.length} video)
             </span>
           </span>
-          {videos.filter((_, idx) => watchedList.includes(idx + 1)).length === videos.length && videos.length > 0 && (
+          {videoList.filter((_, idx) => watchedList.includes(idx + 1)).length === videoList.length && videoList.length > 0 && (
             <span className="text-emerald-700 dark:text-emerald-300 text-[10.5px] font-black bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-500/30 px-2 py-0.5 rounded-full">
               ĐÃ HOÀN THÀNH
             </span>
           )}
         </div>
-        <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-purple-950/80 border border-slate-300/60 dark:border-purple-900/30 overflow-hidden p-0.5">
+        <div className="w-full h-1.5 rounded-full bg-slate-200 dark:bg-purple-950/80 border border-slate-300/60 dark:border-purple-900/30 overflow-hidden p-0.5">
           <div
             className="h-full rounded-full bg-[#1E3A8A] dark:bg-gradient-to-r dark:from-purple-500 dark:to-[#F8DF7B] transition-all duration-500"
             style={{
               width: `${Math.max(
-                Math.min(100, Math.round(((videos.filter((_, idx) => watchedList.includes(idx + 1)).length) / (videos.length || 1)) * 100)),
+                Math.min(100, Math.round(((videoList.filter((_, idx) => watchedList.includes(idx + 1)).length) / (videoList.length || 1)) * 100)),
                 4
               )}%`,
             }}
@@ -461,8 +668,8 @@ export default function VideosBlock({
         </div>
       </div>
 
-      {/* 2. HỆ THỐNG 3 KHUNG TAB PHÂN TÁCH VỚI ĐƯỜNG KẺ NGĂN CÁCH */}
-      <div className="grid grid-cols-3 items-stretch rounded-[14px] bg-slate-100 dark:bg-[#160D30] border border-slate-200 dark:border-purple-900/50 mt-3 mb-2 shadow-2xs divide-x divide-slate-200 dark:divide-purple-900/50 overflow-hidden">
+      {/* 3. HỆ THỐNG 3 KHUNG TAB PHÂN TÁCH VỚI ĐƯỜNG KẺ NGĂN CÁCH (SẮP XẾP SÁT HỢP LÝ) */}
+      <div className="grid grid-cols-3 items-stretch rounded-[14px] bg-slate-100 dark:bg-[#160D30] border border-slate-200 dark:border-purple-900/50 shadow-2xs divide-x divide-slate-200 dark:divide-purple-900/50 overflow-hidden mt-0.5">
         <button
           type="button"
           onClick={() => handleTabChange('syllabus')}
@@ -472,7 +679,7 @@ export default function VideosBlock({
               : 'text-slate-700 dark:text-purple-300/80 bg-white/80 dark:bg-[#160D30] hover:text-slate-950 dark:hover:text-white hover:bg-white dark:hover:bg-purple-950/40'
           }`}
         >
-          <span>Giáo trình ({videos.length})</span>
+          <span>Giáo trình ({videoList.length})</span>
         </button>
 
         <button
@@ -501,184 +708,219 @@ export default function VideosBlock({
       </div>
 
       {/* 3. NỘI DUNG THEO TAB (GỌN GÀNG, TIÊU ĐỀ RỘNG RÃI, KHÔNG THƯA) */}
-      {currentTab === 'syllabus' && (
-        <div className="flex flex-col gap-1.5 mt-1.5 animate-in fade-in duration-150">
-          {videos.map((vid, idx) => {
-            const isActive = idx === safeIndex;
-            const isWatched = watchedList.includes(idx + 1);
-            const thumbUrl =
-              vid.thumbnail_url ||
-              (vid.youtube_id ? `https://i.ytimg.com/vi/${vid.youtube_id}/hqdefault.jpg` : null);
+      {/* 3. NỘI DUNG THEO TAB (CHUYỂN TAB TỨC THÌ 0MS, GIỮ NGUYÊN DOM KHÔNG BỊ GIẬT LAG) */}
+      <div className={currentTab === 'syllabus' ? 'flex flex-col gap-1.5 mt-1.5 animate-in fade-in duration-100' : 'hidden'}>
+        {videoList.map((vid, idx) => {
+          const isActive = idx === safeIndex;
+          const isWatched = watchedList.includes(idx + 1);
+          const thumbUrl =
+            vid.thumbnail_url ||
+            (vid.youtube_id ? `https://i.ytimg.com/vi/${vid.youtube_id}/hqdefault.jpg` : null);
 
-            return (
-              <div
-                key={idx}
-                onClick={() => handleSelectVideo(idx)}
-                className={`w-full flex flex-col p-2.5 sm:p-3 rounded-[16px] text-left transition-colors duration-150 cursor-pointer group active:scale-[0.99] ${
-                  isActive
-                    ? 'bg-blue-50/70 dark:bg-[#0F172A] border-[1.5px] border-[#1E3A8A] dark:border-blue-500 shadow-sm ring-1 ring-[#1E3A8A]/20'
-                    : 'bg-white dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-900/40 hover:border-slate-300 dark:hover:border-purple-600/50 shadow-2xs'
-                }`}
-                role="button"
-                tabIndex={0}
-              >
-                {/* THANH ĐẦU KHUNG: ĐÁNH SỐ BÀI Ở GIỮA GỌN GÀNG THEO GỢI Ý CỦA BẠN */}
-                <div className="flex items-center justify-between pb-1.5 mb-2 border-b border-slate-100 dark:border-slate-800/80">
-                  {/* Bên trái: Trạng thái xem */}
-                  <div className="flex items-center min-w-[70px]">
-                    {isWatched ? (
-                      <span className="inline-flex items-center gap-1 text-[9.5px] font-black text-emerald-700 bg-emerald-100/90 dark:bg-emerald-950/80 dark:text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800/40">
-                        <Check size={9} strokeWidth={3} /> ĐÃ HỌC
-                      </span>
-                    ) : (
-                      <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500">
-                        {isActive ? '● Đang chọn' : 'Chưa học'}
-                      </span>
-                    )}
-                  </div>
+          return (
+            <div
+              key={idx}
+              onClick={() => handleSelectVideo(idx)}
+              className={`w-full flex flex-col p-2 sm:p-2.5 rounded-[13px] text-left transition-colors duration-150 cursor-pointer group active:scale-[0.99] ${
+                isActive
+                  ? 'bg-amber-50/40 dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] border-[1.5px] border-amber-300 dark:border-amber-400/50 shadow-xs animate-breathe-gold'
+                  : 'bg-white dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-900/40 hover:border-slate-300 dark:hover:border-purple-600/50 shadow-2xs'
+              }`}
+              role="button"
+              tabIndex={0}
+            >
+              {/* DÒNG TIÊU ĐẦU: GẮN SỐ BÀI BÊN TRÁI NHƯ BẠN VẼ + THỜI LƯỢNG BÊN PHẢI */}
+              <div className="flex items-center justify-between mb-1.5">
+                {/* Bên trái: Thẻ đánh số Bài 01, Bài 02 gắn góc trái như hình vẽ */}
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[5px] text-[10px] sm:text-[10.5px] font-black tracking-wide uppercase shadow-2xs ${
+                      isActive
+                        ? 'bg-amber-500 text-white dark:bg-amber-400 dark:text-slate-950 shadow-xs ring-1 ring-amber-400/30'
+                        : 'bg-slate-100 text-slate-700 border border-slate-200/90 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700'
+                    }`}
+                  >
+                    {isActive ? '● ĐANG PHÁT · BÀI ' : 'BÀI '}{String(idx + 1).padStart(2, '0')}
+                  </span>
 
-                  {/* Ở giữa: Thẻ đánh số nổi bật */}
-                  <div className="flex items-center justify-center">
-                    <span
-                      className={`inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-[10.5px] font-black tracking-wider uppercase shadow-2xs ${
-                        isActive
-                          ? 'bg-[#1E3A8A] text-white ring-2 ring-[#1E3A8A]/20'
-                          : 'bg-slate-100 text-slate-700 border border-slate-200/90 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700'
-                      }`}
-                    >
-                      {isActive ? '● ĐANG PHÁT · BÀI ' : 'BÀI '}{String(idx + 1).padStart(2, '0')}
+                  {isWatched && (
+                    <span className="inline-flex items-center gap-0.5 text-[9px] sm:text-[9.5px] font-black text-emerald-700 bg-emerald-100/90 dark:bg-emerald-950/80 dark:text-emerald-300 px-1.5 py-0.5 rounded-[4px] border border-emerald-200 dark:border-emerald-800/40">
+                      <Check size={8.5} strokeWidth={3} /> ĐÃ HỌC
                     </span>
-                  </div>
-
-                  {/* Bên phải: Thời lượng */}
-                  <div className="flex items-center justify-end min-w-[70px]">
-                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 font-mono">
-                      {vid.duration_text || '05:00'}
-                    </span>
-                  </div>
+                  )}
                 </div>
 
-                {/* THÂN BÀI: ẢNH THUMBNAIL THU GỌN 68PX + TIÊU ĐỀ TRẢI RỘNG */}
-                <div className="flex items-center gap-2.5">
-                  {/* 1. KHUNG ẢNH THUMBNAIL THU NHỎ GỌN GÀNG (16:9, ~68px) */}
-                  <div className="relative w-[68px] sm:w-[76px] aspect-video rounded-[9px] overflow-hidden bg-slate-100 dark:bg-[#0A0515] shrink-0 border border-slate-200/90 dark:border-purple-500/20 shadow-2xs">
-                    {thumbUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={thumbUrl}
-                        alt={vid.title}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-slate-100 dark:bg-purple-950/40 text-slate-600 dark:text-purple-300">
-                        <Play size={16} className="text-slate-600 dark:text-purple-400/60" />
-                      </div>
-                    )}
-
-                    {/* Lớp phủ & Nút Play khi Active hoặc Hover */}
-                    {isActive ? (
-                      <div className="absolute inset-0 bg-[#1E3A8A]/25 dark:bg-purple-900/40 flex items-center justify-center backdrop-blur-[0.5px]">
-                        <div className="w-5 h-5 rounded-full bg-[#1E3A8A] text-white dark:bg-[#F8DF7B] dark:text-[#160C2C] flex items-center justify-center shadow-md ring-2 ring-white/80 dark:ring-[#F8DF7B]/80">
-                          <Play size={9} fill="currentColor" className="ml-0.5" />
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="absolute inset-0 bg-black/20 dark:bg-black/35 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <div className="w-4.5 h-4.5 rounded-full bg-white text-[#1E3A8A] flex items-center justify-center shadow-xs">
-                          <Play size={8} fill="currentColor" className="ml-0.5 text-[#1E3A8A]" />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* 2. TIÊU ĐỀ RỘNG RÃI TRẢI DÀI TRỌN VẸN CHIỀU NGANG */}
-                  <div className="flex flex-col gap-0.5 min-w-0 flex-1 justify-center">
-                    <h4
-                      className={`text-[13.5px] sm:text-[14.5px] font-extrabold leading-snug line-clamp-2 transition-colors ${
-                        isActive
-                          ? 'text-[#1E3A8A] dark:text-[#93C5FD]'
-                          : 'text-slate-900 dark:text-white group-hover:text-[#1E3A8A]'
-                      }`}
-                      title={vid.title}
-                    >
-                      {vid.title}
-                    </h4>
-
-                    {vid.description && (
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1 font-normal">
-                        {vid.description}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* 3. NÚT ADMIN SỬA VIDEO (NẾU CÓ) */}
-                  {isAdmin && onOpenVideoManager && (
+                {/* Bên phải: Thời lượng + Nút [ ✏️ Sửa ] trực tiếp cho Admin */}
+                <div className="flex items-center gap-1.5 justify-end">
+                  <span className="text-[10.5px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400 font-mono">
+                    {vid.duration_text || '05:00'}
+                  </span>
+                  {isAdmin && (
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        onOpenVideoManager();
+                        playTapSound();
+                        setEditingVideoIndex(idx);
                       }}
-                      className="text-slate-400 hover:text-[#1E3A8A] p-1.5 rounded-lg hover:bg-slate-100 cursor-pointer shrink-0 self-center"
-                      aria-label="Sửa video"
-                      title="Sửa video"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] bg-amber-500 hover:bg-amber-600 text-white text-[10.5px] font-black tracking-wide uppercase transition-transform active:scale-95 shadow-2xs cursor-pointer"
+                      title="Sửa trực tiếp video này: tiêu đề, link YouTube, thời lượng"
+                      aria-label={`Sửa video ${vid.title}`}
                     >
-                      <MoreVertical size={15} />
+                      <Edit2 size={10} strokeWidth={3} />
+                      <span>Sửa</span>
                     </button>
                   )}
                 </div>
               </div>
-            );
-          })}
 
-          {/* Nút Quản lý danh sách video (Hiện khi ở chế độ Admin) */}
-          {isAdmin && onOpenVideoManager && (
-            <button
-              type="button"
-              onClick={onOpenVideoManager}
-              className="flex items-center justify-center gap-2 h-[48px] w-full rounded-[14px] bg-primary text-white font-extrabold text-[15px] transition-transform active:scale-[0.98] mt-1 shadow-xs cursor-pointer"
-            >
-              <span>Quản lý danh sách video ({videos.length})</span>
-              <ArrowRight size={17} strokeWidth={2.5} />
-            </button>
-          )}
-        </div>
-      )}
+              {/* THÂN BÀI: ẢNH THUMBNAIL THU GỌN + TIÊU ĐỀ TRẢI RỘNG */}
+              <div className="flex items-center gap-2 sm:gap-2.5">
+                {/* 1. KHUNG ẢNH THUMBNAIL THU NHỎ GỌN GÀNG (16:9, ~68px) */}
+                <div className="relative w-[68px] sm:w-[74px] aspect-video rounded-[8px] overflow-hidden bg-slate-100 dark:bg-[#0A0515] shrink-0 border border-slate-200/90 dark:border-purple-500/20 shadow-2xs">
+                  {thumbUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={thumbUrl}
+                      alt={vid.title}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-slate-100 dark:bg-purple-950/40 text-slate-600 dark:text-purple-300">
+                      <Play size={15} className="text-slate-600 dark:text-purple-400/60" />
+                    </div>
+                  )}
 
-      {currentTab === 'summary' && (
-        <div className="flex flex-col gap-3 py-1 animate-in fade-in duration-150">
-          {summaryContent || (
-            <p className="text-muted text-[14px] p-4 text-center">Chưa có tóm tắt bổ sung cho bài học này.</p>
-          )}
-        </div>
-      )}
+                  {/* Lớp phủ & Nút Play khi Active hoặc Hover */}
+                  {isActive ? (
+                    <div className="absolute inset-0 bg-amber-500/20 dark:bg-amber-500/30 flex items-center justify-center backdrop-blur-[0.5px]">
+                      <div className="w-5 h-5 rounded-full bg-amber-500 text-white dark:bg-amber-400 dark:text-slate-950 flex items-center justify-center shadow-md ring-2 ring-white/80 dark:ring-amber-300/80">
+                        <Play size={9} fill="currentColor" className="ml-0.5" />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="absolute inset-0 bg-black/20 dark:bg-black/35 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                      <div className="w-4.5 h-4.5 rounded-full bg-white text-[#1E3A8A] flex items-center justify-center shadow-xs">
+                        <Play size={8} fill="currentColor" className="ml-0.5 text-[#1E3A8A]" />
+                      </div>
+                    </div>
+                  )}
+                </div>
 
-      {currentTab === 'resources' && (
-        <div className="flex flex-col gap-3 py-1 animate-in fade-in duration-150">
-          {resourcesContent}
-          {/* Nút Hỏi trợ lý AI */}
-          <Link
-            href={`/tro-ly-ai?q=Giải thích chi tiết hơn về bài học: ${encodeURIComponent(pageTitle || '')}`}
-            className="flex items-center justify-between p-3.5 rounded-[16px] bg-gradient-to-r from-primary-soft to-surface-2 border border-primary/25 text-ink hover:border-primary transition-all shadow-2xs group mt-1"
-          >
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center shadow-xs">
-                <Sparkles size={18} />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[14px] font-extrabold text-primary">
-                  Hỏi Trợ lý sức khỏe về bài này
-                </span>
-                <span className="text-[12px] text-muted font-normal">
-                  Giải đáp thắc mắc chuyên sâu 24/7
-                </span>
+                {/* 2. TIÊU ĐỀ RỘNG RÃI TRẢI DÀI TRỌN VẸN CHIỀU NGANG */}
+                <div className="flex flex-col gap-0.5 min-w-0 flex-1 justify-center">
+                  <h4
+                    className={`text-[13px] sm:text-[14px] font-extrabold leading-snug line-clamp-2 transition-colors ${
+                      isActive
+                        ? 'text-slate-950 dark:text-amber-100 group-hover:text-amber-700'
+                        : 'text-slate-900 dark:text-white group-hover:text-amber-600'
+                    }`}
+                    title={vid.title}
+                  >
+                    {vid.title}
+                  </h4>
+
+                  {vid.description && (
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1 font-normal">
+                      {vid.description}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
-            <ArrowRight size={18} className="text-primary group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </div>
-      )}
+          );
+        })}
+
+        {/* NÚT THÊM VIDEO MỚI VÀ QUẢN LÝ DÀNH CHO ADMIN */}
+        {isAdmin && (
+          <div className="flex flex-col sm:flex-row gap-2 mt-1.5">
+            <button
+              type="button"
+              onClick={() => {
+                playTapSound();
+                setIsAddingVideo(true);
+                setEditingVideoIndex(null);
+              }}
+              className="flex-1 flex items-center justify-center gap-2 h-[44px] rounded-[13px] bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[13.5px] transition-transform active:scale-[0.98] shadow-xs cursor-pointer"
+            >
+              <Plus size={16} strokeWidth={3} />
+              <span>+ Thêm video vào bài</span>
+            </button>
+            {onOpenVideoManager && (
+              <button
+                type="button"
+                onClick={() => {
+                  playTapSound();
+                  onOpenVideoManager();
+                }}
+                className="flex items-center justify-center gap-1.5 h-[44px] px-3.5 rounded-[13px] bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-[12.5px] transition-all cursor-pointer border border-slate-200 dark:border-slate-700"
+              >
+                <span>Sắp xếp / Toàn bộ ({videoList.length})</span>
+                <ArrowRight size={14} />
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className={currentTab === 'summary' ? 'flex flex-col gap-3 py-1 animate-in fade-in duration-100' : 'hidden'}>
+        {summaryContent || (
+          <p className="text-muted text-[14px] p-4 text-center">Chưa có tóm tắt bổ sung cho bài học này.</p>
+        )}
+      </div>
+
+      <div className={currentTab === 'resources' ? 'flex flex-col gap-3 py-1 animate-in fade-in duration-100' : 'hidden'}>
+        {resourcesContent}
+        {/* Nút Hỏi trợ lý AI */}
+        <Link
+          href={`/tro-ly-ai?q=Giải thích chi tiết hơn về bài học: ${encodeURIComponent(pageTitle || '')}`}
+          className="flex items-center justify-between p-3.5 rounded-[16px] bg-gradient-to-r from-primary-soft to-surface-2 border border-primary/25 text-ink hover:border-primary transition-all shadow-2xs group mt-1"
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center shadow-xs">
+              <Sparkles size={18} />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[14px] font-extrabold text-primary">
+                Hỏi Trợ lý sức khỏe về bài này
+              </span>
+              <span className="text-[12px] text-muted font-normal">
+                Giải đáp thắc mắc chuyên sâu 24/7
+              </span>
+            </div>
+          </div>
+          <ArrowRight size={18} className="text-primary group-hover:translate-x-1 transition-transform" />
+        </Link>
+      </div>
+
+      {/* MODAL SỬA TỪNG VIDEO TRỰC QUAN (ẤN VÀO ĐÂU SỬA ĐẤY) */}
+      <EditSingleVideoModal
+        isOpen={editingVideoIndex !== null || isAddingVideo}
+        onClose={() => {
+          setEditingVideoIndex(null);
+          setIsAddingVideo(false);
+        }}
+        video={
+          editingVideoIndex !== null && editingVideoIndex >= 0 && editingVideoIndex < videoList.length
+            ? videoList[editingVideoIndex]
+            : null
+        }
+        videoIndex={editingVideoIndex !== null ? editingVideoIndex : -1}
+        totalVideos={videoList.length}
+        onSave={(updated, idx) => {
+          handleSaveSingleVideo(updated, idx);
+        }}
+        onDelete={(idx) => {
+          handleDeleteSingleVideo(idx);
+        }}
+        onMoveUp={(idx) => {
+          handleMoveSingleVideo(idx, 'up');
+        }}
+        onMoveDown={(idx) => {
+          handleMoveSingleVideo(idx, 'down');
+        }}
+      />
     </div>
   );
 }

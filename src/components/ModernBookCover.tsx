@@ -51,12 +51,24 @@ export default function ModernBookCover({
 
   return (
     <div
-      className={`relative aspect-[3/4] w-full rounded-r-[6px] rounded-l-[2px] overflow-hidden select-none transition-transform duration-300 group-hover:-translate-y-1 ${className}`}
-      style={{
-        boxShadow:
-          '0 14px 28px -6px rgba(15, 23, 42, 0.22), 0 6px 10px -2px rgba(15, 23, 42, 0.1), inset -1px 0 2px rgba(255, 255, 255, 0.2)',
-      }}
+      className={`relative aspect-[3/4] w-full select-none transition-transform duration-300 group-hover:-translate-y-1 ${className}`}
     >
+      {/* THẺ TAG CỦA SÁCH: Ở TRÊN CÙNG GÓC TRÁI, CHỜM RA NGOÀI VIỀN 1 NỬA (50% TRONG, 50% NGOÀI), TĨNH KHÔNG FLASH */}
+      {badgeText && (
+        <div className="absolute -top-2 -left-2 sm:-top-2.5 sm:-left-2 z-30 rounded-[5px] bg-gradient-to-r from-[#991B1B] via-[#DC2626] to-[#991B1B] text-white font-black text-[8px] sm:text-[8.5px] px-1.5 py-[2px] shadow-md shadow-red-950/50 border border-red-300/50 flex items-center gap-1 select-none pointer-events-none drop-shadow-xs max-w-[92%] truncate">
+          <Sparkles size={8} className="text-white fill-white shrink-0" />
+          <span className="tracking-wider uppercase drop-shadow-xs truncate">{badgeText}</span>
+        </div>
+      )}
+
+      {/* THÂN BÌA SÁCH 3D (ĐƯỢC BO GÓC & BẢO TOÀN HIỆU ỨNG GÁY SÁCH) */}
+      <div
+        className="w-full h-full rounded-r-[6px] rounded-l-[2px] overflow-hidden relative"
+        style={{
+          boxShadow:
+            '0 14px 28px -6px rgba(15, 23, 42, 0.22), 0 6px 10px -2px rgba(15, 23, 42, 0.1), inset -1px 0 2px rgba(255, 255, 255, 0.2)',
+        }}
+      >
       {/* 1. GÁY SÁCH 3D BÊN TRÁI (Spine Crease) */}
       <div
         className="pointer-events-none absolute inset-y-0 left-0 w-[14px] sm:w-[16px] z-20"
@@ -123,7 +135,7 @@ export default function ModernBookCover({
             </div>
 
             <h3
-              className="text-[13.5px] sm:text-[15px] font-black text-white leading-snug line-clamp-3 tracking-wide drop-shadow-sm font-serif"
+              className="text-[13.5px] sm:text-[15px] font-black text-white leading-snug line-clamp-3 tracking-wide drop-shadow-sm"
             >
               {title}
             </h3>
@@ -139,13 +151,7 @@ export default function ModernBookCover({
           </div>
         </div>
       )}
-
-      {/* 4. BADGE NỔI BẬT NẾU CÓ */}
-      {badgeText && (
-        <div className="absolute top-2 right-2 z-20 px-2 py-0.5 rounded-[8px] bg-black/60 backdrop-blur-md border border-white/20 text-white text-[10px] font-black tracking-wide shadow-xs">
-          {badgeText}
-        </div>
-      )}
+      </div>
     </div>
   );
 }

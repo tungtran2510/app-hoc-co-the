@@ -145,24 +145,19 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
   );
 
   return (
-    <section className="flex flex-col gap-2.5 mt-1">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <h2 className="text-[17px] sm:text-[19px] font-black text-ink uppercase tracking-wide">
-            LỘ TRÌNH ĐÀO TẠO THEO BƯỚC
-          </h2>
-          <span className="text-[11px] font-black text-[#1E3A8A] bg-blue-50 dark:text-[#F8DF7B] dark:bg-purple-900/50 px-2.5 py-0.5 rounded-full border border-blue-200 dark:border-purple-500/30">
-            {visiblePages.length} BƯỚC
-          </span>
-        </div>
+    <section className="flex flex-col gap-2 mt-1">
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-[15px] sm:text-[16.5px] font-black text-slate-900 dark:text-white uppercase tracking-tight truncate">
+          LỘ TRÌNH {visiblePages.length} BƯỚC · {visiblePages.length} BÀI HỌC
+        </h2>
 
         {isAdmin && (
           <button
             type="button"
             onClick={() => setIsCreating(true)}
-            className="flex items-center gap-1.5 h-8 px-3 rounded-full bg-[#1E3A8A] hover:bg-[#172554] text-white font-bold text-[12px] shadow-xs cursor-pointer transition-all"
+            className="flex items-center gap-1 h-7.5 px-2.5 rounded-full bg-[#1E3A8A] hover:bg-[#172554] text-white font-bold text-[11.5px] shadow-xs cursor-pointer transition-all shrink-0"
           >
-            <Plus size={15} strokeWidth={2.5} />
+            <Plus size={14} strokeWidth={2.5} />
             <span>Thêm bài</span>
           </button>
         )}
@@ -170,32 +165,56 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
 
       {visiblePages.length > 0 ? (
         <>
-          <p className="text-[13px] sm:text-[13.5px] text-muted font-medium leading-normal -mt-0.5">
-            Gợi ý: nếu mới bắt đầu, nên xem theo thứ tự 01 → 02 → 03.
+          <p className="text-[12px] sm:text-[12.5px] text-slate-500 dark:text-white/70 font-medium leading-tight truncate -mt-0.5">
+            Gợi ý: Nên xem lần lượt theo thứ tự từ 01 → 02 → 03.
           </p>
 
-          <div className="flex flex-col gap-2 mt-1">
+          <div className="relative flex flex-col gap-2.5 mt-1">
+            {/* Đường kẻ dọc nối liền các bước lộ trình (như Ảnh mẫu 2) */}
+            <div
+              className="absolute left-[13.5px] top-5 bottom-5 w-[2px] bg-slate-200/90 dark:bg-purple-800/40 pointer-events-none z-0"
+              aria-hidden="true"
+            />
+
             {visiblePages.map(({ page, orderNumber, videoCount }, index) => {
               const pageTienDo = tienDo[page.id];
               const watchedVideos = pageTienDo?.watched || [];
               const lastVideo = pageTienDo?.last_video;
               const isCompleted = completedPages.includes(page.id);
+              const formattedOrder = String(orderNumber).padStart(2, '0');
 
               return (
-                <div key={page.id} className="w-full relative group">
-                  <PageCard
-                    page={page}
-                    topic={topic}
-                    orderNumber={orderNumber}
-                    videoCount={videoCount}
-                    watchedVideos={watchedVideos}
-                    lastVideo={lastVideo}
-                    isCompleted={isCompleted}
-                  />
+                <div key={page.id} className="w-full relative group flex flex-col gap-1.5">
+                  <div className="w-full flex items-center gap-2 sm:gap-2.5">
+                    {/* Cột mốc tròn số thứ tự trên dòng lộ trình (như Ảnh mẫu 2) */}
+                    <div
+                      className={`w-[29px] h-[29px] rounded-full flex items-center justify-center text-[11px] font-black shrink-0 shadow-2xs z-10 font-mono transition-colors ${
+                        isCompleted
+                          ? 'bg-emerald-50 text-emerald-700 border-[1.5px] border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-600/50'
+                          : 'bg-white dark:bg-[#160D30] text-slate-500 dark:text-white/75 border-[1.5px] border-slate-200 dark:border-purple-500/40'
+                      }`}
+                      title={`Bước ${formattedOrder}`}
+                    >
+                      {formattedOrder}
+                    </div>
+
+                    {/* Thẻ bài học PageCard */}
+                    <div className="flex-1 min-w-0">
+                      <PageCard
+                        page={page}
+                        topic={topic}
+                        orderNumber={orderNumber}
+                        videoCount={videoCount}
+                        watchedVideos={watchedVideos}
+                        lastVideo={lastVideo}
+                        isCompleted={isCompleted}
+                      />
+                    </div>
+                  </div>
 
                   {/* Huy hiệu Quản trị: Bản nháp / Đang ẩn */}
                   {isAdmin && (
-                    <div className="absolute top-2 right-12 flex items-center gap-1.5">
+                    <div className="pl-[37px] flex items-center gap-1.5">
                       {page.status === 'draft' && (
                         <span className="px-2 py-0.5 rounded-md bg-amber-500 text-white text-[11px] font-extrabold">
                           Bản nháp
@@ -211,7 +230,7 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
 
                   {/* Thanh công cụ Admin trên mỗi thẻ trang */}
                   {isAdmin && (
-                    <div className="flex items-center justify-between mt-1 px-2.5 py-1.5 rounded-[12px] bg-slate-900 text-white text-[12px] font-bold shadow-xs">
+                    <div className="ml-[37px] flex items-center justify-between mt-1 px-2.5 py-1.5 rounded-[12px] bg-slate-900 text-white text-[12px] font-bold shadow-xs">
                       <button
                         type="button"
                         onClick={() => setEditingPage(page)}

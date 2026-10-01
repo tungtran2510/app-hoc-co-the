@@ -37,12 +37,17 @@ export function normalizeRecommendedBooks(raw?: any): RecommendedBook[] {
   return raw.map((item, idx) => ({
     id: item.id || `rec-book-${idx + 1}`,
     title: item.title?.trim() ? item.title : `Sách ${idx + 1}`,
+    category: item.category || item.tag || null,
+    badge_tag: item.badge_tag || null,
+    tag: item.tag || null,
+    color_theme: item.color_theme || null,
     cover_url: item.cover_url || null,
     description: item.description || '',
     author: item.author || '',
     link_url: item.link_url || '',
     youtube_url: item.youtube_url || null,
     gallery_images: Array.isArray(item.gallery_images) ? item.gallery_images.filter(Boolean) : [],
+    is_visible: item.is_visible !== undefined ? Boolean(item.is_visible) : true,
   }));
 }
 
@@ -60,6 +65,7 @@ export function normalizeAuthorProfile(raw?: any): AuthorProfile {
       ? raw.books.map((b: any) => ({
           ...b,
           gallery_images: Array.isArray(b.gallery_images) ? b.gallery_images.filter(Boolean) : [],
+          is_visible: b.is_visible !== undefined ? Boolean(b.is_visible) : true,
         }))
       : DEFAULT_AUTHOR_PROFILE.books,
     phone: raw.phone !== undefined ? raw.phone : DEFAULT_AUTHOR_PROFILE.phone,
@@ -72,13 +78,21 @@ export function normalizeAuthorProfile(raw?: any): AuthorProfile {
 }
 
 export const DEFAULT_HOME_SECTIONS_ORDER = [
+  'brand_card',
   'topics',
+  'recent_activity',
   'author_profile',
   'author_books',
   'author_philosophy',
   'recommended_books',
   'author_contact',
 ];
+
+export function normalizeHiddenHomeSections(raw?: any): string[] {
+  if (!Array.isArray(raw)) return [];
+  const validSet = new Set(DEFAULT_HOME_SECTIONS_ORDER);
+  return raw.filter((key): key is string => typeof key === 'string' && validSet.has(key));
+}
 
 export function normalizeHomeSectionsOrder(raw?: any): string[] {
   if (!Array.isArray(raw) || raw.length === 0) {
@@ -96,6 +110,21 @@ export function normalizeHomeSectionsOrder(raw?: any): string[] {
 
   const validSet = new Set(DEFAULT_HOME_SECTIONS_ORDER);
   const unique = Array.from(new Set(expanded)).filter((k) => validSet.has(k));
+
+  // Tự động bổ sung brand_card lên đầu nếu dữ liệu cũ chưa có
+  if (!unique.includes('brand_card')) {
+    unique.unshift('brand_card');
+  }
+
+  // Tự động bổ sung recent_activity ngay sau topics nếu dữ liệu cũ chưa có
+  if (!unique.includes('recent_activity')) {
+    const topicsIdx = unique.indexOf('topics');
+    if (topicsIdx !== -1) {
+      unique.splice(topicsIdx + 1, 0, 'recent_activity');
+    } else {
+      unique.push('recent_activity');
+    }
+  }
 
   for (const item of DEFAULT_HOME_SECTIONS_ORDER) {
     if (!unique.includes(item)) {
@@ -158,7 +187,11 @@ export async function getSettings(): Promise<Settings> {
             recommended_books: normalizeRecommendedBooks(data.recommended_books || data.block_styles?.recommended_books),
             recommended_books_layout: data.recommended_books_layout || data.block_styles?.recommended_books_layout || 'grid',
             home_sections_order: normalizeHomeSectionsOrder(data.home_sections_order || data.block_styles?.home_sections_order),
+            hidden_home_sections: normalizeHiddenHomeSections(data.hidden_home_sections || data.block_styles?.hidden_home_sections),
             ai_training: normalizeAiTraining(data.ai_training || data.block_styles?.ai_training),
+            welcome_title: data.welcome_title || data.block_styles?.welcome_title || 'Chào mừng bạn đến với Qbiz Books',
+            welcome_message: data.welcome_message || data.block_styles?.welcome_message || 'Hi vọng nền tảng học hiểu cơ thể và chăm sóc sức khỏe chủ động này sẽ giúp bạn hiểu sâu hơn về cơ thể mình, nuôi dưỡng hệ cơ xương khớp và sống khỏe mỗi ngày.',
+            welcome_video_url: data.welcome_video_url || data.block_styles?.welcome_video_url || 'https://www.youtube.com/watch?v=c9kmCxFKHPY',
           } as Settings;
         }
       } catch {

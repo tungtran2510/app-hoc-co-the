@@ -4,7 +4,7 @@ export const DEFAULT_AUTHOR_PROFILE: AuthorProfile = {
   name: 'Tùng dinh dưỡng',
   title: 'Hỗ trợ kiến thức nền tảng & Sức khỏe',
   avatar_url: null,
-  bio: 'Tùng "không phải bác sĩ". Tùng mong muốn chia sẻ kiến thức đúng giúp mọi người chủ động chăm sóc đúng vì một Việt Nam khỏe mạnh.',
+  bio: 'Tùng mong muốn chia sẻ kiến thức khoa học và kinh nghiệm thực tiễn giúp mọi người chủ động chăm sóc sức khỏe bền vững vì một Việt Nam khỏe mạnh.',
   intro_image_url: null,
   intro_video_url: null,
   books: [
@@ -39,43 +39,58 @@ export const DEFAULT_RECOMMENDED_BOOKS: RecommendedBook[] = [
   {
     id: 'rec-book-1',
     title: 'Lắng Nghe Cơ Thể Để Tự Chữa Lành',
+    category: 'Cơ Xương Khớp',
+    badge_tag: 'NÊN ĐỌC',
     cover_url: null,
     description: 'Hướng dẫn nhận diện các tín hiệu cảnh báo sớm từ hệ cơ xương khớp và phương pháp phục hồi tự nhiên.',
-    author: 'Tài liệu Chăm sóc Cơ thể',
+    author: 'Tùng dinh dưỡng',
     link_url: '',
+    gallery_images: [
+      '/documents/bang_tra_cuu_re_than_kinh_cot_song.png',
+      '/spine_hero_clean.png',
+    ],
   },
   {
     id: 'rec-book-2',
     title: 'Giải Mã Cột Sống & Vận Động Đúng',
+    category: 'Cột Sống & Đĩa Đệm',
+    badge_tag: 'NÊN ĐỌC',
     cover_url: null,
     description: 'Phân tích cơ sinh học cột sống, các sai lầm trong sinh hoạt hằng ngày và bài tập điều chỉnh tư thế.',
-    author: 'Tài liệu Sức khỏe Cột sống',
+    author: 'Tùng dinh dưỡng',
     link_url: '',
+    gallery_images: [
+      '/spine_hero_clean.png',
+      '/documents/bang_tra_cuu_re_than_kinh_cot_song.png',
+    ],
   },
   {
     id: 'rec-book-3',
     title: 'Dinh Dưỡng Kháng Viêm & Tái Tạo Khớp',
+    category: 'Dinh Dưỡng Phục Hồi',
+    badge_tag: 'NÊN ĐỌC',
     cover_url: null,
     description: 'Chế độ ăn uống khoa học giúp nuôi dưỡng sụn khớp, đĩa đệm và giảm phản ứng viêm đau mạn tính.',
-    author: 'Viện Dinh dưỡng Ứng dụng',
+    author: 'Tùng dinh dưỡng',
     link_url: '',
   },
   {
     id: 'rec-book-4',
     title: 'Cẩm Nang Bảo Vệ Đốt Sống Cổ',
+    category: 'Cột Sống Cổ & Vai Gáy',
+    badge_tag: 'NÊN ĐỌC',
     cover_url: null,
     description: 'Dành riêng cho người làm việc văn phòng, lái xe và những người thường xuyên bị đau mỏi vai gáy.',
-    author: 'Tài liệu Chăm sóc Cột sống',
+    author: 'Tùng dinh dưỡng',
     link_url: '',
   },
 ];
 
 export const DEFAULT_AI_TRAINING: AiTrainingConfig = {
-  guidelines: `1. TÁC GIẢ KHÔNG PHẢI LÀ BÁC SĨ: Tác giả là Tùng dinh dưỡng, chia sẻ kiến thức nền tảng giúp mọi người hiểu về cơ thể và chủ động chăm sóc đúng.
-2. CẤM TUYỆT ĐỐI LIÊN QUAN ĐẾN CHỮA BỆNH: Không khám bệnh, không chẩn đoán bệnh, không chữa bệnh, không điều trị bệnh, không kê đơn thuốc.
-3. VAI TRÒ LÀ TRỢ LÝ SỨC KHỎE: Cung cấp kiến thức giáo dục về cấu trúc cơ thể, thói quen sinh hoạt đúng và phục hồi tự nhiên qua vận động sinh cơ học.
-4. KHI CÓ DẤU HIỆU BỆNH LÝ HOẶC ĐAU NHỨC CẤP TÍNH: Luôn dặn dò người học đi khám tại các cơ sở y tế / bác sĩ chuyên khoa để được thăm khám chính xác.
-5. PHONG CÁCH TRẢ LỜI: Luôn trả lời ngắn gọn (1-2 câu, tối đa 40-50 từ), đi thẳng vào kết luận theo tài liệu tác giả và điều hướng mở bài học trong hệ thống để xem chi tiết.`,
+  guidelines: `1. VAI TRÒ CHUYÊN MÔN: Trợ lý Sức Khỏe AI chia sẻ kiến thức giáo dục về cấu trúc cơ thể, cơ chế sinh học, thói quen sinh hoạt đúng và phục hồi tự nhiên theo tài liệu của tác giả Tùng dinh dưỡng.
+2. NGUYÊN TẮC AN TOÀN Y KHOA: Cung cấp thông tin tham khảo khoa học, không đưa ra chẩn đoán hay điều trị y khoa thay thế bác sĩ chuyên khoa.
+3. PHONG CÁCH TRẢ LỜI: Luôn trả lời ngắn gọn (1-2 câu, tối đa 40-50 từ), đi thẳng vào kết luận theo tài liệu tác giả và điều hướng mở bài học trong hệ thống để xem chi tiết.
+4. TUYỆT ĐỐI CẤM: Tuyệt đối không nhắc đến các cụm từ như "tác giả không phải bác sĩ", "Tùng không phải bác sĩ" hay giải thích danh xưng.`,
   documents: [
     {
       id: 'doc-1',

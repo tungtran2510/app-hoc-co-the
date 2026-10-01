@@ -55,6 +55,9 @@ export default function HomeHeader({
   const [showMenu, setShowMenu] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isDark, setIsDark] = useState(false);
+  const [userName, setUserName] = useState<string>('Dr. Tùng');
+  const [showNameModal, setShowNameModal] = useState(false);
+  const [nameInput, setNameInput] = useState('');
 
   useEffect(() => {
     try {
@@ -114,6 +117,42 @@ export default function HomeHeader({
     };
   }, []);
 
+  useEffect(() => {
+    try {
+      const savedName = localStorage.getItem('app_user_display_name');
+      if (savedName && savedName.trim()) {
+        setUserName(savedName.trim());
+      } else {
+        const prompted = sessionStorage.getItem('app_user_name_prompted');
+        if (!prompted) {
+          const timer = setTimeout(() => {
+            setNameInput('');
+            setShowNameModal(true);
+            sessionStorage.setItem('app_user_name_prompted', 'true');
+          }, 800);
+          return () => clearTimeout(timer);
+        }
+      }
+    } catch {}
+  }, []);
+
+  const handleSaveName = () => {
+    const trimmed = nameInput.trim();
+    if (trimmed) {
+      setUserName(trimmed);
+      try {
+        localStorage.setItem('app_user_display_name', trimmed);
+        window.dispatchEvent(new CustomEvent('app_user_name_changed', { detail: { name: trimmed } }));
+      } catch {}
+    } else {
+      setUserName('Dr. Tùng');
+      try {
+        localStorage.removeItem('app_user_display_name');
+      } catch {}
+    }
+    setShowNameModal(false);
+  };
+
   const handleBackup = async () => {
     try {
       setIsExporting(true);
@@ -144,51 +183,50 @@ export default function HomeHeader({
 
   return (
     <>
-      {/* Thanh đen Admin ở Trang chủ (hiện khi là Admin) */}
+      {/* Thanh đen Admin ở Trang chủ (hiện khi là Admin - tối ưu 1 dòng vừa khít mobile) */}
       {isAdmin && (
-        <div className="w-full flex items-center justify-between px-3.5 py-2 rounded-[14px] bg-black/90 text-white text-[13px] font-bold shadow-md -mb-1">
-          <div className="flex items-center gap-2">
+        <div className="w-full flex items-center justify-between px-3 py-1.5 rounded-[12px] bg-black/90 text-white shadow-md -mb-1 overflow-hidden">
+          <div className="flex items-center gap-1.5 shrink-0 min-w-0">
             <span
               className={`w-2 h-2 rounded-full shrink-0 ${
                 supabaseOk ? 'bg-emerald-400' : 'bg-red-400 animate-pulse'
               }`}
             />
-            <span className={supabaseOk ? 'text-white/90' : 'text-red-300 font-extrabold'}>
-              {supabaseOk
-                ? 'Dữ liệu: Đã kết nối ✓'
-                : 'Dữ liệu: CHƯA kết nối – nội dung sửa sẽ không được lưu'}
+            <span className="text-[12px] font-extrabold text-white/95 truncate">
+              {supabaseOk ? 'Sẵn sàng' : 'Chưa kết nối'}
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1 shrink-0">
             <button
               type="button"
               onClick={handleBackup}
               disabled={isExporting}
-              className="flex items-center gap-1 h-7 px-2.5 rounded-[8px] bg-white/15 hover:bg-white/25 text-white transition-colors cursor-pointer disabled:opacity-50"
+              className="flex items-center gap-1 h-6.5 px-2 sm:px-2.5 rounded-[7px] bg-white/15 hover:bg-white/25 text-white transition-colors cursor-pointer disabled:opacity-50 text-[11px] font-bold shrink-0"
               title="Tải file sao lưu dữ liệu"
             >
-              <Download size={13} />
-              <span>{isExporting ? 'Đang tải...' : 'Sao lưu'}</span>
+              <Download size={12} />
+              <span className="hidden sm:inline">{isExporting ? 'Đang tải...' : 'Sao lưu'}</span>
             </button>
 
             <button
               type="button"
               onClick={() => setShowEditApp(true)}
-              className="flex items-center gap-1 h-7 px-2.5 rounded-[8px] bg-white/15 hover:bg-white/25 text-white transition-colors cursor-pointer"
+              className="flex items-center gap-1 h-6.5 px-2 sm:px-2.5 rounded-[7px] bg-white/15 hover:bg-white/25 text-white transition-colors cursor-pointer text-[11px] font-bold shrink-0"
               title="Đổi tên app và logo"
             >
-              <Edit2 size={13} />
-              <span>Đổi tên</span>
+              <Edit2 size={12} />
+              <span className="hidden sm:inline">Đổi tên</span>
             </button>
 
             <button
               type="button"
               onClick={handleLogout}
-              className="h-7 px-2 rounded-[8px] bg-red-500/30 hover:bg-red-500/50 text-red-200 transition-colors cursor-pointer"
+              className="h-6.5 w-6.5 flex items-center justify-center rounded-[7px] bg-red-500/30 hover:bg-red-500/50 text-red-200 transition-colors cursor-pointer shrink-0"
               title="Đăng xuất"
+              aria-label="Đăng xuất"
             >
-              <LogOut size={13} />
+              <LogOut size={12} />
             </button>
           </div>
         </div>
@@ -200,9 +238,24 @@ export default function HomeHeader({
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
-              <span className="text-[17px] sm:text-[18px] font-black text-ink tracking-tight">
-                Hello, Dr. Tùng!
-              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setNameInput(userName === 'Dr. Tùng' ? '' : userName);
+                  setShowNameModal(true);
+                }}
+                className="flex items-center gap-1 text-left group cursor-pointer hover:opacity-90 transition-opacity"
+                title="Bấm để đổi tên chào mừng của bạn"
+              >
+                <div className="flex items-center gap-1 animate-greeting-bounce">
+                  <span className="text-[17px] sm:text-[18px] font-black text-ink tracking-tight group-hover:text-blue-600 dark:group-hover:text-[#F8DF7B] transition-colors">
+                    Hello, {userName || 'Dr. Tùng'}!
+                  </span>
+                  <span className="text-[17px] sm:text-[18px] inline-block animate-wave select-none" aria-label="vẫy tay">
+                    👋
+                  </span>
+                </div>
+              </button>
               <button
                 type="button"
                 onClick={() => setShowPhoneSync(true)}
@@ -259,55 +312,7 @@ export default function HomeHeader({
           </div>
         </div>
 
-        {/* DÒNG 2: BRAND CARD NỔI BẬT ("MEDICA LEARN" STYLE) */}
-        <div
-          onClick={() => {
-            if (isAdmin) setShowEditApp(true);
-          }}
-          className={`w-full rounded-[20px] bg-white text-slate-900 border border-slate-200 border-l-[4px] border-l-[#1E3A8A] shadow-md hover:shadow-lg dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] dark:border-t-white/15 dark:border-r-black/50 dark:border-b-black/70 dark:border-l-[#A78BFA] dark:text-white p-3 sm:p-3.5 flex items-center justify-between gap-3 ${
-            isAdmin ? 'cursor-pointer group' : ''
-          }`}
-          title={isAdmin ? 'Bấm để sửa tên & thương hiệu app' : undefined}
-        >
-          {/* Avatar Bác sĩ / Tác giả bên trái */}
-          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-blue-200 dark:border-purple-400/60 shadow-md shrink-0">
-            <img
-              src="/images/author_tung.png"
-              alt="Tùng Dinh Dưỡng"
-              className="w-full h-full object-cover"
-            />
-          </div>
-
-          {/* Khối chữ thương hiệu ở giữa */}
-          <div className="flex flex-col flex-1 min-w-0">
-            <div className="flex items-center gap-1.5">
-              <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-[#1E3A8A] dark:text-white uppercase">
-                {appName && appName !== 'QBIZ BOOK' && appName !== 'Sống Khỏe Mỗi Ngày' ? appName.split(' ')[0] : 'HỌC'}
-              </span>
-              <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-amber-600 dark:text-[#F8DF7B] uppercase">
-                {appName && appName !== 'QBIZ BOOK' && appName !== 'Sống Khỏe Mỗi Ngày' ? appName.split(' ').slice(1).join(' ') : 'CƠ THỂ'}
-              </span>
-              {isAdmin && <Edit2 size={12} className="text-[#1E3A8A] dark:text-purple-300 opacity-60" />}
-            </div>
-            <span className="text-[9.5px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-purple-300/70 mt-0.5">
-              EMPOWERING MEDICAL KNOWLEDGE
-            </span>
-            <span className="text-[10.5px] sm:text-[11px] text-slate-600 dark:text-purple-100/90 font-medium line-clamp-1">
-              {appSubtitle || 'Advanced Anatomy & Health'}
-            </span>
-          </div>
-
-          {/* Huy hiệu Xanh Sapphire dát vàng kim bên phải */}
-          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[15px] bg-gradient-to-br from-blue-50 via-slate-50 to-blue-100 border border-blue-200 dark:bg-gradient-to-br dark:from-[#3B1F7A] dark:via-[#281358] dark:to-[#12062C] dark:border-amber-300/70 p-[2px] shadow-md shrink-0 flex items-center justify-center relative overflow-hidden">
-            <div className="flex flex-col items-center justify-center text-[#1E3A8A] dark:text-amber-300">
-              <svg className="w-5 h-5 text-[#1E3A8A] dark:text-amber-300 drop-shadow-xs dark:drop-shadow-[0_1px_3px_rgba(245,158,11,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" fill="currentColor" fillOpacity="0.25" />
-                <path d="M3.5 12h3l2-3 3 6 2-3h7" stroke="currentColor" strokeWidth="1.8" />
-              </svg>
-              <span className="text-[7px] font-black tracking-widest text-[#1E3A8A] dark:text-amber-200 uppercase mt-0.5">MEDICA</span>
-            </div>
-          </div>
-        </div>
+        {/* DÒNG 2: Brand card được chuyển sang HomeSectionsClient quản lý vị trí và di chuyển động */}
 
         {/* Dropdown Menu ⋮ Trang chủ */}
         {showMenu && (
@@ -322,6 +327,18 @@ export default function HomeHeader({
             >
               <Smartphone size={16} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
               <span>{userPhone ? 'Quản lý số điện thoại' : 'Lưu tiến độ qua SĐT'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setShowMenu(false);
+                window.dispatchEvent(new Event('replay_qbiz_books_intro'));
+              }}
+              className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-white dark:hover:bg-[#25154D] cursor-pointer"
+            >
+              <BookOpen size={16} className="text-amber-500 dark:text-[#F8DF7B]" />
+              <span>Xem hiệu ứng mở sách 3D</span>
             </button>
 
             <button
@@ -483,6 +500,61 @@ export default function HomeHeader({
         reason="manual"
         onSuccess={() => setUserPhone(getUserPhone())}
       />
+
+      {/* Modal Nhập tên khách hàng Chào mừng */}
+      {showNameModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="w-full max-w-sm rounded-[24px] bg-white dark:bg-[#180E32] border border-slate-200 dark:border-[#3A2268] p-5 shadow-2xl flex flex-col gap-3.5 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-purple-900/50 flex items-center justify-center text-xl shrink-0">
+                <span className="animate-wave">👋</span>
+              </div>
+              <div>
+                <h3 className="text-[16px] font-black text-slate-900 dark:text-white leading-tight">
+                  Chào mừng bạn!
+                </h3>
+                <p className="text-[12px] text-slate-500 dark:text-purple-300 font-medium">
+                  Nhập tên của bạn để bắt đầu học tập nhé
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[12px] font-bold text-slate-700 dark:text-purple-200">
+                Tên hoặc danh xưng của bạn:
+              </label>
+              <input
+                type="text"
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+                placeholder="Ví dụ: Hoàng, Bác sĩ Minh, Thảo..."
+                className="w-full h-11 px-3.5 rounded-[12px] bg-slate-50 dark:bg-[#120924] border border-slate-200 dark:border-[#3A2268] text-slate-900 dark:text-white text-[14px] font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-400"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSaveName();
+                }}
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setShowNameModal(false)}
+                className="px-3.5 py-2 rounded-[10px] text-[13px] font-bold text-slate-500 dark:text-purple-300 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
+              >
+                Để sau
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveName}
+                className="px-4 py-2 rounded-[10px] bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-purple-600 dark:to-indigo-600 hover:opacity-95 text-white text-[13px] font-black shadow-md cursor-pointer transition-all"
+              >
+                Lưu tên ✓
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

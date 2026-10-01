@@ -68,7 +68,7 @@ function fallbackSearch(query: string, catalog: LessonCatalogItem[]) {
   const selected = (matched.length > 0 ? matched : catalog).slice(0, 2);
 
   return {
-    answer: `Theo tài liệu hướng dẫn của tác giả, vấn đề này cần được điều chỉnh từ tư thế và cơ chế vận động sinh học. Mời bạn mở bài học chi tiết dưới đây:`,
+    answer: `Theo tài liệu hướng dẫn của tác giả Tùng dinh dưỡng, vấn đề này cần được điều chỉnh từ tư thế và cơ chế vận động sinh học tự nhiên. Mời bạn mở bài học chi tiết dưới đây:`,
     suggested_pages: selected.map((s) => ({
       title: s.page_title,
       topic_title: s.topic_title,
@@ -133,19 +133,19 @@ export async function POST(req: NextRequest) {
     // 4. Lời dặn và nguyên tắc cốt lõi
     const authorGuidelines =
       aiTraining?.guidelines ||
-      '1. Tác giả KHÔNG PHẢI LÀ BÁC SĨ. Tác giả là Tùng dinh dưỡng, chia sẻ kiến thức nền tảng giúp mọi người hiểu cơ thể.\n2. CẤM TUYỆT ĐỐI: Không khám bệnh, không chẩn đoán bệnh, không chữa bệnh, không điều trị bệnh, không kê đơn thuốc.\n3. Đây là Trợ lý Sức Khỏe chia sẻ kiến thức giáo dục về cấu trúc cơ thể, thói quen sinh hoạt đúng và phục hồi tự nhiên.\n4. Luôn trả lời ngắn gọn (1-2 câu), đi thẳng vào kết luận theo tài liệu tác giả và hướng dẫn người học xem các bài học cụ thể trong ứng dụng.';
+      '1. VAI TRÒ CHUYÊN MÔN: Trợ lý Sức Khỏe AI chia sẻ kiến thức giáo dục về cấu trúc cơ thể, cơ chế sinh học, thói quen sinh hoạt đúng và phục hồi tự nhiên theo tài liệu của tác giả Tùng dinh dưỡng.\n2. NGUYÊN TẮC AN TOÀN Y KHOA: Cung cấp thông tin tham khảo khoa học, không đưa ra chẩn đoán hay điều trị y khoa thay thế bác sĩ chuyên khoa.\n3. PHONG CÁCH TRẢ LỜI: Luôn trả lời ngắn gọn (1-2 câu, tối đa 40-50 từ), đi thẳng vào kết luận theo tài liệu tác giả và điều hướng mở bài học trong hệ thống để xem chi tiết.\n4. TUYỆT ĐỐI CẤM: Tuyệt đối không nhắc đến các cụm từ như "tác giả không phải bác sĩ", "Tùng không phải bác sĩ" hay giải thích danh xưng.';
 
     const prompt = `Bạn là Trợ lý Sức Khỏe AI đồng hành, hướng dẫn người học DỰA TRÊN CHÍNH TÀI LIỆU VÀ BÀI GIẢNG CỦA TÁC GIẢ (Tùng dinh dưỡng) trong ứng dụng "Học Cơ Thể".
 
-ĐẶC BIỆT LƯU Ý & CẤM TUYỆT ĐỐI LIÊN QUAN ĐẾN CHỮA BỆNH:
-1. BẠN LÀ TRỢ LÝ SỨC KHỎE, TUYỆT ĐỐI KHÔNG PHẢI TRỢ LÝ Y KHOA.
-2. TÁC GIẢ KHÔNG PHẢI LÀ BÁC SĨ: Tác giả là Tùng dinh dưỡng, chỉ chia sẻ kiến thức nền tảng giúp người học hiểu về cơ thể và chủ động chăm sóc sức khỏe.
-3. CẤM TUYỆT ĐỐI: KHÔNG KHÁM BỆNH, KHÔNG CHẨN ĐOÁN BỆNH, KHÔNG CHỮA BỆNH, KHÔNG ĐIỀU TRỊ BỆNH, KHÔNG KÊ ĐƠN THUỐC hay đưa ra chỉ định can thiệp y tế.
-4. Chỉ chia sẻ kiến thức giáo dục về cấu trúc cơ thể, cơ chế sinh học, thói quen sinh hoạt đúng và vận động khoa học theo tài liệu của tác giả.
-5. Nếu người học hỏi về dấu hiệu đau nhức bệnh lý bất thường hoặc nghi ngờ bệnh, luôn nhắc nhở họ đi khám tại các cơ sở y tế / bác sĩ chuyên khoa để được thăm khám chính xác.
-
 NGUYÊN TẮC VÀ LỜI DẶN CỐT LÕI CỦA TÁC GIẢ:
 ${authorGuidelines}
+
+ĐẶC BIỆT LƯU Ý & CÁC QUY TẮC BẮT BUỘC:
+1. ĐI THẲNG VÀO NỘI DUNG TRẢ LỜI: Nêu kết luận kiến thức khoa học và giải pháp thực tế ngắn gọn (chỉ từ 1 đến 2 câu ngắn, tối đa 40 - 50 từ).
+2. TUYỆT ĐỐI CẤM: CẤM TUYỆT ĐỐI NÓI CÁC CÂU NHƯ "Tác giả không phải là bác sĩ", "Tùng không phải bác sĩ", "tôi không phải bác sĩ" hay bất kỳ câu trần tình, giải thích danh xưng nào.
+3. VAI TRÒ: Chia sẻ kiến thức giáo dục về cấu trúc cơ thể, cơ chế sinh học, thói quen sinh hoạt đúng và vận động khoa học theo tài liệu của tác giả. Không kê đơn, không đưa ra chẩn đoán hay can thiệp y tế.
+4. NGUỒN KIẾN THỨC: CHỈ TRẢ LỜI DỰA VÀO TÀI LIỆU VÀ BÀI HỌC CỦA TÁC GIẢ Ở DƯỚI. Không bịa đặt hoặc nói lan man ngoài tài liệu.
+5. ĐIỀU HƯỚNG: CHỌN 1 ĐẾN 2 BÀI HỌC CHÍNH XÁC trong tài liệu dưới đây để người học mở ra xem chi tiết.
 
 TOÀN BỘ TÀI LIỆU & NỘI DUNG TÁC GIẢ HƯỚNG DẪN TRONG HỆ THỐNG:
 ${catalogText}
@@ -157,15 +157,9 @@ CÂU HỎI CỦA NGƯỜI HỌC: "${question}"
 LỊCH SỬ HỘI THOẠI TRƯỚC:
 ${history.slice(-2).map((h: any) => `${h.role === 'user' ? 'Người học' : 'Trợ lý'}: ${h.text}`).join('\n')}
 
-QUY TẮC BẮT BUỘC:
-1. CHỈ TRẢ LỜI DỰA VÀO TÀI LIỆU VÀ BÀI HỌC CỦA TÁC GIẢ Ở TRÊN. Không tự bịa đặt hoặc nói lý thuyết lan man bên ngoài.
-2. TUYỆT ĐỐI KHÔNG KHÁM CHỮA BỆNH, KHÔNG DÙNG TỪ NGỮ Y KHOA ĐIỀU TRỊ.
-3. NÓI THẬT NGẮN GỌN (CHỈ TỪ 1 ĐẾN 2 CÂU NGẮN, TỐI ĐA 40 - 50 TỪ)! Nêu thẳng vào kết luận cốt lõi theo hướng dẫn của tác giả, không dài dòng.
-4. CHỌN 1 ĐẾN 2 BÀI HỌC CHÍNH XÁC trong tài liệu trên để người học mở ra xem chi tiết.
-
 BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON (không kèm văn bản nào khác):
 {
-  "answer": "Câu trả lời siêu ngắn gọn (1-2 câu, nêu đúng hướng dẫn cốt lõi của tác giả)...",
+  "answer": "Câu trả lời siêu ngắn gọn (1-2 câu, 30-50 từ, đi thẳng vào hướng dẫn khoa học của tác giả)...",
   "suggested_pages": [
     {
       "title": "Tên bài học chính xác trong tài liệu",
@@ -242,6 +236,16 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON (không kèm văn bả
     }
 
     if (parsedJson && parsedJson.answer) {
+      // Làm sạch triệt để mọi tàn dư nếu model vô tình sinh ra cụm từ "không phải bác sĩ"
+      let cleanAnswer = String(parsedJson.answer)
+        .replace(/(?:tác giả\s+)?(?:tùng\s+)?(?:dinh dưỡng\s+)?(?:không phải|chưa phải)(?:\s+là)?\s+bác sĩ[.,;:\-—–]?\s*/gi, '')
+        .replace(/tôi không phải(?:\s+là)?\s+bác sĩ[.,;:\-—–]?\s*/gi, '')
+        .replace(/\bkhông phải bác sĩ\b/gi, '')
+        .trim();
+      if (cleanAnswer.length > 0) {
+        cleanAnswer = cleanAnswer.charAt(0).toUpperCase() + cleanAnswer.slice(1);
+      }
+
       const normalizedSuggested = Array.isArray(parsedJson.suggested_pages)
         ? parsedJson.suggested_pages.map((p: any) => {
             const topicSlug = (p.topic_slug || '').trim();
@@ -260,7 +264,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON (không kèm văn bả
         : [];
 
       return NextResponse.json({
-        answer: parsedJson.answer,
+        answer: cleanAnswer || parsedJson.answer,
         suggested_pages: normalizedSuggested,
         follow_up_questions: Array.isArray(parsedJson.follow_up_questions) ? parsedJson.follow_up_questions : [],
       });

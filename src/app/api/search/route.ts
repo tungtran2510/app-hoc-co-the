@@ -14,6 +14,8 @@ export async function GET() {
         description: string | null;
         color_bg: string;
         color_fg: string;
+        icon_url?: string;
+        cover_url?: string;
       }[];
       pages: {
         id: string;
@@ -23,6 +25,7 @@ export async function GET() {
         topic_title: string;
         page_number: number;
         summary: string | null;
+        cover_url?: string;
         text_snippets: string[];
       }[];
       videos: {
@@ -35,6 +38,7 @@ export async function GET() {
         page_title: string;
         page_number: number;
         video_index: number;
+        thumbnail_url?: string;
       }[];
     } = {
       topics: [],
@@ -50,6 +54,8 @@ export async function GET() {
         description: topic.description,
         color_bg: topic.color_bg,
         color_fg: topic.color_fg,
+        icon_url: `/images/topics/${topic.slug}.png`,
+        cover_url: topic.cover_url || `/images/topics/${topic.slug}.png`,
       });
 
       const pages = await getPagesByTopic(topic.id, false); // Chỉ lấy trang published và visible
@@ -78,6 +84,7 @@ export async function GET() {
                 page_title: page.title,
                 page_number: pIdx + 1,
                 video_index: videoRunningIndex,
+                thumbnail_url: `https://img.youtube.com/vi/${vid.youtube_id}/hqdefault.jpg`,
               });
             }
           }
@@ -91,6 +98,7 @@ export async function GET() {
           topic_title: topic.title,
           page_number: pIdx + 1,
           summary: page.summary,
+          cover_url: page.cover_url || `/images/topics/${topic.slug}.png`,
           text_snippets: textSnippets,
         });
       }

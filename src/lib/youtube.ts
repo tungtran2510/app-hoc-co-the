@@ -20,6 +20,15 @@ export interface YouTubeMeta {
   title: string;
   thumbnail_url: string;
   author_name?: string;
+  is_vertical?: boolean;
+}
+
+/**
+ * Kiểm tra xem một link hoặc ID có phải là Shorts (video dọc) hay không
+ */
+export function checkIsShorts(urlOrId: string): boolean {
+  if (!urlOrId) return false;
+  return urlOrId.includes('/shorts/') || urlOrId.includes('shorts=true');
 }
 
 /**

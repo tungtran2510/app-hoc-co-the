@@ -41,11 +41,8 @@ interface ChatMessage {
 
 const QUICK_PROMPTS = [
   'Thoát vị đĩa đệm có tập xà đơn được không?',
-  'Đau thắt lưng lan xuống chân thì nên học bài nào?',
   'Bài tập giảm đau mỏi cổ vai gáy cho dân văn phòng?',
-  'Bị thoái hóa khớp gối có nên đi bộ không?',
   'Chế độ dinh dưỡng phục hồi sụn khớp và đĩa đệm?',
-  'Tư thế ngủ đúng giúp bảo vệ cột sống?',
 ];
 
 // Hàm format text markdown đơn giản (bold, bullet) siêu gọn gàng
@@ -128,7 +125,24 @@ export default function AiAssistantPage() {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setMessages(parsed);
+          const sanitized = parsed.map((m: any) => {
+            if (m.role === 'assistant' && typeof m.text === 'string') {
+              let cleaned = m.text
+                .replace(/(?:tác giả\s+)?(?:tùng\s+)?(?:dinh dưỡng\s+)?(?:không phải|chưa phải)(?:\s+là)?\s+bác sĩ[.,;:\-—–]?\s*/gi, '')
+                .replace(/tôi không phải(?:\s+là)?\s+bác sĩ[.,;:\-—–]?\s*/gi, '')
+                .replace(/\bkhông phải bác sĩ\b/gi, '')
+                .trim();
+              if (cleaned.length > 0) {
+                cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+              }
+              return {
+                ...m,
+                text: cleaned,
+              };
+            }
+            return m;
+          });
+          setMessages(sanitized);
         }
       }
     } catch {
@@ -194,10 +208,19 @@ export default function AiAssistantPage() {
 
       const data = await res.json();
 
+      let cleanAnswer = (data.answer || 'Xin lỗi bạn, mình chưa thể xử lý câu trả lời lúc này.')
+        .replace(/(?:tác giả\s+)?(?:tùng\s+)?(?:dinh dưỡng\s+)?(?:không phải|chưa phải)(?:\s+là)?\s+bác sĩ[.,;:\-—–]?\s*/gi, '')
+        .replace(/tôi không phải(?:\s+là)?\s+bác sĩ[.,;:\-—–]?\s*/gi, '')
+        .replace(/\bkhông phải bác sĩ\b/gi, '')
+        .trim();
+      if (cleanAnswer.length > 0) {
+        cleanAnswer = cleanAnswer.charAt(0).toUpperCase() + cleanAnswer.slice(1);
+      }
+
       const aiMsg: ChatMessage = {
         id: `ai-${Date.now()}`,
         role: 'assistant',
-        text: data.answer || 'Xin lỗi bạn, mình chưa thể xử lý câu trả lời lúc này.',
+        text: cleanAnswer || data.answer,
         suggested_pages: data.suggested_pages || [],
         follow_up_questions: data.follow_up_questions || [],
         timestamp: Date.now(),
@@ -314,40 +337,42 @@ export default function AiAssistantPage() {
             {/* Thẻ giới thiệu Trợ lý */}
             <div className="p-3.5 sm:p-4 rounded-[18px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 shadow-xs flex flex-col gap-2">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-[10px] bg-[#1E3A8A] text-white flex items-center justify-center shrink-0 shadow-2xs">
-                  <Bot size={20} />
+                {/* Logo Trợ lý AI y khoa chuyên nghiệp viền sapphire phát sáng nhẹ */}
+                <div className="relative w-10 h-10 rounded-[12px] bg-gradient-to-br from-[#1E3A8A] via-[#2563EB] to-[#0EA5E9] text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-900/20 ring-2 ring-blue-400/30">
+                  <Sparkles size={20} className="text-amber-300 drop-shadow-xs" />
+                  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-white dark:ring-[#160D30]" />
                 </div>
                 <div className="min-w-0">
                   <h2 className="text-[14.5px] sm:text-[15.5px] font-extrabold text-slate-900 dark:text-white leading-snug">
-                    Xin chào! Bạn cần tìm hiểu gì hôm nay?
+                    Trợ lý Sức Khỏe AI đồng hành 24/7
                   </h2>
                   <p className="text-[11.5px] text-slate-500 dark:text-purple-300/70 truncate">
-                    Trợ lý Sức Khỏe AI đồng hành 24/7
+                    Hỏi đáp giải phẫu, cơ xương khớp & vận động khoa học
                   </p>
                 </div>
               </div>
 
-              <p className="text-[12.5px] text-slate-700 dark:text-purple-100/90 leading-snug pt-1 border-t border-slate-100 dark:border-purple-800/30">
-                Hỏi về cấu trúc cơ thể, thói quen sinh hoạt đúng, bài tập an toàn hoặc tìm kiếm bài học hướng dẫn trong ứng dụng!
+              <p className="text-[12.5px] text-slate-600 dark:text-purple-100/90 leading-snug pt-1 border-t border-slate-100 dark:border-purple-800/30">
+                Tra cứu nhanh cấu trúc cơ thể, thói quen sinh hoạt đúng, bài tập an toàn hoặc tìm bài học trong ứng dụng!
               </p>
             </div>
 
-            {/* Gợi ý câu hỏi nhanh */}
+            {/* Gợi ý câu hỏi nhanh súc tích, thân thiện (chỉ 3 câu ngắn gọn) */}
             <div className="flex flex-col gap-1.5">
               <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-purple-300/70 px-1 flex items-center gap-1.5">
-                <HelpCircle size={13} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
-                <span>Câu hỏi thường gặp (Chạm để hỏi ngay):</span>
+                <Sparkles size={12} className="text-amber-500" />
+                <span>Câu hỏi gợi ý (chạm để hỏi ngay):</span>
               </span>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+              <div className="flex flex-col gap-1.5">
                 {QUICK_PROMPTS.map((prompt, idx) => (
                   <button
                     key={idx}
                     type="button"
                     onClick={() => handleSendMessage(prompt)}
-                    className="text-left p-2.5 rounded-[12px] bg-white dark:bg-[#160D30] hover:bg-blue-50/60 dark:hover:bg-purple-900/40 border border-slate-200 dark:border-purple-900/50 hover:border-[#1E3A8A]/50 text-[12.5px] font-bold text-slate-800 dark:text-white leading-snug transition-all cursor-pointer shadow-2xs group flex items-center justify-between gap-2"
+                    className="text-left px-3.5 py-2.5 rounded-[13px] bg-white dark:bg-[#160D30] hover:bg-blue-50/70 dark:hover:bg-purple-900/40 border border-slate-200/90 dark:border-purple-800/40 hover:border-[#1E3A8A]/40 text-[12.5px] font-bold text-slate-800 dark:text-white leading-snug transition-all cursor-pointer shadow-2xs group flex items-center justify-between gap-2 active:scale-[0.99]"
                   >
-                    <span className="line-clamp-1">{prompt}</span>
+                    <span className="truncate">{prompt}</span>
                     <ChevronRight size={14} className="text-slate-400 group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] shrink-0 transition-transform group-hover:translate-x-0.5" />
                   </button>
                 ))}
@@ -381,8 +406,8 @@ export default function AiAssistantPage() {
                         {/* Mini Header AI */}
                         <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-100 dark:border-purple-800/30 text-[11px] font-extrabold text-[#1E3A8A] dark:text-[#93C5FD]">
                           <div className="flex items-center gap-1.5">
-                            <span className="w-4 h-4 rounded-full bg-[#1E3A8A] text-white flex items-center justify-center shrink-0">
-                              <Bot size={10} />
+                            <span className="w-4.5 h-4.5 rounded-[5px] bg-gradient-to-br from-[#1E3A8A] to-[#2563EB] text-white flex items-center justify-center shrink-0 shadow-2xs">
+                              <Sparkles size={10} className="text-amber-300" />
                             </span>
                             <span className="tracking-wide uppercase text-[10.5px]">Trợ lý Sức Khỏe AI</span>
                           </div>
@@ -391,52 +416,77 @@ export default function AiAssistantPage() {
 
                         {/* Nội dung trả lời */}
                         <div>{renderFormattedText(msg.text)}</div>
+
+                        {/* Dòng lưu ý y khoa siêu ngắn gọn, khuất tầm nhìn, đúng 1-2 dòng */}
+                        <div className="mt-1.5 pt-1 border-t border-slate-100/60 dark:border-purple-800/20 flex items-center gap-1 text-[9.5px] sm:text-[10px] text-slate-400/80 dark:text-purple-300/50 italic">
+                          <span className="shrink-0 not-italic text-[9px] opacity-70">⚕️</span>
+                          <span className="line-clamp-2 leading-tight">
+                            * Thông tin tham khảo, không thay thế chẩn đoán y khoa.
+                          </span>
+                        </div>
                       </div>
                     )}
                   </div>
 
-                  {/* THẺ BÀI HỌC GỢI Ý ĐI KÈM CỦA AI (THIẾT KẾ DÒNG NGANG SIÊU GỌN GÀNG) */}
+                  {/* THẺ BÀI HỌC GỢI Ý ĐI KÈM CỦA AI (CÓ ĐỦ LOGO CHUYÊN ĐỀ & FONT RÕ RÀNG) */}
                   {!isUser && msg.suggested_pages && msg.suggested_pages.length > 0 && (
-                    <div className="w-full max-w-[94%] sm:max-w-[88%] flex flex-col gap-1.5 mt-0.5">
-                      <div className="flex items-center gap-1.5 px-0.5 text-[10.5px] font-black text-primary uppercase tracking-wider">
-                        <BookOpen size={12} />
+                    <div className="w-full max-w-[96%] sm:max-w-[90%] flex flex-col gap-1.5 mt-1">
+                      <div className="flex items-center gap-1.5 px-0.5 text-[11px] font-black text-[#1E3A8A] dark:text-[#93C5FD] uppercase tracking-wider">
+                        <BookOpen size={13} strokeWidth={2.5} />
                         <span>Bài học đề xuất nên xem:</span>
                       </div>
 
-                      <div className="flex flex-col gap-1.5">
+                      <div className="flex flex-col gap-2">
                         {msg.suggested_pages.map((sp, sIdx) => {
                           const cleanPageSlug = sp.page_slug
                             .replace(new RegExp(`^${sp.topic_slug}/`), '')
                             .replace(/^\//, '');
                           const lessonUrl = `/${sp.topic_slug}/${cleanPageSlug}`;
+                          const topicIcon = `/images/topics/${sp.topic_slug}.png`;
 
                           return (
                             <Link
                               key={sIdx}
                               href={lessonUrl}
-                              className="group flex items-center gap-2.5 p-2 rounded-[12px] bg-white hover:bg-blue-50/50 dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 hover:border-[#1E3A8A]/50 shadow-2xs hover:shadow-xs transition-all cursor-pointer"
+                              className="group flex items-center gap-3 p-2.5 rounded-[15px] bg-white hover:bg-blue-50/60 dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-800/40 hover:border-[#1E3A8A]/50 dark:hover:border-[#F8DF7B]/60 shadow-xs hover:shadow-md transition-all cursor-pointer"
                             >
-                              <div className="w-7 h-7 rounded-[7px] bg-[#1E3A8A] text-white flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                                <BookOpen size={13} />
+                              {/* Logo Chuyên đề 3D đầy đủ */}
+                              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-[11px] bg-slate-50 dark:bg-purple-950/70 border border-slate-200 dark:border-purple-800/50 p-1 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform overflow-hidden">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={topicIcon}
+                                  alt={sp.topic_title}
+                                  className="w-full h-full object-contain"
+                                  onError={(e) => {
+                                    (e.target as HTMLElement).style.display = 'none';
+                                    const fallback = (e.target as HTMLElement).nextElementSibling as HTMLElement;
+                                    if (fallback) fallback.style.display = 'flex';
+                                  }}
+                                />
+                                <div className="hidden w-full h-full items-center justify-center text-[#1E3A8A] dark:text-[#93C5FD]">
+                                  <BookOpen size={16} />
+                                </div>
                               </div>
 
+                              {/* Tiêu đề & Thông tin bài học (Font to rõ ràng) */}
                               <div className="flex-1 min-w-0">
-                                <div className="text-[9.5px] font-extrabold uppercase text-[#1E3A8A] dark:text-[#93C5FD] tracking-wider truncate">
+                                <div className="text-[10px] sm:text-[10.5px] font-black uppercase text-[#1E3A8A] dark:text-[#93C5FD] tracking-wider truncate">
                                   {sp.topic_title}
                                 </div>
-                                <h4 className="text-[12.5px] font-extrabold text-slate-900 dark:text-white leading-tight truncate group-hover:text-[#1E3A8A] transition-colors">
+                                <h4 className="text-[13.5px] sm:text-[14.5px] font-black text-slate-900 dark:text-white leading-snug truncate group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] transition-colors mt-0.5">
                                   {sp.title}
                                 </h4>
                                 {sp.reason && (
-                                  <p className="text-[11px] text-slate-500 dark:text-purple-300/70 leading-tight truncate mt-0.5">
+                                  <p className="text-[11.5px] text-slate-500 dark:text-purple-300/80 leading-tight truncate mt-0.5 font-medium">
                                     {sp.reason}
                                   </p>
                                 )}
                               </div>
 
-                              <div className="shrink-0 flex items-center gap-0.5 text-[10px] font-extrabold text-[#1E3A8A] bg-blue-50 group-hover:bg-[#1E3A8A] group-hover:text-white px-2 py-1 rounded-[6px] transition-colors whitespace-nowrap">
+                              {/* Nút hành động */}
+                              <div className="shrink-0 flex items-center gap-1 text-[11px] sm:text-[11.5px] font-black text-[#1E3A8A] bg-blue-50 group-hover:bg-[#1E3A8A] group-hover:text-white dark:bg-purple-950/80 dark:text-[#F8DF7B] dark:group-hover:bg-[#F8DF7B] dark:group-hover:text-slate-900 px-2.5 py-1.5 rounded-[8px] border border-blue-200/60 dark:border-purple-800/50 transition-colors whitespace-nowrap shadow-2xs">
                                 <span>Học ngay</span>
-                                <ChevronRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
+                                <ChevronRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
                               </div>
                             </Link>
                           );

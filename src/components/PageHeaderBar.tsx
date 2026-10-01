@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChevronLeft, Home, ListOrdered, MoreVertical, X, Lock, Check, Settings as SettingsIcon, Share2, Bookmark, Sun, Moon, Eye, Smartphone } from 'lucide-react';
+import { ChevronLeft, Home, ListOrdered, MoreVertical, X, Lock, Check, Settings as SettingsIcon, Share2, Bookmark, Sun, Moon, Eye, Smartphone, Volume2, VolumeX } from 'lucide-react';
+import { isSoundEnabled, setSoundEnabled, playTapSound } from '../lib/audioFeedback';
 
 export interface TocItem {
   id: string;
@@ -51,6 +52,154 @@ export default function PageHeaderBar({
   const pathname = usePathname();
   const [showToc, setShowToc] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
+  const [soundActive, setSoundActive] = useState(true);
+
+  React.useEffect(() => {
+    setSoundActive(isSoundEnabled());
+    const handleToggle = (e: any) => {
+      if (e?.detail?.enabled !== undefined) {
+        setSoundActive(e.detail.enabled);
+      }
+    };
+    window.addEventListener('qbiz_sound_toggle', handleToggle);
+    return () => window.removeEventListener('qbiz_sound_toggle', handleToggle);
+  }, []);
+
+  // Floating TOC Draggable & Position State
+  const [tocPos, setTocPos] = useState<{ x: number; y: number } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragInfoRef = React.useRef<{
+    startX: number;
+    startY: number;
+    elemX: number;
+    elemY: number;
+    moved: boolean;
+  }>({ startX: 0, startY: 0, elemX: 0, elemY: 0, moved: false });
+  const justDraggedRef = React.useRef(false);
+
+  // Khởi tạo vị trí: ưu tiên vị trí đã lưu trong localStorage, mặc định bên trái ở 2/3 góc dưới
+  React.useEffect(() => {
+    try {
+      const saved = localStorage.getItem('qbiz_toc_pos');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (typeof parsed.x === 'number' && typeof parsed.y === 'number') {
+          const clampedX = Math.max(12, Math.min(parsed.x, window.innerWidth - 56));
+          const clampedY = Math.max(60, Math.min(parsed.y, window.innerHeight - 70));
+          setTocPos({ x: clampedX, y: clampedY });
+          return;
+        }
+      }
+    } catch (e) {
+      // Bỏ qua lỗi localStorage
+    }
+
+    // Mặc định: Phía bên trái màn hình (12px), khoảng 2/3 góc dưới (khoảng 65% chiều cao)
+    const defaultX = 12;
+    const defaultY = Math.round(window.innerHeight * 0.65 - 24);
+    setTocPos({ x: defaultX, y: defaultY });
+  }, []);
+
+  // Đảm bảo nút luôn nằm trong màn hình khi xoay máy hoặc đổi kích thước cửa sổ
+  React.useEffect(() => {
+    const handleResize = () => {
+      setTocPos((prev) => {
+        if (!prev) return prev;
+        const clampedX = Math.max(12, Math.min(prev.x, window.innerWidth - 56));
+        const clampedY = Math.max(60, Math.min(prev.y, window.innerHeight - 70));
+        return { x: clampedX, y: clampedY };
+      });
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Xử lý kéo thả nút Mục lục (Hỗ trợ cả cảm ứng ngón tay Mobile & chuột Desktop)
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
+
+    const currentX = tocPos ? tocPos.x : 12;
+    const currentY = tocPos ? tocPos.y : Math.round(window.innerHeight * 0.65 - 24);
+
+    dragInfoRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      elemX: currentX,
+      elemY: currentY,
+      moved: false,
+    };
+
+    let latestX = currentX;
+    let latestY = currentY;
+
+    const handlePointerMove = (moveEvt: PointerEvent) => {
+      const dx = moveEvt.clientX - dragInfoRef.current.startX;
+      const dy = moveEvt.clientY - dragInfoRef.current.startY;
+
+      // Ngưỡng 14px loại trừ hoàn toàn vi rung ngón tay khi chạm, chỉ kích hoạt khi thực sự muốn kéo
+      if (!dragInfoRef.current.moved && Math.hypot(dx, dy) > 14) {
+        dragInfoRef.current.moved = true;
+        setIsDragging(true);
+      }
+
+      if (dragInfoRef.current.moved) {
+        const minX = 12;
+        const maxX = window.innerWidth - 56;
+        const minY = 60; // Tránh che thanh header
+        const maxY = window.innerHeight - 70; // Tránh che thanh điều hướng hoặc chạm đáy
+
+        latestX = Math.max(minX, Math.min(dragInfoRef.current.elemX + dx, maxX));
+        latestY = Math.max(minY, Math.min(dragInfoRef.current.elemY + dy, maxY));
+
+        setTocPos({ x: latestX, y: latestY });
+      }
+    };
+
+    const handlePointerUp = () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerUp);
+
+      if (dragInfoRef.current.moved) {
+        // Đã kéo thả: lưu vị trí và chặn click nhầm
+        setIsDragging(false);
+        justDraggedRef.current = true;
+        setTimeout(() => {
+          justDraggedRef.current = false;
+        }, 120);
+
+        // Hít nhẹ vào mép nếu thả gần lề
+        const minX = 12;
+        const maxX = window.innerWidth - 56;
+        let finalX = latestX;
+        if (latestX < 36) finalX = minX;
+        else if (latestX > maxX - 24) finalX = maxX;
+
+        const finalPos = { x: finalX, y: latestY };
+        setTocPos(finalPos);
+
+        try {
+          localStorage.setItem('qbiz_toc_pos', JSON.stringify(finalPos));
+        } catch (err) {}
+      } else {
+        setIsDragging(false);
+      }
+    };
+
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
+  };
+
+  // Mở/đóng mục lục khi người dùng chạm hoặc click (chuẩn native, 100% không trượt phát nào)
+  const handleButtonClick = () => {
+    if (justDraggedRef.current || dragInfoRef.current.moved) {
+      return;
+    }
+    playTapSound();
+    setShowToc((prev) => !prev);
+    setShowOptions(false);
+  };
 
   const handleScrollToBlock = (blockId: string) => {
     setShowToc(false);
@@ -134,41 +283,65 @@ export default function PageHeaderBar({
         </div>
       </div>
 
-      {/* 3. Nút Mục lục nổi góc dưới (Icon tròn tinh tế, không chữ cồng kềnh) */}
+      {/* 3. Nút Mục lục nổi thông minh (Bán trong suốt, có thể kéo thả di chuyển, mặc định bên trái ở 2/3 góc dưới) */}
       {tocItems.length > 0 && (
-        <div className="fixed bottom-6 right-4 sm:right-6 z-40" style={{ transform: 'translateZ(0)' }}>
-          <button
-            type="button"
-            onClick={() => {
-              setShowToc(!showToc);
-              setShowOptions(false);
-            }}
-            className="relative w-12 h-12 rounded-full bg-[#1E3A8A] hover:bg-[#172554] dark:bg-purple-900 dark:hover:bg-purple-800 text-white flex items-center justify-center shadow-[0_6px_20px_rgba(30,58,138,0.35)] active:scale-95 transition-all cursor-pointer border-2 border-white/40 group"
-            title="Mục lục bài học"
-            aria-label="Mở mục lục bài học"
-          >
-            <ListOrdered size={21} strokeWidth={2.3} className="group-hover:scale-110 transition-transform" />
-            <span className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 rounded-full bg-amber-400 text-slate-900 text-[10.5px] font-black flex items-center justify-center shadow-sm ring-2 ring-white dark:ring-[#160D30]">
+        <div
+          onPointerDown={handlePointerDown}
+          onClick={handleButtonClick}
+          className={`fixed z-40 select-none touch-none ${
+            isDragging
+              ? 'opacity-100 cursor-grabbing scale-110'
+              : 'opacity-65 hover:opacity-100 active:opacity-100 cursor-grab hover:scale-105 active:scale-95 transition-opacity transition-transform duration-200'
+          }`}
+          style={{
+            transform: 'translateZ(0)',
+            left: tocPos ? `${tocPos.x}px` : '12px',
+            top: tocPos ? `${tocPos.y}px` : 'calc(65% - 24px)',
+            transition: isDragging
+              ? 'none'
+              : 'left 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.25s ease, transform 0.2s ease',
+          }}
+          title="Mục lục bài học (Giữ để di chuyển)"
+          role="button"
+          tabIndex={0}
+          aria-label="Mở mục lục bài học"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleButtonClick();
+            }
+          }}
+        >
+          <div className="relative w-12 h-12 rounded-full bg-[#1E3A8A]/75 dark:bg-purple-900/75 backdrop-blur-md text-white flex items-center justify-center shadow-[0_6px_20px_rgba(0,0,0,0.28)] border-1.5 border-white/35 dark:border-purple-400/40 group">
+            <ListOrdered size={20} strokeWidth={2.3} className="group-hover:scale-110 transition-transform" />
+            <span className="absolute -top-1 -right-1 min-w-[19px] h-[19px] px-1 rounded-full bg-amber-400/95 text-slate-900 text-[10px] font-black flex items-center justify-center shadow-xs ring-1.5 ring-white/60 dark:ring-[#160D30]">
               {tocItems.length}
             </span>
-          </button>
+          </div>
         </div>
       )}
 
-      {/* 4. Bảng Mục lục dạng Bottom Sheet trượt lên khi bấm nút nổi */}
+      {/* 4. Pop-up Mục lục nổi (Gọn gàng, nhảy popup giữa màn hình, không tràn viền ngang) */}
       {showToc && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4 animate-in fade-in duration-150">
-          <div className="w-full max-w-[480px] bg-white dark:bg-[#160D30] rounded-t-[24px] sm:rounded-[24px] p-4 flex flex-col gap-2 shadow-2xl animate-in slide-in-from-bottom duration-200 border border-slate-200 dark:border-purple-900/60">
+        <div
+          onClick={() => setShowToc(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-[340px] bg-white dark:bg-[#160D30] rounded-[24px] p-4 flex flex-col gap-2.5 shadow-[0_20px_50px_rgba(0,0,0,0.35)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.8)] border border-slate-200 dark:border-purple-900/60 animate-in zoom-in-95 duration-150"
+          >
+            {/* Header popup */}
             <div className="flex items-center justify-between pb-2.5 border-b border-line dark:border-purple-900/50">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-[10px] bg-primary-soft dark:bg-purple-900/60 text-primary dark:text-[#F8DF7B] flex items-center justify-center">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-[10px] bg-[#1E3A8A]/10 dark:bg-purple-900/60 text-[#1E3A8A] dark:text-[#F8DF7B] flex items-center justify-center">
                   <ListOrdered size={18} strokeWidth={2.5} />
                 </div>
                 <div>
-                  <h3 className="text-[16px] font-extrabold text-ink dark:text-white leading-tight">
+                  <h3 className="text-[15px] font-extrabold text-ink dark:text-white leading-tight">
                     MỤC LỤC BÀI HỌC
                   </h3>
-                  <span className="text-[12px] text-muted font-medium">
+                  <span className="text-[11.5px] text-muted font-semibold">
                     {tocItems.length} phần nội dung
                   </span>
                 </div>
@@ -176,20 +349,21 @@ export default function PageHeaderBar({
               <button
                 type="button"
                 onClick={() => setShowToc(false)}
-                className="w-8 h-8 rounded-full bg-surface-2 dark:bg-purple-950/60 flex items-center justify-center text-muted hover:text-ink dark:text-purple-300 dark:hover:text-white cursor-pointer"
+                className="w-8 h-8 rounded-full bg-surface-2 dark:bg-purple-950/60 flex items-center justify-center text-muted hover:text-ink dark:text-purple-300 dark:hover:text-white cursor-pointer active:scale-95 transition-all"
                 aria-label="Đóng mục lục"
               >
-                <X size={18} />
+                <X size={17} />
               </button>
             </div>
 
-            <div className="max-h-[380px] overflow-y-auto flex flex-col divide-y divide-line dark:divide-purple-900/40 py-1">
+            {/* Danh sách các phần mục lục */}
+            <div className="max-h-[340px] overflow-y-auto flex flex-col divide-y divide-line dark:divide-purple-900/40 py-0.5 pr-0.5">
               {tocItems.map((item, idx) => (
                 <button
                   key={item.id}
                   type="button"
                   onClick={() => handleScrollToBlock(item.id)}
-                  className="w-full flex items-center justify-between h-[48px] px-2.5 rounded-[12px] text-left text-[15px] font-bold text-ink dark:text-white hover:bg-blue-50 dark:hover:bg-purple-900/40 hover:text-primary dark:hover:text-[#F8DF7B] transition-colors cursor-pointer group"
+                  className="w-full flex items-center justify-between min-h-[44px] py-2 px-2 rounded-[12px] text-left text-[14px] font-bold text-ink dark:text-white hover:bg-blue-50 dark:hover:bg-purple-900/40 hover:text-[#1E3A8A] dark:hover:text-[#F8DF7B] active:scale-[0.98] transition-all cursor-pointer group"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <span className="w-5 h-5 rounded-full bg-surface-2 dark:bg-purple-950 group-hover:bg-[#1E3A8A] group-hover:text-white text-muted dark:text-purple-300 text-[11px] font-extrabold flex items-center justify-center shrink-0 transition-colors">
@@ -197,7 +371,7 @@ export default function PageHeaderBar({
                     </span>
                     <span className="truncate">{item.label}</span>
                   </div>
-                  <span className="text-muted/60 dark:text-purple-400/60 text-[14px] shrink-0 ml-2 group-hover:text-primary dark:group-hover:text-[#F8DF7B] transition-colors">›</span>
+                  <span className="text-muted/60 dark:text-purple-400/60 text-[15px] font-bold shrink-0 ml-2 group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] transition-colors">›</span>
                 </button>
               ))}
             </div>
@@ -230,8 +404,11 @@ export default function PageHeaderBar({
             <div className="grid grid-cols-3 gap-1.5">
               <button
                 type="button"
-                onClick={() => onFontSizeChange('small')}
-                className={`h-[44px] rounded-[12px] font-extrabold text-[14px] transition-all ${
+                onClick={() => {
+                  playTapSound();
+                  onFontSizeChange('small');
+                }}
+                className={`h-[44px] rounded-[12px] font-extrabold text-[14px] transition-all cursor-pointer ${
                   fontSizeMode === 'small'
                     ? 'bg-primary-soft border-2 border-primary text-primary'
                     : 'bg-surface-2 border border-line-strong text-ink hover:bg-line/40'
@@ -241,8 +418,11 @@ export default function PageHeaderBar({
               </button>
               <button
                 type="button"
-                onClick={() => onFontSizeChange('normal')}
-                className={`h-[44px] rounded-[12px] font-extrabold text-[15px] transition-all ${
+                onClick={() => {
+                  playTapSound();
+                  onFontSizeChange('normal');
+                }}
+                className={`h-[44px] rounded-[12px] font-extrabold text-[15px] transition-all cursor-pointer ${
                   fontSizeMode === 'normal'
                     ? 'bg-primary-soft border-2 border-primary text-primary'
                     : 'bg-surface-2 border border-line-strong text-ink hover:bg-line/40'
@@ -252,8 +432,11 @@ export default function PageHeaderBar({
               </button>
               <button
                 type="button"
-                onClick={() => onFontSizeChange('large')}
-                className={`h-[44px] rounded-[12px] font-extrabold text-[16px] transition-all ${
+                onClick={() => {
+                  playTapSound();
+                  onFontSizeChange('large');
+                }}
+                className={`h-[44px] rounded-[12px] font-extrabold text-[16px] transition-all cursor-pointer ${
                   fontSizeMode === 'large'
                     ? 'bg-primary-soft border-2 border-primary text-primary'
                     : 'bg-surface-2 border border-line-strong text-ink hover:bg-line/40'
@@ -264,7 +447,7 @@ export default function PageHeaderBar({
             </div>
           </div>
 
-          {/* Giao diện: Sáng / Xám dịu / Tối */}
+          {/* Giao diện: Sáng / Tối */}
           <div className="flex flex-col gap-2 pt-2 border-t border-line">
             <span className="text-[13px] font-bold text-muted uppercase tracking-wider">
               Nền giao diện
@@ -272,7 +455,10 @@ export default function PageHeaderBar({
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
-                onClick={() => onThemeChange && onThemeChange('light')}
+                onClick={() => {
+                  playTapSound();
+                  if (onThemeChange) onThemeChange('light');
+                }}
                 className={`h-[42px] rounded-[12px] font-bold text-[13.5px] flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                   themeMode === 'light'
                     ? 'bg-primary text-white font-extrabold shadow-xs'
@@ -284,7 +470,10 @@ export default function PageHeaderBar({
               </button>
               <button
                 type="button"
-                onClick={() => onThemeChange && onThemeChange('dark')}
+                onClick={() => {
+                  playTapSound();
+                  if (onThemeChange) onThemeChange('dark');
+                }}
                 className={`h-[42px] rounded-[12px] font-bold text-[13.5px] flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                   themeMode === 'dark'
                     ? 'bg-primary text-white font-extrabold shadow-xs'
@@ -295,6 +484,38 @@ export default function PageHeaderBar({
                 <span>Nền Tối</span>
               </button>
             </div>
+          </div>
+
+          {/* Âm thanh tương tác vi mô: Bật / Tắt */}
+          <div className="flex flex-col gap-1.5 pt-2 border-t border-line">
+            <button
+              type="button"
+              onClick={() => {
+                const nextState = !soundActive;
+                setSoundActive(nextState);
+                setSoundEnabled(nextState);
+                if (nextState) playTapSound();
+              }}
+              className="flex items-center justify-between h-[44px] px-3 rounded-[12px] bg-surface-2 border border-line-strong text-ink font-bold text-[13.5px] hover:bg-line/30 transition-all cursor-pointer"
+            >
+              <div className="flex items-center gap-2">
+                {soundActive ? (
+                  <Volume2 size={17} className="text-emerald-600 dark:text-emerald-400 stroke-[2.3]" />
+                ) : (
+                  <VolumeX size={17} className="text-slate-400 dark:text-slate-500 stroke-[2.3]" />
+                )}
+                <span>Âm thanh tương tác</span>
+              </div>
+              <span
+                className={`text-[11px] font-black px-2 py-0.5 rounded-full ${
+                  soundActive
+                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300'
+                    : 'bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
+                }`}
+              >
+                {soundActive ? 'BẬT' : 'TẮT'}
+              </span>
+            </button>
           </div>
 
           {/* Chia sẻ trang này */}

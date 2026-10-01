@@ -216,9 +216,13 @@ export default function EditRecommendedBooksModal({
         cover_url: b.cover_url || null,
         description: (b.description || '').trim(),
         author: (b.author || '').trim() || null,
+        category: (b.category || b.tag || '').trim() || null,
+        badge_tag: (b.badge_tag || '').trim() || null,
+        tag: (b.tag || b.category || '').trim() || null,
         link_url: (b.link_url || '').trim() || null,
         youtube_url: (b.youtube_url || '').trim() || null,
         gallery_images: Array.isArray(b.gallery_images) ? b.gallery_images.filter(Boolean) : [],
+        is_visible: b.is_visible !== undefined ? Boolean(b.is_visible) : true,
       }));
 
       const res = await saveSettingsApi({
@@ -490,6 +494,35 @@ export default function EditRecommendedBooksModal({
                             className="w-full h-9 px-3 rounded-[10px] bg-surface border border-line text-[13.5px] font-bold text-ink focus:border-primary focus:outline-hidden"
                             required
                           />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="block text-[12px] font-bold text-ink mb-1">
+                              Đầu mục / Thể loại
+                            </label>
+                            <input
+                              type="text"
+                              value={book.category || book.tag || ''}
+                              onChange={(e) => handleUpdateBook(book.id, { category: e.target.value, tag: e.target.value })}
+                              placeholder="Ví dụ: Cột sống, Dinh dưỡng..."
+                              className="w-full h-8 px-2.5 rounded-[9px] bg-surface border border-line text-[12.5px] text-ink focus:border-primary focus:outline-hidden"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-[12px] font-bold text-ink mb-1 flex items-center gap-1">
+                              <Sparkles size={11} className="text-amber-500" />
+                              <span>Thẻ Flash bìa</span>
+                            </label>
+                            <input
+                              type="text"
+                              value={book.badge_tag || ''}
+                              onChange={(e) => handleUpdateBook(book.id, { badge_tag: e.target.value })}
+                              placeholder="Ví dụ: NÊN ĐỌC, KHUYÊN ĐỌC..."
+                              className="w-full h-8 px-2.5 rounded-[9px] bg-surface border border-line text-[12.5px] text-ink focus:border-primary focus:outline-hidden font-bold"
+                            />
+                          </div>
                         </div>
 
                         <div>

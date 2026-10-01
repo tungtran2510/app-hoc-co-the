@@ -8,6 +8,7 @@ export interface AuthorBook {
   year?: string;
   youtube_url?: string | null;
   gallery_images?: string[];
+  is_visible?: boolean;
 }
 
 export interface AuthorProfile {
@@ -31,6 +32,8 @@ export interface AuthorProfile {
 export interface RecommendedBook {
   id: string;
   title: string;
+  category?: string | null;
+  badge_tag?: string | null;
   cover_url: string | null;
   description: string;
   author?: string | null;
@@ -39,6 +42,7 @@ export interface RecommendedBook {
   color_theme?: string | null;
   youtube_url?: string | null;
   gallery_images?: string[];
+  is_visible?: boolean;
 }
 
 export interface AiKnowledgeDoc {
@@ -82,7 +86,11 @@ export interface Settings {
   recommended_books?: RecommendedBook[];
   recommended_books_layout?: 'grid' | 'lookbook' | null;
   home_sections_order?: string[] | null;
+  hidden_home_sections?: string[] | null;
   ai_training?: AiTrainingConfig | null;
+  welcome_title?: string | null;
+  welcome_message?: string | null;
+  welcome_video_url?: string | null;
 }
 
 export interface Topic {
@@ -127,6 +135,8 @@ export interface Video {
   description?: string;
   duration_text?: string;
   thumbnail_url?: string;
+  is_vertical?: boolean;
+  aspect_ratio?: 'horizontal' | 'vertical' | '9:16' | '16:9';
 }
 
 export interface FileItem {

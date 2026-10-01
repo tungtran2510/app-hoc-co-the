@@ -1,22 +1,39 @@
 import type { Metadata, Viewport } from 'next';
-import { Be_Vietnam_Pro } from 'next/font/google';
+import { Be_Vietnam_Pro, Lora } from 'next/font/google';
 import './globals.css';
 import PwaRegistrar from '../components/PwaRegistrar';
 
 const beVietnamPro = Be_Vietnam_Pro({
-  weight: ['400', '500', '600', '700', '800'],
+  weight: ['400', '500', '600', '700', '800', '900'],
   subsets: ['vietnamese', 'latin'],
   variable: '--font-be-vietnam-pro',
   display: 'swap',
 });
 
+const lora = Lora({
+  weight: ['400', '500', '600', '700'],
+  subsets: ['vietnamese', 'latin'],
+  variable: '--font-lora',
+  display: 'swap',
+});
+
 export const metadata: Metadata = {
-  title: 'Học Cơ Thể - Hiểu Về Cơ Thể',
-  description: 'Ứng dụng học hiểu kiến thức về cơ thể theo lộ trình',
+  title: 'Qbiz Books · Tủ Sách Y Khoa & Khám Phá Cơ Thể',
+  description: 'Ứng dụng học hiểu kiến thức về cơ thể theo lộ trình tương tác',
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Học Cơ Thể',
+    title: 'Qbiz Books',
   },
 };
 
@@ -37,7 +54,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi" className={beVietnamPro.variable}>
+    <html lang="vi" className={`${beVietnamPro.variable} ${lora.variable} ${beVietnamPro.className}`}>
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -45,7 +62,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="bg-bg text-ink min-h-screen flex justify-center selection:bg-primary-soft selection:text-primary-dark">
+      <body className={`${beVietnamPro.className} bg-bg text-ink min-h-screen flex justify-center selection:bg-primary-soft selection:text-primary-dark`}>
         <PwaRegistrar />
         <div className="w-full max-w-[480px] min-h-screen bg-bg relative flex flex-col">
           {children}

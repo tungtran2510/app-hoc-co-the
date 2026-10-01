@@ -4,6 +4,13 @@ node_modules
 .env
 .env*.local
 .vercel
+
+# Temporary scratch and QA test files
+scratch/
+test_*.py
+test_*.mjs
+test_*.png
+verify_*.mjs
 *.tsbuildinfo
 *.log
 npm-debug.log*

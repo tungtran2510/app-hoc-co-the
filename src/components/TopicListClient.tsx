@@ -2,13 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Plus, Edit2, ArrowUp, ArrowDown, Eye, EyeOff, Trash2 } from 'lucide-react';
+import { Plus, Edit2, ArrowUp, ArrowDown, Eye, EyeOff, Trash2, Check, X } from 'lucide-react';
 import TopicCard from './TopicCard';
 import { Topic } from '../lib/types';
 import { checkIsAdminClient } from '../lib/adminAuth';
 import { saveTopicApi, deleteTopicApi } from '../lib/apiAdmin';
+import { saveSettingsApi } from '../lib/apiAdmin';
 import EditTopicModal from './admin/EditTopicModal';
 import SectionOrderControls from './admin/SectionOrderControls';
+import ScrollReveal from './ScrollReveal';
 
 interface TopicListClientProps {
   initialTopics: {
@@ -18,6 +20,8 @@ interface TopicListClientProps {
   initialTopicsTitle?: string | null;
   sectionIndex?: number;
   totalSections?: number;
+  isHidden?: boolean;
+  onToggleVisibility?: () => void;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
   onOpenReorderModal?: () => void;
@@ -28,12 +32,18 @@ export default function TopicListClient({
   initialTopicsTitle,
   sectionIndex,
   totalSections,
+  isHidden,
+  onToggleVisibility,
   onMoveUp,
   onMoveDown,
   onOpenReorderModal,
 }: TopicListClientProps) {
   const [topicsWithCounts, setTopicsWithCounts] = useState(initialTopics);
   const [topicsTitle, setTopicsTitle] = useState(
+    initialTopicsTitle && initialTopicsTitle !== 'Chọn chủ đề' ? initialTopicsTitle : 'Chuyên Đề Học'
+  );
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [titleDraft, setTitleDraft] = useState(
     initialTopicsTitle && initialTopicsTitle !== 'Chọn chủ đề' ? initialTopicsTitle : 'Chuyên Đề Học'
   );
   const [isAdmin, setIsAdmin] = useState(false);
@@ -129,12 +139,84 @@ export default function TopicListClient({
     });
   };
 
+  const handleSaveTitle = async () => {
+    const trimmed = titleDraft.trim() || 'Chuyên Đề Học';
+    setTopicsTitle(trimmed);
+    setIsEditingTitle(false);
+    await saveSettingsApi({ topics_title: trimmed });
+  };
+
   return (
-    <section className="flex flex-col gap-3">
+    <section className="flex flex-col gap-2 mt-1">
+      {/* KHỐI NÚT ĐIỀU KHIỂN DÀNH CHO ADMIN - ĐẶT TRÊN ĐẦU KHỐI (FULL-WIDTH ADMIN BAR) */}
+      {isAdmin && onMoveUp && onMoveDown && onOpenReorderModal && typeof sectionIndex === 'number' && typeof totalSections === 'number' && (
+        <SectionOrderControls
+          sectionTitle="CHUYÊN ĐỀ HỌC"
+          sectionIndex={sectionIndex}
+          totalSections={totalSections}
+          isHidden={isHidden}
+          onToggleVisibility={onToggleVisibility}
+          onMoveUp={onMoveUp}
+          onMoveDown={onMoveDown}
+          onOpenReorderModal={onOpenReorderModal}
+          onEdit={() => setIsCreating(true)}
+          editLabel="+ Thêm chuyên đề"
+        />
+      )}
+
+      {/* Hàng 1: Tiêu đề chuyên đề học + Xem tất cả */}
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-[19px] sm:text-[20px] font-black text-ink tracking-tight leading-tight">
-          {topicsTitle || 'Chuyên Đề Học'}
-        </h2>
+        {isAdmin && isEditingTitle ? (
+          <div className="flex items-center gap-1.5 flex-1 min-w-0">
+            <input
+              type="text"
+              value={titleDraft}
+              onChange={(e) => setTitleDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSaveTitle();
+                if (e.key === 'Escape') setIsEditingTitle(false);
+              }}
+              className="h-8 px-2.5 rounded-[8px] border border-primary bg-white dark:bg-[#1E1342] text-[15px] font-bold text-ink flex-1 min-w-0 shadow-2xs"
+              placeholder="Tên chuyên đề..."
+              autoFocus
+            />
+            <button
+              type="button"
+              onClick={handleSaveTitle}
+              className="w-8 h-8 rounded-[8px] bg-primary text-white flex items-center justify-center shrink-0 cursor-pointer shadow-xs"
+              title="Lưu tên chuyên đề"
+            >
+              <Check size={16} strokeWidth={2.5} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsEditingTitle(false)}
+              className="w-8 h-8 rounded-[8px] bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-white flex items-center justify-center shrink-0 cursor-pointer"
+              title="Hủy"
+            >
+              <X size={16} strokeWidth={2.5} />
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1.5 shrink-0">
+            <h2 className="text-[18px] sm:text-[19px] font-black text-ink tracking-tight leading-tight whitespace-nowrap">
+              {topicsTitle || 'Chuyên Đề Học'}
+            </h2>
+            {isAdmin && (
+              <button
+                type="button"
+                onClick={() => {
+                  setTitleDraft(topicsTitle || 'Chuyên Đề Học');
+                  setIsEditingTitle(true);
+                }}
+                className="p-1 rounded hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-primary transition-colors cursor-pointer shrink-0"
+                title="Sửa tiêu đề chuyên đề học"
+              >
+                <Edit2 size={13} />
+              </button>
+            )}
+          </div>
+        )}
 
         <div className="flex items-center gap-2 shrink-0">
           <Link
@@ -146,37 +228,28 @@ export default function TopicListClient({
             <span>Xem tất cả</span>
             <span className="text-[15px]">›</span>
           </Link>
-
-          {isAdmin && onMoveUp && onMoveDown && onOpenReorderModal && typeof sectionIndex === 'number' && typeof totalSections === 'number' && (
-            <SectionOrderControls
-              sectionIndex={sectionIndex}
-              totalSections={totalSections}
-              onMoveUp={onMoveUp}
-              onMoveDown={onMoveDown}
-              onOpenReorderModal={onOpenReorderModal}
-            />
-          )}
-
-          {isAdmin && (
-            <button
-              type="button"
-              onClick={() => setIsCreating(true)}
-              className="flex items-center gap-1.5 h-8 px-3 rounded-full bg-primary text-white font-bold text-[13px] shadow-xs hover:bg-primary-dark cursor-pointer transition-all"
-            >
-              <Plus size={15} strokeWidth={2.5} />
-              <span>Thêm chủ đề</span>
-            </button>
-          )}
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-3.5 mt-2">
+      {/* Hàng 2: Mô tả phụ */}
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-[12px] text-muted">
+          Hệ thống chuyên đề & bài học giải phẫu cơ thể
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 sm:gap-2.5 mt-1.5">
         {topicsWithCounts.map(({ topic, pageCount }, index) => {
           // Người xem bình thường không thấy chủ đề bị ẩn
           if (!topic.is_visible && !isAdmin) return null;
 
           return (
-            <div key={topic.id} className="relative flex flex-col group">
+            <ScrollReveal
+              key={topic.id}
+              animation="bubble-pop"
+              delay={Math.min(index * 60, 480)}
+              className="relative flex flex-col group"
+            >
               <div className="relative">
                 <TopicCard topic={topic} pageCount={pageCount} />
 
@@ -188,16 +261,16 @@ export default function TopicListClient({
                 )}
               </div>
 
-              {/* Thanh công cụ quản trị trên mỗi thẻ */}
+              {/* Thanh công cụ quản trị trên mỗi thẻ chuyên đề */}
               {isAdmin && (
-                <div className="flex items-center justify-between mt-1 px-1 py-1 rounded-[10px] bg-black/85 text-white text-[12px] font-bold">
+                <div className="flex items-center justify-between mt-1 px-1.5 py-1 rounded-[10px] bg-slate-900/80 dark:bg-[#1A103C]/95 border border-slate-300/30 dark:border-purple-700/60 text-white text-[11.5px] font-bold shadow-2xs backdrop-blur-xs">
                   <button
                     type="button"
                     onClick={() => setEditingTopic(topic)}
-                    className="p-1.5 rounded hover:bg-white/20 text-white flex items-center gap-1"
+                    className="flex items-center gap-1 h-6 px-2 rounded-[6px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[10.5px] uppercase tracking-wide cursor-pointer transition-transform active:scale-95 shadow-2xs"
                     title="Sửa chủ đề"
                   >
-                    <Edit2 size={13} />
+                    <Edit2 size={10} strokeWidth={2.5} />
                     <span>Sửa</span>
                   </button>
 
@@ -206,42 +279,40 @@ export default function TopicListClient({
                       type="button"
                       disabled={index === 0}
                       onClick={() => handleMove(index, 'up')}
-                      className="p-1 rounded hover:bg-white/20 disabled:opacity-30"
+                      className="w-6 h-6 rounded-[6px] flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/15 disabled:opacity-20 cursor-pointer active:scale-90"
                       title="Chuyển lên"
                     >
-                      <ArrowUp size={14} />
+                      <ArrowUp size={12} strokeWidth={2.5} />
                     </button>
                     <button
                       type="button"
                       disabled={index === topicsWithCounts.length - 1}
                       onClick={() => handleMove(index, 'down')}
-                      className="p-1 rounded hover:bg-white/20 disabled:opacity-30"
+                      className="w-6 h-6 rounded-[6px] flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/15 disabled:opacity-20 cursor-pointer active:scale-90"
                       title="Chuyển xuống"
                     >
-                      <ArrowDown size={14} />
+                      <ArrowDown size={12} strokeWidth={2.5} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleToggleVisible(index)}
+                      className="w-6 h-6 rounded-[6px] flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/15 cursor-pointer active:scale-90"
+                      title={topic.is_visible ? 'Ẩn chủ đề' : 'Hiện chủ đề'}
+                    >
+                      {topic.is_visible ? <Eye size={12} strokeWidth={2.2} /> : <EyeOff size={12} strokeWidth={2.5} className="text-amber-400" />}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(topic.id, topic.title)}
+                      className="w-6 h-6 rounded-[6px] flex items-center justify-center text-red-400 hover:text-white hover:bg-red-500/80 cursor-pointer active:scale-90"
+                      title="Xóa chủ đề"
+                    >
+                      <Trash2 size={12} strokeWidth={2.2} />
                     </button>
                   </div>
-
-                  <button
-                    type="button"
-                    onClick={() => handleToggleVisible(index)}
-                    className="p-1 rounded hover:bg-white/20"
-                    title={topic.is_visible ? 'Ẩn chủ đề' : 'Hiện chủ đề'}
-                  >
-                    {topic.is_visible ? <Eye size={14} /> : <EyeOff size={14} className="text-amber-400" />}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(topic.id, topic.title)}
-                    className="p-1 rounded hover:bg-red-500/80 text-red-300 hover:text-white"
-                    title="Xóa chủ đề"
-                  >
-                    <Trash2 size={13} />
-                  </button>
                 </div>
               )}
-            </div>
+            </ScrollReveal>
           );
         })}
       </div>

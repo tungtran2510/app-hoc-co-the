@@ -70,6 +70,7 @@ export default function EditAppModal({
       setErrorMsg(err.message || 'Lỗi khi tải ảnh logo.');
     } finally {
       setIsUploading(false);
+      if (e.target) e.target.value = '';
     }
   };
 

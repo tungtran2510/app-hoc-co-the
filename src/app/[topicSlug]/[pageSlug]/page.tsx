@@ -81,8 +81,11 @@ export default async function ContentPage({ params }: PageProps) {
     getPagesByTopic(topic.id),
   ]);
 
-  // Tìm trang kế tiếp trong cùng chủ đề
+  // Tìm trang trước và trang kế tiếp trong cùng chủ đề
   const currentIdx = allPages.findIndex((p) => p.id === page.id);
+  const prevPage = currentIdx > 0 ? allPages[currentIdx - 1] : null;
+  const prevPageIndex = prevPage ? currentIdx : null;
+
   const nextPage =
     currentIdx >= 0 && currentIdx + 1 < allPages.length
       ? allPages[currentIdx + 1]
@@ -100,6 +103,8 @@ export default async function ContentPage({ params }: PageProps) {
       pageIndex={pageIndex}
       totalPages={totalPages}
       blocks={blocks}
+      prevPage={prevPage}
+      prevPageIndex={prevPageIndex}
       nextPage={nextPage}
       nextPageIndex={nextPageIndex}
       defaultActiveVideoIndex={defaultActiveVideoIndex}

@@ -2,11 +2,53 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, Bookmark, Trash2, ChevronRight, BookOpen, Smartphone } from 'lucide-react';
+import {
+  ChevronLeft,
+  Bookmark,
+  Trash2,
+  ChevronRight,
+  BookOpen,
+  Smartphone,
+  Sparkles,
+  ArrowRight,
+  ShieldCheck,
+  Compass,
+} from 'lucide-react';
 import { getSavedPages, SavedPageInfo, toggleSavePage } from '../../lib/learningProgress';
 import { getUserPhone, syncUserProgress, LEARNING_PROGRESS_EVENT } from '../../lib/userSync';
 import UserSyncModal from '../../components/UserSyncModal';
 import BottomNav from '../../components/BottomNav';
+
+const quickExploreTopics = [
+  {
+    slug: 'cot-song',
+    title: 'Cột sống & Đĩa đệm',
+    badge: 'SPINE & BONE',
+    icon: '/images/topics/cot-song.png',
+    count: '6 bài học',
+  },
+  {
+    slug: 'dinh-duong',
+    title: 'Dinh dưỡng nền tảng',
+    badge: 'NUTRITION',
+    icon: '/images/topics/dinh-duong.png',
+    count: '4 bài học',
+  },
+  {
+    slug: 'co-the-nguoi',
+    title: 'Cơ thể người 3D',
+    badge: 'ANATOMY 3D',
+    icon: '/images/topics/co-the-nguoi.png',
+    count: 'Tổng quan',
+  },
+  {
+    slug: 'tieu-hoa',
+    title: 'Hệ tiêu hóa',
+    badge: 'DIGESTIVE',
+    icon: '/images/topics/tieu-hoa.png',
+    count: 'Chuyên đề',
+  },
+];
 
 export default function SavedPages() {
   const [savedList, setSavedList] = useState<SavedPageInfo[]>([]);
@@ -67,126 +109,219 @@ export default function SavedPages() {
   };
 
   return (
-    <main className="flex-1 flex flex-col px-5 pt-4 pb-28 gap-6">
-      {/* 1. Header */}
-      <header className="flex items-center justify-between h-[52px]">
+    <main className="flex-1 flex flex-col px-4 sm:px-5 pt-3 pb-28 gap-5 max-w-lg mx-auto w-full">
+      {/* 1. Header chuẩn iOS */}
+      <header className="flex items-center justify-between h-[48px]">
         <Link
           href="/"
-          className="flex items-center gap-1 text-primary text-[18px] font-bold min-h-[48px] pr-2 transition-opacity active:opacity-75"
+          className="inline-flex items-center gap-1 text-[#1E3A8A] dark:text-[#93C5FD] text-[16px] font-extrabold pr-2 transition-opacity active:opacity-75"
           aria-label="Quay lại trang chủ"
         >
-          <ChevronLeft size={24} strokeWidth={2.5} />
+          <ChevronLeft size={22} strokeWidth={2.5} />
           <span>Trang chủ</span>
         </Link>
+
         <div className="flex items-center gap-2">
-          {/* Nút nhỏ đồng bộ SĐT ở góc trên đầu */}
+          {/* Nút đồng bộ SĐT */}
           <button
             type="button"
             onClick={() => setShowPhoneSync(true)}
-            className="flex items-center gap-1.5 h-8 px-2.5 rounded-[10px] bg-white border border-line text-muted hover:text-primary text-[12px] font-bold shadow-2xs cursor-pointer active:scale-95 transition-all"
+            className="flex items-center gap-1.5 h-8 px-2.5 rounded-[10px] bg-white dark:bg-[#1E1342] border border-slate-200 dark:border-purple-800/40 text-slate-700 dark:text-purple-200 hover:text-[#1E3A8A] dark:hover:text-[#F8DF7B] text-[12px] font-bold shadow-2xs cursor-pointer active:scale-95 transition-all"
             title="Lưu & Đồng bộ qua Số điện thoại"
           >
-            <Smartphone size={14} />
+            <Smartphone size={13} />
             <span>{userPhone ? formatPhone(userPhone) : 'Đồng bộ SĐT'}</span>
             {userPhone && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />}
           </button>
 
-          <div className="flex items-center gap-1.5 ml-1">
-            <Bookmark size={20} className="text-primary fill-primary" />
-            <span className="text-[17px] font-extrabold text-ink">Đã lưu</span>
+          <div className="flex items-center gap-1.5 ml-0.5 px-2.5 py-1 rounded-[10px] bg-blue-50 dark:bg-purple-950/60 border border-blue-200/60 dark:border-purple-800/40">
+            <Bookmark size={15} className="text-[#1E3A8A] dark:text-[#F8DF7B] fill-current" />
+            <span className="text-[13px] font-black text-[#1E3A8A] dark:text-[#F8DF7B]">Đã lưu</span>
           </div>
         </div>
       </header>
 
-      {/* 2. Tiêu đề */}
-      <section className="flex flex-col gap-1">
-        <h1 className="text-[28px] font-extrabold text-ink leading-[1.2]">
+      {/* 2. Tiêu đề trang trọng */}
+      <section className="flex flex-col gap-1.5 pt-1">
+        <div className="inline-flex items-center gap-1.5 text-amber-600 dark:text-[#F8DF7B] text-[11px] font-black tracking-wider uppercase">
+          <Sparkles size={13} />
+          <span>TỦ BÀI HỌC CÁ NHÂN</span>
+        </div>
+        <h1 className="text-[24px] sm:text-[26px] font-black text-slate-900 dark:text-white leading-tight">
           Bài học đã lưu
         </h1>
-        <p className="text-[15px] text-muted">
+        <p className="text-[13px] sm:text-[13.5px] text-slate-600 dark:text-purple-200/80 leading-relaxed font-normal">
           {savedList.length > 0
-            ? `${savedList.length} bài học bạn đã đánh dấu để xem lại`
-            : 'Lưu các bài học quan trọng để mở xem lại nhanh'}
+            ? `${savedList.length} bài học bạn đã đánh dấu để ôn tập & tra cứu nhanh`
+            : 'Đánh dấu các bài học quan trọng để mở xem lại bất cứ khi nào bạn cần'}
         </p>
       </section>
 
-      {/* 3. Danh sách bài đã lưu */}
+      {/* 3. Dải thông tin tiện ích (Mini Stats Bar) */}
+      {savedList.length > 0 && (
+        <div className="grid grid-cols-3 gap-2 p-2.5 rounded-[16px] bg-slate-50 dark:bg-[#160D30] border border-slate-200/80 dark:border-purple-800/40 text-center">
+          <div className="flex flex-col items-center justify-center py-1">
+            <span className="text-[10px] font-bold text-slate-500 dark:text-purple-300 uppercase tracking-wide">Số lượng</span>
+            <span className="text-[14px] font-black text-[#1E3A8A] dark:text-[#F8DF7B] mt-0.5">{savedList.length} bài</span>
+          </div>
+          <div className="flex flex-col items-center justify-center py-1 border-x border-slate-200 dark:border-purple-800/40">
+            <span className="text-[10px] font-bold text-slate-500 dark:text-purple-300 uppercase tracking-wide">Truy cập</span>
+            <span className="text-[14px] font-black text-emerald-600 dark:text-emerald-400 mt-0.5">1 Chạm</span>
+          </div>
+          <div className="flex flex-col items-center justify-center py-1">
+            <span className="text-[10px] font-bold text-slate-500 dark:text-purple-300 uppercase tracking-wide">Thiết bị</span>
+            <span className="text-[14px] font-black text-slate-800 dark:text-white mt-0.5">
+              {userPhone ? 'Đã đồng bộ' : 'Bộ nhớ máy'}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* 4. Danh sách bài học đã lưu (Giao diện thẻ Chuyên nghiệp) */}
       {isLoading ? (
-        <div className="p-8 text-center bg-white rounded-[22px] border border-line">
-          <p className="text-[16px] text-muted font-medium">Đang tải...</p>
+        <div className="p-8 text-center bg-white dark:bg-[#160D30] rounded-[22px] border border-slate-200 dark:border-purple-800/40">
+          <p className="text-[14px] text-slate-500 dark:text-purple-300 font-medium">Đang tải dữ liệu bài học...</p>
         </div>
       ) : savedList.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-8 bg-white rounded-[24px] border border-line text-center gap-4 my-2 shadow-2xs">
-          <div className="w-16 h-16 rounded-[20px] bg-primary-soft text-primary flex items-center justify-center">
-            <Bookmark size={30} strokeWidth={2} />
+        <div className="flex flex-col items-center justify-center p-7 bg-white dark:bg-[#160D30] rounded-[24px] border border-slate-200/80 dark:border-purple-800/40 text-center gap-3.5 my-1 shadow-xs">
+          <div className="w-14 h-14 rounded-[18px] bg-blue-50 dark:bg-purple-950/80 text-[#1E3A8A] dark:text-[#F8DF7B] flex items-center justify-center shadow-inner-xs">
+            <Bookmark size={26} strokeWidth={2.2} />
           </div>
-          <div className="flex flex-col gap-1.5">
-            <h2 className="text-[20px] font-extrabold text-ink">
-              Chưa có bài học nào được lưu
+          <div className="flex flex-col gap-1 max-w-[280px]">
+            <h2 className="text-[18px] font-black text-slate-900 dark:text-white">
+              Chưa có bài học nào
             </h2>
-            <p className="text-[15px] text-muted max-w-[300px] leading-relaxed">
-              Khi đang xem một bài học, hãy bấm biểu tượng Lưu ở góc trên để đánh dấu bài học đó vào đây.
+            <p className="text-[13px] text-slate-500 dark:text-purple-300 leading-relaxed font-normal">
+              Khi học một bài giảng, bạn hãy bấm biểu tượng Lưu ở góc phải bài học để xem lại nhanh tại đây.
             </p>
           </div>
           <Link
             href="/cot-song"
-            className="flex items-center justify-center gap-2 h-[52px] min-h-[48px] px-6 rounded-[16px] bg-primary text-white font-extrabold text-[16px] shadow-sm active:scale-[0.98] transition-transform"
+            className="flex items-center justify-center gap-2 h-11 px-5 rounded-[12px] bg-gradient-to-r from-blue-700 to-[#1E3A8A] dark:from-purple-600 dark:to-indigo-600 text-white font-black text-[13.5px] shadow-sm active:scale-95 transition-transform"
           >
-            <BookOpen size={18} />
-            <span>Khám phá chủ đề Cột sống</span>
+            <BookOpen size={16} />
+            <span>Khám phá Cột sống ngay</span>
           </Link>
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          {savedList.map((item) => (
-            <div
-              key={item.page_id}
-              className="relative flex items-center justify-between p-4 bg-white rounded-[22px] border border-line shadow-xs group transition-all"
-            >
-              <Link
-                href={`/${item.topic_slug}/${item.page_slug}`}
-                className="flex items-center gap-3.5 flex-1 min-w-0 pr-2"
-              >
-                <div className="w-12 h-12 rounded-[14px] bg-primary-soft text-primary flex items-center justify-center font-extrabold text-[18px] shrink-0">
-                  {String(item.page_number).padStart(2, '0')}
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <span className="text-[12px] font-extrabold text-primary uppercase tracking-wide truncate">
-                    {item.topic_title}
-                  </span>
-                  <h3 className="text-[17px] font-extrabold text-ink leading-snug break-words">
-                    {item.page_title}
-                  </h3>
-                </div>
-              </Link>
+          {savedList.map((item) => {
+            const topicIcon = `/images/topics/${item.topic_slug}.png`;
 
-              <div className="flex items-center gap-1 shrink-0">
-                <button
-                  type="button"
-                  onClick={(e) => handleRemove(e, item)}
-                  className="w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center text-muted hover:text-red-600 hover:bg-red-50 transition-colors"
-                  aria-label="Bỏ lưu bài này"
-                  title="Bỏ lưu"
-                >
-                  <Trash2 size={18} />
-                </button>
+            return (
+              <div
+                key={item.page_id}
+                className="p-3.5 sm:p-4 rounded-[20px] bg-white dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-800/40 shadow-xs hover:shadow-md transition-all flex flex-col gap-3 group"
+              >
+                {/* Hàng trên: Logo chuyên đề + Tiêu đề + Nút xóa */}
+                <div className="flex items-start gap-3">
+                  {/* Thumbnail Chuyên đề 3D */}
+                  <div className="relative w-12 h-12 rounded-[14px] bg-slate-50 dark:bg-purple-950/70 border border-slate-200 dark:border-purple-800/50 p-1 flex items-center justify-center shrink-0 shadow-2xs overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={topicIcon}
+                      alt={item.topic_title}
+                      className="w-full h-full object-contain"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = 'none';
+                        const fallback = (e.target as HTMLElement).nextElementSibling as HTMLElement;
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                    />
+                    <div className="hidden w-full h-full items-center justify-center text-[#1E3A8A] dark:text-[#93C5FD]">
+                      <BookOpen size={18} />
+                    </div>
+
+                    {/* Số bài */}
+                    <span className="absolute bottom-0 right-0 px-1 py-0.2 rounded-tl-[6px] bg-[#1E3A8A] text-white text-[8.5px] font-black">
+                      #{item.page_number}
+                    </span>
+                  </div>
+
+                  {/* Thông tin bài học */}
+                  <div className="flex-1 min-w-0 pt-0.5">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-black uppercase text-[#1E3A8A] dark:text-[#93C5FD] tracking-wider truncate">
+                        {item.topic_title}
+                      </span>
+                      <span className="text-[9.5px] font-bold px-1.5 py-0.5 rounded-[5px] bg-emerald-50 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-300">
+                        Đã lưu
+                      </span>
+                    </div>
+
+                    <h3 className="text-[15.5px] sm:text-[16.5px] font-black text-slate-900 dark:text-white leading-snug line-clamp-2 mt-0.5 group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] transition-colors">
+                      {item.page_title}
+                    </h3>
+                  </div>
+
+                  {/* Nút xóa khỏi danh sách đã lưu */}
+                  <button
+                    type="button"
+                    onClick={(e) => handleRemove(e, item)}
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors shrink-0 cursor-pointer"
+                    aria-label="Xóa bài học khỏi danh sách đã lưu"
+                    title="Bỏ lưu bài học này"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+
+                {/* Hàng dưới: Nút mở bài học rõ ràng chuyên nghiệp */}
                 <Link
                   href={`/${item.topic_slug}/${item.page_slug}`}
-                  className="w-8 h-8 flex items-center justify-center text-muted"
-                  aria-label="Mở bài học"
+                  className="w-full h-10 rounded-[12px] bg-gradient-to-r from-[#0F2A66] via-[#1E3A8A] to-[#2563EB] hover:opacity-95 text-white font-black text-[12.5px] sm:text-[13px] flex items-center justify-center gap-1.5 shadow-xs active:scale-[0.99] transition-all cursor-pointer"
                 >
-                  <ChevronRight size={20} strokeWidth={2.5} />
+                  <span>Mở học bài này</span>
+                  <ArrowRight size={14} />
                 </Link>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
-      {/* 4. Thanh điều hướng dưới cùng */}
+      {/* 5. Khối Gợi ý Khám Phá Thêm Chuyên Đề (Xóa bỏ cảm giác trống trải) */}
+      <section className="flex flex-col gap-2.5 pt-2 border-t border-slate-200/70 dark:border-purple-800/30">
+        <div className="flex items-center gap-1.5 text-slate-700 dark:text-purple-200 text-[12px] font-black uppercase tracking-wide">
+          <Compass size={14} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
+          <span>Gợi ý khám phá thêm chuyên đề:</span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2.5">
+          {quickExploreTopics.map((topic) => (
+            <Link
+              key={topic.slug}
+              href={`/${topic.slug}`}
+              className="p-3 rounded-[16px] bg-white dark:bg-[#160D30] border border-slate-200/80 dark:border-purple-800/40 hover:border-[#1E3A8A]/50 dark:hover:border-[#F8DF7B]/60 shadow-2xs hover:shadow-xs transition-all flex items-center gap-2.5 group cursor-pointer"
+            >
+              <div className="w-10 h-10 rounded-[11px] bg-slate-50 dark:bg-purple-950/70 p-1 flex items-center justify-center shrink-0 border border-slate-200/60 dark:border-purple-800/40 group-hover:scale-105 transition-transform overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={topic.icon}
+                  alt={topic.title}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className="text-[9px] font-extrabold uppercase text-[#1E3A8A] dark:text-[#93C5FD] tracking-wider truncate">
+                  {topic.badge}
+                </span>
+                <span className="text-[12px] font-black text-slate-900 dark:text-white leading-tight truncate mt-0.5 group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] transition-colors">
+                  {topic.title}
+                </span>
+                <span className="text-[10.5px] text-slate-400 dark:text-purple-300/70 font-medium">
+                  {topic.count}
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* 6. Thanh điều hướng dưới cùng */}
       <BottomNav />
 
-      {/* 5. Modal Lưu tiến độ & Đồng bộ qua SĐT */}
+      {/* 7. Modal Lưu tiến độ & Đồng bộ qua SĐT */}
       <UserSyncModal
         isOpen={showPhoneSync}
         onClose={() => setShowPhoneSync(false)}

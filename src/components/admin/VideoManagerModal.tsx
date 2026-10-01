@@ -117,6 +117,8 @@ export default function VideoManagerModal({
     }
   };
 
+  const [inputAspect, setInputAspect] = useState<'auto' | 'vertical' | 'horizontal'>('auto');
+
   // Bắt đầu sửa video
   const handleStartEdit = (index: number) => {
     const v = videoList[index];
@@ -126,6 +128,13 @@ export default function VideoManagerModal({
     setInputDescription(v.description || '');
     setInputUrl(v.youtube_id ? `https://www.youtube.com/watch?v=${v.youtube_id}` : '');
     setInputThumb(v.thumbnail_url || '');
+    setInputAspect(
+      v.is_vertical || v.aspect_ratio === 'vertical' || v.aspect_ratio === '9:16'
+        ? 'vertical'
+        : v.aspect_ratio === 'horizontal' || v.aspect_ratio === '16:9'
+        ? 'horizontal'
+        : 'auto'
+    );
     setAddMode('youtube');
   };
 
@@ -149,8 +158,27 @@ export default function VideoManagerModal({
     if (!inputDuration) {
       setInputDuration('5 phút');
     }
+
+    // Tự động nhận diện video dọc (Shorts)
+    if (inputUrl.includes('/shorts/')) {
+      setInputAspect('vertical');
+      setFetchSuccessMsg('Đã nhận diện: Video dọc YouTube Shorts (9:16) ↕');
+    } else {
+      try {
+        const res = await fetch(`/api/video/detect-aspect?id=${encodeURIComponent(yid)}`);
+        const data = await res.json();
+        if (data?.is_vertical) {
+          setInputAspect('vertical');
+          setFetchSuccessMsg('Đã tự động nhận diện: Video dọc (9:16) ↕');
+        } else {
+          setInputAspect('horizontal');
+          setFetchSuccessMsg('Đã nhận diện: Video bài giảng ngang (16:9) ↔');
+        }
+      } catch {
+        setFetchSuccessMsg('Đã nhận diện video thành công!');
+      }
+    }
     setIsLoadingMeta(false);
-    setFetchSuccessMsg('Đã nhận diện video thành công!');
   };
 
   // Chọn mẫu video có sẵn để test nhanh
@@ -159,6 +187,7 @@ export default function VideoManagerModal({
     setInputTitle(preset.title);
     setInputDuration(preset.duration);
     setInputThumb(`https://i.ytimg.com/vi/${preset.id}/hqdefault.jpg`);
+    setInputAspect('horizontal');
     setFetchSuccessMsg(`Đã chọn mẫu: ${preset.title}`);
   };
 
@@ -185,12 +214,18 @@ export default function VideoManagerModal({
       finalTitle = `Video bài học (${yid || 'Mới'})`;
     }
 
+    const isVert =
+      inputAspect === 'vertical' ||
+      (inputAspect === 'auto' && inputUrl.includes('/shorts/'));
+
     const newVideoItem: Video = {
       youtube_id: yid,
       title: finalTitle,
       duration_text: inputDuration.trim() || '5 phút',
       description: inputDescription.trim() || undefined,
       thumbnail_url: finalThumb || (yid ? `https://i.ytimg.com/vi/${yid}/hqdefault.jpg` : undefined),
+      is_vertical: isVert,
+      aspect_ratio: isVert ? 'vertical' : 'horizontal',
     };
 
     if (editingIndex !== null) {
@@ -209,6 +244,7 @@ export default function VideoManagerModal({
     setInputDuration('');
     setInputDescription('');
     setInputThumb('');
+    setInputAspect('auto');
     setFetchSuccessMsg('');
   };
 
@@ -574,6 +610,49 @@ export default function VideoManagerModal({
                     placeholder="Ví dụ: 01. Cấu tạo cột sống"
                     className="w-full h-[44px] px-3 rounded-[12px] border border-line text-[15px] text-ink focus:outline-hidden focus:border-primary"
                   />
+                </div>
+
+                {/* Tùy chọn Tỷ lệ hiển thị (Dọc 9:16 hoặc Ngang 16:9) */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[13px] font-bold text-ink flex items-center justify-between">
+                    <span>Định dạng khung hình video:</span>
+                    <span className="text-[11.5px] text-muted font-normal">Tự động nhận diện video dọc / ngang</span>
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setInputAspect('auto')}
+                      className={`py-2 px-1 text-[12px] font-bold rounded-[10px] border transition-colors cursor-pointer ${
+                        inputAspect === 'auto'
+                          ? 'bg-primary text-white border-primary shadow-xs'
+                          : 'bg-surface-2 text-ink border-line hover:border-primary'
+                      }`}
+                    >
+                      Tự động nhận diện
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setInputAspect('vertical')}
+                      className={`py-2 px-1 text-[12px] font-bold rounded-[10px] border transition-colors cursor-pointer ${
+                        inputAspect === 'vertical'
+                          ? 'bg-primary text-white border-primary shadow-xs'
+                          : 'bg-surface-2 text-ink border-line hover:border-primary'
+                      }`}
+                    >
+                      ↕ Dạng dọc (9:16)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setInputAspect('horizontal')}
+                      className={`py-2 px-1 text-[12px] font-bold rounded-[10px] border transition-colors cursor-pointer ${
+                        inputAspect === 'horizontal'
+                          ? 'bg-primary text-white border-primary shadow-xs'
+                          : 'bg-surface-2 text-ink border-line hover:border-primary'
+                      }`}
+                    >
+                      ↔ Dạng ngang (16:9)
+                    </button>
+                  </div>
                 </div>
 
                 {/* Mục Lớp phủ ảnh bên ngoài (Ảnh bìa / Thumbnail) */}

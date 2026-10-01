@@ -17,14 +17,14 @@ export const DEFAULT_TOPIC_COVERS: Record<string, string> = {
 };
 
 export const TOPIC_MIND_MAP_SUBTITLES: Record<string, string> = {
-  'cot-song': 'OSTEOLOGY & SPINE',
-  'dinh-duong': 'BIOCHEMISTRY & CELLS',
-  'nuoc': 'PHYSIOLOGY & FLUIDS',
-  'tieu-hoa': 'THORAX & ABDOMEN',
-  'co-the-nguoi': 'GENERAL ANATOMY',
-  'noi-tiet-chuyen-hoa': 'ENDOCRINOLOGY',
-  'gan-mat-tuy': 'METABOLISM & LIVER',
-  'mien-dich': 'IMMUNOLOGY & DEFENSE',
+  'cot-song': 'SPINE & BONE',
+  'dinh-duong': 'NUTRITION',
+  'nuoc': 'FLUIDS & CELL',
+  'tieu-hoa': 'DIGESTIVE',
+  'co-the-nguoi': 'ANATOMY',
+  'noi-tiet-chuyen-hoa': 'ENDOCRINE',
+  'gan-mat-tuy': 'LIVER & GLAND',
+  'mien-dich': 'IMMUNITY',
 };
 
 interface TopicCardProps {
@@ -37,67 +37,77 @@ export default function TopicCard({ topic, pageCount }: TopicCardProps) {
   const isAvailable = pageCount > 0;
   const coverUrl = topic.cover_url || DEFAULT_TOPIC_COVERS[topic.slug] || null;
   const hasCoverImage = Boolean(coverUrl) && !imgError;
-  const mindMapSubtitle = TOPIC_MIND_MAP_SUBTITLES[topic.slug] || 'ANATOMY MIND MAPS';
+  const mindMapSubtitle = TOPIC_MIND_MAP_SUBTITLES[topic.slug] || 'ANATOMY';
+
+  // Định dạng tiêu đề hiển thị đồng bộ, ngắt dòng tự nhiên không bị cắt dấu
+  const displayTitle = topic.title
+    .replace(' – ', '\n')
+    .replace(' - ', '\n');
 
   return (
     <Link
       href={`/${topic.slug}`}
       prefetch={true}
-      className="group relative flex flex-col justify-between p-3 sm:p-3.5 rounded-[14px] bg-gradient-to-br from-[#1E1342] via-[#160D30] to-[#0E0720] border-t border-t-white/20 border-r border-r-black/60 border-b border-b-black/80 border-l-[3.5px] border-l-[#A78BFA] text-white shadow-xl hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 overflow-hidden cursor-pointer min-h-[148px] sm:min-h-[160px]"
+      className="group relative flex flex-col cursor-pointer select-none transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.015] active:scale-[0.98]"
     >
-      {/* 1. HIỆU ỨNG GÁY SÁCH 3D */}
-      <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-gradient-to-b from-white/40 via-purple-300/30 to-white/10 pointer-events-none" />
-      <div className="absolute left-[3px] top-0 bottom-0 w-[1.5px] bg-black/50 pointer-events-none" />
-
-      {/* 2. VẦNG SÁNG HUYỀN ẢO TÍM GÓC TRÊN BÊN PHẢI */}
-      <div className="absolute -top-8 -right-8 w-28 h-28 bg-purple-600/25 rounded-full blur-xl pointer-events-none group-hover:bg-purple-500/35 transition-all" />
-
-      {/* 3. ẢNH GIẢI PHẪU 3D BÊN PHẢI (RADIAL MASK + MIX-BLEND-SCREEN XÓA 100% VIỀN HỘP) */}
-      <div className="absolute right-0 top-1.5 bottom-6 w-[48%] sm:w-[46%] flex items-center justify-center pointer-events-none overflow-visible select-none z-0">
-        {hasCoverImage ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={coverUrl!}
-            alt={topic.title}
-            className={`w-full h-full max-h-[110px] sm:max-h-[120px] object-contain mix-blend-screen opacity-100 [-webkit-mask-image:radial-gradient(circle_at_50%_50%,black_28%,transparent_68%)] [mask-image:radial-gradient(circle_at_50%_50%,black_28%,transparent_68%)] group-hover:scale-105 transition-all duration-300 ${
-              topic.slug === 'cot-song' ? 'scale-110 group-hover:scale-115' : ''
-            }`}
-            onError={() => setImgError(true)}
-            loading="lazy"
-          />
-        ) : (
-          <div className="text-purple-300/60 drop-shadow-md">
-            <TopicIcon name={topic.icon} size={44} />
-          </div>
-        )}
+      {/* 1. GÁY TRÊN 3D CỦA CUỐN SÁCH (Cạnh trên màu trang giấy giống ảnh mẫu Medi Study Go) */}
+      <div className="mx-1.5 h-[5px] sm:h-[6px] bg-gradient-to-r from-[#CBC3E3] via-[#FAF9FD] to-[#B8ADD6] rounded-t-[3px] border-t border-l border-r border-white/50 shadow-xs flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:brightness-110">
+        {/* Rãnh trang giấy xếp lớp */}
+        <div className="w-full h-[1px] bg-purple-950/20" />
       </div>
 
-      {/* 4. CỘT THÔNG TIN BÊN TRÁI */}
-      <div className="relative z-10 flex flex-col gap-0.5 max-w-[62%] sm:max-w-[64%]">
-        {/* Nhãn thương hiệu nhỏ trên cùng */}
-        <div className="flex items-center gap-1 text-[9px] sm:text-[10px] text-purple-200/90 font-bold tracking-tight">
-          <svg className="w-2.5 h-2.5 text-purple-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <path d="M12 2a4 4 0 0 0-4 4c0 1.5.8 2.8 2 3.5V11a2 2 0 0 0 2 2 2 2 0 0 0 2-2V9.5c1.2-.7 2-2 2-3.5a4 4 0 0 0-4-4Z" />
-          </svg>
-          <span className="truncate">Học Cơ Thể</span>
+      {/* 2. MẶT BÌA CHÍNH CỦA CUỐN SÁCH (3D HARDCOVER) */}
+      <div className="relative flex flex-col justify-between p-3 sm:p-3.5 rounded-b-[14px] rounded-tl-[3px] rounded-tr-[12px] bg-gradient-to-br from-[#231652] via-[#1A0E3F] to-[#100629] border-t border-t-white/25 border-r border-r-black/60 border-b-2 border-b-black/80 border-l-[4px] border-l-[#4A2D9E] text-white shadow-[3px_8px_18px_rgba(0,0,0,0.45)] group-hover:shadow-[0_12px_28px_rgba(109,40,217,0.45),0_0_20px_rgba(248,223,123,0.18)] group-hover:border-t-purple-300/60 group-hover:border-r-purple-400/40 group-hover:border-l-[#6D28D9] transition-all duration-300 overflow-hidden min-h-[148px] sm:min-h-[158px]">
+        {/* Đường gân gáy sách (Spine crease) */}
+        <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-gradient-to-b from-white/35 via-purple-300/20 to-white/10 pointer-events-none" />
+        <div className="absolute left-[2.5px] top-0 bottom-0 w-[1.5px] bg-black/40 pointer-events-none" />
+
+        {/* Vầng sáng huyền ảo nền bìa - NỔI SÁNG LÊN KHI LƯỚT TAY / HOVER */}
+        <div className="absolute -top-10 -right-10 w-32 h-32 bg-purple-600/20 rounded-full blur-xl pointer-events-none group-hover:bg-purple-500/40 group-hover:w-44 group-hover:h-44 transition-all duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/0 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
+        {/* 3. ẢNH GIẢI PHẪU 3D TRONG SUỐT BÊN PHẢI (TO HẲN, NỔI BẬT KHÔNG NỀN ĐEN NHƯ ẢNH MẪU SỐ 2) */}
+        <div className="absolute right-0.5 top-1 bottom-4 w-[54%] sm:w-[52%] flex items-center justify-center pointer-events-none overflow-visible select-none z-0">
+          {hasCoverImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={coverUrl!}
+              alt={topic.title}
+              className={`w-full h-full max-h-[120px] sm:max-h-[132px] object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.55)] group-hover:scale-108 transition-all duration-300 ${
+                topic.slug === 'cot-song' ? 'scale-115 group-hover:scale-120' : ''
+              }`}
+              onError={() => setImgError(true)}
+              loading="lazy"
+            />
+          ) : (
+            <div className="text-purple-300/60 drop-shadow-md">
+              <TopicIcon name={topic.icon} size={44} />
+            </div>
+          )}
         </div>
 
-        {/* Dòng phụ đề Mind Map chuẩn y khoa */}
-        <span className="text-[8px] sm:text-[8.5px] font-black uppercase tracking-wider text-purple-300/80 leading-tight truncate">
-          {mindMapSubtitle}
-        </span>
+        {/* 4. CỘT THÔNG TIN BÊN TRÁI: TIẾNG ANH PHỤ TRÊN CÙNG + TIÊU ĐỀ TIẾNG VIỆT TO RÕ ĐỒNG BỘ */}
+        <div className="relative z-10 flex flex-col gap-1 max-w-[60%] sm:max-w-[58%]">
+          {/* Nhãn tiếng Anh phụ trên cùng (ngắn gọn, chuẩn nhãn bìa sách) */}
+          <div className="flex items-center gap-1 text-[8.5px] sm:text-[9.5px] font-bold uppercase tracking-wider text-purple-200/90 leading-tight">
+            <svg className="w-2.5 h-2.5 text-purple-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+            </svg>
+            <span className="truncate">{mindMapSubtitle}</span>
+          </div>
 
-        {/* Tiêu đề in hoa đậm nét chuẩn sách y khoa */}
-        <h3 className="text-[13px] sm:text-[14.5px] font-black text-white uppercase tracking-tight leading-tight line-clamp-2 mt-1 drop-shadow-xs group-hover:text-[#F8DF7B] transition-colors">
-          {topic.title}
-        </h3>
-      </div>
+          {/* Tiêu đề tiếng Việt in hoa ĐỒNG BỘ KÍCH THƯỚC, CHUẨN DẤU VÀ KHOẢNG CÁCH FONT */}
+          <h3 className="font-extrabold text-white uppercase tracking-normal leading-[1.25] drop-shadow-sm mt-0.5 line-clamp-2 text-[14.5px] sm:text-[15.5px] whitespace-pre-line">
+            {displayTitle}
+          </h3>
+        </div>
 
-      {/* 5. RIBBON PHÍA DƯỚI - MÀU VÀNG KIM SANG TRỌNG */}
-      <div className="relative z-10 mt-auto pt-2 flex items-center">
-        <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] bg-[#F8DF7B] text-[#160C2C] text-[8.5px] sm:text-[9.5px] font-black uppercase tracking-wider shadow-sm group-hover:bg-[#FDE68A] transition-colors">
-          {isAvailable ? `${pageCount} BÀI CỐT LÕI` : 'QUICK REVISION'}
-        </span>
+        {/* 5. KHUNG VÀNG NỔI BẬT PHÍA DƯỚI (CHUẨN FORM NHÃN VÀNG ẢNH MẪU 2) */}
+        <div className="relative z-10 mt-auto pt-2 flex items-center">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] bg-[#FCE38A] dark:bg-[#FADB67] text-[#190E33] text-[9px] sm:text-[10px] font-black uppercase tracking-wider shadow-sm group-hover:bg-[#FEF08A] transition-colors">
+            {isAvailable ? `${pageCount} BÀI CỐT LÕI` : 'QUICK REVISION'}
+          </span>
+        </div>
       </div>
     </Link>
   );

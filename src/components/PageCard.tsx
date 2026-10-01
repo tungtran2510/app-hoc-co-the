@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, BookOpen } from 'lucide-react';
 import { Page, Topic } from '../lib/types';
 
 interface PageCardProps {
@@ -54,7 +54,13 @@ export default function PageCard({
   return (
     <Link
       href={targetUrl}
-      className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 bg-white dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] rounded-[16px] border border-slate-200 dark:border-purple-500/25 border-l-[4px] border-l-[#1E3A8A] dark:border-l-[#A78BFA] transition-all active:scale-[0.99] shadow-xs hover:border-slate-300 group"
+      className={`flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 bg-white dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] rounded-[14px] border transition-all active:scale-[0.99] shadow-xs group ${
+        hasStarted && !isCompleted
+          ? 'border-amber-300 dark:border-amber-400/50 animate-breathe-gold'
+          : isCompleted
+          ? 'border-emerald-300/80 dark:border-emerald-500/30 hover:border-emerald-400'
+          : 'border-slate-200/80 dark:border-purple-500/25 hover:border-slate-300'
+      }`}
     >
       {/* Ô ẢNH ĐẠI DIỆN BÀI HỌC (AVATAR / THUMBNAIL) */}
       <div className="relative w-[60px] h-[60px] sm:w-[68px] sm:h-[68px] rounded-[12px] overflow-hidden bg-slate-100 dark:bg-[#0A0515] border border-slate-200 dark:border-purple-500/30 shrink-0 shadow-2xs group-hover:scale-105 transition-transform duration-200">
@@ -69,17 +75,8 @@ export default function PageCard({
           <div
             className="w-full h-full flex flex-col items-center justify-center bg-blue-50 dark:bg-purple-950/60 text-[#1E3A8A] dark:text-purple-200"
           >
-            <span className="text-[17px] font-black">{formattedOrder}</span>
+            <BookOpen size={24} className="opacity-80" />
           </div>
-        )}
-
-        {/* Badge số thứ tự nhỏ gọn ở góc trên của ảnh (nếu có ảnh) */}
-        {page.cover_url && (
-          <span
-            className="absolute top-1 left-1 h-4.5 px-1.5 rounded-[4px] text-[10.5px] font-black flex items-center justify-center tracking-wide bg-[#1E3A8A] text-white dark:bg-[#F8DF7B] dark:text-[#160C2C] shadow-xs"
-          >
-            {formattedOrder}
-          </span>
         )}
       </div>
 

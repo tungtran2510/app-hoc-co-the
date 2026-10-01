@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 :root {
-  --font-be-vietnam-pro: 'Be Vietnam Pro', sans-serif;
   --color-bg: #F8FAFC;
   --color-surface: #FFFFFF;
   --color-surface-2: #F1F5F9;
@@ -34,11 +33,17 @@ body {
     radial-gradient(ellipse 90% 40% at 50% -10%, rgba(30, 58, 138, 0.04), transparent 70%),
     radial-gradient(ellipse 60% 30% at 100% 50%, rgba(15, 23, 42, 0.03), transparent 60%);
   background-repeat: no-repeat;
-  font-family: var(--font-be-vietnam-pro), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--color-ink);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+/* Chuẩn hóa font tiếng Việt và chống dính dấu */
+h1, h2, h3, h4, h5, h6 {
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1;
 }
 
 /* Tối ưu thanh cuộn */
@@ -212,4 +217,228 @@ html.gray select {
 html.gray ::-webkit-scrollbar-thumb {
   background: #64748B;
 }
+
+/* ============================================================================
+   3D BOOK UTILITIES (QBIZ BOOKS LUXURY OPENING)
+   ============================================================================ */
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.transform-3d {
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+}
+
+/* ============================================================================
+   MICRO-INTERACTIONS: SUBTLE BREATHE PULSE & ACCENTS (0 KB CSS)
+   ============================================================================ */
+@keyframes subtle-breathe-emerald {
+  0%, 100% {
+    box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.25), 0 2px 8px -2px rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 2.5px rgba(16, 185, 129, 0.5), 0 4px 14px -1px rgba(16, 185, 129, 0.3);
+    border-color: rgba(16, 185, 129, 0.9);
+  }
+}
+
+@keyframes subtle-breathe-gold {
+  0%, 100% {
+    box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.2), 0 2px 8px -2px rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.45), 0 4px 14px -1px rgba(245, 158, 11, 0.25);
+    border-color: rgba(245, 158, 11, 0.85);
+  }
+}
+
+.animate-breathe-emerald {
+  animation: subtle-breathe-emerald 2.6s ease-in-out infinite;
+}
+
+.animate-breathe-gold {
+  animation: subtle-breathe-gold 2.6s ease-in-out infinite;
+}
+
+/* ============================================================================
+   MICRO-INTERACTIONS TRANG CHỦ (TĂNG TỐC PHẦN CỨNG GPU, 60 FPS, KHÔNG GIẬT LAG)
+   ============================================================================ */
+
+/* 1. Hiệu ứng Bong bóng nảy so le cho các ô Chuyên đề tím (chậm & mượt mà theo yêu cầu) */
+@keyframes bubble-pop {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 22px, 0) scale(0.92);
+  }
+  65% {
+    opacity: 1;
+    transform: translate3d(0, -3px, 0) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.animate-bubble-pop {
+  animation: bubble-pop 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform, opacity;
+}
+
+/* 2. Hiệu ứng trượt ngang so le từ Trái vào cho Hồ sơ Tác giả & Sách đã làm (êm ái, chậm hơn) */
+@keyframes slide-left {
+  0% {
+    opacity: 0;
+    transform: translate3d(-36px, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-slide-left {
+  animation: slide-left 0.95s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+}
+
+/* 3. Hiệu ứng trượt ngang so le từ Phải vào cho Triết lý phụng sự & Liên hệ (êm ái, chậm hơn) */
+@keyframes slide-right {
+  0% {
+    opacity: 0;
+    transform: translate3d(36px, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-slide-right {
+  animation: slide-right 0.95s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+}
+
+/* 4. Hiệu ứng Rút sách từ giá 3D theo bậc thang cho Sách nên đọc (chậm rãi, sang trọng) */
+@keyframes book-cascade {
+  0% {
+    opacity: 0;
+    transform: perspective(800px) rotateY(-8deg) translate3d(0, 24px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(800px) rotateY(0deg) translate3d(0, 0, 0);
+  }
+}
+
+.animate-book-cascade {
+  animation: book-cascade 0.95s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+}
+
+/* 4b. Hiệu ứng vẫy tay & nhún nhảy sinh động cho lời chào Hello */
+@keyframes wave-hand {
+  0%, 100% { transform: rotate(0deg); }
+  20%, 60% { transform: rotate(15deg); }
+  40%, 80% { transform: rotate(-10deg); }
+}
+
+.animate-wave {
+  display: inline-block;
+  transform-origin: 70% 70%;
+  animation: wave-hand 2.2s infinite ease-in-out;
+}
+
+@keyframes greeting-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2.5px); }
+}
+
+.animate-greeting-bounce {
+  display: inline-flex;
+  animation: greeting-bounce 3s infinite ease-in-out;
+}
+
+/* 5. Hiệu ứng Vệt Sáng Quét Qua (Shimmer Sweep) cho nút Xem Tiếp chuyên nghiệp */
+@keyframes shimmer-sweep {
+  0% {
+    transform: translateX(-160%) skewX(-20deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.75;
+  }
+  30% {
+    transform: translateX(260%) skewX(-20deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(260%) skewX(-20deg);
+    opacity: 0;
+  }
+}
+
+.animate-shimmer-sweep {
+  animation: shimmer-sweep 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* 6. Hiệu ứng Hào Quang Nhịp Thở Sáng (Pulse Glow) chuẩn Y Khoa */
+@keyframes pulse-glow-light {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(30, 58, 138, 0.3), 0 2px 6px rgba(0, 0, 0, 0.12);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 16px 2.5px rgba(59, 130, 246, 0.55), 0 4px 12px rgba(30, 58, 138, 0.25);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes pulse-glow-dark {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(248, 223, 123, 0.35), 0 2px 6px rgba(0, 0, 0, 0.3);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 18px 3.5px rgba(248, 223, 123, 0.7), 0 4px 14px rgba(245, 158, 11, 0.4);
+    transform: scale(1.025);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow-light 2.6s ease-in-out infinite;
+}
+
+html.dark .animate-pulse-glow {
+  animation: pulse-glow-dark 2.6s ease-in-out infinite;
+}
+
+/* 7. Hiệu ứng Flash lấp lánh trên thẻ tag bìa sách (Flash Shimmer Tag) */
+@keyframes badge-flash-sweep {
+  0% {
+    transform: translateX(-120%) skewX(-20deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.95;
+  }
+  35% {
+    transform: translateX(240%) skewX(-20deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(240%) skewX(-20deg);
+    opacity: 0;
+  }
+}
+
+.animate-flash-sweep {
+  animation: badge-flash-sweep 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+
 

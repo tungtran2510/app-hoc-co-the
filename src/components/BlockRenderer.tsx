@@ -1,5 +1,5 @@
 import React from 'react';
-import { Block } from '../lib/types';
+import { Block, Video } from '../lib/types';
 import TextBlock from './blocks/TextBlock';
 import VideosBlock from './blocks/VideosBlock';
 import ImagesBlock from './blocks/ImagesBlock';
@@ -14,6 +14,7 @@ interface BlockRendererProps {
   defaultActiveVideoIndex?: number;
   isAdmin?: boolean;
   onOpenVideoManager?: () => void;
+  onSaveVideos?: (newVideos: Video[]) => void;
   pageId?: string;
   topicSlug?: string;
   topicTitle?: string;
@@ -34,6 +35,7 @@ export default function BlockRenderer({
   defaultActiveVideoIndex = 0,
   isAdmin = false,
   onOpenVideoManager,
+  onSaveVideos,
   pageId,
   topicSlug,
   topicTitle,
@@ -73,6 +75,7 @@ export default function BlockRenderer({
           defaultActiveIndex={defaultActiveVideoIndex}
           isAdmin={isAdmin}
           onOpenVideoManager={onOpenVideoManager}
+          onSaveVideos={onSaveVideos}
           pageId={pageId}
           topicSlug={topicSlug}
           topicTitle={topicTitle}

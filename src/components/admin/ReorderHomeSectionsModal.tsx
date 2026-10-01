@@ -14,6 +14,8 @@ import {
   Loader2,
   Sparkles,
   PhoneCall,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { saveSettingsApi } from '../../lib/apiAdmin';
 import { normalizeHomeSectionsOrder } from '../../lib/data';
@@ -26,11 +28,23 @@ interface SectionMeta {
 }
 
 const SECTION_DEFS: Record<string, SectionMeta> = {
+  brand_card: {
+    key: 'brand_card',
+    name: 'Thẻ thương hiệu App (Brand Card)',
+    desc: 'Logo, Tên ứng dụng, định vị và huy hiệu chứng nhận',
+    icon: Sparkles,
+  },
   topics: {
     key: 'topics',
-    name: 'Danh sách chủ đề bài học',
+    name: 'Danh sách chuyên đề học',
     desc: 'Lưới các chủ đề chính (Cột sống, Dinh dưỡng, Nước...)',
     icon: FolderTree,
+  },
+  recent_activity: {
+    key: 'recent_activity',
+    name: 'Hoạt động gần đây (Đang học dở)',
+    desc: 'Thẻ bài học đang theo dõi dở dang của người dùng',
+    icon: Sparkles,
   },
   author_profile: {
     key: 'author_profile',
@@ -67,19 +81,22 @@ const SECTION_DEFS: Record<string, SectionMeta> = {
 interface ReorderHomeSectionsModalProps {
   isOpen: boolean;
   currentOrder: string[];
+  currentHidden?: string[];
   onClose: () => void;
-  onSaved: (newOrder: string[]) => void;
+  onSaved: (newOrder: string[], newHidden: string[]) => void;
 }
 
 export default function ReorderHomeSectionsModal({
   isOpen,
   currentOrder,
+  currentHidden = [],
   onClose,
   onSaved,
 }: ReorderHomeSectionsModalProps) {
   const [order, setOrder] = useState<string[]>(() => {
     return normalizeHomeSectionsOrder(currentOrder);
   });
+  const [hiddenSections, setHiddenSections] = useState<string[]>(() => currentHidden || []);
   const [isSaving, setIsSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -87,12 +104,19 @@ export default function ReorderHomeSectionsModal({
   React.useEffect(() => {
     if (isOpen) {
       setOrder(normalizeHomeSectionsOrder(currentOrder));
+      setHiddenSections(currentHidden || []);
       setErrorMsg('');
       setSuccessMsg('');
     }
-  }, [isOpen, currentOrder]);
+  }, [isOpen, currentOrder, currentHidden]);
 
   if (!isOpen) return null;
+
+  const toggleVisibility = (key: string) => {
+    setHiddenSections((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
+  };
 
   const moveUp = (index: number) => {
     if (index === 0) return;
@@ -118,11 +142,12 @@ export default function ReorderHomeSectionsModal({
       setErrorMsg('');
       const res = await saveSettingsApi({
         home_sections_order: order,
+        hidden_home_sections: hiddenSections,
       });
 
       if (res.success) {
-        setSuccessMsg('Đã lưu thứ tự hiển thị thành công!');
-        onSaved(order);
+        setSuccessMsg('Đã lưu thứ tự & trạng thái hiển thị thành công!');
+        onSaved(order, hiddenSections);
         setTimeout(() => {
           onClose();
         }, 800);
@@ -180,11 +205,16 @@ export default function ReorderHomeSectionsModal({
               const Icon = def.icon;
               const isFirst = idx === 0;
               const isLast = idx === order.length - 1;
+              const isHidden = hiddenSections.includes(key);
 
               return (
                 <div
                   key={key}
-                  className="flex items-center justify-between p-3.5 px-4 rounded-[18px] bg-surface-2/70 border border-line shadow-2xs hover:bg-surface-2 transition-colors gap-3"
+                  className={`flex items-center justify-between p-3.5 px-4 rounded-[18px] border transition-colors gap-3 ${
+                    isHidden
+                      ? 'bg-amber-50/60 border-amber-300/70 dark:bg-amber-950/20 dark:border-amber-800/50'
+                      : 'bg-surface-2/70 border-line shadow-2xs hover:bg-surface-2'
+                  }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="w-8 h-8 rounded-full bg-white border border-line font-black text-ink text-[13px] flex items-center justify-center shrink-0 shadow-2xs">
@@ -196,17 +226,49 @@ export default function ReorderHomeSectionsModal({
                     </div>
 
                     <div className="flex flex-col min-w-0">
-                      <span className="text-[13.5px] font-extrabold text-ink leading-snug line-clamp-1">
-                        {def.name}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[13.5px] font-extrabold text-ink leading-snug line-clamp-1">
+                          {def.name}
+                        </span>
+                        {isHidden && (
+                          <span className="px-1.5 py-0.2 rounded bg-amber-200 text-amber-900 text-[10px] font-black shrink-0">
+                            Ẩn
+                          </span>
+                        )}
+                      </div>
                       <span className="text-[11px] text-muted leading-tight line-clamp-1">
                         {def.desc}
                       </span>
                     </div>
                   </div>
 
-                  {/* Nút lên / xuống */}
+                  {/* Nút Ẩn/Hiện & Lên/Xuống */}
                   <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => toggleVisibility(key)}
+                      className={`h-8 px-2 rounded-[10px] border flex items-center gap-1 text-[11.5px] font-extrabold transition-all cursor-pointer ${
+                        isHidden
+                          ? 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-700/60 shadow-2xs'
+                          : 'bg-white border-line text-muted hover:text-primary hover:border-primary'
+                      }`}
+                      title={isHidden ? 'Khối đang ẨN TẠM với người xem – Bấm để HIỆN' : 'Khối đang HIỆN – Bấm để ẨN TẠM'}
+                    >
+                      {isHidden ? (
+                        <>
+                          <EyeOff size={13} className="text-amber-700 dark:text-amber-300" strokeWidth={2.5} />
+                          <span className="hidden xs:inline">Ẩn</span>
+                        </>
+                      ) : (
+                        <>
+                          <Eye size={13} strokeWidth={2.2} />
+                          <span className="hidden xs:inline">Hiện</span>
+                        </>
+                      )}
+                    </button>
+
+                    <div className="w-[1px] h-4 bg-line mx-0.5" />
+
                     <button
                       type="button"
                       disabled={isFirst}
@@ -259,7 +321,7 @@ export default function ReorderHomeSectionsModal({
               ) : (
                 <>
                   <Save size={18} />
-                  <span>Lưu thứ tự hiển thị</span>
+                  <span>Lưu thứ tự & trạng thái hiển thị</span>
                 </>
               )}
             </button>

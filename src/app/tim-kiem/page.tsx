@@ -26,6 +26,8 @@ interface SearchData {
     description: string | null;
     color_bg: string;
     color_fg: string;
+    icon_url?: string;
+    cover_url?: string;
   }[];
   pages: {
     id: string;
@@ -35,6 +37,7 @@ interface SearchData {
     topic_title: string;
     page_number: number;
     summary: string | null;
+    cover_url?: string;
     text_snippets: string[];
   }[];
   videos: {
@@ -47,6 +50,7 @@ interface SearchData {
     page_title: string;
     page_number: number;
     video_index: number;
+    thumbnail_url?: string;
   }[];
 }
 
@@ -115,29 +119,29 @@ export default function SearchPage() {
   const totalResults = matchedTopics.length + matchedPages.length + matchedVideos.length;
 
   return (
-    <main className="flex-1 flex flex-col px-5 pt-3 pb-28 gap-5">
+    <main className="flex-1 flex flex-col px-4 sm:px-5 pt-3 pb-28 gap-4 max-w-[640px] w-full mx-auto">
       {/* 1. Thanh đầu trang: Nút quay lại + Ô tìm kiếm */}
-      <section className="flex items-center gap-2.5">
+      <section className="flex items-center gap-2">
         <button
           type="button"
           onClick={() => router.back()}
-          className="w-12 h-12 min-w-[48px] rounded-[16px] bg-white border border-slate-200 dark:border-purple-900/60 flex items-center justify-center text-ink hover:text-primary transition-colors cursor-pointer shadow-2xs"
+          className="w-11 h-11 min-w-[44px] rounded-[14px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 flex items-center justify-center text-slate-700 dark:text-purple-200 hover:text-[#1E3A8A] transition-colors cursor-pointer shadow-2xs"
           aria-label="Quay lại"
         >
-          <ArrowLeft size={22} />
+          <ArrowLeft size={20} />
         </button>
 
         <div className="relative flex-1">
-          <div className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-muted">
-            <SearchIcon size={20} />
+          <div className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-slate-400">
+            <SearchIcon size={18} />
           </div>
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Tìm bài, ví dụ: cột sống, đĩa đệm"
-            className="w-full h-[52px] min-h-[48px] pl-11 pr-11 rounded-[18px] bg-white border-[1.5px] border-slate-200 dark:border-purple-900/60 focus:border-[#1E3A8A] dark:focus:border-[#A78BFA] text-[17px] text-ink placeholder:text-muted focus:outline-hidden shadow-2xs transition-colors"
+            placeholder="Tìm bài học, đĩa đệm, cột sống..."
+            className="w-full h-[48px] pl-10 pr-10 rounded-[16px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 focus:border-[#1E3A8A] dark:focus:border-[#F8DF7B] text-[15px] text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden shadow-2xs transition-colors"
             aria-label="Nhập từ khóa tìm kiếm"
           />
           {query && (
@@ -147,34 +151,34 @@ export default function SearchPage() {
                 setQuery('');
                 inputRef.current?.focus();
               }}
-              className="absolute inset-y-0 right-2 my-auto w-8 h-8 rounded-full flex items-center justify-center text-muted hover:text-ink cursor-pointer"
+              className="absolute inset-y-0 right-2 my-auto w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
               aria-label="Xóa từ khóa"
             >
-              <X size={18} />
+              <X size={16} />
             </button>
           )}
         </div>
       </section>
 
       {/* 2. Nội dung kết quả */}
-      <section className="flex flex-col gap-6">
+      <section className="flex flex-col gap-5">
         {loading ? (
-          <div className="p-8 text-center text-muted text-[15px]">
+          <div className="p-8 text-center text-slate-400 text-[14px] font-medium animate-pulse">
             Đang tải dữ liệu tìm kiếm...
           </div>
         ) : !cleanQuery ? (
           /* Gợi ý khi chưa gõ */
-          <div className="flex flex-col gap-3 py-6 px-1">
-            <h2 className="text-[15px] font-extrabold uppercase tracking-wider text-muted">
-              Gợi ý tìm kiếm nhanh
+          <div className="flex flex-col gap-2.5 py-3 px-1">
+            <h2 className="text-[12px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-purple-300/70">
+              Gợi ý tìm kiếm phổ biến
             </h2>
             <div className="flex flex-wrap gap-2">
-              {['Cột sống', 'Đĩa đệm', 'Thần kinh', 'Tư thế', 'Dây chằng'].map((tag) => (
+              {['Cột sống', 'Đĩa đệm', 'Thần kinh', 'Tư thế', 'Dây chằng', 'Dinh dưỡng'].map((tag) => (
                 <button
                   key={tag}
                   type="button"
                   onClick={() => setQuery(tag)}
-                  className="h-10 px-4 rounded-full bg-white border border-line text-[15px] font-bold text-ink hover:border-primary cursor-pointer shadow-2xs transition-colors"
+                  className="h-8.5 px-3.5 rounded-full bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 text-[13px] font-bold text-slate-800 dark:text-purple-200 hover:border-[#1E3A8A] hover:text-[#1E3A8A] cursor-pointer shadow-2xs transition-all active:scale-95"
                 >
                   {tag}
                 </button>
@@ -183,80 +187,123 @@ export default function SearchPage() {
           </div>
         ) : totalResults === 0 ? (
           /* Không tìm thấy */
-          <div className="p-8 text-center bg-white rounded-[22px] border border-line my-4 flex flex-col gap-2">
-            <p className="text-[17px] text-ink font-extrabold">
-              Không tìm thấy
+          <div className="p-8 text-center bg-white dark:bg-[#160D30] rounded-[20px] border border-slate-200 dark:border-purple-800/40 my-4 flex flex-col gap-1.5 shadow-2xs">
+            <p className="text-[16px] text-slate-900 dark:text-white font-extrabold">
+              Không tìm thấy kết quả phù hợp
             </p>
-            <p className="text-[15px] text-muted font-normal">
-              Thử từ khác, ví dụ: cột sống, đĩa đệm.
+            <p className="text-[13px] text-slate-500 dark:text-purple-300/70 font-normal">
+              Thử tìm với từ khóa khác như: cột sống, đĩa đệm, dinh dưỡng.
             </p>
           </div>
         ) : (
-          /* Danh sách kết quả theo 3 nhóm */
-          <div className="flex flex-col gap-6">
+          /* Danh sách kết quả theo 3 nhóm thiết kế dạng Flycy */
+          <div className="flex flex-col gap-5">
             {/* Nhóm 1: Chủ đề */}
             {matchedTopics.length > 0 && (
-              <div className="flex flex-col gap-2.5">
-                <div className="flex items-center gap-1.5 text-[14px] font-extrabold text-muted uppercase tracking-wider px-1">
-                  <Layers size={16} className="text-primary" />
-                  <span>CHỦ ĐỀ ({matchedTopics.length})</span>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-1.5 text-[12px] font-extrabold text-slate-500 dark:text-purple-300/70 uppercase tracking-wider px-1">
+                  <Layers size={14} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
+                  <span>CHUYÊN ĐỀ ({matchedTopics.length})</span>
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  {matchedTopics.map((t) => (
-                    <Link
-                      key={t.id}
-                      href={`/${t.slug}`}
-                      className="p-4 rounded-[18px] bg-white border border-line hover:border-line-strong transition-all flex items-center justify-between shadow-2xs"
-                    >
-                      <div className="flex flex-col gap-1 min-w-0 pr-3">
-                        <span className="text-[17px] font-extrabold text-ink leading-snug truncate">
-                          {t.title}
-                        </span>
-                        {t.description && (
-                          <p className="text-[14px] text-muted line-clamp-2">
-                            {t.description}
-                          </p>
-                        )}
-                      </div>
-                      <ChevronRight size={20} className="text-muted shrink-0" />
-                    </Link>
-                  ))}
+                  {matchedTopics.map((t) => {
+                    const iconSrc = t.icon_url || `/images/topics/${t.slug}.png`;
+                    return (
+                      <Link
+                        key={t.id}
+                        href={`/${t.slug}`}
+                        className="p-3 rounded-[16px] bg-white dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-800/40 hover:border-[#1E3A8A]/50 dark:hover:border-[#F8DF7B]/60 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-3 group"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          {/* Thumbnail 3D chuyên đề sắc nét */}
+                          <div className="w-12 h-12 rounded-[12px] bg-slate-50 dark:bg-purple-950/70 border border-slate-200 dark:border-purple-800/50 p-1 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform overflow-hidden">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={iconSrc}
+                              alt={t.title}
+                              className="w-full h-full object-contain"
+                              onError={(e) => {
+                                (e.target as HTMLElement).style.display = 'none';
+                              }}
+                            />
+                          </div>
+
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-[10px] font-black text-[#1E3A8A] dark:text-[#93C5FD] uppercase tracking-wider">
+                              Chuyên đề y khoa
+                            </span>
+                            <span className="text-[15px] font-black text-slate-900 dark:text-white leading-snug truncate group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] transition-colors">
+                              {t.title}
+                            </span>
+                            {t.description && (
+                              <p className="text-[12px] text-slate-500 dark:text-purple-300/70 line-clamp-1 mt-0.5">
+                                {t.description}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="w-7 h-7 rounded-full bg-slate-50 dark:bg-purple-900/40 text-slate-400 group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] flex items-center justify-center shrink-0 transition-transform group-hover:translate-x-0.5">
+                          <ChevronRight size={16} />
+                        </div>
+                      </Link>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
             {/* Nhóm 2: Trang nội dung */}
             {matchedPages.length > 0 && (
-              <div className="flex flex-col gap-2.5">
-                <div className="flex items-center gap-1.5 text-[14px] font-extrabold text-muted uppercase tracking-wider px-1">
-                  <BookOpen size={16} className="text-primary" />
-                  <span>TRANG NỘI DUNG ({matchedPages.length})</span>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-1.5 text-[12px] font-extrabold text-slate-500 dark:text-purple-300/70 uppercase tracking-wider px-1">
+                  <BookOpen size={14} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
+                  <span>BÀI HỌC NỘI DUNG ({matchedPages.length})</span>
                 </div>
 
                 <div className="flex flex-col gap-2">
                   {matchedPages.map((p) => {
                     const formattedNum = String(p.page_number).padStart(2, '0');
+                    const thumbSrc = p.cover_url || `/images/topics/${p.topic_slug}.png`;
                     return (
                       <Link
                         key={p.id}
                         href={`/${p.topic_slug}/${p.slug}`}
-                        className="p-4 rounded-[18px] bg-white border border-line hover:border-line-strong transition-all flex items-center justify-between shadow-2xs"
+                        className="p-3 rounded-[16px] bg-white dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-800/40 hover:border-[#1E3A8A]/50 dark:hover:border-[#F8DF7B]/60 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-3 group"
                       >
-                        <div className="flex flex-col gap-0.5 min-w-0 pr-3">
-                          <span className="text-[12px] font-extrabold text-muted uppercase tracking-wider">
-                            {p.topic_title} · {formattedNum}
-                          </span>
-                          <span className="text-[17px] font-extrabold text-ink leading-snug truncate">
-                            {p.title}
-                          </span>
-                          {p.summary && (
-                            <p className="text-[14px] text-muted line-clamp-2 mt-0.5">
-                              {p.summary}
-                            </p>
-                          )}
+                        <div className="flex items-center gap-3 min-w-0">
+                          {/* Thumbnail bài học */}
+                          <div className="w-12 h-12 rounded-[12px] bg-slate-50 dark:bg-purple-950/70 border border-slate-200 dark:border-purple-800/50 p-1 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform overflow-hidden">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={thumbSrc}
+                              alt={p.title}
+                              className="w-full h-full object-contain"
+                              onError={(e) => {
+                                (e.target as HTMLElement).style.display = 'none';
+                              }}
+                            />
+                          </div>
+
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-[10.5px] font-black text-slate-500 dark:text-purple-300/70 uppercase tracking-wider">
+                              {p.topic_title} · Bài {formattedNum}
+                            </span>
+                            <span className="text-[14.5px] font-black text-slate-900 dark:text-white leading-snug truncate group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] transition-colors">
+                              {p.title}
+                            </span>
+                            {p.summary && (
+                              <p className="text-[12px] text-slate-500 dark:text-purple-300/70 line-clamp-1 mt-0.5">
+                                {p.summary}
+                              </p>
+                            )}
+                          </div>
                         </div>
-                        <ChevronRight size={20} className="text-muted shrink-0" />
+
+                        <div className="w-7 h-7 rounded-full bg-slate-50 dark:bg-purple-900/40 text-slate-400 group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] flex items-center justify-center shrink-0 transition-transform group-hover:translate-x-0.5">
+                          <ChevronRight size={16} />
+                        </div>
                       </Link>
                     );
                   })}
@@ -266,35 +313,56 @@ export default function SearchPage() {
 
             {/* Nhóm 3: Video */}
             {matchedVideos.length > 0 && (
-              <div className="flex flex-col gap-2.5">
-                <div className="flex items-center gap-1.5 text-[14px] font-extrabold text-muted uppercase tracking-wider px-1">
-                  <PlaySquare size={16} className="text-primary" />
-                  <span>VIDEO ({matchedVideos.length})</span>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-1.5 text-[12px] font-extrabold text-slate-500 dark:text-purple-300/70 uppercase tracking-wider px-1">
+                  <PlaySquare size={14} className="text-red-500" />
+                  <span>VIDEO HƯỚNG DẪN ({matchedVideos.length})</span>
                 </div>
 
                 <div className="flex flex-col gap-2">
                   {matchedVideos.map((v, i) => {
                     const formattedNum = String(v.page_number).padStart(2, '0');
+                    const videoThumb = v.thumbnail_url || `https://img.youtube.com/vi/${v.youtube_id}/hqdefault.jpg`;
                     return (
                       <Link
                         key={i}
                         href={`/${v.topic_slug}/${v.page_slug}?v=${v.video_index}`}
-                        className="p-4 rounded-[18px] bg-white border border-line hover:border-line-strong transition-all flex items-center justify-between shadow-2xs"
+                        className="p-3 rounded-[16px] bg-white dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-800/40 hover:border-red-400/50 dark:hover:border-red-500/60 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-3 group"
                       >
-                        <div className="flex flex-col gap-0.5 min-w-0 pr-3">
-                          <span className="text-[12px] font-extrabold text-primary uppercase tracking-wider">
-                            {v.topic_title} · {formattedNum} · Video {String(v.video_index).padStart(2, '0')}
-                          </span>
-                          <span className="text-[17px] font-extrabold text-ink leading-snug truncate">
-                            {v.title}
-                          </span>
-                          {v.description && (
-                            <p className="text-[14px] text-muted line-clamp-2 mt-0.5">
-                              {v.description}
-                            </p>
-                          )}
+                        <div className="flex items-center gap-3 min-w-0">
+                          {/* Thumbnail video tỷ lệ 16:9 kèm nút Play đỏ */}
+                          <div className="w-[66px] h-[44px] rounded-[10px] bg-slate-900 border border-slate-200 dark:border-purple-800/50 shrink-0 relative overflow-hidden shadow-2xs group-hover:scale-105 transition-transform flex items-center justify-center">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={videoThumb}
+                              alt={v.title}
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
+                              <div className="w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center shadow-xs">
+                                <PlaySquare size={11} fill="white" />
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-[10px] font-black text-red-600 dark:text-red-400 uppercase tracking-wider">
+                              {v.topic_title} · Bài {formattedNum} · Video {v.video_index}
+                            </span>
+                            <span className="text-[14.5px] font-black text-slate-900 dark:text-white leading-snug truncate group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+                              {v.title}
+                            </span>
+                            {v.description && (
+                              <p className="text-[12px] text-slate-500 dark:text-purple-300/70 line-clamp-1 mt-0.5">
+                                {v.description}
+                              </p>
+                            )}
+                          </div>
                         </div>
-                        <ChevronRight size={20} className="text-muted shrink-0" />
+
+                        <div className="w-7 h-7 rounded-full bg-slate-50 dark:bg-purple-900/40 text-slate-400 group-hover:text-red-500 flex items-center justify-center shrink-0 transition-transform group-hover:translate-x-0.5">
+                          <ChevronRight size={16} />
+                        </div>
                       </Link>
                     );
                   })}

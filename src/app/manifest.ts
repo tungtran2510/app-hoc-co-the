@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function manifest(): Promise<MetadataRoute.Manifest> {
   const settings = await getSettings();
-  const name = settings?.app_name || 'Học Cơ Thể';
+  const name = settings?.app_name || 'Qbiz Books';
   const short_name = name.length > 12 ? name.slice(0, 12) : name;
 
   return {

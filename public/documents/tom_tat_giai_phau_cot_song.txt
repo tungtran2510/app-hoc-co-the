@@ -1,0 +1,46 @@
+================================================================================
+ATLAS & CẨM NANG GIẢI PHẪU CỘT SỐNG TOÀN DIỆN - TỦ SÁCH Y KHOA QBIZ BOOKS
+================================================================================
+Ấn bản tóm tắt lâm sàng dành cho học viên và chuyên viên cơ xương khớp
+Nguồn tài liệu: Bộ Y Tế & Atlas Giải Phẫu Netter
+
+I. TỔNG QUAN HỆ TRỤC CỘT SỐNG:
+- Cột sống người trưởng thành gồm 33-34 đốt sống liên hoàn:
+  + Cổ (C1 - C7): 7 đốt sống, linh hoạt nhất, khớp đội - chẩm và khớp đội - trục xoay 180 độ.
+  + Ngực (T1 - T12): 12 đốt sống, khớp với 12 đôi xương sườn tạo thành lồng ngực bảo vệ tim phổi.
+  + Thắt lưng (L1 - L5): 5 đốt sống to dày nhất, gập duỗi mạnh, chịu 60-70% trọng lượng cơ thể.
+  + Xương cùng (S1 - S5): 5 đốt dính liền tạo hình nêm, khớp cùng chậu truyền lực xuống 2 chân.
+  + Xương cụt (Co1 - Co4): Thoái hóa, cung cấp điểm bám cho cơ nâng hậu môn và đáy chậu.
+
+- 4 đường cong sinh lý: Cong ưỡn cổ, gù ngực, ưỡn thắt lưng và gù cùng cụt.
+  Theo định luật Euler: R = N² + 1, khả năng hấp thu lực xóc tăng gấp 10 lần so với cột thẳng đứng.
+
+II. CẤU TẠO VI THỂ 23 ĐĨA ĐỆM:
+- Chiếm 1/4 tổng chiều cao cột sống.
+- Vòng sợi (Annulus Fibrosus): Gồm 15-25 lớp lá collagen đan chéo góc 30-60°, rất dẻo dai.
+- Nhân nhầy (Nucleus Pulposus): Dạng gel chứa 80-85% nước và Proteoglycans chống nén thủy lực.
+- Cơ chế dinh dưỡng: Đĩa đệm không có mạch máu riêng, được nuôi dưỡng hoàn toàn bằng cơ chế khuếch tán qua mâm sụn khi cơ thể vận động nhịp nhàng.
+
+III. 4 GIAI ĐOẠN THOÁT VỊ ĐĨA ĐỆM:
+1. Giai đoạn 1: Phình đĩa đệm (Bulging) - Vòng sợi suy yếu nhẹ, chưa chèn ép rễ.
+2. Giai đoạn 2: Lồi đĩa đệm (Protrusion) - Rách lớp trong vòng sợi, nhân nhầy nhô ra chạm bao màng cứng.
+3. Giai đoạn 3: Thoát vị thực thụ (Extrusion) - Rách hoàn toàn vòng sợi, nhân nhầy chui vào ống sống.
+4. Giai đoạn 4: Thoát vị mảnh rời (Sequestration) - Nhân nhầy đứt rời di trú, nguy cơ chèn ép chùm đuôi ngựa.
+
+IV. NGUYÊN TẮC CÔNG THÁI HỌC (ERGONOMICS) & TƯ THẾ VÀNG:
+- Nằm ngửa: Áp lực đĩa đệm 25 kg.
+- Đứng thẳng tự nhiên: Áp lực 100 kg (Mốc chuẩn 100%).
+- Ngồi thẳng có tựa thắt lưng: 140 kg (140%).
+- Ngồi gù cúi người dùng máy tính: 185 kg (185%).
+- Cúi gập lưng nâng vật nặng 20kg: 275 - 300 kg (gấp 3 lần bình thường).
+- Nguyên tắc nhặt đồ nặng: "GẬP GỐI, KHÔNG GẬP LƯNG".
+
+V. BỘ DẤU HIỆU CỜ ĐỎ (RED FLAGS) CẦN CẤP CỨU NGOẠI THẦN KINH:
+- Bí tiểu, tiểu hoặc đại tiện mất tự chủ.
+- Tê bì mất cảm giác vùng yên ngựa (quanh hậu môn và đáy chậu).
+- Yếu liệt bàn chân tiến triển nhanh (bàn chân rơi, đi vấp ngã).
+- Đau dữ dội về đêm kèm sốt cao hoặc sụt cân không rõ nguyên nhân.
+-> Chụp MRI và mổ giải áp khẩn cấp trong vòng 24 - 48 giờ.
+
+--------------------------------------------------------------------------------
+Tủ Sách Y Khoa Qbiz Books - Nền tảng học cơ thể người trực quan

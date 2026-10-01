@@ -7,6 +7,8 @@ import {
   BookOpen,
   Plus,
   Trash2,
+  ArrowUp,
+  ArrowDown,
   Image as ImageIcon,
   Save,
   Loader2,
@@ -222,6 +224,17 @@ export default function EditAuthorModal({
     }));
   };
 
+  // Di chuyển thứ tự sách lên / xuống
+  const handleMoveBook = (index: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= profile.books.length) return;
+    const nextBooks = [...profile.books];
+    const temp = nextBooks[index];
+    nextBooks[index] = nextBooks[targetIndex];
+    nextBooks[targetIndex] = temp;
+    setProfile((prev) => ({ ...prev, books: nextBooks }));
+  };
+
   // Lưu cấu hình
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -393,7 +406,7 @@ export default function EditAuthorModal({
                     )}
                   </div>
 
-                  <div className="flex-1 flex flex-col gap-1">
+                  <div className="flex-1 flex flex-col gap-1.5">
                     <button
                       type="button"
                       onClick={() => avatarInputRef.current?.click()}
@@ -412,6 +425,13 @@ export default function EditAuthorModal({
                         </>
                       )}
                     </button>
+                    <input
+                      type="text"
+                      value={profile.avatar_url || ''}
+                      onChange={(e) => setProfile({ ...profile, avatar_url: e.target.value.trim() || null })}
+                      placeholder="Hoặc dán URL ảnh trực tiếp..."
+                      className="w-full h-8 px-2.5 rounded-[8px] border border-line text-[12px] text-ink focus:border-primary"
+                    />
                     {profile.avatar_url && (
                       <button
                         type="button"
@@ -552,18 +572,38 @@ export default function EditAuthorModal({
                       key={book.id}
                       className="p-3.5 rounded-[16px] bg-surface border border-line flex flex-col gap-3 shadow-2xs"
                     >
-                      <div className="flex items-center justify-between">
-                        <span className="text-[12px] font-extrabold text-primary bg-primary-soft px-2 py-0.5 rounded-full">
+                      <div className="flex items-center justify-between pb-1.5 border-b border-line/60">
+                        <span className="text-[12px] font-extrabold text-primary bg-primary-soft px-2.5 py-0.5 rounded-full">
                           Sách #{idx + 1}
                         </span>
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteBook(book.id)}
-                          className="w-7 h-7 rounded-full text-red-500 hover:bg-red-50 flex items-center justify-center cursor-pointer"
-                          title="Xóa cuốn sách này"
-                        >
-                          <Trash2 size={15} />
-                        </button>
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            disabled={idx === 0}
+                            onClick={() => handleMoveBook(idx, 'up')}
+                            className="w-7 h-7 rounded-[8px] bg-surface-2 text-muted hover:text-ink disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer"
+                            title="Lên trên"
+                          >
+                            <ArrowUp size={14} />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={idx === profile.books.length - 1}
+                            onClick={() => handleMoveBook(idx, 'down')}
+                            className="w-7 h-7 rounded-[8px] bg-surface-2 text-muted hover:text-ink disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer"
+                            title="Xuống dưới"
+                          >
+                            <ArrowDown size={14} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteBook(book.id)}
+                            className="w-7 h-7 rounded-[8px] bg-red-50 text-red-500 hover:bg-red-100 flex items-center justify-center ml-1 cursor-pointer"
+                            title="Xóa cuốn sách này"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       </div>
 
                       {/* Tên sách & Năm */}

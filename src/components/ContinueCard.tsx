@@ -34,6 +34,9 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
 
       {/* 3D Anatomy / Avatar Render bên phải */}
       <div className="absolute -right-2 top-0 bottom-0 w-[42%] sm:w-[36%] pointer-events-none overflow-hidden select-none">
+        {/* Điểm sáng hào quang đốt sống thở nhẹ (Spine Ambient Glow) */}
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-amber-500/25 dark:bg-amber-400/20 blur-xl pointer-events-none animate-pulse" />
+
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={info.cover_url || '/images/lessons/tong-quan-ve-cot-song.png'}
@@ -50,15 +53,15 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
 
       <div className="relative z-10 flex flex-col gap-1 sm:gap-1.5">
         {/* Dòng 1: Huy hiệu chủ đề có icon Play + Nút sửa ảnh (nếu Admin) + Vị trí video */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-[#1E3A8A] dark:text-white/90 text-[11.5px] sm:text-[12px] font-bold">
+        <div className="flex items-center justify-between gap-1.5">
+          <div className="flex items-center gap-1.5 text-[#1E3A8A] dark:text-white/90 text-[11.5px] sm:text-[12px] font-bold min-w-0 flex-1">
             <span className="w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full bg-blue-100 text-[#1E3A8A] dark:bg-[#F8DF7B] dark:text-[#160C2C] flex items-center justify-center shrink-0 shadow-2xs">
               <Play size={8} fill="currentColor" className="ml-0.5" />
             </span>
-            <span>Đang xem · {info.topic_title || 'Cột sống'}</span>
+            <span className="truncate">Đang xem · {info.topic_title || 'Cột sống'}</span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 shrink-0">
             {isAdmin && onEditPage && (
               <button
                 type="button"
@@ -67,7 +70,7 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
                   e.stopPropagation();
                   onEditPage();
                 }}
-                className="px-2 py-0.5 rounded-full bg-blue-50 text-[#1E3A8A] border border-blue-200 hover:bg-blue-100 dark:bg-white/20 dark:hover:bg-white/35 dark:text-white text-[10.5px] font-bold flex items-center gap-1 backdrop-blur-xs cursor-pointer transition-colors shadow-2xs"
+                className="px-2 py-0.5 rounded-full bg-blue-50 text-[#1E3A8A] border border-blue-200 hover:bg-blue-100 dark:bg-white/20 dark:hover:bg-white/35 dark:text-white text-[10px] sm:text-[10.5px] font-bold flex items-center gap-1 backdrop-blur-xs cursor-pointer transition-colors shadow-2xs shrink-0 whitespace-nowrap"
                 title="Cài đặt ảnh đại diện & thông tin bài học này"
               >
                 <Edit2 size={10} />
@@ -75,7 +78,7 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
               </button>
             )}
 
-            <span className="text-[11px] sm:text-[11.5px] font-bold text-slate-500 dark:text-white/75 pr-1">
+            <span className="text-[11px] sm:text-[11.5px] font-bold text-slate-500 dark:text-white/75 shrink-0 pr-0.5">
               Video {String(current).padStart(2, '0')}/{String(total).padStart(2, '0')}
             </span>
           </div>
@@ -91,9 +94,9 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
           {info.video_title || 'Cấu tạo & chức năng cột sống'}
         </p>
 
-        {/* Dòng 4: Thanh tiến độ + Phần trăm + Nút Xem tiếp */}
+        {/* Dòng 4: Thanh tiến độ + Phần trăm + Nút Xem tiếp phát sáng chuyên nghiệp */}
         <div className="flex items-center justify-between gap-2.5 pt-0.5 mt-0.5">
-          <div className="flex-1 max-w-[56%] sm:max-w-[64%] flex items-center gap-2">
+          <div className="flex-1 max-w-[54%] sm:max-w-[62%] flex items-center gap-2">
             <div
               className="flex-1 h-1.5 bg-slate-200 dark:bg-black/30 rounded-full overflow-hidden p-[0.5px]"
               role="progressbar"
@@ -111,9 +114,19 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
             </span>
           </div>
 
-          <div className="shrink-0 flex items-center gap-1 h-[28px] sm:h-[30px] px-3 sm:px-3.5 rounded-full bg-[#1E3A8A] text-white hover:bg-[#172554] dark:bg-[#F8DF7B] dark:text-[#160C2C] dark:group-hover:bg-[#FDE68A] font-black text-[12px] sm:text-[12.5px] shadow-sm transition-colors">
-            <span>Xem tiếp</span>
-            <ArrowRight size={13} strokeWidth={2.5} />
+          {/* Nút Xem tiếp: Hiệu ứng nhịp thở phát sáng (Pulse-glow) + Vệt sáng quét ngang (Shimmer Sweep) + Đèn tín hiệu Live */}
+          <div className="relative shrink-0 flex items-center gap-1.5 h-[29px] sm:h-[31px] px-3 sm:px-3.5 rounded-full bg-gradient-to-r from-[#1E3A8A] via-[#1D4ED8] to-[#1E3A8A] text-white hover:from-[#172554] hover:to-[#1E3A8A] dark:bg-gradient-to-r dark:from-[#FDE68A] dark:via-[#F8DF7B] dark:to-[#F59E0B] dark:text-[#160C2C] font-black text-[12px] sm:text-[12.5px] shadow-sm transition-all duration-300 animate-pulse-glow overflow-hidden select-none">
+            {/* Vệt sáng quét ngang lấp lánh (Shimmer Sweep Light) */}
+            <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 dark:via-white/60 to-transparent animate-shimmer-sweep" />
+
+            {/* Chấm tròn phát sáng nhịp tim LIVE / Đang học dở */}
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-300 dark:bg-amber-800 opacity-80" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-200 dark:bg-[#160C2C]" />
+            </span>
+
+            <span className="tracking-tight">Xem tiếp</span>
+            <ArrowRight size={13} strokeWidth={2.5} className="transition-transform group-hover:translate-x-0.5" />
           </div>
         </div>
       </div>
