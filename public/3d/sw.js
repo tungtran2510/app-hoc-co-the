@@ -1,9 +1,9 @@
 /**
- * Service Worker - Atlas Giải Phẫu 3D (v6.0.0)
+ * Service Worker - Atlas Giải Phẫu 3D (Production v1.0.0)
  * PWA Offline First, Per-System 3D Model Caching & Background Sync
  */
 
-const CACHE_VERSION = 'atlas-v6';
+const CACHE_VERSION = 'atlas-v1.0.0';
 const STATIC_CACHE = `atlas-static-${CACHE_VERSION}`;
 const MODELS_CACHE = `atlas-models-${CACHE_VERSION}`;
 const DATA_CACHE = `atlas-data-${CACHE_VERSION}`;

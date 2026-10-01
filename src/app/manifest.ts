@@ -49,6 +49,13 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
         url: '/tro-ly-ai',
         icons: [{ src: '/icon-192.png', sizes: '192x192' }],
       },
+      {
+        name: 'Chẩn Đoán Hình Ảnh & Lâm Sàng',
+        short_name: 'Chẩn Đoán',
+        description: 'Đối chiếu X-quang, CT, MRI, Siêu âm với mô hình 3D',
+        url: '/chan-doan-hinh-anh',
+        icons: [{ src: '/icon-192.png', sizes: '192x192' }],
+      },
     ],
   };
 }

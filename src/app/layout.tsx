@@ -21,10 +21,14 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#1D58D8',
+  themeColor: [
+    { media: '(prefers-color-scheme: dark)', color: '#0C0817' },
+    { media: '(prefers-color-scheme: light)', color: '#F5F6FA' },
+  ],
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({
@@ -37,7 +41,7 @@ export default function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem('giao_dien');if(t==='dark'){document.documentElement.classList.add('dark')}else if(t==='gray'){document.documentElement.classList.add('gray')}}catch(e){}`,
+            __html: `try{var t=localStorage.getItem('giao_dien');if(t==='dark'){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}}catch(e){}`,
           }}
         />
       </head>

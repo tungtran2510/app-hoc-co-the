@@ -24,7 +24,7 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      activeVersion: versions[0]?.version || '1.2.0',
+      activeVersion: versions[0]?.version || '1.0.0',
       stats: {
         total: structures.length,
         verified,
