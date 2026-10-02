@@ -1118,19 +1118,20 @@ export default function FlipbookViewer({
             draggable={false}
           />
 
-          {/* Lớp phủ tiêu đề trên bìa sách */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none px-8 sm:px-16">
-            <h3 className="text-amber-100 text-center font-bold text-[15px] sm:text-[20px] leading-snug drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] tracking-wide" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.85), 0 0 20px rgba(0,0,0,0.5)' }}>
+          {/* Lớp phủ tiêu đề trên trang sách mở */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none px-12 sm:px-24">
+            <h3 className="text-[#1a2744] text-center font-bold text-[16px] sm:text-[22px] leading-snug tracking-wide" style={{ textShadow: '0 1px 3px rgba(255,255,255,0.5)' }}>
               {bookTitle}
             </h3>
-            <p className="text-amber-300/80 text-[11px] sm:text-[13px] mt-2 font-semibold tracking-wider uppercase drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
+            <div className="w-12 h-[2px] bg-amber-600/60 rounded-full mt-2.5 mb-1.5" />
+            <p className="text-[#4a5568] text-[10px] sm:text-[12px] font-semibold tracking-wider uppercase">
               Tài liệu tham khảo
             </p>
           </div>
 
           {/* Nút gợi ý ấn vào để đọc */}
           <div className="absolute bottom-3 inset-x-0 flex justify-center z-20">
-            <div className="px-4 py-1.5 rounded-full bg-black/80 text-amber-300 text-[11px] sm:text-[12px] font-bold border border-amber-400/50 flex items-center gap-1.5 shadow-lg backdrop-blur-sm group-hover:bg-amber-900/80 transition-colors">
+            <div className="px-4 py-1.5 rounded-full bg-[#1a2744]/90 text-amber-200 text-[11px] sm:text-[12px] font-bold border border-amber-400/40 flex items-center gap-1.5 shadow-lg backdrop-blur-sm group-hover:bg-[#1a2744] transition-colors">
               <BookOpen size={13} />
               <span>Chạm để mở đọc</span>
             </div>
