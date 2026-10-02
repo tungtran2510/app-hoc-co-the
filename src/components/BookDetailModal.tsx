@@ -707,7 +707,7 @@ export default function BookDetailModal({
                   ? 'transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1)'
                   : 'none',
               }}
-              className="max-h-[80vh] max-w-[92vw] object-contain rounded-[12px] shadow-2xl select-none pointer-events-auto cursor-zoom-in active:cursor-grab"
+              className="max-h-[85vh] max-w-full object-contain rounded-[4px] shadow-2xl select-none pointer-events-auto cursor-zoom-in active:cursor-grab"
             />
 
             {/* Nút tiến ảnh */}

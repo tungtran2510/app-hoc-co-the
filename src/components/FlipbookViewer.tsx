@@ -477,6 +477,25 @@ export default function FlipbookViewer({
   const [showCoverModal, setShowCoverModal] = useState<boolean>(false);
   const [isUploadingCover, setIsUploadingCover] = useState<boolean>(false);
 
+  // Tự động nhận diện tỷ lệ khung hình thật của ảnh bìa (đứng, vuông hay ngang)
+  const [coverAspect, setCoverAspect] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!currentCoverUrl) return;
+    const img = new Image();
+    img.src = currentCoverUrl;
+    const updateAspect = () => {
+      if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+        setCoverAspect(img.naturalWidth / img.naturalHeight);
+      }
+    };
+    if (img.complete && img.naturalWidth > 0) {
+      updateAspect();
+    } else {
+      img.onload = updateAspect;
+    }
+  }, [currentCoverUrl]);
+
   useEffect(() => {
     if (coverUrl && !isOldOrBrokenCover(coverUrl)) {
       setCurrentCoverUrl(coverUrl.trim());
@@ -1232,8 +1251,13 @@ export default function FlipbookViewer({
             - Chạm vào lớp phủ để mở cuốn sách đọc các trang bên trong
             ========================================================================= */}
         <div
-          className="w-full aspect-[4/3] max-h-[500px] rounded-[18px] bg-[#0c1626] relative overflow-hidden flex items-center justify-center group shadow-2xl my-2 cursor-pointer touch-pan-y border border-amber-500/30 select-none"
-          style={{ touchAction: 'pan-y' }}
+          className={`w-full ${coverAspect ? '' : 'aspect-[4/3]'} max-h-[520px] rounded-[18px] bg-[#0c1626] relative overflow-hidden flex items-center justify-center group shadow-2xl my-2 cursor-pointer touch-pan-y border border-amber-500/30 select-none`}
+          style={{
+            touchAction: 'pan-y',
+            aspectRatio: coverAspect ? `${coverAspect}` : undefined,
+            maxWidth: coverAspect && coverAspect < 0.95 ? `${Math.min(420, Math.round(520 * coverAspect))}px` : undefined,
+            marginInline: coverAspect && coverAspect < 0.95 ? 'auto' : undefined,
+          }}
           onTouchStart={onCoverTouchStart}
           onTouchMove={onCoverTouchMove}
           onTouchEnd={onCoverTouchEnd}
@@ -1415,11 +1439,11 @@ export default function FlipbookViewer({
           onMouseMove={resetChromeTimer}
           onTouchStart={resetChromeTimer}
           onPointerDown={resetChromeTimer}
-          className="fixed inset-0 z-[9999] bg-black/95 text-white flex flex-col justify-between p-3 sm:p-5 backdrop-blur-md animate-in fade-in duration-200 select-none overflow-hidden"
+          className="fixed inset-0 z-[9999] bg-black/95 text-white flex flex-col justify-between p-0 sm:p-3 backdrop-blur-md animate-in fade-in duration-200 select-none overflow-hidden"
         >
           {/* TOP BAR FULLSCREEN (Tự động mờ ẩn khi đọc để tập trung vào sách) */}
           <div
-            className={`flex items-center justify-between pb-2 border-b border-white/10 shrink-0 transition-all duration-500 ease-in-out ${
+            className={`flex items-center justify-between px-3 sm:px-4 pt-2.5 pb-2 border-b border-white/10 shrink-0 transition-all duration-500 ease-in-out ${
               isChromeVisible
                 ? 'opacity-100 translate-y-0 pointer-events-auto'
                 : 'opacity-0 -translate-y-6 pointer-events-none'
@@ -1682,7 +1706,7 @@ export default function FlipbookViewer({
                 transformOrigin: 'center center',
                 transition: isDraggingPanRef.current ? 'none' : 'transform 0.15s ease-out',
               }}
-              className="w-full h-full max-w-[850px] max-h-[82vh] flex items-center justify-center pointer-events-auto"
+              className="w-full h-full max-w-[950px] flex items-center justify-center pointer-events-auto"
               onDoubleClick={handleToggleZoom}
             >
               <SideBooksFlipEngine
@@ -1701,7 +1725,7 @@ export default function FlipbookViewer({
                 }}
                 isFullscreen={true}
                 disableFlip={zoomScale > 1.0}
-                className="w-full h-full max-w-[850px] max-h-[82vh]"
+                className="w-full h-full max-w-[950px]"
               />
             </div>
 
@@ -1744,7 +1768,7 @@ export default function FlipbookViewer({
 
           {/* BOTTOM BAR FULLSCREEN: ĐIỀU HƯỚNG TRANG & SLIDER (Tự động mờ ẩn khi đọc) */}
           <div
-            className={`flex items-center justify-between gap-3 pt-2 border-t border-white/10 shrink-0 max-w-[700px] w-full mx-auto transition-all duration-500 ease-in-out ${
+            className={`flex items-center justify-between gap-3 px-3 sm:px-4 pb-2.5 pt-2 border-t border-white/10 shrink-0 max-w-[700px] w-full mx-auto transition-all duration-500 ease-in-out ${
               isChromeVisible
                 ? 'opacity-100 translate-y-0 pointer-events-auto'
                 : 'opacity-0 translate-y-6 pointer-events-none'

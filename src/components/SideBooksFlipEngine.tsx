@@ -1,6 +1,7 @@
 'use client';
 
 import React, {
+  useState,
   useEffect,
   useRef,
   useImperativeHandle,
@@ -112,15 +113,114 @@ const SideBooksFlipEngine = forwardRef<SideBooksFlipEngineRef, SideBooksFlipEngi
       [pageImages, totalPages]
     );
 
+    // Tự động nhận diện tỷ lệ khung hình chuẩn của trang sách (width / height)
+    // Sách dọc (A4/A5 ~ 0.707 - 0.75), Sách vuông (~ 1.0), Sách ngang (~ 1.33 - 1.414)
+    const [pageAspectRatio, setPageAspectRatio] = useState<number>(0.714);
+
+    // Kích thước canvas thực tế (CSS pixel) được tính toán theo tỷ lệ chuẩn
+    const [canvasDimensions, setCanvasDimensions] = useState<{ width: number; height: number }>({
+      width: isFullscreen ? 400 : 350,
+      height: isFullscreen ? 560 : 490,
+    });
+
+    // Nhận diện tỷ lệ kích thước thật từ ảnh trang hiện tại
+    useEffect(() => {
+      const currentUrl = pageImages[currentPage - 1];
+      if (!currentUrl) return;
+      const img = getImage(currentPage - 1);
+      if (img) {
+        const updateRatio = () => {
+          if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+            const ratio = img.naturalWidth / img.naturalHeight;
+            setPageAspectRatio(ratio);
+          }
+        };
+        if (img.complete && img.naturalWidth > 0) {
+          updateRatio();
+        } else {
+          img.onload = () => {
+            updateRatio();
+            drawStatic();
+          };
+        }
+      }
+    }, [currentPage, pageImages, getImage]);
+
+    // Tính toán kích thước canvas khớp chính xác tỷ lệ sách và tối ưu không gian hiển thị
+    const updateDimensions = useCallback(() => {
+      const container = containerRef.current;
+      const availW = container?.clientWidth || (typeof window !== 'undefined' ? window.innerWidth : 360);
+      const availH = container?.clientHeight || (typeof window !== 'undefined' ? window.innerHeight - 100 : 500);
+
+      if (availW <= 0 || availH <= 0) return;
+
+      const ratio = pageAspectRatio > 0 ? pageAspectRatio : 0.714;
+      let targetW = availW;
+      let targetH = targetW / ratio;
+
+      if (targetH > availH) {
+        targetH = availH;
+        targetW = targetH * ratio;
+      }
+
+      const finalW = Math.round(targetW);
+      const finalH = Math.round(targetH);
+
+      setCanvasDimensions((prev) => {
+        if (prev.width === finalW && prev.height === finalH) return prev;
+        return { width: finalW, height: finalH };
+      });
+    }, [pageAspectRatio]);
+
+    useEffect(() => {
+      updateDimensions();
+    }, [updateDimensions, pageAspectRatio]);
+
     // Kích thước canvas thực tế (pixel CSS)
     const getCanvasDimensions = useCallback(() => {
-      const canvas = canvasRef.current;
-      if (!canvas) return { width: 360, height: 500 };
-      const rect = canvas.getBoundingClientRect();
-      const width = rect.width > 0 ? rect.width : (isFullscreen ? 480 : 360);
-      const height = rect.height > 0 ? rect.height : (isFullscreen ? 680 : 500);
-      return { width, height };
-    }, [isFullscreen]);
+      return canvasDimensions;
+    }, [canvasDimensions]);
+
+    // Hàm vẽ trang sách bảo toàn 100% tỷ lệ thật, KHÔNG bóp méo, KHÔNG kéo dãn
+    const drawPageImage = useCallback(
+      (
+        ctx: CanvasRenderingContext2D,
+        img: HTMLImageElement,
+        targetW: number,
+        targetH: number
+      ) => {
+        if (!img.complete || img.naturalWidth <= 0 || img.naturalHeight <= 0) return;
+        const imgW = img.naturalWidth;
+        const imgH = img.naturalHeight;
+        const imgAspect = imgW / imgH;
+        const canvasAspect = targetW / targetH;
+
+        // Nếu tỷ lệ canvas và ảnh gần như trùng khớp (< 1.5% sai khác)
+        if (Math.abs(imgAspect - canvasAspect) < 0.015) {
+          ctx.drawImage(img, 0, 0, targetW, targetH);
+          return;
+        }
+
+        // Nếu có độ lệch, căn giữa và giữ nguyên tỷ lệ thật không bóp méo (contain-fit)
+        let renderW = targetW;
+        let renderH = targetH;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        if (imgAspect > canvasAspect) {
+          renderW = targetW;
+          renderH = targetW / imgAspect;
+          offsetY = (targetH - renderH) / 2;
+        } else {
+          renderH = targetH;
+          renderW = targetH * imgAspect;
+          offsetX = (targetW - renderW) / 2;
+        }
+
+        ctx.drawImage(img, offsetX, offsetY, renderW, renderH);
+      },
+      []
+    );
 
     // Đồng bộ DPI của Canvas với màn hình Retina / High-DPI
     const resizeCanvasDPR = useCallback(() => {
@@ -166,7 +266,7 @@ const SideBooksFlipEngine = forwardRef<SideBooksFlipEngineRef, SideBooksFlipEngi
         // Trường hợp trang tĩnh hoặc chưa lật
         if (progress <= 0 || !toImg || !fromImg) {
           if (fromImg && fromImg.complete) {
-            ctx.drawImage(fromImg, 0, 0, W, H);
+            drawPageImage(ctx, fromImg, W, H);
           }
           // Đổ bóng gáy sách mép trái
           const spineGrad = ctx.createLinearGradient(0, 0, 16, 0);
@@ -183,7 +283,7 @@ const SideBooksFlipEngine = forwardRef<SideBooksFlipEngineRef, SideBooksFlipEngi
         // Trường hợp lật hoàn tất 100%
         if (progress >= 1) {
           if (toImg && toImg.complete) {
-            ctx.drawImage(toImg, 0, 0, W, H);
+            drawPageImage(ctx, toImg, W, H);
           }
           const spineGrad = ctx.createLinearGradient(0, 0, 16, 0);
           spineGrad.addColorStop(0, 'rgba(0, 0, 0, 0.22)');
@@ -213,7 +313,7 @@ const SideBooksFlipEngine = forwardRef<SideBooksFlipEngineRef, SideBooksFlipEngi
 
           // 1. Vẽ trang hiện tại nằm ở lớp đáy (From page)
           if (fromImg.complete) {
-            ctx.drawImage(fromImg, 0, 0, W, H);
+            drawPageImage(ctx, fromImg, W, H);
           }
 
           // 2. Bóng đổ mềm mại (Drop Shadow) phủ lên trang hiện tại bên phải nếp cuộn
@@ -253,7 +353,7 @@ const SideBooksFlipEngine = forwardRef<SideBooksFlipEngineRef, SideBooksFlipEngi
           ctx.closePath();
           ctx.clip();
           if (toImg.complete) {
-            ctx.drawImage(toImg, 0, 0, W, H);
+            drawPageImage(ctx, toImg, W, H);
           }
           ctx.restore();
 
@@ -279,7 +379,7 @@ const SideBooksFlipEngine = forwardRef<SideBooksFlipEngineRef, SideBooksFlipEngi
           ctx.scale(-1, 1);
           ctx.globalAlpha = 0.28;
           if (toImg.complete) {
-            ctx.drawImage(toImg, 0, 0, W, H);
+            drawPageImage(ctx, toImg, W, H);
           }
           ctx.restore();
 
@@ -317,7 +417,7 @@ const SideBooksFlipEngine = forwardRef<SideBooksFlipEngineRef, SideBooksFlipEngi
 
           // 1. Vẽ trang đích (To page) nằm ở lớp đáy
           if (toImg.complete) {
-            ctx.drawImage(toImg, 0, 0, W, H);
+            drawPageImage(ctx, toImg, W, H);
           }
 
           // 2. Bóng đổ mềm mại lên trang đích bên phải nếp cuộn
@@ -357,7 +457,7 @@ const SideBooksFlipEngine = forwardRef<SideBooksFlipEngineRef, SideBooksFlipEngi
           ctx.closePath();
           ctx.clip();
           if (fromImg.complete) {
-            ctx.drawImage(fromImg, 0, 0, W, H);
+            drawPageImage(ctx, fromImg, W, H);
           }
           ctx.restore();
 
@@ -384,7 +484,7 @@ const SideBooksFlipEngine = forwardRef<SideBooksFlipEngineRef, SideBooksFlipEngi
           ctx.scale(-1, 1);
           ctx.globalAlpha = 0.28;
           if (fromImg.complete) {
-            ctx.drawImage(fromImg, 0, 0, W, H);
+            drawPageImage(ctx, fromImg, W, H);
           }
           ctx.restore();
 
@@ -424,7 +524,7 @@ const SideBooksFlipEngine = forwardRef<SideBooksFlipEngineRef, SideBooksFlipEngi
 
         ctx.restore();
       },
-      [getCanvasDimensions, getImage]
+      [getCanvasDimensions, getImage, drawPageImage]
     );
 
     // Vẽ trang tĩnh hiện tại
@@ -437,14 +537,22 @@ const SideBooksFlipEngine = forwardRef<SideBooksFlipEngineRef, SideBooksFlipEngi
 
     // Lắng nghe thay đổi kích thước container để vẽ lại
     useEffect(() => {
+      updateDimensions();
       drawStatic();
       const handleResize = () => {
+        updateDimensions();
         resizeCanvasDPR();
         drawStatic();
       };
       window.addEventListener('resize', handleResize);
       return () => window.removeEventListener('resize', handleResize);
-    }, [drawStatic, resizeCanvasDPR]);
+    }, [drawStatic, resizeCanvasDPR, updateDimensions]);
+
+    // Tự động đồng bộ và vẽ lại khi canvasDimensions thay đổi
+    useEffect(() => {
+      resizeCanvasDPR();
+      drawStatic();
+    }, [canvasDimensions, resizeCanvasDPR, drawStatic]);
 
     // Cập nhật khi currentPage thay đổi từ bên ngoài (slider, click...)
     useEffect(() => {
@@ -850,8 +958,12 @@ const SideBooksFlipEngine = forwardRef<SideBooksFlipEngineRef, SideBooksFlipEngi
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
-          className="w-full h-full object-contain cursor-grab active:cursor-grabbing rounded-[12px] shadow-sm transition-transform"
+          className="cursor-grab active:cursor-grabbing shadow-2xl transition-transform"
           style={{
+            width: `${canvasDimensions.width}px`,
+            height: `${canvasDimensions.height}px`,
+            maxWidth: '100%',
+            maxHeight: '100%',
             touchAction: disableFlip ? 'auto' : isFullscreen ? 'none' : 'pan-y',
             pointerEvents: disableFlip ? 'none' : 'auto',
           }}
