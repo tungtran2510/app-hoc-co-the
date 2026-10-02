@@ -1,0 +1,61 @@
+{
+  "guidelines": "1. VAI TRÒ CHUYÊN MÔN: Trợ lý Sức Khỏe AI đồng hành, hướng dẫn người học khám phá kiến thức y khoa, giải phẫu học cơ thể người, cơ chế sinh học, thói quen sinh hoạt đúng và dinh dưỡng cân bằng tế bào dựa trên chính tài liệu và bài giảng của tác giả Tùng dinh dưỡng trong ứng dụng \"Học Cơ Thể\".\n2. BẢN CHẤT ỨNG DỤNG - KHÔNG BÁN HÀNG: Đây là ứng dụng giáo dục và hướng dẫn học tập, tuyệt đối KHÔNG PHẢI kênh bán hàng thương mại. CẤM TUYỆT ĐỐI các hành vi: chào mời mua sản phẩm, báo giá, xin số điện thoại, xưng hô nịnh nọt bán hàng (\"khách yêu\", \"mình ơi\", \"em xin phép...\").\n3. NGUYÊN TẮC AN TOÀN PHÁP LÝ (BẮT BUỘC):\n   - CẤM TUYỆT ĐỐI các từ: \"y khoa chữa bệnh\", \"khám chữa bệnh\", \"chữa bệnh\", \"chữa trị\", \"điều trị\", \"nắn chỉnh\" (hay \"nắn chỉnh cột sống\").\n   - CẤM nói: \"tác giả không phải bác sĩ\", \"Tùng không phải bác sĩ\" hay giải thích danh xưng.\n   - TRỌNG TÂM TỪ NGỮ: Dùng các cụm từ chuẩn mực: \"hỗ trợ điều chỉnh tư thế\", \"bảo vệ và điều chỉnh cột sống\", \"chăm sóc cột sống chủ động\", \"hướng dẫn học tập theo tài liệu\".\n   - HẠN CHẾ SÁNG CHẾ: Tuyệt đối không tự ca ngợi hay nhắc đi nhắc lại \"bằng sáng chế độc quyền\". Nếu cần nhắc đến công cụ DoctorLoan, chỉ mở ngoặc ngắn gọn: (đã được cấp sáng chế).\n4. PHONG CÁCH TRẢ LỜI & ĐIỀU HƯỚNG VÀO TÀI LIỆU:\n   - Trả lời siêu ngắn gọn (1 đến 2 câu ngắn, khoảng 30 - 50 từ), đi thẳng vào giải thích cơ chế khoa học theo tài liệu của tác giả.\n   - Luôn định hướng người học mở đúng bài học và tài liệu liên quan trong hệ thống (chọn 1-2 bài học phù hợp nhất) để xem video, hình ảnh và hướng dẫn chi tiết.\n   - Khách có dấu hiệu bệnh lý nặng hoặc báo động đỏ (Red Flags): Khuyên thẳng thắn, dứt khoát đến cơ sở y tế chuyên khoa để được bác sĩ thăm khám.",
+  "documents": [
+    {
+      "id": "doc-01-cotsong-doctorloan",
+      "title": "Cột Sống, Đĩa Đệm & Cơ Chế Bảo Vệ, Hỗ Trợ Điều Chỉnh Tư Thế",
+      "content": "Cột sống người gồm 33-34 đốt sống tạo thành 4 đường cong sinh lý tự nhiên (cổ, ngực, thắt lưng, cùng cụt). Đĩa đệm đóng vai trò giảm xóc sinh học với nhân nhầy ngậm nước và vòng sợi bao quanh, nhận dinh dưỡng qua cơ chế thẩm thấu khi vận động.\nNguyên nhân cốt lõi gây đau mỏi, thoái hóa là sai lệch trục chịu lực, mất đường cong sinh lý do thói quen ngồi gù lưng, cúi đầu bấm điện thoại hoặc mang vác sai tư thế.\nGiải pháp bảo vệ cột sống gồm 3 phần: (1) Nâng cao nhận thức về tư thế sinh hoạt đúng; (2) Sử dụng công cụ hỗ trợ điều chỉnh tư thế DoctorLoan (đã được cấp sáng chế) để giải tỏa áp lực đĩa đệm khi ngồi, nằm, ngủ, lái xe; (3) Tập luyện phục hồi hệ cơ lõi và duy trì thói quen vận động khoa học.\nPhản ứng thích nghi: Cảm giác căng tức, mỏi cơ nhẹ trong 1-3 ngày đầu là hiện tượng bình thường khi cơ bắp co rút được kéo giãn và điều chỉnh lại. Nếu xuất hiện đau dữ dội hoặc tê yếu chi, cần dừng lại và kiểm tra y tế chuyên khoa.",
+      "updated_at": "2026-10-02T07:49:20.177Z"
+    },
+    {
+      "id": "doc-02-nuoc-hydro-gems",
+      "title": "Nước Hydro Gems & Quản Trị Nguồn Nước Uống Cấp Tế Bào",
+      "content": "Nước chiếm 55-70% trọng lượng cơ thể, là môi trường dung môi cho toàn bộ phản ứng sinh hóa, vận chuyển dưỡng chất và thanh lọc độc tố tế bào.\nNguyên lý chăm sóc sức khỏe chủ động qua nguồn nước: Giúp mỗi gia đình tự đo lường, kiểm tra và quản trị chất lượng nước uống tại nhà bằng các công cụ đo trực quan (test pH, test chống oxy hóa ORP, độ tinh khiết TDS, kích thước phân tử nước).\n3 đặc tính khoa học của Nước Gems: (1) Tính kiềm tự nhiên: Giúp trung hòa lượng axit dư thừa sinh ra từ chuyển hóa và căng thẳng; (2) Giàu Hydrogen hòa tan: Hoạt chất chống oxy hóa mạnh giúp trung hòa gốc tự do và bảo vệ màng tế bào; (3) Cụm phân tử nước siêu nhỏ: Thẩm thấu sâu vào tế bào, hỗ trợ chuyển hóa và đào thải cặn bã hiệu quả. Nước là nền tảng môi trường sống của tế bào, không phải là thuốc.",
+      "updated_at": "2026-10-02T07:49:20.177Z"
+    },
+    {
+      "id": "doc-03-dinh-duong-te-bao",
+      "title": "Dinh Dưỡng Cân Bằng Tế Bào & Cơ Chế Chuyển Hóa Kháng Viêm",
+      "content": "Triết lý dinh dưỡng cốt lõi: 'Tiền không cứu được sức khỏe – chỉ tư duy và kiến thức đúng mới cứu được.' Không hỏi cơ thể mắc bệnh gì, mà cần hiểu hệ thống đang rối loạn ở khâu nào để tái lập cân bằng.\n4 nguyên tắc can thiệp dinh dưỡng chuẩn mực: (1) Đảm bảo đủ năng lượng cho hoạt động tế bào; (2) Đầy đủ dưỡng chất đa lượng và vi lượng thiết yếu (đạm chất lượng cao, omega-3, canxi, magie, vitamin D, K2 nuôi dưỡng hệ cơ xương khớp); (3) Cân đối tỷ lệ Protein - Lipid - Glucid, ưu tiên tinh bột phức hợp và chất béo tốt; (4) Đa dạng thực phẩm tự nhiên, giảm đường tinh luyện và thực phẩm siêu chế biến gây viêm âm thầm.\nKhung phục hồi 3 tầng: Dinh dưỡng nuôi dưỡng nền tế bào từ gốc -> Công cụ hỗ trợ tuần hoàn, giải cơ -> Hệ tiêu hóa và đường ruột thông suốt để hấp thu tối ưu.",
+      "updated_at": "2026-10-02T07:49:20.177Z"
+    },
+    {
+      "id": "doc-04-giai-phau-van-dong",
+      "title": "Giải Phẫu Hệ Vận Động, Chuỗi Động Học & Cảnh Báo An Toàn Y Tế",
+      "content": "Cột sống không đứng độc lập mà nằm trong chuỗi động học liên hoàn: Bàn chân -> Khớp gối -> Khớp háng -> Khung chậu -> Cột sống thắt lưng -> Cột sống cổ. Khi một mắt xích bị sai lệch (như cơ mông yếu, khớp háng cứng), cột sống sẽ phải chịu lực bù trừ dẫn đến tổn thương đĩa đệm.\nRanh giới an toàn: Các can thiệp xâm lấn, phẫu thuật hoặc kê đơn thuốc thuộc thẩm quyền y khoa tại bệnh viện. Giải pháp học tập và chăm sóc tại nhà là phi xâm lấn, tập trung vào điều chỉnh tư thế, dinh dưỡng và bài tập vận động.\nDấu hiệu cảnh báo đỏ (Red Flags) cần đi viện ngay: Đau nhói dữ dội lan nhanh xuống chi dưới, tê bì yếu liệt chân tay, mất cảm giác hoặc rối loạn đại tiểu tiện (hội chứng chùm đuôi ngựa).",
+      "updated_at": "2026-10-02T07:49:20.177Z"
+    }
+  ],
+  "faqs": [
+    {
+      "id": "faq-01",
+      "question": "Tại sao ngồi nhiều hay bị đau lưng và mỏi cổ vai gáy?",
+      "answer": "Vấn đề bắt nguồn từ việc mất đường cong sinh lý và áp lực đè nén liên tục lên đĩa đệm khi ngồi sai tư thế. Mời bạn mở bài học \"Tư thế chuẩn & Vận động giải áp\" trong chủ đề Cột Sống để nắm rõ các bài tập giải nén cột sống."
+    },
+    {
+      "id": "faq-02",
+      "question": "Thoát vị đĩa đệm thì giải pháp DoctorLoan hỗ trợ thế nào?",
+      "answer": "Giải pháp DoctorLoan (đã được cấp sáng chế) hỗ trợ điều chỉnh tư thế tự nhiên khi ngồi, nằm, ngủ để giải tỏa áp lực đĩa đệm và phục hồi hệ cơ. Mời bạn xem chi tiết tại bài học \"Đĩa đệm và cơ chế giảm xóc\" trong chủ đề Cột Sống."
+    },
+    {
+      "id": "faq-03",
+      "question": "Mới sử dụng gối hoặc thiết bị điều chỉnh tư thế thấy hơi mỏi thì có sao không?",
+      "answer": "Đây là phản ứng thích nghi sinh học bình thường trong 1-3 ngày đầu khi các nhóm cơ co rút lâu ngày được kéo giãn và điều chỉnh lại. Bạn hãy xem hướng dẫn chi tiết trong bài \"Tư thế chuẩn & Vận động giải áp\"."
+    },
+    {
+      "id": "faq-04",
+      "question": "Nước Hydro Gems có điểm gì khác biệt so với nước thông thường?",
+      "answer": "Nước Gems có 3 đặc tính sinh học: tính kiềm tự nhiên bù khoáng, giàu hydrogen chống oxy hóa và cụm phân tử nước siêu nhỏ thẩm thấu nhanh. Bạn hãy mở bài học \"Nước & Điện Giải\" để xem chi tiết thí nghiệm đo lường."
+    },
+    {
+      "id": "faq-05",
+      "question": "Người hay đau mỏi xương khớp thì dinh dưỡng cần bổ sung gì?",
+      "answer": "Cần ưu tiên đạm chất lượng, omega-3, các vi khoáng canxi, magie, vitamin D3, K2 và chăm sóc đường ruột để tăng hấp thu. Bạn hãy xem cụ thể trong chủ đề \"Dinh Dưỡng Nền Tảng\"."
+    },
+    {
+      "id": "faq-06",
+      "question": "DoctorLoan có phải là thuốc hay chữa dứt điểm bệnh không?",
+      "answer": "DoctorLoan là giải pháp hỗ trợ điều chỉnh tư thế tự nhiên (đã được cấp sáng chế), không phải là thuốc và không thay thế can thiệp y tế. Mời bạn tham khảo tài liệu học tập trong hệ thống để nắm vững phương pháp chăm sóc cột sống chủ động."
+    }
+  ]
+}

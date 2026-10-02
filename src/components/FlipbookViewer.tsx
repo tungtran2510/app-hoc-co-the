@@ -1101,53 +1101,39 @@ export default function FlipbookViewer({
           </div>
         </div>
 
-        {/* KHUNG HIỂN THỊ SÁCH LẬT 3D INLINE (GIỮ NGUYÊN TỈ LỆ 100%) */}
+        {/* BÌA SÁCH ĐÓNG - ẤN VÀO MỞ ĐỌC TOÀN MÀN HÌNH */}
         <div
-          className="w-full aspect-[3/4] sm:aspect-[4/3] max-h-[500px] rounded-[14px] bg-black/60 border border-amber-400/40 relative overflow-hidden flex items-center justify-center group shadow-2xl my-2"
+          className="w-full aspect-[3/4] sm:aspect-[4/3] max-h-[500px] rounded-[14px] bg-black/60 border border-amber-400/40 relative overflow-hidden flex items-center justify-center group shadow-2xl my-2 cursor-pointer"
+          onClick={() => setIsFullscreen(true)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsFullscreen(true); }}
+          aria-label={`Mở đọc: ${bookTitle}`}
         >
-          {/* SideBooks 3D Cylindrical Curl Engine */}
-          <SideBooksFlipEngine
-            ref={inlineFlipRef}
-            pageImages={pageImages}
-            currentPage={currentPage}
-            onPageChange={setCurrentPage}
-            onFlipSound={playPageFlipSound}
-            onCenterClick={() => setIsFullscreen(true)}
-            isFullscreen={false}
-            className="w-full h-full"
+          {/* Ảnh bìa sách cố định */}
+          <img
+            src="/images/book_cover_blank.jpg"
+            alt="Bìa sách"
+            className="absolute inset-0 w-full h-full object-contain z-0"
+            draggable={false}
           />
 
-          {/* Nút gợi ý lật trang nhanh 2 bên trái / phải (Dưới góc, mờ 50%) */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleFlipPrev();
-            }}
-            disabled={currentPage <= 1}
-            className="absolute left-2 bottom-3 w-7 h-7 rounded-full bg-black/70 text-amber-300 shadow-md border border-amber-400/40 flex items-center justify-center opacity-60 hover:opacity-100 disabled:opacity-0 disabled:pointer-events-none transition-all cursor-pointer z-10"
-            aria-label="Trang trước"
-          >
-            <ChevronLeft size={14} strokeWidth={2.5} />
-          </button>
+          {/* Lớp phủ tiêu đề trên bìa sách */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none px-8 sm:px-16">
+            <h3 className="text-amber-100 text-center font-bold text-[15px] sm:text-[20px] leading-snug drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] tracking-wide" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.85), 0 0 20px rgba(0,0,0,0.5)' }}>
+              {bookTitle}
+            </h3>
+            <p className="text-amber-300/80 text-[11px] sm:text-[13px] mt-2 font-semibold tracking-wider uppercase drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
+              Tài liệu tham khảo
+            </p>
+          </div>
 
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleFlipNext();
-            }}
-            disabled={currentPage >= totalPages}
-            className="absolute right-2 bottom-3 w-7 h-7 rounded-full bg-black/70 text-amber-300 shadow-md border border-amber-400/40 flex items-center justify-center opacity-60 hover:opacity-100 disabled:opacity-0 disabled:pointer-events-none transition-all cursor-pointer z-10"
-            aria-label="Trang sau"
-          >
-            <ChevronRight size={14} strokeWidth={2.5} />
-          </button>
-
-          {/* Huy hiệu Mở Rộng giữa màn hình (Biến mất sau khi hover/touch) */}
-          <div className="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-[7px] bg-black/85 text-amber-300 text-[10.5px] font-black border border-amber-400/40 pointer-events-none flex items-center gap-1 shadow-md">
-            <Maximize2 size={10} />
-            <span>Chạm giữa để đọc full</span>
+          {/* Nút gợi ý ấn vào để đọc */}
+          <div className="absolute bottom-3 inset-x-0 flex justify-center z-20">
+            <div className="px-4 py-1.5 rounded-full bg-black/80 text-amber-300 text-[11px] sm:text-[12px] font-bold border border-amber-400/50 flex items-center gap-1.5 shadow-lg backdrop-blur-sm group-hover:bg-amber-900/80 transition-colors">
+              <BookOpen size={13} />
+              <span>Chạm để mở đọc</span>
+            </div>
           </div>
         </div>
 
