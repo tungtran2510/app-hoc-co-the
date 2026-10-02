@@ -180,9 +180,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const deepseekKey = process.env.DEEPSEEK_API_KEY;
+    const geminiKey = process.env.GEMINI_API_KEY;
 
-    if (!apiKey) {
+    if (!deepseekKey && !geminiKey) {
       const fallbackResult = fallbackSearch(question, catalog);
       return NextResponse.json(fallbackResult);
     }
@@ -229,7 +230,7 @@ export async function POST(req: NextRequest) {
       aiTraining?.guidelines ||
       '1. VAI TRÒ CHUYÊN MÔN: Trợ lý Sức Khỏe AI chia sẻ kiến thức giáo dục về cấu trúc cơ thể, cơ chế sinh học, thói quen sinh hoạt đúng và phục hồi tự nhiên theo tài liệu của tác giả Tùng dinh dưỡng.\n2. NGUYÊN TẮC AN TOÀN Y KHOA: Cung cấp thông tin tham khảo khoa học, không đưa ra chẩn đoán hay điều trị y khoa thay thế bác sĩ chuyên khoa.\n3. PHONG CÁCH TRẢ LỜI: Trả lời thông minh, thấu đáo, chuẩn y lý theo Bộ quy chuẩn 3 Tầng Vàng (120-160 từ), chia nhánh rõ ràng, có luận điểm khoa học và giải pháp thực tế.\n4. TUYỆT ĐỐI CẤM: Tuyệt đối không nhắc đến các cụm từ như "tác giả không phải bác sĩ", "Tùng không phải bác sĩ" hay giải thích danh xưng.';
 
-    const prompt = `Bạn là Trợ lý Sức Khỏe AI đồng hành, hướng dẫn người học DỰA TRÊN CHÍNH TÀI LIỆU VÀ BÀI GIẢNG CỦA TÁC GIẢ (Tùng dinh dưỡng) trong ứng dụng "Học Cơ Thể".
+    const systemPrompt = `Bạn là Trợ lý Sức Khỏe AI đồng hành, hướng dẫn người học DỰA TRÊN CHÍNH TÀI LIỆU VÀ BÀI GIẢNG CỦA TÁC GIẢ (Tùng dinh dưỡng) trong ứng dụng "Học Cơ Thể".
 
 NGUYÊN TẮC VÀ LỜI DẶN CỐT LÕI CỦA TÁC GIẢ:
 ${authorGuidelines}
@@ -256,11 +257,6 @@ ${catalogText}
 ${authorDocsText}
 ${authorFaqsText}
 
-CÂU HỎI CỦA NGƯỜI HỌC: "${question}"
-
-LỊCH SỬ HỘI THOẠI TRƯỚC:
-${history.slice(-2).map((h: any) => `${h.role === 'user' ? 'Người học' : 'Trợ lý'}: ${h.text}`).join('\n')}
-
 BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON (không kèm văn bản nào khác):
 {
   "answer": "Câu trả lời theo đúng chuẩn 3 Tầng Vàng (120-160 từ, chia dòng thông thoáng, đánh số 1-2-3)...",
@@ -277,45 +273,102 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON (không kèm văn bả
     "Câu hỏi gợi ý mở rộng 1?",
     "Câu hỏi gợi ý mở rộng 2?"
   ]
-}
-`;
+}`;
 
-    const candidateModels = [
-      'gemini-flash-lite-latest',
-      'gemini-3.5-flash-lite',
-      'gemini-3.1-flash-lite',
-    ];
     let rawText = '';
+    let usedProvider = '';
 
-    for (const model of candidateModels) {
+    // 1. ƯU TIÊN 1 (PRIMARY): DEEPSEEK V3 (deepseek-chat)
+    if (deepseekKey) {
       try {
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-        const geminiRes = await fetch(geminiUrl, {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+        const deepseekRes = await fetch('https://api.deepseek.com/chat/completions', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${deepseekKey}`,
+          },
           body: JSON.stringify({
-            contents: [
+            model: 'deepseek-chat',
+            response_format: { type: 'json_object' },
+            messages: [
               {
-                parts: [{ text: prompt }],
+                role: 'system',
+                content: systemPrompt,
+              },
+              ...history.slice(-2).map((h: any) => ({
+                role: h.role === 'user' ? 'user' : 'assistant',
+                content: h.text,
+              })),
+              {
+                role: 'user',
+                content: question,
               },
             ],
-            generationConfig: {
-              temperature: 0.2,
-              maxOutputTokens: 1200,
-            },
+            max_tokens: 1200,
+            temperature: 0.2,
           }),
+          signal: controller.signal,
         });
 
-        if (geminiRes.ok) {
-          const geminiData = await geminiRes.json();
-          const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+        clearTimeout(timeoutId);
+
+        if (deepseekRes.ok) {
+          const dsData = await deepseekRes.json();
+          const text = dsData.choices?.[0]?.message?.content;
           if (text) {
             rawText = text;
-            break;
+            usedProvider = 'deepseek';
           }
         }
-      } catch {
-        // thử model tiếp theo
+      } catch (err: any) {
+        console.warn('[AI] DeepSeek primary call failed or timed out, auto-falling back to Gemini...', err?.message);
+      }
+    }
+
+    // 2. ƯU TIÊN 2 (SECONDARY / FALLBACK): GOOGLE GEMINI FLASH LITE
+    if (!rawText && geminiKey) {
+      const candidateModels = [
+        'gemini-flash-lite-latest',
+        'gemini-3.5-flash-lite',
+        'gemini-3.1-flash-lite',
+      ];
+
+      const geminiPrompt = `${systemPrompt}\n\nCÂU HỎI CỦA NGƯỜI HỌC: "${question}"\n\nLỊCH SỬ HỘI THOẠI TRƯỚC:\n${history.slice(-2).map((h: any) => `${h.role === 'user' ? 'Người học' : 'Trợ lý'}: ${h.text}`).join('\n')}`;
+
+      for (const model of candidateModels) {
+        try {
+          const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`;
+          const geminiRes = await fetch(geminiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [
+                {
+                  parts: [{ text: geminiPrompt }],
+                },
+              ],
+              generationConfig: {
+                temperature: 0.2,
+                maxOutputTokens: 1200,
+              },
+            }),
+          });
+
+          if (geminiRes.ok) {
+            const geminiData = await geminiRes.json();
+            const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (text) {
+              rawText = text;
+              usedProvider = 'gemini';
+              break;
+            }
+          }
+        } catch {
+          // thử model tiếp theo
+        }
       }
     }
 
@@ -385,6 +438,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON (không kèm văn bả
         answer: cleanAnswer || parsedJson.answer,
         suggested_pages: normalizedSuggested,
         follow_up_questions: Array.isArray(parsedJson.follow_up_questions) ? parsedJson.follow_up_questions : [],
+        provider: usedProvider || 'ai',
       });
     }
 
