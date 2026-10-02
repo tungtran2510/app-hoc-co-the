@@ -23,6 +23,8 @@ import {
   Check,
   ShieldCheck,
   Quote,
+  X,
+  MessageCircle,
 } from 'lucide-react';
 import { AuthorProfile, AuthorBook } from '../lib/types';
 import { normalizeAuthorProfile } from '../lib/data';
@@ -57,6 +59,167 @@ export interface AuthorProfileSectionProps extends AuthorSectionBaseProps {
 }
 
 /* =========================================================================
+   MODAL CHI TIẾT HỒ SƠ CHUYÊN GIA (AUTHOR BIO DETAIL MODAL)
+   ========================================================================= */
+export interface AuthorBioDetailModalProps {
+  profile: AuthorProfile;
+  onClose: () => void;
+}
+
+export function AuthorBioDetailModal({ profile, onClose }: AuthorBioDetailModalProps) {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
+  const rawQuote = profile.extra_content || '';
+  const cleanPhilosophyQuote = rawQuote.trim().replace(/^["“'”]+|["“'”]+$/g, '').trim();
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white dark:bg-[#181132] rounded-2xl shadow-2xl border border-slate-200 dark:border-white/15 p-5 sm:p-6 flex flex-col gap-4 text-slate-900 dark:text-white"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Nút đóng modal */}
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors cursor-pointer"
+          title="Đóng"
+        >
+          <X size={18} />
+        </button>
+
+        {/* Tiêu đề Modal */}
+        <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+          <ShieldCheck size={16} className="text-blue-600 dark:text-indigo-400" />
+          <span className="text-[11.5px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">
+            Hồ sơ chuyên gia
+          </span>
+        </div>
+
+        {/* Khối chuyên gia header */}
+        <div className="flex items-center gap-3.5 pt-1">
+          <div className="w-16 h-16 rounded-full overflow-hidden bg-slate-100 dark:bg-white/10 shrink-0 border-2 border-blue-600/30 dark:border-indigo-400/30 shadow-xs">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={profile.avatar_url || '/images/author_tung.png'}
+              alt={profile.name || 'Tùng Dinh Dưỡng'}
+              className="w-full h-full object-cover object-[50%_15%]"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/images/author_tung.png';
+              }}
+            />
+          </div>
+          <div className="flex flex-col min-w-0">
+            <div className="flex items-center gap-1.5">
+              <h4 className="text-[18px] sm:text-[20px] font-black tracking-tight text-slate-900 dark:text-white uppercase font-serif">
+                {profile.name && profile.name.toLowerCase().includes('tùng') ? 'Tùng Dinh Dưỡng' : (profile.name || 'Tùng Dinh Dưỡng')}
+              </h4>
+              <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-blue-600 text-white shrink-0">
+                <Check size={10} strokeWidth={3.5} />
+              </span>
+            </div>
+            {profile.title && (
+              <p className="text-[12.5px] font-semibold text-[#1E3A8A] dark:text-[#A5B4FC]">
+                {profile.title.replace(/\.$/, '')}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Tiểu sử đầy đủ */}
+        <div className="flex flex-col gap-1.5 pt-2 border-t border-slate-100 dark:border-white/10">
+          <span className="text-[12px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+            Giới thiệu &amp; Chuyên môn
+          </span>
+          <p className="text-[13px] sm:text-[13.5px] text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
+            {profile.bio || 'Hơn 10 năm nghiên cứu và ứng dụng giải phẫu cơ xương khớp, dinh dưỡng sinh học và phục hồi chức năng tự nhiên.'}
+          </p>
+        </div>
+
+        {/* Lời tựa / Triết lý nếu có */}
+        {cleanPhilosophyQuote && (
+          <div className="p-3.5 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 flex flex-col gap-1.5">
+            <div className="flex items-center gap-1.5 text-blue-800 dark:text-blue-300">
+              <Quote size={13} className="rotate-180" strokeWidth={2.5} />
+              <span className="text-[11px] font-bold uppercase tracking-wider">
+                {profile.extra_title || 'Triết lý phụng sự'}
+              </span>
+            </div>
+            <p className="font-serif italic text-[13px] text-slate-700 dark:text-slate-200 leading-relaxed">
+              &ldquo;{cleanPhilosophyQuote}&rdquo;
+            </p>
+          </div>
+        )}
+
+        {/* Kênh kết nối & Tư vấn */}
+        <div className="flex flex-col gap-2 pt-2 border-t border-slate-100 dark:border-white/10">
+          <span className="text-[12px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+            Kết nối &amp; Tư vấn
+          </span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {profile.phone && (
+              <a
+                href={`tel:${profile.phone.replace(/[^0-9+]/g, '')}`}
+                className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-blue-500/50 hover:bg-blue-50/40 dark:hover:bg-blue-950/20 transition-all text-slate-800 dark:text-slate-200 group"
+              >
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                  <Phone size={15} />
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-[10.5px] text-slate-400 font-medium">Hotline tư vấn</span>
+                  <span className="text-[12px] font-bold text-slate-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                    {profile.phone}
+                  </span>
+                </div>
+              </a>
+            )}
+
+            {profile.zalo_url && (
+              <a
+                href={profile.zalo_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-blue-500/50 hover:bg-blue-50/40 dark:hover:bg-blue-950/20 transition-all text-slate-800 dark:text-slate-200 group"
+              >
+                <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                  <MessageCircle size={15} />
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-[10.5px] text-slate-400 font-medium">Kênh Zalo</span>
+                  <span className="text-[12px] font-bold text-slate-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                    Nhắn tin trực tiếp
+                  </span>
+                </div>
+              </a>
+            )}
+          </div>
+        </div>
+
+        {/* Nút đóng */}
+        <div className="pt-2 flex justify-end">
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-full sm:w-auto px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/15 text-slate-700 dark:text-slate-200 text-[12.5px] font-semibold transition-colors cursor-pointer text-center"
+          >
+            Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================================
    1. KHỐI 1: HỒ SƠ TÁC GIẢ & CHUYÊN GIA (AUTHOR PROFILE - SINGLE UNIFIED CARD)
    ========================================================================= */
 export function AuthorProfileSection({
@@ -73,6 +236,7 @@ export function AuthorProfileSection({
   onEditPhilosophy,
   showPhilosophy = true,
 }: AuthorProfileSectionProps) {
+  const [showBioModal, setShowBioModal] = useState(false);
   const introVideoId = profile.intro_video_url ? extractYouTubeId(profile.intro_video_url) : null;
   const rawQuote = profile.extra_content || '';
   const cleanPhilosophyQuote = rawQuote.trim().replace(/^["“'”]+|["“'”]+$/g, '').trim();
@@ -102,7 +266,7 @@ export function AuthorProfileSection({
           {/* Họa tiết trang trí viền cao cấp góc phải */}
           <div className="absolute top-0 right-0 w-32 h-32 opacity-10 dark:opacity-20 pointer-events-none bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-300 dark:from-purple-400 via-transparent to-transparent" />
 
-          {/* 1. Phần Tiêu Đề Tác Giả Ở Trên Cùng (Editorial Magazine Header) */}
+          {/* 1. Phần Tiêu Đề Tác GiẢ Ở Trên Cùng (Editorial Magazine Header) */}
           <div className="relative z-10 flex flex-col gap-0.5">
             <div className="flex items-center gap-2 flex-wrap">
               <h3 className="text-[22px] sm:text-[25px] font-black tracking-tight text-slate-900 dark:text-white uppercase font-serif leading-tight">
@@ -120,10 +284,10 @@ export function AuthorProfileSection({
             )}
           </div>
 
-          {/* 2. Phần Thân: Avatar vòm mềm nghệ thuật (Anti-Nested-Frame) + Tiểu sử bên cạnh */}
-          <div className="relative z-10 flex items-start gap-3.5 sm:gap-4 pt-0.5">
+          {/* 2. Phần Thân: Avatar vòm mềm nghệ thuật (Anti-Nested-Frame) + Tiểu sử & Nút xem chi tiết bên cạnh */}
+          <div className="relative z-10 flex items-stretch gap-3.5 sm:gap-4 pt-0.5">
             {/* Ảnh chân dung chuyên gia - Dáng vòm mềm bất đối xứng, không viền hộp chữ nhật thô cứng */}
-            <div className="w-[115px] sm:w-[128px] aspect-[4/5] rounded-tl-[14px] rounded-tr-[38px] rounded-bl-[14px] rounded-br-[22px] overflow-hidden bg-slate-100 dark:bg-[#241548] shrink-0 shadow-sm relative">
+            <div className="w-[115px] sm:w-[128px] aspect-[4/5] rounded-tl-[14px] rounded-tr-[38px] rounded-bl-[14px] rounded-br-[22px] overflow-hidden bg-slate-100 dark:bg-[#241548] shrink-0 shadow-sm relative self-start">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={profile.avatar_url || '/images/author_tung.png'}
@@ -135,12 +299,25 @@ export function AuthorProfileSection({
               />
             </div>
 
-            <div className="flex-1 flex flex-col gap-1 min-w-0 pt-0.5">
+            <div className="flex-1 flex flex-col justify-between min-w-0 py-0.5 self-stretch">
               {profile.bio && (
-                <p className="text-[12.5px] sm:text-[13.5px] text-slate-600 dark:text-slate-300 leading-relaxed font-normal font-sans">
+                <p className="text-[12px] sm:text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed font-normal font-sans line-clamp-4">
                   {profile.bio}
                 </p>
               )}
+
+              {/* Nút Xem chi tiết - Viền mỏng Navy kinh tế, tinh tế, cân bằng khoảng trống */}
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowBioModal(true)}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-[7px] border border-[#1E3A8A]/80 dark:border-blue-400/70 text-[#1E3A8A] dark:text-blue-300 text-[11px] sm:text-[11.5px] font-semibold bg-blue-50/40 dark:bg-blue-950/20 hover:bg-blue-100/60 dark:hover:bg-blue-900/40 active:scale-[0.98] transition-all cursor-pointer group shadow-2xs"
+                  title="Xem chi tiết hồ sơ chuyên gia"
+                >
+                  <span>Xem chi tiết</span>
+                  <ChevronRight size={12} strokeWidth={2.5} className="text-[#1E3A8A] dark:text-blue-300 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+              </div>
             </div>
           </div>
 
@@ -207,6 +384,14 @@ export function AuthorProfileSection({
           )}
         </div>
       </ScrollReveal>
+
+      {/* Modal chi tiết hồ sơ chuyên gia */}
+      {showBioModal && (
+        <AuthorBioDetailModal
+          profile={profile}
+          onClose={() => setShowBioModal(false)}
+        />
+      )}
     </section>
   );
 }
