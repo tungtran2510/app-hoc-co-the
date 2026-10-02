@@ -721,113 +721,105 @@ export default function VideosBlock({
             <div
               key={idx}
               onClick={() => handleSelectVideo(idx)}
-              className={`w-full flex flex-col p-2 sm:p-2.5 rounded-[13px] text-left transition-colors duration-150 cursor-pointer group active:scale-[0.99] ${
+              className={`w-full flex items-center gap-2.5 p-2 sm:p-2.5 rounded-[12px] text-left transition-all duration-150 cursor-pointer group active:scale-[0.99] ${
                 isActive
-                  ? 'bg-amber-50/40 dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] border-[1.5px] border-amber-300 dark:border-amber-400/50 shadow-xs animate-breathe-gold'
+                  ? 'bg-amber-50/60 dark:bg-gradient-to-br dark:from-[#24154B] dark:via-[#1B0F3B] dark:to-[#120829] border-[1.5px] border-amber-400 dark:border-amber-400/60 shadow-xs ring-1 ring-amber-400/20'
                   : 'bg-white dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-900/40 hover:border-slate-300 dark:hover:border-purple-600/50 shadow-2xs'
               }`}
               role="button"
               tabIndex={0}
             >
-              {/* DÒNG TIÊU ĐẦU: GẮN SỐ BÀI BÊN TRÁI NHƯ BẠN VẼ + THỜI LƯỢNG BÊN PHẢI */}
-              <div className="flex items-center justify-between mb-1.5">
-                {/* Bên trái: Thẻ đánh số Bài 01, Bài 02 gắn góc trái như hình vẽ */}
-                <div className="flex items-center gap-1.5">
-                  <span
-                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[5px] text-[10px] sm:text-[10.5px] font-black tracking-wide uppercase shadow-2xs ${
-                      isActive
-                        ? 'bg-amber-500 text-white dark:bg-amber-400 dark:text-slate-950 shadow-xs ring-1 ring-amber-400/30'
-                        : 'bg-slate-100 text-slate-700 border border-slate-200/90 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700'
-                    }`}
-                  >
-                    {isActive ? '● ĐANG PHÁT · BÀI ' : 'BÀI '}{String(idx + 1).padStart(2, '0')}
-                  </span>
+              {/* 1. KHUNG ẢNH THUMBNAIL THU GỌN: HUY HIỆU SỐ BÀI GÓC TRÊN-TRÁI + THỜI LƯỢNG GÓC DƯỚI-PHẢI */}
+              <div className="relative w-[80px] sm:w-[92px] aspect-video rounded-[8px] overflow-hidden bg-slate-100 dark:bg-[#0A0515] shrink-0 border border-slate-200/90 dark:border-purple-500/20 shadow-2xs">
+                {thumbUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={thumbUrl}
+                    alt={vid.title}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-slate-100 dark:bg-purple-950/40 text-slate-600 dark:text-purple-300">
+                    <Play size={15} className="text-slate-600 dark:text-purple-400/60" />
+                  </div>
+                )}
 
-                  {isWatched && (
-                    <span className="inline-flex items-center gap-0.5 text-[9px] sm:text-[9.5px] font-black text-emerald-700 bg-emerald-100/90 dark:bg-emerald-950/80 dark:text-emerald-300 px-1.5 py-0.5 rounded-[4px] border border-emerald-200 dark:border-emerald-800/40">
-                      <Check size={8.5} strokeWidth={3} /> ĐÃ HỌC
-                    </span>
-                  )}
+                {/* Huy hiệu BÀI 01 / ĐANG PHÁT gắn trực tiếp lên góc trên-trái viền ảnh */}
+                <div
+                  className={`absolute top-0.5 left-0.5 px-1.5 py-0.2 rounded-[3.5px] text-[8.5px] sm:text-[9px] font-black tracking-wide uppercase shadow-xs backdrop-blur-xs flex items-center gap-0.5 ${
+                    isActive
+                      ? 'bg-amber-500 text-white dark:bg-amber-400 dark:text-slate-950'
+                      : 'bg-black/75 text-white'
+                  }`}
+                >
+                  {isActive ? '● ĐANG PHÁT' : `BÀI ${String(idx + 1).padStart(2, '0')}`}
                 </div>
 
-                {/* Bên phải: Thời lượng + Nút [ ✏️ Sửa ] trực tiếp cho Admin */}
-                <div className="flex items-center gap-1.5 justify-end">
-                  <span className="text-[10.5px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400 font-mono">
-                    {vid.duration_text || '05:00'}
-                  </span>
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        playTapSound();
-                        setEditingVideoIndex(idx);
-                      }}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] bg-amber-500 hover:bg-amber-600 text-white text-[10.5px] font-black tracking-wide uppercase transition-transform active:scale-95 shadow-2xs cursor-pointer"
-                      title="Sửa trực tiếp video này: tiêu đề, link YouTube, thời lượng"
-                      aria-label={`Sửa video ${vid.title}`}
-                    >
-                      <Edit2 size={10} strokeWidth={3} />
-                      <span>Sửa</span>
-                    </button>
-                  )}
+                {/* Thời lượng gắn góc dưới-phải viền ảnh (chuẩn YouTube/Coursera) */}
+                <div className="absolute bottom-0.5 right-0.5 px-1 py-0.2 rounded-[3px] bg-black/80 text-white text-[8.5px] sm:text-[9px] font-bold font-mono tracking-tight shadow-xs">
+                  {vid.duration_text || '05:00'}
                 </div>
+
+                {/* Lớp phủ & Nút Play khi Active hoặc Hover */}
+                {isActive ? (
+                  <div className="absolute inset-0 bg-amber-500/15 dark:bg-amber-500/25 flex items-center justify-center pointer-events-none">
+                    <div className="w-5 h-5 rounded-full bg-amber-500 text-white dark:bg-amber-400 dark:text-slate-950 flex items-center justify-center shadow-md ring-1.5 ring-white/80 dark:ring-amber-300/80">
+                      <Play size={8.5} fill="currentColor" className="ml-0.5" />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="absolute inset-0 bg-black/25 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
+                    <div className="w-4.5 h-4.5 rounded-full bg-white text-[#1E3A8A] flex items-center justify-center shadow-xs">
+                      <Play size={8} fill="currentColor" className="ml-0.5 text-[#1E3A8A]" />
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* THÂN BÀI: ẢNH THUMBNAIL THU GỌN + TIÊU ĐỀ TRẢI RỘNG */}
-              <div className="flex items-center gap-2 sm:gap-2.5">
-                {/* 1. KHUNG ẢNH THUMBNAIL THU NHỎ GỌN GÀNG (16:9, ~68px) */}
-                <div className="relative w-[68px] sm:w-[74px] aspect-video rounded-[8px] overflow-hidden bg-slate-100 dark:bg-[#0A0515] shrink-0 border border-slate-200/90 dark:border-purple-500/20 shadow-2xs">
-                  {thumbUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={thumbUrl}
-                      alt={vid.title}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-slate-100 dark:bg-purple-950/40 text-slate-600 dark:text-purple-300">
-                      <Play size={15} className="text-slate-600 dark:text-purple-400/60" />
-                    </div>
-                  )}
+              {/* 2. TIÊU ĐỀ RỘNG RÃI TRẢI DÀI TRỌN VẸN CHIỀU NGANG */}
+              <div className="flex flex-col gap-0.5 min-w-0 flex-1 justify-center">
+                <h4
+                  className={`text-[13px] sm:text-[14px] font-extrabold leading-snug line-clamp-2 transition-colors ${
+                    isActive
+                      ? 'text-slate-950 dark:text-amber-100 group-hover:text-amber-700'
+                      : 'text-slate-900 dark:text-white group-hover:text-amber-600'
+                  }`}
+                  title={vid.title}
+                >
+                  {vid.title}
+                </h4>
 
-                  {/* Lớp phủ & Nút Play khi Active hoặc Hover */}
-                  {isActive ? (
-                    <div className="absolute inset-0 bg-amber-500/20 dark:bg-amber-500/30 flex items-center justify-center backdrop-blur-[0.5px]">
-                      <div className="w-5 h-5 rounded-full bg-amber-500 text-white dark:bg-amber-400 dark:text-slate-950 flex items-center justify-center shadow-md ring-2 ring-white/80 dark:ring-amber-300/80">
-                        <Play size={9} fill="currentColor" className="ml-0.5" />
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="absolute inset-0 bg-black/20 dark:bg-black/35 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                      <div className="w-4.5 h-4.5 rounded-full bg-white text-[#1E3A8A] flex items-center justify-center shadow-xs">
-                        <Play size={8} fill="currentColor" className="ml-0.5 text-[#1E3A8A]" />
-                      </div>
-                    </div>
-                  )}
-                </div>
+                {vid.description && (
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1 font-normal">
+                    {vid.description}
+                  </p>
+                )}
 
-                {/* 2. TIÊU ĐỀ RỘNG RÃI TRẢI DÀI TRỌN VẸN CHIỀU NGANG */}
-                <div className="flex flex-col gap-0.5 min-w-0 flex-1 justify-center">
-                  <h4
-                    className={`text-[13px] sm:text-[14px] font-extrabold leading-snug line-clamp-2 transition-colors ${
-                      isActive
-                        ? 'text-slate-950 dark:text-amber-100 group-hover:text-amber-700'
-                        : 'text-slate-900 dark:text-white group-hover:text-amber-600'
-                    }`}
-                    title={vid.title}
-                  >
-                    {vid.title}
-                  </h4>
-
-                  {vid.description && (
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1 font-normal">
-                      {vid.description}
-                    </p>
-                  )}
-                </div>
+                {isWatched && (
+                  <span className="inline-flex items-center gap-0.5 text-[9px] font-black text-emerald-700 dark:text-emerald-300 w-fit">
+                    <Check size={9} strokeWidth={3} /> Đã học xong
+                  </span>
+                )}
               </div>
+
+              {/* 3. NÚT SỬA CHO ADMIN (NẾU CÓ) */}
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    playTapSound();
+                    setEditingVideoIndex(idx);
+                  }}
+                  className="shrink-0 inline-flex items-center gap-1 px-2 py-1 rounded-[6px] bg-amber-500 hover:bg-amber-600 text-white text-[10.5px] font-black tracking-wide uppercase transition-transform active:scale-95 shadow-2xs cursor-pointer"
+                  title="Sửa trực tiếp video này: tiêu đề, link YouTube, thời lượng"
+                  aria-label={`Sửa video ${vid.title}`}
+                >
+                  <Edit2 size={10} strokeWidth={3} />
+                  <span className="hidden sm:inline">Sửa</span>
+                </button>
+              )}
             </div>
           );
         })}
