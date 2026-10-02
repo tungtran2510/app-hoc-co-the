@@ -244,27 +244,27 @@ export default function HomeHeader({
                   setNameInput(userName === 'Dr. Tùng' ? '' : userName);
                   setShowNameModal(true);
                 }}
-                className="flex items-center gap-1 text-left group cursor-pointer hover:opacity-90 transition-opacity"
+                className="flex items-center gap-1.5 text-left group cursor-pointer hover:opacity-90 transition-opacity"
                 title="Bấm để đổi tên của bạn"
               >
-                <div className="flex items-center gap-1 animate-greeting-bounce">
+                <div className="flex items-center gap-1.5 animate-greeting-bounce">
                   <span className="text-[17px] sm:text-[18px] font-black text-ink tracking-tight group-hover:text-blue-600 dark:group-hover:text-[#F8DF7B] transition-colors">
                     Hi, {userName || 'Dr. Tùng'}!
                   </span>
-                  <span className="text-[17px] sm:text-[18px] inline-block animate-wave select-none" aria-label="vẫy tay">
-                    👋
+                  {/* 1 biểu tượng duy nhất ngay cạnh tên: Chuông thông báo & Đồng bộ */}
+                  <span
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowPhoneSync(true);
+                    }}
+                    className="w-5.5 h-5.5 rounded-full bg-amber-500/15 dark:bg-[#F8DF7B]/20 flex items-center justify-center text-amber-500 dark:text-[#F8DF7B] relative hover:scale-110 transition-transform cursor-pointer shrink-0"
+                    title="Thông báo & Đồng bộ tiến độ học tập"
+                    aria-label="Thông báo"
+                  >
+                    <Bell size={13} fill="currentColor" />
+                    <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full bg-red-500 ring-1 ring-white dark:ring-[#0C0817]" />
                   </span>
                 </div>
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowPhoneSync(true)}
-                className="w-5 h-5 flex items-center justify-center text-amber-500 dark:text-[#F8DF7B] hover:text-amber-400 transition-colors relative"
-                title="Thông báo & Đồng bộ tiến độ"
-                aria-label="Thông báo"
-              >
-                <Bell size={15} fill="currentColor" />
-                <span className="absolute top-0 right-0 w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-[#F8DF7B]" />
               </button>
             </div>
             {appSubtitle && appSubtitle.trim() ? (

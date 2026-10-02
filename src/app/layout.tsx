@@ -64,7 +64,7 @@ export default function RootLayout({
       </head>
       <body className={`${beVietnamPro.className} bg-bg text-ink min-h-screen flex justify-center selection:bg-primary-soft selection:text-primary-dark`}>
         <PwaRegistrar />
-        <div className="w-full max-w-[480px] min-h-screen bg-bg relative flex flex-col">
+        <div className="w-full max-w-[480px] md:max-w-[820px] lg:max-w-[820px] min-h-screen bg-bg relative flex flex-col mx-auto shadow-2xl transition-all">
           {children}
         </div>
       </body>

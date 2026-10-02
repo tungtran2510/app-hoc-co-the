@@ -35,7 +35,7 @@ export default function BottomNav() {
       style={{ transform: 'translateZ(0)' }}
       aria-label="Điều hướng chính"
     >
-      <div className="w-full max-w-[480px] h-[80px] pb-2 grid grid-cols-4 select-none bg-white dark:bg-[#100922]">
+      <div className="w-full max-w-[480px] md:max-w-[820px] lg:max-w-[820px] h-[80px] pb-2 grid grid-cols-4 select-none bg-white dark:bg-[#100922] transition-all">
         {/* 1. Trang chủ */}
         <Link
           href="/"
