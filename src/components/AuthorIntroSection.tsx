@@ -29,10 +29,12 @@ import { checkIsAdminClient } from '../lib/adminAuth';
 import { extractYouTubeId } from '../lib/youtube';
 import BookDetailModal from './BookDetailModal';
 import EditAuthorModal from './admin/EditAuthorModal';
+import EditSingleAuthorBookModal from './admin/EditSingleAuthorBookModal';
 import SectionOrderControls from './admin/SectionOrderControls';
 import FlipbookViewer from './FlipbookViewer';
 import ScrollReveal from './ScrollReveal';
 import ModernBookCover from './ModernBookCover';
+import { saveSettingsApi } from '../lib/apiAdmin';
 
 export interface AuthorSectionBaseProps {
   profile: AuthorProfile;
@@ -194,6 +196,7 @@ export function AuthorBooksSection({
 }: AuthorBooksSectionProps) {
   const books = profile.books || [];
   const [previewBook, setPreviewBook] = useState<AuthorBook | null>(null);
+  const [internalEditingBook, setInternalEditingBook] = useState<AuthorBook | null>(null);
 
   if (books.length === 0 && !isAdmin) return null;
 
@@ -361,23 +364,22 @@ export function AuthorBooksSection({
                             {isBookHidden ? <EyeOff size={11} /> : <Eye size={11} />}
                           </button>
                         )}
-                        {(onEditSingleBook || onEdit) && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (onEditSingleBook) {
-                                onEditSingleBook(book);
-                              } else if (onEdit) {
-                                onEdit();
-                              }
-                            }}
-                            className="h-6 px-2 rounded-[6px] bg-primary text-white text-[11px] font-bold flex items-center gap-1 hover:bg-primary-dark transition-colors cursor-pointer shadow-2xs"
-                            title="Sửa cuốn sách này"
-                          >
-                            <Edit2 size={10} />
-                            <span>Sửa</span>
-                          </button>
-                        )}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (onEditSingleBook) {
+                              onEditSingleBook(book);
+                            } else {
+                              setInternalEditingBook(book);
+                            }
+                          }}
+                          className="h-6 px-2 rounded-[6px] bg-primary text-white text-[11px] font-bold flex items-center gap-1 hover:bg-primary-dark transition-colors cursor-pointer shadow-2xs"
+                          title="Sửa cuốn sách này"
+                        >
+                          <Edit2 size={10} />
+                          <span>Sửa</span>
+                        </button>
                         {onDeleteBook && (
                           <button
                             type="button"
@@ -423,6 +425,22 @@ export function AuthorBooksSection({
         book={previewBook}
         title={previewBook?.title ? `Đọc thử tài liệu 3D: ${previewBook.title}` : 'Đọc thử tài liệu 3D'}
         onClose={() => setPreviewBook(null)}
+      />
+
+      {/* MODAL SỬA RIÊNG 1 CUỐN SÁCH TÁC GIẢ TỰ THÂN */}
+      <EditSingleAuthorBookModal
+        isOpen={Boolean(internalEditingBook)}
+        book={internalEditingBook}
+        onClose={() => setInternalEditingBook(null)}
+        onSaved={async (updatedBook) => {
+          const nextBooks = books.map((b) => (b.id === updatedBook.id ? updatedBook : b));
+          const nextProfile = { ...profile, books: nextBooks };
+          if (isAdmin) {
+            await saveSettingsApi({ author_profile: nextProfile });
+          }
+          setInternalEditingBook(null);
+          window.location.reload();
+        }}
       />
     </section>
   );
@@ -661,6 +679,7 @@ export default function AuthorIntroSection({
   const [profile, setProfile] = useState<AuthorProfile>(() => normalizeAuthorProfile(initialProfile));
   const [isAdmin, setIsAdmin] = useState(false);
   const [selectedBook, setSelectedBook] = useState<AuthorBook | null>(null);
+  const [editingSingleBook, setEditingSingleBook] = useState<AuthorBook | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [modalTab, setModalTab] = useState<'author' | 'books' | 'contact' | 'extra'>('author');
 
@@ -693,6 +712,7 @@ export default function AuthorIntroSection({
         profile={profile}
         isAdmin={isAdmin}
         onEdit={() => openModalWithTab('books')}
+        onEditSingleBook={(b) => setEditingSingleBook(b)}
         onSelectBook={(b) => setSelectedBook(b)}
       />
 
@@ -719,8 +739,9 @@ export default function AuthorIntroSection({
           isAdmin={isAdmin}
           onClose={() => setSelectedBook(null)}
           onEdit={() => {
+            const b = selectedBook;
             setSelectedBook(null);
-            openModalWithTab('books');
+            setEditingSingleBook(b);
           }}
         />
       )}
@@ -737,6 +758,22 @@ export default function AuthorIntroSection({
           }}
         />
       )}
+
+      {/* Modal Chỉnh sửa ĐÚNG 1 CUỐN SÁCH của tác giả */}
+      <EditSingleAuthorBookModal
+        isOpen={Boolean(editingSingleBook)}
+        book={editingSingleBook}
+        onClose={() => setEditingSingleBook(null)}
+        onSaved={async (updatedBook) => {
+          const nextBooks = (profile.books || []).map((b) => (b.id === updatedBook.id ? updatedBook : b));
+          const nextProfile = { ...profile, books: nextBooks };
+          setProfile(nextProfile);
+          if (isAdmin) {
+            await saveSettingsApi({ author_profile: nextProfile });
+          }
+          setEditingSingleBook(null);
+        }}
+      />
     </div>
   );
 }

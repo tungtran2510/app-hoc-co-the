@@ -538,8 +538,9 @@ export default function RecommendedBooksSection({
         isAdmin={isAdmin}
         onClose={() => setSelectedBook(null)}
         onEdit={() => {
+          const b = selectedBook;
           setSelectedBook(null);
-          setShowEditModal(true);
+          setEditingSingleBook(b);
         }}
       />
 

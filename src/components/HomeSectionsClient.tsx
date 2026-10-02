@@ -512,8 +512,9 @@ export default function HomeSectionsClient({
           isAdmin={isAdmin}
           onClose={() => setSelectedAuthorBook(null)}
           onEdit={() => {
+            const b = selectedAuthorBook;
             setSelectedAuthorBook(null);
-            openAuthorModal('books');
+            setEditingSingleAuthorBook(b);
           }}
         />
       )}

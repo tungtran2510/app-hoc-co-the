@@ -3,8 +3,8 @@
 // Đạt tốc độ phản hồi tức thì (< 1ms) khi người dùng chuyển đổi các mục hoặc vào bài học
 // TUÂN THỦ CHỈ THỊ: Chỉ tải từ mạng khi người dùng ấn vào tài liệu sách / video dung lượng lớn
 
-const CACHE_NAME = 'qbiz-books-shell-v6';
-const STATIC_ASSETS_CACHE = 'qbiz-books-static-v6';
+const CACHE_NAME = 'qbiz-books-shell-v8';
+const STATIC_ASSETS_CACHE = 'qbiz-books-static-v8';
 
 // Danh sách tài nguyên Shell và các trang cốt lõi cần tải sẵn vào bộ nhớ điện thoại
 const PRECACHE_SHELL_URLS = [
@@ -144,26 +144,22 @@ self.addEventListener('fetch', (event) => {
   }
 
   // 5. Với các trang điều hướng HTML (Chuyển trang Trang chủ, Đang xem, Đã lưu, Trợ lý AI, Chuyên đề):
-  // Chiến lược: STALE-WHILE-REVALIDATE (Mở tức thì từ Cache ngầm trên điện thoại, đồng thời cập nhật mới)
+  // Chiến lược: NETWORK FIRST (Luôn lấy bản mới nhất khi online, offline mới lấy từ cache ngầm)
   if (request.mode === 'navigate') {
     event.respondWith(
-      caches.open(CACHE_NAME).then(async (cache) => {
-        const cachedResponse = await cache.match(request);
-
-        const fetchPromise = fetch(request)
-          .then((networkResponse) => {
-            if (networkResponse.status === 200) {
-              cache.put(request, networkResponse.clone());
-            }
-            return networkResponse;
-          })
-          .catch(() => {
-            return cachedResponse || caches.match('/');
-          });
-
-        // Nếu đã có trong cache ngầm của điện thoại -> Trả về NGAY LẬP TỨC để đạt tốc độ tối đa
-        return cachedResponse || fetchPromise;
-      })
+      fetch(request)
+        .then((networkResponse) => {
+          if (networkResponse.status === 200) {
+            const clone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          }
+          return networkResponse;
+        })
+        .catch(async () => {
+          const cache = await caches.open(CACHE_NAME);
+          const cached = await cache.match(request);
+          return cached || caches.match('/');
+        })
     );
     return;
   }
