@@ -431,6 +431,8 @@ export const sampleBlocks: Block[] = [
           description: 'Cấu trúc chung và vai trò của cột sống.',
           duration_text: '4 phút',
           thumbnail_url: 'https://i.ytimg.com/vi/c9kmCxFKHPY/hqdefault.jpg',
+          aspect_ratio: 'horizontal',
+          is_vertical: false,
         },
         {
           youtube_id: 'mVtS7TYDpbU',
@@ -438,13 +440,17 @@ export const sampleBlocks: Block[] = [
           description: 'Thân đốt sống, đĩa đệm và các mỏm khớp.',
           duration_text: '5 phút',
           thumbnail_url: 'https://i.ytimg.com/vi/mVtS7TYDpbU/hqdefault.jpg',
+          aspect_ratio: 'horizontal',
+          is_vertical: false,
         },
         {
-          youtube_id: 'yTfFaHohKbY',
-          title: '03. Cơ – gân – dây chằng',
-          description: 'Hệ thống giữ và giúp cột sống vận động.',
-          duration_text: '6 phút',
-          thumbnail_url: 'https://i.ytimg.com/vi/yTfFaHohKbY/hqdefault.jpg',
+          youtube_id: 'hESYYpn33OE',
+          title: '03. Cơ – gân – dây chằng: Giãn dây chằng & hồi phục',
+          description: 'Giải pháp chữa lành và phục hồi chức năng dây chằng cột sống (ThS.BS.CK2 Mai Duy Linh).',
+          duration_text: '7 phút',
+          thumbnail_url: 'https://i.ytimg.com/vi/hESYYpn33OE/hqdefault.jpg',
+          aspect_ratio: 'horizontal',
+          is_vertical: false,
         },
         {
           youtube_id: '_uxMIfQfYGk',
@@ -452,6 +458,8 @@ export const sampleBlocks: Block[] = [
           description: 'Tủy sống, rễ thần kinh và đường dẫn truyền.',
           duration_text: '4 phút',
           thumbnail_url: 'https://i.ytimg.com/vi/_uxMIfQfYGk/hqdefault.jpg',
+          aspect_ratio: 'horizontal',
+          is_vertical: false,
         },
       ],
     },
@@ -553,32 +561,32 @@ export const sampleBlocks: Block[] = [
       'page-cot-song-2': [
         { id: 'z0FRTp5CVds', title: '01. Giải phẫu đĩa đệm: Vòng sợi & Nhân nhầy', duration: '6 phút', desc: 'Cơ chế hoạt động của giảm xóc sinh học tự nhiên giữa các đốt sống.' },
         { id: 'y8Atq_HMJbU', title: '02. Cơ chế hình thành thoát vị đĩa đệm 3D', duration: '8 phút', desc: 'Áp lực tải trọng gây rách vòng sợi và tràn nhân nhầy chèn ép rễ.' },
-        { id: 'cdW-7QXCF3Q', title: '03. Dinh dưỡng thẩm thấu & Tái tạo đĩa đệm', duration: '5 phút', desc: 'Cách duy trì độ ngậm nước cho đĩa đệm qua vận động và tư thế đúng.' },
-        { id: '87TGU0Y9dSU', title: '04. Bài tập kéo giãn giải áp đĩa đệm an toàn', duration: '7 phút', desc: 'Hướng dẫn tự tập luyện giảm đau lưng và phục hồi áp lực cột sống.' }
+        { id: 'ilTB5Ks5JQE', title: '03. Điều trị thoát vị đĩa đệm ít xâm lấn (BV Tâm Anh)', duration: '6 phút', desc: 'Kỹ thuật đốt sóng cao tần và can thiệp giải áp đĩa đệm bảo tồn.' },
+        { id: 'ghNXQWVABC4', title: '04. 5 Bài tập kéo giãn giải áp đĩa đệm (Vinmec)', duration: '7 phút', desc: 'Hướng dẫn tự tập luyện giảm đau thắt lưng và phục hồi áp lực cột sống.' }
       ],
       'page-cot-song-3': [
         { id: 'c9kmCxFKHPY', title: '01. Hệ thống cơ sâu & Dây chằng cột sống', duration: '7 phút', desc: 'Dây chằng dọc trước, sau và dây chằng vàng giữ vững đốt sống.' },
-        { id: '8tXMChrI4c0', title: '02. Sức mạnh cơ lõi (Core) bảo vệ thắt lưng', duration: '6 phút', desc: 'Kích hoạt nhóm cơ bụng sâu và cơ nhiều nhánh (Multifidus).' },
-        { id: 'kqgViHyDW9k', title: '03. Kỹ thuật giãn cơ giải tỏa co thắt cạnh sống', duration: '8 phút', desc: 'Giải phóng căng cơ sau ngày dài ngồi làm việc sai tư thế.' },
-        { id: 'gOlY8o8MYuQ', title: '04. Rèn luyện sức bền khối cơ dựng gai sống', duration: '6 phút', desc: 'Bài tập tăng cường nhóm cơ lưng dưới không gây quá tải đĩa đệm.' }
+        { id: '-2P9olGUajg', title: '02. Bài tập 10 phút kích hoạt cơ lõi Core (Vinmec)', duration: '10 phút', desc: 'Plank và bài tập cầu mông củng cố cơ bụng sâu và cơ nhiều nhánh.' },
+        { id: '6ewOPvwfPlo', title: '03. 4 Động tác giải tỏa co thắt cơ lưng (Vinmec)', duration: '8 phút', desc: 'Giải phóng căng cơ sau ngày dài làm việc và ngồi sai tư thế.' },
+        { id: 'XFy_0kQxBs4', title: '04. Rèn luyện sức bền cơ dựng gai sống (BV Tâm Anh)', duration: '10 phút', desc: 'Tập luyện cơ lưng dưới mỗi ngày giúp đẩy lùi thoái hóa thắt lưng.' }
       ],
       'page-cot-song-4': [
         { id: 'IUtyDm9O8lU', title: '01. Tủy sống & 31 đôi rễ thần kinh gai sống', duration: '8 phút', desc: 'Cấu tạo ống sống và đường truyền cảm giác vận động của cơ thể.' },
         { id: 'XilwFY71LR4', title: '02. Hội chứng chèn ép rễ thần kinh tọa 3D', duration: '7 phút', desc: 'Đường đi dây thần kinh tọa từ thắt lưng xuống mông, đùi và bàn chân.' },
-        { id: '9cvpCJddloY', title: '03. Dấu hiệu cảnh báo chèn ép thần kinh nguy hiểm', duration: '5 phút', desc: 'Phân biệt đau thần kinh tọa cơ học và tổn thương tủy sống cấp.' },
+        { id: 'LS75s0fz20w', title: '03. Chèn ép rễ thần kinh & Nguy cơ yếu liệt (BV Tâm Anh)', duration: '6 phút', desc: 'Nhận diện sớm dấu hiệu tê bì, mất phản xạ và suy giảm vận động chi dưới.' },
         { id: 'XBnPTgSP21M', title: '04. Bài tập trượt thần kinh (Nerve Flossing)', duration: '7 phút', desc: 'Vận động trị liệu giúp rễ thần kinh trượt êm ái, giảm đau buốt.' }
       ],
       'page-cot-song-5': [
-        { id: 'zQVOV1eevck', title: '01. Tư thế ngồi & đứng chuẩn công thái học', duration: '6 phút', desc: 'Bảo toàn đường cong sinh lý tự nhiên khi làm việc với máy tính.' },
-        { id: 'fR3NxCR9z2U', title: '02. Nguyên tắc bốc vác vật nặng an toàn', duration: '5 phút', desc: 'Ứng dụng bản lề háng (Hip Hinge) thay vì gập lưng gây chấn thương.' },
-        { id: 'FN3MFhYPWWo', title: '03. Chuỗi bài tập giải nén cột sống cuối ngày', duration: '7 phút', desc: 'Treo xà, tư thế em bé và kéo giãn giải phóng tải trọng đốt sống.' },
-        { id: 'uBGl2BujkPQ', title: '04. Chỉnh sửa tư thế ngủ và chọn gối nệm đúng', duration: '6 phút', desc: 'Giữ trục cổ - lưng thẳng hàng suốt 8 tiếng phục hồi ban đêm.' }
+        { id: '9o55FWHFl2k', title: '01. Tư thế công thái học cho dân văn phòng (BV Tâm Anh)', duration: '6 phút', desc: 'Bảo toàn đường cong sinh lý tự nhiên khi ngồi làm việc với máy tính.' },
+        { id: '6ewOPvwfPlo', title: '02. Nguyên tắc bốc vác & vận động an toàn (Vinmec)', duration: '5 phút', desc: 'Ứng dụng bản lề háng (Hip Hinge) thay vì gập lưng gây chấn thương.' },
+        { id: 'ghNXQWVABC4', title: '03. Chuỗi bài tập giải nén cột sống cuối ngày (Vinmec)', duration: '7 phút', desc: 'Kéo giãn giải phóng áp lực nội đĩa đệm và thư giãn nhóm cơ cạnh sống.' },
+        { id: 'rQ02ysP2vN8', title: '04. Vật lý trị liệu & Tư thế sinh hoạt đúng (BV Tâm Anh)', duration: '8 phút', desc: 'Chỉnh sửa thói quen đi đứng, nằm ngồi và chọn gối nệm đúng chuẩn.' }
       ],
       'page-cot-song-6': [
-        { id: 'gUG_zbKqlaU', title: '01. Thoái hóa cột sống: Tiến trình & Nguyên nhân', duration: '8 phút', desc: 'Sự hao mòn sụn khớp, xơ hóa xương dưới sụn và hình thành gai xương.' },
-        { id: '08VyJOEcDos', title: '02. Phân biệt phồng lồi đĩa đệm & Thoát vị thực thụ', duration: '6 phút', desc: 'Mức độ tổn thương trên phim MRI và hướng điều trị bảo tồn.' },
-        { id: '1sISguPDlhY', title: '03. Chiến lược toàn diện ngăn ngừa đau lưng tái phát', duration: '7 phút', desc: 'Kiểm soát cân nặng, bài tập cơ lõi và chế độ dinh dưỡng kháng viêm.' },
-        { id: '9iMGFqMmUFs', title: '04. Khi nào cần can thiệp y khoa chuyên sâu?', duration: '5 phút', desc: 'Các chỉ định phẫu thuật và dấu hiệu đỏ cần nhập viện khẩn cấp.' }
+        { id: 'Yhvd1RnC_jQ', title: '01. Thoái hóa cột sống: Dấu hiệu & Điều trị (BV Tâm Anh)', duration: '8 phút', desc: 'Bác sĩ chuyên khoa giải thích tiến trình hao mòn sụn và xơ hóa đốt sống.' },
+        { id: '7wzAARekAMk', title: '02. Thoát vị đĩa đệm nặng: Giải pháp điều trị (BV Tâm Anh)', duration: '7 phút', desc: 'Phác đồ chẩn đoán hình ảnh MRI và hướng điều trị bảo tồn tích cực.' },
+        { id: 'EDVhzV8bb7k', title: '03. Chiến lược phục hồi & Ngăn ngừa tái phát (BV Tâm Anh)', duration: '8 phút', desc: 'Tập luyện phục hồi chức năng và chế độ dinh dưỡng kháng viêm cho sụn.' },
+        { id: '7dONUcFKop8', title: '04. Công nghệ cao & Phẫu thuật ít xâm lấn (BV Tâm Anh)', duration: '6 phút', desc: 'TTƯT.BS.CKII Chu Tấn Sĩ chia sẻ về chỉ định phẫu thuật và công nghệ hiện đại.' }
       ],
     };
 

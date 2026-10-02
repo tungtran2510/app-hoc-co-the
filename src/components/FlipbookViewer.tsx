@@ -389,14 +389,16 @@ export default function FlipbookViewer({
   };
 
   // Quản lý ảnh bìa sách tùy chỉnh (Custom Cover Image)
-  const defaultCoverUrl = '/images/book_cover_blank.jpg';
+  const defaultCoverUrl = '/documents/covers/cover_atlas_y_khoa_toan_dien.png';
   const coverStorageKey = `custom_book_cover_${pageTitle || topicTitle || 'default'}`;
   const [currentCoverUrl, setCurrentCoverUrl] = useState<string>(() => {
-    if (coverUrl && coverUrl.trim()) return coverUrl.trim();
+    if (coverUrl && coverUrl.trim() && !coverUrl.startsWith('blob:')) return coverUrl.trim();
     if (typeof window !== 'undefined') {
       try {
         const saved = localStorage.getItem(coverStorageKey);
-        if (saved && saved.trim()) return saved.trim();
+        if (saved && saved.trim() && !saved.startsWith('blob:') && saved !== '/images/book_cover_blank.jpg') {
+          return saved.trim();
+        }
       } catch {}
     }
     return defaultCoverUrl;
@@ -407,19 +409,22 @@ export default function FlipbookViewer({
   const [isUploadingCover, setIsUploadingCover] = useState<boolean>(false);
 
   useEffect(() => {
-    if (coverUrl && coverUrl.trim()) {
+    if (coverUrl && coverUrl.trim() && !coverUrl.startsWith('blob:')) {
       setCurrentCoverUrl(coverUrl.trim());
       setTempCoverUrl(coverUrl.trim());
     } else {
       try {
         const saved = localStorage.getItem(coverStorageKey);
-        if (saved && saved.trim()) {
+        if (saved && saved.trim() && !saved.startsWith('blob:') && saved !== '/images/book_cover_blank.jpg') {
           setCurrentCoverUrl(saved.trim());
           setTempCoverUrl(saved.trim());
+        } else {
+          setCurrentCoverUrl(defaultCoverUrl);
+          setTempCoverUrl(defaultCoverUrl);
         }
       } catch {}
     }
-  }, [coverUrl, coverStorageKey]);
+  }, [coverUrl, coverStorageKey, defaultCoverUrl]);
 
   const handleSaveCover = (newUrl: string) => {
     const finalUrl = newUrl.trim() || defaultCoverUrl;
@@ -1177,25 +1182,35 @@ export default function FlipbookViewer({
             </button>
           )}
 
-          {/* Ảnh bìa sách mở - tràn sát viền tự nhiên, KHÔNG CHẶN TOUCH VUỐT TRANG */}
+          {/* Ảnh bìa sách mở - tràn sát viền tự nhiên, KHÔNG CHẶN TOUCH VUỐT TRANG, TỰ ĐỘNG FALLBACK BẢO VỆ 100% */}
           <img
             src={currentCoverUrl}
-            alt="Bìa sách"
+            alt=""
+            role="presentation"
+            loading="eager"
+            onError={(e) => {
+              const fallback = '/documents/covers/cover_atlas_y_khoa_toan_dien.png';
+              if (e.currentTarget.src !== window.location.origin + fallback) {
+                e.currentTarget.src = fallback;
+              }
+            }}
             className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none select-none"
             draggable={false}
             style={{ pointerEvents: 'none', userSelect: 'none' }}
           />
 
-          {/* Lớp phủ tiêu đề trên trang sách mở - TO RÕ, ĐẬM ĐÀ, NỔI BẬT */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none px-6 sm:px-16 text-center">
-            <h3 className="text-[#0d1b33] font-serif font-black text-[18px] sm:text-[24px] leading-tight tracking-normal drop-shadow-[0_1px_2px_rgba(255,255,255,0.7)] max-w-[90%] line-clamp-3">
-              {bookTitle}
-            </h3>
-            <div className="w-16 h-[2px] bg-amber-600/70 rounded-full mt-3 mb-2" />
-            <p className="text-[#3b4961] text-[11px] sm:text-[13px] font-bold tracking-wider uppercase">
-              Tài liệu tham khảo
-            </p>
-          </div>
+          {/* Lớp phủ tiêu đề trên trang sách mở - chỉ hiện khi dùng ảnh sổ mở book_cover_blank */}
+          {currentCoverUrl.includes('book_cover_blank') && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none px-6 sm:px-16 text-center">
+              <h3 className="text-[#0d1b33] font-serif font-black text-[18px] sm:text-[24px] leading-tight tracking-normal drop-shadow-[0_1px_2px_rgba(255,255,255,0.7)] max-w-[90%] line-clamp-3">
+                {bookTitle}
+              </h3>
+              <div className="w-16 h-[2px] bg-amber-600/70 rounded-full mt-3 mb-2" />
+              <p className="text-[#3b4961] text-[11px] sm:text-[13px] font-bold tracking-wider uppercase">
+                Tài liệu tham khảo
+              </p>
+            </div>
+          )}
 
           {/* Nút gợi ý ấn vào để đọc */}
           <div className="absolute bottom-3.5 inset-x-0 flex justify-center z-20">

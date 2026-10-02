@@ -14,10 +14,77 @@ import {
   ChevronUp,
   ChevronDown,
   Upload,
+  Code,
+  Eye,
+  EyeOff,
+  Palette,
+  Sparkles,
+  AlignLeft,
+  AlignCenter,
+  AlignJustify,
+  Type,
 } from 'lucide-react';
 import { Block, Image as ImageType, FileItem, Video } from '../../lib/types';
 import { extractYouTubeId, fetchYouTubeMeta } from '../../lib/youtube';
 import { uploadImageFile, uploadPdfFile } from '../../lib/storageUpload';
+
+const TITLE_COLORS = [
+  { name: 'Navy', hex: '#1E3A8A' },
+  { name: 'Lam', hex: '#2563EB' },
+  { name: 'Ngọc', hex: '#0D9488' },
+  { name: 'Lá', hex: '#16A34A' },
+  { name: 'Đỏ', hex: '#DC2626' },
+  { name: 'Cam', hex: '#EA580C' },
+  { name: 'Vàng', hex: '#CA8A04' },
+  { name: 'Tím', hex: '#7C3AED' },
+];
+
+const TEXT_COLORS = [
+  { name: 'Tự động', hex: '', preview: '#94A3B8' },
+  { name: 'Than tối', hex: '#1E293B', preview: '#1E293B' },
+  { name: 'Xám đậm', hex: '#475569', preview: '#475569' },
+  { name: 'Navy y khoa', hex: '#1E3A8A', preview: '#1E3A8A' },
+  { name: 'Ngọc thạch', hex: '#0D9488', preview: '#0D9488' },
+  { name: 'Xanh lá', hex: '#16A34A', preview: '#16A34A' },
+  { name: 'Đỏ nổi bật', hex: '#DC2626', preview: '#DC2626' },
+  { name: 'Cam cảnh báo', hex: '#EA580C', preview: '#EA580C' },
+  { name: 'Hổ phách', hex: '#CA8A04', preview: '#CA8A04' },
+  { name: 'Tím hoàng gia', hex: '#7C3AED', preview: '#7C3AED' },
+  { name: 'Trắng sáng', hex: '#FFFFFF', preview: '#E2E8F0' },
+];
+
+const FONT_SIZE_OPTIONS = [
+  { value: 'small', label: 'Nhỏ', px: '14px' },
+  { value: 'normal', label: 'Tiêu chuẩn', px: '16px' },
+  { value: 'large', label: 'Lớn', px: '18px' },
+  { value: 'xlarge', label: 'Rất lớn', px: '21px' },
+];
+
+const HTML_TEMPLATES = [
+  {
+    label: '💡 Hộp thông tin',
+    snippet: `<div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left: 4px solid #2563eb; padding: 14px 16px; border-radius: 12px; margin: 10px 0;">\n  <div style="font-weight: 700; color: #1e40af; margin-bottom: 4px;">💡 Điểm cốt lõi cần nhớ</div>\n  <p style="margin: 0; color: #1e3a8a; line-height: 1.6; font-size: 15px;">Nội dung giải thích chi tiết, ngắn gọn và dễ hiểu tại đây.</p>\n</div>`,
+  },
+  {
+    label: '⚠️ Cảnh báo',
+    snippet: `<div style="background: #fef2f2; border: 1px solid #fecaca; border-left: 4px solid #dc2626; padding: 14px 16px; border-radius: 12px; margin: 10px 0;">\n  <div style="font-weight: 700; color: #991b1b; margin-bottom: 4px;">⚠️ Lưu ý sai lầm thường gặp</div>\n  <p style="margin: 0; color: #7f1d1d; line-height: 1.6; font-size: 15px;">Tránh cúi gập cổ nhìn điện thoại quá lâu hoặc mang vác vật nặng sai tư thế.</p>\n</div>`,
+  },
+  {
+    label: '💬 Trích dẫn',
+    snippet: `<blockquote style="margin: 12px 0; padding: 12px 16px; border-left: 3px solid #0d9488; background: #f0fdf4; border-radius: 0 12px 12px 0; font-style: italic; color: #134e4a; font-size: 15px; line-height: 1.6;">\n  "Cột sống là cột trụ nâng đỡ toàn bộ cơ thể. Chăm sóc đĩa đệm hôm nay là giữ gìn sự linh hoạt cho tương lai."\n  <div style="text-align: right; font-style: normal; font-weight: 700; font-size: 13px; color: #047857; margin-top: 6px;">— Bác sĩ Chuyên khoa</div>\n</blockquote>`,
+  },
+  {
+    label: '📊 Bảng 2 cột',
+    snippet: `<div style="overflow-x: auto; margin: 10px 0;">\n  <table style="width: 100%; border-collapse: collapse; font-size: 14px; text-align: left;">\n    <thead>\n      <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">\n        <th style="padding: 8px 12px; color: #1e293b; font-weight: 700;">Nên làm</th>\n        <th style="padding: 8px 12px; color: #1e293b; font-weight: 700;">Nên tránh</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr style="border-bottom: 1px solid #e2e8f0;">\n        <td style="padding: 8px 12px; color: #166534;">✔ Ngồi thẳng lưng, vai thả lỏng</td>\n        <td style="padding: 8px 12px; color: #991b1b;">✘ Ngồi gù lưng, vắt chéo chân</td>\n      </tr>\n      <tr>\n        <td style="padding: 8px 12px; color: #166534;">✔ Đổi tư thế sau 45 phút</td>\n        <td style="padding: 8px 12px; color: #991b1b;">✘ Bất động liên tục > 2 giờ</td>\n      </tr>\n    </tbody>\n  </table>\n</div>`,
+  },
+];
+
+function sanitizeHtml(raw: string): string {
+  if (!raw) return '';
+  return raw
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/\bon\w+\s*=\s*["'][^"']*["']/gi, '');
+}
 
 interface EditBlockModalProps {
   isOpen: boolean;
@@ -32,15 +99,44 @@ export default function EditBlockModal({
   block,
   onSaveBlock,
 }: EditBlockModalProps) {
+  // State cho text block: Tiêu đề & Màu sắc
+  const [blockTitle, setBlockTitle] = useState<string>(
+    block.type === 'text' ? block.data.title || '' : ''
+  );
+  const [titleColor, setTitleColor] = useState<string>(
+    block.type === 'text' ? block.data.title_color || '#1E3A8A' : '#1E3A8A'
+  );
+  // Chế độ khối: 'text' (Văn bản thường) hoặc 'html' (Mã HTML tùy biến)
+  const [blockMode, setBlockMode] = useState<'text' | 'html'>(
+    block.type === 'text'
+      ? block.data.mode || (block.display_style === 'html' ? 'html' : 'text')
+      : 'text'
+  );
+  const [htmlContent, setHtmlContent] = useState<string>(
+    block.type === 'text'
+      ? block.data.html || (block.display_style === 'html' ? block.data.lines.join('\n') : '')
+      : ''
+  );
+  const [showHtmlPreview, setShowHtmlPreview] = useState<boolean>(false);
+
   // State cho text block
   const [textLines, setTextLines] = useState<string>(
     block.type === 'text' ? block.data.lines.join('\n') : ''
   );
   const [displayStyle, setDisplayStyle] = useState<string>(
-    block.type === 'text' ? block.display_style : 'van_ban'
+    block.type === 'text' ? (block.display_style === 'html' ? 'van_ban' : block.display_style) : 'van_ban'
   );
   const [textFormat, setTextFormat] = useState<'paragraph' | 'numbered' | 'bullet'>(
     block.type === 'text' ? block.data.format || 'paragraph' : 'paragraph'
+  );
+  const [fontSize, setFontSize] = useState<string>(
+    block.type === 'text' ? block.data.font_size || 'normal' : 'normal'
+  );
+  const [textColor, setTextColor] = useState<string>(
+    block.type === 'text' ? block.data.text_color || '' : ''
+  );
+  const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right' | 'justify'>(
+    block.type === 'text' ? block.data.text_align || 'left' : 'left'
   );
 
   // Đính kèm phương tiện (Ảnh, File, Video) ngay trong khối chữ
@@ -230,12 +326,22 @@ export default function EditBlockModal({
         .map((l) => l.trim())
         .filter((l) => l.length > 0);
 
+      const isHtml = blockMode === 'html';
+      const cleanHtml = isHtml ? htmlContent.trim() : undefined;
+
       const updated: Block = {
         ...block,
-        display_style: displayStyle,
+        display_style: isHtml ? 'html' : displayStyle,
         data: {
-          lines: lines.length > 0 ? lines : ['Nội dung mới'],
+          title: blockTitle.trim() || undefined,
+          title_color: titleColor || undefined,
+          mode: blockMode,
+          html: cleanHtml,
+          lines: lines.length > 0 ? lines : (isHtml ? ['Khối nội dung HTML'] : ['Nội dung mới']),
           format: textFormat,
+          font_size: fontSize,
+          text_color: textColor.trim() || undefined,
+          text_align: textAlign,
           images: attachedImages.length > 0 ? attachedImages : undefined,
           files: attachedFiles.length > 0 ? attachedFiles : undefined,
           videos: attachedVideos.length > 0 ? attachedVideos : undefined,
@@ -320,81 +426,451 @@ export default function EditBlockModal({
         <div className="flex-1 overflow-y-auto p-4 sm:p-5 flex flex-col gap-3.5">
           {block.type === 'text' && (
             <>
-              {/* Chọn kiểu khối chữ */}
-              <div className="flex flex-col gap-1">
-                <label className="text-[14px] font-bold text-ink">
-                  Kiểu hiển thị khối
-                </label>
-                <select
-                  value={displayStyle}
-                  onChange={(e) => setDisplayStyle(e.target.value)}
-                  className="w-full h-[44px] px-3 rounded-[12px] bg-white border border-line text-[15px] text-ink font-semibold focus:border-primary"
-                >
-                  <option value="van_ban">Văn bản (không nhãn, chữ đoạn)</option>
-                  <option value="y_nghia">Ý NGHĨA (nền ngọc nhạt)</option>
-                  <option value="diem_can_nho">ĐIỂM CẦN NHỚ (nền xanh dương nhạt)</option>
-                  <option value="chu_y">CHÚ Ý (nền cam nhạt)</option>
-                  <option value="sai_lam">SAI LẦM THƯỜNG GẶP (nền đỏ nhạt)</option>
-                  <option value="giai_phap">GIẢI PHÁP · ỨNG DỤNG (nền xanh lá nhạt)</option>
-                </select>
+              {/* 1. Tiêu đề đoạn văn & Màu sắc tiêu đề */}
+              <div className="flex flex-col gap-2.5 p-3.5 rounded-[16px] bg-slate-50 dark:bg-white/5 border border-line">
+                <div className="flex items-center justify-between">
+                  <label className="text-[14px] font-extrabold text-ink flex items-center gap-1.5">
+                    <span>Tiêu đề đoạn văn</span>
+                    <span className="text-[12px] text-muted font-normal">(tùy chọn)</span>
+                  </label>
+                  {blockTitle.trim() && (
+                    <span
+                      className="text-[11.5px] font-bold px-2 py-0.5 rounded-full border truncate max-w-[140px]"
+                      style={{
+                        color: titleColor,
+                        borderColor: titleColor + '50',
+                        backgroundColor: titleColor + '15',
+                      }}
+                    >
+                      {blockTitle}
+                    </span>
+                  )}
+                </div>
+
+                <input
+                  type="text"
+                  value={blockTitle}
+                  onChange={(e) => setBlockTitle(e.target.value)}
+                  placeholder="Nhập tiêu đề khối (VD: Cấu tạo đĩa đệm, Lưu ý quan trọng...)"
+                  className="w-full h-[42px] px-3.5 rounded-[12px] bg-white dark:bg-[#1E1342] border border-line text-[15px] font-bold text-ink focus:border-primary focus:outline-none transition-all"
+                  style={{ color: blockTitle ? titleColor : undefined }}
+                />
+
+                {/* Chọn màu sắc tiêu đề */}
+                <div className="flex flex-col gap-1.5 pt-1 border-t border-line/60">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[12.5px] font-bold text-muted flex items-center gap-1.5">
+                      <Palette size={13} className="text-primary" />
+                      <span>Màu sắc tiêu đề:</span>
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="color"
+                        value={titleColor}
+                        onChange={(e) => setTitleColor(e.target.value)}
+                        className="w-6 h-6 rounded-md border border-line cursor-pointer p-0 bg-transparent"
+                        title="Bấm để chọn màu tùy thích"
+                      />
+                      <span className="text-[11px] font-mono text-muted">{titleColor}</span>
+                    </div>
+                  </div>
+
+                  {/* 8 Màu chips chuẩn y khoa / thiết kế */}
+                  <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
+                    {TITLE_COLORS.map((col) => {
+                      const isSelected = titleColor.toLowerCase() === col.hex.toLowerCase();
+                      return (
+                        <button
+                          key={col.hex}
+                          type="button"
+                          onClick={() => setTitleColor(col.hex)}
+                          className={`h-7 px-1.5 rounded-[8px] flex items-center justify-center text-[11px] font-bold transition-all border cursor-pointer ${
+                            isSelected
+                              ? 'ring-2 ring-primary ring-offset-1 text-white shadow-xs'
+                              : 'border-line text-ink bg-white dark:bg-[#1C123D] hover:scale-105'
+                          }`}
+                          style={{
+                            backgroundColor: isSelected ? col.hex : undefined,
+                          }}
+                          title={col.name}
+                        >
+                          {isSelected ? (
+                            <Check size={12} className="stroke-[3]" />
+                          ) : (
+                            <span
+                              className="w-2.5 h-2.5 rounded-full mr-1 shrink-0"
+                              style={{ backgroundColor: col.hex }}
+                            />
+                          )}
+                          <span className="truncate">{col.name}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
 
-              {/* Định dạng danh sách */}
-              <div className="flex flex-col gap-1">
-                <label className="text-[14px] font-bold text-ink">
-                  Định dạng danh sách
+              {/* 2. Segmented Control 2 Chế độ: Văn bản thường vs Mã HTML tùy biến */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[14px] font-extrabold text-ink">
+                  Chế độ khối nội dung
                 </label>
-                <div className="grid grid-cols-3 gap-1.5">
+                <div className="grid grid-cols-2 p-1 rounded-[14px] bg-surface-2 border border-line">
                   <button
                     type="button"
-                    onClick={() => setTextFormat('paragraph')}
-                    className={`h-10 rounded-[10px] font-bold text-[13px] ${
-                      textFormat === 'paragraph'
-                        ? 'bg-primary text-white shadow-2xs'
-                        : 'bg-surface-2 text-ink border border-line'
+                    onClick={() => setBlockMode('text')}
+                    className={`h-[38px] rounded-[10px] flex items-center justify-center gap-2 font-bold text-[14px] transition-all cursor-pointer ${
+                      blockMode === 'text'
+                        ? 'bg-white dark:bg-[#1C123D] text-primary shadow-xs'
+                        : 'text-muted hover:text-ink'
                     }`}
                   >
-                    Đoạn văn
+                    <FileText size={16} />
+                    <span>Văn bản thường</span>
                   </button>
                   <button
                     type="button"
-                    onClick={() => setTextFormat('numbered')}
-                    className={`h-10 rounded-[10px] font-bold text-[13px] ${
-                      textFormat === 'numbered'
-                        ? 'bg-primary text-white shadow-2xs'
-                        : 'bg-surface-2 text-ink border border-line'
+                    onClick={() => setBlockMode('html')}
+                    className={`h-[38px] rounded-[10px] flex items-center justify-center gap-2 font-bold text-[14px] transition-all cursor-pointer ${
+                      blockMode === 'html'
+                        ? 'bg-white dark:bg-[#1C123D] text-primary shadow-xs'
+                        : 'text-muted hover:text-ink'
                     }`}
                   >
-                    Số 1, 2, 3
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setTextFormat('bullet')}
-                    className={`h-10 rounded-[10px] font-bold text-[13px] ${
-                      textFormat === 'bullet'
-                        ? 'bg-primary text-white shadow-2xs'
-                        : 'bg-surface-2 text-ink border border-line'
-                    }`}
-                  >
-                    Gạch đầu dòng
+                    <Code size={16} />
+                    <span>Mã HTML tùy biến</span>
                   </button>
                 </div>
               </div>
 
-              {/* Nội dung dòng chữ */}
-              <div className="flex flex-col gap-1">
-                <label className="text-[14px] font-bold text-ink flex items-center justify-between">
-                  <span>Nội dung (mỗi dòng 1 ý)</span>
-                  <span className="text-[12px] text-muted font-normal">Hỗ trợ **chữ đậm**</span>
-                </label>
-                <textarea
-                  rows={4}
-                  value={textLines}
-                  onChange={(e) => setTextLines(e.target.value)}
-                  placeholder="Nhập nội dung vào đây..."
-                  className="w-full p-3 rounded-[14px] border border-line text-[15px] text-ink leading-relaxed focus:border-primary"
-                />
-              </div>
+              {/* 3. Chi tiết theo từng chế độ */}
+              {blockMode === 'html' ? (
+                <div className="flex flex-col gap-2.5">
+                  {/* Mẫu HTML chèn nhanh & nút xem trước */}
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[12.5px] font-bold text-muted flex items-center gap-1">
+                        <Sparkles size={13} className="text-amber-500" />
+                        <span>Mẫu HTML dựng sẵn (bấm để chèn):</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setShowHtmlPreview(!showHtmlPreview)}
+                        className={`flex items-center gap-1 text-[12px] font-bold px-2 py-0.5 rounded-[6px] transition-all cursor-pointer ${
+                          showHtmlPreview
+                            ? 'bg-primary text-white shadow-2xs'
+                            : 'bg-surface-2 text-ink border border-line hover:border-primary'
+                        }`}
+                      >
+                        {showHtmlPreview ? <EyeOff size={12} /> : <Eye size={12} />}
+                        <span>{showHtmlPreview ? 'Ẩn xem trước' : 'Xem trước HTML'}</span>
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                      {HTML_TEMPLATES.map((tmpl, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => {
+                            const current = htmlContent.trim();
+                            setHtmlContent(current ? `${current}\n\n${tmpl.snippet}` : tmpl.snippet);
+                          }}
+                          className="h-8 px-2 rounded-[8px] bg-white dark:bg-[#1C123D] border border-line hover:border-primary text-ink text-[12px] font-bold flex items-center justify-center gap-1 transition-all cursor-pointer shadow-2xs"
+                        >
+                          <span>{tmpl.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Textarea soạn mã HTML */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[14px] font-bold text-ink flex items-center justify-between">
+                      <span>Mã HTML tùy biến</span>
+                      <span className="text-[11.5px] font-mono text-muted">Hỗ trợ HTML5 & inline CSS</span>
+                    </label>
+                    <textarea
+                      rows={6}
+                      value={htmlContent}
+                      onChange={(e) => setHtmlContent(e.target.value)}
+                      placeholder="<div>Nhập hoặc dán mã HTML tại đây...</div>"
+                      className="w-full p-3 rounded-[14px] border border-line text-[13.5px] font-mono leading-relaxed focus:border-primary bg-slate-900 text-emerald-400 dark:bg-black/60 focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Khung xem trước trực tiếp */}
+                  {showHtmlPreview && (
+                    <div className="flex flex-col gap-2 p-3.5 rounded-[14px] bg-slate-50 dark:bg-white/5 border-2 border-dashed border-primary/40 animate-in fade-in">
+                      <div className="flex items-center justify-between pb-1.5 border-b border-line text-[12px] font-extrabold text-primary">
+                        <span>👁️ XEM TRƯỚC HIỂN THỊ THỰC TẾ:</span>
+                      </div>
+                      {blockTitle.trim() && (
+                        <h4
+                          className="text-[18px] font-extrabold m-0 pt-0.5"
+                          style={{ color: titleColor }}
+                        >
+                          {blockTitle}
+                        </h4>
+                      )}
+                      <div
+                        className="p-3 bg-white dark:bg-[#160E2E] rounded-[10px] border border-line text-ink text-[15px] leading-relaxed overflow-x-auto"
+                        dangerouslySetInnerHTML={{
+                          __html:
+                            sanitizeHtml(htmlContent) ||
+                            '<p class="text-muted italic text-[13px] m-0">Chưa có mã HTML. Bấm vào các nút mẫu phía trên để chèn nhanh.</p>',
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              ) : (
+                /* Khối Văn bản thường */
+                <>
+                  {/* Chọn kiểu khối chữ */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[14px] font-bold text-ink">
+                      Kiểu hiển thị khối
+                    </label>
+                    <select
+                      value={displayStyle}
+                      onChange={(e) => setDisplayStyle(e.target.value)}
+                      className="w-full h-[44px] px-3 rounded-[12px] bg-white dark:bg-[#1E1342] border border-line text-[15px] text-ink font-semibold focus:border-primary"
+                    >
+                      <option value="van_ban">Văn bản (không nhãn, chữ đoạn)</option>
+                      <option value="y_nghia">Ý NGHĨA (nền ngọc nhạt)</option>
+                      <option value="diem_can_nho">ĐIỂM CẦN NHỚ (nền xanh dương nhạt)</option>
+                      <option value="chu_y">CHÚ Ý (nền cam nhạt)</option>
+                      <option value="sai_lam">SAI LẦM THƯỜNG GẶP (nền đỏ nhạt)</option>
+                      <option value="giai_phap">GIẢI PHÁP · ỨNG DỤNG (nền xanh lá nhạt)</option>
+                    </select>
+                  </div>
+
+                  {/* Định dạng danh sách */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[14px] font-bold text-ink">
+                      Định dạng danh sách
+                    </label>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setTextFormat('paragraph')}
+                        className={`h-10 rounded-[10px] font-bold text-[13px] transition-all cursor-pointer ${
+                          textFormat === 'paragraph'
+                            ? 'bg-primary text-white shadow-2xs'
+                            : 'bg-surface-2 text-ink border border-line hover:border-primary'
+                        }`}
+                      >
+                        Đoạn văn
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setTextFormat('numbered')}
+                        className={`h-10 rounded-[10px] font-bold text-[13px] transition-all cursor-pointer ${
+                          textFormat === 'numbered'
+                            ? 'bg-primary text-white shadow-2xs'
+                            : 'bg-surface-2 text-ink border border-line hover:border-primary'
+                        }`}
+                      >
+                        Số 1, 2, 3
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setTextFormat('bullet')}
+                        className={`h-10 rounded-[10px] font-bold text-[13px] transition-all cursor-pointer ${
+                          textFormat === 'bullet'
+                            ? 'bg-primary text-white shadow-2xs'
+                            : 'bg-surface-2 text-ink border border-line hover:border-primary'
+                        }`}
+                      >
+                        Gạch đầu dòng
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Cài đặt Cỡ chữ, Màu chữ & Căn lề */}
+                  <div className="flex flex-col gap-2.5 p-3 rounded-[16px] bg-slate-50 dark:bg-white/5 border border-line">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[13px] font-extrabold text-ink flex items-center gap-1.5">
+                        <Type size={14} className="text-primary" />
+                        <span>Cài đặt chữ & Màu sắc</span>
+                      </span>
+                      <span className="text-[11px] text-muted font-mono">
+                        {fontSize === 'small' ? '14px' : fontSize === 'large' ? '18px' : fontSize === 'xlarge' ? '21px' : '16px'} • {textColor || 'Tự động'}
+                      </span>
+                    </div>
+
+                    {/* Cỡ chữ */}
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[12px] font-bold text-muted">Cỡ chữ văn bản:</span>
+                      <div className="grid grid-cols-4 gap-1.5">
+                        {FONT_SIZE_OPTIONS.map((opt) => {
+                          const isSel = fontSize === opt.value;
+                          return (
+                            <button
+                              key={opt.value}
+                              type="button"
+                              onClick={() => setFontSize(opt.value)}
+                              className={`h-9 rounded-[9px] flex flex-col items-center justify-center transition-all cursor-pointer border ${
+                                isSel
+                                  ? 'bg-primary text-white border-primary shadow-xs font-black'
+                                  : 'bg-white dark:bg-[#1C123D] border-line text-ink hover:border-primary font-bold'
+                              }`}
+                            >
+                              <span className="text-[12px] leading-tight">{opt.label}</span>
+                              <span className={`text-[10px] leading-tight ${isSel ? 'text-white/80' : 'text-muted'}`}>{opt.px}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Căn lề */}
+                    <div className="flex flex-col gap-1 pt-1 border-t border-line/50">
+                      <span className="text-[12px] font-bold text-muted">Căn lề:</span>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => setTextAlign('left')}
+                          className={`h-8 rounded-[8px] flex items-center justify-center gap-1 text-[12px] font-bold transition-all cursor-pointer border ${
+                            textAlign === 'left'
+                              ? 'bg-primary text-white border-primary shadow-2xs'
+                              : 'bg-white dark:bg-[#1C123D] border-line text-ink'
+                          }`}
+                        >
+                          <AlignLeft size={13} />
+                          <span>Căn trái</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setTextAlign('center')}
+                          className={`h-8 rounded-[8px] flex items-center justify-center gap-1 text-[12px] font-bold transition-all cursor-pointer border ${
+                            textAlign === 'center'
+                              ? 'bg-primary text-white border-primary shadow-2xs'
+                              : 'bg-white dark:bg-[#1C123D] border-line text-ink'
+                          }`}
+                        >
+                          <AlignCenter size={13} />
+                          <span>Giữa</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setTextAlign('justify')}
+                          className={`h-8 rounded-[8px] flex items-center justify-center gap-1 text-[12px] font-bold transition-all cursor-pointer border ${
+                            textAlign === 'justify'
+                              ? 'bg-primary text-white border-primary shadow-2xs'
+                              : 'bg-white dark:bg-[#1C123D] border-line text-ink'
+                          }`}
+                        >
+                          <AlignJustify size={13} />
+                          <span>Căn đều</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Màu chữ */}
+                    <div className="flex flex-col gap-1.5 pt-1 border-t border-line/50">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[12px] font-bold text-muted flex items-center gap-1">
+                          <Palette size={12} className="text-primary" />
+                          <span>Màu chữ:</span>
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            type="color"
+                            value={textColor || '#1E293B'}
+                            onChange={(e) => setTextColor(e.target.value)}
+                            className="w-5 h-5 rounded border border-line cursor-pointer p-0 bg-transparent"
+                            title="Chọn màu tự do"
+                          />
+                          {textColor ? (
+                            <button
+                              type="button"
+                              onClick={() => setTextColor('')}
+                              className="text-[10.5px] text-red-500 hover:underline font-bold"
+                            >
+                              Đặt lại
+                            </button>
+                          ) : (
+                            <span className="text-[10.5px] text-muted italic">Mặc định</span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-4 sm:grid-cols-6 gap-1.5">
+                        {TEXT_COLORS.map((col) => {
+                          const isSel = (textColor === '' && col.hex === '') || (textColor.toLowerCase() === col.hex.toLowerCase() && col.hex !== '');
+                          return (
+                            <button
+                              key={col.name}
+                              type="button"
+                              onClick={() => setTextColor(col.hex)}
+                              className={`h-7 px-1.5 rounded-[7px] flex items-center justify-center text-[10.5px] font-bold transition-all border cursor-pointer ${
+                                isSel
+                                  ? 'ring-2 ring-primary ring-offset-1 text-white shadow-2xs'
+                                  : 'border-line text-ink bg-white dark:bg-[#1C123D] hover:scale-105'
+                              }`}
+                              style={{
+                                backgroundColor: isSel ? (col.hex || '#2563EB') : undefined,
+                              }}
+                              title={col.name}
+                            >
+                              {col.hex ? (
+                                <span
+                                  className="w-2.5 h-2.5 rounded-full mr-1 shrink-0 border border-black/10"
+                                  style={{ backgroundColor: col.hex }}
+                                />
+                              ) : null}
+                              <span className="truncate">{col.name}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Nội dung dòng chữ */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[14px] font-bold text-ink flex items-center justify-between">
+                      <span>Nội dung (mỗi dòng 1 ý)</span>
+                      <span className="text-[12px] text-muted font-normal">Hỗ trợ **chữ đậm**</span>
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={textLines}
+                      onChange={(e) => setTextLines(e.target.value)}
+                      placeholder="Nhập nội dung vào đây..."
+                      className="w-full p-3 rounded-[14px] border border-line text-[15px] text-ink leading-relaxed focus:border-primary"
+                    />
+                  </div>
+
+                  {/* Xem trước trực tiếp đoạn văn */}
+                  {textLines.trim() && (
+                    <div className="flex flex-col gap-1 p-2.5 rounded-[12px] bg-slate-50 dark:bg-white/5 border border-line/70">
+                      <span className="text-[11px] font-bold text-muted uppercase tracking-wider">
+                        Xem trước chữ hiển thị:
+                      </span>
+                      <p
+                        className={`m-0 leading-relaxed ${
+                          fontSize === 'small'
+                            ? 'text-[14px]'
+                            : fontSize === 'large'
+                            ? 'text-[18px]'
+                            : fontSize === 'xlarge'
+                            ? 'text-[21px]'
+                            : 'text-[16px]'
+                        }`}
+                        style={{
+                          color: textColor || undefined,
+                          textAlign: textAlign,
+                        }}
+                      >
+                        {textLines.split('\n')[0] || 'Nội dung văn bản'}
+                      </p>
+                    </div>
+                  )}
+                </>
+              )}
 
               {/* HÀNG NÚT GỌN GÀNG ĐÍNH KÈM THÊM: ẢNH / PDF / VIDEO */}
               <div className="flex flex-col gap-2 pt-1 border-t border-line/60">

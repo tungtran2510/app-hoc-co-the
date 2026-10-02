@@ -70,7 +70,12 @@ export async function GET() {
           if (!block.is_visible) continue;
 
           if (block.type === 'text') {
-            textSnippets.push(...block.data.lines);
+            if (block.data.title) textSnippets.push(block.data.title);
+            if (block.data.lines) textSnippets.push(...block.data.lines);
+            if (block.data.html) {
+              const stripped = block.data.html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+              if (stripped) textSnippets.push(stripped);
+            }
           } else if (block.type === 'videos') {
             for (const vid of block.data.videos) {
               videoRunningIndex++;

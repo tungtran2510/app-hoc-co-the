@@ -59,9 +59,16 @@ export default function BlockRenderer({
         <TextBlock
           blockId={blockId}
           displayStyle={block.display_style}
+          title={block.data.title}
+          titleColor={block.data.title_color}
+          mode={block.data.mode}
+          html={block.data.html}
           lines={block.data.lines}
           format={block.data.format}
           fontSizeMode={fontSizeMode}
+          fontSize={block.data.font_size}
+          textColor={block.data.text_color}
+          textAlign={block.data.text_align}
           images={block.data.images}
           files={block.data.files}
           videos={block.data.videos}

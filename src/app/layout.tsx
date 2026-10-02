@@ -38,10 +38,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: dark)', color: '#0C0817' },
-    { media: '(prefers-color-scheme: light)', color: '#F5F6FA' },
-  ],
+  themeColor: '#0C0817',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
@@ -56,6 +53,7 @@ export default function RootLayout({
   return (
     <html lang="vi" className={`${beVietnamPro.variable} ${lora.variable} ${beVietnamPro.className}`}>
       <head>
+        <meta name="theme-color" content="#0C0817" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
         <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />

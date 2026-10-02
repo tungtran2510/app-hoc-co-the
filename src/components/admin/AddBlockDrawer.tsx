@@ -17,6 +17,7 @@ import {
   ExternalLink,
   FileArchive,
   Columns2,
+  Code,
 } from 'lucide-react';
 import { Block } from '../../lib/types';
 import { generateUuid } from '../../lib/uuid';
@@ -45,8 +46,18 @@ export default function AddBlockDrawer({
     if (type === 'text') {
       let defaultLines = ['Nội dung mới của khối này. Bấm nút Sửa để thay đổi chữ.'];
       let format: 'paragraph' | 'numbered' | 'bullet' = 'paragraph';
+      let title: string | undefined = undefined;
+      let title_color: string | undefined = undefined;
+      let mode: 'text' | 'html' = displayStyle === 'html' ? 'html' : 'text';
+      let html: string | undefined = undefined;
 
-      if (displayStyle === 'diem_can_nho') {
+      if (displayStyle === 'html') {
+        title = 'Khối HTML tùy biến';
+        title_color = '#1E3A8A';
+        mode = 'html';
+        html = `<div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left: 4px solid #2563eb; padding: 14px 16px; border-radius: 12px; margin: 8px 0;">\n  <div style="font-weight: 700; color: #1e40af; margin-bottom: 4px;">💡 Điểm cốt lõi cần nhớ</div>\n  <p style="margin: 0; color: #1e3a8a; line-height: 1.6; font-size: 15px;">Nội dung giải thích chi tiết, định dạng HTML chuyên nghiệp và dễ tùy biến.</p>\n</div>`;
+        defaultLines = ['Khối nội dung HTML tùy biến'];
+      } else if (displayStyle === 'diem_can_nho') {
         format = 'numbered';
         defaultLines = ['Ý quan trọng thứ nhất.', 'Ý quan trọng thứ hai.'];
       } else if (displayStyle === 'giai_phap') {
@@ -62,6 +73,10 @@ export default function AddBlockDrawer({
         sort_order: nextSortOrder,
         is_visible: true,
         data: {
+          title,
+          title_color,
+          mode,
+          html,
           lines: defaultLines,
           format,
         },
@@ -294,6 +309,14 @@ export default function AddBlockDrawer({
               >
                 <Columns2 size={20} className="text-primary dark:text-[#C4B5FD] shrink-0" />
                 <span className="text-ink dark:text-white">So sánh 2 mặt (Đúng – Sai / Khỏe – Bệnh)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => createAndAdd('text', 'html')}
+                className="col-span-2 flex items-center justify-center gap-2.5 p-3 rounded-[16px] bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/60 dark:to-indigo-950/60 hover:opacity-95 transition-all font-bold text-[15px] border border-blue-200 dark:border-blue-500/40 shadow-2xs"
+              >
+                <Code size={20} className="text-primary dark:text-blue-400 shrink-0" />
+                <span className="text-ink dark:text-white">Khối HTML tùy biến (Rich HTML)</span>
               </button>
             </div>
           </div>

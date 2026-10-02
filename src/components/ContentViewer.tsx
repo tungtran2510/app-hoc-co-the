@@ -488,6 +488,10 @@ export default function ContentViewer({
         }
 
         if (block.type === 'text') {
+          if (block.data?.title?.trim()) {
+            return { id: block.id, label: block.data.title.trim() };
+          }
+
           const style = block.display_style || 'text';
           textStyleCounts[style] = (textStyleCounts[style] || 0) + 1;
           const count = textStyleCounts[style];
@@ -509,8 +513,11 @@ export default function ContentViewer({
             case 'giai_phap':
               baseLabel = 'Giải pháp phục hồi';
               break;
+            case 'html':
+              baseLabel = 'Khối HTML';
+              break;
             default:
-              baseLabel = 'Đoạn văn';
+              baseLabel = block.data?.mode === 'html' ? 'Khối HTML' : 'Đoạn văn';
           }
 
           // Trích xuất từ khóa tiêu đề từ dòng đầu tiên nếu có
@@ -602,6 +609,15 @@ export default function ContentViewer({
       return 'DANH SÁCH VIDEO';
     }
     if (block.type === 'text') {
+      if (block.data.title?.trim()) {
+        const isHtml = block.data.mode === 'html' || block.display_style === 'html';
+        return isHtml
+          ? `[HTML] ${block.data.title.trim().toUpperCase()}`
+          : block.data.title.trim().toUpperCase();
+      }
+      if (block.data.mode === 'html' || block.display_style === 'html') {
+        return 'KHỐI HTML TÙY BIẾN';
+      }
       switch (block.display_style) {
         case 'y_nghia':
           return 'Ý NGHĨA';
@@ -819,23 +835,96 @@ export default function ContentViewer({
           }
           summaryContent={
             block.type === 'videos' ? (
-              <div className="flex flex-col gap-4">
-                {textBlocks.map((b) => (
-                  <TextBlock
-                    key={b.id}
-                    displayStyle={b.display_style}
-                    lines={b.data.lines}
-                    format={b.data.format}
-                    images={b.data.images}
-                    files={b.data.files}
-                    videos={b.data.videos}
-                    fontSizeMode={fontSizeMode}
-                  />
-                ))}
-                {textBlocks.length === 0 && (
+              <div className="flex flex-col gap-3 py-1">
+                {textBlocks
+                  .filter((b) => isAdmin || b.is_visible)
+                  .map((b) => (
+                    <div
+                      key={b.id}
+                      id={`block-${b.id}`}
+                      className={`relative transition-all ${
+                        isAdmin
+                          ? 'p-2 rounded-[20px] border-2 border-dashed border-[#2D5B94]/30 dark:border-purple-500/40 bg-white/40 dark:bg-[#160E2E]/40'
+                          : ''
+                      } ${!b.is_visible ? 'opacity-50' : ''}`}
+                    >
+                      {/* Thanh điều khiển của Admin trên từng khối tóm tắt */}
+                      {isAdmin && (
+                        <div className="flex items-center justify-between pb-1.5 mb-2 border-b border-line/60">
+                          <span className="text-[11.5px] font-extrabold text-muted uppercase tracking-wider">
+                            {getBlockTitle(b)}
+                          </span>
+
+                          <div className="flex items-center gap-1.5">
+                            {/* Nút Sửa */}
+                            <button
+                              type="button"
+                              onClick={() => setEditingBlock(b)}
+                              className="flex items-center gap-1 h-7 px-2.5 rounded-[8px] bg-white dark:bg-[#1C123D] border border-line text-ink font-bold text-[12px] hover:border-primary shadow-2xs cursor-pointer"
+                            >
+                              <Edit2 size={12} className="text-primary" />
+                              <span>Sửa</span>
+                            </button>
+
+                            {/* Nút Ẩn/Hiện */}
+                            <button
+                              type="button"
+                              onClick={() => handleToggleVisibility(b.id)}
+                              className="w-7 h-7 rounded-[8px] bg-white dark:bg-[#1C123D] border border-line flex items-center justify-center text-ink shadow-2xs cursor-pointer"
+                              title={b.is_visible ? 'Ẩn mục này' : 'Hiện mục này'}
+                            >
+                              {b.is_visible ? <EyeOff size={13} /> : <Eye size={13} />}
+                            </button>
+
+                            {/* Nút Xóa */}
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteBlock(b.id)}
+                              className="w-7 h-7 rounded-[8px] bg-white dark:bg-[#1C123D] border border-line flex items-center justify-center text-[#E5484D] shadow-2xs cursor-pointer"
+                              title="Xóa mục này"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      <TextBlock
+                        blockId={`block-${b.id}`}
+                        displayStyle={b.display_style}
+                        title={b.data.title}
+                        titleColor={b.data.title_color}
+                        mode={b.data.mode}
+                        html={b.data.html}
+                        lines={b.data.lines}
+                        format={b.data.format}
+                        fontSizeMode={fontSizeMode}
+                        fontSize={b.data.font_size}
+                        textColor={b.data.text_color}
+                        textAlign={b.data.text_align}
+                        images={b.data.images}
+                        files={b.data.files}
+                        videos={b.data.videos}
+                      />
+                    </div>
+                  ))}
+
+                {textBlocks.filter((b) => isAdmin || b.is_visible).length === 0 && (
                   <p className="text-muted text-[14px] p-4 text-center">
                     Chưa có tóm tắt bằng văn bản cho bài học này.
                   </p>
+                )}
+
+                {/* Nút thêm tóm tắt mới dành cho Admin ngay trong tab Tóm tắt cốt lõi */}
+                {isAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAddDrawer(true)}
+                    className="flex items-center justify-center gap-1.5 h-10 w-full rounded-[12px] border border-dashed border-primary text-primary font-bold text-[13.5px] hover:bg-primary-soft/30 transition-colors cursor-pointer mt-1"
+                  >
+                    <Plus size={15} strokeWidth={2.5} />
+                    <span>+ Thêm mục tóm tắt cốt lõi</span>
+                  </button>
                 )}
               </div>
             ) : undefined
@@ -969,7 +1058,13 @@ export default function ContentViewer({
       {/* 4. Danh sách tất cả các khối theo đúng thứ tự sắp xếp */}
       <div className="flex flex-col gap-4">
         {blockList
-          .filter((b) => isAdmin || b.is_visible)
+          .filter((b) => {
+            if (!isAdmin && !b.is_visible) return false;
+            // Nếu bài học có khối video, các khối text đã nằm trong tab 'Tóm tắt cốt lõi'
+            // Tuyệt đối không hiển thị lặp lại ở ngoài trang chính có danh sách phát nữa
+            if (videoBlock && b.type === 'text') return false;
+            return true;
+          })
           .map((block) => {
             const actualIdx = blockList.findIndex((item) => item.id === block.id);
             return renderBlockItem(block, actualIdx);

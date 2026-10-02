@@ -94,9 +94,8 @@ export default async function ContentPage({ params }: PageProps) {
       : null;
   const nextPageIndex = nextPage ? currentIdx + 2 : null;
 
-  // Lệnh 01: Mặc định đang phát video thứ 3 ở trang Tổng quan (khớp thẻ Xem tiếp), video thứ 1 ở trang khác.
-  const defaultActiveVideoIndex =
-    page.slug === 'tong-quan-ve-cot-song' ? 2 : 0;
+  // Mặc định phát video thứ 1 (Bài 01)
+  const defaultActiveVideoIndex = 0;
 
   return (
     <ContentViewer

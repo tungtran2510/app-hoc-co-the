@@ -154,6 +154,13 @@ export type Block =
       sort_order: number;
       is_visible: boolean;
       data: {
+        title?: string;
+        title_color?: string;
+        mode?: 'text' | 'html';
+        html?: string;
+        font_size?: string;
+        text_color?: string;
+        text_align?: 'left' | 'center' | 'right' | 'justify';
         lines: string[];
         format?: 'paragraph' | 'numbered' | 'bullet';
         images?: Image[];
