@@ -19,12 +19,14 @@ const nextConfig = {
     ],
   },
   async rewrites() {
-    return [
-      {
-        source: '/manifest.json',
-        destination: '/manifest.webmanifest',
-      },
-    ];
+    return {
+      beforeFiles: [
+        {
+          source: '/manifest.json',
+          destination: '/manifest.webmanifest',
+        },
+      ],
+    };
   },
 };
 
