@@ -9,7 +9,7 @@ import {
 } from '../../../lib/data';
 import ContentViewer from '../../../components/ContentViewer';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 interface PageProps {
   params: {

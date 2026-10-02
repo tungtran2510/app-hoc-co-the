@@ -58,6 +58,7 @@ export default function PageCard({
   return (
     <Link
       href={targetUrl}
+      prefetch={true}
       onTouchStart={onActivate}
       className={`page-card-container flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 bg-white dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] rounded-[14px] border transition-all active:scale-[0.99] shadow-xs group ${
         isActive

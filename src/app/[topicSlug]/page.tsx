@@ -29,8 +29,7 @@ interface TopicPageProps {
   };
 }
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 60;
 
 export async function generateMetadata({ params }: TopicPageProps): Promise<Metadata> {
   const [topic, settings] = await Promise.all([

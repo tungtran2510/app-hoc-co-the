@@ -904,53 +904,13 @@ export default function FlipbookViewer({
           ========================================================================= */}
       {mode !== 'modal-only' && (
       <section
-        className={`w-full flex flex-col rounded-[22px] sm:rounded-[26px] bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#0A0F1D] text-white border-2 border-amber-400/90 ring-4 ring-amber-500/15 p-3 sm:p-4.5 my-4 transition-all relative overflow-hidden group/book ${
+        className={`w-full flex flex-col rounded-[20px] sm:rounded-[24px] bg-gradient-to-b from-[#0F172A] via-[#131E36] to-[#0A0F1D] text-white border border-amber-400/40 p-2 sm:p-3 my-3 transition-all relative overflow-hidden group/book shadow-[0_12px_32px_-10px_rgba(0,0,0,0.6)] ${
           isHidden ? 'opacity-70 border-dashed border-amber-500' : ''
         }`}
-        style={{
-          boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.6), 0 0 25px -5px rgba(245, 158, 11, 0.3)',
-        }}
       >
-        {/* Họa tiết nẹp góc kim loại vàng đồng 4 góc (Vintage Brass Book Corners) */}
-        <div className="absolute top-0 left-0 w-7 h-7 pointer-events-none z-20">
-          <svg viewBox="0 0 32 32" className="w-full h-full text-amber-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" fill="currentColor">
-            <path d="M0 0 L18 0 C12 2 4 10 2 16 L2 30 L0 32 Z" opacity="0.9" />
-            <circle cx="6" cy="6" r="1.5" fill="#FDE68A" />
-            <path d="M0 0 L32 0 L32 3 L3 3 L3 32 L0 32 Z" fill="#F59E0B" />
-          </svg>
-        </div>
-        <div className="absolute top-0 right-0 w-7 h-7 pointer-events-none z-20 rotate-90">
-          <svg viewBox="0 0 32 32" className="w-full h-full text-amber-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" fill="currentColor">
-            <path d="M0 0 L18 0 C12 2 4 10 2 16 L2 30 L0 32 Z" opacity="0.9" />
-            <circle cx="6" cy="6" r="1.5" fill="#FDE68A" />
-            <path d="M0 0 L32 0 L32 3 L3 3 L3 32 L0 32 Z" fill="#F59E0B" />
-          </svg>
-        </div>
-        <div className="absolute bottom-0 left-0 w-7 h-7 pointer-events-none z-20 -rotate-90">
-          <svg viewBox="0 0 32 32" className="w-full h-full text-amber-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" fill="currentColor">
-            <path d="M0 0 L18 0 C12 2 4 10 2 16 L2 30 L0 32 Z" opacity="0.9" />
-            <circle cx="6" cy="6" r="1.5" fill="#FDE68A" />
-            <path d="M0 0 L32 0 L32 3 L3 3 L3 32 L0 32 Z" fill="#F59E0B" />
-          </svg>
-        </div>
-        <div className="absolute bottom-0 right-0 w-7 h-7 pointer-events-none z-20 rotate-180">
-          <svg viewBox="0 0 32 32" className="w-full h-full text-amber-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" fill="currentColor">
-            <path d="M0 0 L18 0 C12 2 4 10 2 16 L2 30 L0 32 Z" opacity="0.9" />
-            <circle cx="6" cy="6" r="1.5" fill="#FDE68A" />
-            <path d="M0 0 L32 0 L32 3 L3 3 L3 32 L0 32 Z" fill="#F59E0B" />
-          </svg>
-        </div>
-
-        {/* Gáy sách da dập nổi bên trái (Leather Book Spine Simulation) */}
-        <div className="absolute top-0 bottom-0 left-0 w-2.5 sm:w-3 bg-gradient-to-r from-amber-600/40 via-amber-500/20 to-transparent border-r border-amber-400/30 pointer-events-none z-10 flex flex-col justify-around py-6 opacity-80">
-          <div className="w-full h-2 bg-amber-400/40 rounded-r-xs" />
-          <div className="w-full h-2 bg-amber-400/40 rounded-r-xs" />
-          <div className="w-full h-2 bg-amber-400/40 rounded-r-xs" />
-        </div>
-
         {/* THANH ĐIỀU KHIỂN QUẢN TRỊ (CHO PHÉP DI CHUYỂN, ẨN/HIỆN KHỐI - CHỈ HIỆN VỚI ADMIN) */}
         {isAdmin && (
-          <div className="flex items-center justify-between pb-2 mb-2 border-b border-amber-400/30 relative z-20">
+          <div className="flex items-center justify-between pb-2 mb-2 border-b border-amber-400/20 relative z-20">
             <div className="flex items-center gap-1.5">
               <span className="text-[11px] font-black text-amber-300 uppercase tracking-wider bg-black/50 border border-amber-400/40 px-2 py-0.5 rounded-[6px]">
                 Quản trị khối sách
@@ -1012,61 +972,15 @@ export default function FlipbookViewer({
           </div>
         )}
 
-        {/* TIÊU ĐỀ QUYỂN SÁCH MẠ VÀNG SANG TRỌNG (CÓ THỂ TỰ ĐIỀN HOẶC TỰ SINH) */}
-        <div className="flex items-center justify-between gap-2 pb-2.5 pl-2 border-b border-amber-400/30 relative z-20">
-          <div className="flex items-center gap-2 min-w-0 flex-1">
+        {/* THANH CÔNG CỤ ĐỈNH KHỐI SÁCH: BIỂU TƯỢNG CUỐN SÁCH + HUY HIỆU + ÂM THANH + MỞ RỘNG (KHÔNG ĐỂ TIÊU ĐỀ 3 CHẤM CẮT CỤT) */}
+        <div className="flex items-center justify-between gap-2 pb-1.5 px-1 relative z-20">
+          <div className="flex items-center gap-2 min-w-0">
+            {/* Biểu tượng cuốn sách dát vàng */}
             <div className="w-7 h-7 rounded-[8px] bg-gradient-to-br from-amber-300 via-amber-500 to-amber-700 text-slate-950 flex items-center justify-center shrink-0 shadow-md border border-amber-200">
               <BookOpen size={15} strokeWidth={2.5} />
             </div>
 
-            {isEditingTitle ? (
-              <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                <input
-                  type="text"
-                  value={titleInput}
-                  onChange={(e) => setTitleInput(e.target.value)}
-                  placeholder="Nhập tiêu đề quyển sách..."
-                  className="h-7.5 px-2.5 text-[13px] font-bold rounded-[7px] bg-black/70 border border-amber-400 text-amber-200 focus:outline-none flex-1 min-w-0"
-                  autoFocus
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleSaveTitle(titleInput);
-                    if (e.key === 'Escape') setIsEditingTitle(false);
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => handleSaveTitle(titleInput)}
-                  className="h-7.5 px-2.5 bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 text-[11px] font-black rounded-[7px] cursor-pointer shadow-xs active:scale-95 shrink-0"
-                >
-                  Lưu
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsEditingTitle(false)}
-                  className="h-7.5 px-2 bg-white/20 text-white text-[11px] font-bold rounded-[7px] cursor-pointer shrink-0"
-                >
-                  Hủy
-                </button>
-              </div>
-            ) : (
-              <div
-                className="flex items-center gap-1.5 min-w-0 group/title cursor-pointer"
-                onClick={() => {
-                  setTitleInput(bookTitle);
-                  setIsEditingTitle(true);
-                }}
-                title="Bấm để đổi tiêu đề quyển sách"
-              >
-                <h3 className="text-[14px] sm:text-[16px] font-serif font-black text-amber-300 dark:text-[#F8DF7B] tracking-wide leading-tight truncate drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
-                  {bookTitle}
-                </h3>
-                <span className="opacity-60 group-hover/title:opacity-100 text-amber-400 hover:text-amber-200 p-0.5 transition-opacity shrink-0">
-                  <Edit2 size={12} />
-                </span>
-              </div>
-            )}
-
-            <span className="text-[10px] font-black text-amber-950 bg-gradient-to-r from-amber-300 to-amber-400 px-2 py-0.5 rounded-full shrink-0 shadow-2xs whitespace-nowrap">
+            <span className="text-[10.5px] font-black text-amber-950 bg-gradient-to-r from-amber-300 to-amber-400 px-2.5 py-0.5 rounded-full shrink-0 shadow-2xs whitespace-nowrap">
               {totalPages} trang
             </span>
           </div>
@@ -1101,16 +1015,16 @@ export default function FlipbookViewer({
           </div>
         </div>
 
-        {/* BÌA SÁCH ĐÓNG - ẤN VÀO MỞ ĐỌC TOÀN MÀN HÌNH */}
+        {/* BÌA SÁCH ĐÓNG/MỞ - SÁT VIỀN, KHÔNG KHUNG CHỒNG KHUNG */}
         <div
-          className="w-full aspect-[4/3] max-h-[500px] rounded-[14px] bg-[#0a1628] border border-amber-400/40 relative overflow-hidden flex items-center justify-center group shadow-2xl my-2 cursor-pointer"
+          className="w-full aspect-[4/3] max-h-[500px] rounded-[16px] bg-[#0c1626] relative overflow-hidden flex items-center justify-center group shadow-xl my-1 cursor-pointer"
           onClick={() => setIsFullscreen(true)}
           role="button"
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsFullscreen(true); }}
           aria-label={`Mở đọc: ${bookTitle}`}
         >
-          {/* Ảnh bìa sách cố định - FULL khung */}
+          {/* Ảnh bìa sách mở - tràn sát viền tự nhiên */}
           <img
             src="/images/book_cover_blank.jpg"
             alt="Bìa sách"
@@ -1118,21 +1032,21 @@ export default function FlipbookViewer({
             draggable={false}
           />
 
-          {/* Lớp phủ tiêu đề trên trang sách mở */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none px-12 sm:px-24">
-            <h3 className="text-[#1a2744] text-center font-bold text-[16px] sm:text-[22px] leading-snug tracking-wide" style={{ textShadow: '0 1px 3px rgba(255,255,255,0.5)' }}>
+          {/* Lớp phủ tiêu đề trên trang sách mở - TO RÕ, ĐẬM ĐÀ, NỔI BẬT */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none px-6 sm:px-16 text-center">
+            <h3 className="text-[#0d1b33] font-serif font-black text-[18px] sm:text-[24px] leading-tight tracking-normal drop-shadow-[0_1px_2px_rgba(255,255,255,0.7)] max-w-[90%] line-clamp-3">
               {bookTitle}
             </h3>
-            <div className="w-12 h-[2px] bg-amber-600/60 rounded-full mt-2.5 mb-1.5" />
-            <p className="text-[#4a5568] text-[10px] sm:text-[12px] font-semibold tracking-wider uppercase">
+            <div className="w-16 h-[2px] bg-amber-600/70 rounded-full mt-3 mb-2" />
+            <p className="text-[#3b4961] text-[11px] sm:text-[13px] font-bold tracking-wider uppercase">
               Tài liệu tham khảo
             </p>
           </div>
 
           {/* Nút gợi ý ấn vào để đọc */}
-          <div className="absolute bottom-3 inset-x-0 flex justify-center z-20">
-            <div className="px-4 py-1.5 rounded-full bg-[#1a2744]/90 text-amber-200 text-[11px] sm:text-[12px] font-bold border border-amber-400/40 flex items-center gap-1.5 shadow-lg backdrop-blur-sm group-hover:bg-[#1a2744] transition-colors">
-              <BookOpen size={13} />
+          <div className="absolute bottom-3.5 inset-x-0 flex justify-center z-20">
+            <div className="px-4 py-1.5 rounded-full bg-[#0d1b33]/90 text-amber-200 text-[11.5px] sm:text-[13px] font-extrabold border border-amber-400/50 flex items-center gap-1.5 shadow-xl backdrop-blur-xs group-hover:bg-[#0d1b33] group-hover:scale-105 transition-all">
+              <BookOpen size={14} />
               <span>Chạm để mở đọc</span>
             </div>
           </div>

@@ -1,22 +1,28 @@
 // Service Worker PWA Chuyên Nghiệp Cho Qbiz Books
-// Lưu sẵn toàn bộ chức năng, giao diện, shell và assets trên điện thoại
-// Đạt tốc độ phản hồi tức thì (< 1ms) khi người dùng chuyển đổi các mục
+// Lưu sẵn toàn bộ chức năng, giao diện, shell, tabs và bài học cốt lõi trên điện thoại
+// Đạt tốc độ phản hồi tức thì (< 1ms) khi người dùng chuyển đổi các mục hoặc vào bài học
 // TUÂN THỦ CHỈ THỊ: Chỉ tải từ mạng khi người dùng ấn vào tài liệu sách / video dung lượng lớn
 
-const CACHE_NAME = 'qbiz-books-shell-v2';
-const STATIC_ASSETS_CACHE = 'qbiz-books-static-v2';
+const CACHE_NAME = 'qbiz-books-shell-v4';
+const STATIC_ASSETS_CACHE = 'qbiz-books-static-v4';
 
-// Danh sách tài nguyên Shell cần tải sẵn vào bộ nhớ điện thoại ngay khi cài đặt
+// Danh sách tài nguyên Shell và các trang cốt lõi cần tải sẵn vào bộ nhớ điện thoại
 const PRECACHE_SHELL_URLS = [
   '/',
   '/tro-ly-ai',
   '/da-luu',
   '/tim-kiem',
+  '/cot-song',
+  '/cot-song/tong-quan-ve-cot-song',
+  '/cot-song/tu-the-va-van-dong',
+  '/dinh-duong',
+  '/co-the-nguoi',
   '/favicon.ico',
   '/apple-icon.png',
   '/app_logo.png',
   '/icon-192.png',
   '/icon-512.png',
+  '/images/book_cover_blank.jpg',
   '/spine_hero_clean.png',
   '/manifest.webmanifest',
 ];
@@ -67,7 +73,28 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 3. Với các file tĩnh Next.js (_next/static, CSS, JS, fonts, icon):
+  // 3. Next.js App Router RSC Payloads (?_rsc=... hoặc header RSC=1)
+  // Chiến lược: STALE-WHILE-REVALIDATE -> Chuyển tab / vào bài học phản hồi ngay lập tức 0ms!
+  const isRSC = url.searchParams.has('_rsc') || request.headers.get('rsc') === '1' || request.headers.get('RSC') === '1';
+  if (isRSC) {
+    event.respondWith(
+      caches.open(CACHE_NAME).then(async (cache) => {
+        const cachedResponse = await cache.match(request);
+        const fetchPromise = fetch(request)
+          .then((networkResponse) => {
+            if (networkResponse.status === 200) {
+              cache.put(request, networkResponse.clone());
+            }
+            return networkResponse;
+          })
+          .catch(() => cachedResponse);
+        return cachedResponse || fetchPromise;
+      })
+    );
+    return;
+  }
+
+  // 4. Với các file tĩnh Next.js (_next/static, CSS, JS, fonts, icon):
   // Chiến lược: CACHE FIRST (Có sẵn trên máy là dùng ngay lập tức 0ms)
   if (
     url.pathname.startsWith('/_next/static/') ||
@@ -99,7 +126,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 4. Với các trang điều hướng HTML (Chuyển trang Trang chủ, Đang xem, Đã lưu, Trợ lý AI):
+  // 5. Với các trang điều hướng HTML (Chuyển trang Trang chủ, Đang xem, Đã lưu, Trợ lý AI, Chuyên đề):
   // Chiến lược: STALE-WHILE-REVALIDATE (Mở tức thì từ Cache ngầm trên điện thoại, đồng thời cập nhật mới)
   if (request.mode === 'navigate') {
     event.respondWith(
