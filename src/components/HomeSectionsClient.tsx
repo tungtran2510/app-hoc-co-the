@@ -254,10 +254,10 @@ export default function HomeSectionsClient({
                 />
               )}
 
-              {/* DÒNG BRAND CARD NỔI BẬT ("MEDICA LEARN" STYLE) */}
+              {/* DÒNG BRAND CARD NỔI BẬT ("MEDICA LEARN" STYLE) - HIỆU ỨNG NHỊP THỞ SINH HỌC & NHỊP TIM MEDICA */}
               <div
                 onClick={() => setShowWelcomeModal(true)}
-                className={`w-full rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-lg hover:shadow-blue-900/10 hover:border-blue-400 dark:hover:border-[#F8DF7B]/60 dark:hover:shadow-[0_10px_26px_rgba(248,223,123,0.12)] hover:-translate-y-1 active:scale-[0.99] transition-all duration-300 dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] dark:border-white/15 dark:text-white p-3 sm:p-3.5 flex items-center justify-between gap-3 cursor-pointer group ${
+                className={`w-full rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs animate-bio-breathing hover:shadow-lg hover:shadow-blue-900/10 hover:border-blue-400 dark:hover:border-[#F8DF7B]/70 dark:hover:shadow-[0_10px_28px_rgba(248,223,123,0.18)] hover:-translate-y-1 active:scale-[0.99] transition-all duration-300 dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] dark:border-white/15 dark:text-white p-3 sm:p-3.5 flex items-center justify-between gap-3 cursor-pointer group ${
                   isHidden ? 'opacity-80 ring-2 ring-dashed ring-amber-500/40' : ''
                 }`}
                 title="Bấm để xem lời ngỏ chào mừng & video giới thiệu"
@@ -290,10 +290,10 @@ export default function HomeSectionsClient({
                   </span>
                 </div>
 
-                {/* Huy hiệu Xanh Sapphire dát vàng kim bên phải */}
+                {/* Huy hiệu Xanh Sapphire dát vàng kim bên phải - Icon quả tim đập nhịp y khoa */}
                 <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[15px] bg-gradient-to-br from-blue-50 via-slate-50 to-blue-100 border border-blue-200 dark:bg-gradient-to-br dark:from-[#3B1F7A] dark:via-[#281358] dark:to-[#12062C] dark:border-amber-300/70 p-[2px] shadow-md shrink-0 flex items-center justify-center relative overflow-hidden">
                   <div className="flex flex-col items-center justify-center text-[#1E3A8A] dark:text-amber-300">
-                    <svg className="w-5 h-5 text-[#1E3A8A] dark:text-amber-300 drop-shadow-xs dark:drop-shadow-[0_1px_3px_rgba(245,158,11,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg className="w-5 h-5 text-[#1E3A8A] dark:text-amber-300 drop-shadow-xs dark:drop-shadow-[0_1px_3px_rgba(245,158,11,0.8)] animate-medica-heartbeat" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" fill="currentColor" fillOpacity="0.25" />
                       <path d="M3.5 12h3l2-3 3 6 2-3h7" stroke="currentColor" strokeWidth="1.8" />
                     </svg>

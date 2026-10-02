@@ -440,5 +440,153 @@ html.dark .animate-pulse-glow {
   animation: badge-flash-sweep 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
+/* ============================================================================
+   8. HIỆU ỨNG BRAND CARD: NHỊP THỞ SINH HỌC ÊM ÁI (BIO-BREATHING AURA)
+   ============================================================================ */
+@keyframes bio-breathing-light {
+  0%, 100% {
+    border-color: rgba(203, 213, 225, 0.85);
+    box-shadow: 0 2px 8px rgba(30, 58, 138, 0.05);
+    transform: translateY(0);
+  }
+  50% {
+    border-color: rgba(59, 130, 246, 0.55);
+    box-shadow: 0 6px 20px rgba(30, 58, 138, 0.12), 0 0 16px rgba(245, 158, 11, 0.18);
+    transform: translateY(-1.5px);
+  }
+}
+
+@keyframes bio-breathing-dark {
+  0%, 100% {
+    border-color: rgba(255, 255, 255, 0.16);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+    transform: translateY(0);
+  }
+  50% {
+    border-color: rgba(248, 223, 123, 0.65);
+    box-shadow: 0 8px 28px rgba(109, 40, 217, 0.35), 0 0 18px rgba(248, 223, 123, 0.28);
+    transform: translateY(-1.5px);
+  }
+}
+
+.animate-bio-breathing {
+  animation: bio-breathing-light 3.8s ease-in-out infinite;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+html.dark .animate-bio-breathing {
+  animation: bio-breathing-dark 3.8s ease-in-out infinite;
+}
+
+/* ============================================================================
+   9. HIỆU ỨNG NHỊP ĐẬP QUẢ TIM MEDICA (MEDICA HEARTBEAT MICRO-PULSE)
+   ============================================================================ */
+@keyframes medica-heartbeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  6% {
+    transform: scale(1.14);
+  }
+  12% {
+    transform: scale(1.02);
+  }
+  20% {
+    transform: scale(1.18);
+  }
+  30% {
+    transform: scale(1);
+  }
+}
+
+.animate-medica-heartbeat {
+  display: inline-block;
+  transform-origin: center center;
+  animation: medica-heartbeat 3.8s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+}
+
+/* ============================================================================
+   10. HIỆU ỨNG NỔI SÁNG THẺ CHUYÊN MỤC (TOPIC CARD LUMINOUS GLOW)
+   ============================================================================ */
+.topic-card-container {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.topic-card-glow {
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, box-shadow, border-color;
+}
+
+.topic-card-spine {
+  transition: all 0.28s ease;
+}
+
+.topic-card-inner-glow {
+  transition: all 0.35s ease;
+}
+
+.topic-card-badge {
+  transition: all 0.25s ease;
+}
+
+.topic-card-img {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* KHI LƯỚT TAY VÀO (TOUCH), HOVER CHUỘT HOẶC ACTIVE: TOÀN BỘ THẺ BỪNG SÁNG RỰC RỠ */
+.topic-card-container:hover .topic-card-glow,
+.topic-card-container:active .topic-card-glow,
+.topic-card-container:focus-within .topic-card-glow,
+.topic-card-container.is-active .topic-card-glow {
+  border-top-color: #FDE047 !important;
+  border-right-color: rgba(253, 224, 71, 0.9) !important;
+  border-left-color: #EAB308 !important;
+  box-shadow: 
+    0 0 0 2px #FDE047,
+    0 0 32px rgba(250, 204, 21, 0.85),
+    0 12px 38px rgba(168, 85, 247, 0.65),
+    inset 0 0 18px rgba(255, 255, 255, 0.35) !important;
+  transform: translateY(-3.5px) scale(1.025);
+}
+
+.topic-card-container:hover .topic-card-spine,
+.topic-card-container:active .topic-card-spine,
+.topic-card-container:focus-within .topic-card-spine,
+.topic-card-container.is-active .topic-card-spine {
+  filter: brightness(1.35) !important;
+  border-color: #FDE047 !important;
+  box-shadow: 0 0 16px rgba(250, 204, 21, 0.95) !important;
+}
+
+.topic-card-container:hover .topic-card-inner-glow,
+.topic-card-container:active .topic-card-inner-glow,
+.topic-card-container:focus-within .topic-card-inner-glow,
+.topic-card-container.is-active .topic-card-inner-glow {
+  opacity: 1 !important;
+  transform: scale(1.4) !important;
+  background-color: rgba(250, 204, 21, 0.45) !important;
+}
+
+.topic-card-container:hover .topic-card-badge,
+.topic-card-container:active .topic-card-badge,
+.topic-card-container:focus-within .topic-card-badge,
+.topic-card-container.is-active .topic-card-badge {
+  background-color: #FEF08A !important;
+  color: #000000 !important;
+  box-shadow: 0 0 16px rgba(250, 204, 21, 0.95) !important;
+  transform: scale(1.08) !important;
+}
+
+.topic-card-container:hover .topic-card-img,
+.topic-card-container:active .topic-card-img,
+.topic-card-container:focus-within .topic-card-img,
+.topic-card-container.is-active .topic-card-img {
+  transform: scale(1.14) !important;
+  filter: drop-shadow(0 10px 24px rgba(250, 204, 21, 0.55)) !important;
+}
+
+
+
 
 

@@ -34,6 +34,7 @@ interface TopicCardProps {
 
 export default function TopicCard({ topic, pageCount }: TopicCardProps) {
   const [imgError, setImgError] = useState(false);
+  const [isTouched, setIsTouched] = useState(false);
   const isAvailable = pageCount > 0;
   const coverUrl = topic.cover_url || DEFAULT_TOPIC_COVERS[topic.slug] || null;
   const hasCoverImage = Boolean(coverUrl) && !imgError;
@@ -48,33 +49,44 @@ export default function TopicCard({ topic, pageCount }: TopicCardProps) {
     <Link
       href={`/${topic.slug}`}
       prefetch={true}
-      className="group relative flex flex-col cursor-pointer select-none transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.015] active:scale-[0.98]"
+      onTouchStart={() => setIsTouched(true)}
+      onTouchEnd={() => {
+        // Giữ sáng 600ms khi lướt tay trên màn hình điện thoại
+        setTimeout(() => setIsTouched(false), 600);
+      }}
+      onTouchCancel={() => setIsTouched(false)}
+      className={`topic-card-container group relative flex flex-col cursor-pointer select-none transition-all duration-300 ${
+        isTouched ? 'is-active' : ''
+      }`}
     >
-      {/* 1. GÁY TRÊN 3D CỦA CUỐN SÁCH (Cạnh trên màu trang giấy giống ảnh mẫu Medi Study Go) */}
-      <div className="mx-1.5 h-[5px] sm:h-[6px] bg-gradient-to-r from-[#CBC3E3] via-[#FAF9FD] to-[#B8ADD6] rounded-t-[3px] border-t border-l border-r border-white/50 shadow-xs flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:brightness-110">
+      {/* 1. GÁY TRÊN 3D CỦA CUỐN SÁCH (Bừng sáng khi lướt tay / hover) */}
+      <div className="topic-card-spine mx-1.5 h-[5px] sm:h-[6px] bg-gradient-to-r from-[#CBC3E3] via-[#FAF9FD] to-[#B8ADD6] rounded-t-[3px] border-t border-l border-r border-white/50 shadow-xs flex items-center justify-center overflow-hidden">
         {/* Rãnh trang giấy xếp lớp */}
         <div className="w-full h-[1px] bg-purple-950/20" />
       </div>
 
-      {/* 2. MẶT BÌA CHÍNH CỦA CUỐN SÁCH (3D HARDCOVER) */}
-      <div className="relative flex flex-col justify-between p-3 sm:p-3.5 rounded-b-[14px] rounded-tl-[3px] rounded-tr-[12px] bg-gradient-to-br from-[#231652] via-[#1A0E3F] to-[#100629] border-t border-t-white/25 border-r border-r-black/60 border-b-2 border-b-black/80 border-l-[4px] border-l-[#4A2D9E] text-white shadow-[3px_8px_18px_rgba(0,0,0,0.45)] group-hover:shadow-[0_12px_28px_rgba(109,40,217,0.45),0_0_20px_rgba(248,223,123,0.18)] group-hover:border-t-purple-300/60 group-hover:border-r-purple-400/40 group-hover:border-l-[#6D28D9] transition-all duration-300 overflow-hidden min-h-[148px] sm:min-h-[158px]">
+      {/* 2. MẶT BÌA CHÍNH CỦA CUỐN SÁCH (3D HARDCOVER VỚI HÀO QUANG PHÁT QUANG RỰC RỠ KHI LƯỚT TAY) */}
+      <div className="topic-card-glow relative flex flex-col justify-between p-3 sm:p-3.5 rounded-b-[14px] rounded-tl-[3px] rounded-tr-[12px] bg-gradient-to-br from-[#231652] via-[#1A0E3F] to-[#100629] border-t border-t-white/25 border-r border-r-black/60 border-b-2 border-b-black/80 border-l-[4px] border-l-[#4A2D9E] text-white overflow-hidden min-h-[148px] sm:min-h-[158px] shadow-[3px_8px_18px_rgba(0,0,0,0.45)]">
         {/* Đường gân gáy sách (Spine crease) */}
         <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-gradient-to-b from-white/35 via-purple-300/20 to-white/10 pointer-events-none" />
         <div className="absolute left-[2.5px] top-0 bottom-0 w-[1.5px] bg-black/40 pointer-events-none" />
 
-        {/* Vầng sáng huyền ảo nền bìa - NỔI SÁNG LÊN KHI LƯỚT TAY / HOVER */}
-        <div className="absolute -top-10 -right-10 w-32 h-32 bg-purple-600/20 rounded-full blur-xl pointer-events-none group-hover:bg-purple-500/40 group-hover:w-44 group-hover:h-44 transition-all duration-300" />
-        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/0 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+        {/* VẦNG SÁNG HÀO QUANG KÉP - BỪNG SÁNG RỰC RỠ KHI LƯỚT TAY QUA */}
+        <div className="topic-card-inner-glow absolute -top-10 -right-10 w-32 h-32 rounded-full blur-xl pointer-events-none bg-purple-600/25" />
+        <div className="topic-card-inner-glow absolute -bottom-8 -left-8 w-28 h-28 rounded-full blur-xl pointer-events-none bg-purple-600/15" />
 
-        {/* 3. ẢNH GIẢI PHẪU 3D TRONG SUỐT BÊN PHẢI (TO HẲN, NỔI BẬT KHÔNG NỀN ĐEN NHƯ ẢNH MẪU SỐ 2) */}
+        {/* VỆT SÁNG PHẢN CHIẾU ÁNH KIM (SHINE GLINT) */}
+        <div className="topic-card-inner-glow absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent pointer-events-none opacity-0" />
+
+        {/* 3. ẢNH GIẢI PHẪU 3D TRONG SUỐT BÊN PHẢI (TO HẲN, NỔI BẬT KHÔNG NỀN ĐEN) */}
         <div className="absolute right-0.5 top-1 bottom-4 w-[54%] sm:w-[52%] flex items-center justify-center pointer-events-none overflow-visible select-none z-0">
           {hasCoverImage ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={coverUrl!}
               alt={topic.title}
-              className={`w-full h-full max-h-[120px] sm:max-h-[132px] object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.55)] group-hover:scale-108 transition-all duration-300 ${
-                topic.slug === 'cot-song' ? 'scale-115 group-hover:scale-120' : ''
+              className={`topic-card-img w-full h-full max-h-[120px] sm:max-h-[132px] object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.55)] ${
+                topic.slug === 'cot-song' ? 'scale-115' : ''
               }`}
               onError={() => setImgError(true)}
               loading="lazy"
@@ -102,9 +114,9 @@ export default function TopicCard({ topic, pageCount }: TopicCardProps) {
           </h3>
         </div>
 
-        {/* 5. KHUNG VÀNG NỔI BẬT PHÍA DƯỚI (CHUẨN FORM NHÃN VÀNG ẢNH MẪU 2) */}
+        {/* 5. KHUNG VÀNG NỔI BẬT PHÍA DƯỚI (PHÁT QUANG KHI LƯỚT TAY HOẶC HOVER) */}
         <div className="relative z-10 mt-auto pt-2 flex items-center">
-          <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] bg-[#FCE38A] dark:bg-[#FADB67] text-[#190E33] text-[9px] sm:text-[10px] font-black uppercase tracking-wider shadow-sm group-hover:bg-[#FEF08A] transition-colors">
+          <span className="topic-card-badge inline-flex items-center px-2 py-0.5 rounded-[4px] bg-[#FCE38A] dark:bg-[#FADB67] text-[#190E33] text-[9px] sm:text-[10px] font-black uppercase tracking-wider shadow-sm">
             {isAvailable ? `${pageCount} BÀI CỐT LÕI` : 'QUICK REVISION'}
           </span>
         </div>

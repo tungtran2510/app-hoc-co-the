@@ -63,7 +63,7 @@ export default function ModernBookCover({
 
       {/* THÂN BÌA SÁCH 3D (ĐƯỢC BO GÓC & BẢO TOÀN HIỆU ỨNG GÁY SÁCH) */}
       <div
-        className="w-full h-full rounded-r-[6px] rounded-l-[2px] overflow-hidden relative"
+        className="w-full h-full rounded-r-[6px] rounded-l-[2px] overflow-hidden relative transition-all duration-300 group-hover:shadow-[0_0_24px_rgba(248,223,123,0.45),0_12px_28px_rgba(15,23,42,0.35)] group-active:shadow-[0_0_24px_rgba(248,223,123,0.45)] group-hover:ring-1 group-hover:ring-amber-300/60"
         style={{
           boxShadow:
             '0 14px 28px -6px rgba(15, 23, 42, 0.22), 0 6px 10px -2px rgba(15, 23, 42, 0.1), inset -1px 0 2px rgba(255, 255, 255, 0.2)',
