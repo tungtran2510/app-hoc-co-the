@@ -70,9 +70,11 @@ async function getOrBuildLessonCatalog(): Promise<LessonCatalogItem[]> {
   return catalog;
 }
 
-// Fallback siêu ngắn gọn theo đúng tài liệu
+// Fallback thông minh dựa trên tri thức chuyên sâu từ 20 file Markdown của tác giả
 function fallbackSearch(query: string, catalog: LessonCatalogItem[]) {
   const lower = query.toLowerCase();
+  const matchedDocs = searchFastKnowledge(query, 2);
+
   const matched = catalog.filter((item) => {
     return (
       item.page_title.toLowerCase().includes(lower) ||
@@ -84,8 +86,34 @@ function fallbackSearch(query: string, catalog: LessonCatalogItem[]) {
 
   const selected = (matched.length > 0 ? matched : catalog).slice(0, 2);
 
+  if (matchedDocs.length > 0) {
+    const doc = matchedDocs[0];
+    const docExcerpt = doc.excerpt.replace(/\n+/g, ' ').slice(0, 280);
+
+    const answer = `Theo tài liệu "${doc.fileTitle}" của tác giả Tùng Dinh Dưỡng, vấn đề này cần được tiếp cận toàn diện theo 3 trụ cột phục hồi tự nhiên:\n\n` +
+      `1. **Cơ chế & Giải áp:** ${docExcerpt}...\n` +
+      `2. **Vận động sinh cơ học:** Giữ vững đường cong sinh lý tự nhiên, gia cố hệ cơ lõi và tránh áp lực đè nén đột ngột.\n` +
+      `3. **Dinh dưỡng tế bào:** Cung cấp đủ nước và dưỡng chất để nuôi dưỡng cấu trúc cơ thể qua cơ chế thẩm thấu tự nhiên.\n\n` +
+      `*Lưu ý: Nếu có triệu chứng đau lan chi hoặc tê yếu, cần thăm khám y tế chuyên khoa. Mời bạn mở bài học chi tiết dưới đây:*`;
+
+    return {
+      answer,
+      suggested_pages: selected.map((s) => ({
+        title: s.page_title,
+        topic_title: s.topic_title,
+        topic_slug: s.topic_slug,
+        page_slug: s.page_slug,
+        reason: `Hướng dẫn chuyên sâu theo tài liệu "${doc.fileTitle}".`,
+      })),
+      follow_up_questions: [
+        'Tư thế sinh hoạt đúng cần chú ý những gì?',
+        'Lộ trình chăm sóc và phục hồi tự nhiên như thế nào?',
+      ],
+    };
+  }
+
   return {
-    answer: `Theo tài liệu hướng dẫn của tác giả Tùng dinh dưỡng, vấn đề này cần được điều chỉnh từ tư thế và cơ chế vận động sinh học tự nhiên. Mời bạn mở bài học chi tiết dưới đây:`,
+    answer: `Theo tài liệu hướng dẫn của tác giả Tùng Dinh Dưỡng, sức khỏe cơ thể và hệ cơ xương khớp bắt đầu từ việc khôi phục độ cong sinh lý tự nhiên, vận động đúng cơ chế sinh học và nuôi dưỡng tế bào qua đường thẩm thấu.\n\nMời bạn mở bài học chi tiết dưới đây để xem video và hướng dẫn thực hành của tác giả:`,
     suggested_pages: selected.map((s) => ({
       title: s.page_title,
       topic_title: s.topic_title,
@@ -95,7 +123,7 @@ function fallbackSearch(query: string, catalog: LessonCatalogItem[]) {
     })),
     follow_up_questions: [
       'Tư thế sinh hoạt đúng cần chú ý gì?',
-      'Cách phân biệt đau mỏi thông thường?',
+      'Cách phân biệt đau mỏi thông thường và sai lệch trục?',
     ],
   };
 }
@@ -199,19 +227,29 @@ export async function POST(req: NextRequest) {
     // 4. Lời dặn và nguyên tắc cốt lõi
     const authorGuidelines =
       aiTraining?.guidelines ||
-      '1. VAI TRÒ CHUYÊN MÔN: Trợ lý Sức Khỏe AI chia sẻ kiến thức giáo dục về cấu trúc cơ thể, cơ chế sinh học, thói quen sinh hoạt đúng và phục hồi tự nhiên theo tài liệu của tác giả Tùng dinh dưỡng.\n2. NGUYÊN TẮC AN TOÀN Y KHOA: Cung cấp thông tin tham khảo khoa học, không đưa ra chẩn đoán hay điều trị y khoa thay thế bác sĩ chuyên khoa.\n3. PHONG CÁCH TRẢ LỜI: Luôn trả lời ngắn gọn (1-2 câu, tối đa 40-50 từ), đi thẳng vào kết luận theo tài liệu tác giả và điều hướng mở bài học trong hệ thống để xem chi tiết.\n4. TUYỆT ĐỐI CẤM: Tuyệt đối không nhắc đến các cụm từ như "tác giả không phải bác sĩ", "Tùng không phải bác sĩ" hay giải thích danh xưng.';
+      '1. VAI TRÒ CHUYÊN MÔN: Trợ lý Sức Khỏe AI chia sẻ kiến thức giáo dục về cấu trúc cơ thể, cơ chế sinh học, thói quen sinh hoạt đúng và phục hồi tự nhiên theo tài liệu của tác giả Tùng dinh dưỡng.\n2. NGUYÊN TẮC AN TOÀN Y KHOA: Cung cấp thông tin tham khảo khoa học, không đưa ra chẩn đoán hay điều trị y khoa thay thế bác sĩ chuyên khoa.\n3. PHONG CÁCH TRẢ LỜI: Trả lời thông minh, thấu đáo, chuẩn y lý theo Bộ quy chuẩn 3 Tầng Vàng (120-160 từ), chia nhánh rõ ràng, có luận điểm khoa học và giải pháp thực tế.\n4. TUYỆT ĐỐI CẤM: Tuyệt đối không nhắc đến các cụm từ như "tác giả không phải bác sĩ", "Tùng không phải bác sĩ" hay giải thích danh xưng.';
 
     const prompt = `Bạn là Trợ lý Sức Khỏe AI đồng hành, hướng dẫn người học DỰA TRÊN CHÍNH TÀI LIỆU VÀ BÀI GIẢNG CỦA TÁC GIẢ (Tùng dinh dưỡng) trong ứng dụng "Học Cơ Thể".
 
 NGUYÊN TẮC VÀ LỜI DẶN CỐT LÕI CỦA TÁC GIẢ:
 ${authorGuidelines}
 
-ĐẶC BIỆT LƯU Ý & CÁC QUY TẮC BẮT BUỘC:
-1. ĐI THẲNG VÀO NỘI DUNG TRẢ LỜI: Nêu kết luận kiến thức khoa học và giải pháp thực tế ngắn gọn (chỉ từ 1 đến 2 câu ngắn, tối đa 40 - 50 từ).
-2. TUYỆT ĐỐI CẤM: CẤM TUYỆT ĐỐI NÓI CÁC CÂU NHƯ "Tác giả không phải là bác sĩ", "Tùng không phải bác sĩ", "tôi không phải bác sĩ" hay bất kỳ câu trần tình, giải thích danh xưng nào.
-3. VAI TRÒ: Chia sẻ kiến thức giáo dục về cấu trúc cơ thể, cơ chế sinh học, thói quen sinh hoạt đúng và vận động khoa học theo tài liệu của tác giả. Không kê đơn, không đưa ra chẩn đoán hay can thiệp y tế.
-4. NGUỒN KIẾN THỨC: CHỈ TRẢ LỜI DỰA VÀO TÀI LIỆU VÀ BÀI HỌC CỦA TÁC GIẢ Ở DƯỚI. Không bịa đặt hoặc nói lan man ngoài tài liệu.
-5. ĐIỀU HƯỚNG: CHỌN 1 ĐẾN 2 BÀI HỌC CHÍNH XÁC trong tài liệu dưới đây để người học mở ra xem chi tiết.
+BỘ QUY CHUẨN TRẢ LỜI 3 TẦNG VÀNG (BẮT BUỘC TUÂN THỦ NGHIÊM NGẶT):
+Mỗi câu trả lời chuyên môn phải có độ dài chuẩn mực từ 120 đến 160 từ, diễn giải thông minh, chuẩn y lý, chia thành 3 phần rõ ràng:
+1. TẦNG 1: CƠ CHẾ & BẢN CHẤT CỐT LÕI (30-40 từ):
+   - Giải thích bản chất vì sao cơ thể bị đau/tổn thương (ví dụ: mất độ cong sinh lý tự nhiên, áp lực cơ học đè nén, nhân nhầy chèn ép, thiếu thẩm thấu dinh dưỡng).
+2. TẦNG 2: 3 TRỤ CỘT HÀNH ĐỘNG THỰC TẾ (70-90 từ - trình bày bằng gạch đầu dòng hoặc đánh số 1, 2, 3 rõ ràng):
+   - Trụ cột 1 (Cơ học & Tư thế): Khôi phục và nâng đỡ độ cong sinh lý tự nhiên khi ngồi và ngủ (giải pháp DoctorLoan, giữ lưng thẳng, tránh cúi gập vặn xoắn).
+   - Trụ cột 2 (Vận động sinh cơ học): Kích hoạt và gia cố hệ cơ lõi (vùng bụng, lưng) để nâng đỡ tải trọng thay cho cột sống; tránh bất động quá lâu gây xơ cứng.
+   - Trụ cột 3 (Dinh dưỡng tế bào): Uống đủ nước theo công thức (0.04 x trọng lượng), bổ sung chất nền sụn khớp và chất chống oxy hóa để nuôi dưỡng đĩa đệm qua cơ chế thẩm thấu.
+3. TẦNG 3: CỜ ĐỎ AN TOÀN & ĐIỀU HƯỚNG BÀI HỌC (20-30 từ):
+   - Nhắc nhở: Nếu có dấu hiệu tê yếu chân lan nhanh hoặc rối loạn bài tiết, cần thăm khám y tế chuyên khoa ngay.
+   - Gợi ý người học mở bài học chi tiết bên dưới để xem video và hình ảnh giải phẫu trực quan.
+
+ĐẶC BIỆT LƯU Ý & CÁC QUY TẮC AN TOÀN:
+- TUYỆT ĐỐI CẤM: CẤM TUYỆT ĐỐI NÓI CÁC CÂU NHƯ "Tác giả không phải là bác sĩ", "Tùng không phải bác sĩ", "tôi không phải bác sĩ" hay bất kỳ câu trần tình, giải thích danh xưng nào.
+- VAI TRÒ: Chia sẻ kiến thức giáo dục về cấu trúc cơ thể, cơ chế sinh học, thói quen sinh hoạt đúng và vận động khoa học theo tài liệu của tác giả. Không kê đơn thuốc, không cam kết "chữa khỏi dứt điểm", dùng thuật ngữ "phục hồi tự nhiên", "hỗ trợ điều chỉnh độ cong sinh lý", "nuôi dưỡng tái tạo".
+- ĐIỀU HƯỚNG: CHỌN 1 ĐẾN 2 BÀI HỌC CHÍNH XÁC NHẤT trong danh mục bài học dưới đây để người học mở ra xem chi tiết.
 
 TOÀN BỘ TÀI LIỆU & NỘI DUNG TÁC GIẢ HƯỚNG DẪN TRONG HỆ THỐNG:
 ${catalogText}
@@ -225,7 +263,7 @@ ${history.slice(-2).map((h: any) => `${h.role === 'user' ? 'Người học' : 'T
 
 BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON (không kèm văn bản nào khác):
 {
-  "answer": "Câu trả lời siêu ngắn gọn (1-2 câu, 30-50 từ, đi thẳng vào hướng dẫn khoa học của tác giả)...",
+  "answer": "Câu trả lời theo đúng chuẩn 3 Tầng Vàng (120-160 từ, chia dòng thông thoáng, đánh số 1-2-3)...",
   "suggested_pages": [
     {
       "title": "Tên bài học chính xác trong tài liệu",
@@ -236,12 +274,17 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON (không kèm văn bả
     }
   ],
   "follow_up_questions": [
-    "Câu hỏi ngắn gợi ý tiếp theo 1?",
-    "Câu hỏi ngắn gợi ý tiếp theo 2?"
+    "Câu hỏi gợi ý mở rộng 1?",
+    "Câu hỏi gợi ý mở rộng 2?"
   ]
-}`;
+}
+`;
 
-    const candidateModels = ['gemini-flash-lite-latest', 'gemini-flash-latest'];
+    const candidateModels = [
+      'gemini-flash-lite-latest',
+      'gemini-3.5-flash-lite',
+      'gemini-3.1-flash-lite',
+    ];
     let rawText = '';
 
     for (const model of candidateModels) {
@@ -258,7 +301,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON (không kèm văn bả
             ],
             generationConfig: {
               temperature: 0.2,
-              maxOutputTokens: 600,
+              maxOutputTokens: 1200,
             },
           }),
         });
