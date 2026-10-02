@@ -11,8 +11,20 @@
   "icons": [
     {
       "src": "./favicon.svg",
-      "sizes": "192x192 512x512",
+      "sizes": "any",
       "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./images/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./images/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ],
@@ -22,21 +34,21 @@
       "short_name": "Xương khớp",
       "description": "Mở atlas hệ xương và khớp nối",
       "url": "./?system=skeletal",
-      "icons": [{ "src": "./favicon.svg", "sizes": "192x192" }]
+      "icons": [{ "src": "./images/app-icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Tim đập & Tuần hoàn",
       "short_name": "Tim mạch",
       "description": "Quan sát chu kỳ co bóp tim và mạch máu",
       "url": "./?motion=cardiac",
-      "icons": [{ "src": "./favicon.svg", "sizes": "192x192" }]
+      "icons": [{ "src": "./images/app-icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Thực tế tăng cường AR",
       "short_name": "AR 3D",
       "description": "Chiếu mô hình giải phẫu vào phòng thật",
       "url": "./?ar=true",
-      "icons": [{ "src": "./favicon.svg", "sizes": "192x192" }]
+      "icons": [{ "src": "./images/app-icon-192.png", "sizes": "192x192" }]
     }
   ],
   "categories": ["education", "medical"]

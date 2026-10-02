@@ -6,6 +6,8 @@
   <meta name="description" content="Atlas Giải Phẫu 3D - Human Anatomy Atlas & Chuyển động sinh lý 3D PWA Offline">
   <title>Atlas Giải Phẫu 3D - Human Anatomy Atlas</title>
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="icon" type="image/png" sizes="192x192" href="./images/app-icon-192.png">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#0f172a">
   <meta name="mobile-web-app-capable" content="yes">
@@ -16,13 +18,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="./assets/index-_qYgHFJB.js"></script>
+  <script type="module" crossorigin src="./assets/index-D3wzpJAT.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/rolldown-runtime-DK3Fl9T5.js">
   <link rel="modulepreload" crossorigin href="./assets/three.core-CsYvfgU5.js">
   <link rel="modulepreload" crossorigin href="./assets/createScene-C3MwJGVP.js">
   <link rel="modulepreload" crossorigin href="./assets/paths-C53js1nF.js">
   <link rel="modulepreload" crossorigin href="./assets/loadModel-BIpreATg.js">
-  <link rel="stylesheet" crossorigin href="./assets/index-DrRUNwFd.css">
+  <link rel="stylesheet" crossorigin href="./assets/index-BO2j5km_.css">
 </head>
 <body>
   <div id="app">
@@ -32,7 +34,10 @@
         <button id="systemsOpen" class="btn-icon drawer-open" aria-label="Open systems" title="Hệ cơ quan">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
         </button>
-        <h1 class="logo">Atlas 3D</h1>
+        <h1 class="logo">
+          <img src="./favicon.svg" class="app-brand-logo-img" alt="Logo" width="22" height="22" style="border-radius:5px;display:inline-block;vertical-align:middle;margin-right:6px;filter:drop-shadow(0 0 6px rgba(0,242,254,0.4));">
+          <span>Atlas 3D</span>
+        </h1>
       </div>
       <div class="header-center">
         <div class="search-container">
@@ -290,6 +295,18 @@
             <button type="button" class="pill-close-btn" id="pillCloseHalfBodyBtn" title="Tắt chế độ nửa người">&times;</button>
           </div>
 
+          <!-- Floating Top View Button (Góc nhìn từ trên đỉnh đầu nhân vật) -->
+          <button type="button" class="floating-top-view-btn" id="btnQuickTopView" title="Góc nhìn từ trên đỉnh đầu nhân vật (Top View)">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="7"/>
+              <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+              <line x1="12" y1="2" x2="12" y2="5"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+              <line x1="2" y1="12" x2="5" y2="12"/>
+              <line x1="19" y1="12" x2="22" y2="12"/>
+            </svg>
+          </button>
+
           <!-- Floating Views Quick Nav (<| Views |>) (Visible Body Standard: Top-Left) -->
           <div class="floating-views-quick-nav" id="floatingViewsQuickNav">
             <button type="button" class="btn-quick-nav-arrow" id="btnQuickNavPrev" title="Góc nhìn trước (&lt;)">
@@ -410,6 +427,9 @@
               <div class="explain-header">
                 <span class="explain-badge badge-desc">💡 Là gì?</span>
                 <span class="explain-subtitle">Bản chất & Khái niệm</span>
+                <button type="button" class="btn-explain-tts" id="btnSpeakDesc" title="Nghe đọc tiếng Việt: Bản chất là gì" aria-label="Nghe đọc bản chất">
+                  <svg class="tts-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                </button>
               </div>
               <div class="explain-content" id="cardExplainDesc">Đang tải thông tin bản chất cấu tạo...</div>
             </div>
@@ -419,6 +439,9 @@
               <div class="explain-header">
                 <span class="explain-badge badge-func">⚙️ Ý nghĩa là gì?</span>
                 <span class="explain-subtitle">Chức năng & Vai trò</span>
+                <button type="button" class="btn-explain-tts" id="btnSpeakFunc" title="Nghe đọc tiếng Việt: Chức năng & Vai trò" aria-label="Nghe đọc chức năng">
+                  <svg class="tts-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                </button>
               </div>
               <div class="explain-content" id="cardExplainFunc">Đang tải ý nghĩa sinh lý & cơ học...</div>
             </div>
@@ -428,9 +451,22 @@
               <div class="explain-header">
                 <span class="explain-badge badge-rel">🔗 Liên kết ra sao?</span>
                 <span class="explain-subtitle">Vị trí & Tương quan giải phẫu</span>
+                <button type="button" class="btn-explain-tts" id="btnSpeakRel" title="Nghe đọc tiếng Việt: Vị trí & Liên kết giải phẫu" aria-label="Nghe đọc liên kết">
+                  <svg class="tts-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                </button>
               </div>
               <div class="explain-content" id="cardExplainRel">Đang tải liên kết giải phẫu...</div>
             </div>
+          </div>
+        </div>
+
+        <!-- DYNAMIC PHYSIOLOGICAL & ANATOMICAL FLOW PATHWAY (Đường đi & Chu trình giải phẫu trực quan) -->
+        <div class="info-section-group hidden" id="cardPathwaySection">
+          <div class="info-group-title">
+            <span id="cardPathwayHeaderTitle">Đường đi & Chu trình giải phẫu (Anatomical Pathway)</span>
+          </div>
+          <div class="pathway-flow-container" id="cardPathwayContainer">
+            <!-- Dynamic interactive step pills injected here -->
           </div>
         </div>
 

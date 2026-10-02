@@ -1103,18 +1103,18 @@ export default function FlipbookViewer({
 
         {/* BÌA SÁCH ĐÓNG - ẤN VÀO MỞ ĐỌC TOÀN MÀN HÌNH */}
         <div
-          className="w-full aspect-[3/4] sm:aspect-[4/3] max-h-[500px] rounded-[14px] bg-black/60 border border-amber-400/40 relative overflow-hidden flex items-center justify-center group shadow-2xl my-2 cursor-pointer"
+          className="w-full aspect-[4/3] max-h-[500px] rounded-[14px] bg-[#0a1628] border border-amber-400/40 relative overflow-hidden flex items-center justify-center group shadow-2xl my-2 cursor-pointer"
           onClick={() => setIsFullscreen(true)}
           role="button"
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsFullscreen(true); }}
           aria-label={`Mở đọc: ${bookTitle}`}
         >
-          {/* Ảnh bìa sách cố định */}
+          {/* Ảnh bìa sách cố định - FULL khung */}
           <img
             src="/images/book_cover_blank.jpg"
             alt="Bìa sách"
-            className="absolute inset-0 w-full h-full object-contain z-0"
+            className="absolute inset-0 w-full h-full object-cover z-0"
             draggable={false}
           />
 
