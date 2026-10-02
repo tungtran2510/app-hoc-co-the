@@ -22,6 +22,7 @@ interface BlockRendererProps {
   pageTitle?: string;
   pageNumber?: number;
   pageCoverUrl?: string | null;
+  pageSlugMap?: Record<string, { slug: string; topicSlug: string; title: string; cover_url?: string }>;
   nextPage?: { slug: string; title: string; orderNumber: number } | null;
   summaryContent?: React.ReactNode;
   resourcesContent?: React.ReactNode;
@@ -43,6 +44,7 @@ export default function BlockRenderer({
   pageTitle,
   pageNumber,
   pageCoverUrl,
+  pageSlugMap,
   nextPage,
   summaryContent,
   resourcesContent,
@@ -106,6 +108,8 @@ export default function BlockRenderer({
           blockId={blockId}
           displayStyle={block.display_style}
           items={block.data.items}
+          topicSlug={topicSlug}
+          pageSlugMap={pageSlugMap}
         />
       );
 

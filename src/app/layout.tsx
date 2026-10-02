@@ -20,6 +20,7 @@ const lora = Lora({
 export const metadata: Metadata = {
   title: 'Qbiz Books · Tủ Sách Y Khoa & Khám Phá Cơ Thể',
   description: 'Ứng dụng học hiểu kiến thức về cơ thể theo lộ trình tương tác',
+  manifest: '/manifest.webmanifest',
   icons: {
     icon: [
       { url: '/favicon.ico' },
@@ -56,6 +57,10 @@ export default function RootLayout({
   return (
     <html lang="vi" className={`${beVietnamPro.variable} ${lora.variable} ${beVietnamPro.className}`}>
       <head>
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" />
         <script
           dangerouslySetInnerHTML={{
             __html: `try{var t=localStorage.getItem('giao_dien');if(t==='dark'){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}}catch(e){}`,

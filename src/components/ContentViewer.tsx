@@ -70,6 +70,7 @@ interface ContentViewerProps {
   prevPage?: Page | null;
   prevPageIndex?: number | null;
   defaultActiveVideoIndex?: number;
+  pageSlugMap?: Record<string, { slug: string; topicSlug: string; title: string; cover_url?: string }>;
 }
 
 export default function ContentViewer({
@@ -83,6 +84,7 @@ export default function ContentViewer({
   prevPage = null,
   prevPageIndex = null,
   defaultActiveVideoIndex = 0,
+  pageSlugMap,
 }: ContentViewerProps) {
   const [fontSizeMode, setFontSizeMode] = useState<FontSizeOption>('normal');
   const [isAdmin, setIsAdmin] = useState(false);
@@ -786,6 +788,7 @@ export default function ContentViewer({
           pageTitle={currentPage.title}
           pageNumber={pageIndex}
           pageCoverUrl={currentPage.cover_url}
+          pageSlugMap={pageSlugMap}
           nextPage={
             nextPage
               ? {

@@ -6,6 +6,7 @@ import {
   getBlocksByPage,
   getPagesByTopic,
   getSettings,
+  getAllPageSlugMap,
 } from '../../../lib/data';
 import ContentViewer from '../../../components/ContentViewer';
 
@@ -76,9 +77,10 @@ export default async function ContentPage({ params }: PageProps) {
   }
 
   const { topic, page, pageIndex, totalPages } = result;
-  const [blocks, allPages] = await Promise.all([
+  const [blocks, allPages, pageSlugMap] = await Promise.all([
     getBlocksByPage(page.id),
     getPagesByTopic(topic.id),
+    getAllPageSlugMap(),
   ]);
 
   // Tìm trang trước và trang kế tiếp trong cùng chủ đề
@@ -108,6 +110,7 @@ export default async function ContentPage({ params }: PageProps) {
       nextPage={nextPage}
       nextPageIndex={nextPageIndex}
       defaultActiveVideoIndex={defaultActiveVideoIndex}
+      pageSlugMap={pageSlugMap}
     />
   );
 }

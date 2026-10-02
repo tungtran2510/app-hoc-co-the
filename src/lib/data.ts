@@ -395,3 +395,50 @@ export async function getContinue(): Promise<ContinueInfo | null> {
     video_title: 'Cơ – gân – dây chằng',
   };
 }
+
+export async function getAllPageSlugMap(): Promise<Record<string, { slug: string; topicSlug: string; title: string; cover_url: string }>> {
+  const cacheKey = 'all_page_slug_map';
+  return getCachedOrFetch(cacheKey, async () => {
+    const supabase = getSupabaseClient();
+    const map: Record<string, { slug: string; topicSlug: string; title: string; cover_url: string }> = {};
+    if (supabase) {
+      try {
+        const [{ data: topics }, { data: pages }] = await Promise.all([
+          supabase.from('topics').select('id, slug'),
+          supabase.from('pages').select('id, topic_id, slug, title, cover_url'),
+        ]);
+        if (topics && pages) {
+          const topicMap = Object.fromEntries(topics.map((t) => [t.id, t.slug]));
+          pages.forEach((p) => {
+            const topicSlug = topicMap[p.topic_id] || 'cot-song';
+            const info = {
+              slug: p.slug,
+              topicSlug,
+              title: p.title,
+              cover_url: p.cover_url || `/images/lessons/${p.slug}.jpg`,
+            };
+            map[p.id] = info;
+            map[p.slug] = info;
+          });
+          return map;
+        }
+      } catch {
+        // fallback
+      }
+    }
+    const sampleTopicMap = Object.fromEntries(sampleTopics.map((t) => [t.id, t.slug]));
+    samplePages.forEach((p) => {
+      const topicSlug = sampleTopicMap[p.topic_id] || 'cot-song';
+      const info = {
+        slug: p.slug,
+        topicSlug,
+        title: p.title,
+        cover_url: p.cover_url || `/images/lessons/${p.slug}.jpg`,
+      };
+      map[p.id] = info;
+      map[p.slug] = info;
+    });
+    return map;
+  });
+}
+
