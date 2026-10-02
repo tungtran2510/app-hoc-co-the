@@ -77,6 +77,9 @@ export default function EditBlockModal({
   );
   const [newFileName, setNewFileName] = useState('');
   const [newFileUrl, setNewFileUrl] = useState('');
+  const [bookCoverUrl, setBookCoverUrl] = useState<string>(
+    block.type === 'files' ? block.data.cover_url || '' : ''
+  );
 
   // State cho links block gốc
   const [linkList, setLinkList] = useState<{ page_id?: string; url?: string; label?: string }[]>(
@@ -252,6 +255,7 @@ export default function EditBlockModal({
         ...block,
         data: {
           files: fileList,
+          cover_url: bookCoverUrl.trim() || undefined,
         },
       };
       onSaveBlock(updated);
@@ -710,6 +714,76 @@ export default function EditBlockModal({
           {/* Dành cho block files gốc */}
           {block.type === 'files' && (
             <div className="flex flex-col gap-3">
+              {/* QUẢN LÝ ẢNH BÌA SÁCH (ATLAS / EBOOK COVER) */}
+              <div className="flex flex-col gap-2 p-3.5 rounded-[16px] bg-amber-500/10 dark:bg-amber-950/20 border border-amber-400/40">
+                <div className="flex items-center justify-between">
+                  <span className="text-[13px] font-black text-amber-900 dark:text-amber-200 flex items-center gap-1.5 uppercase tracking-wide">
+                    <ImageIcon size={15} className="text-amber-600 dark:text-amber-400" />
+                    <span>Ảnh bìa sách (Atlas / Ebook)</span>
+                  </span>
+                  {bookCoverUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setBookCoverUrl('')}
+                      className="text-[11.5px] text-red-500 hover:text-red-700 font-bold underline cursor-pointer"
+                    >
+                      Dùng bìa mặc định
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="w-16 h-20 rounded-[10px] bg-slate-900 border border-amber-400/50 overflow-hidden relative shrink-0 shadow-sm flex items-center justify-center">
+                    <img
+                      src={bookCoverUrl || '/images/book_cover_blank.jpg'}
+                      alt="Bìa sách"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  <div className="flex-1 flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <label className="flex items-center gap-1.5 h-9 px-3 rounded-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[12.5px] cursor-pointer shadow-xs transition-colors shrink-0">
+                        <Upload size={14} />
+                        <span>{isUploadingMedia ? 'Đang tải...' : 'Thay ảnh bìa sách'}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            try {
+                              setIsUploadingMedia(true);
+                              const res = await uploadImageFile(file);
+                              setBookCoverUrl(res.url);
+                            } catch (err: any) {
+                              const reader = new FileReader();
+                              reader.onload = (re) => {
+                                if (re.target?.result) setBookCoverUrl(String(re.target.result));
+                              };
+                              reader.readAsDataURL(file);
+                            } finally {
+                              setIsUploadingMedia(false);
+                            }
+                          }}
+                          disabled={isUploadingMedia}
+                          className="hidden"
+                        />
+                      </label>
+                      <span className="text-[11.5px] text-muted font-medium">Tự tải ảnh lên (JPG, PNG, WebP)</span>
+                    </div>
+
+                    <input
+                      type="url"
+                      value={bookCoverUrl}
+                      onChange={(e) => setBookCoverUrl(e.target.value)}
+                      placeholder="Hoặc dán link ảnh bìa (https://...)..."
+                      className="h-8 px-2.5 rounded-[8px] border border-line text-[12.5px] bg-surface text-ink w-full"
+                    />
+                  </div>
+                </div>
+              </div>
+
               <div className="flex flex-col gap-1.5 p-3 rounded-[14px] bg-surface-2 border border-line">
                 <span className="text-[13px] font-bold text-ink">+ Thêm tài liệu PDF mới</span>
                 <input

@@ -266,6 +266,9 @@ export interface FlipbookViewerProps {
   title?: string;
   topicTitle?: string;
   pageTitle?: string;
+  coverUrl?: string;
+  onUpdateCover?: (newCoverUrl: string) => void;
+  onOpenEditBlockModal?: () => void;
   isAdmin?: boolean;
   isHidden?: boolean;
   onToggleVisibility?: () => void;
@@ -284,6 +287,9 @@ export default function FlipbookViewer({
   title = 'Tài liệu tham khảo',
   topicTitle = 'Cột Sống & Đĩa Đệm',
   pageTitle = 'Giải Phẫu',
+  coverUrl,
+  onUpdateCover,
+  onOpenEditBlockModal,
   isAdmin: propIsAdmin,
   isHidden = false,
   onToggleVisibility,
@@ -296,26 +302,39 @@ export default function FlipbookViewer({
   onClose,
 }: FlipbookViewerProps) {
   const [pages, setPages] = useState<FlipbookPage[]>(() => {
-    if (initialPages && initialPages.length > 0) return initialPages;
-    if (book) return getBookFlipbookPages(book);
-    if (title && title !== 'Tài liệu tham khảo' && title !== 'Đọc thử sách 3D' && title !== 'Đọc thử tài liệu 3D') {
+    let p: FlipbookPage[];
+    if (initialPages && initialPages.length > 0) p = initialPages;
+    else if (book) p = getBookFlipbookPages(book);
+    else if (title && title !== 'Tài liệu tham khảo' && title !== 'Đọc thử sách 3D' && title !== 'Đọc thử tài liệu 3D') {
       const cleanTitle = title.replace(/^Đọc thử:\s*/i, '').replace(/^Đọc thử tài liệu 3D:\s*/i, '');
-      return getBookFlipbookPages({ title: cleanTitle });
+      p = getBookFlipbookPages({ title: cleanTitle });
+    } else {
+      p = DEFAULT_ANATOMY_PAGES;
     }
-    return DEFAULT_ANATOMY_PAGES;
+    if (coverUrl && p.length > 0) {
+      p = [{ ...p[0], imageUrl: coverUrl }, ...p.slice(1)];
+    }
+    return p;
   });
 
-  // Tự động đồng bộ danh sách trang khi initialPages, book hoặc title thay đổi
+  // Tự động đồng bộ danh sách trang khi initialPages, book, title hoặc coverUrl thay đổi
   useEffect(() => {
+    let p: FlipbookPage[] = [];
     if (initialPages && initialPages.length > 0) {
-      setPages(initialPages);
+      p = [...initialPages];
     } else if (book) {
-      setPages(getBookFlipbookPages(book));
+      p = getBookFlipbookPages(book);
     } else if (title && title !== 'Tài liệu tham khảo' && title !== 'Đọc thử sách 3D' && title !== 'Đọc thử tài liệu 3D') {
       const cleanTitle = title.replace(/^Đọc thử:\s*/i, '').replace(/^Đọc thử tài liệu 3D:\s*/i, '');
-      setPages(getBookFlipbookPages({ title: cleanTitle }));
+      p = getBookFlipbookPages({ title: cleanTitle });
+    } else {
+      p = [...DEFAULT_ANATOMY_PAGES];
     }
-  }, [initialPages, book, title]);
+    if (coverUrl && p.length > 0) {
+      p = [{ ...p[0], imageUrl: coverUrl }, ...p.slice(1)];
+    }
+    setPages(p);
+  }, [initialPages, book, title, coverUrl]);
 
   const [pageImages, setPageImages] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -957,6 +976,17 @@ export default function FlipbookViewer({
                   title={isHidden ? 'Hiện khối với học viên' : 'Ẩn khối với học viên'}
                 >
                   {isHidden ? <EyeOff size={12} /> : <Eye size={12} />}
+                </button>
+              )}
+              {onOpenEditBlockModal && (
+                <button
+                  type="button"
+                  onClick={onOpenEditBlockModal}
+                  className="flex items-center gap-1 h-6 px-2 rounded-[6px] bg-white/10 border border-white/20 text-white text-[11px] font-bold hover:bg-white/20 cursor-pointer shadow-xs"
+                  title="Sửa cấu hình khối và ảnh bìa"
+                >
+                  <Edit2 size={10} />
+                  <span>Sửa</span>
                 </button>
               )}
               <button

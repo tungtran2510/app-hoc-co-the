@@ -640,11 +640,30 @@ export default function ContentViewer({
 
     // Nếu là khối sách lật 3D
     if (block.display_style === 'flipbook') {
+      const coverUrl = block.type === 'files' ? block.data.cover_url : undefined;
       return (
         <div key={block.id} id={`block-${block.id}`}>
           <FlipbookViewer
             topicTitle={topic.title}
             pageTitle={currentPage.title}
+            coverUrl={coverUrl}
+            onUpdateCover={(newCoverUrl: string) => {
+              const updated = blockList.map((b) => {
+                if (b.id === block.id && b.type === 'files') {
+                  return {
+                    ...b,
+                    data: {
+                      ...b.data,
+                      cover_url: newCoverUrl,
+                    },
+                  };
+                }
+                return b;
+              });
+              setBlockList(updated);
+              triggerSaveBlocks(updated);
+            }}
+            onOpenEditBlockModal={() => setEditingBlock(block)}
             isAdmin={isAdmin}
             isHidden={!block.is_visible}
             onToggleVisibility={() => handleToggleVisibility(block.id)}

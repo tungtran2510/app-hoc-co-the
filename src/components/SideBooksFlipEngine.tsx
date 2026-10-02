@@ -660,11 +660,13 @@ const SideBooksFlipEngine = forwardRef<SideBooksFlipEngineRef, SideBooksFlipEngi
       state.lastTime = performance.now();
       state.velocityX = 0;
       state.dragDistance = 0;
-      state.isDragging = false;
-
-      try {
-        canvas.setPointerCapture(e.pointerId);
-      } catch {}
+      // Chỉ tự động setPointerCapture trong chế độ Fullscreen
+      // Trong chế độ Inline, không setPointerCapture ngay để trình duyệt cuộn trang dọc tự nhiên
+      if (isFullscreen) {
+        try {
+          canvas.setPointerCapture(e.pointerId);
+        } catch {}
+      }
     };
 
     const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -705,8 +707,22 @@ const SideBooksFlipEngine = forwardRef<SideBooksFlipEngineRef, SideBooksFlipEngi
 
       const { width: W } = getCanvasDimensions();
 
-      // Bắt đầu kéo khi dịch chuyển > 6px
-      if (!state.isDragging && Math.abs(dx) > 6) {
+      // Trong chế độ Inline, nếu người dùng vuốt dọc (dy > dx), ưu tiên cuộn trang dọc của trình duyệt
+      if (!isFullscreen && !state.isDragging) {
+        if (Math.abs(dy) > Math.abs(dx) * 1.1 && Math.abs(dy) > 5) {
+          isPointerDownRef.current = false;
+          return;
+        }
+      }
+
+      // Bắt đầu kéo khi dịch chuyển ngang đủ lớn và dx vượt trội hơn dy
+      const threshold = isFullscreen ? 6 : 12;
+      if (!state.isDragging && Math.abs(dx) > threshold && Math.abs(dx) > Math.abs(dy) * 1.2) {
+        if (!isFullscreen) {
+          try {
+            canvas.setPointerCapture(e.pointerId);
+          } catch {}
+        }
         if (dx < 0 && currentPage < totalPages) {
           // Vuốt sang trái -> Lật tiếp (Next)
           state.isDragging = true;
@@ -825,7 +841,7 @@ const SideBooksFlipEngine = forwardRef<SideBooksFlipEngineRef, SideBooksFlipEngi
       <div
         ref={containerRef}
         className={`w-full h-full flex items-center justify-center select-none ${
-          disableFlip ? 'pointer-events-none' : 'touch-none'
+          disableFlip ? 'pointer-events-none' : isFullscreen ? 'touch-none' : 'touch-pan-y'
         } ${className}`}
       >
         <canvas
@@ -836,7 +852,7 @@ const SideBooksFlipEngine = forwardRef<SideBooksFlipEngineRef, SideBooksFlipEngi
           onPointerCancel={handlePointerUp}
           className="w-full h-full object-contain cursor-grab active:cursor-grabbing rounded-[12px] shadow-sm transition-transform"
           style={{
-            touchAction: disableFlip ? 'auto' : 'none',
+            touchAction: disableFlip ? 'auto' : isFullscreen ? 'none' : 'pan-y',
             pointerEvents: disableFlip ? 'none' : 'auto',
           }}
         />
