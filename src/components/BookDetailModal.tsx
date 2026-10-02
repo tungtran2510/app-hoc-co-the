@@ -18,6 +18,7 @@ import {
 import { extractYouTubeId } from '../lib/youtube';
 import ModernBookCover from './ModernBookCover';
 import FlipbookViewer from './FlipbookViewer';
+import YouTubeEmbed from './YouTubeEmbed';
 
 export interface UnifiedBookItem {
   id: string;
@@ -480,15 +481,11 @@ export default function BookDetailModal({
               </div>
 
               {youtubeId ? (
-                <div className="relative w-full aspect-video rounded-[18px] overflow-hidden border border-line bg-black shadow-xs">
-                  <iframe
-                    src={`https://www.youtube.com/embed/${youtubeId}?rel=0&modestbranding=1`}
-                    title={`Video giới thiệu ${book.title}`}
-                    className="w-full h-full border-0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
+                <YouTubeEmbed
+                  youtubeId={youtubeId}
+                  title={`Video giới thiệu ${book.title}`}
+                  showExternalLink={true}
+                />
               ) : (
                 <div className="p-4 rounded-[16px] bg-surface-2 border border-line text-center flex flex-col items-center justify-center gap-1.5 text-muted">
                   <Film size={22} className="text-muted/60" />

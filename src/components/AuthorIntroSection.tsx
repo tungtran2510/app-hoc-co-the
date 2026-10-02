@@ -34,6 +34,7 @@ import SectionOrderControls from './admin/SectionOrderControls';
 import FlipbookViewer from './FlipbookViewer';
 import ScrollReveal from './ScrollReveal';
 import ModernBookCover from './ModernBookCover';
+import YouTubeEmbed from './YouTubeEmbed';
 import { saveSettingsApi } from '../lib/apiAdmin';
 
 export interface AuthorSectionBaseProps {
@@ -149,15 +150,11 @@ export function AuthorProfileSection({
               <Film size={15} className="text-emerald-500 dark:text-emerald-300" />
               <span>Video giới thiệu</span>
             </span>
-            <div className="relative w-full aspect-video rounded-[16px] overflow-hidden border border-slate-200 dark:border-white/15 bg-black shadow-xs">
-              <iframe
-                src={`https://www.youtube-nocookie.com/embed/${introVideoId}?rel=0`}
-                title="Video giới thiệu tác giả"
-                className="w-full h-full border-0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
+            <YouTubeEmbed
+              youtubeId={introVideoId}
+              title="Video giới thiệu tác giả"
+              showExternalLink={true}
+            />
           </div>
         )}
       </div>

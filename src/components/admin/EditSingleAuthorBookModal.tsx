@@ -17,6 +17,7 @@ import {
 import { AuthorBook } from '../../lib/types';
 import { uploadImageFile } from '../../lib/storageUpload';
 import { extractYouTubeId } from '../../lib/youtube';
+import YouTubeEmbed from '../YouTubeEmbed';
 
 interface EditSingleAuthorBookModalProps {
   isOpen: boolean;
@@ -332,13 +333,12 @@ export default function EditSingleAuthorBookModal({
             />
 
             {detectedYtId ? (
-              <div className="mt-2 rounded-[12px] overflow-hidden border border-slate-200 dark:border-purple-500/40 bg-black aspect-video relative">
-                <iframe
-                  src={`https://www.youtube.com/embed/${detectedYtId}?rel=0`}
-                  title="YouTube Preview"
-                  className="w-full h-full border-0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
+              <div className="mt-2">
+                <YouTubeEmbed
+                  youtubeId={detectedYtId}
+                  title={`Video giới thiệu ${title || 'cuốn sách'}`}
+                  showAdminTip={true}
+                  showExternalLink={true}
                 />
               </div>
             ) : youtubeUrl.trim() ? (

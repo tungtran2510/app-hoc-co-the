@@ -87,3 +87,48 @@ export async function fetchYouTubeMeta(youtubeId: string): Promise<YouTubeMeta> 
 
   return defaultMeta;
 }
+
+/**
+ * Tạo URL nhúng chuẩn quốc tế cho YouTube iframe
+ * Bắt buộc có rel=0, modestbranding=1, enablejsapi=1, playsinline=1
+ */
+export function getYouTubeEmbedUrl(
+  youtubeId: string,
+  options?: { autoplay?: boolean; origin?: string }
+): string {
+  const params = new URLSearchParams({
+    rel: '0',
+    modestbranding: '1',
+    enablejsapi: '1',
+    playsinline: '1',
+  });
+
+  if (options?.autoplay) {
+    params.set('autoplay', '1');
+  }
+
+  // Gắn origin nếu chạy trên trình duyệt client
+  const origin = options?.origin || (typeof window !== 'undefined' ? window.location.origin : '');
+  if (origin && origin.startsWith('http')) {
+    params.set('origin', origin);
+  }
+
+  return `https://www.youtube-nocookie.com/embed/${youtubeId}?${params.toString()}`;
+}
+
+/**
+ * Link mở xem trực tiếp trên YouTube app / web
+ */
+export function getYouTubeWatchUrl(youtubeId: string): string {
+  return `https://www.youtube.com/watch?v=${youtubeId}`;
+}
+
+/**
+ * Link ảnh thumbnail độ nét cao của YouTube
+ */
+export function getYouTubeThumbnailUrl(
+  youtubeId: string,
+  quality: 'maxresdefault' | 'hqdefault' | 'mqdefault' = 'hqdefault'
+): string {
+  return `https://i.ytimg.com/vi/${youtubeId}/${quality}.jpg`;
+}

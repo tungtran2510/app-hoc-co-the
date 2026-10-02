@@ -18,6 +18,7 @@ import { RecommendedBook } from '../../lib/types';
 import { uploadImageFile } from '../../lib/storageUpload';
 import { extractYouTubeId } from '../../lib/youtube';
 import ModernBookCover from '../ModernBookCover';
+import YouTubeEmbed from '../YouTubeEmbed';
 
 interface EditSingleRecommendedBookModalProps {
   isOpen: boolean;
@@ -369,6 +370,25 @@ export default function EditSingleRecommendedBookModal({
               placeholder="https://www.youtube.com/watch?v=... hoặc youtu.be/..."
               className="w-full h-10 px-3 rounded-[10px] border border-line text-[13.5px] text-ink focus:border-primary"
             />
+
+            {extractYouTubeId(youtubeUrl) ? (
+              <div className="mt-2">
+                <YouTubeEmbed
+                  youtubeId={extractYouTubeId(youtubeUrl)!}
+                  title={`Video giới thiệu ${title || 'cuốn sách'}`}
+                  showAdminTip={true}
+                  showExternalLink={true}
+                />
+              </div>
+            ) : youtubeUrl.trim() ? (
+              <p className="text-[11.5px] text-amber-600 dark:text-amber-400 font-medium">
+                ⚠️ Không nhận diện được mã video từ link trên. Hãy kiểm tra lại định dạng link YouTube.
+              </p>
+            ) : (
+              <p className="text-[11.5px] text-muted">
+                Gắn link YouTube giúp độc giả xem video giới thiệu hoặc tác giả thuyết trình về cuốn sách này.
+              </p>
+            )}
           </div>
 
           {/* 7. Ảnh bên trong tài liệu (Gallery) */}

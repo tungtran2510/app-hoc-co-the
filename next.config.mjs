@@ -21,6 +21,12 @@ const nextConfig = {
   async headers() {
     return [
       {
+        source: '/:path*',
+        headers: [
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        ],
+      },
+      {
         source: '/(manifest.json|manifest.webmanifest|icon-192.png|icon-512.png|apple-icon.png)',
         headers: [
           { key: 'Access-Control-Allow-Origin', value: '*' },

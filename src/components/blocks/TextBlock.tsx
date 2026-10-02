@@ -15,6 +15,7 @@ import { getBlockStyle } from '../../lib/blockStyles';
 import { Image as ImageType, FileItem, Video } from '../../lib/types';
 import { FontSizeOption } from '../PageHeaderBar';
 import Lightbox from '../Lightbox';
+import YouTubeEmbed from '../YouTubeEmbed';
 
 interface TextBlockProps {
   displayStyle: string;
@@ -189,16 +190,15 @@ export default function TextBlock({
         {videos && videos.length > 0 && (
           <div className="flex flex-col gap-2 mt-1 pt-2 border-t border-line/40">
             {videos.map((vid, i) => (
-              <div key={i} className="rounded-[14px] overflow-hidden bg-ink aspect-video relative flex items-center justify-center">
+              <div key={i} className="w-full">
                 {vid.youtube_id ? (
-                  <iframe
-                    src={`https://www.youtube-nocookie.com/embed/${vid.youtube_id}?rel=0&playsinline=1`}
+                  <YouTubeEmbed
+                    youtubeId={vid.youtube_id}
                     title={vid.title}
-                    className="w-full h-full border-0"
-                    allowFullScreen
+                    showExternalLink={true}
                   />
                 ) : (
-                  <div className="text-white text-[14px] font-bold">{vid.title}</div>
+                  <div className="text-white text-[14px] font-bold p-3 bg-ink rounded-[14px]">{vid.title}</div>
                 )}
               </div>
             ))}
@@ -370,16 +370,15 @@ export default function TextBlock({
       {videos && videos.length > 0 && (
         <div className="flex flex-col gap-2 mt-1 pt-2 border-t border-line/40">
           {videos.map((vid, i) => (
-            <div key={i} className="rounded-[14px] overflow-hidden bg-ink aspect-video relative flex items-center justify-center">
+            <div key={i} className="w-full">
               {vid.youtube_id ? (
-                <iframe
-                  src={`https://www.youtube-nocookie.com/embed/${vid.youtube_id}?rel=0&playsinline=1`}
+                <YouTubeEmbed
+                  youtubeId={vid.youtube_id}
                   title={vid.title}
-                  className="w-full h-full border-0"
-                  allowFullScreen
+                  showExternalLink={true}
                 />
               ) : (
-                <div className="text-white text-[14px] font-bold">{vid.title}</div>
+                <div className="text-white text-[14px] font-bold p-3 bg-ink rounded-[14px]">{vid.title}</div>
               )}
             </div>
           ))}

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { extractYouTubeId } from '../lib/youtube';
 import { saveSettingsApi } from '../lib/apiAdmin';
+import YouTubeEmbed from './YouTubeEmbed';
 
 interface WelcomeModalProps {
   isOpen: boolean;
@@ -261,15 +262,11 @@ export default function WelcomeModal({
 
               {/* VIDEO YOUTUBE GIỚI THIỆU (NẾU CÓ) */}
               {youtubeId && (
-                <div className="relative w-full aspect-video rounded-[18px] overflow-hidden border border-slate-200 dark:border-white/15 bg-black shadow-md">
-                  <iframe
-                    src={`https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&modestbranding=1`}
-                    title="Video chào mừng"
-                    className="w-full h-full border-0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
+                <YouTubeEmbed
+                  youtubeId={youtubeId}
+                  title="Video chào mừng"
+                  showExternalLink={true}
+                />
               )}
 
               {/* 3 ĐIỂM NHẤN CỐT LÕI */}
