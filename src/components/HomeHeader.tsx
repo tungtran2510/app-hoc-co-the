@@ -241,22 +241,18 @@ export default function HomeHeader({
               <button
                 type="button"
                 onClick={() => {
-                  if (isAdmin) {
-                    setShowEditApp(true);
-                  } else {
-                    setNameInput(userName === 'Dr. Tùng' ? '' : userName);
-                    setShowNameModal(true);
-                  }
+                  setNameInput(userName === 'Dr. Tùng' ? '' : userName);
+                  setShowNameModal(true);
                 }}
                 className="flex items-center gap-1 text-left group cursor-pointer hover:opacity-90 transition-opacity"
-                title={isAdmin ? "Bấm để đổi tên & cấu hình ứng dụng" : "Bấm để đổi tên của bạn"}
+                title="Bấm để đổi tên của bạn"
               >
                 <div className="flex items-center gap-1 animate-greeting-bounce">
                   <span className="text-[17px] sm:text-[18px] font-black text-ink tracking-tight group-hover:text-blue-600 dark:group-hover:text-[#F8DF7B] transition-colors">
-                    {appName ? appName : `Hello, ${userName || 'Dr. Tùng'}!`}
+                    Hi, {userName || 'Dr. Tùng'}!
                   </span>
-                  <span className="text-[17px] sm:text-[18px] inline-block animate-wave select-none" aria-label="icon">
-                    {appName ? '📚' : '👋'}
+                  <span className="text-[17px] sm:text-[18px] inline-block animate-wave select-none" aria-label="vẫy tay">
+                    👋
                   </span>
                 </div>
               </button>
