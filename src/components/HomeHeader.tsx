@@ -62,13 +62,16 @@ export default function HomeHeader({
   useEffect(() => {
     try {
       const stored = localStorage.getItem('giao_dien');
-      const darkActive = stored === 'dark';
+      const darkActive = stored === 'dark' || (!stored && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
       setIsDark(darkActive);
       if (darkActive) {
         document.documentElement.classList.add('dark');
       } else {
         document.documentElement.classList.remove('dark');
       }
+      const targetColor = darkActive ? '#0C0817' : '#FFFFFF';
+      const metas = document.querySelectorAll('meta[name="theme-color"]');
+      metas.forEach((m) => m.setAttribute('content', targetColor));
     } catch {
       setIsDark(false);
     }
@@ -85,10 +88,9 @@ export default function HomeHeader({
         document.documentElement.classList.remove('dark');
         localStorage.setItem('giao_dien', 'light');
       }
-      const meta = document.querySelector('meta[name="theme-color"]');
-      if (meta) {
-        meta.setAttribute('content', nextDark ? '#0C0817' : '#F5F6FA');
-      }
+      const targetColor = nextDark ? '#0C0817' : '#FFFFFF';
+      const metas = document.querySelectorAll('meta[name="theme-color"]');
+      metas.forEach((m) => m.setAttribute('content', targetColor));
       window.dispatchEvent(new Event('giao_dien_changed'));
     } catch {}
   };

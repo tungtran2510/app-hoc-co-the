@@ -18,13 +18,28 @@ export default function PwaRegistrar() {
 
   useEffect(() => {
     // 1. Đăng ký Service Worker và ép cập nhật bản mới nhất
-    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('/sw.js')
-        .then((reg) => {
-          reg.update();
-        })
-        .catch(() => {});
+    if (typeof window !== 'undefined') {
+      const syncThemeColor = () => {
+        const stored = localStorage.getItem('giao_dien');
+        const isDark = stored === 'dark' || (!stored && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        const targetColor = isDark ? '#0C0817' : '#FFFFFF';
+        const metas = document.querySelectorAll('meta[name="theme-color"]');
+        metas.forEach((m) => m.setAttribute('content', targetColor));
+      };
+      syncThemeColor();
+      window.addEventListener('giao_dien_changed', syncThemeColor);
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncThemeColor);
+      }
+
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker
+          .register('/sw.js')
+          .then((reg) => {
+            reg.update();
+          })
+          .catch(() => {});
+      }
     }
 
     // 2. Kiểm tra nếu app đã được cài đặt độc lập (PWA Standalone)

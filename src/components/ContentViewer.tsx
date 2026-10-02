@@ -249,14 +249,13 @@ export default function ContentViewer({
         document.documentElement.classList.add('dark');
         document.body.classList.add('dark');
       }
-      const meta = document.querySelector('meta[name="theme-color"]');
-      if (meta) {
-        meta.setAttribute('content', mode === 'dark' ? '#0C0817' : '#F5F6FA');
+        const targetColor = mode === 'dark' ? '#0C0817' : '#FFFFFF';
+        const metas = document.querySelectorAll('meta[name="theme-color"]');
+        metas.forEach((m) => m.setAttribute('content', targetColor));
+        window.dispatchEvent(new Event('giao_dien_changed'));
+      } catch {
+        // Bỏ qua
       }
-      window.dispatchEvent(new Event('giao_dien_changed'));
-    } catch {
-      // Bỏ qua
-    }
   };
 
   const handleOpenShareModal = async () => {
