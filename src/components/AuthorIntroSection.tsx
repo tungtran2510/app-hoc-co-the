@@ -22,6 +22,7 @@ import {
   EyeOff,
   Check,
   ShieldCheck,
+  Quote,
 } from 'lucide-react';
 import { AuthorProfile, AuthorBook } from '../lib/types';
 import { normalizeAuthorProfile } from '../lib/data';
@@ -50,8 +51,13 @@ export interface AuthorSectionBaseProps {
   onEdit?: () => void;
 }
 
+export interface AuthorProfileSectionProps extends AuthorSectionBaseProps {
+  onEditPhilosophy?: () => void;
+  showPhilosophy?: boolean;
+}
+
 /* =========================================================================
-   1. KHỐI 1: HỒ SƠ TÁC GIẢ & CHUYÊN GIA (AUTHOR PROFILE)
+   1. KHỐI 1: HỒ SƠ TÁC GIẢ & CHUYÊN GIA (AUTHOR PROFILE - SINGLE UNIFIED CARD)
    ========================================================================= */
 export function AuthorProfileSection({
   profile,
@@ -64,8 +70,12 @@ export function AuthorProfileSection({
   onMoveDown,
   onOpenReorderModal,
   onEdit,
-}: AuthorSectionBaseProps) {
+  onEditPhilosophy,
+  showPhilosophy = true,
+}: AuthorProfileSectionProps) {
   const introVideoId = profile.intro_video_url ? extractYouTubeId(profile.intro_video_url) : null;
+  const rawQuote = profile.extra_content || '';
+  const cleanPhilosophyQuote = rawQuote.trim().replace(/^["“'”]+|["“'”]+$/g, '').trim();
 
   return (
     <section className="flex flex-col gap-3 mt-1">
@@ -86,78 +96,113 @@ export function AuthorProfileSection({
         />
       )}
 
-      {/* THẺ MASTER INSTRUCTOR PROFILE CARD CAO CẤP */}
+      {/* THẺ MASTER SINGLE CARD (ĐÚNG 1 KHUNG DUY NHẤT, NỀN TRẮNG SẠCH ĐỒNG BỘ APP) */}
       <ScrollReveal animation="slide-left" delay={40}>
-        <div className="relative p-4 sm:p-5 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-sm dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] dark:border-white/15 dark:text-white overflow-hidden flex flex-col gap-3">
-        {/* Họa tiết trang trí viền cao cấp góc phải */}
-        <div className="absolute top-0 right-0 w-32 h-32 opacity-10 dark:opacity-20 pointer-events-none bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-300 dark:from-amber-400 via-transparent to-transparent" />
+        <div className="relative p-4 sm:p-5 rounded-[16px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-sm dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] dark:border-white/15 dark:text-white overflow-hidden flex flex-col gap-3">
+          {/* Họa tiết trang trí viền cao cấp góc phải */}
+          <div className="absolute top-0 right-0 w-32 h-32 opacity-10 dark:opacity-20 pointer-events-none bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-300 dark:from-purple-400 via-transparent to-transparent" />
 
-        {/* 1. Phần Đầu: Chân dung bên trái + Tên & Sứ mệnh bên phải */}
-        <div className="relative z-10 flex items-start gap-3.5 sm:gap-4">
-          {/* Ảnh chân dung chuyên gia - To rõ, sát mép khung viền theo yêu cầu */}
-          <div className="w-[110px] sm:w-[124px] aspect-[4/5] rounded-[16px] overflow-hidden bg-slate-100 dark:bg-[#241548] shrink-0 border-2 border-blue-200/90 dark:border-purple-400/50 shadow-md relative">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={profile.avatar_url || '/images/author_tung.png'}
-              alt={profile.name || 'Tùng Dinh Dưỡng'}
-              className="w-full h-full object-cover object-[50%_15%] scale-110 transition-transform duration-300 hover:scale-115"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = '/images/author_tung.png';
-              }}
-            />
-          </div>
-
-          <div className="flex-1 flex flex-col gap-1 min-w-0 pt-0.5">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <h3 className="text-[20px] sm:text-[22px] font-bold text-slate-900 dark:text-white leading-tight">
-                {profile.name && profile.name.toLowerCase().includes('tùng') ? 'Tùng Dinh Dưỡng' : (profile.name || 'Tùng Dinh Dưỡng')}
-              </h3>
-              <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-blue-600 text-white shrink-0 shadow-2xs" title="Chuyên gia được xác thực">
-                <Check size={10} strokeWidth={3.5} />
-              </span>
+          {/* 1. Phần Đầu: Chân dung bên trái + Tên & Sứ mệnh bên phải */}
+          <div className="relative z-10 flex items-start gap-3.5 sm:gap-4">
+            {/* Ảnh chân dung chuyên gia */}
+            <div className="w-[110px] sm:w-[124px] aspect-[4/5] rounded-[14px] overflow-hidden bg-slate-100 dark:bg-[#241548] shrink-0 border border-slate-200/90 dark:border-purple-400/40 shadow-xs relative">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={profile.avatar_url || '/images/author_tung.png'}
+                alt={profile.name || 'Tùng Dinh Dưỡng'}
+                className="w-full h-full object-cover object-[50%_15%] scale-110 transition-transform duration-300 hover:scale-115"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/author_tung.png';
+                }}
+              />
             </div>
 
-            {profile.title && (
-              <p className="text-[12px] sm:text-[13px] font-semibold text-[#1E3A8A] dark:text-[#F8DF7B] leading-snug">
-                {profile.title.replace(/\.$/, '')}
-              </p>
-            )}
+            <div className="flex-1 flex flex-col gap-1 min-w-0 pt-0.5">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <h3 className="text-[19px] sm:text-[21px] font-bold text-slate-900 dark:text-white leading-tight">
+                  {profile.name && profile.name.toLowerCase().includes('tùng') ? 'Tùng Dinh Dưỡng' : (profile.name || 'Tùng Dinh Dưỡng')}
+                </h3>
+                <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-blue-600 text-white shrink-0 shadow-2xs" title="Chuyên gia được xác thực">
+                  <Check size={10} strokeWidth={3.5} />
+                </span>
+              </div>
 
-            {profile.bio && (
-              <p className="text-[12.5px] sm:text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-4 mt-0.5 font-normal font-sans">
-                {profile.bio}
-              </p>
-            )}
+              {profile.title && (
+                <p className="text-[12px] sm:text-[13px] font-semibold text-[#1E3A8A] dark:text-[#A5B4FC] leading-snug">
+                  {profile.title.replace(/\.$/, '')}
+                </p>
+              )}
+
+              {profile.bio && (
+                <p className="text-[12.5px] sm:text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-4 mt-0.5 font-normal font-sans">
+                  {profile.bio}
+                </p>
+              )}
+            </div>
           </div>
+
+          {/* Ảnh minh họa thêm (nếu có) */}
+          {profile.intro_image_url && (
+            <div className="w-full rounded-[14px] overflow-hidden border border-slate-200 dark:border-white/15 shadow-2xs mt-1">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={profile.intro_image_url}
+                alt="Ảnh giới thiệu"
+                className="w-full max-h-[280px] object-cover"
+              />
+            </div>
+          )}
+
+          {/* Video giới thiệu YouTube (nếu có) */}
+          {introVideoId && (
+            <div className="flex flex-col gap-1.5 pt-1">
+              <span className="text-[13px] font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                <Film size={15} className="text-emerald-500 dark:text-emerald-300" />
+                <span>Video giới thiệu</span>
+              </span>
+              <YouTubeEmbed
+                youtubeId={introVideoId}
+                title="Video giới thiệu tác giả"
+                showExternalLink={true}
+              />
+            </div>
+          )}
+
+          {/* 2. LỜI TỰA / TRIẾT LÝ PHỤNG SỰ (LIỀN MẠCH TRONG CÙNG 1 KHUNG DUY NHẤT, NỀN TRẮNG ĐỒNG BỘ) */}
+          {showPhilosophy && cleanPhilosophyQuote && (
+            <div className="pt-3 border-t border-slate-100 dark:border-white/10 flex flex-col gap-1.5 relative">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+                  <Quote size={12} className="rotate-180 text-blue-600 dark:text-indigo-400" strokeWidth={2.5} />
+                  <span className="text-[11px] sm:text-[11.5px] font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                    {profile.extra_title || 'Lời tựa'}
+                  </span>
+                </div>
+                {isAdmin && onEditPhilosophy && (
+                  <button
+                    type="button"
+                    onClick={onEditPhilosophy}
+                    className="flex items-center gap-1 px-2 py-0.5 rounded-[6px] bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 text-[11px] font-medium hover:bg-slate-200 dark:hover:bg-white/15 cursor-pointer"
+                    title="Sửa lời tựa"
+                  >
+                    <Edit2 size={11} />
+                    <span>Sửa lời tựa</span>
+                  </button>
+                )}
+              </div>
+
+              <p className="font-serif italic text-[14px] sm:text-[14.5px] text-slate-700 dark:text-slate-200 leading-relaxed font-normal pl-0.5">
+                &ldquo;{cleanPhilosophyQuote}&rdquo;
+              </p>
+
+              <div className="text-right pt-0.5">
+                <span className="text-[12.5px] sm:text-[13px] font-bold text-slate-800 dark:text-slate-200 tracking-tight">
+                  — {profile.name && profile.name.toLowerCase().includes('tùng') ? 'Tùng Dinh Dưỡng' : (profile.name || 'Tùng Dinh Dưỡng')}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
-
-        {/* Ảnh minh họa thêm (nếu có) */}
-        {profile.intro_image_url && (
-          <div className="w-full rounded-[16px] overflow-hidden border border-slate-200 dark:border-white/15 shadow-2xs mt-1">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={profile.intro_image_url}
-              alt="Ảnh giới thiệu"
-              className="w-full max-h-[280px] object-cover"
-            />
-          </div>
-        )}
-
-        {/* Video giới thiệu YouTube (nếu có) */}
-        {introVideoId && (
-          <div className="flex flex-col gap-1.5 pt-1">
-            <span className="text-[13px] font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-              <Film size={15} className="text-emerald-500 dark:text-emerald-300" />
-              <span>Video giới thiệu</span>
-            </span>
-            <YouTubeEmbed
-              youtubeId={introVideoId}
-              title="Video giới thiệu tác giả"
-              showExternalLink={true}
-            />
-          </div>
-        )}
-      </div>
       </ScrollReveal>
     </section>
   );

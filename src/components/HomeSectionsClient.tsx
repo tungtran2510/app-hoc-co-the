@@ -38,6 +38,7 @@ interface HomeSectionsClientProps {
   initialBooksLayout?: 'grid' | 'lookbook' | null;
   appName?: string | null;
   appSubtitle?: string | null;
+  brandTagline?: string | null;
   logoUrl?: string | null;
   hotline?: string | null;
   zaloUrl?: string | null;
@@ -58,6 +59,7 @@ export default function HomeSectionsClient({
   initialBooksLayout,
   appName: initialAppName,
   appSubtitle: initialAppSubtitle,
+  brandTagline: initialBrandTagline,
   logoUrl: initialLogoUrl,
   hotline: initialHotline,
   zaloUrl: initialZaloUrl,
@@ -78,7 +80,12 @@ export default function HomeSectionsClient({
   );
 
   const [appName, setAppName] = useState(initialAppName || 'Học Cơ Thể');
-  const [appSubtitle, setAppSubtitle] = useState(initialAppSubtitle || 'Kiến thức đúng · Sức khỏe bền vững');
+  const [appSubtitle, setAppSubtitle] = useState(initialAppSubtitle ?? '');
+  const [brandTagline, setBrandTagline] = useState(
+    initialBrandTagline !== undefined && initialBrandTagline !== null
+      ? initialBrandTagline
+      : 'EMPOWERING MEDICAL KNOWLEDGE'
+  );
   const [logoUrl, setLogoUrl] = useState<string | null>(initialLogoUrl || null);
   const [hotline, setHotline] = useState(initialHotline || '');
   const [zaloUrl, setZaloUrl] = useState(initialZaloUrl || '');
@@ -294,12 +301,16 @@ export default function HomeSectionsClient({
                     </span>
                     {isAdmin && <Edit2 size={12} className="text-[#1E3A8A] dark:text-purple-300 opacity-60" />}
                   </div>
-                  <span className="text-[9.5px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-purple-300/70 mt-0.5">
-                    EMPOWERING MEDICAL KNOWLEDGE
-                  </span>
-                  <span className="text-[10.5px] sm:text-[11px] text-slate-600 dark:text-purple-100/90 font-medium line-clamp-1">
-                    {appSubtitle || 'Advanced Anatomy & Health'}
-                  </span>
+                  {brandTagline && brandTagline.trim() ? (
+                    <span className="text-[9.5px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-purple-300/70 mt-0.5 truncate">
+                      {brandTagline.trim()}
+                    </span>
+                  ) : null}
+                  {appSubtitle && appSubtitle.trim() ? (
+                    <span className="text-[10.5px] sm:text-[11px] text-slate-600 dark:text-purple-100/90 font-medium line-clamp-1">
+                      {appSubtitle.trim()}
+                    </span>
+                  ) : null}
                 </div>
 
                 {/* Huy hiệu Xanh Sapphire dát vàng kim bên phải - Icon quả tim đập nhịp y khoa */}
@@ -369,7 +380,7 @@ export default function HomeSectionsClient({
           );
         }
 
-        // KHỐI 4: HỒ SƠ TÁC GIẢ (AUTHOR PROFILE)
+        // KHỐI 4: HỒ SƠ TÁC GIẢ & LỜI TỰA (MASTER SINGLE CARD - GỘP 1 KHUNG DUY NHẤT)
         if (sectionKey === 'author_profile') {
           return (
             <React.Fragment key="author_profile">
@@ -385,6 +396,7 @@ export default function HomeSectionsClient({
                 onMoveDown={() => handleMoveSection(index, 'down')}
                 onOpenReorderModal={() => setShowReorderModal(true)}
                 onEdit={() => openAuthorModal('author')}
+                onEditPhilosophy={() => openAuthorModal('extra')}
               />
             </React.Fragment>
           );
@@ -416,7 +428,11 @@ export default function HomeSectionsClient({
         }
 
         // KHỐI 6: TRIẾT LÝ & ĐỊNH HƯỚNG (AUTHOR PHILOSOPHY)
+        // Đã được gộp trọn vẹn vào 1 khung duy nhất trong AuthorProfileSection (Mẫu 1)
         if (sectionKey === 'author_philosophy') {
+          if (sectionsOrder.includes('author_profile')) {
+            return null;
+          }
           return (
             <React.Fragment key="author_philosophy">
               {hiddenBanner}
@@ -538,13 +554,15 @@ export default function HomeSectionsClient({
           isOpen={true}
           initialName={appName}
           initialSubtitle={appSubtitle}
+          initialBrandTagline={brandTagline}
           initialLogoUrl={logoUrl}
           initialHotline={hotline}
           initialZaloUrl={zaloUrl}
           onClose={() => setShowEditAppModal(false)}
-          onSaved={(newName, newSubtitle, newLogo, newHotline, newZalo) => {
+          onSaved={(newName, newSubtitle, newLogo, newHotline, newZalo, newTagline) => {
             setAppName(newName);
             setAppSubtitle(newSubtitle);
+            if (newTagline !== undefined) setBrandTagline(newTagline);
             setLogoUrl(newLogo);
             setHotline(newHotline);
             setZaloUrl(newZalo);
