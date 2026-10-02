@@ -51,7 +51,7 @@ export default function RecommendedBooksSection({
   onMoveDown,
   onOpenReorderModal,
 }: RecommendedBooksSectionProps) {
-  const [title, setTitle] = useState(initialTitle || 'Tài Liệu Y Khoa Chuyên Sâu');
+  const [title, setTitle] = useState(initialTitle || 'Tài Liệu Y Khoa');
   const [subtitle, setSubtitle] = useState(
     initialSubtitle || 'Tài liệu tham khảo chuyên sâu giúp bạn hiểu và chăm sóc cơ thể mỗi ngày'
   );
@@ -76,10 +76,14 @@ export default function RecommendedBooksSection({
     title: string;
     subtitle: string;
     books: RecommendedBook[];
+    layout?: 'grid' | 'lookbook';
   }) => {
     setTitle(data.title);
     setSubtitle(data.subtitle);
     setBooks(data.books);
+    if (data.layout) {
+      setLayoutMode(data.layout);
+    }
   };
 
   const toggleLayoutMode = async (mode: 'grid' | 'lookbook') => {
@@ -169,23 +173,16 @@ export default function RecommendedBooksSection({
         />
       )}
 
-      {/* TIÊU ĐỀ MỤC & NHÓM NÚT QUẢN TRỊ (2 HÀNG GỌN GÀNG, KHÔNG RỚT CHỮ) */}
+      {/* TIÊU ĐỀ MỤC & NHÓM NÚT CHUYỂN CHẾ ĐỘ XEM (BỎ BADGE SỐ TÀI LIỆU, TỰ ĐỘNG XUỐNG DÒNG KHÔNG ĐÈ NÚT) */}
       <div className="flex flex-col gap-1.5">
-        {/* Hàng 1: Tiêu đề, số lượng & Nút chuyển chế độ xem */}
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            <h2 className="text-[19px] sm:text-[20px] font-extrabold text-ink leading-tight whitespace-nowrap">
-              {title}
-            </h2>
-            {books.length > 0 && (
-              <span className="text-[11.5px] font-extrabold text-[#1E3A8A] bg-blue-100 dark:text-[#F8DF7B] dark:bg-[#2E1B58] px-2.5 py-0.5 rounded-full shrink-0">
-                {books.length} tài liệu
-              </span>
-            )}
-          </div>
+        {/* Hàng 1: Tiêu đề bên trái (tự co giãn / xuống dòng), Nút chuyển đổi Lưới / Danh sách bên phải */}
+        <div className="flex items-center justify-between gap-2.5">
+          <h2 className="text-[18px] sm:text-[19px] font-extrabold text-ink leading-tight break-words line-clamp-2 flex-1 min-w-0">
+            {title}
+          </h2>
 
-          <div className="flex items-center gap-1.5 shrink-0">
-            {/* Nút chuyển đổi kiểu hiển thị: Lưới hoặc Lookbook */}
+          <div className="flex items-center gap-1.5 shrink-0 ml-auto">
+            {/* Nút chuyển đổi kiểu hiển thị: Lưới hoặc Danh sách chi tiết */}
             <div className="inline-flex items-center bg-white dark:bg-[#180E32] border border-slate-200 dark:border-[#3A2268] rounded-[10px] p-0.5 shadow-2xs">
               <button
                 type="button"
@@ -208,8 +205,8 @@ export default function RecommendedBooksSection({
                     ? 'bg-[#1E3A8A] text-white dark:bg-[#F8DF7B] dark:text-[#160C2C] shadow-xs font-bold'
                     : 'text-slate-400 hover:text-slate-700 dark:text-purple-300 dark:hover:text-white'
                 }`}
-                title="Xem dạng thẻ chi tiết (Lookbook)"
-                aria-label="Xem dạng thẻ chi tiết (Lookbook)"
+                title="Xem dạng danh sách chi tiết"
+                aria-label="Xem dạng danh sách chi tiết"
               >
                 <List size={14} strokeWidth={2.5} />
               </button>
@@ -307,12 +304,12 @@ export default function RecommendedBooksSection({
                           setFlipbookPreviewBook(book);
                         }}
                         className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[9px] bg-gradient-to-r from-[#FFF0BA] via-[#ECC45F] to-[#D4A028] hover:from-[#FFF5CE] hover:to-[#DFAC32] text-[#1A1608] font-black text-[11.5px] sm:text-[12px] shadow-xs shadow-[#D4A028]/25 cursor-pointer transition-all active:scale-95 border border-[#F3D37A] overflow-hidden shrink-0"
-                        title="Đọc thử tài liệu 3D chân thực"
+                        title="Xem thử 3D"
                       >
                         {/* Vệt sáng Flash quét định kỳ */}
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/70 to-transparent -translate-x-full animate-flash-sweep pointer-events-none" />
                         <BookOpen size={12} strokeWidth={2.8} className="shrink-0 text-[#1A1608]" />
-                        <span>Đọc thử tài liệu 3D</span>
+                        <span>Xem thử 3D</span>
                       </button>
 
                       <span className="text-[12px] font-black text-[#1E3A8A] dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0 ml-auto">
@@ -540,6 +537,7 @@ export default function RecommendedBooksSection({
         initialTitle={title}
         initialSubtitle={subtitle}
         initialBooks={books}
+        initialLayout={layoutMode}
         onClose={() => setShowEditModal(false)}
         onSaved={handleSaved}
       />

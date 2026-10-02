@@ -46,6 +46,7 @@ export default function TopicListClient({
   const [titleDraft, setTitleDraft] = useState(
     initialTopicsTitle && initialTopicsTitle !== 'Chọn chủ đề' ? initialTopicsTitle : 'Chuyên Đề Học'
   );
+  const [activeTopicSlug, setActiveTopicSlug] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [editingTopic, setEditingTopic] = useState<Topic | null>(null);
   const [isCreating, setIsCreating] = useState(false);
@@ -251,7 +252,12 @@ export default function TopicListClient({
               className="relative flex flex-col group"
             >
               <div className="relative">
-                <TopicCard topic={topic} pageCount={pageCount} />
+                <TopicCard
+                  topic={topic}
+                  pageCount={pageCount}
+                  isActive={activeTopicSlug === topic.slug}
+                  onActivate={() => setActiveTopicSlug(topic.slug)}
+                />
 
                 {/* Nhãn Đang ẩn nếu admin */}
                 {!topic.is_visible && isAdmin && (

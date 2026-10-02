@@ -213,19 +213,12 @@ export function AuthorBooksSection({
         />
       )}
 
-      {/* Tiêu đề mục sách (gọn gàng, không rớt chữ) */}
+      {/* Tiêu đề mục sách ngắn gọn 4 từ, tự co giãn xuống dòng an toàn, bỏ hẳn badge số tài liệu */}
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            <h3 className="text-[19px] font-extrabold text-ink leading-tight whitespace-nowrap">
-              Tài Liệu & Cẩm Nang Chuyên Sâu
-            </h3>
-            {books.length > 0 && (
-              <span className="text-[11.5px] font-extrabold text-[#1E3A8A] bg-blue-100 dark:text-[#F8DF7B] dark:bg-[#2E1B58] px-2.5 py-0.5 rounded-full shrink-0">
-                {books.length} tài liệu
-              </span>
-            )}
-          </div>
+          <h3 className="text-[18px] sm:text-[19px] font-extrabold text-ink leading-tight break-words line-clamp-2">
+            Tài Liệu Chuyên Sâu
+          </h3>
         </div>
 
         <div className="flex items-center justify-between gap-2">
@@ -308,41 +301,44 @@ export function AuthorBooksSection({
                     </p>
                   </div>
 
-                  <div className="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-purple-800/40 mt-1 gap-1.5">
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setPreviewBook(book);
-                        }}
-                        className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[9px] bg-gradient-to-r from-[#FFF0BA] via-[#ECC45F] to-[#D4A028] hover:from-[#FFF5CE] hover:to-[#DFAC32] text-[#1A1608] font-black text-[11.5px] sm:text-[12px] shadow-xs shadow-[#D4A028]/25 cursor-pointer transition-all active:scale-95 border border-[#F3D37A] overflow-hidden shrink-0"
-                        title="Đọc thử tài liệu 3D chân thực"
-                      >
-                        {/* Vệt sáng Flash quét định kỳ */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/70 to-transparent -translate-x-full animate-flash-sweep pointer-events-none" />
-                        <BookOpen size={12} strokeWidth={2.8} className="shrink-0 text-[#1A1608]" />
-                        <span>Đọc thử tài liệu 3D</span>
-                      </button>
+                  <div className="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-purple-800/40 mt-1 gap-2">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPreviewBook(book);
+                      }}
+                      className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[9px] bg-gradient-to-r from-[#FFF0BA] via-[#ECC45F] to-[#D4A028] hover:from-[#FFF5CE] hover:to-[#DFAC32] text-[#1A1608] font-black text-[12px] shadow-xs shadow-[#D4A028]/25 cursor-pointer transition-all active:scale-95 border border-[#F3D37A] overflow-hidden shrink-0"
+                      title="Xem thử 3D"
+                    >
+                      {/* Vệt sáng Flash quét định kỳ */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/70 to-transparent -translate-x-full animate-flash-sweep pointer-events-none" />
+                      <BookOpen size={12} strokeWidth={2.8} className="shrink-0 text-[#1A1608]" />
+                      <span>Xem thử 3D</span>
+                    </button>
 
-                      <span className="text-[11.5px] font-black text-[#1E3A8A] dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0">
-                        <span>Chi tiết</span>
-                        <ChevronRight size={12} strokeWidth={2.5} />
+                    <span className="text-[12px] font-black text-[#1E3A8A] dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0 ml-auto">
+                      <span>Chi tiết</span>
+                      <ChevronRight size={13} strokeWidth={2.5} />
+                    </span>
+                  </div>
+
+                  {isAdmin && (
+                    <div
+                      className="mt-2 pt-1.5 border-t border-dashed border-[#2D5B94]/25 dark:border-purple-500/30 flex items-center justify-between gap-1.5"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted">
+                        Quản trị:
                       </span>
-                    </div>
-
-                    {isAdmin && (
-                      <div
-                        className="flex items-center gap-0.5 shrink-0 ml-auto"
-                        onClick={(e) => e.stopPropagation()}
-                      >
+                      <div className="flex items-center gap-1">
                         {onMoveBook && (
                           <>
                             <button
                               type="button"
                               disabled={idx === 0}
                               onClick={() => onMoveBook(idx, 'up')}
-                              className="w-5.5 h-5.5 rounded-[5px] bg-slate-100 hover:bg-blue-100 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors"
+                              className="w-6 h-6 rounded-[6px] bg-slate-100 hover:bg-blue-100 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors shadow-2xs"
                               title="Chuyển sách lên trên"
                             >
                               <ArrowUp size={11} />
@@ -351,7 +347,7 @@ export function AuthorBooksSection({
                               type="button"
                               disabled={idx === books.length - 1}
                               onClick={() => onMoveBook(idx, 'down')}
-                              className="w-5.5 h-5.5 rounded-[5px] bg-slate-100 hover:bg-blue-100 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors"
+                              className="w-6 h-6 rounded-[6px] bg-slate-100 hover:bg-blue-100 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors shadow-2xs"
                               title="Chuyển sách xuống dưới"
                             >
                               <ArrowDown size={11} />
@@ -362,7 +358,7 @@ export function AuthorBooksSection({
                           <button
                             type="button"
                             onClick={() => onToggleBookVisible(idx)}
-                            className={`w-5.5 h-5.5 rounded-[5px] flex items-center justify-center cursor-pointer transition-colors ${
+                            className={`w-6 h-6 rounded-[6px] flex items-center justify-center cursor-pointer transition-colors shadow-2xs ${
                               isBookHidden
                                 ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200'
                                 : 'bg-slate-100 hover:bg-blue-100 text-slate-600 dark:bg-purple-950 dark:text-purple-200'
@@ -376,10 +372,10 @@ export function AuthorBooksSection({
                           <button
                             type="button"
                             onClick={onEdit}
-                            className="flex items-center gap-0.5 h-5.5 px-1.5 rounded-[5px] bg-blue-50 hover:bg-blue-100 text-[#1E3A8A] border border-blue-200 dark:bg-purple-950 dark:text-purple-200 dark:border-purple-800/40 text-[10.5px] font-bold cursor-pointer transition-colors"
+                            className="h-6 px-2 rounded-[6px] bg-primary text-white text-[11px] font-bold flex items-center gap-1 hover:bg-primary-dark transition-colors cursor-pointer shadow-2xs"
                             title="Sửa sách"
                           >
-                            <Edit2 size={9} />
+                            <Edit2 size={10} />
                             <span>Sửa</span>
                           </button>
                         )}
@@ -387,17 +383,17 @@ export function AuthorBooksSection({
                           <button
                             type="button"
                             onClick={() => onDeleteBook(idx)}
-                            className="w-5.5 h-5.5 rounded-[5px] bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-950 dark:text-red-300 flex items-center justify-center cursor-pointer transition-colors"
+                            className="w-6 h-6 rounded-[6px] bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-950 dark:text-red-300 flex items-center justify-center cursor-pointer transition-colors shadow-2xs"
                             title="Xóa cuốn sách này"
                           >
                             <Trash2 size={11} />
                           </button>
                         )}
                       </div>
-                    )}
+                    </div>
+                  )}
                   </div>
                 </div>
-              </div>
             </ScrollReveal>
           );
           })}

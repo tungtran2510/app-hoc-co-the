@@ -53,6 +53,21 @@ async function buildLessonCatalog(): Promise<LessonCatalogItem[]> {
   }
 }
 
+let cachedCatalog: LessonCatalogItem[] | null = null;
+let cachedCatalogExpiry = 0;
+
+async function getOrBuildLessonCatalog(): Promise<LessonCatalogItem[]> {
+  if (cachedCatalog && cachedCatalog.length > 0 && cachedCatalogExpiry > Date.now()) {
+    return cachedCatalog;
+  }
+  const catalog = await buildLessonCatalog();
+  if (catalog.length > 0) {
+    cachedCatalog = catalog;
+    cachedCatalogExpiry = Date.now() + 15 * 60 * 1000; // Lưu cache trong bộ nhớ 15 phút
+  }
+  return catalog;
+}
+
 // Fallback siêu ngắn gọn theo đúng tài liệu
 function fallbackSearch(query: string, catalog: LessonCatalogItem[]) {
   const lower = query.toLowerCase();
@@ -94,12 +109,48 @@ export async function POST(req: NextRequest) {
     }
 
     const [catalog, settings] = await Promise.all([
-      buildLessonCatalog(),
+      getOrBuildLessonCatalog(),
       getSettings(),
     ]);
 
-    const apiKey = process.env.GEMINI_API_KEY;
     const aiTraining = settings?.ai_training;
+    const lowerQ = question.toLowerCase();
+
+    // KIỂM TRA PHẢN HỒI SIÊU TỐC TỪ CÂU HỎI MẪU FAQ CỦA TÁC GIẢ (< 5ms)
+    if (Array.isArray(aiTraining?.faqs) && aiTraining.faqs.length > 0) {
+      const matchedFaq = aiTraining.faqs.find((f) => {
+        const fq = f.question.toLowerCase();
+        return fq === lowerQ || lowerQ.includes(fq) || fq.includes(lowerQ);
+      });
+
+      if (matchedFaq && matchedFaq.answer) {
+        // Tìm 1-2 bài học liên quan nhất từ catalog đã nạp sẵn trong bộ nhớ
+        const relatedPages = catalog
+          .filter((c) => {
+            const text = `${c.page_title} ${c.topic_title} ${c.summary}`.toLowerCase();
+            const words = matchedFaq.question.toLowerCase().split(/\s+/).filter((w) => w.length > 2);
+            return words.some((w) => text.includes(w));
+          })
+          .slice(0, 2);
+
+        return NextResponse.json({
+          answer: matchedFaq.answer,
+          suggested_pages: (relatedPages.length > 0 ? relatedPages : catalog.slice(0, 2)).map((s) => ({
+            title: s.page_title,
+            topic_title: s.topic_title,
+            topic_slug: s.topic_slug,
+            page_slug: s.page_slug,
+            reason: 'Tài liệu hướng dẫn trực tiếp từ chuyên gia.',
+          })),
+          follow_up_questions: [
+            'Lộ trình chăm sóc cụ thể như thế nào?',
+            'Có lưu ý gì trong sinh hoạt hàng ngày không?',
+          ],
+        });
+      }
+    }
+
+    const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
       const fallbackResult = fallbackSearch(question, catalog);
@@ -241,6 +292,15 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON (không kèm văn bả
         .replace(/(?:tác giả\s+)?(?:tùng\s+)?(?:dinh dưỡng\s+)?(?:không phải|chưa phải)(?:\s+là)?\s+bác sĩ[.,;:\-—–]?\s*/gi, '')
         .replace(/tôi không phải(?:\s+là)?\s+bác sĩ[.,;:\-—–]?\s*/gi, '')
         .replace(/\bkhông phải bác sĩ\b/gi, '')
+        .replace(/y\s+khoa\s+chữa\s+bệnh/gi, 'y khoa chuyên sâu')
+        .replace(/khám\s+chữa\s+bệnh/gi, 'thăm khám y tế')
+        .replace(/chữa\s+dứt\s+điểm/gi, 'phục hồi tự nhiên')
+        .replace(/chữa\s+bệnh/gi, 'chăm sóc sức khỏe')
+        .replace(/chữa\s+trị/gi, 'chăm sóc')
+        .replace(/điều\s+trị/gi, 'phục hồi')
+        .replace(/nắn\s+chỉnh\s+cột\s+sống/gi, 'hỗ trợ điều chỉnh độ cong sinh lý cột sống')
+        .replace(/nắn\s+chỉnh/gi, 'hỗ trợ điều chỉnh tư thế')
+        .replace(/uốn\s+nắn/gi, 'hỗ trợ điều chỉnh')
         .trim();
       if (cleanAnswer.length > 0) {
         cleanAnswer = cleanAnswer.charAt(0).toUpperCase() + cleanAnswer.slice(1);

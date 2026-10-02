@@ -30,11 +30,17 @@ export const TOPIC_MIND_MAP_SUBTITLES: Record<string, string> = {
 interface TopicCardProps {
   topic: Topic;
   pageCount: number;
+  isActive?: boolean;
+  onActivate?: () => void;
 }
 
-export default function TopicCard({ topic, pageCount }: TopicCardProps) {
+export default function TopicCard({
+  topic,
+  pageCount,
+  isActive = false,
+  onActivate,
+}: TopicCardProps) {
   const [imgError, setImgError] = useState(false);
-  const [isTouched, setIsTouched] = useState(false);
   const isAvailable = pageCount > 0;
   const coverUrl = topic.cover_url || DEFAULT_TOPIC_COVERS[topic.slug] || null;
   const hasCoverImage = Boolean(coverUrl) && !imgError;
@@ -49,14 +55,9 @@ export default function TopicCard({ topic, pageCount }: TopicCardProps) {
     <Link
       href={`/${topic.slug}`}
       prefetch={true}
-      onTouchStart={() => setIsTouched(true)}
-      onTouchEnd={() => {
-        // Giữ sáng 600ms khi lướt tay trên màn hình điện thoại
-        setTimeout(() => setIsTouched(false), 600);
-      }}
-      onTouchCancel={() => setIsTouched(false)}
+      onTouchStart={onActivate}
       className={`topic-card-container group relative flex flex-col cursor-pointer select-none transition-all duration-300 ${
-        isTouched ? 'is-active' : ''
+        isActive ? 'is-active' : ''
       }`}
     >
       {/* 1. GÁY TRÊN 3D CỦA CUỐN SÁCH (Bừng sáng khi lướt tay / hover) */}

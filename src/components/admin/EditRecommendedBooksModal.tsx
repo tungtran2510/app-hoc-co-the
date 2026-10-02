@@ -15,6 +15,8 @@ import {
   Sparkles,
   Film,
   Images,
+  LayoutGrid,
+  List,
 } from 'lucide-react';
 import { RecommendedBook } from '../../lib/types';
 import { uploadImageFile } from '../../lib/storageUpload';
@@ -25,11 +27,13 @@ interface EditRecommendedBooksModalProps {
   initialTitle?: string | null;
   initialSubtitle?: string | null;
   initialBooks?: RecommendedBook[];
+  initialLayout?: 'grid' | 'lookbook' | null;
   onClose: () => void;
   onSaved: (data: {
     title: string;
     subtitle: string;
     books: RecommendedBook[];
+    layout?: 'grid' | 'lookbook';
   }) => void;
 }
 
@@ -38,12 +42,16 @@ export default function EditRecommendedBooksModal({
   initialTitle,
   initialSubtitle,
   initialBooks = [],
+  initialLayout = 'grid',
   onClose,
   onSaved,
 }: EditRecommendedBooksModalProps) {
-  const [title, setTitle] = useState(initialTitle || 'Tài Liệu Y Khoa Chuyên Sâu');
+  const [title, setTitle] = useState(initialTitle || 'Tài Liệu Y Khoa');
   const [subtitle, setSubtitle] = useState(
     initialSubtitle || 'Tài liệu tham khảo chuyên sâu giúp bạn hiểu và chăm sóc cơ thể mỗi ngày'
+  );
+  const [layout, setLayout] = useState<'grid' | 'lookbook'>(
+    initialLayout === 'lookbook' ? 'lookbook' : 'grid'
   );
   const [books, setBooks] = useState<RecommendedBook[]>([]);
   const [uploadingBookId, setUploadingBookId] = useState<string | null>(null);
@@ -58,10 +66,11 @@ export default function EditRecommendedBooksModal({
 
   useEffect(() => {
     if (isOpen) {
-      setTitle(initialTitle || 'Tài Liệu Y Khoa Chuyên Sâu');
+      setTitle(initialTitle || 'Tài Liệu Y Khoa');
       setSubtitle(
         initialSubtitle || 'Tài liệu tham khảo chuyên sâu giúp bạn hiểu và chăm sóc cơ thể mỗi ngày'
       );
+      setLayout(initialLayout === 'lookbook' ? 'lookbook' : 'grid');
       setBooks(
         Array.isArray(initialBooks) && initialBooks.length > 0
           ? initialBooks.map((b) => ({
@@ -72,7 +81,7 @@ export default function EditRecommendedBooksModal({
       );
       setErrorMsg('');
     }
-  }, [isOpen, initialTitle, initialSubtitle, initialBooks]);
+  }, [isOpen, initialTitle, initialSubtitle, initialBooks, initialLayout]);
 
   if (!isOpen) return null;
 
@@ -229,6 +238,7 @@ export default function EditRecommendedBooksModal({
         recommended_books_title: title.trim(),
         recommended_books_subtitle: subtitle.trim(),
         recommended_books: cleanBooks,
+        recommended_books_layout: layout,
       });
 
       if (res.success) {
@@ -236,6 +246,7 @@ export default function EditRecommendedBooksModal({
           title: title.trim(),
           subtitle: subtitle.trim(),
           books: cleanBooks,
+          layout,
         });
         onClose();
       } else {
@@ -335,6 +346,62 @@ export default function EditRecommendedBooksModal({
                 placeholder="Ví dụ: Tài liệu tham khảo chuyên sâu giúp bạn hiểu và chăm sóc cơ thể mỗi ngày"
                 className="w-full p-3 rounded-[12px] bg-white border border-line text-[13px] text-ink focus:border-primary focus:outline-hidden resize-none"
               />
+            </div>
+
+            {/* Cài đặt chế độ hiển thị mặc định cho người xem */}
+            <div>
+              <label className="block text-[13px] font-bold text-ink mb-1.5">
+                Chế độ hiển thị mặc định cho người xem
+              </label>
+              <div className="grid grid-cols-2 gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setLayout('grid')}
+                  className={`flex items-center gap-2 p-2.5 rounded-[12px] border text-left transition-all cursor-pointer ${
+                    layout === 'grid'
+                      ? 'bg-primary/5 border-primary text-primary font-bold shadow-xs'
+                      : 'bg-white border-line text-ink hover:bg-surface-2'
+                  }`}
+                >
+                  <div
+                    className={`w-7 h-7 rounded-[8px] flex items-center justify-center shrink-0 ${
+                      layout === 'grid'
+                        ? 'bg-primary text-white'
+                        : 'bg-surface-2 text-muted'
+                    }`}
+                  >
+                    <LayoutGrid size={15} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[13px] font-bold leading-tight">Dạng lưới (Grid)</p>
+                    <p className="text-[11px] text-muted leading-tight mt-0.5">2 cột gọn gàng</p>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setLayout('lookbook')}
+                  className={`flex items-center gap-2 p-2.5 rounded-[12px] border text-left transition-all cursor-pointer ${
+                    layout === 'lookbook'
+                      ? 'bg-primary/5 border-primary text-primary font-bold shadow-xs'
+                      : 'bg-white border-line text-ink hover:bg-surface-2'
+                  }`}
+                >
+                  <div
+                    className={`w-7 h-7 rounded-[8px] flex items-center justify-center shrink-0 ${
+                      layout === 'lookbook'
+                        ? 'bg-primary text-white'
+                        : 'bg-surface-2 text-muted'
+                    }`}
+                  >
+                    <List size={15} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[13px] font-bold leading-tight">Dạng danh sách</p>
+                    <p className="text-[11px] text-muted leading-tight mt-0.5">Chi tiết kèm mô tả</p>
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
 

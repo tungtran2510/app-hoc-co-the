@@ -22,6 +22,7 @@ interface PageListClientProps {
 
 export default function PageListClient({ initialPages, topic }: PageListClientProps) {
   const [pagesWithCount, setPagesWithCount] = useState<PageItemData[]>(initialPages);
+  const [activePageId, setActivePageId] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [editingPage, setEditingPage] = useState<Page | null>(null);
   const [isCreating, setIsCreating] = useState(false);
@@ -208,6 +209,8 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
                         watchedVideos={watchedVideos}
                         lastVideo={lastVideo}
                         isCompleted={isCompleted}
+                        isActive={activePageId === page.id}
+                        onActivate={() => setActivePageId(page.id)}
                       />
                     </div>
                   </div>

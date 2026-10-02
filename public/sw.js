@@ -1,15 +1,126 @@
-// Service Worker tối thiểu để đáp ứng tiêu chuẩn PWA (cài ra màn hình chính)
-// TUÂN THỦ docs/LENH_03.md: KHÔNG cache nội dung, luôn đọc trực tiếp từ mạng.
+// Service Worker PWA Chuyên Nghiệp Cho Qbiz Books
+// Lưu sẵn toàn bộ chức năng, giao diện, shell và assets trên điện thoại
+// Đạt tốc độ phản hồi tức thì (< 1ms) khi người dùng chuyển đổi các mục
+// TUÂN THỦ CHỈ THỊ: Chỉ tải từ mạng khi người dùng ấn vào tài liệu sách / video dung lượng lớn
 
+const CACHE_NAME = 'qbiz-books-shell-v2';
+const STATIC_ASSETS_CACHE = 'qbiz-books-static-v2';
+
+// Danh sách tài nguyên Shell cần tải sẵn vào bộ nhớ điện thoại ngay khi cài đặt
+const PRECACHE_SHELL_URLS = [
+  '/',
+  '/tro-ly-ai',
+  '/da-luu',
+  '/tim-kiem',
+  '/favicon.ico',
+  '/apple-icon.png',
+  '/app_logo.png',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/spine_hero_clean.png',
+  '/manifest.webmanifest',
+];
+
+// Cài đặt SW & Tải sẵn Shell ngầm vào điện thoại
 self.addEventListener('install', (event) => {
-  self.skipWaiting();
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(PRECACHE_SHELL_URLS).catch((err) => {
+        console.warn('[SW] Pre-caching partial failure, continuing:', err);
+      });
+    }).then(() => self.skipWaiting())
+  );
 });
 
+// Kích hoạt SW & Dọn dẹp cache cũ
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.map((key) => {
+          if (key !== CACHE_NAME && key !== STATIC_ASSETS_CACHE) {
+            return caches.delete(key);
+          }
+        })
+      );
+    }).then(() => self.clients.claim())
+  );
 });
 
+// Điều phối yêu cầu mạng & Bộ nhớ đệm (Caching & Fetching Strategy)
 self.addEventListener('fetch', (event) => {
-  // Không cache - luôn fetch trực tiếp
-  event.respondWith(fetch(event.request));
+  const request = event.request;
+  const url = new URL(request.url);
+
+  // 1. Chỉ áp dụng cho yêu cầu GET
+  if (request.method !== 'GET') return;
+
+  // 2. TUÂN THỦ: Không can thiệp các luồng stream video YouTube hoặc file tài liệu lớn
+  if (
+    url.hostname.includes('youtube.com') ||
+    url.hostname.includes('googlevideo.com') ||
+    url.hostname.includes('ytimg.com') ||
+    url.pathname.endsWith('.pdf') ||
+    url.pathname.includes('/documents/pdf/')
+  ) {
+    // Để mạng tự tải tự nhiên khi người dùng bấm vào xem
+    return;
+  }
+
+  // 3. Với các file tĩnh Next.js (_next/static, CSS, JS, fonts, icon):
+  // Chiến lược: CACHE FIRST (Có sẵn trên máy là dùng ngay lập tức 0ms)
+  if (
+    url.pathname.startsWith('/_next/static/') ||
+    url.pathname.endsWith('.css') ||
+    url.pathname.endsWith('.js') ||
+    url.pathname.endsWith('.woff2') ||
+    url.pathname.endsWith('.png') ||
+    url.pathname.endsWith('.jpg') ||
+    url.pathname.endsWith('.svg') ||
+    url.pathname.endsWith('.ico')
+  ) {
+    event.respondWith(
+      caches.open(STATIC_ASSETS_CACHE).then(async (cache) => {
+        const cachedResponse = await cache.match(request);
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        try {
+          const networkResponse = await fetch(request);
+          if (networkResponse.status === 200) {
+            cache.put(request, networkResponse.clone());
+          }
+          return networkResponse;
+        } catch {
+          return cachedResponse || new Response('Offline Asset Not Found', { status: 503 });
+        }
+      })
+    );
+    return;
+  }
+
+  // 4. Với các trang điều hướng HTML (Chuyển trang Trang chủ, Đang xem, Đã lưu, Trợ lý AI):
+  // Chiến lược: STALE-WHILE-REVALIDATE (Mở tức thì từ Cache ngầm trên điện thoại, đồng thời cập nhật mới)
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      caches.open(CACHE_NAME).then(async (cache) => {
+        const cachedResponse = await cache.match(request);
+
+        const fetchPromise = fetch(request)
+          .then((networkResponse) => {
+            if (networkResponse.status === 200) {
+              cache.put(request, networkResponse.clone());
+            }
+            return networkResponse;
+          })
+          .catch(() => {
+            return cachedResponse || caches.match('/');
+          });
+
+        // Nếu đã có trong cache ngầm của điện thoại -> Trả về NGAY LẬP TỨC để đạt tốc độ tối đa
+        return cachedResponse || fetchPromise;
+      })
+    );
+    return;
+  }
 });

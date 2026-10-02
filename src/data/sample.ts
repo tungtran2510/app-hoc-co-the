@@ -10,7 +10,7 @@ export const DEFAULT_AUTHOR_PROFILE: AuthorProfile = {
   books: [
     {
       id: 'book-1',
-      title: 'Hiểu Đúng Về Cột Sống',
+      title: 'Hiểu Đúng Cột Sống',
       cover_url: '/documents/covers/cover_hieu_dung_ve_cot_song.png',
       description: 'Cẩm nang toàn diện giải mã cơ chế thoát vị đĩa đệm, thoái hóa và giải pháp vận động tự phục hồi.',
       year: '2025',
@@ -18,7 +18,7 @@ export const DEFAULT_AUTHOR_PROFILE: AuthorProfile = {
     },
     {
       id: 'book-2',
-      title: 'Tự Chữa Lành Lưng & Cổ',
+      title: 'Phục Hồi Lưng Cổ',
       cover_url: '/documents/covers/cover_tu_chua_lanh_lung_co.png',
       description: 'Các bài tập sinh cơ học đơn giản, 15 phút mỗi ngày giúp bảo vệ và phục hồi đường cong sinh lý.',
       year: '2024',
@@ -38,7 +38,7 @@ export const DEFAULT_AUTHOR_PROFILE: AuthorProfile = {
 export const DEFAULT_RECOMMENDED_BOOKS: RecommendedBook[] = [
   {
     id: 'rec-book-1',
-    title: 'Lắng Nghe Cơ Thể Để Tự Chữa Lành',
+    title: 'Lắng Nghe Cơ Thể',
     category: 'Cơ Xương Khớp',
     badge_tag: 'TÀI LIỆU NÊN ĐỌC',
     cover_url: '/documents/covers/cover_lang_nghe_co_the.png',
@@ -52,7 +52,7 @@ export const DEFAULT_RECOMMENDED_BOOKS: RecommendedBook[] = [
   },
   {
     id: 'rec-book-2',
-    title: 'Giải Mã Cột Sống & Vận Động Đúng',
+    title: 'Giải Mã Cột Sống',
     category: 'Cột Sống & Đĩa Đệm',
     badge_tag: 'TÀI LIỆU NÊN ĐỌC',
     cover_url: '/documents/covers/cover_giai_ma_cot_song.png',
@@ -66,7 +66,7 @@ export const DEFAULT_RECOMMENDED_BOOKS: RecommendedBook[] = [
   },
   {
     id: 'rec-book-3',
-    title: 'Dinh Dưỡng Kháng Viêm & Tái Tạo Khớp',
+    title: 'Dinh Dưỡng Kháng Viêm',
     category: 'Dinh Dưỡng Phục Hồi',
     badge_tag: 'TÀI LIỆU NÊN ĐỌC',
     cover_url: '/documents/covers/cover_dinh_duong_khang_viem.png',
@@ -76,7 +76,7 @@ export const DEFAULT_RECOMMENDED_BOOKS: RecommendedBook[] = [
   },
   {
     id: 'rec-book-4',
-    title: 'Cẩm Nang Bảo Vệ Đốt Sống Cổ',
+    title: 'Bảo Vệ Đốt Sống Cổ',
     category: 'Cột Sống Cổ & Vai Gáy',
     badge_tag: 'TÀI LIỆU NÊN ĐỌC',
     cover_url: '/documents/covers/cover_cam_nang_dot_song_co.png',
@@ -87,94 +87,85 @@ export const DEFAULT_RECOMMENDED_BOOKS: RecommendedBook[] = [
 ];
 
 export const DEFAULT_AI_TRAINING: AiTrainingConfig = {
-  guidelines: `1. VAI TRÒ CHUYÊN MÔN: Trợ lý Sức Khỏe AI đồng hành chia sẻ kiến thức chuẩn mực về 4 trụ cột sức khỏe: Cột sống xương khớp & Giải pháp DoctorLoan, Nước & Điện giải Gems, Dinh dưỡng chuyên sâu & Tiêu hóa, Giải phẫu học ứng dụng cơ thể người theo tài liệu đào tạo của tác giả.
-2. NGUYÊN TẮC AN TOÀN Y KHOA: Cung cấp thông tin giáo dục khoa học, cơ chế sinh học và giải pháp chăm sóc tự nhiên, không đưa ra chẩn đoán hay điều trị y tế thay thế bác sĩ chuyên khoa.
-3. PHONG CÁCH TRẢ LỜI: Luôn trả lời ngắn gọn (1-2 câu, tối đa 40-50 từ), đi thẳng vào kết luận theo tài liệu tác giả và điều hướng mở bài học trong hệ thống để xem chi tiết.
-4. TUYỆT ĐỐI CẤM: Tuyệt đối không nhắc đến các cụm từ như "tác giả không phải bác sĩ", "Tùng không phải bác sĩ" hay giải thích danh xưng.`,
+  guidelines: `1. VAI TRÒ CHUYÊN MÔN: Trợ lý Sức Khỏe AI đồng hành, hướng dẫn người học khám phá kiến thức y khoa, giải phẫu học cơ thể người, cơ chế sinh học, thói quen sinh hoạt đúng và dinh dưỡng cân bằng tế bào dựa trên chính tài liệu và bài giảng của tác giả Tùng dinh dưỡng trong ứng dụng "Học Cơ Thể".
+2. BẢN CHẤT ỨNG DỤNG - KHÔNG BÁN HÀNG: Đây là ứng dụng giáo dục và hướng dẫn học tập, tuyệt đối KHÔNG PHẢI kênh bán hàng thương mại. CẤM TUYỆT ĐỐI các hành vi: chào mời mua sản phẩm, báo giá, xin số điện thoại, xưng hô nịnh nọt bán hàng ("khách yêu", "mình ơi", "em xin phép...").
+3. NGUYÊN TẮC AN TOÀN PHÁP LÝ (BẮT BUỘC):
+   - CẤM TUYỆT ĐỐI các từ: "y khoa chữa bệnh", "khám chữa bệnh", "chữa bệnh", "chữa trị", "điều trị", "hỗ trợ điều chỉnh" (hay "hỗ trợ điều chỉnh cột sống").
+   - CẤM nói: "tác giả không phải bác sĩ", "Tùng không phải bác sĩ" hay giải thích danh xưng.
+   - TRỌNG TÂM TỪ NGỮ: Dùng các cụm từ chuẩn mực: "hỗ trợ điều chỉnh tư thế", "bảo vệ và điều chỉnh cột sống", "chăm sóc cột sống chủ động", "hướng dẫn học tập theo tài liệu".
+   - HẠN CHẾ SÁNG CHẾ: Tuyệt đối không tự ca ngợi hay nhắc đi nhắc lại "bằng sáng chế độc quyền". Nếu cần nhắc đến công cụ DoctorLoan, chỉ mở ngoặc ngắn gọn: (đã được cấp sáng chế).
+4. PHONG CÁCH TRẢ LỜI & ĐIỀU HƯỚNG VÀO TÀI LIỆU:
+   - Trả lời siêu ngắn gọn (1 đến 2 câu ngắn, khoảng 30 - 50 từ), đi thẳng vào giải thích cơ chế khoa học theo tài liệu của tác giả.
+   - Luôn định hướng người học mở đúng bài học và tài liệu liên quan trong hệ thống (chọn 1-2 bài học phù hợp nhất) để xem video, hình ảnh và hướng dẫn chi tiết.
+   - Khách có dấu hiệu bệnh lý nặng hoặc báo động đỏ (Red Flags): Khuyên thẳng thắn, dứt khoát đến cơ sở y tế chuyên khoa để được bác sĩ thăm khám.`,
   documents: [
     {
-      id: 'doc-cot-song-1',
-      title: 'Cột sống, Đĩa đệm & Cơ chế thoái hóa xương khớp',
-      content: `Cột sống gồm 33-34 đốt sống tạo thành 4 đường cong sinh lý tự nhiên. Đĩa đệm đóng vai trò giảm chấn sinh học gồm vòng sợi và nhân nhầy ngậm nước. Nguyên nhân cốt lõi thoái hóa là sự mất đường cong sinh lý, sai lệch trục chịu lực và thiếu vận động thẩm thấu dưỡng chất.`,
+      id: 'doc-01-cotsong-doctorloan',
+      title: 'Cột Sống, Đĩa Đệm & Cơ Chế Bảo Vệ, Hỗ Trợ Điều Chỉnh Tư Thế',
+      content: `Cột sống người gồm 33-34 đốt sống tạo thành 4 đường cong sinh lý tự nhiên (cổ, ngực, thắt lưng, cùng cụt). Đĩa đệm đóng vai trò giảm xóc sinh học với nhân nhầy ngậm nước và vòng sợi bao quanh, nhận dinh dưỡng qua cơ chế thẩm thấu khi vận động.
+Nguyên nhân cốt lõi gây đau mỏi, thoái hóa là sai lệch trục chịu lực, mất đường cong sinh lý do thói quen ngồi gù lưng, cúi đầu bấm điện thoại hoặc mang vác sai tư thế.
+Giải pháp bảo vệ cột sống gồm 3 phần: (1) Nâng cao nhận thức về tư thế sinh hoạt đúng; (2) Sử dụng công cụ hỗ trợ điều chỉnh tư thế DoctorLoan (đã được cấp sáng chế) để giải tỏa áp lực đĩa đệm khi ngồi, nằm, ngủ, lái xe; (3) Tập luyện phục hồi hệ cơ lõi và duy trì thói quen vận động khoa học.
+Phản ứng thích nghi: Cảm giác căng tức, mỏi cơ nhẹ trong 1-3 ngày đầu là hiện tượng bình thường khi cơ bắp co rút được kéo giãn và điều chỉnh lại. Nếu xuất hiện đau dữ dội hoặc tê yếu chi, cần dừng lại và kiểm tra y tế chuyên khoa.`,
       updated_at: '2026-10-02T00:00:00.000Z',
     },
     {
-      id: 'doc-doctorloan-1',
-      title: 'Giải pháp DoctorLoan: Định hình & Phục hồi trục cột sống tự nhiên',
-      content: `Giải pháp DoctorLoan tạo lực uốn nắn đa chiều tái tạo và giữ vững độ cong sinh lý chuẩn của cột sống cổ và thắt lưng. Thiết bị mở rộng khe gian đốt sống, giải áp lực nội đĩa đệm, giải phóng chèn ép rễ thần kinh và cân chỉnh khung chậu.`,
+      id: 'doc-02-nuoc-hydro-gems',
+      title: 'Nước Hydro Gems & Quản Trị Nguồn Nước Uống Cấp Tế Bào',
+      content: `Nước chiếm 55-70% trọng lượng cơ thể, là môi trường dung môi cho toàn bộ phản ứng sinh hóa, vận chuyển dưỡng chất và thanh lọc độc tố tế bào.
+Nguyên lý chăm sóc sức khỏe chủ động qua nguồn nước: Giúp mỗi gia đình tự đo lường, kiểm tra và quản trị chất lượng nước uống tại nhà bằng các công cụ đo trực quan (test pH, test chống oxy hóa ORP, độ tinh khiết TDS, kích thước phân tử nước).
+3 đặc tính khoa học của Nước Gems: (1) Tính kiềm tự nhiên: Giúp trung hòa lượng axit dư thừa sinh ra từ chuyển hóa và căng thẳng; (2) Giàu Hydrogen hòa tan: Hoạt chất chống oxy hóa mạnh giúp trung hòa gốc tự do và bảo vệ màng tế bào; (3) Cụm phân tử nước siêu nhỏ: Thẩm thấu sâu vào tế bào, hỗ trợ chuyển hóa và đào thải cặn bã hiệu quả. Nước là nền tảng môi trường sống của tế bào, không phải là thuốc.`,
       updated_at: '2026-10-02T00:00:00.000Z',
     },
     {
-      id: 'doc-doctorloan-2',
-      title: 'Bộ bài tập chuẩn DoctorLoan & Phản ứng chỉnh hình sinh học',
-      content: `Bài tập chuẩn DoctorLoan kết hợp tư thế nằm trên thiết bị chỉnh hình chuyên dụng với nhịp thở điều hòa và co gập chân nhẹ nhàng. Phản ứng chỉnh hình: Trong 3-7 ngày đầu có thể thấy căng tức hoặc hơi mỏi do các đốt sống và cơ co rút đang được nắn về vị trí chuẩn.`,
+      id: 'doc-03-dinh-duong-te-bao',
+      title: 'Dinh Dưỡng Cân Bằng Tế Bào & Cơ Chế Chuyển Hóa Kháng Viêm',
+      content: `Triết lý dinh dưỡng cốt lõi: 'Tiền không cứu được sức khỏe – chỉ tư duy và kiến thức đúng mới cứu được.' Không hỏi cơ thể mắc bệnh gì, mà cần hiểu hệ thống đang rối loạn ở khâu nào để tái lập cân bằng.
+4 nguyên tắc can thiệp dinh dưỡng chuẩn mực: (1) Đảm bảo đủ năng lượng cho hoạt động tế bào; (2) Đầy đủ dưỡng chất đa lượng và vi lượng thiết yếu (đạm chất lượng cao, omega-3, canxi, magie, vitamin D, K2 nuôi dưỡng hệ cơ xương khớp); (3) Cân đối tỷ lệ Protein - Lipid - Glucid, ưu tiên tinh bột phức hợp và chất béo tốt; (4) Đa dạng thực phẩm tự nhiên, giảm đường tinh luyện và thực phẩm siêu chế biến gây viêm âm thầm.
+Khung phục hồi 3 tầng: Dinh dưỡng nuôi dưỡng nền tế bào từ gốc -> Công cụ hỗ trợ tuần hoàn, giải cơ -> Hệ tiêu hóa và đường ruột thông suốt để hấp thu tối ưu.`,
       updated_at: '2026-10-02T00:00:00.000Z',
     },
     {
-      id: 'doc-nuoc-gems-1',
-      title: 'Nước Gems: Bản chất của nước tốt đối với tế bào & Sức khỏe',
-      content: `Nước tốt ion kiềm giàu hydro Gems sở hữu 4 đặc tính vàng: Tính kiềm tự nhiên pH 8.5-9.5 trung hòa axit dư thừa; Khả năng chống oxy hóa ORP âm sâu triệt tiêu gốc tự do; Cụm phân tử nước siêu nhỏ thẩm thấu cấp nước tức thì; Giàu khoáng chất ion Ca, Mg, K dễ hấp thu.`,
-      updated_at: '2026-10-02T00:00:00.000Z',
-    },
-    {
-      id: 'doc-nuoc-gems-2',
-      title: 'Quy trình chuẩn Demo Test Nước Gems & Thí nghiệm thực nghiệm',
-      content: `4 thí nghiệm trực quan: Test pH bằng dung dịch chỉ thị (tím kiềm vs vàng axit); Test chống oxy hóa với Betadine (nước Gems khử trong suốt tức thì); Test cụm phân tử nước nhỏ pha trà mạn nước nguội bừng sắc trà; Test hòa tan bẻ gãy dầu mỡ làm sạch lòng mạch.`,
-      updated_at: '2026-10-02T00:00:00.000Z',
-    },
-    {
-      id: 'doc-dinh-duong-1',
-      title: 'Dinh dưỡng nền tảng & Dinh dưỡng chuyên sâu cấp độ tế bào',
-      content: `Dinh dưỡng chuyên sâu gồm: Đa lượng sinh năng lượng (Đạm xây cơ sụn, Chất béo bảo vệ màng tế bào, Tinh bột phức tạo năng lượng ổn định); Vi lượng xúc tác sinh hóa (Vitamin & khoáng chất canxi, magie, kẽm xúc tác tạo ATP trong ty thể).`,
-      updated_at: '2026-10-02T00:00:00.000Z',
-    },
-    {
-      id: 'doc-dinh-duong-2',
-      title: 'Cơ chế hoạt động hệ tiêu hóa & Hấp thu dưỡng chất',
-      content: `Hệ tiêu hóa: Khoang miệng nhai kỹ nghiền nhỏ và men amylase; Dạ dày axit mạnh phân giải đạm; Tá tràng nhận dịch mật và men tụy; Ruột non hấp thu 90% dưỡng chất qua vi nhung mao; Đại tràng hấp thu nước và nuôi dưỡng hệ vi sinh microbiome.`,
-      updated_at: '2026-10-02T00:00:00.000Z',
-    },
-    {
-      id: 'doc-giai-phau-1',
-      title: 'Giải phẫu học xương khớp ứng dụng & Cân bằng chuyển động',
-      content: `Khớp háng và đốt sống thắt lưng hoạt động theo cơ chế bản lề động. Khi khớp háng cứng hoặc cơ mông yếu, cột sống thắt lưng chịu tải thay thế dẫn đến thoát vị. Cần giải phóng điểm căng cứng cơ và kích hoạt nhóm cơ giữ trục bảo vệ cột sống.`,
-      updated_at: '2026-10-02T00:00:00.000Z',
-    },
-    {
-      id: 'doc-giai-phau-2',
-      title: 'Giải phẫu đường tiêu hóa & Các tạng phụ trợ (Gan - Mật - Tụy)',
-      content: `Ống tiêu hóa từ miệng đến đại tràng kết hợp chặt chẽ với 3 tạng phụ trợ: Gan lọc thải độc và tiết mật liên tục; Túi mật cô đặc và co bóp dự trữ dịch mật; Tuyến tụy tiết enzyme tiêu hóa và hormone insulin cân bằng chuyển hóa.`,
+      id: 'doc-04-giai-phau-van-dong',
+      title: 'Giải Phẫu Hệ Vận Động, Chuỗi Động Học & Cảnh Báo An Toàn Y Tế',
+      content: `Cột sống không đứng độc lập mà nằm trong chuỗi động học liên hoàn: Bàn chân -> Khớp gối -> Khớp háng -> Khung chậu -> Cột sống thắt lưng -> Cột sống cổ. Khi một mắt xích bị sai lệch (như cơ mông yếu, khớp háng cứng), cột sống sẽ phải chịu lực bù trừ dẫn đến tổn thương đĩa đệm.
+Ranh giới an toàn: Các can thiệp xâm lấn, phẫu thuật hoặc kê đơn thuốc thuộc thẩm quyền y khoa tại bệnh viện. Giải pháp học tập và chăm sóc tại nhà là phi xâm lấn, tập trung vào điều chỉnh tư thế, dinh dưỡng và bài tập vận động.
+Dấu hiệu cảnh báo đỏ (Red Flags) cần đi viện ngay: Đau nhói dữ dội lan nhanh xuống chi dưới, tê bì yếu liệt chân tay, mất cảm giác hoặc rối loạn đại tiểu tiện (hội chứng chùm đuôi ngựa).`,
       updated_at: '2026-10-02T00:00:00.000Z',
     },
   ],
   faqs: [
     {
-      id: 'faq-1',
-      question: 'Thoát vị đĩa đệm có dùng được giải pháp DoctorLoan không?',
-      answer: 'Hoàn toàn dùng được và rất hiệu quả. Giải pháp DoctorLoan giúp nắn chỉnh lại đường cong sinh lý tự nhiên, giải áp lực nén ép đĩa đệm và mở rộng khe gian đốt sống để đĩa đệm tự phục hồi.',
+      id: 'faq-01',
+      question: 'Tại sao ngồi nhiều hay bị đau lưng và mỏi cổ vai gáy?',
+      answer: 'Vấn đề bắt nguồn từ việc mất đường cong sinh lý và áp lực đè nén liên tục lên đĩa đệm khi ngồi sai tư thế. Mời bạn mở bài học "Tư thế chuẩn & Vận động giải áp" trong chủ đề Cột Sống để nắm rõ các bài tập giải nén cột sống.',
     },
     {
-      id: 'faq-2',
-      question: 'Tại sao mới nằm gối DoctorLoan lại thấy hơi tức hoặc mỏi lưng?',
-      answer: 'Đây là phản ứng chỉnh hình sinh học bình thường khi các đốt sống và dải cơ bị co rút sai lệch nhiều năm đang được kéo giãn định vị lại về trục chuẩn tự nhiên. Cảm giác này sẽ hết sau vài ngày.',
+      id: 'faq-02',
+      question: 'Thoát vị đĩa đệm thì giải pháp DoctorLoan hỗ trợ thế nào?',
+      answer: 'Giải pháp DoctorLoan (đã được cấp sáng chế) hỗ trợ điều chỉnh tư thế tự nhiên khi ngồi, nằm, ngủ để giải tỏa áp lực đĩa đệm và phục hồi hệ cơ. Mời bạn xem chi tiết tại bài học "Đĩa đệm và cơ chế giảm xóc" trong chủ đề Cột Sống.',
     },
     {
-      id: 'faq-3',
-      question: 'Nước ion kiềm Gems khác gì so với nước lọc RO thông thường?',
-      answer: 'Nước RO thông thường có tính axit nhẹ và mất hết khoáng chất. Nước Gems giàu hydro, có độ pH kiềm tự nhiên 8.5-9.5, chỉ số chống oxy hóa ORP âm sâu và cụm phân tử nước siêu nhỏ giúp thẩm thấu cấp nước tế bào tức thì.',
+      id: 'faq-03',
+      question: 'Mới sử dụng gối hoặc thiết bị điều chỉnh tư thế thấy hơi mỏi thì có sao không?',
+      answer: 'Đây là phản ứng thích nghi sinh học bình thường trong 1-3 ngày đầu khi các nhóm cơ co rút lâu ngày được kéo giãn và điều chỉnh lại. Bạn hãy xem hướng dẫn chi tiết trong bài "Tư thế chuẩn & Vận động giải áp".',
     },
     {
-      id: 'faq-4',
-      question: 'Cách thực hiện bài test nước phân tử nhỏ bằng trà mạn như thế nào?',
-      answer: 'Lấy 2 cốc nước nguội (1 cốc nước thường, 1 cốc nước Gems), thả cùng một lượng trà mạn khô vào. Cốc nước thường không thể đổi màu trà, trong khi nước Gems lập tức bừng sắc vàng óng của trà vì cụm phân tử nước siêu nhỏ thẩm thấu xuyên qua lá trà.',
+      id: 'faq-04',
+      question: 'Nước Hydro Gems có điểm gì khác biệt so với nước thông thường?',
+      answer: 'Nước Gems có 3 đặc tính sinh học: tính kiềm tự nhiên bù khoáng, giàu hydrogen chống oxy hóa và cụm phân tử nước siêu nhỏ thẩm thấu nhanh. Bạn hãy mở bài học "Nước & Điện Giải" để xem chi tiết thí nghiệm đo lường.',
     },
     {
-      id: 'faq-5',
-      question: 'Tại sao nhai kỹ lại là bước quan trọng nhất của hệ tiêu hóa?',
-      answer: 'Nhai kỹ giúp nghiền nhỏ cơ học thức ăn và hòa trộn men amylase trong nước bọt, giảm tải tới 70% gánh nặng nghiền bóp cho dạ dày, ngăn ngừa viêm loét và giúp ruột non hấp thu dưỡng chất tối đa.',
+      id: 'faq-05',
+      question: 'Người hay đau mỏi xương khớp thì dinh dưỡng cần bổ sung gì?',
+      answer: 'Cần ưu tiên đạm chất lượng, omega-3, các vi khoáng canxi, magie, vitamin D3, K2 và chăm sóc đường ruột để tăng hấp thu. Bạn hãy xem cụ thể trong chủ đề "Dinh Dưỡng Nền Tảng".',
     },
     {
-      id: 'faq-6',
+      id: 'faq-06',
+      question: 'DoctorLoan có phải là thuốc hay chữa dứt điểm bệnh không?',
+      answer: 'DoctorLoan là giải pháp hỗ trợ điều chỉnh tư thế tự nhiên (đã được cấp sáng chế), không phải là thuốc và không thay thế can thiệp y tế. Mời bạn tham khảo tài liệu học tập trong hệ thống để nắm vững phương pháp chăm sóc cột sống chủ động.',
+    },
+    {
+      id: 'faq-07',
       question: 'Muốn phòng ngừa thoái hóa cột sống cổ khi làm việc văn phòng thì làm thế nào?',
       answer: 'Cần giữ màn hình máy tính ngang tầm mắt để cổ không bị cúi gập, duy trì tư thế ngồi thẳng lưng và cứ sau mỗi 45-60 phút nên đứng dậy vận động xoay vai nhẹ nhàng để đĩa đệm được bơm hút dịch dinh dưỡng.',
     },
@@ -197,8 +188,9 @@ export const sampleSettings: Settings = {
   home_title: 'Hôm nay mình học gì?',
   search_placeholder: 'Tìm bài, ví dụ: đĩa đệm',
   topics_title: 'Chuyên Đề Học',
-  recommended_books_title: 'Tài Liệu Y Khoa Chuyên Sâu',
+  recommended_books_title: 'Tài Liệu Y Khoa',
   recommended_books_subtitle: 'Tài liệu tham khảo chuyên sâu giúp bạn hiểu và chăm sóc cơ thể mỗi ngày',
+  recommended_books_layout: 'grid',
   recommended_books: DEFAULT_RECOMMENDED_BOOKS,
   home_sections_order: [
     'topics',
