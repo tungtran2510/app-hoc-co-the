@@ -49,23 +49,33 @@ export async function POST(req: NextRequest) {
     };
 
     const existingAuthorProfile = existing?.author_profile || {};
+    
+    // Đồng bộ 2 chiều hoàn hảo giữa settings.hotline/zalo_url và author_profile.phone/zalo_url
+    const finalHotline = settings.hotline !== undefined 
+      ? settings.hotline 
+      : (settings.author_profile?.phone !== undefined ? settings.author_profile.phone : (existing?.hotline ?? existingAuthorProfile.phone ?? '0974.248.716'));
+
+    const finalZaloUrl = settings.zalo_url !== undefined 
+      ? settings.zalo_url 
+      : (settings.author_profile?.zalo_url !== undefined ? settings.author_profile.zalo_url : (existing?.zalo_url ?? existingAuthorProfile.zalo_url ?? 'https://zalo.me/0987792400'));
+
     const updatedAuthorProfile = {
       ...existingAuthorProfile,
       ...(settings.author_profile || {}),
-      phone: settings.hotline !== undefined ? settings.hotline : (settings.author_profile?.phone ?? existingAuthorProfile.phone ?? existing?.hotline ?? null),
-      zalo_url: settings.zalo_url !== undefined ? settings.zalo_url : (settings.author_profile?.zalo_url ?? existingAuthorProfile.zalo_url ?? existing?.zalo_url ?? null),
+      phone: finalHotline,
+      zalo_url: finalZaloUrl,
     };
 
     const merged = {
       workspace_id: settings.workspace_id || existing?.workspace_id || 'default',
-      app_name: settings.app_name ?? existing?.app_name ?? 'Sống Khỏe Mỗi Ngày',
+      app_name: settings.app_name ?? existing?.app_name ?? 'Qbiz Books',
       logo_url: settings.logo_url !== undefined ? settings.logo_url : (existing?.logo_url ?? null),
-      primary_color: settings.primary_color ?? existing?.primary_color ?? '#1D58D8',
+      primary_color: settings.primary_color ?? existing?.primary_color ?? '#0C0817',
       access_mode: settings.access_mode ?? existing?.access_mode ?? 'OPEN',
       block_styles: updatedBlockStyles,
       expert_title: settings.expert_title !== undefined ? settings.expert_title : (existing?.expert_title ?? null),
-      hotline: settings.hotline !== undefined ? settings.hotline : (existing?.hotline ?? null),
-      zalo_url: settings.zalo_url !== undefined ? settings.zalo_url : (existing?.zalo_url ?? null),
+      hotline: finalHotline,
+      zalo_url: finalZaloUrl,
       author_profile: updatedAuthorProfile,
       admin_password: settings.admin_password ?? existing?.admin_password ?? null,
       updated_at: new Date().toISOString(),

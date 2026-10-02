@@ -104,6 +104,10 @@ export default function EditSingleVideoModal({
       alert('Vui lòng nhập tiêu đề cho video.');
       return;
     }
+    if (urlInput.trim() && !detectedId) {
+      alert('Đường dẫn YouTube không hợp lệ. Vui lòng dán link dạng youtube.com/watch?v=... hoặc youtu.be/... hoặc ID 11 ký tự.');
+      return;
+    }
 
     const yid = detectedId || (video?.youtube_id ?? '');
 

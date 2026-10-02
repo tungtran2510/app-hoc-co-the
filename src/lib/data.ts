@@ -60,7 +60,9 @@ export function normalizeAuthorProfile(raw?: any): AuthorProfile {
     ...raw,
     name: raw.name?.trim() ? raw.name : DEFAULT_AUTHOR_PROFILE.name,
     title: raw.title?.trim() ? raw.title : DEFAULT_AUTHOR_PROFILE.title,
-    bio: raw.bio !== undefined ? raw.bio : DEFAULT_AUTHOR_PROFILE.bio,
+    avatar_url: raw.avatar_url !== undefined && raw.avatar_url !== null && raw.avatar_url !== '' ? raw.avatar_url : DEFAULT_AUTHOR_PROFILE.avatar_url,
+    extra_title: raw.extra_title !== undefined && raw.extra_title !== null && raw.extra_title !== '' ? raw.extra_title : DEFAULT_AUTHOR_PROFILE.extra_title,
+    extra_content: raw.extra_content !== undefined && raw.extra_content !== null && raw.extra_content !== '' ? raw.extra_content : DEFAULT_AUTHOR_PROFILE.extra_content,
     books: Array.isArray(raw.books) && raw.books.length > 0
       ? raw.books.map((b: any) => ({
           ...b,
@@ -68,12 +70,12 @@ export function normalizeAuthorProfile(raw?: any): AuthorProfile {
           is_visible: b.is_visible !== undefined ? Boolean(b.is_visible) : true,
         }))
       : DEFAULT_AUTHOR_PROFILE.books,
-    phone: raw.phone !== undefined ? raw.phone : DEFAULT_AUTHOR_PROFILE.phone,
-    zalo_url: raw.zalo_url !== undefined ? raw.zalo_url : DEFAULT_AUTHOR_PROFILE.zalo_url,
-    email: raw.email !== undefined ? raw.email : DEFAULT_AUTHOR_PROFILE.email,
-    facebook_url: raw.facebook_url !== undefined ? raw.facebook_url : DEFAULT_AUTHOR_PROFILE.facebook_url,
-    address: raw.address !== undefined ? raw.address : DEFAULT_AUTHOR_PROFILE.address,
-    contact_note: raw.contact_note !== undefined ? raw.contact_note : DEFAULT_AUTHOR_PROFILE.contact_note,
+    phone: raw.phone !== undefined && raw.phone !== null && raw.phone !== '' ? raw.phone : DEFAULT_AUTHOR_PROFILE.phone,
+    zalo_url: raw.zalo_url !== undefined && raw.zalo_url !== null && raw.zalo_url !== '' ? raw.zalo_url : DEFAULT_AUTHOR_PROFILE.zalo_url,
+    email: raw.email !== undefined && raw.email !== null && raw.email !== '' ? raw.email : DEFAULT_AUTHOR_PROFILE.email,
+    facebook_url: raw.facebook_url !== undefined && raw.facebook_url !== null && raw.facebook_url !== '' ? raw.facebook_url : DEFAULT_AUTHOR_PROFILE.facebook_url,
+    address: raw.address !== undefined && raw.address !== null && raw.address !== '' ? raw.address : DEFAULT_AUTHOR_PROFILE.address,
+    contact_note: raw.contact_note !== undefined && raw.contact_note !== null && raw.contact_note !== '' ? raw.contact_note : DEFAULT_AUTHOR_PROFILE.contact_note,
   };
 }
 
@@ -175,10 +177,22 @@ export async function getSettings(): Promise<Settings> {
           .eq('workspace_id', 'default')
           .single();
         if (data) {
+          const authProfile = normalizeAuthorProfile(data.author_profile);
+          const finalHotline = data.hotline || authProfile.phone || DEFAULT_AUTHOR_PROFILE.phone;
+          const finalZaloUrl = data.zalo_url || authProfile.zalo_url || DEFAULT_AUTHOR_PROFILE.zalo_url;
+
           return {
             ...data,
+            app_name: data.app_name || 'Qbiz Books',
+            primary_color: data.primary_color || '#0C0817',
+            hotline: finalHotline,
+            zalo_url: finalZaloUrl,
             app_subtitle: data.app_subtitle !== undefined ? data.app_subtitle : (data.block_styles?.app_subtitle !== undefined ? data.block_styles.app_subtitle : null),
-            author_profile: normalizeAuthorProfile(data.author_profile),
+            author_profile: {
+              ...authProfile,
+              phone: finalHotline,
+              zalo_url: finalZaloUrl,
+            },
             home_greeting: data.home_greeting || data.block_styles?.home_greeting || 'Xin chào!',
             home_title: data.home_title || data.block_styles?.home_title || 'Hôm nay mình học gì?',
             search_placeholder: data.search_placeholder || data.block_styles?.search_placeholder || 'Tìm bài, ví dụ: đĩa đệm',

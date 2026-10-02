@@ -511,9 +511,14 @@ export default function VideosBlock({
           {currentVideo.youtube_id ? (
             <>
               {isPlaying ? (
-                <div
+                <iframe
+                  key={currentVideo.youtube_id}
                   id={`yt-player-${blockId || 'default'}`}
+                  src={`https://www.youtube.com/embed/${currentVideo.youtube_id}?autoplay=1&rel=0&playsinline=1&modestbranding=1&enablejsapi=1`}
+                  title={currentVideo.title}
                   className="w-full h-full border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
                 />
               ) : (
                 /* Lớp phủ ảnh bên ngoài khi video chưa bắt đầu phát - 0 iframe, siêu nhẹ */

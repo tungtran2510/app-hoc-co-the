@@ -17,6 +17,7 @@ import RecommendedBooksSection from './RecommendedBooksSection';
 import ReorderHomeSectionsModal from './admin/ReorderHomeSectionsModal';
 import EditAuthorModal from './admin/EditAuthorModal';
 import EditAppModal from './admin/EditAppModal';
+import EditSingleAuthorBookModal from './admin/EditSingleAuthorBookModal';
 import BookDetailModal from './BookDetailModal';
 import WelcomeModal from './WelcomeModal';
 import HomeContinueSection from './HomeContinueSection';
@@ -98,6 +99,17 @@ export default function HomeSectionsClient({
   const [showEditAppModal, setShowEditAppModal] = useState(false);
   const [authorModalTab, setAuthorModalTab] = useState<'author' | 'books' | 'contact' | 'extra'>('author');
   const [selectedAuthorBook, setSelectedAuthorBook] = useState<AuthorBook | null>(null);
+  const [editingSingleAuthorBook, setEditingSingleAuthorBook] = useState<AuthorBook | null>(null);
+
+  const handleSaveSingleAuthorBook = async (updatedBook: AuthorBook) => {
+    const books = authorProfile.books || [];
+    const nextBooks = books.map((b) => (b.id === updatedBook.id ? updatedBook : b));
+    const nextProfile = { ...authorProfile, books: nextBooks };
+    setAuthorProfile(nextProfile);
+    if (isAdmin) {
+      await saveSettingsApi({ author_profile: nextProfile });
+    }
+  };
 
   useEffect(() => {
     checkIsAdminClient().then(setIsAdmin);
@@ -394,6 +406,7 @@ export default function HomeSectionsClient({
                 onMoveDown={() => handleMoveSection(index, 'down')}
                 onOpenReorderModal={() => setShowReorderModal(true)}
                 onEdit={() => openAuthorModal('books')}
+                onEditSingleBook={(b) => setEditingSingleAuthorBook(b)}
                 onSelectBook={(b) => setSelectedAuthorBook(b)}
                 onMoveBook={handleMoveAuthorBook}
                 onDeleteBook={handleDeleteAuthorBook}
@@ -566,6 +579,14 @@ export default function HomeSectionsClient({
           setWelcomeMessage(newMessage);
           setWelcomeVideoUrl(newVideo);
         }}
+      />
+
+      {/* Modal Chỉnh sửa ĐÚNG 1 CUỐN SÁCH của tác giả */}
+      <EditSingleAuthorBookModal
+        isOpen={Boolean(editingSingleAuthorBook)}
+        book={editingSingleAuthorBook}
+        onClose={() => setEditingSingleAuthorBook(null)}
+        onSaved={handleSaveSingleAuthorBook}
       />
     </>
   );

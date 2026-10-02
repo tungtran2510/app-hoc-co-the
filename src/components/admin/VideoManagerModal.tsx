@@ -194,6 +194,10 @@ export default function VideoManagerModal({
   // Lưu video mới hoặc cập nhật video
   const handleSaveVideoItem = async () => {
     const yid = extractYouTubeId(inputUrl) || '';
+    if (inputUrl.trim() && !yid) {
+      alert('Đường dẫn YouTube không hợp lệ. Vui lòng kiểm tra lại link (ví dụ: youtube.com/watch?v=... hoặc youtu.be/... hoặc ID 11 ký tự).');
+      return;
+    }
     let finalTitle = inputTitle.trim();
     let finalThumb = inputThumb.trim();
 

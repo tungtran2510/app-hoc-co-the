@@ -48,6 +48,11 @@ export default function ModernBookCover({
   index = 0,
 }: ModernBookCoverProps) {
   const palette = LUXURY_PALETTES[index % LUXURY_PALETTES.length];
+  const [imgError, setImgError] = React.useState(false);
+
+  React.useEffect(() => {
+    setImgError(false);
+  }, [coverUrl]);
 
   return (
     <div
@@ -88,11 +93,12 @@ export default function ModernBookCover({
       />
 
       {/* 3. NỘI DUNG BÌA SÁCH */}
-      {coverUrl ? (
+      {coverUrl && !imgError ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={coverUrl}
           alt={title}
+          onError={() => setImgError(true)}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           loading="lazy"
         />

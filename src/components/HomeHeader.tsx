@@ -185,50 +185,53 @@ export default function HomeHeader({
 
   return (
     <>
-      {/* Thanh đen Admin ở Trang chủ (hiện khi là Admin - tối ưu 1 dòng vừa khít mobile) */}
+      {/* Thanh đen Admin ở Trang chủ (hiện khi là Admin - to rõ, sang trọng, ổn định trên 1 dòng) */}
       {isAdmin && (
-        <div className="w-full flex items-center justify-between px-3 py-1.5 rounded-[12px] bg-black/90 text-white shadow-md -mb-1 overflow-hidden">
-          <div className="flex items-center gap-1.5 shrink-0 min-w-0">
+        <div className="w-full flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 rounded-[14px] bg-slate-950/95 dark:bg-[#120A24] text-white border border-white/10 shadow-md mb-0.5 overflow-hidden gap-1.5">
+          {/* Trạng thái hệ thống */}
+          <div className="flex items-center gap-2 shrink-0 min-w-0">
             <span
-              className={`w-2 h-2 rounded-full shrink-0 ${
-                supabaseOk ? 'bg-emerald-400' : 'bg-red-400 animate-pulse'
+              className={`w-2.5 h-2.5 rounded-full shrink-0 shadow-xs ${
+                supabaseOk ? 'bg-emerald-400 shadow-emerald-400/50' : 'bg-red-400 animate-pulse'
               }`}
             />
-            <span className="text-[12px] font-extrabold text-white/95 truncate">
+            <span className="text-[13px] sm:text-[14px] font-black text-white/95 tracking-tight truncate">
               {supabaseOk ? 'Sẵn sàng' : 'Chưa kết nối'}
             </span>
           </div>
 
-          <div className="flex items-center gap-1 shrink-0">
+          {/* Các nút hành động to rõ, hiển thị chữ đầy đủ trên 1 dòng */}
+          <div className="flex items-center gap-1.5 shrink-0">
             <button
               type="button"
               onClick={handleBackup}
               disabled={isExporting}
-              className="flex items-center gap-1 h-6.5 px-2 sm:px-2.5 rounded-[7px] bg-white/15 hover:bg-white/25 text-white transition-colors cursor-pointer disabled:opacity-50 text-[11px] font-bold shrink-0"
+              className="flex items-center gap-1.5 h-7.5 sm:h-8 px-2.5 sm:px-3 rounded-[8px] bg-white/15 hover:bg-white/25 active:bg-white/30 text-white transition-all cursor-pointer disabled:opacity-50 text-[12px] sm:text-[12.5px] font-bold shrink-0 shadow-2xs"
               title="Tải file sao lưu dữ liệu"
             >
-              <Download size={12} />
-              <span className="hidden sm:inline">{isExporting ? 'Đang tải...' : 'Sao lưu'}</span>
+              <Download size={13} strokeWidth={2.4} />
+              <span>{isExporting ? 'Đang tải...' : 'Sao lưu'}</span>
             </button>
 
             <button
               type="button"
               onClick={() => setShowEditApp(true)}
-              className="flex items-center gap-1 h-6.5 px-2 sm:px-2.5 rounded-[7px] bg-white/15 hover:bg-white/25 text-white transition-colors cursor-pointer text-[11px] font-bold shrink-0"
+              className="flex items-center gap-1.5 h-7.5 sm:h-8 px-2.5 sm:px-3 rounded-[8px] bg-white/15 hover:bg-white/25 active:bg-white/30 text-white transition-all cursor-pointer text-[12px] sm:text-[12.5px] font-bold shrink-0 shadow-2xs"
               title="Đổi tên app và logo"
             >
-              <Edit2 size={12} />
-              <span className="hidden sm:inline">Đổi tên</span>
+              <Edit2 size={13} strokeWidth={2.4} />
+              <span>Đổi tên</span>
             </button>
 
             <button
               type="button"
               onClick={handleLogout}
-              className="h-6.5 w-6.5 flex items-center justify-center rounded-[7px] bg-red-500/30 hover:bg-red-500/50 text-red-200 transition-colors cursor-pointer shrink-0"
-              title="Đăng xuất"
+              className="flex items-center gap-1 h-7.5 sm:h-8 px-2 sm:px-2.5 rounded-[8px] bg-red-500/25 hover:bg-red-500/40 text-red-200 transition-all cursor-pointer shrink-0 text-[12px] font-bold shadow-2xs"
+              title="Đăng xuất khỏi chế độ Quản trị"
               aria-label="Đăng xuất"
             >
-              <LogOut size={12} />
+              <LogOut size={13} strokeWidth={2.4} />
+              <span className="hidden xs:inline">Thoát</span>
             </button>
           </div>
         </div>

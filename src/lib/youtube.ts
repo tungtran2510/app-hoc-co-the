@@ -4,16 +4,44 @@
  */
 export function extractYouTubeId(url: string): string | null {
   if (!url) return null;
-  const trimmed = url.trim();
-  
-  // Nếu người dùng chỉ gõ đúng 11 ký tự YouTube ID
-  if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) {
-    return trimmed;
+  let clean = url.trim();
+
+  // 1. Nếu dán cả thẻ <iframe ... src="...">
+  const iframeSrcMatch = clean.match(/src=["']([^"']+)["']/i);
+  if (iframeSrcMatch) {
+    clean = iframeSrcMatch[1].trim();
   }
 
-  const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=|shorts\/)|youtu\.be\/)([^"&?\/\s]{11})/;
-  const match = trimmed.match(regex);
-  return match ? match[1] : null;
+  // 2. Nếu người dùng chỉ gõ đúng 11 ký tự YouTube ID
+  if (/^[a-zA-Z0-9_-]{11}$/.test(clean)) {
+    return clean;
+  }
+
+  // 3. Các mẫu URL YouTube thông dụng
+  const patterns = [
+    /[?&]v=([a-zA-Z0-9_-]{11})/,
+    /youtu\.be\/([a-zA-Z0-9_-]{11})/,
+    /youtube(?:-nocookie)?\.com\/(?:shorts|live|embed|v)\/([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/user\/[^\/]+\/([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/[^\/]+\/([a-zA-Z0-9_-]{11})/,
+  ];
+
+  for (const p of patterns) {
+    const match = clean.match(p);
+    if (match && match[1]) {
+      return match[1];
+    }
+  }
+
+  // 4. Fallback tìm chuỗi 11 ký tự nếu có từ khóa youtube hoặc youtu.be
+  if (/youtube|youtu\.be/i.test(clean)) {
+    const fallbackMatch = clean.match(/([a-zA-Z0-9_-]{11})/);
+    if (fallbackMatch) {
+      return fallbackMatch[1];
+    }
+  }
+
+  return null;
 }
 
 export interface YouTubeMeta {

@@ -18,6 +18,7 @@ import { RecommendedBook } from '../lib/types';
 import { checkIsAdminClient } from '../lib/adminAuth';
 import { saveSettingsApi } from '../lib/apiAdmin';
 import EditRecommendedBooksModal from './admin/EditRecommendedBooksModal';
+import EditSingleRecommendedBookModal from './admin/EditSingleRecommendedBookModal';
 import SectionOrderControls from './admin/SectionOrderControls';
 import ModernBookCover from './ModernBookCover';
 import BookDetailModal, { UnifiedBookItem } from './BookDetailModal';
@@ -63,6 +64,17 @@ export default function RecommendedBooksSection({
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedBook, setSelectedBook] = useState<RecommendedBook | null>(null);
   const [flipbookPreviewBook, setFlipbookPreviewBook] = useState<RecommendedBook | null>(null);
+  const [editingSingleBook, setEditingSingleBook] = useState<RecommendedBook | null>(null);
+
+  const handleSaveSingleBook = async (updatedBook: RecommendedBook) => {
+    const nextBooks = books.map((b) => (b.id === updatedBook.id ? updatedBook : b));
+    setBooks(nextBooks);
+    if (isAdmin) {
+      await saveSettingsApi({
+        recommended_books: nextBooks,
+      });
+    }
+  };
 
   useEffect(() => {
     checkIsAdminClient().then(setIsAdmin);
@@ -169,7 +181,7 @@ export default function RecommendedBooksSection({
           onMoveDown={onMoveDown}
           onOpenReorderModal={onOpenReorderModal}
           onEdit={() => setShowEditModal(true)}
-          editLabel="Sửa tài liệu"
+          editLabel="Cài đặt khối sách"
         />
       )}
 
@@ -359,9 +371,9 @@ export default function RecommendedBooksSection({
                           </button>
                           <button
                             type="button"
-                            onClick={() => setShowEditModal(true)}
+                            onClick={() => setEditingSingleBook(book)}
                             className="flex items-center gap-1 h-6.5 px-2 rounded-[7px] bg-blue-50 text-[#1E3A8A] border border-blue-200 hover:bg-blue-100 dark:bg-purple-950 dark:text-purple-200 dark:border-purple-800/40 text-[11px] font-bold cursor-pointer transition-colors shadow-2xs"
-                            title="Sửa sách"
+                            title="Sửa cuốn sách này"
                           >
                             <Edit2 size={11} />
                             <span>Sửa</span>
@@ -495,9 +507,9 @@ export default function RecommendedBooksSection({
                           </button>
                           <button
                             type="button"
-                            onClick={() => setShowEditModal(true)}
+                            onClick={() => setEditingSingleBook(book)}
                             className="w-5.5 h-5.5 rounded-[5px] bg-blue-50 text-[#1E3A8A] border border-blue-200 hover:bg-blue-100 dark:bg-purple-950 dark:text-purple-200 dark:border-purple-800/40 flex items-center justify-center cursor-pointer transition-colors"
-                            title="Sửa sách"
+                            title="Sửa cuốn sách này"
                           >
                             <Edit2 size={10} />
                           </button>
@@ -549,6 +561,14 @@ export default function RecommendedBooksSection({
         book={flipbookPreviewBook}
         title={flipbookPreviewBook?.title ? `Đọc thử tài liệu 3D: ${flipbookPreviewBook.title}` : 'Đọc thử tài liệu 3D'}
         onClose={() => setFlipbookPreviewBook(null)}
+      />
+
+      {/* MODAL SỬA ĐÚNG 1 CUỐN SÁCH NÊN ĐỌC */}
+      <EditSingleRecommendedBookModal
+        isOpen={Boolean(editingSingleBook)}
+        book={editingSingleBook}
+        onClose={() => setEditingSingleBook(null)}
+        onSaved={handleSaveSingleBook}
       />
     </section>
   );

@@ -32,6 +32,7 @@ import EditAuthorModal from './admin/EditAuthorModal';
 import SectionOrderControls from './admin/SectionOrderControls';
 import FlipbookViewer from './FlipbookViewer';
 import ScrollReveal from './ScrollReveal';
+import ModernBookCover from './ModernBookCover';
 
 export interface AuthorSectionBaseProps {
   profile: AuthorProfile;
@@ -168,6 +169,7 @@ export function AuthorProfileSection({
    ========================================================================= */
 export interface AuthorBooksSectionProps extends AuthorSectionBaseProps {
   onSelectBook?: (book: AuthorBook) => void;
+  onEditSingleBook?: (book: AuthorBook) => void;
   onMoveBook?: (index: number, direction: 'up' | 'down') => void;
   onToggleBookVisible?: (index: number) => void;
   onDeleteBook?: (index: number) => void;
@@ -185,6 +187,7 @@ export function AuthorBooksSection({
   onOpenReorderModal,
   onEdit,
   onSelectBook,
+  onEditSingleBook,
   onMoveBook,
   onToggleBookVisible,
   onDeleteBook,
@@ -197,7 +200,6 @@ export function AuthorBooksSection({
   return (
     <section className="flex flex-col gap-3 mt-1">
       {/* KHỐI NÚT ĐIỀU KHIỂN DÀNH CHO ADMIN - ĐẶT TRÊN ĐẦU KHỐI */}
-      {/* KHỐI NÚT ĐIỀU KHIỂN DÀNH CHO ADMIN - ĐẶT TRÊN ĐẦU KHỐI */}
       {isAdmin && typeof sectionIndex === 'number' && typeof totalSections === 'number' && onMoveUp && onMoveDown && onOpenReorderModal && (
         <SectionOrderControls
           sectionTitle="TÀI LIỆU TÁC PHẨM"
@@ -209,7 +211,7 @@ export function AuthorBooksSection({
           onMoveDown={onMoveDown}
           onOpenReorderModal={onOpenReorderModal}
           onEdit={onEdit}
-          editLabel="Sửa tài liệu"
+          editLabel="Cài đặt khối sách"
         />
       )}
 
@@ -248,31 +250,22 @@ export function AuthorBooksSection({
                     isBookHidden ? 'opacity-70 border-dashed border-amber-300' : ''
                   }`}
                 >
-                {/* BÊN TRÁI: Bìa sách to rõ chuẩn tỷ lệ 3:4 */}
-                <div className="w-[116px] sm:w-[138px] aspect-[3/4] rounded-[14px] bg-slate-100 dark:bg-[#241548] overflow-hidden shrink-0 shadow-md border border-slate-200 dark:border-purple-400/40 relative flex items-center justify-center group-hover:scale-[1.02] transition-transform">
-                  {book.cover_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={book.cover_url}
-                      alt={book.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center gap-1 text-slate-400 dark:text-purple-300 text-center p-2">
-                      <BookOpen size={28} className="text-slate-400 dark:text-purple-400" />
-                      <span className="text-[10px] font-bold">Bìa sách 3:4</span>
-                    </div>
-                  )}
+                {/* BÊN TRÁI: Bìa sách to rõ chuẩn tỷ lệ 3:4 với ModernBookCover */}
+                <div className="w-[116px] sm:w-[138px] aspect-[3/4] shrink-0 relative flex items-center justify-center">
+                  <ModernBookCover
+                    title={book.title}
+                    coverUrl={book.cover_url}
+                    author={profile.name || 'Tùng Dinh Dưỡng'}
+                    index={idx}
+                    badgeText={book.year ? `NĂM ${book.year}` : 'CHUYÊN SÂU'}
+                  />
 
                   {/* Nhãn Đang ẩn nếu admin */}
                   {isBookHidden && isAdmin && (
-                    <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/75 text-amber-300 text-[9.5px] font-black z-10">
+                    <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/75 text-amber-300 text-[9.5px] font-black z-30">
                       Ẩn tạm
                     </div>
                   )}
-
-                  {/* Hiệu ứng bóng gáy sách tạo cảm giác sách thật */}
-                  <div className="absolute inset-y-0 left-0 w-2.5 bg-gradient-to-r from-black/20 via-white/10 to-transparent pointer-events-none" />
                 </div>
 
                 {/* BÊN PHẢI: Miêu tả, tiêu đề, năm phát hành & nút xem chi tiết */}
@@ -368,12 +361,18 @@ export function AuthorBooksSection({
                             {isBookHidden ? <EyeOff size={11} /> : <Eye size={11} />}
                           </button>
                         )}
-                        {onEdit && (
+                        {(onEditSingleBook || onEdit) && (
                           <button
                             type="button"
-                            onClick={onEdit}
+                            onClick={() => {
+                              if (onEditSingleBook) {
+                                onEditSingleBook(book);
+                              } else if (onEdit) {
+                                onEdit();
+                              }
+                            }}
                             className="h-6 px-2 rounded-[6px] bg-primary text-white text-[11px] font-bold flex items-center gap-1 hover:bg-primary-dark transition-colors cursor-pointer shadow-2xs"
-                            title="Sửa sách"
+                            title="Sửa cuốn sách này"
                           >
                             <Edit2 size={10} />
                             <span>Sửa</span>
