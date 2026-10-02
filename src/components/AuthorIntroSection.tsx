@@ -22,7 +22,6 @@ import {
   EyeOff,
   Check,
   ShieldCheck,
-  Quote,
 } from 'lucide-react';
 import { AuthorProfile, AuthorBook } from '../lib/types';
 import { normalizeAuthorProfile } from '../lib/data';
@@ -89,7 +88,7 @@ export function AuthorProfileSection({
 
       {/* THẺ MASTER INSTRUCTOR PROFILE CARD CAO CẤP */}
       <ScrollReveal animation="slide-left" delay={40}>
-        <div className="relative p-4 sm:p-5 rounded-[18px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-sm dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] dark:border-white/15 dark:text-white overflow-hidden flex flex-col gap-3">
+        <div className="relative p-4 sm:p-5 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-sm dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] dark:border-white/15 dark:text-white overflow-hidden flex flex-col gap-3">
         {/* Họa tiết trang trí viền cao cấp góc phải */}
         <div className="absolute top-0 right-0 w-32 h-32 opacity-10 dark:opacity-20 pointer-events-none bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-300 dark:from-amber-400 via-transparent to-transparent" />
 
@@ -461,9 +460,6 @@ export function AuthorPhilosophySection({
 }: AuthorSectionBaseProps) {
   if (!profile.extra_content && !isAdmin) return null;
 
-  const rawQuote = profile.extra_content || '';
-  const cleanQuote = rawQuote.trim().replace(/^["“'”]+|["“'”]+$/g, '').trim();
-
   return (
     <section className="flex flex-col gap-2 mt-1">
       {/* KHỐI NÚT ĐIỀU KHIỂN DÀNH CHO ADMIN - ĐẶT TRÊN ĐẦU KHỐI */}
@@ -482,43 +478,20 @@ export function AuthorPhilosophySection({
         />
       )}
 
-      {/* THẺ LỜI TỰA & TRIẾT LÝ PHONG CÁCH MASTER EDITORIAL CAO CẤP */}
       <ScrollReveal animation="slide-right" delay={40}>
-        <div className="relative p-4 sm:p-5 rounded-[18px] bg-gradient-to-br from-[#FCFBF7] via-[#FAF7F0] to-[#F5EFEB] text-slate-900 border border-amber-200/80 shadow-xs hover:shadow-sm dark:bg-gradient-to-br dark:from-[#19102E] dark:via-[#140C24] dark:to-[#0D071B] dark:border-amber-400/20 dark:text-white overflow-hidden flex flex-col gap-2.5">
-          {/* Họa tiết dấu ngoặc kép chìm nghệ thuật góc dưới bên phải */}
-          <div className="absolute -bottom-4 -right-1 text-[88px] font-serif font-black leading-none text-amber-500/[0.08] dark:text-amber-300/[0.06] pointer-events-none select-none">
-            ”
-          </div>
-
-          {/* Dải tiêu đề lời tựa tinh tế */}
-          <div className="flex items-center justify-between pb-1 relative z-10">
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-100/90 dark:bg-amber-400/15 text-amber-700 dark:text-[#F8DF7B] shrink-0 shadow-2xs">
-                <Quote size={12} className="rotate-180" strokeWidth={2.5} />
-              </span>
-              <h4 className="text-[12.5px] sm:text-[13px] font-extrabold uppercase tracking-wider text-amber-800 dark:text-[#F8DF7B]">
-                {profile.extra_title || 'Lời tựa & Triết lý phụng sự'}
+        <div className="p-4 sm:p-5 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-sm dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] dark:border-white/15 dark:text-white flex flex-col gap-2">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-purple-800/40 pb-2">
+            <div className="flex items-center gap-1.5 text-amber-600 dark:text-[#F8DF7B]">
+              <Sparkles size={16} strokeWidth={2.5} />
+              <h4 className="text-[13.5px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-[#F8DF7B]">
+                {profile.extra_title || 'Triết lý phụng sự'}
               </h4>
             </div>
           </div>
 
-          {/* Nội dung câu trích dẫn: Serif Italic trang trọng, sạch sẽ, không bao giờ bị nhân đôi dấu ngoặc */}
-          <div className="relative z-10 pl-0.5 sm:pl-1 pr-2">
-            <p className="font-serif italic text-[14.5px] sm:text-[15.5px] text-slate-800 dark:text-purple-100/95 leading-relaxed font-normal">
-              &ldquo;{cleanQuote || 'Bấm sửa để thêm thông điệp triết lý phụng sự...'}&rdquo;
-            </p>
-          </div>
-
-          {/* Dòng chữ ký tác giả trang trọng ở chân thẻ */}
-          <div className="flex items-center justify-between pt-2.5 border-t border-amber-200/60 dark:border-amber-400/15 mt-1 relative z-10">
-            <span className="text-[11px] sm:text-[11.5px] font-medium tracking-wide text-amber-700/80 dark:text-amber-300/80">
-              Thông điệp từ tác giả
-            </span>
-            <span className="text-[12.5px] sm:text-[13px] font-bold text-slate-800 dark:text-amber-100 tracking-tight flex items-center gap-1.5">
-              <span className="text-amber-500 dark:text-amber-400 font-serif">—</span>{' '}
-              {profile.name && profile.name.toLowerCase().includes('tùng') ? 'Tùng Dinh Dưỡng' : (profile.name || 'Tùng Dinh Dưỡng')}
-            </span>
-          </div>
+          <p className="text-[14px] sm:text-[15px] font-medium text-slate-700 dark:text-purple-100/90 leading-relaxed pt-1 italic">
+            &ldquo;{profile.extra_content || 'Bấm sửa để thêm thông điệp triết lý phụng sự...'}&rdquo;
+          </p>
         </div>
       </ScrollReveal>
     </section>
