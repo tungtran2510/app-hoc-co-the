@@ -54,8 +54,8 @@ const SECTION_DEFS: Record<string, SectionMeta> = {
   },
   author_books: {
     key: 'author_books',
-    name: 'Sách & Tác phẩm đã làm',
-    desc: 'Các ấn phẩm, công trình sách của tác giả và video',
+    name: 'Tài Liệu & Cẩm Nang Chuyên Sâu',
+    desc: 'Các ấn phẩm, tài liệu chuyên sâu của tác giả và video',
     icon: BookOpen,
   },
   author_philosophy: {
@@ -72,8 +72,8 @@ const SECTION_DEFS: Record<string, SectionMeta> = {
   },
   recommended_books: {
     key: 'recommended_books',
-    name: 'Tài liệu nên đọc (Sách khuyên đọc)',
-    desc: 'Bộ sưu tập các cuốn sách khuyên đọc chuyên sâu về cơ thể',
+    name: 'Tài Liệu Nên Đọc (Chuyên Khảo)',
+    desc: 'Bộ sưu tập các tài liệu y khoa khuyên đọc chuyên sâu về cơ thể',
     icon: BookOpen,
   },
 };

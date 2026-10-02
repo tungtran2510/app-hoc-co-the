@@ -362,7 +362,7 @@ export default function BookDetailModal({
               </div>
               <div className="min-w-0">
                 <h3 className="text-[16px] sm:text-[17px] font-extrabold text-ink leading-tight truncate">
-                  {book.type === 'author' ? 'Tác phẩm đã xuất bản' : 'Sách & Tài liệu khuyên đọc'}
+                  {book.type === 'author' ? 'Tài liệu xuất bản chính thức' : 'Tài liệu tham khảo chuyên sâu'}
                 </h3>
                 <p className="text-[12px] text-muted truncate">
                   {book.author || 'Tài liệu chăm sóc sức khỏe & cơ thể'}
@@ -423,7 +423,7 @@ export default function BookDetailModal({
                   {book.title}
                 </h4>
 
-                {/* NÚT ĐỌC THỬ SÁCH 3D TO NỔI BẬT - VÀNG KIM CHAMPAGNE SANG TRỌNG THEO YÊU CẦU */}
+                {/* NÚT ĐỌC THỬ TÀI LIỆU 3D TO NỔI BẬT - VÀNG KIM CHAMPAGNE SANG TRỌNG THEO YÊU CẦU */}
                 <div className="mt-2.5 w-full">
                   <button
                     type="button"
@@ -434,7 +434,7 @@ export default function BookDetailModal({
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/70 to-transparent -translate-x-full animate-flash-sweep pointer-events-none" />
                     
                     <BookOpen size={16} strokeWidth={2.8} className="shrink-0 text-[#1A1608]" />
-                    <span className="tracking-wide">Đọc thử sách 3D</span>
+                    <span className="tracking-wide">Đọc thử tài liệu 3D</span>
                   </button>
                 </div>
 
@@ -767,7 +767,8 @@ export default function BookDetailModal({
       <FlipbookViewer
         mode="modal-only"
         isOpen={show3DFlipbook}
-        title={`Đọc thử: ${book.title}`}
+        book={book}
+        title={`Đọc thử tài liệu 3D: ${book.title}`}
         onClose={() => setShow3DFlipbook(false)}
       />
     </>

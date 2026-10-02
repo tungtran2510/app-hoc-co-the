@@ -51,7 +51,7 @@ export default function RecommendedBooksSection({
   onMoveDown,
   onOpenReorderModal,
 }: RecommendedBooksSectionProps) {
-  const [title, setTitle] = useState(initialTitle || 'Sách nên đọc');
+  const [title, setTitle] = useState(initialTitle || 'Tài Liệu Y Khoa Chuyên Sâu');
   const [subtitle, setSubtitle] = useState(
     initialSubtitle || 'Tài liệu tham khảo chuyên sâu giúp bạn hiểu và chăm sóc cơ thể mỗi ngày'
   );
@@ -156,7 +156,7 @@ export default function RecommendedBooksSection({
       {/* KHỐI NÚT ĐIỀU KHIỂN DÀNH CHO ADMIN - ĐẶT TRÊN ĐẦU KHỐI */}
       {isAdmin && onMoveUp && onMoveDown && onOpenReorderModal && typeof sectionIndex === 'number' && typeof totalSections === 'number' && (
         <SectionOrderControls
-          sectionTitle="SÁCH NÊN ĐỌC"
+          sectionTitle="TÀI LIỆU NÊN ĐỌC"
           sectionIndex={sectionIndex}
           totalSections={totalSections}
           isHidden={isHidden}
@@ -165,7 +165,7 @@ export default function RecommendedBooksSection({
           onMoveDown={onMoveDown}
           onOpenReorderModal={onOpenReorderModal}
           onEdit={() => setShowEditModal(true)}
-          editLabel="Sửa sách đọc"
+          editLabel="Sửa tài liệu"
         />
       )}
 
@@ -179,7 +179,7 @@ export default function RecommendedBooksSection({
             </h2>
             {books.length > 0 && (
               <span className="text-[11.5px] font-extrabold text-[#1E3A8A] bg-blue-100 dark:text-[#F8DF7B] dark:bg-[#2E1B58] px-2.5 py-0.5 rounded-full shrink-0">
-                {books.length} cuốn
+                {books.length} tài liệu
               </span>
             )}
           </div>
@@ -308,12 +308,12 @@ export default function RecommendedBooksSection({
                             setFlipbookPreviewBook(book);
                           }}
                           className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[9px] bg-gradient-to-r from-[#FFF0BA] via-[#ECC45F] to-[#D4A028] hover:from-[#FFF5CE] hover:to-[#DFAC32] text-[#1A1608] font-black text-[11.5px] sm:text-[12px] shadow-xs shadow-[#D4A028]/25 cursor-pointer transition-all active:scale-95 border border-[#F3D37A] overflow-hidden shrink-0"
-                          title="Đọc thử lật sách 3D chân thực"
+                          title="Đọc thử tài liệu 3D chân thực"
                         >
                           {/* Vệt sáng Flash quét định kỳ */}
                           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/70 to-transparent -translate-x-full animate-flash-sweep pointer-events-none" />
                           <BookOpen size={12} strokeWidth={2.8} className="shrink-0 text-[#1A1608]" />
-                          <span>Đọc thử 3D</span>
+                          <span>Đọc thử tài liệu 3D</span>
                         </button>
 
                         <span className="text-[12px] font-black text-[#1E3A8A] dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0">
@@ -442,12 +442,12 @@ export default function RecommendedBooksSection({
                           setFlipbookPreviewBook(book);
                         }}
                         className="relative inline-flex items-center justify-center gap-1 px-2.5 py-1 rounded-[7px] bg-gradient-to-r from-[#FFF0BA] via-[#ECC45F] to-[#D4A028] hover:from-[#FFF5CE] hover:to-[#DFAC32] text-[#1A1608] font-black text-[10.5px] shadow-xs shadow-[#D4A028]/20 cursor-pointer transition-all active:scale-95 border border-[#F3D37A] overflow-hidden shrink-0"
-                        title="Đọc thử lật sách 3D chân thực"
+                        title="Đọc thử tài liệu 3D chân thực"
                       >
                         {/* Vệt sáng Flash quét định kỳ */}
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/70 to-transparent -translate-x-full animate-flash-sweep pointer-events-none" />
                         <BookOpen size={11} strokeWidth={2.8} className="shrink-0 text-[#1A1608]" />
-                        <span>Đọc thử 3D</span>
+                        <span>Đọc thử tài liệu 3D</span>
                       </button>
 
                       <span className="text-[10.5px] sm:text-[11px] font-black text-[#1E3A8A] dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0">
@@ -542,7 +542,8 @@ export default function RecommendedBooksSection({
       <FlipbookViewer
         mode="modal-only"
         isOpen={Boolean(flipbookPreviewBook)}
-        title={flipbookPreviewBook?.title ? `Đọc thử: ${flipbookPreviewBook.title}` : 'Đọc thử sách 3D'}
+        book={flipbookPreviewBook}
+        title={flipbookPreviewBook?.title ? `Đọc thử tài liệu 3D: ${flipbookPreviewBook.title}` : 'Đọc thử tài liệu 3D'}
         onClose={() => setFlipbookPreviewBook(null)}
       />
     </section>

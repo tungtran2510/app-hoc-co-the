@@ -183,7 +183,7 @@ export async function getSettings(): Promise<Settings> {
             home_title: data.home_title || data.block_styles?.home_title || 'Hôm nay mình học gì?',
             search_placeholder: data.search_placeholder || data.block_styles?.search_placeholder || 'Tìm bài, ví dụ: đĩa đệm',
             topics_title: (data.topics_title && data.topics_title !== 'Chọn chủ đề') ? data.topics_title : (data.block_styles?.topics_title || 'Chuyên Đề Học'),
-            recommended_books_title: data.recommended_books_title || data.block_styles?.recommended_books_title || 'Sách nên đọc',
+            recommended_books_title: data.recommended_books_title || data.block_styles?.recommended_books_title || 'Tài Liệu Y Khoa Chuyên Sâu',
             recommended_books: normalizeRecommendedBooks(data.recommended_books || data.block_styles?.recommended_books),
             recommended_books_layout: data.recommended_books_layout || data.block_styles?.recommended_books_layout || 'grid',
             home_sections_order: normalizeHomeSectionsOrder(data.home_sections_order || data.block_styles?.home_sections_order),

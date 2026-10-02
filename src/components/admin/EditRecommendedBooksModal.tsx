@@ -41,7 +41,7 @@ export default function EditRecommendedBooksModal({
   onClose,
   onSaved,
 }: EditRecommendedBooksModalProps) {
-  const [title, setTitle] = useState(initialTitle || 'Sách nên đọc');
+  const [title, setTitle] = useState(initialTitle || 'Tài Liệu Y Khoa Chuyên Sâu');
   const [subtitle, setSubtitle] = useState(
     initialSubtitle || 'Tài liệu tham khảo chuyên sâu giúp bạn hiểu và chăm sóc cơ thể mỗi ngày'
   );
@@ -58,7 +58,7 @@ export default function EditRecommendedBooksModal({
 
   useEffect(() => {
     if (isOpen) {
-      setTitle(initialTitle || 'Sách nên đọc');
+      setTitle(initialTitle || 'Tài Liệu Y Khoa Chuyên Sâu');
       setSubtitle(
         initialSubtitle || 'Tài liệu tham khảo chuyên sâu giúp bạn hiểu và chăm sóc cơ thể mỗi ngày'
       );
@@ -279,10 +279,10 @@ export default function EditRecommendedBooksModal({
             </div>
             <div>
               <h3 className="text-[17px] font-extrabold text-ink leading-tight">
-                Quản lý mục Sách Nên Đọc
+                Quản lý mục Tài Liệu Nên Đọc
               </h3>
               <p className="text-[12px] text-muted">
-                Bìa 3:4 · Video YouTube · Ảnh chi tiết bên trong sách
+                Bìa 3:4 · Video YouTube · Ảnh chi tiết bên trong tài liệu
               </p>
             </div>
           </div>
@@ -319,7 +319,7 @@ export default function EditRecommendedBooksModal({
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Ví dụ: Sách nên đọc"
+                placeholder="Ví dụ: Tài Liệu Y Khoa Chuyên Sâu"
                 className="w-full h-10 px-3.5 rounded-[12px] bg-white border border-line text-[14px] text-ink focus:border-primary focus:outline-hidden"
               />
             </div>
@@ -343,10 +343,10 @@ export default function EditRecommendedBooksModal({
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="text-[15px] font-extrabold text-ink">
-                  Danh sách sách hiển thị ({books.length})
+                  Danh sách tài liệu hiển thị ({books.length})
                 </h4>
                 <p className="text-[12px] text-muted">
-                  Tất cả sách đều có mục video & ảnh bên trong
+                  Tất cả tài liệu đều có mục video & ảnh bên trong
                 </p>
               </div>
 
@@ -356,7 +356,7 @@ export default function EditRecommendedBooksModal({
                 className="flex items-center gap-1.5 h-8 px-3 rounded-[10px] bg-primary text-white text-[12.5px] font-extrabold hover:bg-primary-hover transition-colors cursor-pointer shadow-2xs"
               >
                 <Plus size={14} strokeWidth={2.5} />
-                <span>Thêm sách</span>
+                <span>Thêm tài liệu</span>
               </button>
             </div>
 

@@ -27,6 +27,7 @@ import {
 import { checkIsAdminClient } from '../lib/adminAuth';
 import { renderPageToCanvas } from '../lib/atlasCanvasGenerator';
 import SideBooksFlipEngine, { SideBooksFlipEngineRef } from './SideBooksFlipEngine';
+import { getBookFlipbookPages, BookInfoInput } from '../lib/bookFlipbookData';
 
 export interface FlipbookPage {
   id: string;
@@ -45,23 +46,15 @@ export interface FlipbookPage {
   };
 }
 
-// 10 trang giáo trình Atlas Y Khoa Cột Sống & Khớp
+// 11 trang giáo trình Atlas Y Khoa Cột Sống & Khớp (Trang 1 là bìa thật Retina cao cấp, trang cuối là bìa sau)
 export const DEFAULT_ANATOMY_PAGES: FlipbookPage[] = [
   {
     id: 'page-1',
     pageNum: 1,
-    title: 'Atlas Giải Phẫu Cột Sống & Đĩa Đệm 3D',
+    title: 'Atlas Giải Phẫu Cột Sống & Cơ Thể 3D',
     category: 'GIÁO TRÌNH Y HỌC NỀN TẢNG',
     badge: 'Y KHOA LÂM SÀNG',
-    content: {
-      heading: 'ATLAS GIẢI PHẪU 3D',
-      subheading: 'CỘT SỐNG & ĐĨA ĐỆM TOÀN DIỆN',
-      paragraphs: [
-        'Cẩm nang tra cứu và giải phẫu ứng dụng chuyên sâu dành cho học viên và người quan tâm sức khỏe cơ xương khớp.',
-        'Hệ thống hóa 33-34 đốt sống, 23 đĩa đệm sinh học, mạng lưới dây chằng và các rễ thần kinh tủy sống.',
-      ],
-      highlight: 'Lật trang sách 3D chân thực trên mọi thiết bị.',
-    },
+    imageUrl: '/documents/covers/cover_atlas_y_khoa_toan_dien.png',
   },
   {
     id: 'page-2',
@@ -258,10 +251,17 @@ export const DEFAULT_ANATOMY_PAGES: FlipbookPage[] = [
       diagramType: 'ergonomics',
     },
   },
+  {
+    id: 'page-11',
+    pageNum: 11,
+    title: 'Bản Quyền Xuất Bản & Bìa Sau',
+    imageUrl: '/documents/covers/back_cover_atlas_y_khoa_toan_dien.png',
+  },
 ];
 
 export interface FlipbookViewerProps {
   initialPages?: FlipbookPage[];
+  book?: BookInfoInput | null;
   title?: string;
   topicTitle?: string;
   pageTitle?: string;
@@ -279,6 +279,7 @@ export interface FlipbookViewerProps {
 
 export default function FlipbookViewer({
   initialPages,
+  book,
   title = 'Tài liệu tham khảo',
   topicTitle = 'Cột Sống & Đĩa Đệm',
   pageTitle = 'Giải Phẫu',
@@ -293,7 +294,28 @@ export default function FlipbookViewer({
   isOpen,
   onClose,
 }: FlipbookViewerProps) {
-  const [pages, setPages] = useState<FlipbookPage[]>(initialPages || DEFAULT_ANATOMY_PAGES);
+  const [pages, setPages] = useState<FlipbookPage[]>(() => {
+    if (initialPages && initialPages.length > 0) return initialPages;
+    if (book) return getBookFlipbookPages(book);
+    if (title && title !== 'Tài liệu tham khảo' && title !== 'Đọc thử sách 3D' && title !== 'Đọc thử tài liệu 3D') {
+      const cleanTitle = title.replace(/^Đọc thử:\s*/i, '').replace(/^Đọc thử tài liệu 3D:\s*/i, '');
+      return getBookFlipbookPages({ title: cleanTitle });
+    }
+    return DEFAULT_ANATOMY_PAGES;
+  });
+
+  // Tự động đồng bộ danh sách trang khi initialPages, book hoặc title thay đổi
+  useEffect(() => {
+    if (initialPages && initialPages.length > 0) {
+      setPages(initialPages);
+    } else if (book) {
+      setPages(getBookFlipbookPages(book));
+    } else if (title && title !== 'Tài liệu tham khảo' && title !== 'Đọc thử sách 3D' && title !== 'Đọc thử tài liệu 3D') {
+      const cleanTitle = title.replace(/^Đọc thử:\s*/i, '').replace(/^Đọc thử tài liệu 3D:\s*/i, '');
+      setPages(getBookFlipbookPages({ title: cleanTitle }));
+    }
+  }, [initialPages, book, title]);
+
   const [pageImages, setPageImages] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(mode === 'modal-only' ? Boolean(isOpen) : false);
@@ -580,6 +602,7 @@ export default function FlipbookViewer({
 
   // Kiểm tra tài liệu tùy biến đã lưu trong localStorage cho bài học này
   useEffect(() => {
+    if (mode === 'modal-only') return;
     try {
       const storageKey = `flipbook_doc_${topicTitle}_${pageTitle}`;
       const savedDoc = localStorage.getItem(storageKey);
@@ -590,7 +613,7 @@ export default function FlipbookViewer({
         }
       }
     } catch {}
-  }, [topicTitle, pageTitle]);
+  }, [topicTitle, pageTitle, mode]);
 
   // Sinh ảnh chất lượng cao cho các trang tài liệu
   useEffect(() => {

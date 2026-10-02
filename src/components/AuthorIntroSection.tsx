@@ -200,7 +200,7 @@ export function AuthorBooksSection({
       {/* KHỐI NÚT ĐIỀU KHIỂN DÀNH CHO ADMIN - ĐẶT TRÊN ĐẦU KHỐI */}
       {isAdmin && typeof sectionIndex === 'number' && typeof totalSections === 'number' && onMoveUp && onMoveDown && onOpenReorderModal && (
         <SectionOrderControls
-          sectionTitle="SÁCH TÁC PHẨM"
+          sectionTitle="TÀI LIỆU TÁC PHẨM"
           sectionIndex={sectionIndex}
           totalSections={totalSections}
           isHidden={isHidden}
@@ -209,7 +209,7 @@ export function AuthorBooksSection({
           onMoveDown={onMoveDown}
           onOpenReorderModal={onOpenReorderModal}
           onEdit={onEdit}
-          editLabel="Sửa sách"
+          editLabel="Sửa tài liệu"
         />
       )}
 
@@ -218,11 +218,11 @@ export function AuthorBooksSection({
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
             <h3 className="text-[19px] font-extrabold text-ink leading-tight whitespace-nowrap">
-              Sách & Tác phẩm đã làm
+              Tài Liệu & Cẩm Nang Chuyên Sâu
             </h3>
             {books.length > 0 && (
               <span className="text-[11.5px] font-extrabold text-[#1E3A8A] bg-blue-100 dark:text-[#F8DF7B] dark:bg-[#2E1B58] px-2.5 py-0.5 rounded-full shrink-0">
-                {books.length} cuốn
+                {books.length} tài liệu
               </span>
             )}
           </div>
@@ -230,7 +230,7 @@ export function AuthorBooksSection({
 
         <div className="flex items-center justify-between gap-2">
           <p className="text-[12.5px] text-muted">
-            Một bên là sách, một bên là mô tả chi tiết & video
+            Một bên là tài liệu, một bên là mô tả chi tiết & video
           </p>
         </div>
       </div>
@@ -317,12 +317,12 @@ export function AuthorBooksSection({
                           setPreviewBook(book);
                         }}
                         className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[9px] bg-gradient-to-r from-[#FFF0BA] via-[#ECC45F] to-[#D4A028] hover:from-[#FFF5CE] hover:to-[#DFAC32] text-[#1A1608] font-black text-[11.5px] sm:text-[12px] shadow-xs shadow-[#D4A028]/25 cursor-pointer transition-all active:scale-95 border border-[#F3D37A] overflow-hidden shrink-0"
-                        title="Đọc thử lật sách 3D chân thực"
+                        title="Đọc thử tài liệu 3D chân thực"
                       >
                         {/* Vệt sáng Flash quét định kỳ */}
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/70 to-transparent -translate-x-full animate-flash-sweep pointer-events-none" />
                         <BookOpen size={12} strokeWidth={2.8} className="shrink-0 text-[#1A1608]" />
-                        <span>Đọc thử 3D</span>
+                        <span>Đọc thử tài liệu 3D</span>
                       </button>
 
                       <span className="text-[11.5px] font-black text-[#1E3A8A] dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0">
@@ -425,7 +425,8 @@ export function AuthorBooksSection({
       <FlipbookViewer
         mode="modal-only"
         isOpen={Boolean(previewBook)}
-        title={previewBook?.title ? `Đọc thử: ${previewBook.title}` : 'Đọc thử sách 3D'}
+        book={previewBook}
+        title={previewBook?.title ? `Đọc thử tài liệu 3D: ${previewBook.title}` : 'Đọc thử tài liệu 3D'}
         onClose={() => setPreviewBook(null)}
       />
     </section>
