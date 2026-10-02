@@ -299,39 +299,42 @@ export default function RecommendedBooksSection({
                       )}
                     </div>
 
-                    <div className="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-purple-800/40 mt-1.5 gap-2">
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setFlipbookPreviewBook(book);
-                          }}
-                          className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[9px] bg-gradient-to-r from-[#FFF0BA] via-[#ECC45F] to-[#D4A028] hover:from-[#FFF5CE] hover:to-[#DFAC32] text-[#1A1608] font-black text-[11.5px] sm:text-[12px] shadow-xs shadow-[#D4A028]/25 cursor-pointer transition-all active:scale-95 border border-[#F3D37A] overflow-hidden shrink-0"
-                          title="Đọc thử tài liệu 3D chân thực"
-                        >
-                          {/* Vệt sáng Flash quét định kỳ */}
-                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/70 to-transparent -translate-x-full animate-flash-sweep pointer-events-none" />
-                          <BookOpen size={12} strokeWidth={2.8} className="shrink-0 text-[#1A1608]" />
-                          <span>Đọc thử tài liệu 3D</span>
-                        </button>
+                    <div className="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-purple-800/40 mt-1.5">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setFlipbookPreviewBook(book);
+                        }}
+                        className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[9px] bg-gradient-to-r from-[#FFF0BA] via-[#ECC45F] to-[#D4A028] hover:from-[#FFF5CE] hover:to-[#DFAC32] text-[#1A1608] font-black text-[11.5px] sm:text-[12px] shadow-xs shadow-[#D4A028]/25 cursor-pointer transition-all active:scale-95 border border-[#F3D37A] overflow-hidden shrink-0"
+                        title="Đọc thử tài liệu 3D chân thực"
+                      >
+                        {/* Vệt sáng Flash quét định kỳ */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/70 to-transparent -translate-x-full animate-flash-sweep pointer-events-none" />
+                        <BookOpen size={12} strokeWidth={2.8} className="shrink-0 text-[#1A1608]" />
+                        <span>Đọc thử tài liệu 3D</span>
+                      </button>
 
-                        <span className="text-[12px] font-black text-[#1E3A8A] dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0">
-                          <span>Chi tiết</span>
-                          <ChevronRight size={13} strokeWidth={2.5} />
+                      <span className="text-[12px] font-black text-[#1E3A8A] dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0 ml-auto">
+                        <span>Chi tiết</span>
+                        <ChevronRight size={13} strokeWidth={2.5} />
+                      </span>
+                    </div>
+
+                    {isAdmin && (
+                      <div
+                        className="mt-2 pt-1.5 border-t border-dashed border-[#2D5B94]/25 dark:border-purple-500/30 flex items-center justify-between gap-1.5"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted">
+                          Quản trị:
                         </span>
-                      </div>
-
-                      {isAdmin && (
-                        <div
-                          className="flex items-center gap-1 shrink-0 ml-auto"
-                          onClick={(e) => e.stopPropagation()}
-                        >
+                        <div className="flex items-center gap-1">
                           <button
                             type="button"
                             disabled={idx === 0}
                             onClick={() => handleMoveBook(idx, 'up')}
-                            className="w-6 h-6 rounded-[6px] bg-slate-100 hover:bg-blue-100 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors"
+                            className="w-6.5 h-6.5 rounded-[7px] bg-slate-100 hover:bg-blue-100 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors shadow-2xs"
                             title="Chuyển sách lên trên"
                           >
                             <ArrowUp size={12} />
@@ -340,7 +343,7 @@ export default function RecommendedBooksSection({
                             type="button"
                             disabled={idx === books.length - 1}
                             onClick={() => handleMoveBook(idx, 'down')}
-                            className="w-6 h-6 rounded-[6px] bg-slate-100 hover:bg-blue-100 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors"
+                            className="w-6.5 h-6.5 rounded-[7px] bg-slate-100 hover:bg-blue-100 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors shadow-2xs"
                             title="Chuyển sách xuống dưới"
                           >
                             <ArrowDown size={12} />
@@ -348,7 +351,7 @@ export default function RecommendedBooksSection({
                           <button
                             type="button"
                             onClick={() => handleToggleBookVisibility(idx)}
-                            className={`w-6 h-6 rounded-[6px] flex items-center justify-center cursor-pointer transition-colors ${
+                            className={`w-6.5 h-6.5 rounded-[7px] flex items-center justify-center cursor-pointer transition-colors shadow-2xs ${
                               isBookHidden
                                 ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200'
                                 : 'bg-slate-100 hover:bg-blue-100 text-slate-600 dark:bg-purple-950 dark:text-purple-200'
@@ -360,23 +363,23 @@ export default function RecommendedBooksSection({
                           <button
                             type="button"
                             onClick={() => setShowEditModal(true)}
-                            className="flex items-center gap-1 h-6 px-2 rounded-[6px] bg-blue-50 text-[#1E3A8A] border border-blue-200 hover:bg-blue-100 dark:bg-purple-950 dark:text-purple-200 dark:border-purple-800/40 text-[11px] font-bold cursor-pointer transition-colors"
+                            className="flex items-center gap-1 h-6.5 px-2 rounded-[7px] bg-blue-50 text-[#1E3A8A] border border-blue-200 hover:bg-blue-100 dark:bg-purple-950 dark:text-purple-200 dark:border-purple-800/40 text-[11px] font-bold cursor-pointer transition-colors shadow-2xs"
                             title="Sửa sách"
                           >
-                            <Edit2 size={10} />
+                            <Edit2 size={11} />
                             <span>Sửa</span>
                           </button>
                           <button
                             type="button"
                             onClick={() => handleDeleteBook(idx)}
-                            className="w-6 h-6 rounded-[6px] bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-950 dark:text-red-300 flex items-center justify-center cursor-pointer transition-colors"
+                            className="w-6.5 h-6.5 rounded-[7px] bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-950 dark:text-red-300 flex items-center justify-center cursor-pointer transition-colors shadow-2xs"
                             title="Xóa cuốn sách này"
                           >
                             <Trash2 size={12} />
                           </button>
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </ScrollReveal>
@@ -447,24 +450,27 @@ export default function RecommendedBooksSection({
                         {/* Vệt sáng Flash quét định kỳ */}
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/70 to-transparent -translate-x-full animate-flash-sweep pointer-events-none" />
                         <BookOpen size={11} strokeWidth={2.8} className="shrink-0 text-[#1A1608]" />
-                        <span>Đọc thử tài liệu 3D</span>
+                        <span>Đọc thử 3D</span>
                       </button>
 
-                      <span className="text-[10.5px] sm:text-[11px] font-black text-[#1E3A8A] dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0">
+                      <span className="text-[10.5px] sm:text-[11px] font-black text-[#1E3A8A] dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0 ml-auto">
                         <span>Chi tiết</span>
                         <ChevronRight size={11} strokeWidth={2.5} />
                       </span>
+                    </div>
 
-                      {isAdmin && (
-                        <div
-                          className="flex items-center gap-0.5 shrink-0 ml-auto"
-                          onClick={(e) => e.stopPropagation()}
-                        >
+                    {isAdmin && (
+                      <div
+                        className="mt-1.5 pt-1 border-t border-dashed border-[#2D5B94]/25 dark:border-purple-500/30 flex items-center justify-between gap-1"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <span className="text-[9.5px] font-extrabold uppercase text-muted">Quản trị</span>
+                        <div className="flex items-center gap-1">
                           <button
                             type="button"
                             disabled={idx === 0}
                             onClick={() => handleMoveBook(idx, 'up')}
-                            className="w-6 h-6 rounded-[6px] bg-slate-100 hover:bg-blue-100 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors"
+                            className="w-5.5 h-5.5 rounded-[5px] bg-slate-100 hover:bg-blue-100 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors"
                             title="Chuyển sách lên trên"
                           >
                             <ArrowUp size={11} />
@@ -473,7 +479,7 @@ export default function RecommendedBooksSection({
                             type="button"
                             disabled={idx === books.length - 1}
                             onClick={() => handleMoveBook(idx, 'down')}
-                            className="w-6 h-6 rounded-[6px] bg-slate-100 hover:bg-blue-100 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors"
+                            className="w-5.5 h-5.5 rounded-[5px] bg-slate-100 hover:bg-blue-100 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors"
                             title="Chuyển sách xuống dưới"
                           >
                             <ArrowDown size={11} />
@@ -481,19 +487,19 @@ export default function RecommendedBooksSection({
                           <button
                             type="button"
                             onClick={() => handleToggleBookVisibility(idx)}
-                            className={`w-6 h-6 rounded-[6px] flex items-center justify-center cursor-pointer transition-colors ${
+                            className={`w-5.5 h-5.5 rounded-[5px] flex items-center justify-center cursor-pointer transition-colors ${
                               isBookHidden
                                 ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200'
                                 : 'bg-slate-100 hover:bg-blue-100 text-slate-600 dark:bg-purple-950 dark:text-purple-200'
                             }`}
-                            title={isBookHidden ? 'Cuốn sách này đang ẨN với khách – Bấm để HIỆN' : 'Cuốn sách này đang HIỆN – Bấm để ẨN TẠM'}
+                            title={isBookHidden ? 'Hiện' : 'Ẩn'}
                           >
                             {isBookHidden ? <EyeOff size={11} /> : <Eye size={11} />}
                           </button>
                           <button
                             type="button"
                             onClick={() => setShowEditModal(true)}
-                            className="w-6 h-6 rounded-[6px] bg-blue-50 text-[#1E3A8A] border border-blue-200 hover:bg-blue-100 dark:bg-purple-950 dark:text-purple-200 dark:border-purple-800/40 flex items-center justify-center cursor-pointer transition-colors"
+                            className="w-5.5 h-5.5 rounded-[5px] bg-blue-50 text-[#1E3A8A] border border-blue-200 hover:bg-blue-100 dark:bg-purple-950 dark:text-purple-200 dark:border-purple-800/40 flex items-center justify-center cursor-pointer transition-colors"
                             title="Sửa sách"
                           >
                             <Edit2 size={10} />
@@ -501,14 +507,14 @@ export default function RecommendedBooksSection({
                           <button
                             type="button"
                             onClick={() => handleDeleteBook(idx)}
-                            className="w-6 h-6 rounded-[6px] bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-950 dark:text-red-300 flex items-center justify-center cursor-pointer transition-colors"
-                            title="Xóa cuốn sách này"
+                            className="w-5.5 h-5.5 rounded-[5px] bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-950 dark:text-red-300 flex items-center justify-center cursor-pointer transition-colors"
+                            title="Xóa sách"
                           >
                             <Trash2 size={11} />
                           </button>
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </ScrollReveal>

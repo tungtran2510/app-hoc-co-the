@@ -25,9 +25,10 @@ import {
 } from 'lucide-react';
 import QRCode from 'qrcode';
 import { Topic, Page, Block, Video, FileItem } from '../lib/types';
-import { generateUuid } from '../lib/uuid';
+import { generateUuid, isValidUuid } from '../lib/uuid';
 import PageHeaderBar, { TocItem, FontSizeOption, ThemeModeOption } from './PageHeaderBar';
 import BlockRenderer from './BlockRenderer';
+import TextBlock from './blocks/TextBlock';
 import EditBlockModal from './admin/EditBlockModal';
 import VideoManagerModal from './admin/VideoManagerModal';
 import AddBlockDrawer from './admin/AddBlockDrawer';
@@ -88,7 +89,30 @@ export default function ContentViewer({
   const [supabaseOk, setSupabaseOk] = useState(false);
   const [currentPage, setCurrentPage] = useState<Page>(page);
   const [pageStatus, setPageStatus] = useState<'draft' | 'published'>(page.status);
-  const [blockList, setBlockList] = useState<Block[]>(initialBlocks);
+  // Khởi tạo và chuẩn hóa danh sách khối (bao gồm khối sách lật 3D vào luồng thống nhất)
+  const initializeBlocks = (rawBlocks: Block[]): Block[] => {
+    let list = [...rawBlocks];
+    const hasFlipbook = list.some((b) => b.display_style === 'flipbook');
+    if (!hasFlipbook) {
+      const videoIdx = list.findIndex((b) => b.type === 'videos');
+      const insertIdx = videoIdx >= 0 ? videoIdx + 1 : Math.min(1, list.length);
+      const flipbookId = isValidUuid(page.id) ? 'f' + page.id.slice(1) : generateUuid();
+      const flipbookBlock: Block = {
+        id: flipbookId,
+        page_id: page.id,
+        type: 'files',
+        display_style: 'flipbook',
+        sort_order: insertIdx + 1,
+        is_visible: true,
+        data: { files: [] },
+      };
+      list.splice(insertIdx, 0, flipbookBlock);
+    }
+    list.sort((a, b) => a.sort_order - b.sort_order);
+    return list.map((b, idx) => ({ ...b, sort_order: idx + 1 }));
+  };
+
+  const [blockList, setBlockList] = useState<Block[]>(() => initializeBlocks(initialBlocks));
 
   // Modals
   const [editingBlock, setEditingBlock] = useState<Block | null>(null);
@@ -97,61 +121,6 @@ export default function ContentViewer({
   const [showEditPageModal, setShowEditPageModal] = useState(false);
   const [showAdminSettingsModal, setShowAdminSettingsModal] = useState(false);
   const [activeMenuBlockId, setActiveMenuBlockId] = useState<string | null>(null);
-
-  // Quản lý khối Sách lật 3D (Độc lập, tách rời danh sách phát, quản trị di chuyển/ẩn hiện)
-  const [flipbookOrder, setFlipbookOrder] = useState<number>(1); // 0: trên video, 1: ngay dưới playlist, 2: cuối trang
-  const [flipbookHidden, setFlipbookHidden] = useState<boolean>(false);
-
-  useEffect(() => {
-    try {
-      const storageKey = `flipbook_pos_${topic.slug}_${page.slug}`;
-      const saved = localStorage.getItem(storageKey);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (typeof parsed.order === 'number') setFlipbookOrder(parsed.order);
-        if (typeof parsed.hidden === 'boolean') setFlipbookHidden(parsed.hidden);
-      }
-    } catch {}
-  }, [topic.slug, page.slug]);
-
-  const handleFlipbookMoveUp = () => {
-    setFlipbookOrder((prev) => {
-      const next = Math.max(0, prev - 1);
-      try {
-        localStorage.setItem(
-          `flipbook_pos_${topic.slug}_${page.slug}`,
-          JSON.stringify({ order: next, hidden: flipbookHidden })
-        );
-      } catch {}
-      return next;
-    });
-  };
-
-  const handleFlipbookMoveDown = () => {
-    setFlipbookOrder((prev) => {
-      const next = Math.min(2, prev + 1);
-      try {
-        localStorage.setItem(
-          `flipbook_pos_${topic.slug}_${page.slug}`,
-          JSON.stringify({ order: next, hidden: flipbookHidden })
-        );
-      } catch {}
-      return next;
-    });
-  };
-
-  const handleFlipbookToggleVisibility = () => {
-    setFlipbookHidden((prev) => {
-      const next = !prev;
-      try {
-        localStorage.setItem(
-          `flipbook_pos_${topic.slug}_${page.slug}`,
-          JSON.stringify({ order: flipbookOrder, hidden: next })
-        );
-      } catch {}
-      return next;
-    });
-  };
 
   // Đọc dữ liệu từ localStorage khi client mount
   useEffect(() => {
@@ -179,7 +148,7 @@ export default function ContentViewer({
 
       // 4. Khối nội dung đã sửa
       const loadedBlocks = getStoredBlocks(page.id, initialBlocks);
-      setBlockList(loadedBlocks);
+      setBlockList(initializeBlocks(loadedBlocks));
 
       // 5. Trạng thái đã lưu, đã hoàn thành, theme & cài đặt tư vấn
       setIsSaved(isPageSaved(page.id));
@@ -398,7 +367,8 @@ export default function ContentViewer({
 
   // Di chuyển khối lên
   const handleMoveBlockUp = (index: number) => {
-    if (index === 0) return;
+    if (index <= 0 || index >= blockList.length) return;
+    playTapSound();
     const updated = [...blockList];
     const temp = updated[index - 1];
     updated[index - 1] = updated[index];
@@ -410,7 +380,8 @@ export default function ContentViewer({
 
   // Di chuyển khối xuống
   const handleMoveBlockDown = (index: number) => {
-    if (index === blockList.length - 1) return;
+    if (index < 0 || index >= blockList.length - 1) return;
+    playTapSound();
     const updated = [...blockList];
     const temp = updated[index + 1];
     updated[index + 1] = updated[index];
@@ -496,41 +467,93 @@ export default function ContentViewer({
       triggerSaveBlocks(updated);
     };
 
-  // Tạo danh sách mục lục từ các khối hiển thị
-  const tocItems: TocItem[] = blockList
-    .filter((b) => b.is_visible)
-    .map((block) => {
-      if (block.type === 'videos') {
-        return { id: block.id, label: 'Danh sách video' };
-      }
-      if (block.type === 'text') {
-        switch (block.display_style) {
-          case 'y_nghia':
-            return { id: block.id, label: 'Ý nghĩa' };
-          case 'diem_can_nho':
-            return { id: block.id, label: 'Điểm cần nhớ' };
-          case 'chu_y':
-            return { id: block.id, label: 'Chú ý' };
-          case 'sai_lam':
-            return { id: block.id, label: 'Sai lầm thường gặp' };
-          case 'giai_phap':
-            return { id: block.id, label: 'Giải pháp' };
-          default:
-            return null;
+  // Tạo danh sách mục lục phong phú, chi tiết từ các khối hiển thị
+  const tocItems: TocItem[] = (() => {
+    const textStyleCounts: Record<string, number> = {};
+
+    return blockList
+      .filter((b) => b.is_visible)
+      .map((block) => {
+        if (block.display_style === 'flipbook') {
+          return { id: block.id, label: 'Đọc sách lật 3D Atlas Y Khoa' };
         }
-      }
-      if (block.type === 'links' && block.display_style === 'related') {
-        return { id: block.id, label: 'Bài liên quan' };
-      }
-      if (block.type === 'files') {
-        return { id: block.id, label: 'Tài liệu' };
-      }
-      if (block.type === 'images') {
-        return { id: block.id, label: 'Hình ảnh' };
-      }
-      return null;
-    })
-    .filter((item): item is TocItem => item !== null);
+
+        if (block.type === 'videos') {
+          const firstVid = block.data?.videos?.[0];
+          const vidTitle = firstVid?.title ? `: ${firstVid.title}` : '';
+          const shortTitle = vidTitle.length > 32 ? vidTitle.slice(0, 30) + '…' : vidTitle;
+          return { id: block.id, label: `Video bài giảng${shortTitle}` };
+        }
+
+        if (block.type === 'text') {
+          const style = block.display_style || 'text';
+          textStyleCounts[style] = (textStyleCounts[style] || 0) + 1;
+          const count = textStyleCounts[style];
+
+          let baseLabel = 'Đoạn văn';
+          switch (style) {
+            case 'y_nghia':
+              baseLabel = 'Ý nghĩa';
+              break;
+            case 'diem_can_nho':
+              baseLabel = 'Điểm cần nhớ';
+              break;
+            case 'chu_y':
+              baseLabel = 'Lưu ý quan trọng';
+              break;
+            case 'sai_lam':
+              baseLabel = 'Sai lầm thường gặp';
+              break;
+            case 'giai_phap':
+              baseLabel = 'Giải pháp phục hồi';
+              break;
+            default:
+              baseLabel = 'Đoạn văn';
+          }
+
+          // Trích xuất từ khóa tiêu đề từ dòng đầu tiên nếu có
+          const firstLine = block.data?.lines?.[0]?.trim() || '';
+          const boldMatch = firstLine.match(/\*\*(.*?)\*\*/);
+          if (boldMatch && boldMatch[1]) {
+            const topicSnippet = boldMatch[1].trim();
+            const shortSnippet = topicSnippet.length > 25 ? topicSnippet.slice(0, 23) + '…' : topicSnippet;
+            return { id: block.id, label: `${baseLabel}: ${shortSnippet}` };
+          }
+
+          return {
+            id: block.id,
+            label: count > 1 ? `${baseLabel} (${count})` : baseLabel,
+          };
+        }
+
+        if (block.type === 'links' && block.display_style === 'related') {
+          return { id: block.id, label: 'Bài học liên quan trong chuyên đề' };
+        }
+
+        if (block.type === 'files') {
+          const firstFile = block.data?.files?.[0];
+          const fileName = firstFile?.name ? `: ${firstFile.name}` : '';
+          const shortName = fileName.length > 28 ? fileName.slice(0, 26) + '…' : fileName;
+          return { id: block.id, label: `Tài liệu y khoa${shortName}` };
+        }
+
+        if (block.type === 'comparison') {
+          const lTitle = block.data?.left_title;
+          const rTitle = block.data?.right_title;
+          if (lTitle && rTitle) {
+            return { id: block.id, label: `So sánh: ${lTitle} & ${rTitle}` };
+          }
+          return { id: block.id, label: 'Bảng so sánh 2 cột' };
+        }
+
+        if (block.type === 'images') {
+          return { id: block.id, label: 'Thư viện hình ảnh giải phẫu' };
+        }
+
+        return null;
+      })
+      .filter((item): item is TocItem => item !== null);
+  })();
 
   const formattedOrder = String(pageIndex).padStart(2, '0');
 
@@ -569,23 +592,70 @@ export default function ContentViewer({
   const customFiles: FileItem[] = filesBlocks.flatMap((b) => (b.type === 'files' ? b.data.files : []));
   const relatedLinksBlock = blockList.find((b) => b.type === 'links' && b.display_style === 'related');
 
+  const getBlockTitle = (block: Block): string => {
+    if (block.display_style === 'flipbook') {
+      return 'QUẢN TRỊ KHỐI SÁCH';
+    }
+    if (block.type === 'videos') {
+      return 'DANH SÁCH VIDEO';
+    }
+    if (block.type === 'text') {
+      switch (block.display_style) {
+        case 'y_nghia':
+          return 'Ý NGHĨA';
+        case 'diem_can_nho':
+          return 'ĐIỂM CẦN NHỚ';
+        case 'chu_y':
+          return 'CHÚ Ý';
+        case 'sai_lam':
+          return 'SAI LẦM THƯỜNG GẶP';
+        case 'giai_phap':
+          return 'GIẢI PHÁP';
+        default:
+          return 'ĐOẠN VĂN';
+      }
+    }
+    if (block.type === 'images') {
+      return block.display_style === 'gallery' ? 'BỘ SƯU TẬP ẢNH' : 'HÌNH ẢNH';
+    }
+    if (block.type === 'files') {
+      return 'TÀI LIỆU Y KHOA';
+    }
+    if (block.type === 'comparison') {
+      return 'SO SÁNH 2 CỘT';
+    }
+    if (block.type === 'links') {
+      return block.display_style === 'related' ? 'BÀI LIÊN QUAN' : 'LIÊN KẾT NGOÀI';
+    }
+    return 'KHỐI NỘI DUNG';
+  };
+
   const renderBlockItem = (
     block: Block,
-    idx: number,
-    isSubBlock = false
+    idx: number
   ) => {
     if (!isAdmin && !block.is_visible) return null;
 
-    const blockTitle =
-      block.type === 'videos'
-        ? 'DANH SÁCH VIDEO'
-        : block.type === 'text'
-        ? block.display_style.toUpperCase().replace('_', ' ')
-        : block.type === 'images'
-        ? 'HÌNH ẢNH'
-        : block.type === 'files'
-        ? 'TÀI LIỆU'
-        : 'BÀI LIÊN QUAN';
+    // Nếu là khối sách lật 3D
+    if (block.display_style === 'flipbook') {
+      return (
+        <div key={block.id} id={`block-${block.id}`}>
+          <FlipbookViewer
+            topicTitle={topic.title}
+            pageTitle={currentPage.title}
+            isAdmin={isAdmin}
+            isHidden={!block.is_visible}
+            onToggleVisibility={() => handleToggleVisibility(block.id)}
+            onMoveUp={() => handleMoveBlockUp(idx)}
+            onMoveDown={() => handleMoveBlockDown(idx)}
+            isFirst={idx === 0}
+            isLast={idx === blockList.length - 1}
+          />
+        </div>
+      );
+    }
+
+    const blockTitle = getBlockTitle(block);
 
     return (
       <div
@@ -728,7 +798,18 @@ export default function ContentViewer({
           summaryContent={
             block.type === 'videos' ? (
               <div className="flex flex-col gap-4">
-                {textBlocks.map((b) => renderBlockItem(b, blockList.indexOf(b), true))}
+                {textBlocks.map((b) => (
+                  <TextBlock
+                    key={b.id}
+                    displayStyle={b.display_style}
+                    lines={b.data.lines}
+                    format={b.data.format}
+                    images={b.data.images}
+                    files={b.data.files}
+                    videos={b.data.videos}
+                    fontSizeMode={fontSizeMode}
+                  />
+                ))}
                 {textBlocks.length === 0 && (
                   <p className="text-muted text-[14px] p-4 text-center">
                     Chưa có tóm tắt bằng văn bản cho bài học này.
@@ -754,22 +835,6 @@ export default function ContentViewer({
       </div>
     );
   };
-
-  // Khối sách lật 3D độc lập (Tách rời danh sách phát, quản trị di chuyển/ẩn hiện)
-  const renderFlipbookBlock = () => (
-    <FlipbookViewer
-      key="independent-flipbook-block"
-      topicTitle={topic.title}
-      pageTitle={currentPage.title}
-      isAdmin={isAdmin}
-      isHidden={flipbookHidden}
-      onToggleVisibility={handleFlipbookToggleVisibility}
-      onMoveUp={handleFlipbookMoveUp}
-      onMoveDown={handleFlipbookMoveDown}
-      isFirst={flipbookOrder === 0}
-      isLast={flipbookOrder === 2}
-    />
-  );
 
   return (
     <main className="flex-1 flex flex-col px-5 pt-2 pb-16 sm:pb-20 gap-3 sm:gap-3.5">
@@ -879,52 +944,25 @@ export default function ContentViewer({
         )}
       </section>
 
-      {/* 4. Danh sách các khối */}
-      {blockList.filter((b) => isAdmin || b.is_visible).length === 0 ? (
-        <div className="flex flex-col gap-4">
-          {renderFlipbookBlock()}
+      {/* 4. Danh sách tất cả các khối theo đúng thứ tự sắp xếp */}
+      <div className="flex flex-col gap-4">
+        {blockList
+          .filter((b) => isAdmin || b.is_visible)
+          .map((block) => {
+            const actualIdx = blockList.findIndex((item) => item.id === block.id);
+            return renderBlockItem(block, actualIdx);
+          })}
+
+        {blockList.filter((b) => isAdmin || b.is_visible).length === 0 && (
           <div className="p-8 text-center bg-white rounded-[22px] border border-line my-4">
             <p className="text-[17px] text-muted font-medium">
               Bài học đang được cập nhật nội dung.
             </p>
           </div>
-        </div>
-      ) : videoBlock ? (
-        <div className="flex flex-col gap-4">
-          {/* Vị trí 0: Khối sách lật phía trên video nếu Admin chọn chuyển lên */}
-          {flipbookOrder === 0 && renderFlipbookBlock()}
+        )}
+      </div>
 
-          {/* Khối video là trung tâm lớp học EdTech (chứa 3 tab: Giáo trình, Tóm tắt cốt lõi, Tài liệu) */}
-          {renderBlockItem(videoBlock, blockList.indexOf(videoBlock), false)}
-
-          {/* Vị trí 1 (Mặc định): Khối sách lật 3D độc lập ngay dưới danh sách bài học */}
-          {flipbookOrder === 1 && renderFlipbookBlock()}
-
-          {/* Các khối khác (nếu có khối nào không thuộc text / resource / videoBlock) */}
-          {blockList
-            .filter(
-              (b) =>
-                b.id !== videoBlock.id &&
-                b.type !== 'text' &&
-                b.type !== 'files' &&
-                b.type !== 'links' &&
-                b.type !== 'images' &&
-                b.type !== 'comparison'
-            )
-            .map((b) => renderBlockItem(b, blockList.indexOf(b), false))}
-
-          {/* Vị trí 2: Khối sách lật ở cuối cùng */}
-          {flipbookOrder === 2 && renderFlipbookBlock()}
-        </div>
-      ) : (
-        <div className="flex flex-col gap-4">
-          {flipbookOrder === 0 && renderFlipbookBlock()}
-          {blockList.map((block, idx) => renderBlockItem(block, idx, false))}
-          {flipbookOrder > 0 && renderFlipbookBlock()}
-        </div>
-      )}
-
-      {/* 5. Nút "+ Thêm nội dung" (Hiện khi ở chế độ Admin) */}
+      {/* 5. Nút "+ Thêm nội dung" (Hiện khi ở chế độ Admin, đặt ở cuối danh sách các khối) */}
       {isAdmin && (
         <div className="flex flex-col gap-2 mt-2">
           <button
@@ -936,13 +974,6 @@ export default function ContentViewer({
             <span>Thêm nội dung</span>
           </button>
         </div>
-      )}
-
-      {/* 6. Bài học liên quan trong chuyên đề (hiển thị đúng vị trí điều hướng cuối trang, không đặt lẫn vào tab Tài liệu) */}
-      {relatedLinksBlock && (
-        <section className="flex flex-col gap-2 mt-2">
-          {renderBlockItem(relatedLinksBlock, blockList.indexOf(relatedLinksBlock), false)}
-        </section>
       )}
 
       {/* 7. Cuối trang: Nút Chia sẻ và Thẻ tư vấn Zalo */}

@@ -44,8 +44,8 @@ export default function EditAppModal({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
-    setAppName(initialName);
-    setAppSubtitle(initialSubtitle || 'Kiến thức đúng · Sức khỏe bền vững');
+    setAppName(initialName || '');
+    setAppSubtitle(initialSubtitle ?? '');
     setLogoUrl(initialLogoUrl || null);
     setZaloUrl(initialZaloUrl || '');
     setHotline(initialHotline || '');
@@ -85,14 +85,14 @@ export default function EditAppModal({
       setIsSaving(true);
       setErrorMsg('');
 
-      const cleanName = appName.trim();
-      const cleanSubtitle = appSubtitle.trim() || 'Kiến thức đúng · Sức khỏe bền vững';
+      const cleanName = appName.trim() || 'Qbiz Books';
+      const cleanSubtitle = appSubtitle.trim();
       const cleanHotline = hotline.trim();
       const cleanZalo = zaloUrl.trim();
 
       const res = await saveSettingsApi({
         app_name: cleanName,
-        app_subtitle: cleanSubtitle,
+        app_subtitle: cleanSubtitle || null,
         logo_url: logoUrl,
         hotline: cleanHotline || null,
         zalo_url: cleanZalo || null,

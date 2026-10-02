@@ -35,15 +35,15 @@ interface HomeHeaderProps {
 
 export default function HomeHeader({
   initialAppName,
-  initialAppSubtitle = 'Kiến thức đúng · Sức khỏe bền vững',
+  initialAppSubtitle,
   initialLogoUrl,
   initialHotline,
   initialZaloUrl,
 }: HomeHeaderProps) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [supabaseOk, setSupabaseOk] = useState(false);
-  const [appName, setAppName] = useState(initialAppName);
-  const [appSubtitle, setAppSubtitle] = useState(initialAppSubtitle || 'Kiến thức đúng · Sức khỏe bền vững');
+  const [appName, setAppName] = useState(initialAppName || '');
+  const [appSubtitle, setAppSubtitle] = useState(initialAppSubtitle ?? '');
   const [logoUrl, setLogoUrl] = useState<string | null>(initialLogoUrl || null);
   const [hotline, setHotline] = useState<string | null>(initialHotline || null);
   const [zaloUrl, setZaloUrl] = useState<string | null>(initialZaloUrl || null);
@@ -98,8 +98,8 @@ export default function HomeHeader({
       setIsAdmin(isAdmin);
       setSupabaseOk(supabaseOk);
     });
-    setAppName(initialAppName);
-    if (initialAppSubtitle) setAppSubtitle(initialAppSubtitle);
+    setAppName(initialAppName || '');
+    setAppSubtitle(initialAppSubtitle ?? '');
     if (initialLogoUrl) setLogoUrl(initialLogoUrl);
     if (initialHotline) setHotline(initialHotline);
     if (initialZaloUrl) setZaloUrl(initialZaloUrl);
@@ -241,18 +241,22 @@ export default function HomeHeader({
               <button
                 type="button"
                 onClick={() => {
-                  setNameInput(userName === 'Dr. Tùng' ? '' : userName);
-                  setShowNameModal(true);
+                  if (isAdmin) {
+                    setShowEditApp(true);
+                  } else {
+                    setNameInput(userName === 'Dr. Tùng' ? '' : userName);
+                    setShowNameModal(true);
+                  }
                 }}
                 className="flex items-center gap-1 text-left group cursor-pointer hover:opacity-90 transition-opacity"
-                title="Bấm để đổi tên chào mừng của bạn"
+                title={isAdmin ? "Bấm để đổi tên & cấu hình ứng dụng" : "Bấm để đổi tên của bạn"}
               >
                 <div className="flex items-center gap-1 animate-greeting-bounce">
                   <span className="text-[17px] sm:text-[18px] font-black text-ink tracking-tight group-hover:text-blue-600 dark:group-hover:text-[#F8DF7B] transition-colors">
-                    Hello, {userName || 'Dr. Tùng'}!
+                    {appName ? appName : `Hello, ${userName || 'Dr. Tùng'}!`}
                   </span>
-                  <span className="text-[17px] sm:text-[18px] inline-block animate-wave select-none" aria-label="vẫy tay">
-                    👋
+                  <span className="text-[17px] sm:text-[18px] inline-block animate-wave select-none" aria-label="icon">
+                    {appName ? '📚' : '👋'}
                   </span>
                 </div>
               </button>
@@ -267,9 +271,11 @@ export default function HomeHeader({
                 <span className="absolute top-0 right-0 w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-[#F8DF7B]" />
               </button>
             </div>
-            <span className="text-[11px] sm:text-[11.5px] text-muted font-medium">
-              Kiến thức giải phẫu & Sức khỏe
-            </span>
+            {appSubtitle && appSubtitle.trim() ? (
+              <span className="text-[11px] sm:text-[11.5px] text-muted font-medium">
+                {appSubtitle.trim()}
+              </span>
+            ) : null}
           </div>
 
           <div className="flex items-center gap-2">

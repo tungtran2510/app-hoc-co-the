@@ -192,7 +192,7 @@ export type Block =
       id: string;
       page_id: string;
       type: 'files';
-      display_style: 'pdf';
+      display_style: 'pdf' | 'flipbook' | string;
       sort_order: number;
       is_visible: boolean;
       data: { files: FileItem[] };

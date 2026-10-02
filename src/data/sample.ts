@@ -87,25 +87,96 @@ export const DEFAULT_RECOMMENDED_BOOKS: RecommendedBook[] = [
 ];
 
 export const DEFAULT_AI_TRAINING: AiTrainingConfig = {
-  guidelines: `1. VAI TRÒ CHUYÊN MÔN: Trợ lý Sức Khỏe AI chia sẻ kiến thức giáo dục về cấu trúc cơ thể, cơ chế sinh học, thói quen sinh hoạt đúng và phục hồi tự nhiên theo tài liệu của tác giả Tùng dinh dưỡng.
-2. NGUYÊN TẮC AN TOÀN Y KHOA: Cung cấp thông tin tham khảo khoa học, không đưa ra chẩn đoán hay điều trị y khoa thay thế bác sĩ chuyên khoa.
+  guidelines: `1. VAI TRÒ CHUYÊN MÔN: Trợ lý Sức Khỏe AI đồng hành chia sẻ kiến thức chuẩn mực về 4 trụ cột sức khỏe: Cột sống xương khớp & Giải pháp DoctorLoan, Nước & Điện giải Gems, Dinh dưỡng chuyên sâu & Tiêu hóa, Giải phẫu học ứng dụng cơ thể người theo tài liệu đào tạo của tác giả.
+2. NGUYÊN TẮC AN TOÀN Y KHOA: Cung cấp thông tin giáo dục khoa học, cơ chế sinh học và giải pháp chăm sóc tự nhiên, không đưa ra chẩn đoán hay điều trị y tế thay thế bác sĩ chuyên khoa.
 3. PHONG CÁCH TRẢ LỜI: Luôn trả lời ngắn gọn (1-2 câu, tối đa 40-50 từ), đi thẳng vào kết luận theo tài liệu tác giả và điều hướng mở bài học trong hệ thống để xem chi tiết.
 4. TUYỆT ĐỐI CẤM: Tuyệt đối không nhắc đến các cụm từ như "tác giả không phải bác sĩ", "Tùng không phải bác sĩ" hay giải thích danh xưng.`,
   documents: [
     {
-      id: 'doc-1',
-      title: 'Triết lý phục hồi cột sống tự nhiên & Sinh cơ học',
-      content: `Cột sống không tự nhiên bị hỏng hay thoái hóa nhanh chóng, mà là kết quả của việc chịu áp lực sai tư thế tích tụ qua nhiều năm.
-Cơ chế tự phục hồi: Đĩa đệm không có mạch máu trực tiếp nuôi dưỡng ở người trưởng thành, nó nhận dinh dưỡng qua cơ chế thẩm thấu khi chúng ta vận động nhịp nhàng (bơm hút dịch). Khi ngồi yên một chỗ quá lâu, đĩa đệm bị thiếu nước và xơ cứng.
-Nguyên tắc chăm sóc & phục hồi tự nhiên: Giảm áp lực nén ép xấu -> Tăng cường tuần hoàn thẩm thấu -> Củng cố hệ cơ lõi (core) và dây chằng để giữ vững trục sinh lý.`,
-      updated_at: new Date().toISOString(),
+      id: 'doc-cot-song-1',
+      title: 'Cột sống, Đĩa đệm & Cơ chế thoái hóa xương khớp',
+      content: `Cột sống gồm 33-34 đốt sống tạo thành 4 đường cong sinh lý tự nhiên. Đĩa đệm đóng vai trò giảm chấn sinh học gồm vòng sợi và nhân nhầy ngậm nước. Nguyên nhân cốt lõi thoái hóa là sự mất đường cong sinh lý, sai lệch trục chịu lực và thiếu vận động thẩm thấu dưỡng chất.`,
+      updated_at: '2026-10-02T00:00:00.000Z',
+    },
+    {
+      id: 'doc-doctorloan-1',
+      title: 'Giải pháp DoctorLoan: Định hình & Phục hồi trục cột sống tự nhiên',
+      content: `Giải pháp DoctorLoan tạo lực uốn nắn đa chiều tái tạo và giữ vững độ cong sinh lý chuẩn của cột sống cổ và thắt lưng. Thiết bị mở rộng khe gian đốt sống, giải áp lực nội đĩa đệm, giải phóng chèn ép rễ thần kinh và cân chỉnh khung chậu.`,
+      updated_at: '2026-10-02T00:00:00.000Z',
+    },
+    {
+      id: 'doc-doctorloan-2',
+      title: 'Bộ bài tập chuẩn DoctorLoan & Phản ứng chỉnh hình sinh học',
+      content: `Bài tập chuẩn DoctorLoan kết hợp tư thế nằm trên thiết bị chỉnh hình chuyên dụng với nhịp thở điều hòa và co gập chân nhẹ nhàng. Phản ứng chỉnh hình: Trong 3-7 ngày đầu có thể thấy căng tức hoặc hơi mỏi do các đốt sống và cơ co rút đang được nắn về vị trí chuẩn.`,
+      updated_at: '2026-10-02T00:00:00.000Z',
+    },
+    {
+      id: 'doc-nuoc-gems-1',
+      title: 'Nước Gems: Bản chất của nước tốt đối với tế bào & Sức khỏe',
+      content: `Nước tốt ion kiềm giàu hydro Gems sở hữu 4 đặc tính vàng: Tính kiềm tự nhiên pH 8.5-9.5 trung hòa axit dư thừa; Khả năng chống oxy hóa ORP âm sâu triệt tiêu gốc tự do; Cụm phân tử nước siêu nhỏ thẩm thấu cấp nước tức thì; Giàu khoáng chất ion Ca, Mg, K dễ hấp thu.`,
+      updated_at: '2026-10-02T00:00:00.000Z',
+    },
+    {
+      id: 'doc-nuoc-gems-2',
+      title: 'Quy trình chuẩn Demo Test Nước Gems & Thí nghiệm thực nghiệm',
+      content: `4 thí nghiệm trực quan: Test pH bằng dung dịch chỉ thị (tím kiềm vs vàng axit); Test chống oxy hóa với Betadine (nước Gems khử trong suốt tức thì); Test cụm phân tử nước nhỏ pha trà mạn nước nguội bừng sắc trà; Test hòa tan bẻ gãy dầu mỡ làm sạch lòng mạch.`,
+      updated_at: '2026-10-02T00:00:00.000Z',
+    },
+    {
+      id: 'doc-dinh-duong-1',
+      title: 'Dinh dưỡng nền tảng & Dinh dưỡng chuyên sâu cấp độ tế bào',
+      content: `Dinh dưỡng chuyên sâu gồm: Đa lượng sinh năng lượng (Đạm xây cơ sụn, Chất béo bảo vệ màng tế bào, Tinh bột phức tạo năng lượng ổn định); Vi lượng xúc tác sinh hóa (Vitamin & khoáng chất canxi, magie, kẽm xúc tác tạo ATP trong ty thể).`,
+      updated_at: '2026-10-02T00:00:00.000Z',
+    },
+    {
+      id: 'doc-dinh-duong-2',
+      title: 'Cơ chế hoạt động hệ tiêu hóa & Hấp thu dưỡng chất',
+      content: `Hệ tiêu hóa: Khoang miệng nhai kỹ nghiền nhỏ và men amylase; Dạ dày axit mạnh phân giải đạm; Tá tràng nhận dịch mật và men tụy; Ruột non hấp thu 90% dưỡng chất qua vi nhung mao; Đại tràng hấp thu nước và nuôi dưỡng hệ vi sinh microbiome.`,
+      updated_at: '2026-10-02T00:00:00.000Z',
+    },
+    {
+      id: 'doc-giai-phau-1',
+      title: 'Giải phẫu học xương khớp ứng dụng & Cân bằng chuyển động',
+      content: `Khớp háng và đốt sống thắt lưng hoạt động theo cơ chế bản lề động. Khi khớp háng cứng hoặc cơ mông yếu, cột sống thắt lưng chịu tải thay thế dẫn đến thoát vị. Cần giải phóng điểm căng cứng cơ và kích hoạt nhóm cơ giữ trục bảo vệ cột sống.`,
+      updated_at: '2026-10-02T00:00:00.000Z',
+    },
+    {
+      id: 'doc-giai-phau-2',
+      title: 'Giải phẫu đường tiêu hóa & Các tạng phụ trợ (Gan - Mật - Tụy)',
+      content: `Ống tiêu hóa từ miệng đến đại tràng kết hợp chặt chẽ với 3 tạng phụ trợ: Gan lọc thải độc và tiết mật liên tục; Túi mật cô đặc và co bóp dự trữ dịch mật; Tuyến tụy tiết enzyme tiêu hóa và hormone insulin cân bằng chuyển hóa.`,
+      updated_at: '2026-10-02T00:00:00.000Z',
     },
   ],
   faqs: [
     {
       id: 'faq-1',
-      question: 'Thoát vị đĩa đệm có tập xà đơn được không?',
-      answer: 'Tác giả lưu ý chỉ nên treo người thả lỏng nhẹ nhàng để giải áp lực cột sống, tuyệt đối không đu gập người hay nhảy tiếp đất mạnh gây sốc đĩa đệm.',
+      question: 'Thoát vị đĩa đệm có dùng được giải pháp DoctorLoan không?',
+      answer: 'Hoàn toàn dùng được và rất hiệu quả. Giải pháp DoctorLoan giúp nắn chỉnh lại đường cong sinh lý tự nhiên, giải áp lực nén ép đĩa đệm và mở rộng khe gian đốt sống để đĩa đệm tự phục hồi.',
+    },
+    {
+      id: 'faq-2',
+      question: 'Tại sao mới nằm gối DoctorLoan lại thấy hơi tức hoặc mỏi lưng?',
+      answer: 'Đây là phản ứng chỉnh hình sinh học bình thường khi các đốt sống và dải cơ bị co rút sai lệch nhiều năm đang được kéo giãn định vị lại về trục chuẩn tự nhiên. Cảm giác này sẽ hết sau vài ngày.',
+    },
+    {
+      id: 'faq-3',
+      question: 'Nước ion kiềm Gems khác gì so với nước lọc RO thông thường?',
+      answer: 'Nước RO thông thường có tính axit nhẹ và mất hết khoáng chất. Nước Gems giàu hydro, có độ pH kiềm tự nhiên 8.5-9.5, chỉ số chống oxy hóa ORP âm sâu và cụm phân tử nước siêu nhỏ giúp thẩm thấu cấp nước tế bào tức thì.',
+    },
+    {
+      id: 'faq-4',
+      question: 'Cách thực hiện bài test nước phân tử nhỏ bằng trà mạn như thế nào?',
+      answer: 'Lấy 2 cốc nước nguội (1 cốc nước thường, 1 cốc nước Gems), thả cùng một lượng trà mạn khô vào. Cốc nước thường không thể đổi màu trà, trong khi nước Gems lập tức bừng sắc vàng óng của trà vì cụm phân tử nước siêu nhỏ thẩm thấu xuyên qua lá trà.',
+    },
+    {
+      id: 'faq-5',
+      question: 'Tại sao nhai kỹ lại là bước quan trọng nhất của hệ tiêu hóa?',
+      answer: 'Nhai kỹ giúp nghiền nhỏ cơ học thức ăn và hòa trộn men amylase trong nước bọt, giảm tải tới 70% gánh nặng nghiền bóp cho dạ dày, ngăn ngừa viêm loét và giúp ruột non hấp thu dưỡng chất tối đa.',
+    },
+    {
+      id: 'faq-6',
+      question: 'Muốn phòng ngừa thoái hóa cột sống cổ khi làm việc văn phòng thì làm thế nào?',
+      answer: 'Cần giữ màn hình máy tính ngang tầm mắt để cổ không bị cúi gập, duy trì tư thế ngồi thẳng lưng và cứ sau mỗi 45-60 phút nên đứng dậy vận động xoay vai nhẹ nhàng để đĩa đệm được bơm hút dịch dinh dưỡng.',
     },
   ],
 };
