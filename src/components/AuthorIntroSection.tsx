@@ -102,15 +102,33 @@ export function AuthorProfileSection({
           {/* Họa tiết trang trí viền cao cấp góc phải */}
           <div className="absolute top-0 right-0 w-32 h-32 opacity-10 dark:opacity-20 pointer-events-none bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-300 dark:from-purple-400 via-transparent to-transparent" />
 
-          {/* 1. Phần Đầu: Chân dung bên trái + Tên & Sứ mệnh bên phải */}
-          <div className="relative z-10 flex items-start gap-3.5 sm:gap-4">
-            {/* Ảnh chân dung chuyên gia */}
-            <div className="w-[110px] sm:w-[124px] aspect-[4/5] rounded-[14px] overflow-hidden bg-slate-100 dark:bg-[#241548] shrink-0 border border-slate-200/90 dark:border-purple-400/40 shadow-xs relative">
+          {/* 1. Phần Tiêu Đề Tác Giả Ở Trên Cùng (Editorial Magazine Header) */}
+          <div className="relative z-10 flex flex-col gap-0.5">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="text-[22px] sm:text-[25px] font-black tracking-tight text-slate-900 dark:text-white uppercase font-serif leading-tight">
+                {profile.name && profile.name.toLowerCase().includes('tùng') ? 'Tùng Dinh Dưỡng' : (profile.name || 'Tùng Dinh Dưỡng')}
+              </h3>
+              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-white shrink-0 shadow-2xs" title="Chuyên gia được xác thực">
+                <Check size={11} strokeWidth={3.5} />
+              </span>
+            </div>
+
+            {profile.title && (
+              <p className="text-[12.5px] sm:text-[13px] font-semibold text-[#1E3A8A] dark:text-[#A5B4FC] tracking-wide">
+                {profile.title.replace(/\.$/, '')}
+              </p>
+            )}
+          </div>
+
+          {/* 2. Phần Thân: Avatar vòm mềm nghệ thuật (Anti-Nested-Frame) + Tiểu sử bên cạnh */}
+          <div className="relative z-10 flex items-start gap-3.5 sm:gap-4 pt-0.5">
+            {/* Ảnh chân dung chuyên gia - Dáng vòm mềm bất đối xứng, không viền hộp chữ nhật thô cứng */}
+            <div className="w-[115px] sm:w-[128px] aspect-[4/5] rounded-tl-[14px] rounded-tr-[38px] rounded-bl-[14px] rounded-br-[22px] overflow-hidden bg-slate-100 dark:bg-[#241548] shrink-0 shadow-sm relative">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={profile.avatar_url || '/images/author_tung.png'}
                 alt={profile.name || 'Tùng Dinh Dưỡng'}
-                className="w-full h-full object-cover object-[50%_15%] scale-110 transition-transform duration-300 hover:scale-115"
+                className="w-full h-full object-cover object-[50%_15%] scale-105 transition-transform duration-300 hover:scale-110"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/images/author_tung.png';
                 }}
@@ -118,23 +136,8 @@ export function AuthorProfileSection({
             </div>
 
             <div className="flex-1 flex flex-col gap-1 min-w-0 pt-0.5">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <h3 className="text-[19px] sm:text-[21px] font-bold text-slate-900 dark:text-white leading-tight">
-                  {profile.name && profile.name.toLowerCase().includes('tùng') ? 'Tùng Dinh Dưỡng' : (profile.name || 'Tùng Dinh Dưỡng')}
-                </h3>
-                <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-blue-600 text-white shrink-0 shadow-2xs" title="Chuyên gia được xác thực">
-                  <Check size={10} strokeWidth={3.5} />
-                </span>
-              </div>
-
-              {profile.title && (
-                <p className="text-[12px] sm:text-[13px] font-semibold text-[#1E3A8A] dark:text-[#A5B4FC] leading-snug">
-                  {profile.title.replace(/\.$/, '')}
-                </p>
-              )}
-
               {profile.bio && (
-                <p className="text-[12.5px] sm:text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-4 mt-0.5 font-normal font-sans">
+                <p className="text-[12.5px] sm:text-[13.5px] text-slate-600 dark:text-slate-300 leading-relaxed font-normal font-sans">
                   {profile.bio}
                 </p>
               )}
