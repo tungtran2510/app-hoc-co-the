@@ -24,6 +24,8 @@ import {
   ZoomIn,
   ZoomOut,
   Edit2,
+  Check,
+  Type,
 } from 'lucide-react';
 import { checkIsAdminClient } from '../lib/adminAuth';
 import { renderPageToCanvas } from '../lib/atlasCanvasGenerator';
@@ -53,10 +55,25 @@ export const DEFAULT_ANATOMY_PAGES: FlipbookPage[] = [
   {
     id: 'page-1',
     pageNum: 1,
-    title: 'Atlas Giải Phẫu Cột Sống & Cơ Thể 3D',
+    title: 'Lời Mở Đầu & Cấu Trúc Trục Cột Sống',
     category: 'GIÁO TRÌNH Y HỌC NỀN TẢNG',
     badge: 'Y KHOA LÂM SÀNG',
-    imageUrl: '/documents/covers/cover_atlas_y_khoa_toan_dien.png',
+    content: {
+      heading: 'Lời Mở Đầu & Mục Lục Chuyên Đề',
+      subheading: 'Cột trụ nâng đỡ cơ thể và bảo vệ tủy sống trung ương',
+      paragraphs: [
+        'Cột sống là trục cơ học trung tâm nâng đỡ toàn bộ nửa trên thân mình và bảo vệ tủy sống - đường dẫn truyền xung thần kinh quan trọng nhất cơ thể.',
+        'Cuốn tài liệu này tổng hợp toàn diện cấu trúc 33-34 đốt sống, 23 đĩa đệm sinh học, mạng lưới cơ - dây chằng và các nguyên tắc bảo tồn vận động chuẩn y khoa.',
+      ],
+      bullets: [
+        'Chương 1: Phân đoạn giải phẫu 33-34 đốt sống & 4 đường cong sinh lý.',
+        'Chương 2: Cột sống cổ C1-C7 và cơ chế vận động xoay 180° của đầu.',
+        'Chương 3: Cột sống ngực T1-T12 và khung lồng ngực bảo vệ nội tạng.',
+        'Chương 4: Trục thắt lưng L1-L5, xương cùng chậu và đĩa đệm giảm chấn.',
+      ],
+      highlight: 'Hiểu rõ cấu trúc giải phẫu là nền tảng đầu tiên để bảo vệ cột sống và phòng ngừa thoát vị đĩa đệm.',
+      diagramType: 'spine_overview',
+    },
   },
   {
     id: 'page-2',
@@ -261,6 +278,49 @@ export const DEFAULT_ANATOMY_PAGES: FlipbookPage[] = [
   },
 ];
 
+export const CLEAN_COVER_PRESETS = [
+  {
+    id: 'navy',
+    name: 'Xanh Navy Hoàng Gia',
+    url: '/documents/covers/clean_cover_navy.png',
+    desc: 'Mẫu chuẩn Y Khoa sang trọng, viền vàng kim dập nổi',
+  },
+  {
+    id: 'emerald',
+    name: 'Lục Bảo Phục Hồi',
+    url: '/documents/covers/clean_cover_emerald.png',
+    desc: 'Y học phục hồi tự nhiên, xanh ngọc quý phái',
+  },
+  {
+    id: 'burgundy',
+    name: 'Đỏ Rượu Dinh Dưỡng',
+    url: '/documents/covers/clean_cover_burgundy.png',
+    desc: 'Dinh dưỡng tế bào & kháng viêm, sang trọng',
+  },
+  {
+    id: 'slate',
+    name: 'Đêm Midnight Cột Sống',
+    url: '/documents/covers/clean_cover_slate.png',
+    desc: 'Cơ sinh học & cột sống 3D công nghệ cao',
+  },
+  {
+    id: 'pure_frame',
+    name: 'Khung Vàng Tối Giản',
+    url: '/documents/covers/clean_cover_pure_frame.png',
+    desc: 'Nền sạch 100% khung vàng kim thanh lịch',
+  },
+];
+
+export const isOldOrBrokenCover = (url?: string | null) => {
+  if (!url || !url.trim()) return true;
+  if (url.startsWith('blob:')) return true;
+  if (url === '/images/book_cover_blank.jpg') return true;
+  if (url.includes('/documents/covers/cover_')) return true;
+  if (url.includes('8345656d-8d0f-4f15-b943-6efd775e4ec7')) return true;
+  if (url.includes('/images/lessons/') || url.includes('/lessons/')) return true;
+  return false;
+};
+
 export interface FlipbookViewerProps {
   initialPages?: FlipbookPage[];
   book?: BookInfoInput | null;
@@ -269,6 +329,7 @@ export interface FlipbookViewerProps {
   pageTitle?: string;
   coverUrl?: string;
   onUpdateCover?: (newCoverUrl: string) => void;
+  onUpdateTitle?: (newTitle: string) => void;
   onOpenEditBlockModal?: () => void;
   isAdmin?: boolean;
   isHidden?: boolean;
@@ -290,6 +351,7 @@ export default function FlipbookViewer({
   pageTitle = 'Giải Phẫu',
   coverUrl,
   onUpdateCover,
+  onUpdateTitle,
   onOpenEditBlockModal,
   isAdmin: propIsAdmin,
   isHidden = false,
@@ -312,13 +374,10 @@ export default function FlipbookViewer({
     } else {
       p = DEFAULT_ANATOMY_PAGES;
     }
-    if (coverUrl && p.length > 0) {
-      p = [{ ...p[0], imageUrl: coverUrl }, ...p.slice(1)];
-    }
     return p;
   });
 
-  // Tự động đồng bộ danh sách trang khi initialPages, book, title hoặc coverUrl thay đổi
+  // Tự động đồng bộ danh sách trang khi initialPages, book, title thay đổi
   useEffect(() => {
     let p: FlipbookPage[] = [];
     if (initialPages && initialPages.length > 0) {
@@ -331,11 +390,8 @@ export default function FlipbookViewer({
     } else {
       p = [...DEFAULT_ANATOMY_PAGES];
     }
-    if (coverUrl && p.length > 0) {
-      p = [{ ...p[0], imageUrl: coverUrl }, ...p.slice(1)];
-    }
     setPages(p);
-  }, [initialPages, book, title, coverUrl]);
+  }, [initialPages, book, title]);
 
   const [pageImages, setPageImages] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -348,16 +404,18 @@ export default function FlipbookViewer({
 
   // Tiêu đề sách: Tự sinh hoặc do người dùng tự điền
   const defaultAutoTitle = (() => {
+    if (title && title !== 'Tài liệu tham khảo' && title !== 'Đọc thử sách 3D' && title !== 'Đọc thử tài liệu 3D') return title;
     if (book?.title) return book.title;
     if (pageTitle && pageTitle.trim()) return `Atlas Giải Phẫu · ${pageTitle.trim()}`;
     if (topicTitle && topicTitle.trim()) return `Atlas Y Khoa · ${topicTitle.trim()}`;
-    if (title && title !== 'Tài liệu tham khảo' && title !== 'Đọc thử sách 3D') return title;
     return 'Atlas Giải Phẫu & Sức Khỏe 3D';
   })();
 
   const [bookTitle, setBookTitle] = useState<string>(defaultAutoTitle);
   const [isEditingTitle, setIsEditingTitle] = useState<boolean>(false);
-  const [titleInput, setTitleInput] = useState<string>('');
+  const [isEditingTitleInFullscreen, setIsEditingTitleInFullscreen] = useState<boolean>(false);
+  const [titleInput, setTitleInput] = useState<string>(defaultAutoTitle);
+  const [tempTitle, setTempTitle] = useState<string>(defaultAutoTitle);
 
   useEffect(() => {
     try {
@@ -365,11 +423,17 @@ export default function FlipbookViewer({
       const saved = localStorage.getItem(storageKey);
       if (saved && saved.trim()) {
         setBookTitle(saved.trim());
+        setTitleInput(saved.trim());
+        setTempTitle(saved.trim());
       } else {
         setBookTitle(defaultAutoTitle);
+        setTitleInput(defaultAutoTitle);
+        setTempTitle(defaultAutoTitle);
       }
     } catch {
       setBookTitle(defaultAutoTitle);
+      setTitleInput(defaultAutoTitle);
+      setTempTitle(defaultAutoTitle);
     }
   }, [pageTitle, topicTitle, title, defaultAutoTitle]);
 
@@ -377,26 +441,31 @@ export default function FlipbookViewer({
     const trimmed = val.trim();
     const finalVal = trimmed || defaultAutoTitle;
     setBookTitle(finalVal);
+    setTitleInput(finalVal);
+    setTempTitle(finalVal);
     setIsEditingTitle(false);
     try {
       const storageKey = `custom_book_casing_title_${pageTitle || topicTitle || 'default'}`;
-      if (trimmed) {
+      if (trimmed && trimmed !== defaultAutoTitle) {
         localStorage.setItem(storageKey, trimmed);
       } else {
         localStorage.removeItem(storageKey);
       }
     } catch {}
+    if (onUpdateTitle) {
+      onUpdateTitle(finalVal);
+    }
   };
 
-  // Quản lý ảnh bìa sách tùy chỉnh (Custom Cover Image)
-  const defaultCoverUrl = '/documents/covers/cover_atlas_y_khoa_toan_dien.png';
+  // Quản lý ảnh bìa sách sạch & sang trọng (Clean Luxury Cover Image)
+  const defaultCoverUrl = '/documents/covers/clean_cover_navy.png';
   const coverStorageKey = `custom_book_cover_${pageTitle || topicTitle || 'default'}`;
   const [currentCoverUrl, setCurrentCoverUrl] = useState<string>(() => {
-    if (coverUrl && coverUrl.trim() && !coverUrl.startsWith('blob:')) return coverUrl.trim();
+    if (coverUrl && !isOldOrBrokenCover(coverUrl)) return coverUrl.trim();
     if (typeof window !== 'undefined') {
       try {
         const saved = localStorage.getItem(coverStorageKey);
-        if (saved && saved.trim() && !saved.startsWith('blob:') && saved !== '/images/book_cover_blank.jpg') {
+        if (saved && !isOldOrBrokenCover(saved)) {
           return saved.trim();
         }
       } catch {}
@@ -409,20 +478,23 @@ export default function FlipbookViewer({
   const [isUploadingCover, setIsUploadingCover] = useState<boolean>(false);
 
   useEffect(() => {
-    if (coverUrl && coverUrl.trim() && !coverUrl.startsWith('blob:')) {
+    if (coverUrl && !isOldOrBrokenCover(coverUrl)) {
       setCurrentCoverUrl(coverUrl.trim());
       setTempCoverUrl(coverUrl.trim());
     } else {
       try {
         const saved = localStorage.getItem(coverStorageKey);
-        if (saved && saved.trim() && !saved.startsWith('blob:') && saved !== '/images/book_cover_blank.jpg') {
+        if (saved && !isOldOrBrokenCover(saved)) {
           setCurrentCoverUrl(saved.trim());
           setTempCoverUrl(saved.trim());
         } else {
           setCurrentCoverUrl(defaultCoverUrl);
           setTempCoverUrl(defaultCoverUrl);
         }
-      } catch {}
+      } catch {
+        setCurrentCoverUrl(defaultCoverUrl);
+        setTempCoverUrl(defaultCoverUrl);
+      }
     }
   }, [coverUrl, coverStorageKey, defaultCoverUrl]);
 
@@ -440,7 +512,6 @@ export default function FlipbookViewer({
     if (onUpdateCover) {
       onUpdateCover(finalUrl === defaultCoverUrl ? '' : finalUrl);
     }
-    setShowCoverModal(false);
   };
 
   // Tránh chặn thao tác vuốt cuộn trang trên mobile khi chạm vào bìa sách
@@ -1153,9 +1224,15 @@ export default function FlipbookViewer({
           </div>
         </div>
 
-        {/* BÌA SÁCH ĐÓNG/MỞ - SÁT VIỀN, KHÔNG KHUNG CHỒNG KHUNG, VUỐT CUỘN TRANG TRƠN TRU */}
+        {/* =========================================================================
+            LỚP PHỦ ẢNH BÌA SÁCH (COVER OVERLAY)
+            - Nền sạch sang trọng (Clean Cover) không in chữ sẵn
+            - Tiêu đề {bookTitle} hiển thị động bằng typography mạ vàng sắc nét
+            - Cho phép Admin sửa tiêu đề tại chỗ hoặc thay ảnh nền bìa
+            - Chạm vào lớp phủ để mở cuốn sách đọc các trang bên trong
+            ========================================================================= */}
         <div
-          className="w-full aspect-[4/3] max-h-[500px] rounded-[16px] bg-[#0c1626] relative overflow-hidden flex items-center justify-center group shadow-xl my-1 cursor-pointer touch-pan-y"
+          className="w-full aspect-[4/3] max-h-[500px] rounded-[18px] bg-[#0c1626] relative overflow-hidden flex items-center justify-center group shadow-2xl my-2 cursor-pointer touch-pan-y border border-amber-500/30 select-none"
           style={{ touchAction: 'pan-y' }}
           onTouchStart={onCoverTouchStart}
           onTouchMove={onCoverTouchMove}
@@ -1166,30 +1243,48 @@ export default function FlipbookViewer({
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsFullscreen(true); }}
           aria-label={`Mở đọc: ${bookTitle}`}
         >
-          {/* Nút Thay Bìa Nhanh (Overlay góc trên bên phải khi ở chế độ Admin) */}
+          {/* Nút Quản Trị Admin: Sửa tiêu đề & Thay ảnh bìa (Góc trên bên phải) */}
           {isAdmin && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowCoverModal(true);
-              }}
-              className="absolute top-2.5 right-2.5 z-30 flex items-center gap-1.5 px-2.5 py-1 rounded-[8px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[11px] shadow-lg border border-amber-300 cursor-pointer backdrop-blur-xs transition-transform active:scale-95"
-              title="Tải ảnh bìa sách mới lên"
-            >
-              <ImageIcon size={12} strokeWidth={2.5} />
-              <span>Thay ảnh bìa</span>
-            </button>
+            <div className="absolute top-2.5 right-2.5 z-30 flex items-center gap-1.5 pointer-events-auto">
+              {/* Nút Sửa Tiêu Đề Trực Tiếp */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsEditingTitle(true);
+                  setTitleInput(bookTitle);
+                }}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-[8px] bg-slate-900/90 hover:bg-slate-800 text-amber-300 font-extrabold text-[11px] shadow-lg border border-amber-400/60 cursor-pointer backdrop-blur-xs transition-transform active:scale-95"
+                title="Sửa tiêu đề sách trên bìa"
+              >
+                <Edit2 size={12} strokeWidth={2.5} />
+                <span>Sửa tiêu đề</span>
+              </button>
+
+              {/* Nút Thay Ảnh Bìa */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowCoverModal(true);
+                }}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-[8px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[11px] shadow-lg border border-amber-300 cursor-pointer backdrop-blur-xs transition-transform active:scale-95"
+                title="Chọn mẫu bìa sạch hoặc tải ảnh bìa mới"
+              >
+                <ImageIcon size={12} strokeWidth={2.5} />
+                <span>Thay bìa</span>
+              </button>
+            </div>
           )}
 
-          {/* Ảnh bìa sách mở - tràn sát viền tự nhiên, KHÔNG CHẶN TOUCH VUỐT TRANG, TỰ ĐỘNG FALLBACK BẢO VỆ 100% */}
+          {/* Ảnh nền bìa sách sạch sang trọng (Tràn viền tự nhiên) */}
           <img
             src={currentCoverUrl}
             alt=""
             role="presentation"
             loading="eager"
             onError={(e) => {
-              const fallback = '/documents/covers/cover_atlas_y_khoa_toan_dien.png';
+              const fallback = '/documents/covers/clean_cover_navy.png';
               if (e.currentTarget.src !== window.location.origin + fallback) {
                 e.currentTarget.src = fallback;
               }
@@ -1199,24 +1294,75 @@ export default function FlipbookViewer({
             style={{ pointerEvents: 'none', userSelect: 'none' }}
           />
 
-          {/* Lớp phủ tiêu đề trên trang sách mở - chỉ hiện khi dùng ảnh sổ mở book_cover_blank */}
-          {currentCoverUrl.includes('book_cover_blank') && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none px-6 sm:px-16 text-center">
-              <h3 className="text-[#0d1b33] font-serif font-black text-[18px] sm:text-[24px] leading-tight tracking-normal drop-shadow-[0_1px_2px_rgba(255,255,255,0.7)] max-w-[90%] line-clamp-3">
-                {bookTitle}
-              </h3>
-              <div className="w-16 h-[2px] bg-amber-600/70 rounded-full mt-3 mb-2" />
-              <p className="text-[#3b4961] text-[11px] sm:text-[13px] font-bold tracking-wider uppercase">
-                Tài liệu tham khảo
-              </p>
-            </div>
-          )}
+          {/* Lớp phủ chuyển sắc nhẹ đảm bảo chữ luôn nổi rõ 100% */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/50 z-1 pointer-events-none" />
 
-          {/* Nút gợi ý ấn vào để đọc */}
-          <div className="absolute bottom-3.5 inset-x-0 flex justify-center z-20">
-            <div className="px-4 py-1.5 rounded-full bg-[#0d1b33]/90 text-amber-200 text-[11.5px] sm:text-[13px] font-extrabold border border-amber-400/50 flex items-center gap-1.5 shadow-xl backdrop-blur-xs group-hover:bg-[#0d1b33] group-hover:scale-105 transition-all">
-              <BookOpen size={14} />
-              <span>Chạm để mở đọc</span>
+          {/* LỚP PHỦ NỘI DUNG BÌA (TYPOGRAPHY DYNAMIC) */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-10 px-6 sm:px-14 text-center pointer-events-none">
+            {/* Nhãn loại tài liệu trên đầu */}
+            <div className="text-[10px] sm:text-[11.5px] font-black tracking-[0.2em] text-amber-300 uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] mb-1.5 sm:mb-2.5">
+              ✦ GIÁO TRÌNH & ATLAS Y KHOA 3D ✦
+            </div>
+
+            {/* Tiêu đề sách: Cho phép sửa inline hoặc hiển thị chữ vàng kim sang trọng */}
+            {isEditingTitle ? (
+              <div
+                className="w-full max-w-[90%] sm:max-w-[80%] flex flex-col items-center gap-2 z-30 pointer-events-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <textarea
+                  value={titleInput}
+                  onChange={(e) => setTitleInput(e.target.value)}
+                  rows={2}
+                  className="w-full text-center text-amber-200 font-serif font-black text-[16px] sm:text-[20px] bg-slate-950/90 border-2 border-amber-400 rounded-[12px] p-2 focus:outline-none shadow-2xl"
+                  placeholder="Nhập tiêu đề sách..."
+                  autoFocus
+                />
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleSaveTitle(titleInput)}
+                    className="flex items-center gap-1 px-3 py-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black rounded-[8px] text-[12px] shadow-md cursor-pointer transition-all active:scale-95"
+                  >
+                    <Check size={14} strokeWidth={2.5} />
+                    <span>Lưu tiêu đề</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsEditingTitle(false);
+                      setTitleInput(bookTitle);
+                    }}
+                    className="px-3 py-1 bg-white/20 hover:bg-white/30 text-white font-bold rounded-[8px] text-[12px] cursor-pointer"
+                  >
+                    Hủy
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <h2 className="text-amber-100 font-serif font-black text-[17px] sm:text-[23px] md:text-[26px] leading-tight tracking-normal drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)] max-w-[92%] line-clamp-3">
+                {bookTitle}
+              </h2>
+            )}
+
+            {/* Hoa văn ngăn cách mạ vàng sang trọng */}
+            <div className="flex items-center justify-center gap-2 my-2 sm:my-3">
+              <div className="w-10 sm:w-16 h-[1.5px] bg-gradient-to-r from-transparent via-amber-400/80 to-transparent" />
+              <span className="text-amber-400 text-[10px] sm:text-[12px]">◆</span>
+              <div className="w-10 sm:w-16 h-[1.5px] bg-gradient-to-l from-transparent via-amber-400/80 to-transparent" />
+            </div>
+
+            {/* Dòng phụ đề chuẩn y khoa */}
+            <p className="text-amber-200/90 italic font-serif text-[11.5px] sm:text-[13px] font-medium max-w-[85%] line-clamp-2 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
+              Tài liệu tra cứu cấu trúc giải phẫu học và sinh lý cơ quan chuẩn y khoa
+            </p>
+          </div>
+
+          {/* NÚT GỌI MỞ ĐỌC SÁCH NỔI BẬT Ở ĐÁY BÌA */}
+          <div className="absolute bottom-3.5 sm:bottom-4 inset-x-0 flex justify-center z-20 pointer-events-none">
+            <div className="px-5 py-2 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 text-slate-950 text-[12px] sm:text-[13.5px] font-black border border-amber-300 shadow-2xl flex items-center gap-2 group-hover:scale-105 group-hover:brightness-110 transition-all">
+              <BookOpen size={16} strokeWidth={2.5} />
+              <span>Chạm để mở đọc sách</span>
             </div>
           </div>
         </div>
@@ -1296,9 +1442,54 @@ export default function FlipbookViewer({
                 <BookOpen size={18} strokeWidth={2.5} />
               </div>
               <div className="min-w-0">
-                <h3 className="text-[14px] sm:text-[17px] font-black text-white truncate">
-                  {title}
-                </h3>
+                {isEditingTitleInFullscreen ? (
+                  <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                    <input
+                      type="text"
+                      value={tempTitle}
+                      onChange={(e) => setTempTitle(e.target.value)}
+                      className="h-8 px-2.5 rounded-[8px] bg-slate-900 border border-amber-400 text-amber-200 text-[13px] font-serif font-bold focus:outline-none max-w-[220px] sm:max-w-[320px]"
+                      placeholder="Tiêu đề sách..."
+                      autoFocus
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleSaveTitle(tempTitle);
+                        setIsEditingTitleInFullscreen(false);
+                      }}
+                      className="h-8 px-2.5 rounded-[8px] bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-[12px] cursor-pointer"
+                    >
+                      Lưu
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingTitleInFullscreen(false)}
+                      className="h-8 px-2 rounded-[8px] bg-white/10 hover:bg-white/20 text-white text-[12px] cursor-pointer"
+                    >
+                      Hủy
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <h3 className="text-[13.5px] sm:text-[16px] font-black text-white truncate font-serif">
+                      {bookTitle || title}
+                    </h3>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTempTitle(bookTitle);
+                          setIsEditingTitleInFullscreen(true);
+                        }}
+                        className="p-1 rounded-[6px] bg-white/10 hover:bg-amber-500 hover:text-slate-950 text-amber-300 transition-colors cursor-pointer shrink-0"
+                        title="Sửa tiêu đề sách ngay tại đây"
+                      >
+                        <Edit2 size={12} />
+                      </button>
+                    )}
+                  </div>
+                )}
                 <span className="text-[10.5px] sm:text-[11.5px] text-amber-300 font-bold block truncate">
                   Trang {currentPage} / {totalPages} · Chạm trang để ẩn/hiện thanh công cụ
                 </span>
@@ -1705,7 +1896,7 @@ export default function FlipbookViewer({
       )}
 
       {/* =========================================================================
-          MODAL THAY ẢNH BÌA SÁCH (CHO ADMIN TỰ TẢI LÊN ẢNH BÌA HOẶC DÁN URL)
+          MODAL CÀI ĐẶT BÌA & TIÊU ĐỀ SÁCH (CHO ADMIN TÙY BIẾN TIÊU ĐỀ, MẪU BÌA SẠCH HOẶC TẢI LÊN)
           ========================================================================= */}
       {showCoverModal && (
         <div
@@ -1713,7 +1904,7 @@ export default function FlipbookViewer({
           onClick={() => setShowCoverModal(false)}
         >
           <div
-            className="w-full max-w-[480px] rounded-[24px] bg-[#0F172A] border border-amber-400/50 p-4 sm:p-5 text-white shadow-2xl flex flex-col gap-4 relative animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto"
+            className="w-full max-w-[500px] rounded-[24px] bg-[#0F172A] border border-amber-400/50 p-4 sm:p-5 text-white shadow-2xl flex flex-col gap-4 relative animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header Modal */}
@@ -1724,10 +1915,10 @@ export default function FlipbookViewer({
                 </div>
                 <div>
                   <h3 className="text-[15px] font-black text-amber-200 leading-tight">
-                    Thay ảnh bìa sách
+                    Cài đặt Bìa & Tiêu đề Sách
                   </h3>
                   <p className="text-[11px] text-slate-400 font-medium">
-                    Tải lên ảnh bìa mới cho tài liệu / Atlas
+                    Tùy biến lớp phủ bìa ngoài và tiêu đề sách
                   </p>
                 </div>
               </div>
@@ -1742,46 +1933,101 @@ export default function FlipbookViewer({
               </button>
             </div>
 
-            {/* Xem trước bìa hiện tại */}
+            {/* Xem trước bìa trực quan */}
             <div className="flex items-center gap-3 p-3 rounded-[16px] bg-black/40 border border-white/10">
-              <div className="w-20 h-24 rounded-[10px] bg-slate-900 border border-amber-400/40 overflow-hidden relative shrink-0 shadow-md flex items-center justify-center">
+              <div className="w-20 h-28 rounded-[10px] bg-slate-900 border border-amber-400/50 overflow-hidden relative shrink-0 shadow-md flex items-center justify-center">
                 <img
                   src={tempCoverUrl || currentCoverUrl}
                   alt="Xem trước bìa"
                   className="w-full h-full object-cover"
                 />
+                <div className="absolute inset-0 bg-black/30 flex items-center justify-center p-1 text-center">
+                  <span className="text-[9px] font-serif font-black text-amber-200 line-clamp-3 leading-tight drop-shadow">
+                    {tempTitle || bookTitle}
+                  </span>
+                </div>
               </div>
 
               <div className="flex-1 min-w-0">
                 <span className="text-[11px] font-black text-amber-400 uppercase tracking-wider block mb-1">
-                  Xem trước ảnh bìa
+                  Xem trước lớp phủ bìa
                 </span>
-                <p className="text-[12.5px] text-slate-200 truncate font-semibold">
-                  {bookTitle}
+                <p className="text-[13px] text-slate-100 font-serif font-bold line-clamp-2">
+                  {tempTitle || bookTitle}
                 </p>
                 <p className="text-[11px] text-slate-400 mt-1 line-clamp-2">
-                  Ảnh bìa này sẽ hiển thị ở trang bài học và thu hút học viên mở đọc.
+                  Lớp phủ bìa sạch này giúp học viên nhận biết tài liệu và chạm mở đọc ngay.
                 </p>
               </div>
             </div>
 
-            {/* Lựa chọn 1: Tải ảnh từ thiết bị (Điện thoại / Máy tính) */}
+            {/* Phần 1: Tiêu đề sách */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[12.5px] font-extrabold text-amber-100 flex items-center gap-1.5">
+                <Type size={14} className="text-amber-400" />
+                <span>1. Tiêu đề sách (hiển thị trên bìa & trong sách):</span>
+              </label>
+              <input
+                type="text"
+                value={tempTitle}
+                onChange={(e) => setTempTitle(e.target.value)}
+                placeholder="Nhập tiêu đề sách (vd: Atlas Giải Phẫu Cột Sống 3D)..."
+                className="w-full h-10 px-3 rounded-[10px] bg-white/10 border border-white/20 text-white placeholder-slate-500 text-[13px] font-serif font-bold focus:outline-none focus:border-amber-400"
+              />
+            </div>
+
+            {/* Phần 2: Chọn mẫu bìa nền sạch có sẵn */}
             <div className="flex flex-col gap-2">
               <label className="text-[12.5px] font-extrabold text-amber-100 flex items-center gap-1.5">
-                <Upload size={14} className="text-amber-400" />
-                <span>1. Tải ảnh từ điện thoại / máy tính:</span>
+                <Layers size={14} className="text-amber-400" />
+                <span>2. Chọn mẫu nền bìa sạch hoàng gia (Không in chữ sẵn):</span>
               </label>
+              <div className="grid grid-cols-5 gap-1.5">
+                {CLEAN_COVER_PRESETS.map((preset) => {
+                  const isSelected = (tempCoverUrl || currentCoverUrl) === preset.url;
+                  return (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      onClick={() => setTempCoverUrl(preset.url)}
+                      className={`flex flex-col items-center gap-1 p-1 rounded-[10px] border cursor-pointer transition-all ${
+                        isSelected
+                          ? 'border-amber-400 bg-amber-400/20 shadow-md ring-1 ring-amber-400'
+                          : 'border-white/10 bg-white/5 hover:border-amber-400/50'
+                      }`}
+                    >
+                      <div className="w-full aspect-[3/4] rounded-[6px] overflow-hidden bg-slate-900 border border-black/20">
+                        <img
+                          src={preset.url}
+                          alt={preset.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <span className="text-[10px] font-bold text-center leading-tight line-clamp-1 text-slate-200">
+                        {preset.name}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
-              <label className="w-full h-12 rounded-[12px] bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-black text-[13px] flex items-center justify-center gap-2 cursor-pointer shadow-md transition-all active:scale-[0.98]">
+            {/* Phần 3: Hoặc tải ảnh riêng từ máy */}
+            <div className="flex flex-col gap-2">
+              <label className="text-[12px] font-bold text-slate-300 flex items-center gap-1.5">
+                <Upload size={13} className="text-amber-400" />
+                <span>3. Hoặc tải ảnh nền riêng từ máy:</span>
+              </label>
+              <label className="w-full h-10 rounded-[10px] bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold text-[12px] flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.98]">
                 {isUploadingCover ? (
                   <>
-                    <Loader2 size={16} className="animate-spin" />
+                    <Loader2 size={15} className="animate-spin text-amber-400" />
                     <span>Đang tải ảnh lên...</span>
                   </>
                 ) : (
                   <>
-                    <Upload size={16} strokeWidth={2.5} />
-                    <span>Chọn ảnh từ thiết bị (JPG, PNG, WebP)</span>
+                    <Upload size={15} className="text-amber-400" />
+                    <span>Chọn ảnh nền riêng (JPG, PNG, WebP)</span>
                   </>
                 )}
                 <input
@@ -1797,7 +2043,6 @@ export default function FlipbookViewer({
                       const res = await uploadImageFile(file);
                       setTempCoverUrl(res.url);
                     } catch (err: any) {
-                      // Fallback đọc DataURL trực tiếp
                       const reader = new FileReader();
                       reader.onload = (re) => {
                         if (re.target?.result) setTempCoverUrl(String(re.target.result));
@@ -1811,17 +2056,17 @@ export default function FlipbookViewer({
               </label>
             </div>
 
-            {/* Lựa chọn 2: Dán URL ảnh */}
+            {/* Phần 4: Hoặc dán link ảnh */}
             <div className="flex flex-col gap-1.5">
               <label className="text-[12px] font-bold text-slate-300">
-                2. Hoặc dán đường dẫn ảnh bìa trực tiếp:
+                4. Hoặc dán đường dẫn ảnh nền bìa:
               </label>
               <input
                 type="url"
                 value={tempCoverUrl}
                 onChange={(e) => setTempCoverUrl(e.target.value)}
                 placeholder="https://example.com/anh-bia-sach.jpg..."
-                className="w-full h-10 px-3 rounded-[10px] bg-white/10 border border-white/20 text-white placeholder-slate-500 text-[13px] focus:outline-none focus:border-amber-400"
+                className="w-full h-9 px-3 rounded-[8px] bg-white/10 border border-white/20 text-white placeholder-slate-500 text-[12px] focus:outline-none focus:border-amber-400"
               />
             </div>
 
@@ -1831,11 +2076,11 @@ export default function FlipbookViewer({
                 type="button"
                 onClick={() => {
                   setTempCoverUrl(defaultCoverUrl);
-                  handleSaveCover(defaultCoverUrl);
+                  setTempTitle(defaultAutoTitle);
                 }}
-                className="text-[12px] text-red-400 hover:text-red-300 font-bold underline cursor-pointer"
+                className="text-[12px] text-amber-400/80 hover:text-amber-300 font-bold underline cursor-pointer"
               >
-                Dùng bìa mặc định
+                Đặt lại mẫu gốc
               </button>
 
               <div className="flex items-center gap-2">
@@ -1849,11 +2094,15 @@ export default function FlipbookViewer({
                 <button
                   type="button"
                   onClick={() => {
+                    if (tempTitle && tempTitle.trim() !== bookTitle) {
+                      handleSaveTitle(tempTitle);
+                    }
                     handleSaveCover(tempCoverUrl || currentCoverUrl);
+                    setShowCoverModal(false);
                   }}
                   className="h-9 px-4 rounded-[10px] bg-amber-400 hover:bg-amber-300 text-slate-950 text-[12.5px] font-black cursor-pointer shadow-md transition-all active:scale-95"
                 >
-                  Lưu ảnh bìa
+                  Lưu cài đặt
                 </button>
               </div>
             </div>

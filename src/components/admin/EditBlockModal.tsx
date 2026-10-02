@@ -176,6 +176,9 @@ export default function EditBlockModal({
   const [bookCoverUrl, setBookCoverUrl] = useState<string>(
     block.type === 'files' ? block.data.cover_url || '' : ''
   );
+  const [bookTitleInput, setBookTitleInput] = useState<string>(
+    block.type === 'files' ? block.data.title || '' : ''
+  );
 
   // State cho links block gốc
   const [linkList, setLinkList] = useState<{ page_id?: string; url?: string; label?: string }[]>(
@@ -361,6 +364,7 @@ export default function EditBlockModal({
         ...block,
         data: {
           files: fileList,
+          title: bookTitleInput.trim() || undefined,
           cover_url: bookCoverUrl.trim() || undefined,
         },
       };
@@ -1190,12 +1194,12 @@ export default function EditBlockModal({
           {/* Dành cho block files gốc */}
           {block.type === 'files' && (
             <div className="flex flex-col gap-3">
-              {/* QUẢN LÝ ẢNH BÌA SÁCH (ATLAS / EBOOK COVER) */}
-              <div className="flex flex-col gap-2 p-3.5 rounded-[16px] bg-amber-500/10 dark:bg-amber-950/20 border border-amber-400/40">
+              {/* QUẢN LÝ ẢNH BÌA SÁCH (ATLAS / EBOOK COVER) & TIÊU ĐỀ LỚP PHỦ */}
+              <div className="flex flex-col gap-3 p-3.5 rounded-[16px] bg-amber-500/10 dark:bg-amber-950/20 border border-amber-400/40">
                 <div className="flex items-center justify-between">
                   <span className="text-[13px] font-black text-amber-900 dark:text-amber-200 flex items-center gap-1.5 uppercase tracking-wide">
                     <ImageIcon size={15} className="text-amber-600 dark:text-amber-400" />
-                    <span>Ảnh bìa sách (Atlas / Ebook)</span>
+                    <span>Lớp phủ ảnh bìa sách & Tiêu đề</span>
                   </span>
                   {bookCoverUrl && (
                     <button
@@ -1203,15 +1207,63 @@ export default function EditBlockModal({
                       onClick={() => setBookCoverUrl('')}
                       className="text-[11.5px] text-red-500 hover:text-red-700 font-bold underline cursor-pointer"
                     >
-                      Dùng bìa mặc định
+                      Dùng bìa chuẩn mặc định
                     </button>
                   )}
                 </div>
 
-                <div className="flex items-center gap-3">
+                {/* Tiêu đề hiển thị trên bìa sách */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-[12px] font-bold text-ink flex items-center gap-1">
+                    <Type size={13} className="text-amber-500" />
+                    <span>Tiêu đề hiển thị trên lớp phủ bìa:</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={bookTitleInput}
+                    onChange={(e) => setBookTitleInput(e.target.value)}
+                    placeholder="Nhập tiêu đề sách hiển thị trên bìa (vd: Atlas Giải Phẫu Cột Sống 3D)..."
+                    className="h-9 px-3 rounded-[8px] border border-line text-[13px] bg-surface text-ink w-full font-serif font-bold"
+                  />
+                </div>
+
+                {/* Chọn mẫu nền sạch không có chữ */}
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-[11.5px] font-bold text-muted">
+                    Chọn nhanh mẫu màu nền sạch sang trọng (Không in sẵn chữ):
+                  </span>
+                  <div className="grid grid-cols-5 gap-1.5">
+                    {[
+                      { name: 'Xanh Navy', url: '/documents/covers/clean_cover_navy.png' },
+                      { name: 'Lục Bảo', url: '/documents/covers/clean_cover_emerald.png' },
+                      { name: 'Đỏ Rượu', url: '/documents/covers/clean_cover_burgundy.png' },
+                      { name: 'Đêm Midnight', url: '/documents/covers/clean_cover_slate.png' },
+                      { name: 'Khung Vàng', url: '/documents/covers/clean_cover_pure_frame.png' },
+                    ].map((preset) => (
+                      <button
+                        key={preset.url}
+                        type="button"
+                        onClick={() => setBookCoverUrl(preset.url)}
+                        className={`flex flex-col items-center gap-1 p-1 rounded-[8px] border cursor-pointer transition-all ${
+                          (bookCoverUrl || '/documents/covers/clean_cover_navy.png') === preset.url
+                            ? 'border-amber-500 bg-amber-500/20 font-bold'
+                            : 'border-line bg-surface hover:border-amber-400/50'
+                        }`}
+                      >
+                        <div className="w-full aspect-[3/4] rounded-[4px] overflow-hidden bg-slate-900 border border-black/10">
+                          <img src={preset.url} alt={preset.name} className="w-full h-full object-cover" />
+                        </div>
+                        <span className="text-[10px] text-ink truncate w-full text-center">{preset.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Xem trước và Tự tải ảnh lên */}
+                <div className="flex items-center gap-3 pt-2 border-t border-amber-400/20">
                   <div className="w-16 h-20 rounded-[10px] bg-slate-900 border border-amber-400/50 overflow-hidden relative shrink-0 shadow-sm flex items-center justify-center">
                     <img
-                      src={bookCoverUrl || '/images/book_cover_blank.jpg'}
+                      src={bookCoverUrl || '/documents/covers/clean_cover_navy.png'}
                       alt="Bìa sách"
                       className="w-full h-full object-cover"
                     />
@@ -1221,7 +1273,7 @@ export default function EditBlockModal({
                     <div className="flex items-center gap-2">
                       <label className="flex items-center gap-1.5 h-9 px-3 rounded-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[12.5px] cursor-pointer shadow-xs transition-colors shrink-0">
                         <Upload size={14} />
-                        <span>{isUploadingMedia ? 'Đang tải...' : 'Thay ảnh bìa sách'}</span>
+                        <span>{isUploadingMedia ? 'Đang tải...' : 'Tải ảnh nền riêng'}</span>
                         <input
                           type="file"
                           accept="image/*"
@@ -1246,15 +1298,15 @@ export default function EditBlockModal({
                           className="hidden"
                         />
                       </label>
-                      <span className="text-[11.5px] text-muted font-medium">Tự tải ảnh lên (JPG, PNG, WebP)</span>
+                      <span className="text-[11px] text-muted font-medium">Tự tải ảnh lên (JPG, PNG, WebP)</span>
                     </div>
 
                     <input
                       type="url"
                       value={bookCoverUrl}
                       onChange={(e) => setBookCoverUrl(e.target.value)}
-                      placeholder="Hoặc dán link ảnh bìa (https://...)..."
-                      className="h-8 px-2.5 rounded-[8px] border border-line text-[12.5px] bg-surface text-ink w-full"
+                      placeholder="Hoặc dán URL ảnh nền (https://...)..."
+                      className="h-8 px-2.5 rounded-[8px] border border-line text-[12px] bg-surface text-ink w-full"
                     />
                   </div>
                 </div>
