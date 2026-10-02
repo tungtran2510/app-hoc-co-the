@@ -486,38 +486,45 @@ export const sampleBlocks: Block[] = [
 
   // Blocks for pages 2 to 6
   ...samplePages.slice(1).flatMap((p, idx) => {
-    const pageVideoIds: Record<string, { id: string; title: string; duration: string }> = {
-      'page-cot-song-2': {
-        id: 'z0FRTp5CVds',
-        title: '02. Giải phẫu và chức năng đĩa đệm',
-        duration: '5 phút',
-      },
-      'page-cot-song-3': {
-        id: 'c9kmCxFKHPY',
-        title: '03. Hệ thống cơ và dây chằng cột sống',
-        duration: '6 phút',
-      },
-      'page-cot-song-4': {
-        id: 'IUtyDm9O8lU',
-        title: '04. Tủy sống và các rễ thần kinh',
-        duration: '5 phút',
-      },
-      'page-cot-song-5': {
-        id: 'zQVOV1eevck',
-        title: '05. Tư thế sinh hoạt và vận động đúng',
-        duration: '4 phút',
-      },
-      'page-cot-song-6': {
-        id: 'gUG_zbKqlaU',
-        title: '06. Các vấn đề cột sống thường gặp',
-        duration: '6 phút',
-      },
+    const pagePlaylists: Record<string, { id: string; title: string; duration: string; desc: string }[]> = {
+      'page-cot-song-2': [
+        { id: 'z0FRTp5CVds', title: '01. Giải phẫu đĩa đệm: Vòng sợi & Nhân nhầy', duration: '6 phút', desc: 'Cơ chế hoạt động của giảm xóc sinh học tự nhiên giữa các đốt sống.' },
+        { id: 'y8Atq_HMJbU', title: '02. Cơ chế hình thành thoát vị đĩa đệm 3D', duration: '8 phút', desc: 'Áp lực tải trọng gây rách vòng sợi và tràn nhân nhầy chèn ép rễ.' },
+        { id: 'cdW-7QXCF3Q', title: '03. Dinh dưỡng thẩm thấu & Tái tạo đĩa đệm', duration: '5 phút', desc: 'Cách duy trì độ ngậm nước cho đĩa đệm qua vận động và tư thế đúng.' },
+        { id: '87TGU0Y9dSU', title: '04. Bài tập kéo giãn giải áp đĩa đệm an toàn', duration: '7 phút', desc: 'Hướng dẫn tự tập luyện giảm đau lưng và phục hồi áp lực cột sống.' }
+      ],
+      'page-cot-song-3': [
+        { id: 'c9kmCxFKHPY', title: '01. Hệ thống cơ sâu & Dây chằng cột sống', duration: '7 phút', desc: 'Dây chằng dọc trước, sau và dây chằng vàng giữ vững đốt sống.' },
+        { id: '8tXMChrI4c0', title: '02. Sức mạnh cơ lõi (Core) bảo vệ thắt lưng', duration: '6 phút', desc: 'Kích hoạt nhóm cơ bụng sâu và cơ nhiều nhánh (Multifidus).' },
+        { id: 'kqgViHyDW9k', title: '03. Kỹ thuật giãn cơ giải tỏa co thắt cạnh sống', duration: '8 phút', desc: 'Giải phóng căng cơ sau ngày dài ngồi làm việc sai tư thế.' },
+        { id: 'gOlY8o8MYuQ', title: '04. Rèn luyện sức bền khối cơ dựng gai sống', duration: '6 phút', desc: 'Bài tập tăng cường nhóm cơ lưng dưới không gây quá tải đĩa đệm.' }
+      ],
+      'page-cot-song-4': [
+        { id: 'IUtyDm9O8lU', title: '01. Tủy sống & 31 đôi rễ thần kinh gai sống', duration: '8 phút', desc: 'Cấu tạo ống sống và đường truyền cảm giác vận động của cơ thể.' },
+        { id: 'XilwFY71LR4', title: '02. Hội chứng chèn ép rễ thần kinh tọa 3D', duration: '7 phút', desc: 'Đường đi dây thần kinh tọa từ thắt lưng xuống mông, đùi và bàn chân.' },
+        { id: '9cvpCJddloY', title: '03. Dấu hiệu cảnh báo chèn ép thần kinh nguy hiểm', duration: '5 phút', desc: 'Phân biệt đau thần kinh tọa cơ học và tổn thương tủy sống cấp.' },
+        { id: 'XBnPTgSP21M', title: '04. Bài tập trượt thần kinh (Nerve Flossing)', duration: '7 phút', desc: 'Vận động trị liệu giúp rễ thần kinh trượt êm ái, giảm đau buốt.' }
+      ],
+      'page-cot-song-5': [
+        { id: 'zQVOV1eevck', title: '01. Tư thế ngồi & đứng chuẩn công thái học', duration: '6 phút', desc: 'Bảo toàn đường cong sinh lý tự nhiên khi làm việc với máy tính.' },
+        { id: 'fR3NxCR9z2U', title: '02. Nguyên tắc bốc vác vật nặng an toàn', duration: '5 phút', desc: 'Ứng dụng bản lề háng (Hip Hinge) thay vì gập lưng gây chấn thương.' },
+        { id: 'FN3MFhYPWWo', title: '03. Chuỗi bài tập giải nén cột sống cuối ngày', duration: '7 phút', desc: 'Treo xà, tư thế em bé và kéo giãn giải phóng tải trọng đốt sống.' },
+        { id: 'uBGl2BujkPQ', title: '04. Chỉnh sửa tư thế ngủ và chọn gối nệm đúng', duration: '6 phút', desc: 'Giữ trục cổ - lưng thẳng hàng suốt 8 tiếng phục hồi ban đêm.' }
+      ],
+      'page-cot-song-6': [
+        { id: 'gUG_zbKqlaU', title: '01. Thoái hóa cột sống: Tiến trình & Nguyên nhân', duration: '8 phút', desc: 'Sự hao mòn sụn khớp, xơ hóa xương dưới sụn và hình thành gai xương.' },
+        { id: '08VyJOEcDos', title: '02. Phân biệt phồng lồi đĩa đệm & Thoát vị thực thụ', duration: '6 phút', desc: 'Mức độ tổn thương trên phim MRI và hướng điều trị bảo tồn.' },
+        { id: '1sISguPDlhY', title: '03. Chiến lược toàn diện ngăn ngừa đau lưng tái phát', duration: '7 phút', desc: 'Kiểm soát cân nặng, bài tập cơ lõi và chế độ dinh dưỡng kháng viêm.' },
+        { id: '9iMGFqMmUFs', title: '04. Khi nào cần can thiệp y khoa chuyên sâu?', duration: '5 phút', desc: 'Các chỉ định phẫu thuật và dấu hiệu đỏ cần nhập viện khẩn cấp.' }
+      ],
     };
-    const vidInfo = pageVideoIds[p.id] || {
-      id: 'c9kmCxFKHPY',
-      title: p.title,
-      duration: '5 phút',
-    };
+
+    const playlist = pagePlaylists[p.id] || [
+      { id: 'c9kmCxFKHPY', title: `01. ${p.title} - Tổng quan`, duration: '6 phút', desc: p.summary || '' },
+      { id: 'z0FRTp5CVds', title: `02. ${p.title} - Cơ chế sinh học`, duration: '7 phút', desc: 'Phân tích chi tiết cơ chế hoạt động và tương tác cơ thể.' },
+      { id: 'y8Atq_HMJbU', title: `03. ${p.title} - Chăm sóc & Vận động`, duration: '8 phút', desc: 'Các bài tập và thói quen sinh hoạt bảo vệ sức khỏe chủ động.' },
+      { id: 'IUtyDm9O8lU', title: `04. ${p.title} - Sai lầm cần tránh`, duration: '5 phút', desc: 'Nhận diện các sai lầm phổ biến và phương pháp phòng ngừa.' }
+    ];
 
     return [
       {
@@ -540,15 +547,15 @@ export const sampleBlocks: Block[] = [
         sort_order: 2,
         is_visible: true,
         data: {
-          videos: [
-            {
-              youtube_id: vidInfo.id,
-              title: vidInfo.title,
-              duration_text: vidInfo.duration,
-              description: p.summary || '',
-              thumbnail_url: `https://i.ytimg.com/vi/${vidInfo.id}/hqdefault.jpg`,
-            },
-          ],
+          videos: playlist.map((v) => ({
+            youtube_id: v.id,
+            title: v.title,
+            duration_text: v.duration,
+            description: v.desc,
+            thumbnail_url: `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`,
+            is_vertical: false,
+            aspect_ratio: 'horizontal' as const,
+          })),
         },
       },
     ];

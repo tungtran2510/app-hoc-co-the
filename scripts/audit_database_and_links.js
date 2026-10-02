@@ -74,7 +74,7 @@ async function audit() {
     }
     topicBreakdown[topicSlug].pages += 1;
 
-    if (!page.thumbnail) missingThumbCount++;
+    if (!page.cover_url && !page.thumbnail) missingThumbCount++;
 
     const pageBlocks = blocksByPage[page.id] || [];
     const videoBlock = pageBlocks.find(b => b.type === 'videos');
