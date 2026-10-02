@@ -18,15 +18,17 @@ const nextConfig = {
       },
     ],
   },
-  async rewrites() {
-    return {
-      beforeFiles: [
-        {
-          source: '/manifest.json',
-          destination: '/manifest.webmanifest',
-        },
-      ],
-    };
+  async headers() {
+    return [
+      {
+        source: '/(manifest.json|manifest.webmanifest|icon-192.png|icon-512.png|apple-icon.png)',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET, HEAD, OPTIONS' },
+          { key: 'Cache-Control', value: 'public, max-age=0, must-revalidate' },
+        ],
+      },
+    ];
   },
 };
 

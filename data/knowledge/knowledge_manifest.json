@@ -1,0 +1,312 @@
+{
+  "version": "1.0.0",
+  "description": "Chỉ mục tra cứu siêu tốc tri thức chuyên môn Tùng Dinh Dưỡng, DoctorLoan, Nước Gems, Giải Phẫu",
+  "categories": [
+    {
+      "id": "chinh_sach_cot_loi",
+      "title": "Nguyên Tắc Cốt Lõi, Pháp Lý & Phong Cách CSKH",
+      "folder": "00_chinh_sach_cot_loi",
+      "files": [
+        {
+          "name": "00_NGUYEN_TAC_COT_LOI_CSKH.md",
+          "title": "Nguyên Tắc Pháp Lý, Truyền Thông & Phong Cách Tư Vấn Chuẩn",
+          "keywords": [
+            "pháp lý",
+            "cấm chữa bệnh",
+            "cấm nắn chỉnh",
+            "sáng chế",
+            "phong cách",
+            "chào hỏi",
+            "bản lĩnh",
+            "red flags",
+            "cảnh báo đỏ"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cotsong_doctorloan",
+      "title": "Cột Sống & Hệ Giải Pháp DoctorLoan",
+      "folder": "01_cotsong_doctorloan",
+      "files": [
+        {
+          "name": "01_BAI_TAP_CHUAN_DOCTORLOAN.md",
+          "title": "Tập Luyện Phục Hồi Hệ Cơ & Tư Thế Chuẩn DoctorLoan",
+          "keywords": [
+            "bài tập",
+            "tập luyện",
+            "phục hồi cơ",
+            "chuỗi động học",
+            "chân yếu",
+            "cổ",
+            "vai",
+            "thắt lưng",
+            "hạ người",
+            "đứng lên"
+          ]
+        },
+        {
+          "name": "02_BO_CAU_HOI_TRA_LOI_DOCTORLOAN.md",
+          "title": "Bộ Câu Hỏi & Giải Đáp Tình Huống Lâm Sàng DoctorLoan",
+          "keywords": [
+            "hỏi đáp",
+            "tình huống",
+            "thoát vị đĩa đệm",
+            "thoái hóa",
+            "chèn ép",
+            "tê chân",
+            "mỏi cổ",
+            "gối cổ",
+            "gối lưng",
+            "đệm ghế",
+            "phản ứng ban đầu"
+          ]
+        },
+        {
+          "name": "03_GIAI_PHAP_DOCTORLOAN.md",
+          "title": "Tổng Quan Hệ Giải Pháp Khoa Học DoctorLoan",
+          "keywords": [
+            "giải pháp",
+            "ba trụ cột",
+            "cơ chế sinh học",
+            "đường cong sinh lý",
+            "trọng lực",
+            "giải nén đĩa đệm",
+            "sáng chế"
+          ]
+        },
+        {
+          "name": "04_TONG_HOP_CAU_HOI_DOCTORLOAN.md",
+          "title": "Tổng Hợp Các Tình Huống Trả Lời Ngắn Gọn DoctorLoan",
+          "keywords": [
+            "tổng hợp",
+            "câu hỏi nhanh",
+            "giải thích ngắn",
+            "cốt lõi"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "nuoc_hydro_gems",
+      "title": "Nước Hydro Gems & Quản Trị Nguồn Nước Tế Bào",
+      "folder": "02_nuoc_hydro_gems",
+      "files": [
+        {
+          "name": "01_DAO_TAO_DEMO_THAY_NGOAN.md",
+          "title": "Đào Tạo Thực Chiến Demo Thí Nghiệm Nước Của Thầy Ngoan",
+          "keywords": [
+            "demo",
+            "thầy ngoan",
+            "thí nghiệm",
+            "quỳ tím",
+            "đo ph",
+            "chống oxy hóa",
+            "orp"
+          ]
+        },
+        {
+          "name": "02_DAO_TAO_NGUYEN_VAN_THAY_NGUYEN.md",
+          "title": "Bài Giảng Nguyên Văn Thầy Nguyên Về Bản Chất Nước & Tế Bào",
+          "keywords": [
+            "thầy nguyên",
+            "bản chất nước",
+            "dung môi",
+            "môi trường tế bào",
+            "axit kiềm",
+            "thải độc"
+          ]
+        },
+        {
+          "name": "03_DAO_TAO_TONG_HOP_GEMS.md",
+          "title": "Tài Liệu Đào Tạo Tổng Hợp Nước Gems",
+          "keywords": [
+            "tổng hợp gems",
+            "hydrogen",
+            "chỉ số orp",
+            "cụm phân tử nhỏ",
+            "thẩm thấu"
+          ]
+        },
+        {
+          "name": "04_GEMS_DAO_TAO_ZOOM_DEMO.md",
+          "title": "Đào Tạo Zoom Thực Chiến & Giải Đáp Trực Tuyến Nước Gems",
+          "keywords": [
+            "zoom",
+            "đào tạo trực tuyến",
+            "câu hỏi khách hàng",
+            "thắc mắc nguồn nước"
+          ]
+        },
+        {
+          "name": "05_KY_THUAT_MAY_GEMS.md",
+          "title": "Cẩm Nang Kỹ Thuật Máy Tạo Nước & Cơ Chế Điện Phân Gems",
+          "keywords": [
+            "kỹ thuật máy",
+            "điện phân",
+            "lõi lọc",
+            "bảo dưỡng",
+            "vận hành",
+            "nguyên lý máy"
+          ]
+        },
+        {
+          "name": "06_NUOC_GEMS_TONG_QUAN.md",
+          "title": "Tổng Quan Nước Gems: 3 Đặc Tính Sinh Học Cốt Lõi",
+          "keywords": [
+            "tổng quan",
+            "3 đặc tính",
+            "kiềm tính tự nhiên",
+            "giàu hydrogen",
+            "cụm phân tử siêu nhỏ",
+            "tds",
+            "khoáng chất"
+          ]
+        },
+        {
+          "name": "07_QUY_TRINH_CHUAN_DEMO_TEST_NUOC_GEMS.md",
+          "title": "Quy Trình Chuẩn Các Bước Thử Nghiệm & Test Nước Trực Quan",
+          "keywords": [
+            "quy trình test",
+            "dụng cụ thử",
+            "bút đo",
+            "thuốc thử ph",
+            "dung dịch trà",
+            "trực quan hóa"
+          ]
+        },
+        {
+          "name": "08_THAY_NGOAN_DAO_TAO_GEMS.md",
+          "title": "Giáo Trình Chuyên Sâu Thầy Ngoan Đào Tạo Gems",
+          "keywords": [
+            "giáo trình",
+            "chuyên sâu",
+            "tư duy nguồn nước",
+            "quản trị gia đình"
+          ]
+        },
+        {
+          "name": "09_THAY_NGOAN_DEMO_CHO_KHACH.md",
+          "title": "Kịch Bản Hướng Dẫn Khách Trải Nghiệm & Đo Lường Nguồn Nước",
+          "keywords": [
+            "kịch bản",
+            "trải nghiệm",
+            "đo lường",
+            "thấu hiểu",
+            "bảo vệ sức khỏe"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dinh_duong",
+      "title": "Dinh Dưỡng Cân Bằng Tế Bào & Chuyển Hóa",
+      "folder": "03_dinh_duong",
+      "files": [
+        {
+          "name": "01_CHAT_DINH_DUONG_CO_BAN.md",
+          "title": "Kiến Thức Căn Bản Các Nhóm Chất Dinh Dưỡng Đa Lượng & Vi Lượng",
+          "keywords": [
+            "chất dinh dưỡng",
+            "đạm",
+            "protein",
+            "chất béo",
+            "lipid",
+            "tinh bột",
+            "glucid",
+            "vitamin",
+            "khoáng chất",
+            "năng lượng"
+          ]
+        },
+        {
+          "name": "02_DAO_TAO_DINH_DUONG.md",
+          "title": "Đào Tạo Dinh Dưỡng Chăm Sóc Sức Khỏe Chủ Động",
+          "keywords": [
+            "đào tạo",
+            "tư duy dinh dưỡng",
+            "tiền không cứu được",
+            "tái lập cân bằng",
+            "hệ thống"
+          ]
+        },
+        {
+          "name": "03_DINH_DUONG_CHUYEN_SAU.md",
+          "title": "Dinh Dưỡng Chuyên Sâu Kháng Viêm, Nuôi Dưỡng Sụn Khớp & Tế Bào",
+          "keywords": [
+            "chuyên sâu",
+            "kháng viêm",
+            "sụn khớp",
+            "đĩa đệm",
+            "omega 3",
+            "canxi",
+            "magie",
+            "d3",
+            "k2",
+            "hấp thu"
+          ]
+        },
+        {
+          "name": "04_LOI_THOAI_TIEU_HOA.md",
+          "title": "Hệ Tiêu Hóa, Đường Ruột & Khả Năng Đồng Hóa Dưỡng Chất",
+          "keywords": [
+            "tiêu hóa",
+            "đường ruột",
+            "lợi khuẩn",
+            "men vi sinh",
+            "dạ dày",
+            "đại tràng",
+            "hấp thu dinh dưỡng"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "giai_phau",
+      "title": "Giải Phẫu Học Cơ Thể Người & Cơ Sinh Học Ứng Dụng",
+      "folder": "04_giai_phau",
+      "files": [
+        {
+          "name": "01_DAO_TAO_GIAI_PHAU.md",
+          "title": "Đào Tạo Giải Phẫu Học Toàn Diện Dành Cho Cố Vấn Sức Khỏe",
+          "keywords": [
+            "giải phẫu",
+            "hệ cơ quan",
+            "tuần hoàn",
+            "hô hấp",
+            "thần kinh",
+            "nội tiết"
+          ]
+        },
+        {
+          "name": "02_GIAI_PHAU_DUONG_TIEU_HOA.md",
+          "title": "Giải Phẫu & Sinh Lý Hệ Thống Tiêu Hóa Từ Miệng Đến Đại Tràng",
+          "keywords": [
+            "giải phẫu tiêu hóa",
+            "thực quản",
+            "dạ dày",
+            "gan",
+            "tụy",
+            "ruột non",
+            "ruột già"
+          ]
+        },
+        {
+          "name": "03_GIAI_PHAU_XUONG_KHOP_UNG_DUNG.md",
+          "title": "Giải Phẫu Hệ Cơ Xương Khớp Ứng Dụng & Cơ Sinh Học Cột Sống",
+          "keywords": [
+            "cơ xương khớp",
+            "33 đốt sống",
+            "đĩa đệm",
+            "vòng sợi",
+            "nhân nhầy",
+            "dây chằng",
+            "rễ thần kinh",
+            "khớp háng",
+            "khung chậu"
+          ]
+        }
+      ]
+    }
+  ]
+}

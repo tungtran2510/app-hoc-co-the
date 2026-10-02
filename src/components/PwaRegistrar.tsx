@@ -17,11 +17,13 @@ export default function PwaRegistrar() {
   const [showFloatingPill, setShowFloatingPill] = useState<boolean>(false);
 
   useEffect(() => {
-    // 1. Đăng ký Service Worker
+    // 1. Đăng ký Service Worker và ép cập nhật bản mới nhất
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
       navigator.serviceWorker
         .register('/sw.js')
-        .then(() => {})
+        .then((reg) => {
+          reg.update();
+        })
         .catch(() => {});
     }
 

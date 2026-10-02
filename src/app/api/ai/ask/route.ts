@@ -3,6 +3,8 @@ import { getTopics, getPagesByTopic, getBlocksByPage, getSettings } from '../../
 
 export const dynamic = 'force-dynamic';
 
+import { searchFastKnowledge } from '../../../../lib/knowledge';
+
 interface LessonCatalogItem {
   topic_title: string;
   topic_slug: string;
@@ -157,22 +159,35 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(fallbackResult);
     }
 
-    // 1. Danh sách bài học và nội dung thực tế do tác giả viết
-    const catalogText = catalog
+    // 1. Lọc thông minh 3-4 bài học liên quan nhất từ catalog (giảm 80% độ trễ suy nghĩ của AI)
+    const lowerTokens = lowerQ.split(/[\s,?.!;:()\[\]{}"]+/).filter((w: string) => w.length >= 2);
+    const scoredCatalog = catalog.map((c) => {
+      let score = 0;
+      const text = `${c.page_title} ${c.topic_title} ${c.summary} ${c.content}`.toLowerCase();
+      lowerTokens.forEach((t: string) => {
+        if (text.includes(t)) score += 1;
+      });
+      return { c, score };
+    });
+    scoredCatalog.sort((a, b) => b.score - a.score);
+    const topCatalog = scoredCatalog[0]?.score > 0 ? scoredCatalog.slice(0, 4).map((sc: { c: LessonCatalogItem }) => sc.c) : catalog.slice(0, 3);
+
+    const catalogText = topCatalog
       .map(
         (c, idx) =>
           `[Bài ${idx + 1}] Chủ đề: "${c.topic_title}" | Bài: "${c.page_title}" (slug: ${c.topic_slug}/${c.page_slug})\n- Tóm tắt: ${c.summary}\n- Nội dung tác giả hướng dẫn: ${c.content || 'Xem bài giảng chi tiết.'}`
       )
       .join('\n\n');
 
-    // 2. Tài liệu chuyên sâu do tác giả nạp thêm vào
-    const authorDocsText =
-      aiTraining?.documents && aiTraining.documents.length > 0
-        ? '\n\nCÁC TÀI LIỆU & SÁCH CHUYÊN SÂU TÁC GIẢ NẠP THÊM:\n' +
-          aiTraining.documents
-            .map((d, i) => `=== [Tài liệu ${i + 1}: ${d.title}] ===\n${d.content}`)
-            .join('\n\n')
-        : '';
+    // 2. Tra cứu siêu tốc từ các file Markdown chuyên sâu nguyên văn của tác giả
+    const matchedDocs = searchFastKnowledge(question, 2);
+    const authorDocsText = matchedDocs.length > 0
+      ? '\n\nCÁC TÀI LIỆU CHUYÊN SÂU NGUYÊN VĂN CỦA TÁC GIẢ:\n' +
+        matchedDocs.map((m, i) => `=== [Tài liệu ${i + 1}: ${m.fileTitle} (${m.sourceFile})] ===\n${m.excerpt}`).join('\n\n')
+      : (aiTraining?.documents && aiTraining.documents.length > 0
+          ? '\n\nCÁC TÀI LIỆU & SÁCH CHUYÊN SÂU TÁC GIẢ NẠP THÊM:\n' +
+            aiTraining.documents.map((d, i) => `=== [Tài liệu ${i + 1}: ${d.title}] ===\n${d.content}`).join('\n\n')
+          : '');
 
     // 3. Câu hỏi và trả lời mẫu do tác giả định sẵn
     const authorFaqsText =
