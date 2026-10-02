@@ -29,6 +29,7 @@ import { checkIsAdminClient } from '../lib/adminAuth';
 import { renderPageToCanvas } from '../lib/atlasCanvasGenerator';
 import SideBooksFlipEngine, { SideBooksFlipEngineRef } from './SideBooksFlipEngine';
 import { getBookFlipbookPages, BookInfoInput } from '../lib/bookFlipbookData';
+import { uploadImageFile } from '../lib/storageUpload';
 
 export interface FlipbookPage {
   id: string;
@@ -385,6 +386,96 @@ export default function FlipbookViewer({
         localStorage.removeItem(storageKey);
       }
     } catch {}
+  };
+
+  // Quản lý ảnh bìa sách tùy chỉnh (Custom Cover Image)
+  const defaultCoverUrl = '/images/book_cover_blank.jpg';
+  const coverStorageKey = `custom_book_cover_${pageTitle || topicTitle || 'default'}`;
+  const [currentCoverUrl, setCurrentCoverUrl] = useState<string>(() => {
+    if (coverUrl && coverUrl.trim()) return coverUrl.trim();
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem(coverStorageKey);
+        if (saved && saved.trim()) return saved.trim();
+      } catch {}
+    }
+    return defaultCoverUrl;
+  });
+
+  const [tempCoverUrl, setTempCoverUrl] = useState<string>(currentCoverUrl);
+  const [showCoverModal, setShowCoverModal] = useState<boolean>(false);
+  const [isUploadingCover, setIsUploadingCover] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (coverUrl && coverUrl.trim()) {
+      setCurrentCoverUrl(coverUrl.trim());
+      setTempCoverUrl(coverUrl.trim());
+    } else {
+      try {
+        const saved = localStorage.getItem(coverStorageKey);
+        if (saved && saved.trim()) {
+          setCurrentCoverUrl(saved.trim());
+          setTempCoverUrl(saved.trim());
+        }
+      } catch {}
+    }
+  }, [coverUrl, coverStorageKey]);
+
+  const handleSaveCover = (newUrl: string) => {
+    const finalUrl = newUrl.trim() || defaultCoverUrl;
+    setCurrentCoverUrl(finalUrl);
+    setTempCoverUrl(finalUrl);
+    try {
+      if (finalUrl === defaultCoverUrl) {
+        localStorage.removeItem(coverStorageKey);
+      } else {
+        localStorage.setItem(coverStorageKey, finalUrl);
+      }
+    } catch {}
+    if (onUpdateCover) {
+      onUpdateCover(finalUrl === defaultCoverUrl ? '' : finalUrl);
+    }
+    setShowCoverModal(false);
+  };
+
+  // Tránh chặn thao tác vuốt cuộn trang trên mobile khi chạm vào bìa sách
+  const touchStartPos = useRef<{ x: number; y: number; time: number } | null>(null);
+  const isScrollingRef = useRef(false);
+
+  const onCoverTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      touchStartPos.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+        time: Date.now(),
+      };
+      isScrollingRef.current = false;
+    }
+  };
+
+  const onCoverTouchMove = (e: React.TouchEvent) => {
+    if (!touchStartPos.current || e.touches.length !== 1) return;
+    const dx = Math.abs(e.touches[0].clientX - touchStartPos.current.x);
+    const dy = Math.abs(e.touches[0].clientY - touchStartPos.current.y);
+    if (dx > 6 || dy > 6) {
+      // Người dùng đang cầm tay vuốt cuộn trang -> Đánh dấu không phải click mở sách
+      isScrollingRef.current = true;
+    }
+  };
+
+  const onCoverTouchEnd = () => {
+    setTimeout(() => {
+      isScrollingRef.current = false;
+      touchStartPos.current = null;
+    }, 120);
+  };
+
+  const handleCoverClick = () => {
+    if (isScrollingRef.current) {
+      // Người dùng vừa vuốt qua bìa sách để cuộn trang, không mở toàn màn hình
+      return;
+    }
+    setIsFullscreen(true);
   };
 
   // 1. Trạng thái Đọc Thuyết Minh Y Khoa Tiếng Việt (Text-to-Speech)
@@ -923,25 +1014,26 @@ export default function FlipbookViewer({
           ========================================================================= */}
       {mode !== 'modal-only' && (
       <section
-        className={`w-full flex flex-col rounded-[20px] sm:rounded-[24px] bg-gradient-to-b from-[#0F172A] via-[#131E36] to-[#0A0F1D] text-white border border-amber-400/40 p-2 sm:p-3 my-3 transition-all relative overflow-hidden group/book shadow-[0_12px_32px_-10px_rgba(0,0,0,0.6)] ${
+        style={{ touchAction: 'pan-y' }}
+        className={`w-full flex flex-col rounded-[20px] sm:rounded-[24px] bg-gradient-to-b from-[#0F172A] via-[#131E36] to-[#0A0F1D] text-white border border-amber-400/40 p-2 sm:p-3 my-3 transition-all relative overflow-hidden group/book shadow-[0_12px_32px_-10px_rgba(0,0,0,0.6)] touch-pan-y ${
           isHidden ? 'opacity-70 border-dashed border-amber-500' : ''
         }`}
       >
         {/* THANH ĐIỀU KHIỂN QUẢN TRỊ (CHO PHÉP DI CHUYỂN, ẨN/HIỆN KHỐI - CHỈ HIỆN VỚI ADMIN) */}
         {isAdmin && (
-          <div className="flex items-center justify-between pb-2 mb-2 border-b border-amber-400/20 relative z-20">
-            <div className="flex items-center gap-1.5">
+          <div className="flex flex-wrap items-center justify-between gap-1.5 pb-2 mb-2 border-b border-amber-400/20 relative z-20">
+            <div className="flex items-center gap-1.5 shrink-0">
               <span className="text-[11px] font-black text-amber-300 uppercase tracking-wider bg-black/50 border border-amber-400/40 px-2 py-0.5 rounded-[6px]">
                 Quản trị khối sách
               </span>
               {isHidden && (
-                <span className="text-[10.5px] font-bold text-red-300 bg-red-950/80 border border-red-500/50 px-2 py-0.5 rounded-[6px]">
-                  Đang ẩn với học viên
+                <span className="text-[10px] font-bold text-red-300 bg-red-950/80 border border-red-500/50 px-1.5 py-0.5 rounded-[6px]">
+                  Đang ẩn
                 </span>
               )}
             </div>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 flex-wrap justify-end">
               {onMoveUp && (
                 <button
                   type="button"
@@ -978,11 +1070,22 @@ export default function FlipbookViewer({
                   {isHidden ? <EyeOff size={12} /> : <Eye size={12} />}
                 </button>
               )}
+              {/* Nút THAY ẢNH BÌA SÁCH */}
+              <button
+                type="button"
+                onClick={() => setShowCoverModal(true)}
+                className="flex items-center gap-1 h-6 px-2.5 rounded-[6px] bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 text-[11px] font-black cursor-pointer shadow-xs whitespace-nowrap"
+                title="Thay ảnh bìa sách (Atlas / Ebook Cover)"
+              >
+                <ImageIcon size={11} strokeWidth={2.5} />
+                <span>Thay bìa sách</span>
+              </button>
+
               {onOpenEditBlockModal && (
                 <button
                   type="button"
                   onClick={onOpenEditBlockModal}
-                  className="flex items-center gap-1 h-6 px-2 rounded-[6px] bg-white/10 border border-white/20 text-white text-[11px] font-bold hover:bg-white/20 cursor-pointer shadow-xs"
+                  className="flex items-center gap-1 h-6 px-2 rounded-[6px] bg-white/10 border border-white/20 text-white text-[11px] font-bold hover:bg-white/20 cursor-pointer shadow-xs whitespace-nowrap"
                   title="Sửa cấu hình khối và ảnh bìa"
                 >
                   <Edit2 size={10} />
@@ -992,7 +1095,7 @@ export default function FlipbookViewer({
               <button
                 type="button"
                 onClick={() => setShowUploadModal(true)}
-                className="flex items-center gap-1 h-6 px-2 rounded-[6px] bg-amber-500 text-slate-950 text-[11px] font-black hover:bg-amber-400 cursor-pointer shadow-xs"
+                className="flex items-center gap-1 h-6 px-2 rounded-[6px] bg-white/15 border border-white/25 text-white text-[11px] font-bold hover:bg-white/25 cursor-pointer shadow-xs whitespace-nowrap"
                 title="Nạp file PDF hoặc bộ ảnh mới"
               >
                 <Upload size={10} />
@@ -1045,21 +1148,42 @@ export default function FlipbookViewer({
           </div>
         </div>
 
-        {/* BÌA SÁCH ĐÓNG/MỞ - SÁT VIỀN, KHÔNG KHUNG CHỒNG KHUNG */}
+        {/* BÌA SÁCH ĐÓNG/MỞ - SÁT VIỀN, KHÔNG KHUNG CHỒNG KHUNG, VUỐT CUỘN TRANG TRƠN TRU */}
         <div
-          className="w-full aspect-[4/3] max-h-[500px] rounded-[16px] bg-[#0c1626] relative overflow-hidden flex items-center justify-center group shadow-xl my-1 cursor-pointer"
-          onClick={() => setIsFullscreen(true)}
+          className="w-full aspect-[4/3] max-h-[500px] rounded-[16px] bg-[#0c1626] relative overflow-hidden flex items-center justify-center group shadow-xl my-1 cursor-pointer touch-pan-y"
+          style={{ touchAction: 'pan-y' }}
+          onTouchStart={onCoverTouchStart}
+          onTouchMove={onCoverTouchMove}
+          onTouchEnd={onCoverTouchEnd}
+          onClick={handleCoverClick}
           role="button"
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsFullscreen(true); }}
           aria-label={`Mở đọc: ${bookTitle}`}
         >
-          {/* Ảnh bìa sách mở - tràn sát viền tự nhiên */}
+          {/* Nút Thay Bìa Nhanh (Overlay góc trên bên phải khi ở chế độ Admin) */}
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowCoverModal(true);
+              }}
+              className="absolute top-2.5 right-2.5 z-30 flex items-center gap-1.5 px-2.5 py-1 rounded-[8px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[11px] shadow-lg border border-amber-300 cursor-pointer backdrop-blur-xs transition-transform active:scale-95"
+              title="Tải ảnh bìa sách mới lên"
+            >
+              <ImageIcon size={12} strokeWidth={2.5} />
+              <span>Thay ảnh bìa</span>
+            </button>
+          )}
+
+          {/* Ảnh bìa sách mở - tràn sát viền tự nhiên, KHÔNG CHẶN TOUCH VUỐT TRANG */}
           <img
-            src="/images/book_cover_blank.jpg"
+            src={currentCoverUrl}
             alt="Bìa sách"
-            className="absolute inset-0 w-full h-full object-cover z-0"
+            className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none select-none"
             draggable={false}
+            style={{ pointerEvents: 'none', userSelect: 'none' }}
           />
 
           {/* Lớp phủ tiêu đề trên trang sách mở - TO RÕ, ĐẬM ĐÀ, NỔI BẬT */}
@@ -1561,6 +1685,163 @@ export default function FlipbookViewer({
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          MODAL THAY ẢNH BÌA SÁCH (CHO ADMIN TỰ TẢI LÊN ẢNH BÌA HOẶC DÁN URL)
+          ========================================================================= */}
+      {showCoverModal && (
+        <div
+          className="fixed inset-0 z-[10000] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
+          onClick={() => setShowCoverModal(false)}
+        >
+          <div
+            className="w-full max-w-[480px] rounded-[24px] bg-[#0F172A] border border-amber-400/50 p-4 sm:p-5 text-white shadow-2xl flex flex-col gap-4 relative animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header Modal */}
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-[10px] bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 flex items-center justify-center font-black shadow-md">
+                  <ImageIcon size={18} />
+                </div>
+                <div>
+                  <h3 className="text-[15px] font-black text-amber-200 leading-tight">
+                    Thay ảnh bìa sách
+                  </h3>
+                  <p className="text-[11px] text-slate-400 font-medium">
+                    Tải lên ảnh bìa mới cho tài liệu / Atlas
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowCoverModal(false)}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center cursor-pointer transition-colors"
+                title="Đóng"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Xem trước bìa hiện tại */}
+            <div className="flex items-center gap-3 p-3 rounded-[16px] bg-black/40 border border-white/10">
+              <div className="w-20 h-24 rounded-[10px] bg-slate-900 border border-amber-400/40 overflow-hidden relative shrink-0 shadow-md flex items-center justify-center">
+                <img
+                  src={tempCoverUrl || currentCoverUrl}
+                  alt="Xem trước bìa"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <span className="text-[11px] font-black text-amber-400 uppercase tracking-wider block mb-1">
+                  Xem trước ảnh bìa
+                </span>
+                <p className="text-[12.5px] text-slate-200 truncate font-semibold">
+                  {bookTitle}
+                </p>
+                <p className="text-[11px] text-slate-400 mt-1 line-clamp-2">
+                  Ảnh bìa này sẽ hiển thị ở trang bài học và thu hút học viên mở đọc.
+                </p>
+              </div>
+            </div>
+
+            {/* Lựa chọn 1: Tải ảnh từ thiết bị (Điện thoại / Máy tính) */}
+            <div className="flex flex-col gap-2">
+              <label className="text-[12.5px] font-extrabold text-amber-100 flex items-center gap-1.5">
+                <Upload size={14} className="text-amber-400" />
+                <span>1. Tải ảnh từ điện thoại / máy tính:</span>
+              </label>
+
+              <label className="w-full h-12 rounded-[12px] bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-black text-[13px] flex items-center justify-center gap-2 cursor-pointer shadow-md transition-all active:scale-[0.98]">
+                {isUploadingCover ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    <span>Đang tải ảnh lên...</span>
+                  </>
+                ) : (
+                  <>
+                    <Upload size={16} strokeWidth={2.5} />
+                    <span>Chọn ảnh từ thiết bị (JPG, PNG, WebP)</span>
+                  </>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  disabled={isUploadingCover}
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    try {
+                      setIsUploadingCover(true);
+                      const res = await uploadImageFile(file);
+                      setTempCoverUrl(res.url);
+                    } catch (err: any) {
+                      // Fallback đọc DataURL trực tiếp
+                      const reader = new FileReader();
+                      reader.onload = (re) => {
+                        if (re.target?.result) setTempCoverUrl(String(re.target.result));
+                      };
+                      reader.readAsDataURL(file);
+                    } finally {
+                      setIsUploadingCover(false);
+                    }
+                  }}
+                />
+              </label>
+            </div>
+
+            {/* Lựa chọn 2: Dán URL ảnh */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[12px] font-bold text-slate-300">
+                2. Hoặc dán đường dẫn ảnh bìa trực tiếp:
+              </label>
+              <input
+                type="url"
+                value={tempCoverUrl}
+                onChange={(e) => setTempCoverUrl(e.target.value)}
+                placeholder="https://example.com/anh-bia-sach.jpg..."
+                className="w-full h-10 px-3 rounded-[10px] bg-white/10 border border-white/20 text-white placeholder-slate-500 text-[13px] focus:outline-none focus:border-amber-400"
+              />
+            </div>
+
+            {/* Nút hành động Lưu & Dùng mặc định */}
+            <div className="flex items-center justify-between pt-3 border-t border-white/10 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setTempCoverUrl(defaultCoverUrl);
+                  handleSaveCover(defaultCoverUrl);
+                }}
+                className="text-[12px] text-red-400 hover:text-red-300 font-bold underline cursor-pointer"
+              >
+                Dùng bìa mặc định
+              </button>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCoverModal(false)}
+                  className="h-9 px-3.5 rounded-[10px] bg-white/10 hover:bg-white/20 text-slate-200 text-[12.5px] font-bold cursor-pointer transition-colors"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleSaveCover(tempCoverUrl || currentCoverUrl);
+                  }}
+                  className="h-9 px-4 rounded-[10px] bg-amber-400 hover:bg-amber-300 text-slate-950 text-[12.5px] font-black cursor-pointer shadow-md transition-all active:scale-95"
+                >
+                  Lưu ảnh bìa
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
