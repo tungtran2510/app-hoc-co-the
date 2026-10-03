@@ -702,8 +702,24 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
       const isAskingPillows = /gối/i.test(question);
       if (!isAskingPillows) {
         cleanAnswer = cleanAnswer
-          .replace(/.*(?:gối ngủ|chọn gối|kê gối|kẹp gối|xuống gối|thử gối).*\n?/gi, '')
-          .trim();
+          .split('\n')
+          .map((line) => {
+            if (/gối/i.test(line) && !/(?:đầu\s*gối|khớp\s*gối|gập\s*gối|chùng\s*gối)/i.test(line)) {
+              let l = line;
+              l = l.replace(/kê\s+(?:một\s+)?gối\s+(?:mỏng|mềm|nhẹ)?\s+(?:dưới|ở)\s+cổ/gi, 'giữ cổ thẳng trục tự nhiên');
+              l = l.replace(/(?:bằng|dùng)\s+gối\s+mềm/gi, '');
+              l = l.replace(/không\s+dùng\s+gối\s+cao/gi, 'không kê gập cổ');
+              l = l.replace(/(?:hoặc\s+)?gối\s+quá\s+cao(?:\s*[\/\-]\s*thấp)?/gi, 'tư thế gập cổ');
+              l = l.replace(/tránh\s+gối\s+quá\s+cao/gi, 'tránh nằm gập cổ');
+              l = l.replace(/gối\s+cao\s+vừa\s+phải/gi, 'độ dốc vừa phải');
+              l = l.replace(/ngủ\s+sai\s+gối/gi, 'nằm sai tư thế cổ');
+              l = l.replace(/(?<!(?:đầu|khớp|gập|chùng)\s*)gối/gi, 'đệm phẳng');
+              return l;
+            }
+            return line;
+          })
+          .filter((l) => l.trim().length > 0)
+          .join('\n');
       }
 
       if (cleanAnswer.length > 0) {
