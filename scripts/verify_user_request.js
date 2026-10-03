@@ -17,61 +17,56 @@ async function testUserDesign() {
     localStorage.setItem('app_user_display_name', 'Bác sĩ Minh');
     sessionStorage.setItem('app_user_name_prompted', 'true');
     localStorage.setItem('dismissed_pwa_banner', '1');
+    localStorage.setItem('skip_intro', '1');
   });
 
-  console.log('1. Testing 3D Opening Splash on entry...');
-  await page.goto('http://127.0.0.1:3100/?intro=1', { waitUntil: 'domcontentloaded' });
+  console.log('Navigating to homepage...');
+  await page.goto('http://127.0.0.1:3100/?skip_intro=1', { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1000);
 
-  const splash = await page.$('#qbiz-books-3d-splash');
-  if (splash) {
-    console.log('Found 3D Opening Splash on entry!');
-    const splashPath = path.resolve('C:/Users/Admin/.gemini/antigravity/brain/dd6e1346-6c48-4052-81d1-b14ecf51288f/verified_3d_opening_splash.png');
-    await page.screenshot({ path: splashPath, fullPage: false });
-    console.log('Captured 3D opening splash:', splashPath);
-
-    // Click "Khám phá ngay" to enter
-    const exploreBtn = await page.$('button:has-text("Khám phá ngay")');
-    if (exploreBtn) {
-      await exploreBtn.click({ force: true });
-      await page.waitForTimeout(800);
-    }
-  }
-
   // Scroll to "Tài Liệu Chuyên Sâu" (Author Books)
-  console.log('2. Testing Author Books section...');
+  console.log('1. Testing Author Books redesigned card...');
   const authorSec = await page.$('text=Tài Liệu Chuyên Sâu');
   if (authorSec) {
     await authorSec.scrollIntoViewIfNeeded();
     await page.waitForTimeout(800);
   }
 
-  const shot1Path = path.resolve('C:/Users/Admin/.gemini/antigravity/brain/dd6e1346-6c48-4052-81d1-b14ecf51288f/verified_author_books_unobstructed.png');
+  const shot1Path = path.resolve('C:/Users/Admin/.gemini/antigravity/brain/dd6e1346-6c48-4052-81d1-b14ecf51288f/verified_author_books_separated_layout.png');
   await page.screenshot({ path: shot1Path, fullPage: false });
   console.log('Captured Author Books section:', shot1Path);
 
   // Scroll to "Tài Liệu Y Khoa" (Recommended Books)
-  console.log('3. Testing Recommended Books section...');
+  console.log('2. Testing Recommended Books in Lookbook / List view...');
   const recSec = await page.$('text=Tài Liệu Y Khoa');
   if (recSec) {
     await recSec.scrollIntoViewIfNeeded();
     await page.waitForTimeout(800);
   }
 
-  const shot2Path = path.resolve('C:/Users/Admin/.gemini/antigravity/brain/dd6e1346-6c48-4052-81d1-b14ecf51288f/verified_recommended_books_unobstructed.png');
-  await page.screenshot({ path: shot2Path, fullPage: false });
-  console.log('Captured Recommended Books section:', shot2Path);
-
-  // Check Flipbook 3D Modal
-  console.log('4. Testing Flipbook 3D preview modal...');
-  const previewBtn = await page.$('button[title="Xem thử 3D"], button:has-text("Xem thử 3D")');
-  if (previewBtn) {
-    await previewBtn.click({ force: true });
-    await page.waitForTimeout(1500);
-    const shot4Path = path.resolve('C:/Users/Admin/.gemini/antigravity/brain/dd6e1346-6c48-4052-81d1-b14ecf51288f/verified_flipbook_modal_preview.png');
-    await page.screenshot({ path: shot4Path, fullPage: false });
-    console.log('Captured Flipbook Modal:', shot4Path);
+  // Switch to list layout (Lookbook) by clicking the list layout icon
+  const listToggleBtn = await page.$('button[title*="danh sách"], button:has(svg.lucide-list)');
+  if (listToggleBtn) {
+    console.log('Clicking list layout toggle...');
+    await listToggleBtn.click({ force: true });
+    await page.waitForTimeout(600);
   }
+
+  const shot2Path = path.resolve('C:/Users/Admin/.gemini/antigravity/brain/dd6e1346-6c48-4052-81d1-b14ecf51288f/verified_recommended_books_list_layout.png');
+  await page.screenshot({ path: shot2Path, fullPage: false });
+  console.log('Captured Recommended Books List section:', shot2Path);
+
+  // Switch back to grid layout to test grid button styling
+  const gridToggleBtn = await page.$('button[title*="lưới"], button:has(svg.lucide-layout-grid)');
+  if (gridToggleBtn) {
+    console.log('Clicking grid layout toggle...');
+    await gridToggleBtn.click({ force: true });
+    await page.waitForTimeout(600);
+  }
+
+  const shot3Path = path.resolve('C:/Users/Admin/.gemini/antigravity/brain/dd6e1346-6c48-4052-81d1-b14ecf51288f/verified_recommended_books_grid_navy.png');
+  await page.screenshot({ path: shot3Path, fullPage: false });
+  console.log('Captured Recommended Books Grid section:', shot3Path);
 
   await browser.close();
   console.log('ALL TESTS COMPLETED SUCCESSFULLY!');

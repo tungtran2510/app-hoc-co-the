@@ -457,11 +457,11 @@ html.dark .animate-pulse-glow {
 @keyframes bubble-float {
   0%, 100% {
     transform: translateY(0);
-    box-shadow: 0 4px 14px rgba(212, 160, 40, 0.32), 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 14px rgba(30, 58, 138, 0.28), 0 1px 3px rgba(0, 0, 0, 0.08);
   }
   50% {
     transform: translateY(-3.5px);
-    box-shadow: 0 9px 24px rgba(212, 160, 40, 0.52), 0 2px 8px rgba(0, 0, 0, 0.14);
+    box-shadow: 0 10px 24px rgba(30, 58, 138, 0.45), 0 2px 8px rgba(0, 0, 0, 0.14);
   }
 }
 

@@ -13,6 +13,8 @@ import {
   Eye,
   EyeOff,
   BookOpen,
+  Sparkles,
+  FileText,
 } from 'lucide-react';
 import { RecommendedBook } from '../lib/types';
 import { checkIsAdminClient } from '../lib/adminAuth';
@@ -270,54 +272,70 @@ export default function RecommendedBooksSection({
                 delay={idx * 120}
               >
                 <div
-                  onClick={() => setSelectedBook(book)}
-                  className={`group p-3 sm:p-4 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-lg hover:shadow-blue-900/10 hover:border-[#1E3A8A]/50 dark:hover:border-[#F8DF7B]/60 dark:hover:shadow-[0_12px_28px_rgba(248,223,123,0.15)] hover:-translate-y-1.5 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 flex flex-row gap-3 sm:gap-4.5 cursor-pointer relative ${
+                  className={`p-3.5 sm:p-4 rounded-[16px] bg-white text-slate-900 border border-slate-200/90 dark:border-white/10 shadow-xs hover:shadow-md hover:border-[#1E3A8A]/40 dark:hover:border-[#F8DF7B]/60 transition-all duration-300 flex flex-col gap-3 group relative ${
                     isBookHidden ? 'opacity-70 border-dashed border-amber-300' : ''
                   }`}
                 >
-                  {/* BÌA SÁCH 3D HIỆN ĐẠI BÊN TRÁI - TO RÕ RÀNG THEO YÊU CẦU */}
-                  <div className="w-[116px] sm:w-[138px] shrink-0 pt-0.5 relative">
-                    <ModernBookCover
-                      title={book.title}
-                      coverUrl={book.cover_url}
-                      author={book.author}
-                      index={idx}
-                      badgeText={book.badge_tag || book.tag || 'NÊN ĐỌC'}
-                    />
-                    {isBookHidden && isAdmin && (
-                      <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/75 text-amber-300 text-[9.5px] font-black z-10">
-                        Ẩn tạm
+                  {/* PHẦN TRÊN: Bìa sách bên trái & Khung chi tiết bên phải */}
+                  <div
+                    onClick={() => setSelectedBook(book)}
+                    className="flex flex-row gap-3 sm:gap-4 items-start cursor-pointer"
+                  >
+                    {/* BÊN TRÁI: Bìa sách 3D to rõ chuẩn tỷ lệ 3:4 với ModernBookCover */}
+                    <div className="w-[110px] sm:w-[130px] aspect-[3/4] shrink-0 pt-0.5 relative flex items-center justify-center">
+                      <ModernBookCover
+                        title={book.title}
+                        coverUrl={book.cover_url}
+                        author={book.author}
+                        index={idx}
+                        badgeText={book.badge_tag || book.tag || 'NÊN ĐỌC'}
+                      />
+                      {isBookHidden && isAdmin && (
+                        <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/75 text-amber-300 text-[9.5px] font-black z-10">
+                          Ẩn tạm
+                        </div>
+                      )}
+                    </div>
+
+                    {/* BÊN PHẢI: Khung chi tiết sách tách bạch */}
+                    <div className="flex-1 flex flex-col justify-between min-w-0 self-stretch py-0.5">
+                      <div className="flex flex-col gap-1.5">
+                        <span className="text-[10.5px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">
+                          {book.author ? `Tác giả: ${book.author}` : 'Tài liệu tham khảo'}
+                        </span>
+
+                        <h3 className="text-[16px] sm:text-[17.5px] font-black text-slate-900 dark:text-white leading-snug line-clamp-2 break-normal group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] transition-colors">
+                          {book.title}
+                        </h3>
                       </div>
-                    )}
+
+                      {/* Khung nút Chi tiết sách riêng biệt */}
+                      <div className="pt-2 mt-auto">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[9px] bg-slate-100 hover:bg-slate-200/90 dark:bg-white/10 dark:hover:bg-white/15 text-[#1E3A8A] dark:text-[#F8DF7B] text-[12px] font-extrabold border border-slate-200/80 dark:border-white/10 transition-colors">
+                          <FileText size={13} strokeWidth={2.2} />
+                          <span>Chi tiết sách</span>
+                          <ChevronRight size={13} strokeWidth={2.5} />
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* THÔNG TIN CHI TIẾT BÊN PHẢI - RỘNG RÃI */}
-                  <div className="flex-1 flex flex-col justify-between min-w-0 py-0.5">
-                    <div className="flex flex-col gap-1.5">
-                      <h3 className="text-[16px] sm:text-[17.5px] font-black text-slate-900 dark:text-white leading-snug line-clamp-2 break-normal group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] transition-colors">
-                        {book.title}
-                      </h3>
-                    </div>
-
-                    <div className="pt-2.5 flex items-center justify-between border-t border-slate-100 dark:border-purple-800/40 mt-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setFlipbookPreviewBook(book);
-                        }}
-                        className="animate-bubble-float relative inline-flex items-center gap-2 px-4 py-2 sm:px-4.5 sm:py-2.5 rounded-[12px] bg-gradient-to-r from-[#FFF0BA] via-[#ECC45F] to-[#D4A028] hover:from-[#FFF5CE] hover:to-[#DFAC32] text-[#1A1608] font-black text-[13px] sm:text-[14px] shadow-md shadow-[#D4A028]/35 cursor-pointer transition-all active:scale-95 border border-[#F3D37A] shrink-0"
-                        title="Xem thử 3D"
-                      >
-                        <BookOpen size={16} strokeWidth={2.8} className="shrink-0 text-[#1A1608]" />
-                        <span className="tracking-wide">Xem thử 3D</span>
-                      </button>
-
-                      <span className="text-[12.5px] sm:text-[13px] font-black text-[#1E3A8A] dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0 ml-auto">
-                        <span>Chi tiết</span>
-                        <ChevronRight size={14} strokeWidth={2.5} />
-                      </span>
-                    </div>
+                  {/* PHẦN DƯỚI: KHUNG XEM THỬ 3D TO RỘNG, TÁCH HẲN RA BẰNG HÀNG ĐỘC LẬP */}
+                  <div className="pt-2.5 border-t border-slate-100 dark:border-white/10">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setFlipbookPreviewBook(book);
+                      }}
+                      className="animate-bubble-float relative w-full h-[46px] sm:h-[48px] rounded-[13px] bg-gradient-to-r from-[#1E3A8A] via-[#1D4ED8] to-[#0F2454] hover:from-[#1E40AF] hover:to-[#172554] text-white font-black text-[13.5px] sm:text-[14.5px] tracking-wide shadow-md shadow-blue-950/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer border border-blue-400/30"
+                      title="Mở trình đọc xem thử sách 3D"
+                    >
+                      <BookOpen size={17} strokeWidth={2.8} className="text-amber-300 shrink-0" />
+                      <span>Xem thử 3D (Lật sách tương tác)</span>
+                      <Sparkles size={14} className="text-amber-300 shrink-0" />
+                    </button>
+                  </div>
 
                     {isAdmin && (
                       <div
@@ -378,7 +396,6 @@ export default function RecommendedBooksSection({
                         </div>
                       </div>
                     )}
-                  </div>
                 </div>
               </ScrollReveal>
             );
@@ -425,21 +442,21 @@ export default function RecommendedBooksSection({
                       {book.title}
                     </h3>
 
-                    <div className="mt-auto pt-2 flex items-center justify-between border-t border-slate-100 dark:border-purple-800/40 gap-1.5">
+                    <div className="mt-auto pt-2 flex items-center justify-between border-t border-slate-100 dark:border-white/10 gap-1.5">
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           setFlipbookPreviewBook(book);
                         }}
-                        className="animate-bubble-float relative inline-flex items-center justify-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-[9px] sm:rounded-[10px] bg-gradient-to-r from-[#FFF0BA] via-[#ECC45F] to-[#D4A028] hover:from-[#FFF5CE] hover:to-[#DFAC32] text-[#1A1608] font-black text-[11.5px] sm:text-[12.5px] shadow-sm shadow-[#D4A028]/25 cursor-pointer transition-all active:scale-95 border border-[#F3D37A] shrink-0"
+                        className="animate-bubble-float relative inline-flex items-center justify-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-[10px] bg-gradient-to-r from-[#1E3A8A] via-[#1D4ED8] to-[#0F2454] hover:from-[#1E40AF] hover:to-[#172554] text-white font-black text-[11.5px] sm:text-[12.5px] shadow-sm shadow-blue-950/25 cursor-pointer transition-all active:scale-95 border border-blue-400/30 shrink-0"
                         title="Đọc thử tài liệu 3D chân thực"
                       >
-                        <BookOpen size={13} strokeWidth={2.8} className="shrink-0 text-[#1A1608]" />
+                        <BookOpen size={13} strokeWidth={2.8} className="shrink-0 text-amber-300" />
                         <span>Đọc thử 3D</span>
                       </button>
 
-                      <span className="text-[11px] sm:text-[12px] font-black text-[#1E3A8A] dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0 ml-auto">
+                      <span className="text-[11.5px] sm:text-[12px] font-black text-[#1E3A8A] dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0 ml-auto">
                         <span>Chi tiết</span>
                         <ChevronRight size={12} strokeWidth={2.5} />
                       </span>

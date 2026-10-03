@@ -433,10 +433,11 @@ export default function BookDetailModal({
                   <button
                     type="button"
                     onClick={() => setShow3DFlipbook(true)}
-                    className="animate-bubble-float relative w-full py-2.5 sm:py-3 px-4 rounded-[13px] bg-gradient-to-r from-[#FFF0BA] via-[#ECC45F] to-[#D4A028] hover:from-[#FFF5CE] hover:to-[#DFAC32] text-[#1A1608] font-black text-[14px] shadow-md shadow-[#D4A028]/35 flex items-center justify-center gap-2 transition-transform active:scale-[0.98] cursor-pointer border border-[#F3D37A]"
+                    className="animate-bubble-float relative w-full py-2.5 sm:py-3 px-4 rounded-[13px] bg-gradient-to-r from-[#1E3A8A] via-[#1D4ED8] to-[#0F2454] hover:from-[#1E40AF] hover:to-[#172554] text-white font-black text-[14px] shadow-md shadow-blue-950/25 flex items-center justify-center gap-2 transition-transform active:scale-[0.98] cursor-pointer border border-blue-400/30"
                   >
-                    <BookOpen size={17} strokeWidth={2.8} className="shrink-0 text-[#1A1608]" />
+                    <BookOpen size={17} strokeWidth={2.8} className="shrink-0 text-amber-300" />
                     <span className="tracking-wide">Đọc thử tài liệu 3D</span>
+                    <Sparkles size={14} className="shrink-0 text-amber-300" />
                   </button>
                 </div>
 

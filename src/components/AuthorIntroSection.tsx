@@ -25,6 +25,7 @@ import {
   Quote,
   X,
   MessageCircle,
+  FileText,
 } from 'lucide-react';
 import { AuthorProfile, AuthorBook } from '../lib/types';
 import { normalizeAuthorProfile } from '../lib/data';
@@ -478,64 +479,79 @@ export function AuthorBooksSection({
                 delay={idx * 140}
               >
                 <div
-                  onClick={() => onSelectBook?.(book)}
-                  className={`p-3.5 sm:p-4 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-lg hover:shadow-blue-950/10 hover:border-amber-400/80 dark:hover:border-[#F8DF7B]/60 dark:hover:shadow-[0_12px_28px_rgba(248,223,123,0.15)] hover:-translate-y-1.5 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 cursor-pointer flex flex-row gap-3 sm:gap-4 group ${
+                  className={`p-3.5 sm:p-4 rounded-[16px] bg-white text-slate-900 border border-slate-200/90 dark:border-white/10 shadow-xs hover:shadow-md hover:border-[#1E3A8A]/40 dark:hover:border-[#F8DF7B]/60 transition-all duration-300 flex flex-col gap-3 group ${
                     isBookHidden ? 'opacity-70 border-dashed border-amber-300' : ''
                   }`}
                 >
-                {/* BÊN TRÁI: Bìa sách to rõ chuẩn tỷ lệ 3:4 với ModernBookCover */}
-                <div className="w-[116px] sm:w-[138px] aspect-[3/4] shrink-0 relative flex items-center justify-center">
-                  <ModernBookCover
-                    title={book.title}
-                    coverUrl={book.cover_url}
-                    author={profile.name || 'Tùng Dinh Dưỡng'}
-                    index={idx}
-                    badgeText={book.year ? `NĂM ${book.year}` : 'CHUYÊN SÂU'}
-                  />
+                  {/* PHẦN TRÊN: Bìa sách bên trái & Khung chi tiết bên phải */}
+                  <div
+                    onClick={() => onSelectBook?.(book)}
+                    className="flex flex-row gap-3 sm:gap-4 items-start cursor-pointer"
+                  >
+                    {/* BÊN TRÁI: Bìa sách to rõ chuẩn tỷ lệ 3:4 với ModernBookCover */}
+                    <div className="w-[110px] sm:w-[130px] aspect-[3/4] shrink-0 relative flex items-center justify-center">
+                      <ModernBookCover
+                        title={book.title}
+                        coverUrl={book.cover_url}
+                        author={profile.name || 'Tùng Dinh Dưỡng'}
+                        index={idx}
+                        badgeText={book.year ? `NĂM ${book.year}` : 'CHUYÊN SÂU'}
+                      />
 
-                  {/* Nhãn Đang ẩn nếu admin */}
-                  {isBookHidden && isAdmin && (
-                    <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/75 text-amber-300 text-[9.5px] font-black z-30">
-                      Ẩn tạm
+                      {/* Nhãn Đang ẩn nếu admin */}
+                      {isBookHidden && isAdmin && (
+                        <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/75 text-amber-300 text-[9.5px] font-black z-30">
+                          Ẩn tạm
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
 
-                {/* BÊN PHẢI: Tiêu đề, tag videos & nút xem thử 3D to nổi dạng bong bóng */}
-                <div className="flex-1 flex flex-col justify-between min-w-0 py-0.5">
-                  <div className="flex flex-col gap-1.5">
-                    {hasVideo && (
-                      <div className="flex items-center gap-1.5">
-                        <span className="flex items-center gap-1 px-2 py-0.5 rounded-[5px] bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/80 dark:text-red-300 dark:border-red-800/40 text-[10.5px] font-extrabold uppercase">
-                          <Play size={10} className="fill-red-600 dark:fill-red-400" />
-                          <span>videos</span>
+                    {/* BÊN PHẢI: Khung chi tiết sách tách bạch */}
+                    <div className="flex-1 flex flex-col justify-between min-w-0 self-stretch py-0.5">
+                      <div className="flex flex-col gap-1.5">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {hasVideo && (
+                            <span className="flex items-center gap-1 px-2 py-0.5 rounded-[5px] bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/80 dark:text-rose-300 dark:border-rose-800/40 text-[10.5px] font-extrabold uppercase">
+                              <Play size={10} className="fill-rose-600 dark:fill-rose-400" />
+                              <span>videos</span>
+                            </span>
+                          )}
+                          <span className="text-[10.5px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">
+                            Tài liệu chuyên sâu
+                          </span>
+                        </div>
+
+                        <h4 className="text-[16px] sm:text-[17.5px] font-black text-slate-900 dark:text-white leading-snug line-clamp-2 break-normal group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] transition-colors">
+                          {book.title}
+                        </h4>
+                      </div>
+
+                      {/* Khung nút Chi tiết sách riêng biệt */}
+                      <div className="pt-2 mt-auto">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[9px] bg-slate-100 hover:bg-slate-200/90 dark:bg-white/10 dark:hover:bg-white/15 text-[#1E3A8A] dark:text-[#F8DF7B] text-[12px] font-extrabold border border-slate-200/80 dark:border-white/10 transition-colors">
+                          <FileText size={13} strokeWidth={2.2} />
+                          <span>Chi tiết sách</span>
+                          <ChevronRight size={13} strokeWidth={2.5} />
                         </span>
                       </div>
-                    )}
-
-                    <h4 className="text-[16px] sm:text-[17.5px] font-black text-slate-900 dark:text-white leading-snug line-clamp-2 break-normal group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] transition-colors">
-                      {book.title}
-                    </h4>
+                    </div>
                   </div>
 
-                  <div className="pt-2.5 flex items-center justify-between border-t border-slate-100 dark:border-purple-800/40 mt-2 gap-2">
+                  {/* PHẦN DƯỚI: KHUNG XEM THỬ 3D TO RỘNG, TÁCH HẲN RA BẰNG HÀNG ĐỘC LẬP */}
+                  <div className="pt-2.5 border-t border-slate-100 dark:border-white/10">
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         setPreviewBook(book);
                       }}
-                      className="animate-bubble-float relative inline-flex items-center gap-2 px-4 py-2 sm:px-4.5 sm:py-2.5 rounded-[12px] bg-gradient-to-r from-[#FFF0BA] via-[#ECC45F] to-[#D4A028] hover:from-[#FFF5CE] hover:to-[#DFAC32] text-[#1A1608] font-black text-[13px] sm:text-[14px] shadow-md shadow-[#D4A028]/35 cursor-pointer transition-all active:scale-95 border border-[#F3D37A] shrink-0"
-                      title="Xem thử 3D"
+                      className="animate-bubble-float relative w-full h-[46px] sm:h-[48px] rounded-[13px] bg-gradient-to-r from-[#1E3A8A] via-[#1D4ED8] to-[#0F2454] hover:from-[#1E40AF] hover:to-[#172554] text-white font-black text-[13.5px] sm:text-[14.5px] tracking-wide shadow-md shadow-blue-950/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer border border-blue-400/30"
+                      title="Mở trình đọc xem thử sách 3D"
                     >
-                      <BookOpen size={16} strokeWidth={2.8} className="shrink-0 text-[#1A1608]" />
-                      <span className="tracking-wide">Xem thử 3D</span>
+                      <BookOpen size={17} strokeWidth={2.8} className="text-amber-300 shrink-0" />
+                      <span>Xem thử 3D (Lật sách tương tác)</span>
+                      <Sparkles size={14} className="text-amber-300 shrink-0" />
                     </button>
-
-                    <span className="text-[12.5px] sm:text-[13px] font-black text-amber-700 dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0 ml-auto">
-                      <span>Chi tiết</span>
-                      <ChevronRight size={14} strokeWidth={2.5} />
-                    </span>
                   </div>
 
                   {isAdmin && (
@@ -612,7 +628,6 @@ export function AuthorBooksSection({
                       </div>
                     </div>
                   )}
-                  </div>
                 </div>
             </ScrollReveal>
           );
