@@ -1860,8 +1860,8 @@ export default function FlipbookViewer({
             ) : (
               <div className="flex flex-col gap-3">
                 {/* Lựa chọn 1: Nạp file PDF */}
-                <label className="flex items-center gap-3 p-3.5 rounded-[14px] border-2 border-dashed border-blue-300 dark:border-blue-700/60 bg-blue-50/50 dark:bg-blue-950/20 hover:bg-blue-50 hover:border-blue-500 cursor-pointer transition-all">
-                  <div className="w-10 h-10 rounded-[10px] bg-blue-100 dark:bg-blue-900/60 text-[#1E3A8A] dark:text-blue-300 flex items-center justify-center shrink-0">
+                <label className="flex items-center gap-3 p-3.5 rounded-[14px] border-2 border-dashed border-amber-300 dark:border-purple-600/60 bg-amber-50/40 dark:bg-purple-950/30 hover:bg-amber-50 hover:border-amber-500 cursor-pointer transition-all">
+                  <div className="w-10 h-10 rounded-[10px] bg-amber-100 dark:bg-purple-900/60 text-amber-800 dark:text-purple-200 flex items-center justify-center shrink-0">
                     <FileText size={20} />
                   </div>
                   <div className="flex flex-col min-w-0">

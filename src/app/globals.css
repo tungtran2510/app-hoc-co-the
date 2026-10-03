@@ -11,11 +11,11 @@
   --color-muted: #475569;
   --color-line: #E2E8F0;
   --color-line-strong: #CBD5E1;
-  --color-primary: #1E3A8A;
-  --color-primary-dark: #172554;
-  --color-primary-soft: #EFF6FF;
-  --color-primary-track: #DBEAFE;
-  --color-on-primary-muted: #1E40AF;
+  --color-primary: #7C3AED;
+  --color-primary-dark: #6D28D9;
+  --color-primary-soft: #F5F3FF;
+  --color-primary-track: #EDE9FE;
+  --color-on-primary-muted: #6D28D9;
 }
 
 html {
@@ -30,7 +30,7 @@ body {
   padding: 0;
   background-color: var(--color-bg);
   background-image: 
-    radial-gradient(ellipse 90% 40% at 50% -10%, rgba(30, 58, 138, 0.04), transparent 70%),
+    radial-gradient(ellipse 90% 40% at 50% -10%, rgba(124, 58, 237, 0.05), transparent 70%),
     radial-gradient(ellipse 60% 30% at 100% 50%, rgba(15, 23, 42, 0.03), transparent 60%);
   background-repeat: no-repeat;
   color: var(--color-ink);
@@ -46,17 +46,27 @@ h1, h2, h3, h4, h5, h6 {
   font-feature-settings: "kern" 1, "liga" 1;
 }
 
-/* Tối ưu thanh cuộn */
+/* Tối ưu thanh cuộn và chống viền xanh trình duyệt */
+* {
+  scrollbar-color: rgba(148, 148, 160, 0.28) transparent;
+  scrollbar-width: thin;
+}
+:focus, :focus-visible {
+  outline-color: #8B5CF6;
+}
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #94A3B8;
+  background: rgba(148, 148, 160, 0.28);
   border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 148, 160, 0.45);
 }
 
 /* ============================================================================
@@ -389,11 +399,11 @@ html.gray ::-webkit-scrollbar-thumb {
 /* 6. Hiệu ứng Hào Quang Nhịp Thở Sáng (Pulse Glow) chuẩn Y Khoa */
 @keyframes pulse-glow-light {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(30, 58, 138, 0.3), 0 2px 6px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.2), 0 2px 6px rgba(0, 0, 0, 0.08);
     transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 16px 2.5px rgba(59, 130, 246, 0.55), 0 4px 12px rgba(30, 58, 138, 0.25);
+    box-shadow: 0 0 16px 2.5px rgba(245, 158, 11, 0.35), 0 4px 12px rgba(124, 58, 237, 0.15);
     transform: scale(1.02);
   }
 }
@@ -446,12 +456,12 @@ html.dark .animate-pulse-glow {
 @keyframes bio-breathing-light {
   0%, 100% {
     border-color: rgba(203, 213, 225, 0.85);
-    box-shadow: 0 2px 8px rgba(30, 58, 138, 0.05);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
     transform: translateY(0);
   }
   50% {
-    border-color: rgba(59, 130, 246, 0.55);
-    box-shadow: 0 6px 20px rgba(30, 58, 138, 0.12), 0 0 16px rgba(245, 158, 11, 0.18);
+    border-color: rgba(245, 158, 11, 0.5);
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.08), 0 0 16px rgba(245, 158, 11, 0.15);
     transform: translateY(-1.5px);
   }
 }

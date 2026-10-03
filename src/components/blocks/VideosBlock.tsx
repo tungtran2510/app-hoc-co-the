@@ -489,7 +489,7 @@ export default function VideosBlock({
               className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border transition-colors cursor-pointer whitespace-nowrap ${
                 isVertical
                   ? 'bg-purple-900/70 text-purple-200 border-purple-500/50 hover:bg-purple-800'
-                  : 'bg-blue-950/70 text-blue-200 border-blue-500/40 hover:bg-blue-900'
+                  : 'bg-slate-800/80 text-amber-200 border-amber-500/40 hover:bg-slate-700'
               }`}
               title="Bấm để chuyển đổi giữa khung dọc và khung ngang"
             >
@@ -544,8 +544,8 @@ export default function VideosBlock({
                   )}
                   <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors" />
 
-                  <div className="relative z-10 w-[64px] h-[64px] sm:w-[70px] sm:h-[70px] rounded-full bg-white/95 flex items-center justify-center text-[#1E3A8A] shadow-2xl transition-transform group-hover:scale-105 active:scale-95 ring-4 ring-[#1E3A8A]/25">
-                    <Play size={28} fill="currentColor" className="ml-1 text-[#1E3A8A]" />
+                  <div className="relative z-10 w-[64px] h-[64px] sm:w-[70px] sm:h-[70px] rounded-full bg-white/95 flex items-center justify-center text-purple-900 shadow-2xl transition-transform group-hover:scale-105 active:scale-95 ring-4 ring-amber-400/40">
+                    <Play size={28} fill="currentColor" className="ml-1 text-purple-900" />
                   </div>
 
                   <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between z-10 text-white text-[12.5px] sm:text-[13.5px] font-semibold bg-black/75 px-3 py-1.5 rounded-[10px] border border-white/15">
@@ -573,10 +573,10 @@ export default function VideosBlock({
                     alert('Video đang được cập nhật.');
                   }
                 }}
-                className="relative z-10 w-[72px] h-[72px] rounded-full bg-white flex items-center justify-center text-[#1E3A8A] shadow-lg transition-transform active:scale-95 ring-4 ring-[#1E3A8A]/20"
+                className="relative z-10 w-[72px] h-[72px] rounded-full bg-white flex items-center justify-center text-purple-900 shadow-lg transition-transform active:scale-95 ring-4 ring-amber-400/40"
                 aria-label={`Phát video: ${currentVideo.title}`}
               >
-                <Play size={32} fill="currentColor" className="ml-1 text-[#1E3A8A]" />
+                <Play size={32} fill="currentColor" className="ml-1 text-purple-900" />
               </button>
 
               <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between z-10 text-white text-[14px] font-semibold bg-black/60 px-3 py-1.5 rounded-lg backdrop-blur-xs border border-white/15">
@@ -621,7 +621,7 @@ export default function VideosBlock({
       {/* 1. THANH TÙY CHỈNH TỐC ĐỘ PHÁT VIDEO CHUYÊN NGHIỆP (ĐẶT Ở TRÊN, SÁT DƯỚI KHUNG VIDEO THEO YÊU CẦU) */}
       <div className="flex items-center justify-between gap-1.5 px-2.5 py-1 rounded-[11px] bg-slate-50 dark:bg-[#160D30]/80 border border-slate-200/80 dark:border-purple-900/40 text-[11px] font-bold">
         <span className="flex items-center gap-1.5 text-slate-700 dark:text-purple-300 font-extrabold shrink-0">
-          <Gauge size={13} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
+          <Gauge size={13} className="text-amber-600 dark:text-[#F8DF7B]" />
           <span>Tốc độ phát:</span>
         </span>
         <div className="flex items-center gap-1 shrink-0 overflow-x-auto">
@@ -632,7 +632,7 @@ export default function VideosBlock({
               onClick={() => handleSetSpeed(spd)}
               className={`px-2 py-0.5 rounded-[6px] text-[10.5px] font-extrabold transition-all cursor-pointer ${
                 playbackRate === spd
-                  ? 'bg-[#1E3A8A] text-white dark:bg-[#F8DF7B] dark:text-[#160C2C] shadow-2xs font-black'
+                  ? 'bg-purple-900 text-white dark:bg-[#F8DF7B] dark:text-[#160C2C] shadow-2xs font-black'
                   : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200/80 dark:bg-purple-950/60 dark:text-purple-200 dark:border-purple-800/40'
               }`}
               title={`Phát video ở tốc độ ${spd}x`}
@@ -648,7 +648,7 @@ export default function VideosBlock({
         <div className="flex items-center justify-between text-[12.5px] font-bold text-ink">
           <span className="flex items-center gap-1.5 text-muted">
             <span>Tiến độ bài học:</span>
-            <strong className="text-[#1E3A8A] dark:text-[#F8DF7B] font-black">
+            <strong className="text-amber-600 dark:text-[#F8DF7B] font-black">
               {Math.min(100, Math.round(((videoList.filter((_, idx) => watchedList.includes(idx + 1)).length) / (videoList.length || 1)) * 100))}%
             </strong>
             <span>
@@ -663,7 +663,7 @@ export default function VideosBlock({
         </div>
         <div className="w-full h-1.5 rounded-full bg-slate-200 dark:bg-purple-950/80 border border-slate-300/60 dark:border-purple-900/30 overflow-hidden p-0.5">
           <div
-            className="h-full rounded-full bg-[#1E3A8A] dark:bg-gradient-to-r dark:from-purple-500 dark:to-[#F8DF7B] transition-all duration-500"
+            className="h-full rounded-full bg-amber-500 dark:bg-gradient-to-r dark:from-purple-500 dark:to-[#F8DF7B] transition-all duration-500"
             style={{
               width: `${Math.max(
                 Math.min(100, Math.round(((videoList.filter((_, idx) => watchedList.includes(idx + 1)).length) / (videoList.length || 1)) * 100)),
@@ -681,7 +681,7 @@ export default function VideosBlock({
           onClick={() => handleTabChange('syllabus')}
           className={`flex items-center justify-center py-2 px-1 text-[13px] sm:text-[14px] font-extrabold transition-all cursor-pointer text-center leading-tight min-h-[42px] ${
             currentTab === 'syllabus'
-              ? 'bg-[#1E3A8A] text-white font-black shadow-xs'
+              ? 'bg-purple-900 text-white font-black shadow-xs'
               : 'text-slate-700 dark:text-purple-300/80 bg-white/80 dark:bg-[#160D30] hover:text-slate-950 dark:hover:text-white hover:bg-white dark:hover:bg-purple-950/40'
           }`}
         >
@@ -693,7 +693,7 @@ export default function VideosBlock({
           onClick={() => handleTabChange('summary')}
           className={`flex items-center justify-center py-2 px-1 text-[13px] sm:text-[14px] font-extrabold transition-all cursor-pointer text-center leading-tight min-h-[42px] ${
             currentTab === 'summary'
-              ? 'bg-[#1E3A8A] text-white font-black shadow-xs'
+              ? 'bg-purple-900 text-white font-black shadow-xs'
               : 'text-slate-700 dark:text-purple-300/80 bg-white/80 dark:bg-[#160D30] hover:text-slate-950 dark:hover:text-white hover:bg-white dark:hover:bg-purple-950/40'
           }`}
         >
@@ -705,7 +705,7 @@ export default function VideosBlock({
           onClick={() => handleTabChange('resources')}
           className={`flex items-center justify-center py-2 px-1 text-[13px] sm:text-[14px] font-extrabold transition-all cursor-pointer text-center leading-tight min-h-[42px] ${
             currentTab === 'resources'
-              ? 'bg-[#1E3A8A] text-white font-black shadow-xs'
+              ? 'bg-purple-900 text-white font-black shadow-xs'
               : 'text-slate-700 dark:text-purple-300/80 bg-white/80 dark:bg-[#160D30] hover:text-slate-950 dark:hover:text-white hover:bg-white dark:hover:bg-purple-950/40'
           }`}
         >
@@ -776,8 +776,8 @@ export default function VideosBlock({
                   </div>
                 ) : (
                   <div className="absolute inset-0 bg-black/25 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
-                    <div className="w-4.5 h-4.5 rounded-full bg-white text-[#1E3A8A] flex items-center justify-center shadow-xs">
-                      <Play size={8} fill="currentColor" className="ml-0.5 text-[#1E3A8A]" />
+                    <div className="w-4.5 h-4.5 rounded-full bg-white text-purple-900 flex items-center justify-center shadow-xs">
+                      <Play size={8} fill="currentColor" className="ml-0.5 text-purple-900" />
                     </div>
                   </div>
                 )}

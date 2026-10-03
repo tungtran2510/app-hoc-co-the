@@ -588,13 +588,13 @@ export default function BookDetailModal({
                 href={book.link_url || 'https://zalo.me/0987792400'}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative w-full py-3.5 px-4 rounded-[14px] bg-gradient-to-r from-[#0068FF] via-[#005FEA] to-[#0047C2] hover:from-[#0058DB] hover:to-[#003EA6] text-white font-extrabold text-[14px] shadow-md shadow-blue-500/25 flex items-center justify-center gap-2.5 transition-all active:scale-[0.98] cursor-pointer overflow-hidden border border-blue-300/40"
+                className="group relative w-full py-3.5 px-4 rounded-[14px] bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-slate-950 font-black text-[14px] shadow-md shadow-amber-500/20 flex items-center justify-center gap-2.5 transition-all active:scale-[0.98] cursor-pointer overflow-hidden border border-amber-300/60"
               >
-                <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-                  <MessageCircle size={14} className="text-white fill-white" />
+                <div className="w-6 h-6 rounded-full bg-slate-950/15 flex items-center justify-center shrink-0">
+                  <MessageCircle size={14} className="text-slate-950 fill-slate-950" />
                 </div>
                 <span className="tracking-wide">Đặt sách liên hệ Zalo</span>
-                <span className="text-[12px] opacity-90 font-medium font-sans">· 0974.248.716</span>
+                <span className="text-[12px] opacity-90 font-bold font-sans">· 0974.248.716</span>
               </a>
             </div>
           </div>
@@ -620,7 +620,7 @@ export default function BookDetailModal({
             <button
               type="button"
               onClick={handleClose}
-              className="flex items-center justify-center gap-1.5 h-8.5 px-4 rounded-[10px] bg-[#1E3A8A] hover:bg-[#172554] text-white font-extrabold text-[12.5px] cursor-pointer shadow-xs transition-all active:scale-95"
+              className="flex items-center justify-center gap-1.5 h-8.5 px-4 rounded-[10px] bg-slate-800 hover:bg-slate-900 text-white font-extrabold text-[12.5px] cursor-pointer shadow-xs transition-all active:scale-95"
             >
               <X size={14} strokeWidth={2.5} />
               <span>Đóng</span>

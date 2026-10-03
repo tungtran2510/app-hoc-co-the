@@ -205,7 +205,7 @@ export default function PwaRegistrar() {
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
             <div className="w-10 h-10 rounded-[12px] overflow-hidden shrink-0 shadow-xs border border-slate-200 dark:border-purple-400/40 p-0.5 bg-white dark:bg-[#120A2B]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/icon-192.png" alt="Qbiz Books" className="w-full h-full object-cover rounded-[10px]" />
+              <img src="/app_logo.png?v=21" alt="Qbiz Books" className="w-full h-full object-cover rounded-[10px]" />
             </div>
             <div className="flex flex-col min-w-0">
               <span className="text-[13px] sm:text-[14px] font-black text-slate-900 dark:text-white leading-tight truncate flex items-center gap-1.5">

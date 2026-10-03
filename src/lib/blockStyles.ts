@@ -8,7 +8,7 @@ export interface BlockStyleConfig {
 export const DEFAULT_BLOCK_STYLES: Record<string, BlockStyleConfig> = {
   van_ban: { label: null, icon: null, bg: null, fg: "#2E3847" },
   y_nghia: { label: "Ý NGHĨA", icon: "Lightbulb", bg: "#E6F2EF", fg: "#0A4F43" },
-  diem_can_nho: { label: "ĐIỂM CẦN NHỚ", icon: "SquareCheck", bg: "#E3ECF7", fg: "#244A78" },
+  diem_can_nho: { label: "ĐIỂM CẦN NHỚ", icon: "SquareCheck", bg: "#F3E8FF", fg: "#581C87" },
   chu_y: { label: "CHÚ Ý", icon: "TriangleAlert", bg: "#FFF1E6", fg: "#8A3A14" },
   sai_lam: { label: "SAI LẦM THƯỜNG GẶP", icon: "CircleX", bg: "#FBE7E1", fg: "#7A2F12" },
   giai_phap: { label: "GIẢI PHÁP · ỨNG DỤNG", icon: "Wrench", bg: "#EDF3E4", fg: "#3C5420" },

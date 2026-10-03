@@ -29,8 +29,8 @@ import { extractYouTubeId, fetchYouTubeMeta } from '../../lib/youtube';
 import { uploadImageFile, uploadPdfFile } from '../../lib/storageUpload';
 
 const TITLE_COLORS = [
-  { name: 'Navy', hex: '#1E3A8A' },
-  { name: 'Lam', hex: '#2563EB' },
+  { name: 'Đen than', hex: '#1E293B' },
+  { name: 'Tím đậm', hex: '#4C1D95' },
   { name: 'Ngọc', hex: '#0D9488' },
   { name: 'Lá', hex: '#16A34A' },
   { name: 'Đỏ', hex: '#DC2626' },
@@ -43,7 +43,7 @@ const TEXT_COLORS = [
   { name: 'Tự động', hex: '', preview: '#94A3B8' },
   { name: 'Than tối', hex: '#1E293B', preview: '#1E293B' },
   { name: 'Xám đậm', hex: '#475569', preview: '#475569' },
-  { name: 'Navy y khoa', hex: '#1E3A8A', preview: '#1E3A8A' },
+  { name: 'Tím than', hex: '#3B1262', preview: '#3B1262' },
   { name: 'Ngọc thạch', hex: '#0D9488', preview: '#0D9488' },
   { name: 'Xanh lá', hex: '#16A34A', preview: '#16A34A' },
   { name: 'Đỏ nổi bật', hex: '#DC2626', preview: '#DC2626' },
@@ -63,7 +63,7 @@ const FONT_SIZE_OPTIONS = [
 const HTML_TEMPLATES = [
   {
     label: '💡 Hộp thông tin',
-    snippet: `<div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left: 4px solid #2563eb; padding: 14px 16px; border-radius: 12px; margin: 10px 0;">\n  <div style="font-weight: 700; color: #1e40af; margin-bottom: 4px;">💡 Điểm cốt lõi cần nhớ</div>\n  <p style="margin: 0; color: #1e3a8a; line-height: 1.6; font-size: 15px;">Nội dung giải thích chi tiết, ngắn gọn và dễ hiểu tại đây.</p>\n</div>`,
+    snippet: `<div style="background: linear-gradient(135deg, #fdfbf7 0%, #fef3c7 100%); border-left: 4px solid #d97706; padding: 14px 16px; border-radius: 12px; margin: 10px 0;">\n  <div style="font-weight: 700; color: #92400e; margin-bottom: 4px;">💡 Điểm cốt lõi cần nhớ</div>\n  <p style="margin: 0; color: #78350f; line-height: 1.6; font-size: 15px;">Nội dung giải thích chi tiết, ngắn gọn và dễ hiểu tại đây.</p>\n</div>`,
   },
   {
     label: '⚠️ Cảnh báo',
@@ -104,7 +104,7 @@ export default function EditBlockModal({
     block.type === 'text' ? block.data.title || '' : ''
   );
   const [titleColor, setTitleColor] = useState<string>(
-    block.type === 'text' ? block.data.title_color || '#1E3A8A' : '#1E3A8A'
+    block.type === 'text' ? block.data.title_color || '#1E293B' : '#1E293B'
   );
   // Chế độ khối: 'text' (Văn bản thường) hoặc 'html' (Mã HTML tùy biến)
   const [blockMode, setBlockMode] = useState<'text' | 'html'>(
@@ -643,7 +643,7 @@ export default function EditBlockModal({
                     >
                       <option value="van_ban">Văn bản (không nhãn, chữ đoạn)</option>
                       <option value="y_nghia">Ý NGHĨA (nền ngọc nhạt)</option>
-                      <option value="diem_can_nho">ĐIỂM CẦN NHỚ (nền xanh dương nhạt)</option>
+                      <option value="diem_can_nho">ĐIỂM CẦN NHỚ (nền tím nhạt)</option>
                       <option value="chu_y">CHÚ Ý (nền cam nhạt)</option>
                       <option value="sai_lam">SAI LẦM THƯỜNG GẶP (nền đỏ nhạt)</option>
                       <option value="giai_phap">GIẢI PHÁP · ỨNG DỤNG (nền xanh lá nhạt)</option>
@@ -815,7 +815,7 @@ export default function EditBlockModal({
                                   : 'border-line text-ink bg-white dark:bg-[#1C123D] hover:scale-105'
                               }`}
                               style={{
-                                backgroundColor: isSel ? (col.hex || '#2563EB') : undefined,
+                                backgroundColor: isSel ? (col.hex || '#8B5CF6') : undefined,
                               }}
                               title={col.name}
                             >

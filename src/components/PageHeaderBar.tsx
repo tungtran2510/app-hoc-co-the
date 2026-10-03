@@ -233,7 +233,7 @@ export default function PageHeaderBar({
           <Link
             href={`/${topicSlug}`}
             prefetch={true}
-            className="flex items-center gap-1 text-[#1E3A8A] hover:text-[#172554] dark:text-purple-300 text-[16px] sm:text-[17px] font-extrabold min-h-[44px] transition-colors truncate"
+            className="flex items-center gap-1 text-purple-700 hover:text-purple-900 dark:text-purple-300 text-[16px] sm:text-[17px] font-extrabold min-h-[44px] transition-colors truncate"
             aria-label={`Về chủ đề ${topicTitle}`}
             title={`Về chủ đề ${topicTitle}`}
           >
@@ -252,7 +252,7 @@ export default function PageHeaderBar({
             className={`flex items-center justify-center w-[44px] h-[44px] rounded-[14px] border-[1.5px] transition-all shadow-2xs cursor-pointer active:scale-95 ${
               isSaved
                 ? 'bg-amber-50 border-amber-400 text-amber-600 dark:bg-purple-900/50 dark:border-[#F8DF7B] dark:text-[#F8DF7B]'
-                : 'bg-white border-slate-200 text-slate-700 hover:border-[#1E3A8A] hover:text-[#1E3A8A] dark:bg-[#160D30] dark:border-purple-900/50 dark:text-purple-200 dark:hover:border-purple-600'
+                : 'bg-white border-slate-200 text-slate-700 hover:border-purple-500 hover:text-purple-700 dark:bg-[#160D30] dark:border-purple-900/50 dark:text-purple-200 dark:hover:border-purple-600'
             }`}
             aria-label={isSaved ? 'Bỏ lưu bài học này' : 'Lưu bài học này'}
             title={isSaved ? 'Đã lưu (Bấm để bỏ lưu)' : 'Lưu bài học'}
@@ -272,8 +272,8 @@ export default function PageHeaderBar({
             }}
             className={`flex items-center justify-center w-[44px] h-[44px] rounded-[14px] border-[1.5px] transition-all shadow-2xs cursor-pointer active:scale-95 ${
               showOptions
-                ? 'bg-blue-50 border-[#1E3A8A] text-[#1E3A8A] dark:bg-purple-900/50 dark:border-purple-500 dark:text-purple-200'
-                : 'bg-white border-slate-200 text-slate-700 hover:border-[#1E3A8A] hover:text-[#1E3A8A] dark:bg-[#160D30] dark:border-purple-900/50 dark:text-purple-200 dark:hover:border-purple-600'
+                ? 'bg-purple-50 border-purple-500 text-purple-700 dark:bg-purple-900/50 dark:border-purple-500 dark:text-purple-200'
+                : 'bg-white border-slate-200 text-slate-700 hover:border-purple-500 hover:text-purple-700 dark:bg-[#160D30] dark:border-purple-900/50 dark:text-purple-200 dark:hover:border-purple-600'
             }`}
             aria-expanded={showOptions}
             aria-label="Tùy chọn"
@@ -312,7 +312,7 @@ export default function PageHeaderBar({
             }
           }}
         >
-          <div className="relative w-12 h-12 rounded-full bg-[#1E3A8A]/75 dark:bg-purple-900/75 backdrop-blur-md text-white flex items-center justify-center shadow-[0_6px_20px_rgba(0,0,0,0.28)] border-1.5 border-white/35 dark:border-purple-400/40 group">
+          <div className="relative w-12 h-12 rounded-full bg-purple-900/80 dark:bg-purple-900/75 backdrop-blur-md text-white flex items-center justify-center shadow-[0_6px_20px_rgba(0,0,0,0.28)] border-1.5 border-white/35 dark:border-purple-400/40 group">
             <ListOrdered size={20} strokeWidth={2.3} className="group-hover:scale-110 transition-transform" />
             <span className="absolute -top-1 -right-1 min-w-[19px] h-[19px] px-1 rounded-full bg-amber-400/95 text-slate-900 text-[10px] font-black flex items-center justify-center shadow-xs ring-1.5 ring-white/60 dark:ring-[#160D30]">
               {tocItems.length}
@@ -334,7 +334,7 @@ export default function PageHeaderBar({
             {/* Header popup */}
             <div className="flex items-center justify-between pb-2.5 border-b border-line dark:border-purple-900/50">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-[10px] bg-[#1E3A8A]/10 dark:bg-purple-900/60 text-[#1E3A8A] dark:text-[#F8DF7B] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-[10px] bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-[#F8DF7B] flex items-center justify-center">
                   <ListOrdered size={18} strokeWidth={2.5} />
                 </div>
                 <div>
@@ -363,15 +363,15 @@ export default function PageHeaderBar({
                   key={item.id}
                   type="button"
                   onClick={() => handleScrollToBlock(item.id)}
-                  className="w-full flex items-center justify-between min-h-[44px] py-2 px-2 rounded-[12px] text-left text-[14px] font-bold text-ink dark:text-white hover:bg-blue-50 dark:hover:bg-purple-900/40 hover:text-[#1E3A8A] dark:hover:text-[#F8DF7B] active:scale-[0.98] transition-all cursor-pointer group"
+                  className="w-full flex items-center justify-between min-h-[44px] py-2 px-2 rounded-[12px] text-left text-[14px] font-bold text-ink dark:text-white hover:bg-purple-50 dark:hover:bg-purple-900/40 hover:text-purple-800 dark:hover:text-[#F8DF7B] active:scale-[0.98] transition-all cursor-pointer group"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="w-5 h-5 rounded-full bg-surface-2 dark:bg-purple-950 group-hover:bg-[#1E3A8A] group-hover:text-white text-muted dark:text-purple-300 text-[11px] font-extrabold flex items-center justify-center shrink-0 transition-colors">
+                    <span className="w-5 h-5 rounded-full bg-surface-2 dark:bg-purple-950 group-hover:bg-purple-700 group-hover:text-white text-muted dark:text-purple-300 text-[11px] font-extrabold flex items-center justify-center shrink-0 transition-colors">
                       {idx + 1}
                     </span>
                     <span className="truncate">{item.label}</span>
                   </div>
-                  <span className="text-muted/60 dark:text-purple-400/60 text-[15px] font-bold shrink-0 ml-2 group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] transition-colors">›</span>
+                  <span className="text-muted/60 dark:text-purple-400/60 text-[15px] font-bold shrink-0 ml-2 group-hover:text-purple-800 dark:group-hover:text-[#F8DF7B] transition-colors">›</span>
                 </button>
               ))}
             </div>

@@ -272,7 +272,7 @@ export default function WelcomeModal({
               {/* 3 ĐIỂM NHẤN CỐT LÕI */}
               <div className="p-3.5 sm:p-4 rounded-[18px] bg-slate-50 dark:bg-purple-950/40 border border-slate-200/80 dark:border-purple-800/40 flex flex-col gap-2.5">
                 <div className="flex items-start gap-2.5">
-                  <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/60 text-[#1E3A8A] dark:text-blue-300 flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-purple-900/60 text-amber-700 dark:text-[#F8DF7B] flex items-center justify-center shrink-0 mt-0.5">
                     <BookOpen size={12} strokeWidth={2.5} />
                   </div>
                   <div className="flex-1 min-w-0">

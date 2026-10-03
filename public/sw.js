@@ -3,8 +3,8 @@
 // Đạt tốc độ phản hồi tức thì (< 1ms) khi người dùng chuyển đổi các mục hoặc vào bài học
 // TUÂN THỦ CHỈ THỊ: Chỉ tải từ mạng khi người dùng ấn vào tài liệu sách / video dung lượng lớn
 
-const CACHE_NAME = 'qbiz-books-shell-v12';
-const STATIC_ASSETS_CACHE = 'qbiz-books-static-v12';
+const CACHE_NAME = 'qbiz-books-shell-v21';
+const STATIC_ASSETS_CACHE = 'qbiz-books-static-v21';
 
 // Danh sách tài nguyên Shell và các trang cốt lõi cần tải sẵn vào bộ nhớ điện thoại
 const PRECACHE_SHELL_URLS = [
@@ -28,12 +28,13 @@ const PRECACHE_SHELL_URLS = [
 
 // Cài đặt SW & Tải sẵn Shell ngầm vào điện thoại
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(PRECACHE_SHELL_URLS).catch((err) => {
         console.warn('[SW] Pre-caching partial failure, continuing:', err);
       });
-    }).then(() => self.skipWaiting())
+    })
   );
 });
 
@@ -44,6 +45,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME && key !== STATIC_ASSETS_CACHE) {
+            console.log('[SW] Purging old cache:', key);
             return caches.delete(key);
           }
         })
@@ -72,9 +74,26 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 2b. MANIFEST.JSON: Luôn nạp mới từ mạng để cập nhật theme_color và icon chuẩn tức thì
-  if (url.pathname === '/manifest.json' || url.pathname === '/manifest.webmanifest') {
-    event.respondWith(fetch(request));
+  // 2b. MANIFEST & BRAND ICONS: Luôn nạp mới từ mạng để cập nhật theme_color và icon chuẩn tức thì
+  if (
+    url.pathname.startsWith('/manifest.') ||
+    url.pathname === '/app_logo.png' ||
+    url.pathname === '/icon-192.png' ||
+    url.pathname === '/icon-512.png' ||
+    url.pathname === '/apple-icon.png' ||
+    url.pathname === '/favicon.ico'
+  ) {
+    event.respondWith(
+      fetch(request)
+        .then((networkResponse) => {
+          if (networkResponse.status === 200) {
+            const clone = networkResponse.clone();
+            caches.open(STATIC_ASSETS_CACHE).then((cache) => cache.put(request, clone));
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match(request))
+    );
     return;
   }
 

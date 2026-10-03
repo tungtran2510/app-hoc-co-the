@@ -120,8 +120,8 @@ export default function TextBlock({
       <div id={blockId} className="w-full scroll-mt-20 flex flex-col gap-2.5">
         {title && (
           <h3
-            className="text-[19px] sm:text-[21px] font-extrabold tracking-tight m-0"
-            style={{ color: titleColor || '#1E3A8A' }}
+            className="text-[19px] sm:text-[21px] font-extrabold tracking-tight m-0 text-slate-900 dark:text-white"
+            style={titleColor ? { color: titleColor } : undefined}
           >
             {title}
           </h3>
@@ -214,8 +214,8 @@ export default function TextBlock({
       <div id={blockId} className="w-full scroll-mt-20 flex flex-col gap-2.5">
         {title && (
           <h3
-            className="text-[19px] sm:text-[21px] font-extrabold tracking-tight m-0"
-            style={{ color: titleColor || '#1E3A8A' }}
+            className="text-[19px] sm:text-[21px] font-extrabold tracking-tight m-0 text-slate-900 dark:text-white"
+            style={titleColor ? { color: titleColor } : undefined}
           >
             {title}
           </h3>

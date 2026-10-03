@@ -114,7 +114,7 @@ export default function SavedPages() {
       <header className="flex items-center justify-between h-[48px]">
         <Link
           href="/"
-          className="inline-flex items-center gap-1 text-[#1E3A8A] dark:text-[#93C5FD] text-[16px] font-extrabold pr-2 transition-opacity active:opacity-75"
+          className="inline-flex items-center gap-1 text-purple-700 dark:text-purple-300 text-[16px] font-extrabold pr-2 transition-opacity active:opacity-75"
           aria-label="Quay lại trang chủ"
         >
           <ChevronLeft size={22} strokeWidth={2.5} />
@@ -126,7 +126,7 @@ export default function SavedPages() {
           <button
             type="button"
             onClick={() => setShowPhoneSync(true)}
-            className="flex items-center gap-1.5 h-8 px-2.5 rounded-[10px] bg-white dark:bg-[#1E1342] border border-slate-200 dark:border-purple-800/40 text-slate-700 dark:text-purple-200 hover:text-[#1E3A8A] dark:hover:text-[#F8DF7B] text-[12px] font-bold shadow-2xs cursor-pointer active:scale-95 transition-all"
+            className="flex items-center gap-1.5 h-8 px-2.5 rounded-[10px] bg-white dark:bg-[#1E1342] border border-slate-200 dark:border-purple-800/40 text-slate-700 dark:text-purple-200 hover:text-purple-700 dark:hover:text-[#F8DF7B] text-[12px] font-bold shadow-2xs cursor-pointer active:scale-95 transition-all"
             title="Lưu & Đồng bộ qua Số điện thoại"
           >
             <Smartphone size={13} />
@@ -134,9 +134,9 @@ export default function SavedPages() {
             {userPhone && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />}
           </button>
 
-          <div className="flex items-center gap-1.5 ml-0.5 px-2.5 py-1 rounded-[10px] bg-blue-50 dark:bg-purple-950/60 border border-blue-200/60 dark:border-purple-800/40">
-            <Bookmark size={15} className="text-[#1E3A8A] dark:text-[#F8DF7B] fill-current" />
-            <span className="text-[13px] font-black text-[#1E3A8A] dark:text-[#F8DF7B]">Đã lưu</span>
+          <div className="flex items-center gap-1.5 ml-0.5 px-2.5 py-1 rounded-[10px] bg-amber-50 dark:bg-purple-950/60 border border-amber-300 dark:border-purple-800/40">
+            <Bookmark size={15} className="text-amber-700 dark:text-[#F8DF7B] fill-current" />
+            <span className="text-[13px] font-black text-amber-700 dark:text-[#F8DF7B]">Đã lưu</span>
           </div>
         </div>
       </header>
@@ -162,7 +162,7 @@ export default function SavedPages() {
         <div className="grid grid-cols-3 gap-2 p-2.5 rounded-[16px] bg-slate-50 dark:bg-[#160D30] border border-slate-200/80 dark:border-purple-800/40 text-center">
           <div className="flex flex-col items-center justify-center py-1">
             <span className="text-[10px] font-bold text-slate-500 dark:text-purple-300 uppercase tracking-wide">Số lượng</span>
-            <span className="text-[14px] font-black text-[#1E3A8A] dark:text-[#F8DF7B] mt-0.5">{savedList.length} bài</span>
+            <span className="text-[14px] font-black text-purple-700 dark:text-[#F8DF7B] mt-0.5">{savedList.length} bài</span>
           </div>
           <div className="flex flex-col items-center justify-center py-1 border-x border-slate-200 dark:border-purple-800/40">
             <span className="text-[10px] font-bold text-slate-500 dark:text-purple-300 uppercase tracking-wide">Truy cập</span>
@@ -184,7 +184,7 @@ export default function SavedPages() {
         </div>
       ) : savedList.length === 0 ? (
         <div className="flex flex-col items-center justify-center p-7 bg-white dark:bg-[#160D30] rounded-[24px] border border-slate-200/80 dark:border-purple-800/40 text-center gap-3.5 my-1 shadow-xs">
-          <div className="w-14 h-14 rounded-[18px] bg-blue-50 dark:bg-purple-950/80 text-[#1E3A8A] dark:text-[#F8DF7B] flex items-center justify-center shadow-inner-xs">
+          <div className="w-14 h-14 rounded-[18px] bg-amber-50 dark:bg-purple-950/80 text-amber-700 dark:text-[#F8DF7B] flex items-center justify-center shadow-inner-xs">
             <Bookmark size={26} strokeWidth={2.2} />
           </div>
           <div className="flex flex-col gap-1 max-w-[280px]">
@@ -197,7 +197,7 @@ export default function SavedPages() {
           </div>
           <Link
             href="/cot-song"
-            className="flex items-center justify-center gap-2 h-11 px-5 rounded-[12px] bg-gradient-to-r from-blue-700 to-[#1E3A8A] dark:from-purple-600 dark:to-indigo-600 text-white font-black text-[13.5px] shadow-sm active:scale-95 transition-transform"
+            className="flex items-center justify-center gap-2 h-11 px-5 rounded-[12px] bg-gradient-to-r from-purple-700 to-indigo-700 dark:from-purple-600 dark:to-indigo-600 text-white font-black text-[13.5px] shadow-sm active:scale-95 transition-transform"
           >
             <BookOpen size={16} />
             <span>Khám phá Cột sống ngay</span>
@@ -228,12 +228,12 @@ export default function SavedPages() {
                         if (fallback) fallback.style.display = 'flex';
                       }}
                     />
-                    <div className="hidden w-full h-full items-center justify-center text-[#1E3A8A] dark:text-[#93C5FD]">
+                    <div className="hidden w-full h-full items-center justify-center text-purple-700 dark:text-[#F8DF7B]">
                       <BookOpen size={18} />
                     </div>
 
                     {/* Số bài */}
-                    <span className="absolute bottom-0 right-0 px-1 py-0.2 rounded-tl-[6px] bg-[#1E3A8A] text-white text-[8.5px] font-black">
+                    <span className="absolute bottom-0 right-0 px-1 py-0.2 rounded-tl-[6px] bg-purple-900 text-amber-300 text-[8.5px] font-black">
                       #{item.page_number}
                     </span>
                   </div>
@@ -241,7 +241,7 @@ export default function SavedPages() {
                   {/* Thông tin bài học */}
                   <div className="flex-1 min-w-0 pt-0.5">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] font-black uppercase text-[#1E3A8A] dark:text-[#93C5FD] tracking-wider truncate">
+                      <span className="text-[10px] font-black uppercase text-purple-700 dark:text-[#F8DF7B] tracking-wider truncate">
                         {item.topic_title}
                       </span>
                       <span className="text-[9.5px] font-bold px-1.5 py-0.5 rounded-[5px] bg-emerald-50 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-300">
@@ -249,7 +249,7 @@ export default function SavedPages() {
                       </span>
                     </div>
 
-                    <h3 className="text-[15.5px] sm:text-[16.5px] font-black text-slate-900 dark:text-white leading-snug line-clamp-2 mt-0.5 group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] transition-colors">
+                    <h3 className="text-[15.5px] sm:text-[16.5px] font-black text-slate-900 dark:text-white leading-snug line-clamp-2 mt-0.5 group-hover:text-purple-700 dark:group-hover:text-[#F8DF7B] transition-colors">
                       {item.page_title}
                     </h3>
                   </div>
@@ -269,7 +269,7 @@ export default function SavedPages() {
                 {/* Hàng dưới: Nút mở bài học rõ ràng chuyên nghiệp */}
                 <Link
                   href={`/${item.topic_slug}/${item.page_slug}`}
-                  className="w-full h-10 rounded-[12px] bg-gradient-to-r from-[#0F2A66] via-[#1E3A8A] to-[#2563EB] hover:opacity-95 text-white font-black text-[12.5px] sm:text-[13px] flex items-center justify-center gap-1.5 shadow-xs active:scale-[0.99] transition-all cursor-pointer"
+                  className="w-full h-10 rounded-[12px] bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:opacity-95 text-slate-950 font-black text-[12.5px] sm:text-[13px] flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.99] transition-all cursor-pointer"
                 >
                   <span>Mở học bài này</span>
                   <ArrowRight size={14} />
@@ -283,7 +283,7 @@ export default function SavedPages() {
       {/* 5. Khối Gợi ý Khám Phá Thêm Chuyên Đề (Xóa bỏ cảm giác trống trải) */}
       <section className="flex flex-col gap-2.5 pt-2 border-t border-slate-200/70 dark:border-purple-800/30">
         <div className="flex items-center gap-1.5 text-slate-700 dark:text-purple-200 text-[12px] font-black uppercase tracking-wide">
-          <Compass size={14} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
+          <Compass size={14} className="text-amber-600 dark:text-[#F8DF7B]" />
           <span>Gợi ý khám phá thêm chuyên đề:</span>
         </div>
 
@@ -292,7 +292,7 @@ export default function SavedPages() {
             <Link
               key={topic.slug}
               href={`/${topic.slug}`}
-              className="p-3 rounded-[16px] bg-white dark:bg-[#160D30] border border-slate-200/80 dark:border-purple-800/40 hover:border-[#1E3A8A]/50 dark:hover:border-[#F8DF7B]/60 shadow-2xs hover:shadow-xs transition-all flex items-center gap-2.5 group cursor-pointer"
+              className="p-3 rounded-[16px] bg-white dark:bg-[#160D30] border border-slate-200/80 dark:border-purple-800/40 hover:border-purple-500/50 dark:hover:border-[#F8DF7B]/60 shadow-2xs hover:shadow-xs transition-all flex items-center gap-2.5 group cursor-pointer"
             >
               <div className="w-10 h-10 rounded-[11px] bg-slate-50 dark:bg-purple-950/70 p-1 flex items-center justify-center shrink-0 border border-slate-200/60 dark:border-purple-800/40 group-hover:scale-105 transition-transform overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -303,10 +303,10 @@ export default function SavedPages() {
                 />
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-[9px] font-extrabold uppercase text-[#1E3A8A] dark:text-[#93C5FD] tracking-wider truncate">
+                <span className="text-[9px] font-extrabold uppercase text-purple-700 dark:text-[#F8DF7B] tracking-wider truncate">
                   {topic.badge}
                 </span>
-                <span className="text-[12px] font-black text-slate-900 dark:text-white leading-tight truncate mt-0.5 group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] transition-colors">
+                <span className="text-[12px] font-black text-slate-900 dark:text-white leading-tight truncate mt-0.5 group-hover:text-purple-700 dark:group-hover:text-[#F8DF7B] transition-colors">
                   {topic.title}
                 </span>
                 <span className="text-[10.5px] text-slate-400 dark:text-purple-300/70 font-medium">

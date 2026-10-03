@@ -240,7 +240,7 @@ export default function BookFlipbookAdminSection({
   };
 
   return (
-    <div className="space-y-3 p-3.5 sm:p-4 rounded-[18px] bg-gradient-to-b from-blue-50/70 to-indigo-50/40 dark:from-[#1E113B] dark:to-[#170B2E] border-2 border-blue-200/80 dark:border-purple-500/35 shadow-xs">
+    <div className="space-y-3 p-3.5 sm:p-4 rounded-[18px] bg-gradient-to-b from-slate-50 to-purple-50/30 dark:from-[#1E113B] dark:to-[#170B2E] border-2 border-slate-200/90 dark:border-purple-500/35 shadow-xs">
       {/* ẨN CÁC INPUT FILE CHUYÊN DỤNG */}
       <input
         type="file"
@@ -266,9 +266,9 @@ export default function BookFlipbookAdminSection({
       />
 
       {/* HEADER SECTION: TIÊU ĐỀ + BADGE SỐ TRANG */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-blue-100 dark:border-purple-500/20 pb-2.5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 dark:border-purple-500/20 pb-2.5">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-[10px] bg-[#1E3A8A] text-white flex items-center justify-center shadow-xs">
+          <div className="w-8 h-8 rounded-[10px] bg-purple-900 text-amber-300 flex items-center justify-center shadow-xs">
             <BookOpen size={16} strokeWidth={2.5} />
           </div>
           <div>
@@ -276,7 +276,7 @@ export default function BookFlipbookAdminSection({
               <h4 className="text-[13.5px] font-black text-slate-900 dark:text-white uppercase tracking-wide">
                 Tài Liệu Xem Thử 3D (Flipbook)
               </h4>
-              <span className="px-2 py-0.5 rounded-full bg-[#1E3A8A] text-white text-[11px] font-black shadow-xs">
+              <span className="px-2 py-0.5 rounded-full bg-purple-900 text-amber-300 text-[11px] font-black shadow-xs">
                 {effectivePages.length} trang
               </span>
             </div>
@@ -302,15 +302,15 @@ export default function BookFlipbookAdminSection({
 
       {/* THÔNG BÁO TIẾN TRÌNH / LỖI / THÀNH CÔNG */}
       {isProcessing && (
-        <div className="p-3 rounded-[12px] bg-blue-100/80 dark:bg-purple-900/60 border border-blue-300 dark:border-purple-400 text-[#1E3A8A] dark:text-white text-[12.5px] font-bold space-y-1.5 animate-pulse">
+        <div className="p-3 rounded-[12px] bg-purple-100/80 dark:bg-purple-900/60 border border-purple-300 dark:border-purple-400 text-purple-950 dark:text-white text-[12.5px] font-bold space-y-1.5 animate-pulse">
           <div className="flex items-center gap-2">
-            <Loader2 size={16} className="animate-spin text-[#1E3A8A] dark:text-purple-300" />
+            <Loader2 size={16} className="animate-spin text-purple-600 dark:text-purple-300" />
             <span>{progressText || 'Đang xử lý tài liệu...'}</span>
           </div>
           {progressPercent !== null && (
-            <div className="w-full h-2 rounded-full bg-blue-200 dark:bg-purple-950 overflow-hidden">
+            <div className="w-full h-2 rounded-full bg-purple-200 dark:bg-purple-950 overflow-hidden">
               <div
-                className="h-full bg-[#1E3A8A] dark:bg-purple-400 transition-all duration-300 rounded-full"
+                className="h-full bg-purple-600 dark:bg-purple-400 transition-all duration-300 rounded-full"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -377,13 +377,13 @@ export default function BookFlipbookAdminSection({
           type="button"
           disabled={isProcessing}
           onClick={() => wordInputRef.current?.click()}
-          className="h-10 px-2.5 rounded-[12px] bg-white dark:bg-[#130826] border-2 border-blue-200 dark:border-blue-900/50 hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-950/40 text-slate-800 dark:text-white flex items-center justify-center gap-1.5 transition-all shadow-2xs group cursor-pointer disabled:opacity-50"
+          className="h-10 px-2.5 rounded-[12px] bg-white dark:bg-[#130826] border-2 border-purple-200 dark:border-purple-900/50 hover:border-purple-400 hover:bg-purple-50/50 dark:hover:bg-purple-950/40 text-slate-800 dark:text-white flex items-center justify-center gap-1.5 transition-all shadow-2xs group cursor-pointer disabled:opacity-50"
         >
-          <div className="w-6 h-6 rounded-[6px] bg-blue-100 dark:bg-blue-950 text-[#1E3A8A] flex items-center justify-center shrink-0">
+          <div className="w-6 h-6 rounded-[6px] bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 flex items-center justify-center shrink-0">
             <FileEdit size={13} strokeWidth={2.5} />
           </div>
           <div className="text-left min-w-0">
-            <div className="text-[12px] font-black leading-tight text-[#1E3A8A] dark:text-blue-300 truncate">
+            <div className="text-[12px] font-black leading-tight text-purple-700 dark:text-purple-300 truncate">
               File Word
             </div>
             <div className="text-[9.5px] text-slate-500 dark:text-slate-400 leading-tight">
@@ -445,12 +445,12 @@ export default function BookFlipbookAdminSection({
             value={directUrl}
             onChange={(e) => setDirectUrl(e.target.value)}
             placeholder="Dán link ảnh trang sách hoặc link file: https://..."
-            className="flex-1 h-8.5 px-3 rounded-[8px] bg-slate-50 dark:bg-[#1E113B] border border-slate-200 dark:border-purple-500/30 text-[12px] font-medium text-slate-900 dark:text-white focus:outline-hidden focus:ring-1 focus:ring-[#1E3A8A]"
+            className="flex-1 h-8.5 px-3 rounded-[8px] bg-slate-50 dark:bg-[#1E113B] border border-slate-200 dark:border-purple-500/30 text-[12px] font-medium text-slate-900 dark:text-white focus:outline-hidden focus:ring-1 focus:ring-purple-600 dark:focus:ring-amber-400"
             autoFocus
           />
           <button
             type="submit"
-            className="h-8.5 px-3.5 rounded-[8px] bg-[#1E3A8A] text-white text-[12px] font-black flex items-center gap-1 shrink-0 cursor-pointer hover:bg-[#152a65]"
+            className="h-8.5 px-3.5 rounded-[8px] bg-purple-900 text-white text-[12px] font-black flex items-center gap-1 shrink-0 cursor-pointer hover:bg-purple-950"
           >
             <Plus size={13} strokeWidth={2.5} />
             <span>Thêm</span>
@@ -473,7 +473,7 @@ export default function BookFlipbookAdminSection({
                 href={fileUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                className="text-[11px] text-purple-700 dark:text-[#F8DF7B] hover:underline flex items-center gap-1"
               >
                 <span>Xem tệp gốc đã tải lên</span>
                 <ExternalLink size={10} />

@@ -280,7 +280,7 @@ export default function HomeHeader({
                 title="Bấm để đổi tên của bạn"
               >
                 <div className="flex items-center gap-1.5 animate-greeting-bounce">
-                  <span className="text-[17px] sm:text-[18px] font-black text-ink tracking-tight group-hover:text-blue-600 dark:group-hover:text-[#F8DF7B] transition-colors">
+                  <span className="text-[17px] sm:text-[18px] font-black text-ink tracking-tight group-hover:text-amber-600 dark:group-hover:text-[#F8DF7B] transition-colors">
                     Hi, {userName || 'Dr. Tùng'}!
                   </span>
                   {/* 1 biểu tượng duy nhất ngay cạnh tên: Chuông thông báo & Đồng bộ */}
@@ -311,7 +311,7 @@ export default function HomeHeader({
             <Link
               href="/tim-kiem"
               prefetch={true}
-              className="w-9 h-9 rounded-full bg-white dark:bg-[#1E1342] hover:bg-slate-100 dark:hover:bg-[#281855] border border-slate-200 dark:border-purple-800/40 flex items-center justify-center text-[#1E3A8A] dark:text-purple-200 transition-colors shadow-2xs"
+              className="w-9 h-9 rounded-full bg-white dark:bg-[#1E1342] hover:bg-slate-100 dark:hover:bg-[#281855] border border-slate-200 dark:border-purple-800/40 flex items-center justify-center text-purple-900 dark:text-purple-200 transition-colors shadow-2xs"
               title="Tìm kiếm bài học"
               aria-label="Tìm kiếm"
             >
@@ -359,7 +359,7 @@ export default function HomeHeader({
               }}
               className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-white dark:hover:bg-[#25154D] cursor-pointer"
             >
-              <Smartphone size={16} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
+              <Smartphone size={16} className="text-purple-700 dark:text-[#F8DF7B]" />
               <span>{userPhone ? 'Quản lý số điện thoại' : 'Lưu tiến độ qua SĐT'}</span>
             </button>
 
@@ -383,7 +383,7 @@ export default function HomeHeader({
               }}
               className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-white dark:hover:bg-[#25154D] cursor-pointer"
             >
-              <Smartphone size={16} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
+              <Smartphone size={16} className="text-purple-700 dark:text-[#F8DF7B]" />
               <span>Cài app ra màn hình</span>
             </button>
 
@@ -416,7 +416,7 @@ export default function HomeHeader({
                   }}
                   className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-white dark:hover:bg-[#25154D] cursor-pointer"
                 >
-                  <Download size={16} className="text-[#1E3A8A] dark:text-purple-300" />
+                  <Download size={16} className="text-purple-700 dark:text-purple-300" />
                   <span>Sao lưu dữ liệu</span>
                 </button>
 
@@ -428,7 +428,7 @@ export default function HomeHeader({
                   }}
                   className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-white dark:hover:bg-[#25154D] cursor-pointer"
                 >
-                  <Edit2 size={16} className="text-[#1E3A8A] dark:text-purple-300" />
+                  <Edit2 size={16} className="text-purple-700 dark:text-purple-300" />
                   <span>Sửa tên & logo app</span>
                 </button>
 
@@ -440,7 +440,7 @@ export default function HomeHeader({
                   }}
                   className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-white dark:hover:bg-[#25154D] cursor-pointer"
                 >
-                  <Settings size={16} className="text-[#1E3A8A] dark:text-purple-300" />
+                  <Settings size={16} className="text-purple-700 dark:text-purple-300" />
                   <span>Cài đặt quản trị</span>
                 </button>
 
@@ -449,7 +449,7 @@ export default function HomeHeader({
                   onClick={() => setShowMenu(false)}
                   className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-white dark:hover:bg-[#25154D] cursor-pointer"
                 >
-                  <Sparkles size={16} className="text-[#1E3A8A] dark:text-primary" />
+                  <Sparkles size={16} className="text-purple-700 dark:text-[#F8DF7B]" />
                   <span>Huấn luyện Trợ lý AI</span>
                 </Link>
 
@@ -470,7 +470,7 @@ export default function HomeHeader({
                 onClick={() => setShowMenu(false)}
                 className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-ink dark:hover:bg-surface-2 cursor-pointer"
               >
-                <User size={16} className="text-[#1E3A8A] dark:text-primary" />
+                <User size={16} className="text-purple-700 dark:text-[#F8DF7B]" />
                 <span>Đăng nhập quản trị</span>
               </Link>
             )}
@@ -542,7 +542,7 @@ export default function HomeHeader({
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
           <div className="w-full max-w-sm rounded-[24px] bg-white dark:bg-[#180E32] border border-slate-200 dark:border-[#3A2268] p-5 shadow-2xl flex flex-col gap-3.5 animate-in zoom-in-95 duration-200">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-purple-900/50 flex items-center justify-center text-xl shrink-0">
+              <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-purple-900/50 flex items-center justify-center text-xl shrink-0">
                 <span className="animate-wave">👋</span>
               </div>
               <div>
@@ -564,7 +564,7 @@ export default function HomeHeader({
                 value={nameInput}
                 onChange={(e) => setNameInput(e.target.value)}
                 placeholder="Ví dụ: Hoàng, Bác sĩ Minh, Thảo..."
-                className="w-full h-11 px-3.5 rounded-[12px] bg-slate-50 dark:bg-[#120924] border border-slate-200 dark:border-[#3A2268] text-slate-900 dark:text-white text-[14px] font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-400"
+                className="w-full h-11 px-3.5 rounded-[12px] bg-slate-50 dark:bg-[#120924] border border-slate-200 dark:border-[#3A2268] text-slate-900 dark:text-white text-[14px] font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400"
                 autoFocus
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleSaveName();
@@ -583,7 +583,7 @@ export default function HomeHeader({
               <button
                 type="button"
                 onClick={handleSaveName}
-                className="px-4 py-2 rounded-[10px] bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-purple-600 dark:to-indigo-600 hover:opacity-95 text-white text-[13px] font-black shadow-md cursor-pointer transition-all"
+                className="px-4 py-2 rounded-[10px] bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-500 text-slate-950 font-black text-[13px] shadow-md cursor-pointer transition-all"
               >
                 Lưu tên ✓
               </button>

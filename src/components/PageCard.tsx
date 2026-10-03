@@ -81,7 +81,7 @@ export default function PageCard({
           />
         ) : (
           <div
-            className="w-full h-full flex flex-col items-center justify-center bg-blue-50 dark:bg-purple-950/60 text-[#1E3A8A] dark:text-purple-200"
+            className="w-full h-full flex flex-col items-center justify-center bg-amber-50 dark:bg-purple-950/60 text-amber-700 dark:text-purple-200"
           >
             <BookOpen size={24} className="opacity-80" />
           </div>
@@ -93,12 +93,12 @@ export default function PageCard({
         {/* HÀNG TRÊN: TIÊU ĐỀ TRẢI RỘNG TOÀN DIỆN KHÔNG BỊ CHÈN ÉP BỞI CHỮ BẮT ĐẦU */}
         <div className="flex items-center justify-between gap-1.5">
           <h3 className={`text-[14.5px] sm:text-[15.5px] font-bold leading-snug line-clamp-2 transition-colors flex-1 min-w-0 ${
-            isActive ? 'text-[#1E3A8A] dark:text-[#F8DF7B]' : 'text-slate-900 dark:text-white group-hover:text-[#1E3A8A] dark:group-hover:text-amber-200'
+            isActive ? 'text-amber-600 dark:text-[#F8DF7B]' : 'text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-200'
           }`}>
             {page.title}
           </h3>
           <ChevronRight size={16} strokeWidth={2.5} className={`transition-colors shrink-0 ml-1 ${
-            isActive ? 'text-[#1E3A8A] dark:text-[#F8DF7B] translate-x-0.5' : 'text-slate-400 group-hover:text-[#1E3A8A] dark:group-hover:text-white'
+            isActive ? 'text-amber-600 dark:text-[#F8DF7B] translate-x-0.5' : 'text-slate-400 group-hover:text-amber-600 dark:group-hover:text-white'
           }`} />
         </div>
 
@@ -114,7 +114,7 @@ export default function PageCard({
                 ĐANG HỌC
               </span>
             ) : orderNumber === 1 ? (
-              <span className="px-2 py-0.5 rounded-full bg-blue-50 text-[#1E3A8A] border border-blue-200 dark:bg-purple-900/60 dark:text-[#F8DF7B] text-[10px] sm:text-[10.5px] font-black shrink-0">
+              <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-300 dark:bg-purple-900/60 dark:text-[#F8DF7B] text-[10px] sm:text-[10.5px] font-black shrink-0">
                 BẮT ĐẦU
               </span>
             ) : null}
@@ -136,7 +136,7 @@ export default function PageCard({
             >
               <div
                 className={`h-full rounded-full transition-all duration-300 ${
-                  isAllWatched ? 'bg-emerald-500' : 'bg-[#1E3A8A] dark:bg-gradient-to-r dark:from-purple-500 dark:to-[#F8DF7B]'
+                  isAllWatched ? 'bg-emerald-500' : 'bg-amber-500 dark:bg-gradient-to-r dark:from-purple-500 dark:to-[#F8DF7B]'
                 }`}
                 style={{ width: `${progressPercent}%` }}
               />

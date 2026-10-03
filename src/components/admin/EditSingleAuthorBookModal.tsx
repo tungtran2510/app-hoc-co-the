@@ -179,9 +179,9 @@ export default function EditSingleAuthorBookModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* HEADER MODAL TINH GỌN */}
-        <div className="px-4 py-3 sm:px-5 sm:py-3.5 border-b border-slate-100 dark:border-purple-500/20 bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-white dark:from-[#211142] dark:to-[#160D2D] flex items-center justify-between shrink-0">
+        <div className="px-4 py-3 sm:px-5 sm:py-3.5 border-b border-slate-100 dark:border-purple-500/20 bg-gradient-to-r from-slate-50 via-purple-50/30 to-white dark:from-[#211142] dark:to-[#160D2D] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-[10px] bg-[#1E3A8A] text-white flex items-center justify-center shadow-xs shrink-0">
+            <div className="w-9 h-9 rounded-[10px] bg-purple-900 text-amber-300 flex items-center justify-center shadow-xs shrink-0">
               <BookOpen size={18} strokeWidth={2.5} />
             </div>
             <div className="min-w-0">
@@ -189,7 +189,7 @@ export default function EditSingleAuthorBookModal({
                 <h3 className="text-[16px] font-black text-slate-900 dark:text-white leading-tight truncate">
                   Cài Đặt Sách: {title || book.title}
                 </h3>
-                <span className="px-2 py-0.5 rounded-[6px] bg-blue-100 text-[#1E3A8A] dark:bg-purple-900/60 dark:text-purple-200 text-[10px] font-black uppercase shrink-0">
+                <span className="px-2 py-0.5 rounded-[6px] bg-amber-100 text-amber-900 border border-amber-300 dark:bg-purple-900/60 dark:text-purple-200 text-[10px] font-black uppercase shrink-0">
                   Tác giả
                 </span>
               </div>
@@ -235,7 +235,7 @@ export default function EditSingleAuthorBookModal({
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="VD: Hiểu Đúng Về Cột Sống..."
-                  className="w-full h-9.5 px-3 rounded-[10px] bg-white dark:bg-[#120824] border border-slate-200 dark:border-purple-500/30 text-slate-900 dark:text-white font-bold text-[13.5px] focus:outline-hidden focus:ring-2 focus:ring-[#1E3A8A]"
+                  className="w-full h-9.5 px-3 rounded-[10px] bg-white dark:bg-[#120824] border border-slate-200 dark:border-purple-500/30 text-slate-900 dark:text-white font-bold text-[13.5px] focus:outline-hidden focus:ring-2 focus:ring-purple-500"
                   required
                 />
               </div>
@@ -249,7 +249,7 @@ export default function EditSingleAuthorBookModal({
                   value={year}
                   onChange={(e) => setYear(e.target.value)}
                   placeholder="VD: 2025"
-                  className="w-full h-9.5 px-3 rounded-[10px] bg-white dark:bg-[#120824] border border-slate-200 dark:border-purple-500/30 text-slate-900 dark:text-white font-bold text-[13.5px] focus:outline-hidden focus:ring-2 focus:ring-[#1E3A8A]"
+                  className="w-full h-9.5 px-3 rounded-[10px] bg-white dark:bg-[#120824] border border-slate-200 dark:border-purple-500/30 text-slate-900 dark:text-white font-bold text-[13.5px] focus:outline-hidden focus:ring-2 focus:ring-purple-500"
                 />
               </div>
             </div>
@@ -263,7 +263,7 @@ export default function EditSingleAuthorBookModal({
                 onChange={(e) => setDescription(e.target.value)}
                 rows={2}
                 placeholder="Nhập nội dung tóm tắt, giá trị cốt lõi hoặc đối tượng độc giả..."
-                className="w-full p-2.5 rounded-[10px] bg-white dark:bg-[#120824] border border-slate-200 dark:border-purple-500/30 text-slate-900 dark:text-white font-medium text-[12.5px] leading-relaxed focus:outline-hidden focus:ring-2 focus:ring-[#1E3A8A]"
+                className="w-full p-2.5 rounded-[10px] bg-white dark:bg-[#120824] border border-slate-200 dark:border-purple-500/30 text-slate-900 dark:text-white font-medium text-[12.5px] leading-relaxed focus:outline-hidden focus:ring-2 focus:ring-purple-500"
               />
             </div>
           </div>
@@ -274,7 +274,7 @@ export default function EditSingleAuthorBookModal({
             <div className="p-3 rounded-[16px] bg-slate-50/80 dark:bg-[#1A0E35]/60 border border-slate-200/80 dark:border-purple-500/20 space-y-2">
               <div className="flex items-center justify-between">
                 <label className="text-[12px] font-black text-slate-800 dark:text-purple-200 uppercase tracking-wide flex items-center gap-1.5">
-                  <ImageIcon size={14} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
+                  <ImageIcon size={14} className="text-amber-600 dark:text-[#F8DF7B]" />
                   <span>Ảnh bìa (Tỷ lệ 3:4)</span>
                 </label>
                 {coverUrl && (
@@ -313,7 +313,7 @@ export default function EditSingleAuthorBookModal({
                     type="button"
                     disabled={isUploadingCover}
                     onClick={() => coverInputRef.current?.click()}
-                    className="w-full h-8 px-2.5 rounded-[9px] bg-[#1E3A8A] hover:bg-[#152a65] text-white text-[11.5px] font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+                    className="w-full h-8 px-2.5 rounded-[9px] bg-purple-900 hover:bg-purple-950 text-white text-[11.5px] font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
                   >
                     {isUploadingCover ? (
                       <>
@@ -333,7 +333,7 @@ export default function EditSingleAuthorBookModal({
                     value={coverUrl || ''}
                     onChange={(e) => setCoverUrl(e.target.value)}
                     placeholder="Hoặc dán URL ảnh bìa..."
-                    className="w-full h-7.5 px-2.5 rounded-[8px] bg-white dark:bg-[#120824] border border-slate-200 dark:border-purple-500/30 text-[11px] font-medium focus:outline-hidden focus:ring-1 focus:ring-[#1E3A8A]"
+                    className="w-full h-7.5 px-2.5 rounded-[8px] bg-white dark:bg-[#120824] border border-slate-200 dark:border-purple-500/30 text-[11px] font-medium focus:outline-hidden focus:ring-1 focus:ring-purple-500"
                   />
                 </div>
               </div>
@@ -402,11 +402,11 @@ export default function EditSingleAuthorBookModal({
                     type="button"
                     disabled={isUploadingGallery}
                     onClick={() => galleryInputRef.current?.click()}
-                    className="w-12 h-16 sm:w-13 sm:h-17 aspect-[3/4] rounded-[8px] border-2 border-dashed border-[#1E3A8A]/40 hover:border-[#1E3A8A] dark:border-purple-400/40 dark:hover:border-purple-300 bg-blue-50/40 hover:bg-blue-100/50 dark:bg-purple-950/30 text-[#1E3A8A] dark:text-purple-200 flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer disabled:opacity-50 shrink-0"
+                    className="w-12 h-16 sm:w-13 sm:h-17 aspect-[3/4] rounded-[8px] border-2 border-dashed border-amber-500/40 hover:border-amber-500 dark:border-purple-400/40 dark:hover:border-purple-300 bg-amber-50/40 hover:bg-amber-100/50 dark:bg-purple-950/30 text-amber-800 dark:text-purple-200 flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer disabled:opacity-50 shrink-0"
                     title="Thêm ảnh chụp thực tế cuốn sách"
                   >
                     {isUploadingGallery ? (
-                      <Loader2 size={13} className="animate-spin text-[#1E3A8A]" />
+                      <Loader2 size={13} className="animate-spin text-amber-600" />
                     ) : (
                       <>
                         <Plus size={15} strokeWidth={2.5} />
@@ -438,7 +438,7 @@ export default function EditSingleAuthorBookModal({
                       }
                     }}
                     placeholder="Hoặc dán URL ảnh + Enter..."
-                    className="flex-1 h-6.5 px-2 rounded-[6px] bg-white dark:bg-[#120824] border border-slate-200 dark:border-purple-500/30 text-[10.5px] font-medium text-slate-900 dark:text-white focus:outline-hidden focus:ring-1 focus:ring-[#1E3A8A]"
+                    className="flex-1 h-6.5 px-2 rounded-[6px] bg-white dark:bg-[#120824] border border-slate-200 dark:border-purple-500/30 text-[10.5px] font-medium text-slate-900 dark:text-white focus:outline-hidden focus:ring-1 focus:ring-purple-500"
                   />
                 </div>
               </div>
@@ -523,7 +523,7 @@ export default function EditSingleAuthorBookModal({
             type="button"
             onClick={handleSave}
             disabled={isSaving}
-            className="h-9 px-5 rounded-[10px] bg-gradient-to-r from-[#1E3A8A] to-[#2563EB] hover:from-[#152a65] hover:to-[#1d4ed8] text-white text-[13px] font-black flex items-center gap-2 shadow-md shadow-blue-900/25 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+            className="h-9 px-5 rounded-[10px] bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-[13px] flex items-center gap-2 shadow-md shadow-amber-500/20 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
           >
             {isSaving ? (
               <>

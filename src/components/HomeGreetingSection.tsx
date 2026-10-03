@@ -53,8 +53,8 @@ export default function HomeGreetingSection({
       {/* 2. "Quan điểm" & Tiêu đề chính "Hiểu đúng - Làm chuẩn" */}
       <section className="flex flex-col gap-1 relative group mt-0.5">
         <div className="flex items-center justify-between">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sky-50 border border-sky-200 text-sky-800 text-[11.5px] font-black uppercase tracking-wider w-fit">
-            <span className="w-1.5 h-1.5 rounded-full bg-sky-600 animate-pulse" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-purple-950/60 border border-amber-300/80 dark:border-purple-800/50 text-amber-900 dark:text-[#F8DF7B] text-[11.5px] font-black uppercase tracking-wider w-fit">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
             <span>{greeting || 'Hiểu đúng'}</span>
           </div>
 
@@ -78,7 +78,7 @@ export default function HomeGreetingSection({
 
       {/* 3. Khung Tìm kiếm kết hợp Nút Hỏi AI */}
       <section>
-        <div className="w-full h-[52px] sm:h-[56px] rounded-full sm:rounded-[22px] bg-white border border-line pl-4 pr-1.5 flex items-center justify-between gap-2 shadow-xs hover:border-sky-400 focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-100 transition-all">
+        <div className="w-full h-[52px] sm:h-[56px] rounded-full sm:rounded-[22px] bg-white dark:bg-[#160D30] border border-line dark:border-purple-800/40 pl-4 pr-1.5 flex items-center justify-between gap-2 shadow-xs hover:border-purple-400 focus-within:border-purple-500 focus-within:ring-2 focus-within:ring-purple-100 dark:focus-within:ring-purple-900/30 transition-all">
           <div className="flex items-center gap-2.5 flex-1 min-w-0">
             <Search size={19} className="text-muted shrink-0" />
             <input
@@ -92,10 +92,10 @@ export default function HomeGreetingSection({
           <Link
             href="/tro-ly-ai"
             prefetch={true}
-            className="shrink-0 flex items-center gap-1 px-3.5 py-2 rounded-full bg-[#EBF3FF] hover:bg-[#DCEBFF] text-[#0066FF] text-[13px] font-extrabold shadow-2xs transition-all active:scale-95 whitespace-nowrap cursor-pointer"
+            className="shrink-0 flex items-center gap-1 px-3.5 py-2 rounded-full bg-purple-50 dark:bg-purple-950/80 hover:bg-purple-100 dark:hover:bg-purple-900 text-purple-800 dark:text-[#F8DF7B] text-[13px] font-extrabold border border-purple-200/60 dark:border-purple-800/40 shadow-2xs transition-all active:scale-95 whitespace-nowrap cursor-pointer"
             aria-label="Hỏi Trợ lý AI"
           >
-            <Sparkles size={14} className="text-[#0066FF]" />
+            <Sparkles size={14} className="text-amber-500" />
             <span>Hỏi AI</span>
             <span>→</span>
           </Link>
@@ -104,12 +104,12 @@ export default function HomeGreetingSection({
         {isAdmin && (
           <div className="flex items-center justify-between px-1.5 pt-1.5">
             <span className="text-[11.5px] text-muted flex items-center gap-1 font-medium">
-              <Sparkles size={12} className="text-blue-600" />
+              <Sparkles size={12} className="text-amber-600 dark:text-amber-400" />
               <span>Trợ lý AI sẵn sàng</span>
             </span>
             <Link
               href="/tro-ly-ai"
-              className="flex items-center gap-1 text-[11.5px] font-bold text-blue-600 hover:underline cursor-pointer"
+              className="flex items-center gap-1 text-[11.5px] font-bold text-amber-600 hover:underline cursor-pointer dark:text-amber-400"
             >
               <span>Huấn luyện & Nạp tài liệu AI →</span>
             </Link>

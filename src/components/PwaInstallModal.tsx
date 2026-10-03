@@ -39,7 +39,7 @@ export default function PwaInstallModal({ isOpen, onClose }: PwaInstallModalProp
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-[12px] overflow-hidden shrink-0 border border-slate-200 dark:border-purple-400/40 p-0.5 bg-white dark:bg-[#120A2B] shadow-2xs">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/icon-192.png" alt="Qbiz Books" className="w-full h-full object-cover rounded-[10px]" />
+              <img src="/app_logo.png?v=21" alt="Qbiz Books" className="w-full h-full object-cover rounded-[10px]" />
             </div>
             <div className="flex flex-col">
               <h3 className="text-[17px] font-extrabold text-ink dark:text-white leading-tight">
@@ -62,10 +62,10 @@ export default function PwaInstallModal({ isOpen, onClose }: PwaInstallModalProp
 
         <div className="p-5 flex flex-col gap-4">
           {/* Card giới thiệu app với logo chuẩn */}
-          <div className="flex items-center gap-3 p-3 rounded-[16px] bg-blue-50/80 dark:bg-purple-950/40 border border-blue-200/80 dark:border-purple-800/40">
-            <div className="w-12 h-12 rounded-[13px] overflow-hidden shrink-0 border border-blue-200 dark:border-purple-700/60 shadow-xs bg-white dark:bg-[#120A2B] p-0.5">
+          <div className="flex items-center gap-3 p-3 rounded-[16px] bg-amber-50/70 dark:bg-purple-950/40 border border-amber-200/80 dark:border-purple-800/40">
+            <div className="w-12 h-12 rounded-[13px] overflow-hidden shrink-0 border border-amber-300 dark:border-purple-700/60 shadow-xs bg-white dark:bg-[#120A2B] p-0.5">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/icon-192.png" alt="Qbiz Books" className="w-full h-full object-cover rounded-[11px]" />
+              <img src="/app_logo.png?v=21" alt="Qbiz Books" className="w-full h-full object-cover rounded-[11px]" />
             </div>
             <div className="flex flex-col min-w-0">
               <span className="text-[14px] font-extrabold text-slate-900 dark:text-white leading-tight">
@@ -120,7 +120,7 @@ export default function PwaInstallModal({ isOpen, onClose }: PwaInstallModalProp
               <button
                 type="button"
                 onClick={handleAndroidInstall}
-                className="flex items-center justify-center gap-2 h-[50px] rounded-[16px] bg-gradient-to-r from-[#1E3A8A] to-blue-700 hover:from-blue-700 hover:to-[#1E3A8A] dark:from-[#F8DF7B] dark:to-amber-400 text-white dark:text-slate-950 font-extrabold text-[15px] shadow-sm hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer"
+                className="flex items-center justify-center gap-2 h-[50px] rounded-[16px] bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-500 dark:from-[#F8DF7B] dark:to-amber-400 text-slate-950 font-black text-[15px] shadow-sm hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer"
               >
                 <Download size={18} strokeWidth={2.5} />
                 <span>Cài đặt ứng dụng ngay</span>

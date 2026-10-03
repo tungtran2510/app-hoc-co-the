@@ -80,7 +80,7 @@ export default function EditMedicalDocumentModal({
     }
 
     const badgeColors: Record<string, string> = {
-      'PDF Y KHOA': 'bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-950/80 dark:text-blue-300 dark:border-blue-800',
+      'PDF Y KHOA': 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950/80 dark:text-amber-300 dark:border-amber-800',
       'BẢNG TRA CỨU': 'bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-800',
       'HƯỚNG DẪN THỰC HÀNH': 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950/80 dark:text-amber-300 dark:border-amber-800',
       'CẨM NANG Y HỌC': 'bg-purple-100 text-purple-900 border-purple-300 dark:bg-purple-950/80 dark:text-purple-300 dark:border-purple-800',
@@ -92,7 +92,7 @@ export default function EditMedicalDocumentModal({
       id: docId,
       title: trimmedTitle,
       badge: badge.trim() || 'PDF Y KHOA',
-      badgeColor: badgeColors[badge.trim()] || 'bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-950/80 dark:text-blue-300 dark:border-blue-800',
+      badgeColor: badgeColors[badge.trim()] || 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950/80 dark:text-amber-300 dark:border-amber-800',
       description: description.trim() || 'Tài liệu hướng dẫn & tài liệu thực chứng y khoa chuyên sâu.',
       format: format.trim() || 'Tài liệu PDF',
       pages: Number(pages) || 1,
@@ -138,7 +138,7 @@ export default function EditMedicalDocumentModal({
         {/* Header Modal */}
         <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-purple-900/40 bg-slate-50/70 dark:bg-purple-950/40">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-[10px] bg-blue-100 text-[#1E3A8A] dark:bg-[#F8DF7B] dark:text-[#160C2C] flex items-center justify-center shrink-0 shadow-2xs">
+            <div className="w-8 h-8 rounded-[10px] bg-purple-100 text-purple-900 dark:bg-[#F8DF7B] dark:text-[#160C2C] flex items-center justify-center shrink-0 shadow-2xs">
               <FileCheck size={16} strokeWidth={2.5} />
             </div>
             <div>
@@ -166,7 +166,7 @@ export default function EditMedicalDocumentModal({
           {/* 1. Tiêu đề tài liệu */}
           <div className="flex flex-col gap-1.5">
             <label className="text-[12px] font-black uppercase tracking-wider text-slate-700 dark:text-purple-200 flex items-center gap-1.5">
-              <FileText size={13} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
+              <FileText size={13} className="text-purple-700 dark:text-[#F8DF7B]" />
               <span>Tiêu đề tài liệu <strong className="text-red-500">*</strong></span>
             </label>
             <input
@@ -174,7 +174,7 @@ export default function EditMedicalDocumentModal({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Ví dụ: Atlas & Cẩm Nang Giải Phẫu Cột Sống..."
-              className="h-9 px-3 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[13px] font-bold shadow-2xs focus:border-[#1E3A8A] focus:outline-hidden"
+              className="h-9 px-3 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[13px] font-bold shadow-2xs focus:border-purple-600 dark:focus:border-amber-400 focus:outline-hidden"
               autoFocus
             />
           </div>
@@ -183,13 +183,13 @@ export default function EditMedicalDocumentModal({
           <div className="grid grid-cols-2 gap-2.5">
             <div className="flex flex-col gap-1.5">
               <label className="text-[12px] font-black uppercase tracking-wider text-slate-700 dark:text-purple-200 flex items-center gap-1.5">
-                <Bookmark size={13} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
+                <Bookmark size={13} className="text-purple-700 dark:text-[#F8DF7B]" />
                 <span>Huy hiệu</span>
               </label>
               <select
                 value={badge}
                 onChange={(e) => setBadge(e.target.value)}
-                className="h-9 px-2 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[12.5px] font-bold shadow-2xs focus:border-[#1E3A8A] focus:outline-hidden"
+                className="h-9 px-2 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[12.5px] font-bold shadow-2xs focus:border-purple-600 dark:focus:border-amber-400 focus:outline-hidden"
               >
                 <option value="PDF Y KHOA">PDF Y KHOA</option>
                 <option value="BẢNG TRA CỨU">BẢNG TRA CỨU</option>
@@ -201,7 +201,7 @@ export default function EditMedicalDocumentModal({
 
             <div className="flex flex-col gap-1.5">
               <label className="text-[12px] font-black uppercase tracking-wider text-slate-700 dark:text-purple-200 flex items-center gap-1.5">
-                <Layers size={13} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
+                <Layers size={13} className="text-purple-700 dark:text-[#F8DF7B]" />
                 <span>Số trang</span>
               </label>
               <input
@@ -209,7 +209,7 @@ export default function EditMedicalDocumentModal({
                 value={pages}
                 onChange={(e) => setPages(parseInt(e.target.value, 10) || 1)}
                 min={1}
-                className="h-9 px-3 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[13px] font-bold shadow-2xs focus:border-[#1E3A8A] focus:outline-hidden"
+                className="h-9 px-3 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[13px] font-bold shadow-2xs focus:border-purple-600 dark:focus:border-amber-400 focus:outline-hidden"
               />
             </div>
           </div>
@@ -217,7 +217,7 @@ export default function EditMedicalDocumentModal({
           {/* 3. Đường dẫn file PDF / Tải về */}
           <div className="flex flex-col gap-1.5">
             <label className="text-[12px] font-black uppercase tracking-wider text-slate-700 dark:text-purple-200 flex items-center gap-1.5">
-              <LinkIcon size={13} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
+              <LinkIcon size={13} className="text-purple-700 dark:text-[#F8DF7B]" />
               <span>Đường dẫn File PDF / Tải về</span>
             </label>
             <input
@@ -225,7 +225,7 @@ export default function EditMedicalDocumentModal({
               value={pdfUrl}
               onChange={(e) => setPdfUrl(e.target.value)}
               placeholder="/documents/ten_file.pdf hoặc https://..."
-              className="h-9 px-3 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[12.5px] font-mono shadow-2xs focus:border-[#1E3A8A] focus:outline-hidden"
+              className="h-9 px-3 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[12.5px] font-mono shadow-2xs focus:border-purple-600 dark:focus:border-amber-400 focus:outline-hidden"
             />
           </div>
 
@@ -233,14 +233,14 @@ export default function EditMedicalDocumentModal({
           <div className="grid grid-cols-2 gap-2.5">
             <div className="flex flex-col gap-1.5">
               <label className="text-[12px] font-black uppercase tracking-wider text-slate-700 dark:text-purple-200">
-                Định dạng text
+                Định dạng
               </label>
               <input
                 type="text"
                 value={format}
                 onChange={(e) => setFormat(e.target.value)}
                 placeholder="Ví dụ: PDF Sách Y Khoa"
-                className="h-9 px-3 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[12.5px] font-medium shadow-2xs focus:border-[#1E3A8A] focus:outline-hidden"
+                className="h-9 px-3 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[12.5px] font-medium shadow-2xs focus:border-purple-600 dark:focus:border-amber-400 focus:outline-hidden"
               />
             </div>
 
@@ -253,7 +253,7 @@ export default function EditMedicalDocumentModal({
                 value={size}
                 onChange={(e) => setSize(e.target.value)}
                 placeholder="Ví dụ: 393 KB (14 trang)"
-                className="h-9 px-3 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[12.5px] font-medium shadow-2xs focus:border-[#1E3A8A] focus:outline-hidden"
+                className="h-9 px-3 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[12.5px] font-medium shadow-2xs focus:border-purple-600 dark:focus:border-amber-400 focus:outline-hidden"
               />
             </div>
           </div>
@@ -269,7 +269,7 @@ export default function EditMedicalDocumentModal({
                 value={source}
                 onChange={(e) => setSource(e.target.value)}
                 placeholder="Bộ Y Tế & Atlas..."
-                className="h-9 px-3 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[12.5px] font-medium shadow-2xs focus:border-[#1E3A8A] focus:outline-hidden"
+                className="h-9 px-3 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[12.5px] font-medium shadow-2xs focus:border-purple-600 dark:focus:border-amber-400 focus:outline-hidden"
               />
             </div>
 
@@ -282,7 +282,7 @@ export default function EditMedicalDocumentModal({
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
                 placeholder="/documents/anh.png"
-                className="h-9 px-3 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[12.5px] font-mono shadow-2xs focus:border-[#1E3A8A] focus:outline-hidden"
+                className="h-9 px-3 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[12.5px] font-mono shadow-2xs focus:border-purple-600 dark:focus:border-amber-400 focus:outline-hidden"
               />
             </div>
           </div>
@@ -297,7 +297,7 @@ export default function EditMedicalDocumentModal({
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Tổng quan chi tiết cấu trúc tài liệu, đối tượng học viên..."
               rows={2}
-              className="p-2.5 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[12.5px] font-normal shadow-2xs focus:border-[#1E3A8A] focus:outline-hidden resize-none"
+              className="p-2.5 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[12.5px] font-normal shadow-2xs focus:border-purple-600 dark:focus:border-amber-400 focus:outline-hidden resize-none"
             />
           </div>
         </div>
@@ -327,7 +327,7 @@ export default function EditMedicalDocumentModal({
             <button
               type="button"
               onClick={handleSave}
-              className="flex items-center gap-1.5 h-9 px-4 rounded-[10px] bg-[#1E3A8A] text-white hover:bg-[#162D6E] dark:bg-[#F8DF7B] dark:text-[#160C2C] dark:hover:bg-amber-300 text-[12.5px] font-black cursor-pointer shadow-xs transition-colors"
+              className="flex items-center gap-1.5 h-9 px-4 rounded-[10px] bg-purple-900 text-white hover:bg-purple-950 dark:bg-[#F8DF7B] dark:text-[#160C2C] dark:hover:bg-amber-300 text-[12.5px] font-black cursor-pointer shadow-xs transition-colors"
             >
               <Check size={14} strokeWidth={2.5} />
               <span>{isNew ? 'Thêm tài liệu' : 'Lưu tài liệu'}</span>

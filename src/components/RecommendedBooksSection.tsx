@@ -205,7 +205,7 @@ export default function RecommendedBooksSection({
                 onClick={() => toggleLayoutMode('grid')}
                 className={`w-7 h-7 rounded-[7px] flex items-center justify-center transition-all cursor-pointer ${
                   layoutMode === 'grid'
-                    ? 'bg-[#1E3A8A] text-white dark:bg-[#F8DF7B] dark:text-[#160C2C] shadow-xs font-bold'
+                    ? 'bg-purple-900 text-amber-300 shadow-xs font-bold'
                     : 'text-slate-400 hover:text-slate-700 dark:text-purple-300 dark:hover:text-white'
                 }`}
                 title="Xem dạng lưới 2 cột"
@@ -218,7 +218,7 @@ export default function RecommendedBooksSection({
                 onClick={() => toggleLayoutMode('lookbook')}
                 className={`w-7 h-7 rounded-[7px] flex items-center justify-center transition-all cursor-pointer ${
                   layoutMode === 'lookbook'
-                    ? 'bg-[#1E3A8A] text-white dark:bg-[#F8DF7B] dark:text-[#160C2C] shadow-xs font-bold'
+                    ? 'bg-purple-900 text-amber-300 shadow-xs font-bold'
                     : 'text-slate-400 hover:text-slate-700 dark:text-purple-300 dark:hover:text-white'
                 }`}
                 title="Xem dạng danh sách chi tiết"
@@ -271,7 +271,7 @@ export default function RecommendedBooksSection({
               >
                 <div
                   onClick={() => setSelectedBook(book)}
-                  className={`group p-3 sm:p-4 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-lg hover:shadow-blue-900/10 hover:border-blue-400/80 dark:hover:border-[#F8DF7B]/60 dark:hover:shadow-[0_12px_28px_rgba(248,223,123,0.15)] hover:-translate-y-1.5 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 flex flex-row gap-3 sm:gap-4.5 cursor-pointer relative ${
+                  className={`group p-3 sm:p-4 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-lg hover:shadow-purple-900/10 hover:border-purple-400/60 dark:hover:border-[#F8DF7B]/60 dark:hover:shadow-[0_12px_28px_rgba(248,223,123,0.15)] hover:-translate-y-1.5 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 flex flex-row gap-3 sm:gap-4.5 cursor-pointer relative ${
                     isBookHidden ? 'opacity-70 border-dashed border-amber-300' : ''
                   }`}
                 >
@@ -296,12 +296,12 @@ export default function RecommendedBooksSection({
                     <div className="flex flex-col gap-1.5">
                       {/* Đầu mục / Thể loại sách có thể tùy chỉnh (Cột sống, Dinh dưỡng, Cơ xương khớp...) */}
                       <div className="flex items-center gap-1.5">
-                        <span className="px-2 py-0.5 rounded-[5px] bg-blue-50 text-[#1E3A8A] border border-blue-200 dark:bg-purple-950/80 dark:text-purple-200 dark:border-purple-800/40 text-[10px] font-extrabold tracking-wide uppercase shrink-0">
+                        <span className="px-2 py-0.5 rounded-[5px] bg-amber-50 text-amber-800 border border-amber-300 dark:bg-purple-950/80 dark:text-purple-200 dark:border-purple-800/40 text-[10px] font-extrabold tracking-wide uppercase shrink-0">
                           {book.category || book.tag || (idx === 0 ? 'Cơ Xương Khớp' : idx === 1 ? 'Cột Sống' : idx === 2 ? 'Dinh Dưỡng' : 'Cột Sống Cổ')}
                         </span>
                       </div>
 
-                      <h3 className="text-[15px] sm:text-[16.5px] font-extrabold text-slate-900 dark:text-white leading-snug line-clamp-2 break-normal group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] transition-colors">
+                      <h3 className="text-[15px] sm:text-[16.5px] font-extrabold text-slate-900 dark:text-white leading-snug line-clamp-2 break-normal group-hover:text-purple-700 dark:group-hover:text-[#F8DF7B] transition-colors">
                         {book.title}
                       </h3>
 
@@ -328,7 +328,7 @@ export default function RecommendedBooksSection({
                         <span>Xem thử 3D</span>
                       </button>
 
-                      <span className="text-[12px] font-black text-[#1E3A8A] dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0 ml-auto">
+                      <span className="text-[12px] font-black text-purple-700 dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0 ml-auto">
                         <span>Chi tiết</span>
                         <ChevronRight size={13} strokeWidth={2.5} />
                       </span>
@@ -347,7 +347,7 @@ export default function RecommendedBooksSection({
                             type="button"
                             disabled={idx === 0}
                             onClick={() => handleMoveBook(idx, 'up')}
-                            className="w-6.5 h-6.5 rounded-[7px] bg-slate-100 hover:bg-blue-100 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors shadow-2xs"
+                            className="w-6.5 h-6.5 rounded-[7px] bg-slate-100 hover:bg-slate-200 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors shadow-2xs"
                             title="Chuyển sách lên trên"
                           >
                             <ArrowUp size={12} />
@@ -356,7 +356,7 @@ export default function RecommendedBooksSection({
                             type="button"
                             disabled={idx === books.length - 1}
                             onClick={() => handleMoveBook(idx, 'down')}
-                            className="w-6.5 h-6.5 rounded-[7px] bg-slate-100 hover:bg-blue-100 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors shadow-2xs"
+                            className="w-6.5 h-6.5 rounded-[7px] bg-slate-100 hover:bg-slate-200 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors shadow-2xs"
                             title="Chuyển sách xuống dưới"
                           >
                             <ArrowDown size={12} />
@@ -367,7 +367,7 @@ export default function RecommendedBooksSection({
                             className={`w-6.5 h-6.5 rounded-[7px] flex items-center justify-center cursor-pointer transition-colors shadow-2xs ${
                               isBookHidden
                                 ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200'
-                                : 'bg-slate-100 hover:bg-blue-100 text-slate-600 dark:bg-purple-950 dark:text-purple-200'
+                                : 'bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-purple-950 dark:text-purple-200'
                             }`}
                             title={isBookHidden ? 'Cuốn sách này đang ẨN với khách – Bấm để HIỆN' : 'Cuốn sách này đang HIỆN – Bấm để ẨN TẠM'}
                           >
@@ -376,7 +376,7 @@ export default function RecommendedBooksSection({
                           <button
                             type="button"
                             onClick={() => setEditingSingleBook(book)}
-                            className="flex items-center gap-1 h-6.5 px-2 rounded-[7px] bg-blue-50 text-[#1E3A8A] border border-blue-200 hover:bg-blue-100 dark:bg-purple-950 dark:text-purple-200 dark:border-purple-800/40 text-[11px] font-bold cursor-pointer transition-colors shadow-2xs"
+                            className="flex items-center gap-1 h-6.5 px-2 rounded-[7px] bg-amber-50 text-amber-900 border border-amber-300 hover:bg-amber-100 dark:bg-purple-950 dark:text-purple-200 dark:border-purple-800/40 text-[11px] font-bold cursor-pointer transition-colors shadow-2xs"
                             title="Sửa cuốn sách này"
                           >
                             <Edit2 size={11} />
@@ -414,7 +414,7 @@ export default function RecommendedBooksSection({
               >
                 <div
                   onClick={() => setSelectedBook(book)}
-                  className={`group p-3 sm:p-3.5 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-lg hover:shadow-blue-900/10 hover:border-blue-400/80 dark:hover:border-[#F8DF7B]/60 dark:hover:shadow-[0_12px_28px_rgba(248,223,123,0.15)] hover:-translate-y-1.5 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 flex flex-col cursor-pointer relative h-full ${
+                  className={`group p-3 sm:p-3.5 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-lg hover:shadow-purple-950/10 hover:border-amber-400/80 dark:hover:border-[#F8DF7B]/60 dark:hover:shadow-[0_12px_28px_rgba(248,223,123,0.15)] hover:-translate-y-1.5 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 flex flex-col cursor-pointer relative h-full ${
                     isBookHidden ? 'opacity-70 border-dashed border-amber-300' : ''
                   }`}
                 >
@@ -436,11 +436,11 @@ export default function RecommendedBooksSection({
 
                   {/* NỘI DUNG CHÂN THẺ */}
                   <div className="flex-1 flex flex-col pt-1.5 gap-1 min-w-0">
-                    <span className="self-start px-1.5 py-0.5 rounded-[4px] bg-blue-50 text-[#1E3A8A] border border-blue-200 dark:bg-purple-950/80 dark:text-purple-200 dark:border-purple-800/40 text-[9.5px] font-extrabold tracking-wider uppercase truncate max-w-full">
+                    <span className="self-start px-1.5 py-0.5 rounded-[4px] bg-amber-50 text-amber-800 border border-amber-300/70 dark:bg-purple-950/80 dark:text-purple-200 dark:border-purple-800/40 text-[9.5px] font-extrabold tracking-wider uppercase truncate max-w-full">
                       {book.category || book.tag || (idx === 0 ? 'Cơ Xương Khớp' : idx === 1 ? 'Cột Sống' : idx === 2 ? 'Dinh Dưỡng' : 'Cột Sống Cổ')}
                     </span>
 
-                    <h3 className="text-[13.5px] sm:text-[14.5px] font-extrabold text-slate-900 dark:text-white leading-snug line-clamp-2 min-h-[36px] group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] transition-colors">
+                    <h3 className="text-[13.5px] sm:text-[14.5px] font-extrabold text-slate-900 dark:text-white leading-snug line-clamp-2 min-h-[36px] group-hover:text-amber-700 dark:group-hover:text-[#F8DF7B] transition-colors">
                       {book.title}
                     </h3>
 
@@ -466,7 +466,7 @@ export default function RecommendedBooksSection({
                         <span>Đọc thử 3D</span>
                       </button>
 
-                      <span className="text-[10.5px] sm:text-[11px] font-black text-[#1E3A8A] dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0 ml-auto">
+                      <span className="text-[10.5px] sm:text-[11px] font-black text-purple-700 dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0 ml-auto">
                         <span>Chi tiết</span>
                         <ChevronRight size={11} strokeWidth={2.5} />
                       </span>
@@ -483,7 +483,7 @@ export default function RecommendedBooksSection({
                             type="button"
                             disabled={idx === 0}
                             onClick={() => handleMoveBook(idx, 'up')}
-                            className="w-5.5 h-5.5 rounded-[5px] bg-slate-100 hover:bg-blue-100 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors"
+                            className="w-5.5 h-5.5 rounded-[5px] bg-slate-100 hover:bg-slate-200 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors"
                             title="Chuyển sách lên trên"
                           >
                             <ArrowUp size={11} />
@@ -492,7 +492,7 @@ export default function RecommendedBooksSection({
                             type="button"
                             disabled={idx === books.length - 1}
                             onClick={() => handleMoveBook(idx, 'down')}
-                            className="w-5.5 h-5.5 rounded-[5px] bg-slate-100 hover:bg-blue-100 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors"
+                            className="w-5.5 h-5.5 rounded-[5px] bg-slate-100 hover:bg-slate-200 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors"
                             title="Chuyển sách xuống dưới"
                           >
                             <ArrowDown size={11} />
@@ -503,7 +503,7 @@ export default function RecommendedBooksSection({
                             className={`w-5.5 h-5.5 rounded-[5px] flex items-center justify-center cursor-pointer transition-colors ${
                               isBookHidden
                                 ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200'
-                                : 'bg-slate-100 hover:bg-blue-100 text-slate-600 dark:bg-purple-950 dark:text-purple-200'
+                                : 'bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-purple-950 dark:text-purple-200'
                             }`}
                             title={isBookHidden ? 'Hiện' : 'Ẩn'}
                           >
@@ -512,7 +512,7 @@ export default function RecommendedBooksSection({
                           <button
                             type="button"
                             onClick={() => setEditingSingleBook(book)}
-                            className="w-5.5 h-5.5 rounded-[5px] bg-blue-50 text-[#1E3A8A] border border-blue-200 hover:bg-blue-100 dark:bg-purple-950 dark:text-purple-200 dark:border-purple-800/40 flex items-center justify-center cursor-pointer transition-colors"
+                            className="w-5.5 h-5.5 rounded-[5px] bg-amber-50 text-amber-900 border border-amber-300 hover:bg-amber-100 dark:bg-purple-950 dark:text-purple-200 dark:border-purple-800/40 flex items-center justify-center cursor-pointer transition-colors"
                             title="Sửa cuốn sách này"
                           >
                             <Edit2 size={10} />

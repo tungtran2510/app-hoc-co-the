@@ -47,7 +47,7 @@ export function renderPageToCanvas(page: FlipbookPage, totalPages: number): stri
   let curY = 65;
 
   // Badge chuyên mục trên cùng
-  ctx.fillStyle = '#1E3A8A';
+  ctx.fillStyle = '#4C1D95';
   ctx.font = 'bold 15px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
   ctx.fillText((page.category || 'TÀI LIỆU Y KHOA NỀN TẢNG').toUpperCase(), padX, curY);
 
@@ -93,7 +93,7 @@ export function renderPageToCanvas(page: FlipbookPage, totalPages: number): stri
 
   // 4. TIÊU ĐỀ PHỤ (SUBHEADING)
   if (page.content?.subheading) {
-    ctx.fillStyle = '#2563EB';
+    ctx.fillStyle = '#6D28D9';
     ctx.font = 'bold 18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
     ctx.fillText(page.content.subheading, padX, curY);
     curY += 35;
@@ -144,7 +144,7 @@ export function renderPageToCanvas(page: FlipbookPage, totalPages: number): stri
     ctx.font = '500 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
     for (const bullet of page.content.bullets.slice(0, 4)) {
       // Bullet dot
-      ctx.fillStyle = '#2563EB';
+      ctx.fillStyle = '#D97706';
       ctx.beginPath();
       ctx.arc(padX + 8, curY - 5, 4, 0, Math.PI * 2);
       ctx.fill();
@@ -254,8 +254,8 @@ function drawAnatomyDiagram(
   if (pageNum === 1) {
     // Trang 1: Bìa sách Atlas Cột Sống & Khớp
     const grad = ctx.createLinearGradient(boxX, boxY, boxX + boxW, boxY + boxH);
-    grad.addColorStop(0, '#1E3A8A');
-    grad.addColorStop(0.5, '#172554');
+    grad.addColorStop(0, '#2E1065');
+    grad.addColorStop(0.5, '#1E0B36');
     grad.addColorStop(1, '#0F172A');
     ctx.fillStyle = grad;
     roundRect(ctx, boxX + 4, boxY + 4, boxW - 8, boxH - 8, 12);
@@ -270,7 +270,7 @@ function drawAnatomyDiagram(
     ctx.font = 'bold 20px -apple-system, sans-serif';
     ctx.fillText('CỘT SỐNG & HỆ THỐNG XƯƠNG KHỚP', cX, cY - 10);
 
-    ctx.fillStyle = '#93C5FD';
+    ctx.fillStyle = '#E9D5FF';
     ctx.font = 'normal 15px -apple-system, sans-serif';
     ctx.fillText('Phiên bản lật sách 3D chân thực · Minh họa giải phẫu chi tiết', cX, cY + 25);
 
@@ -350,7 +350,7 @@ function drawAnatomyDiagram(
 
     // Chú thích các thành phần vi chất bên phải (Omega 3, Glucosamine, Canxi...)
     const textStartX = boxX + 240;
-    ctx.fillStyle = '#1E3A8A';
+    ctx.fillStyle = '#1E293B';
     ctx.font = 'bold 14px -apple-system, sans-serif';
     ctx.fillText('• Glucosamine & Chondroitin: Tái tạo sụn khớp', textStartX, boxY + 95);
     ctx.fillText('• Acid Hyaluronic: Tăng độ nhờn bôi trơn ổ khớp', textStartX, boxY + 125);

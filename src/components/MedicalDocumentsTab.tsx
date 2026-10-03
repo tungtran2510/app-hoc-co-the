@@ -52,7 +52,7 @@ const TOPIC_DOCUMENTS: Record<string, MedicalDocument[]> = {
       id: 'doc-cot-song-1',
       title: 'Atlas & Cẩm Nang Giải Phẫu Cột Sống Toàn Diện',
       badge: 'PDF Y KHOA',
-      badgeColor: 'bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-950/80 dark:text-blue-300 dark:border-blue-800',
+      badgeColor: 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-purple-950/80 dark:text-purple-300 dark:border-purple-800',
       description: 'Tổng quan chi tiết cấu trúc 33-34 đốt sống, 4 đoạn cong sinh lý, cấu tạo đĩa đệm và hệ thống dây chằng nâng đỡ thân mình.',
       format: 'PDF Sách Y Khoa',
       pages: 14,
@@ -210,7 +210,7 @@ const DEFAULT_TOPIC_DOCUMENT = (topicTitle: string): MedicalDocument[] => [
     id: 'doc-default-1',
     title: `Tài Liệu Tổng Quan & Cẩm Nang Y Khoa: ${topicTitle}`,
     badge: 'TÀI LIỆU Y KHOA',
-    badgeColor: 'bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-950/80 dark:text-blue-300 dark:border-blue-800',
+    badgeColor: 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-purple-950/80 dark:text-purple-300 dark:border-purple-800',
     description: `Hệ thống hóa toàn bộ kiến thức giải phẫu, cơ chế sinh lý và hướng dẫn tự chăm sóc sức khỏe chủ động cho chuyên đề ${topicTitle}.`,
     format: 'PDF Giáo Trình Chuẩn',
     pages: 14,
@@ -413,7 +413,7 @@ export default function MedicalDocumentsTab({
       {/* HEADER GIỚI THIỆU TỦ TÀI LIỆU HỌC TẬP */}
       <div className="flex items-center justify-between px-1 flex-wrap gap-2">
         <div className="flex items-center gap-2">
-          <FileCheck size={18} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
+          <FileCheck size={18} className="text-purple-700 dark:text-[#F8DF7B]" />
           <h4 className="text-[14px] sm:text-[15.5px] font-black text-slate-900 dark:text-white uppercase tracking-wider">
             TÀI LIỆU HỌC TẬP & CẨM NANG Y KHOA
           </h4>
@@ -441,7 +441,7 @@ export default function MedicalDocumentsTab({
       {/* 1. TÀI LIỆU ĐÍNH KÈM TỪ HỆ THỐNG / GIẢNG VIÊN (NẾU CÓ) */}
       {customFiles.length > 0 && (
         <div className="flex flex-col gap-2.5 mb-1">
-          <span className="text-[12px] font-black text-[#1E3A8A] dark:text-purple-300 uppercase tracking-wide px-1">
+          <span className="text-[12px] font-black text-purple-700 dark:text-purple-300 uppercase tracking-wide px-1">
             File đính kèm từ bài giảng:
           </span>
           {customFiles.map((file, idx) => (
@@ -450,7 +450,7 @@ export default function MedicalDocumentsTab({
               className="flex items-center justify-between p-3.5 rounded-[16px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-500/30 shadow-2xs gap-3"
             >
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-[12px] bg-blue-50 dark:bg-purple-900/60 text-[#1E3A8A] dark:text-purple-200 flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-[12px] bg-amber-50 dark:bg-purple-900/60 text-amber-800 dark:text-purple-200 flex items-center justify-center shrink-0">
                   <FileText size={20} strokeWidth={2.2} />
                 </div>
                 <div className="flex flex-col min-w-0">
@@ -466,7 +466,7 @@ export default function MedicalDocumentsTab({
                 href={file.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1E3A8A] text-white dark:bg-[#F8DF7B] dark:text-[#160C2C] text-[12px] font-bold shrink-0 hover:opacity-90 transition-opacity"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-900 text-white dark:bg-[#F8DF7B] dark:text-[#160C2C] text-[12px] font-bold shrink-0 hover:opacity-90 transition-opacity"
               >
                 <ExternalLink size={13} />
                 <span>Xem</span>
@@ -481,7 +481,7 @@ export default function MedicalDocumentsTab({
         {docs.map((doc) => (
           <div
             key={doc.id}
-            className="flex flex-col p-3.5 sm:p-4 rounded-[18px] bg-white dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-500/30 shadow-xs hover:border-[#1E3A8A]/50 dark:hover:border-purple-400 transition-all gap-2.5"
+            className="flex flex-col p-3.5 sm:p-4 rounded-[18px] bg-white dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-500/30 shadow-xs hover:border-purple-600/50 dark:hover:border-purple-400 transition-all gap-2.5"
           >
             {/* Hàng 1: Badge phân loại + Tên định dạng & Dung lượng thật + Nút Sửa trực tiếp */}
             <div className="flex items-center justify-between gap-2">
@@ -522,7 +522,7 @@ export default function MedicalDocumentsTab({
             {/* Hàng 4: Các định dạng sẵn có & Nút hành động */}
             <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-purple-900/40 gap-2 flex-wrap sm:flex-nowrap">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[10px] font-black px-2 py-0.5 rounded-[6px] bg-blue-50 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                <span className="text-[10px] font-black px-2 py-0.5 rounded-[6px] bg-slate-100 text-slate-800 dark:bg-purple-950 dark:text-purple-300 border border-slate-300 dark:border-purple-800">
                   PDF A4 Chuẩn
                 </span>
                 {doc.imageUrl && (
@@ -560,7 +560,7 @@ export default function MedicalDocumentsTab({
                     setSelectedDoc(doc);
                     setReaderTab('pdf');
                   }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 hover:bg-blue-100 text-[#1E3A8A] border border-blue-200 dark:bg-purple-900/50 dark:text-purple-200 dark:border-purple-700/50 text-[12px] font-bold transition-colors cursor-pointer active:scale-95"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 dark:bg-purple-900/50 dark:text-purple-200 dark:border-purple-700/50 text-[12px] font-bold transition-colors cursor-pointer active:scale-95"
                   title="Đọc trực tiếp tài liệu y khoa này"
                 >
                   <BookOpen size={14} />
@@ -571,7 +571,7 @@ export default function MedicalDocumentsTab({
                 <button
                   type="button"
                   onClick={() => handleDownload(doc, 'pdf')}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1E3A8A] hover:bg-[#162D6E] text-white dark:bg-[#F8DF7B] dark:hover:bg-amber-300 dark:text-[#160C2C] text-[12px] font-black transition-colors cursor-pointer active:scale-95 shadow-2xs"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-900 hover:bg-purple-950 text-white dark:bg-[#F8DF7B] dark:hover:bg-amber-300 dark:text-[#160C2C] text-[12px] font-black transition-colors cursor-pointer active:scale-95 shadow-2xs"
                   title="Tải file PDF y khoa thực tế về máy"
                 >
                   <Download size={14} />
@@ -626,7 +626,7 @@ export default function MedicalDocumentsTab({
                   onClick={() => setReaderTab('pdf')}
                   className={`flex items-center gap-1 px-3 py-1 rounded-[8px] text-[12px] font-bold cursor-pointer transition-colors ${
                     readerTab === 'pdf'
-                      ? 'bg-[#1E3A8A] text-white shadow-2xs'
+                      ? 'bg-purple-900 text-white shadow-2xs'
                       : 'bg-white dark:bg-purple-900/40 text-slate-700 dark:text-purple-200 hover:bg-slate-50'
                   }`}
                 >
@@ -639,7 +639,7 @@ export default function MedicalDocumentsTab({
                   onClick={() => setReaderTab('summary')}
                   className={`flex items-center gap-1 px-3 py-1 rounded-[8px] text-[12px] font-bold cursor-pointer transition-colors ${
                     readerTab === 'summary'
-                      ? 'bg-[#1E3A8A] text-white shadow-2xs'
+                      ? 'bg-purple-900 text-white shadow-2xs'
                       : 'bg-white dark:bg-purple-900/40 text-slate-700 dark:text-purple-200 hover:bg-slate-50'
                   }`}
                 >
@@ -653,7 +653,7 @@ export default function MedicalDocumentsTab({
                     onClick={() => setReaderTab('image')}
                     className={`flex items-center gap-1 px-3 py-1 rounded-[8px] text-[12px] font-bold cursor-pointer transition-colors ${
                       readerTab === 'image'
-                        ? 'bg-[#1E3A8A] text-white shadow-2xs'
+                        ? 'bg-purple-900 text-white shadow-2xs'
                         : 'bg-white dark:bg-purple-900/40 text-slate-700 dark:text-purple-200 hover:bg-slate-50'
                     }`}
                   >
@@ -704,7 +704,7 @@ export default function MedicalDocumentsTab({
                     <button
                       type="button"
                       onClick={() => handleOpenNativePdf(selectedDoc)}
-                      className="text-[#1E3A8A] dark:text-[#F8DF7B] font-bold hover:underline cursor-pointer"
+                      className="text-purple-700 dark:text-[#F8DF7B] font-bold hover:underline cursor-pointer"
                     >
                       Bấm vào đây nếu muốn xem toàn màn hình
                     </button>
@@ -716,8 +716,8 @@ export default function MedicalDocumentsTab({
               {readerTab === 'summary' && (
                 <div className="space-y-4">
                   {/* Khối Tổng quan */}
-                  <div className="p-3.5 rounded-[16px] bg-blue-50/80 dark:bg-purple-950/40 border border-blue-200/80 dark:border-purple-800/40">
-                    <span className="text-[12px] font-black text-[#1E3A8A] dark:text-purple-300 uppercase tracking-wide block mb-1">
+                  <div className="p-3.5 rounded-[16px] bg-amber-50/70 dark:bg-purple-950/40 border border-amber-200/80 dark:border-purple-800/40">
+                    <span className="text-[12px] font-black text-amber-800 dark:text-purple-300 uppercase tracking-wide block mb-1">
                       Tổng quan cốt lõi
                     </span>
                     <p className="text-slate-700 dark:text-slate-300 font-medium leading-relaxed">
@@ -844,7 +844,7 @@ export default function MedicalDocumentsTab({
                 <button
                   type="button"
                   onClick={() => handleDownload(selectedDoc, 'pdf')}
-                  className="flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-full bg-[#1E3A8A] text-white dark:bg-[#F8DF7B] dark:text-[#160C2C] font-black text-[12.5px] hover:opacity-90 transition-opacity cursor-pointer shadow-xs"
+                  className="flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-full bg-purple-900 text-white dark:bg-[#F8DF7B] dark:text-[#160C2C] font-black text-[12.5px] hover:opacity-90 transition-opacity cursor-pointer shadow-xs"
                   title="Tải file PDF chuẩn A4 về máy"
                 >
                   <Download size={14} />

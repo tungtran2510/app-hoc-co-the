@@ -146,7 +146,7 @@ export default function EditSingleVideoModal({
         {/* Header Modal */}
         <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-purple-900/40 bg-slate-50/70 dark:bg-purple-950/40">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-[10px] bg-blue-100 text-[#1E3A8A] dark:bg-[#F8DF7B] dark:text-[#160C2C] flex items-center justify-center shrink-0 shadow-2xs">
+            <div className="w-8 h-8 rounded-[10px] bg-amber-100 text-amber-800 dark:bg-[#F8DF7B] dark:text-[#160C2C] flex items-center justify-center shrink-0 shadow-2xs">
               <Play size={15} fill="currentColor" className="ml-0.5" />
             </div>
             <div>
@@ -175,7 +175,7 @@ export default function EditSingleVideoModal({
           <div className="flex flex-col gap-1.5">
             <label className="text-[12px] font-black uppercase tracking-wider text-slate-700 dark:text-purple-200 flex items-center justify-between">
               <span className="flex items-center gap-1.5">
-                <LinkIcon size={13} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
+                <LinkIcon size={13} className="text-amber-600 dark:text-[#F8DF7B]" />
                 <span>Link YouTube hoặc Video ID</span>
               </span>
               {detectedId && (
@@ -190,13 +190,13 @@ export default function EditSingleVideoModal({
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
                 placeholder="https://www.youtube.com/watch?v=... hoặc youtu.be/..."
-                className="h-9 px-3 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[13px] font-medium flex-1 min-w-0 shadow-2xs focus:border-[#1E3A8A] focus:outline-hidden"
+                className="h-9 px-3 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[13px] font-medium flex-1 min-w-0 shadow-2xs focus:border-purple-500 focus:outline-hidden"
               />
               <button
                 type="button"
                 onClick={handleFetchMeta}
                 disabled={isLoadingMeta || !detectedId}
-                className="flex items-center gap-1 h-9 px-2.5 rounded-[10px] bg-blue-50 text-[#1E3A8A] border border-blue-200 hover:bg-blue-100 dark:bg-purple-900/60 dark:text-purple-200 dark:border-purple-700 text-[11.5px] font-extrabold disabled:opacity-40 cursor-pointer shrink-0 transition-colors shadow-2xs"
+                className="flex items-center gap-1 h-9 px-2.5 rounded-[10px] bg-amber-50 text-amber-900 border border-amber-300 hover:bg-amber-100 dark:bg-purple-900/60 dark:text-purple-200 dark:border-purple-700 text-[11.5px] font-extrabold disabled:opacity-40 cursor-pointer shrink-0 transition-colors shadow-2xs"
                 title="Tự động lấy tiêu đề và ảnh từ YouTube"
               >
                 <Sparkles size={12} />
@@ -233,7 +233,7 @@ export default function EditSingleVideoModal({
           {/* 2. Tiêu đề video */}
           <div className="flex flex-col gap-1.5">
             <label className="text-[12px] font-black uppercase tracking-wider text-slate-700 dark:text-purple-200 flex items-center gap-1.5">
-              <VideoIcon size={13} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
+              <VideoIcon size={13} className="text-amber-600 dark:text-[#F8DF7B]" />
               <span>Tiêu đề video bài giảng <strong className="text-red-500">*</strong></span>
             </label>
             <input
@@ -241,7 +241,7 @@ export default function EditSingleVideoModal({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Ví dụ: 01. Cấu tạo & chức năng cột sống"
-              className="h-9 px-3 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[13px] font-bold flex-1 min-w-0 shadow-2xs focus:border-[#1E3A8A] focus:outline-hidden"
+              className="h-9 px-3 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[13px] font-bold flex-1 min-w-0 shadow-2xs focus:border-purple-500 focus:outline-hidden"
               autoFocus
             />
           </div>
@@ -250,7 +250,7 @@ export default function EditSingleVideoModal({
           <div className="grid grid-cols-2 gap-2.5">
             <div className="flex flex-col gap-1.5">
               <label className="text-[12px] font-black uppercase tracking-wider text-slate-700 dark:text-purple-200 flex items-center gap-1.5">
-                <Clock size={13} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
+                <Clock size={13} className="text-amber-600 dark:text-[#F8DF7B]" />
                 <span>Thời lượng</span>
               </label>
               <input
@@ -258,7 +258,7 @@ export default function EditSingleVideoModal({
                 value={durationText}
                 onChange={(e) => setDurationText(e.target.value)}
                 placeholder="Ví dụ: 4 phút / 04:30"
-                className="h-9 px-3 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[13px] font-medium shadow-2xs focus:border-[#1E3A8A] focus:outline-hidden"
+                className="h-9 px-3 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[13px] font-medium shadow-2xs focus:border-purple-500 focus:outline-hidden"
               />
             </div>
 
@@ -283,7 +283,7 @@ export default function EditSingleVideoModal({
           {/* 4. Mô tả / tóm tắt nội dung */}
           <div className="flex flex-col gap-1.5">
             <label className="text-[12px] font-black uppercase tracking-wider text-slate-700 dark:text-purple-200 flex items-center gap-1.5">
-              <FileText size={13} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
+              <FileText size={13} className="text-amber-600 dark:text-[#F8DF7B]" />
               <span>Tóm tắt nội dung video (tùy chọn)</span>
             </label>
             <textarea
@@ -291,7 +291,7 @@ export default function EditSingleVideoModal({
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Mô tả ngắn gọn nội dung bài học trong video này..."
               rows={2}
-              className="p-2.5 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[12.5px] font-normal shadow-2xs focus:border-[#1E3A8A] focus:outline-hidden resize-none"
+              className="p-2.5 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[12.5px] font-normal shadow-2xs focus:border-purple-500 focus:outline-hidden resize-none"
             />
           </div>
         </div>
@@ -346,7 +346,7 @@ export default function EditSingleVideoModal({
             <button
               type="button"
               onClick={handleSave}
-              className="flex items-center gap-1.5 h-9 px-4 rounded-[10px] bg-[#1E3A8A] text-white hover:bg-[#162D6E] dark:bg-[#F8DF7B] dark:text-[#160C2C] dark:hover:bg-amber-300 text-[12.5px] font-black cursor-pointer shadow-xs transition-colors"
+              className="flex items-center gap-1.5 h-9 px-4 rounded-[10px] bg-amber-500 text-slate-950 hover:bg-amber-600 dark:bg-[#F8DF7B] dark:text-[#160C2C] dark:hover:bg-amber-300 text-[12.5px] font-black cursor-pointer shadow-xs transition-colors"
             >
               <Check size={14} strokeWidth={2.5} />
               <span>{isNew ? 'Thêm video' : 'Lưu video'}</span>

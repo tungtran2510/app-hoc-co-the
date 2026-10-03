@@ -42,8 +42,8 @@ export default function BottomNav() {
           prefetch={true}
           className={`flex flex-col items-center justify-center gap-1 transition-all duration-100 active:scale-90 active:opacity-70 min-h-[48px] cursor-pointer ${
             isHome
-              ? 'text-[#1E3A8A] dark:text-[#F8DF7B] font-black'
-              : 'text-slate-600 dark:text-purple-300/80 font-bold hover:text-[#1E3A8A] dark:hover:text-purple-200'
+              ? 'text-purple-900 dark:text-[#F8DF7B] font-black'
+              : 'text-slate-600 dark:text-purple-300/80 font-bold hover:text-purple-800 dark:hover:text-purple-200'
           }`}
           aria-label="Trang chủ"
         >
@@ -57,8 +57,8 @@ export default function BottomNav() {
           prefetch={true}
           className={`flex flex-col items-center justify-center gap-1 transition-all duration-100 active:scale-90 active:opacity-70 min-h-[48px] cursor-pointer ${
             isReading
-              ? 'text-[#1E3A8A] dark:text-[#F8DF7B] font-black'
-              : 'text-slate-600 dark:text-purple-300/80 font-bold hover:text-[#1E3A8A] dark:hover:text-purple-200'
+              ? 'text-purple-900 dark:text-[#F8DF7B] font-black'
+              : 'text-slate-600 dark:text-purple-300/80 font-bold hover:text-purple-800 dark:hover:text-purple-200'
           }`}
           aria-label="Đang xem"
         >
@@ -72,12 +72,12 @@ export default function BottomNav() {
           prefetch={true}
           className={`flex flex-col items-center justify-center gap-1 transition-all duration-100 active:scale-90 active:opacity-70 min-h-[48px] cursor-pointer ${
             isSaved
-              ? 'text-[#1E3A8A] dark:text-[#F8DF7B] font-black'
-              : 'text-slate-600 dark:text-purple-300/80 font-bold hover:text-[#1E3A8A] dark:hover:text-purple-200'
+              ? 'text-purple-900 dark:text-[#F8DF7B] font-black'
+              : 'text-slate-600 dark:text-purple-300/80 font-bold hover:text-purple-800 dark:hover:text-purple-200'
           }`}
           aria-label="Bài học đã lưu"
         >
-          <Bookmark size={22} strokeWidth={isSaved ? 2.5 : 2} className={isSaved ? 'fill-[#1E3A8A] dark:fill-[#F8DF7B]' : ''} />
+          <Bookmark size={22} strokeWidth={isSaved ? 2.5 : 2} className={isSaved ? 'fill-purple-900 dark:fill-[#F8DF7B]' : ''} />
           <span className="text-[11px] sm:text-[12px] leading-tight">Đã lưu</span>
         </Link>
 
@@ -87,14 +87,14 @@ export default function BottomNav() {
           prefetch={true}
           className={`flex flex-col items-center justify-center gap-1 transition-all duration-100 active:scale-90 active:opacity-70 min-h-[48px] cursor-pointer ${
             isAi
-              ? 'text-[#1E3A8A] dark:text-[#F8DF7B] font-black'
-              : 'text-slate-600 dark:text-purple-300/80 font-bold hover:text-[#1E3A8A] dark:hover:text-purple-200'
+              ? 'text-purple-900 dark:text-[#F8DF7B] font-black'
+              : 'text-slate-600 dark:text-purple-300/80 font-bold hover:text-purple-800 dark:hover:text-purple-200'
           }`}
           aria-label="Trợ lý AI"
         >
           <div className="relative">
-            <Sparkles size={22} strokeWidth={isAi ? 2.5 : 2} className={isAi ? 'fill-[#1E3A8A]/20 text-[#1E3A8A] dark:fill-[#F8DF7B]/20 dark:text-[#F8DF7B]' : ''} />
-            <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#1E3A8A] dark:bg-[#F8DF7B] animate-pulse" />
+            <Sparkles size={22} strokeWidth={isAi ? 2.5 : 2} className={isAi ? 'fill-purple-900/20 text-purple-900 dark:fill-[#F8DF7B]/20 dark:text-[#F8DF7B]' : ''} />
+            <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-purple-900 dark:bg-[#F8DF7B] animate-pulse" />
           </div>
           <span className="text-[11px] sm:text-[12px] leading-tight">Trợ lý AI</span>
         </Link>

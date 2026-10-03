@@ -53,9 +53,9 @@ export default function AddBlockDrawer({
 
       if (displayStyle === 'html') {
         title = 'Khối HTML tùy biến';
-        title_color = '#1E3A8A';
+        title_color = '#1E293B';
         mode = 'html';
-        html = `<div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left: 4px solid #2563eb; padding: 14px 16px; border-radius: 12px; margin: 8px 0;">\n  <div style="font-weight: 700; color: #1e40af; margin-bottom: 4px;">💡 Điểm cốt lõi cần nhớ</div>\n  <p style="margin: 0; color: #1e3a8a; line-height: 1.6; font-size: 15px;">Nội dung giải thích chi tiết, định dạng HTML chuyên nghiệp và dễ tùy biến.</p>\n</div>`;
+        html = `<div style="background: linear-gradient(135deg, #fdfbf7 0%, #fef3c7 100%); border-left: 4px solid #d97706; padding: 14px 16px; border-radius: 12px; margin: 8px 0;">\n  <div style="font-weight: 700; color: #92400e; margin-bottom: 4px;">💡 Điểm cốt lõi cần nhớ</div>\n  <p style="margin: 0; color: #78350f; line-height: 1.6; font-size: 15px;">Nội dung giải thích chi tiết, định dạng HTML chuyên nghiệp và dễ tùy biến.</p>\n</div>`;
         defaultLines = ['Khối nội dung HTML tùy biến'];
       } else if (displayStyle === 'diem_can_nho') {
         format = 'numbered';
@@ -273,9 +273,9 @@ export default function AddBlockDrawer({
               <button
                 type="button"
                 onClick={() => createAndAdd('text', 'diem_can_nho')}
-                className="flex items-center gap-2.5 p-3 rounded-[16px] bg-[#E3ECF7] dark:bg-[#12243D] text-[#244A78] dark:text-[#93C5FD] transition-all text-left font-bold text-[15px] border border-[#2D5B94]/20 dark:border-blue-500/40"
+                className="flex items-center gap-2.5 p-3 rounded-[16px] bg-[#EDE9FE] dark:bg-[#2E1065] text-[#581C87] dark:text-[#E9D5FF] transition-all text-left font-bold text-[15px] border border-[#581C87]/20 dark:border-purple-500/40"
               >
-                <SquareCheck size={20} className="text-[#2D5B94] dark:text-[#93C5FD] shrink-0" />
+                <SquareCheck size={20} className="text-[#581C87] dark:text-[#E9D5FF] shrink-0" />
                 <span>Điểm cần nhớ</span>
               </button>
               <button
@@ -313,9 +313,9 @@ export default function AddBlockDrawer({
               <button
                 type="button"
                 onClick={() => createAndAdd('text', 'html')}
-                className="col-span-2 flex items-center justify-center gap-2.5 p-3 rounded-[16px] bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/60 dark:to-indigo-950/60 hover:opacity-95 transition-all font-bold text-[15px] border border-blue-200 dark:border-blue-500/40 shadow-2xs"
+                className="col-span-2 flex items-center justify-center gap-2.5 p-3 rounded-[16px] bg-gradient-to-r from-purple-50 to-amber-50 dark:from-purple-950/60 dark:to-amber-950/60 hover:opacity-95 transition-all font-bold text-[15px] border border-purple-200 dark:border-purple-500/40 shadow-2xs"
               >
-                <Code size={20} className="text-primary dark:text-blue-400 shrink-0" />
+                <Code size={20} className="text-primary dark:text-purple-300 shrink-0" />
                 <span className="text-ink dark:text-white">Khối HTML tùy biến (Rich HTML)</span>
               </button>
             </div>

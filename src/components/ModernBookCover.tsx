@@ -32,10 +32,10 @@ const LUXURY_PALETTES = [
     badge: 'bg-rose-950/80 text-rose-200 border-rose-700/40',
   },
   {
-    bg: 'from-[#152033] via-[#0E1624] to-[#0A0E17]',
-    border: 'border-cyan-400/40',
-    accent: 'text-cyan-200',
-    badge: 'bg-cyan-950/80 text-cyan-200 border-cyan-700/40',
+    bg: 'from-[#2B1F08] via-[#1F1605] to-[#120D03]',
+    border: 'border-amber-400/50',
+    accent: 'text-amber-200',
+    badge: 'bg-amber-950/80 text-amber-200 border-amber-700/40',
   },
 ];
 
