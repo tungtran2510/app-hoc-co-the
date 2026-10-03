@@ -17,31 +17,70 @@ function getAdminSecret(): string {
   return PROCESS_FALLBACK_SECRET;
 }
 
-function sign(exp: string): string {
-  return crypto.createHmac('sha256', getAdminSecret()).update(`admin:${exp}`).digest('hex');
+export interface AdminSessionUser {
+  phone: string;
+  name: string;
+  role: 'super_admin' | 'admin' | 'instructor';
+  allowed_topic_ids?: string[];
 }
 
-/** Tạo token phiên có chữ ký và hạn dùng: "<hết hạn (giây)>.<chữ ký>" */
-export function generateAdminHmac(): string {
+function sign(exp: string, payloadStr = ''): string {
+  const message = payloadStr ? `admin:${exp}:${payloadStr}` : `admin:${exp}`;
+  return crypto.createHmac('sha256', getAdminSecret()).update(message).digest('hex');
+}
+
+/** Tạo token phiên có chữ ký HMAC: "<hết hạn>.<dữ liệu base64>.<chữ ký>" (hoặc "<hết hạn>.<chữ ký>" cũ) */
+export function generateAdminHmac(user?: AdminSessionUser): string {
   const exp = String(Math.floor(Date.now() / 1000) + ADMIN_SESSION_SECONDS);
-  return `${exp}.${sign(exp)}`;
+  if (!user) {
+    return `${exp}.${sign(exp)}`;
+  }
+  const payloadStr = Buffer.from(JSON.stringify(user)).toString('base64url');
+  const sig = sign(exp, payloadStr);
+  return `${exp}.${payloadStr}.${sig}`;
+}
+
+export function parseAdminToken(token?: string | null): { isValid: boolean; user?: AdminSessionUser } {
+  if (!token || typeof token !== 'string') return { isValid: false };
+  const parts = token.split('.');
+  if (parts.length === 2) {
+    const [exp, sig] = parts;
+    if (!/^\d{9,12}$/.test(exp)) return { isValid: false };
+    if (Number(exp) < Math.floor(Date.now() / 1000)) return { isValid: false };
+    try {
+      const expectedSig = sign(exp);
+      const a = Buffer.from(sig);
+      const b = Buffer.from(expectedSig);
+      if (a.length === b.length && crypto.timingSafeEqual(a, b)) {
+        return {
+          isValid: true,
+          user: { phone: '0974248716', name: 'Tùng Dinh Dưỡng', role: 'super_admin' },
+        };
+      }
+    } catch {
+      return { isValid: false };
+    }
+  } else if (parts.length === 3) {
+    const [exp, payloadB64, sig] = parts;
+    if (!/^\d{9,12}$/.test(exp)) return { isValid: false };
+    if (Number(exp) < Math.floor(Date.now() / 1000)) return { isValid: false };
+    try {
+      const expectedSig = sign(exp, payloadB64);
+      const a = Buffer.from(sig);
+      const b = Buffer.from(expectedSig);
+      if (a.length === b.length && crypto.timingSafeEqual(a, b)) {
+        const decoded = JSON.parse(Buffer.from(payloadB64, 'base64url').toString('utf8'));
+        return { isValid: true, user: decoded };
+      }
+    } catch {
+      return { isValid: false };
+    }
+  }
+  return { isValid: false };
 }
 
 export function verifyAdminToken(token?: string | null): boolean {
-  if (!token || typeof token !== 'string') return false;
-  const dot = token.indexOf('.');
-  if (dot <= 0) return false;
-  const exp = token.slice(0, dot);
-  const sig = token.slice(dot + 1);
-  if (!/^\d{9,12}$/.test(exp)) return false;
-  if (Number(exp) < Math.floor(Date.now() / 1000)) return false;
-  try {
-    const a = Buffer.from(sig);
-    const b = Buffer.from(sign(exp));
-    return a.length === b.length && crypto.timingSafeEqual(a, b);
-  } catch {
-    return false;
-  }
+  return parseAdminToken(token).isValid;
 }
 
 export function safeEqualStrings(a: string, b: string): boolean {
@@ -50,13 +89,10 @@ export function safeEqualStrings(a: string, b: string): boolean {
   return crypto.timingSafeEqual(ha, hb);
 }
 
-export function checkIsAdminRequest(request?: NextRequest): boolean {
+export function getAdminUserFromRequest(request?: NextRequest): AdminSessionUser | null {
   let token: string | undefined;
   if (request) {
-    token = request.cookies.get(COOKIE_NAME)?.value;
-    if (!token) {
-      token = request.headers.get('x-admin-token') || undefined;
-    }
+    token = request.cookies.get(COOKIE_NAME)?.value || request.headers.get('x-admin-token') || undefined;
   } else {
     try {
       token = cookies().get(COOKIE_NAME)?.value;
@@ -64,8 +100,20 @@ export function checkIsAdminRequest(request?: NextRequest): boolean {
       token = undefined;
     }
   }
-  return verifyAdminToken(token);
+  const res = parseAdminToken(token);
+  return res.isValid && res.user ? res.user : null;
 }
+
+export function checkIsAdminRequest(request?: NextRequest): boolean {
+  return getAdminUserFromRequest(request) !== null;
+}
+
+export function checkIsSuperAdminRequest(request?: NextRequest): boolean {
+  const user = getAdminUserFromRequest(request);
+  if (!user) return false;
+  return user.role === 'super_admin' || user.phone === '0974248716';
+}
+
 
 /** Giới hạn số lần gọi theo khóa (IP...) – bộ nhớ tiến trình, đủ để chặn dò mật khẩu cơ bản */
 const rateBuckets = new Map<string, { count: number; reset: number }>();

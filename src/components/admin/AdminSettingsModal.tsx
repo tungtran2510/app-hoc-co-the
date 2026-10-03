@@ -16,8 +16,9 @@ import {
   saveStoredAppSettings,
   AppCustomSettings,
 } from '../../lib/storage';
-import { logoutAdmin } from '../../lib/adminAuth';
+import { logoutAdmin, isSuperAdmin, checkAdminStatus } from '../../lib/adminAuth';
 import { saveSettingsApi, changePasswordApi, getAdminHeaders } from '../../lib/apiAdmin';
+import InstructorManagerSection from './InstructorManagerSection';
 
 interface AdminSettingsModalProps {
   isOpen: boolean;
@@ -32,7 +33,8 @@ export default function AdminSettingsModal({
   onSettingsSaved,
   onLogout,
 }: AdminSettingsModalProps) {
-  const [activeTab, setActiveTab] = useState<'chung' | 'trai_nghiem' | 'du_lieu'>('chung');
+  const [activeTab, setActiveTab] = useState<'chung' | 'trai_nghiem' | 'du_lieu' | 'giang_vien'>('chung');
+  const [isSuper, setIsSuper] = useState(false);
 
   // Cài đặt chung
   const [settings, setSettings] = useState<AppCustomSettings>(getStoredAppSettings());
@@ -53,8 +55,12 @@ export default function AdminSettingsModal({
       setSaveSuccessMsg('');
       setPasswordError('');
       setPasswordSuccess('');
+      checkAdminStatus().then((st) => {
+        setIsSuper(isSuperAdmin(st.user));
+      });
     }
   }, [isOpen]);
+
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -182,8 +188,8 @@ export default function AdminSettingsModal({
           </button>
         </div>
 
-        {/* 3 Tabs */}
-        <div className="grid grid-cols-3 border-b border-line bg-surface p-1.5 gap-1">
+        {/* Tabs */}
+        <div className={`grid ${isSuper ? 'grid-cols-4' : 'grid-cols-3'} border-b border-line bg-surface p-1.5 gap-1`}>
           <button
             type="button"
             onClick={() => setActiveTab('chung')}
@@ -204,7 +210,7 @@ export default function AdminSettingsModal({
                 : 'text-muted hover:text-ink'
             }`}
           >
-            Học tập & Giao diện
+            Giao diện
           </button>
           <button
             type="button"
@@ -215,9 +221,23 @@ export default function AdminSettingsModal({
                 : 'text-muted hover:text-ink'
             }`}
           >
-            Dữ liệu & Bảo mật
+            Bảo mật
           </button>
+          {isSuper && (
+            <button
+              type="button"
+              onClick={() => setActiveTab('giang_vien')}
+              className={`h-10 rounded-[10px] text-[13px] font-extrabold transition-all cursor-pointer ${
+                activeTab === 'giang_vien'
+                  ? 'bg-white text-primary shadow-xs'
+                  : 'text-muted hover:text-ink'
+              }`}
+            >
+              Giảng viên
+            </button>
+          )}
         </div>
+
 
         {/* Tab Body */}
         <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-4">
@@ -461,7 +481,13 @@ export default function AdminSettingsModal({
               </div>
             </div>
           )}
+
+          {/* TAB 4: QUẢN LÝ GIẢNG VIÊN (CHỈ SUPER ADMIN) */}
+          {activeTab === 'giang_vien' && isSuper && (
+            <InstructorManagerSection />
+          )}
         </div>
+
 
         {/* Footer */}
         <div className="p-3.5 px-5 border-t border-line flex items-center justify-between bg-surface">

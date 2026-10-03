@@ -286,3 +286,21 @@ export interface UserProgressSyncData {
   da_hoan_thanh?: string[];
   updated_at?: string;
 }
+
+export interface InstructorAccount {
+  id: string;
+  name: string;
+  phone: string;
+  password?: string;
+  role: 'instructor' | 'admin';
+  allowed_topic_ids: string[];
+  is_active: boolean;
+  created_at?: string;
+}
+
+export interface AdminUserSession {
+  phone: string;
+  name: string;
+  role: 'super_admin' | 'admin' | 'instructor';
+  allowed_topic_ids?: string[];
+}

@@ -22,15 +22,16 @@ export async function POST(req: NextRequest) {
     const { password, phone } = await req.json();
     let serverPassword = process.env.ADMIN_PASSWORD;
 
-    // Kiểm tra tài khoản riêng biệt của người dùng (SĐT: 0974248716, Mật khẩu: Tung@2510)
+    // 1. Kiểm tra tài khoản Chủ sở hữu tối cao (SĐT: 0974248716, Mật khẩu: Tung@2510)
     const cleanPhone = typeof phone === 'string' ? phone.trim().replace(/\s+/g, '') : '';
     const isSpecialTungAccount =
       (cleanPhone === '0974248716' && password === 'Tung@2510') ||
       password === 'Tung@2510';
 
-    // Ưu tiên mật khẩu quản trị lưu trong Supabase
+    let matchedInstructorAccount: any = null;
+
+    // Lấy cấu hình và danh sách tài khoản từ Supabase
     const supabase = getSupabaseServer();
-    let isSupabaseValid = false;
     if (supabase) {
       try {
         const { data } = await supabase
@@ -38,41 +39,76 @@ export async function POST(req: NextRequest) {
           .select('admin_password, block_styles')
           .eq('workspace_id', 'default')
           .single();
+
         if (data?.admin_password) {
           serverPassword = data.admin_password;
         }
-        // Kiểm tra trong danh sách admin_accounts nếu có
+
+        // Kiểm tra danh sách tài khoản giảng viên con
         const adminAccounts = data?.block_styles?.admin_accounts || [];
         if (cleanPhone && Array.isArray(adminAccounts)) {
-          const matchedAcc = adminAccounts.find((acc: any) => acc.phone === cleanPhone);
-          if (matchedAcc && password === 'Tung@2510') {
-            isSupabaseValid = true;
+          const acc = adminAccounts.find(
+            (item: any) =>
+              item.phone?.trim().replace(/\s+/g, '') === cleanPhone &&
+              item.is_active !== false
+          );
+          if (acc) {
+            const isPassValid =
+              (acc.password && verifyPassword(password, acc.password)) ||
+              acc.password === password;
+            if (isPassValid) {
+              matchedInstructorAccount = acc;
+            }
           }
         }
       } catch {
-        // Fallback sang biến môi trường
+        // Fallback
       }
     }
 
-    let isAuthorized = isSpecialTungAccount || isSupabaseValid;
+    let isAuthorized = isSpecialTungAccount || !!matchedInstructorAccount;
 
     if (!isAuthorized) {
-      if (!serverPassword) {
-        return NextResponse.json({ error: 'Chưa cài mật khẩu Admin trên máy chủ' }, { status: 403 });
-      }
-      if (typeof password === 'string' && verifyPassword(password, serverPassword)) {
+      if (serverPassword && typeof password === 'string' && verifyPassword(password, serverPassword)) {
         isAuthorized = true;
       }
     }
 
     if (!isAuthorized) {
-      return NextResponse.json({ error: 'Số điện thoại hoặc mật khẩu quản trị không chính xác' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Số điện thoại hoặc mật khẩu không chính xác' },
+        { status: 401 }
+      );
     }
 
-    const token = generateAdminHmac();
-    const userInfo = cleanPhone === '0974248716' || password === 'Tung@2510'
-      ? { phone: '0974248716', name: 'Tùng Dinh Dưỡng', role: 'admin' }
-      : { phone: cleanPhone || '', name: 'Quản trị viên', role: 'admin' };
+    let userInfo: { phone: string; name: string; role: 'super_admin' | 'admin' | 'instructor'; allowed_topic_ids?: string[] };
+
+    if (matchedInstructorAccount) {
+      userInfo = {
+        phone: matchedInstructorAccount.phone,
+        name: matchedInstructorAccount.name || 'Giảng viên',
+        role: matchedInstructorAccount.role || 'instructor',
+        allowed_topic_ids: Array.isArray(matchedInstructorAccount.allowed_topic_ids)
+          ? matchedInstructorAccount.allowed_topic_ids
+          : [],
+      };
+    } else if (cleanPhone === '0974248716' || password === 'Tung@2510') {
+      userInfo = {
+        phone: '0974248716',
+        name: 'Tùng Dinh Dưỡng',
+        role: 'super_admin',
+        allowed_topic_ids: ['*'],
+      };
+    } else {
+      userInfo = {
+        phone: cleanPhone || '',
+        name: 'Quản trị viên',
+        role: 'super_admin',
+        allowed_topic_ids: ['*'],
+      };
+    }
+
+    const token = generateAdminHmac(userInfo);
 
     const response = NextResponse.json({ success: true, token, user: userInfo });
 

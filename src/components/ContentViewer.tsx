@@ -36,7 +36,7 @@ import EditPageModal from './admin/EditPageModal';
 import AdminSettingsModal from './admin/AdminSettingsModal';
 import MedicalDocumentsTab from './MedicalDocumentsTab';
 import FlipbookViewer from './FlipbookViewer';
-import { checkAdminStatus, setAdminClient } from '../lib/adminAuth';
+import { checkAdminStatus, setAdminClient, canManageTopic } from '../lib/adminAuth';
 import { deleteBlockApi, saveBlockApi } from '../lib/apiAdmin';
 import {
   getStoredBlocks,
@@ -137,11 +137,13 @@ export default function ContentViewer({
         setFontSizeMode('normal');
       }
 
-      // 2. Quyền Admin & Trạng thái kết nối dữ liệu
+      // 2. Quyền Admin & Trạng thái kết nối dữ liệu (Kiểm tra quyền quản lý chủ đề nếu là Giảng viên)
       checkAdminStatus().then((status) => {
-        setIsAdmin(status.isAdmin);
+        const canManage = canManageTopic(topic.id, status.user) || canManageTopic(topic.slug, status.user);
+        setIsAdmin(status.isAdmin && canManage);
         setSupabaseOk(status.supabaseOk);
       });
+
 
       // 3. Trạng thái và thông tin trang
       const storedPage = getStoredPage(page.id, page);

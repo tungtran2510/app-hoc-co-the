@@ -2,16 +2,21 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, Settings, ShieldCheck } from 'lucide-react';
-import { checkIsAdminClient } from '../lib/adminAuth';
+import { ChevronLeft, Settings } from 'lucide-react';
+import { checkAdminStatus, isSuperAdmin } from '../lib/adminAuth';
 import AdminSettingsModal from './admin/AdminSettingsModal';
+
 
 export default function TopicHeaderNav() {
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isSuper, setIsSuper] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
-    checkIsAdminClient().then(setIsAdmin);
+    checkAdminStatus().then((st) => {
+      setIsAdmin(st.isAdmin);
+      setIsSuper(isSuperAdmin(st.user));
+    });
   }, []);
 
   return (
@@ -27,18 +32,19 @@ export default function TopicHeaderNav() {
           <span>Trang chủ</span>
         </Link>
 
-        {isAdmin && (
+        {isSuper && (
           <button
             type="button"
             onClick={() => setShowSettings(true)}
             className="flex items-center gap-1 h-8 px-2.5 rounded-full bg-blue-50 text-[#1E3A8A] dark:bg-purple-950 dark:text-[#F8DF7B] font-bold text-[12px] border border-blue-200 dark:border-purple-700/60 shadow-2xs hover:bg-blue-100"
-            title="Cài đặt quản trị"
+            title="Cài đặt quản trị & Giảng viên"
           >
             <Settings size={14} />
             <span>Quản trị</span>
           </button>
         )}
       </nav>
+
 
       {showSettings && (
         <AdminSettingsModal

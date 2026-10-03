@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { checkIsAdminRequest } from '../../../../lib/authServer';
+import { checkIsAdminRequest, getAdminUserFromRequest } from '../../../../lib/authServer';
 import { getSupabaseServer } from '../../../../lib/supabaseServer';
 
 export async function GET(req: NextRequest) {
   const isAdmin = checkIsAdminRequest(req);
+  const user = getAdminUserFromRequest(req);
   let supabase_ok = false;
 
   const supabase = getSupabaseServer();
@@ -18,5 +19,6 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  return NextResponse.json({ isAdmin, supabase_ok });
+  return NextResponse.json({ isAdmin, supabase_ok, user });
 }
+

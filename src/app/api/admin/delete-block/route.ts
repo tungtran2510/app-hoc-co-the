@@ -1,11 +1,12 @@
 import { revalidatePath } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
-import { checkIsAdminRequest } from '../../../../lib/authServer';
+import { checkIsAdminRequest, getAdminUserFromRequest } from '../../../../lib/authServer';
 import { getSupabaseServer } from '../../../../lib/supabaseServer';
 import { isValidUuid } from '../../../../lib/uuid';
 
 export async function POST(req: NextRequest) {
-  if (!checkIsAdminRequest(req)) {
+  const user = getAdminUserFromRequest(req);
+  if (!user) {
     return NextResponse.json({ error: 'Chưa đăng nhập quyền quản trị' }, { status: 401 });
   }
 
@@ -23,6 +24,30 @@ export async function POST(req: NextRequest) {
     const targetId = String(blockId).trim();
     if (!isValidUuid(targetId)) {
       return NextResponse.json({ success: true, message: 'Khối không tồn tại hoặc đã được xóa' });
+    }
+
+    // Kiểm tra quyền nếu là giảng viên
+    if (user.role === 'instructor') {
+      const allowed = user.allowed_topic_ids || [];
+      if (!allowed.includes('*')) {
+        const { data: blockRow } = await supabase.from('blocks').select('page_id').eq('id', targetId).maybeSingle();
+        if (blockRow?.page_id) {
+          const { data: pageRow } = await supabase.from('pages').select('topic_id').eq('id', blockRow.page_id).maybeSingle();
+          if (pageRow?.topic_id) {
+            const tId = pageRow.topic_id;
+            let isAllowed = allowed.includes(tId) || allowed.includes(String(tId));
+            if (!isAllowed) {
+              const { data: topicRow } = await supabase.from('topics').select('slug').eq('id', tId).maybeSingle();
+              if (topicRow && allowed.includes(topicRow.slug)) {
+                isAllowed = true;
+              }
+            }
+            if (!isAllowed) {
+              return NextResponse.json({ error: 'Bạn không có quyền xóa khối trong chủ đề này' }, { status: 403 });
+            }
+          }
+        }
+      }
     }
 
     const { error } = await supabase.from('blocks').delete().eq('id', targetId);

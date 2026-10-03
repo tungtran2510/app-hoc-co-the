@@ -6,6 +6,28 @@
 export interface AdminStatus {
   isAdmin: boolean;
   supabaseOk: boolean;
+  user?: {
+    phone: string;
+    name: string;
+    role: 'super_admin' | 'admin' | 'instructor';
+    allowed_topic_ids?: string[];
+  } | null;
+}
+
+export function isSuperAdmin(user?: { role?: string; phone?: string } | null): boolean {
+  if (!user) return false;
+  return user.role === 'super_admin' || user.phone === '0974248716';
+}
+
+export function canManageTopic(
+  topicIdOrSlug: string,
+  user?: { role?: string; allowed_topic_ids?: string[] } | null
+): boolean {
+  if (!user) return false;
+  if (user.role === 'super_admin' || user.role === 'admin') return true;
+  if (!user.allowed_topic_ids || user.allowed_topic_ids.length === 0) return false;
+  if (user.allowed_topic_ids.includes('*')) return true;
+  return user.allowed_topic_ids.includes(topicIdOrSlug);
 }
 
 export function getAdminTokenClient(): string {
@@ -14,7 +36,7 @@ export function getAdminTokenClient(): string {
 }
 
 export async function checkAdminStatus(): Promise<AdminStatus> {
-  if (typeof window === 'undefined') return { isAdmin: false, supabaseOk: false };
+  if (typeof window === 'undefined') return { isAdmin: false, supabaseOk: false, user: null };
   try {
     const token = getAdminTokenClient();
     const headers: Record<string, string> = {};
@@ -22,14 +44,15 @@ export async function checkAdminStatus(): Promise<AdminStatus> {
       headers['x-admin-token'] = token;
     }
     const res = await fetch('/api/admin/me', { headers, cache: 'no-store' });
-    if (!res.ok) return { isAdmin: false, supabaseOk: false };
+    if (!res.ok) return { isAdmin: false, supabaseOk: false, user: null };
     const data = await res.json();
     return {
       isAdmin: Boolean(data.isAdmin),
       supabaseOk: Boolean(data.supabase_ok),
+      user: data.user || null,
     };
   } catch {
-    return { isAdmin: false, supabaseOk: false };
+    return { isAdmin: false, supabaseOk: false, user: null };
   }
 }
 
@@ -41,7 +64,7 @@ export async function checkIsAdminClient(): Promise<boolean> {
 export async function loginAdmin(
   password: string,
   phone?: string
-): Promise<{ success: boolean; error?: string; user?: { phone: string; name: string; role: string } }> {
+): Promise<{ success: boolean; error?: string; user?: any }> {
   try {
     const res = await fetch('/api/admin/login', {
       method: 'POST',

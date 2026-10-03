@@ -17,7 +17,7 @@ import {
   Sun,
   Moon,
 } from 'lucide-react';
-import { checkAdminStatus, logoutAdmin } from '../lib/adminAuth';
+import { checkAdminStatus, logoutAdmin, isSuperAdmin } from '../lib/adminAuth';
 import { getStoredAppSettings } from '../lib/storage';
 import AdminSettingsModal from './admin/AdminSettingsModal';
 import EditAppModal from './admin/EditAppModal';
@@ -44,6 +44,7 @@ export default function HomeHeader({
 }: HomeHeaderProps) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [supabaseOk, setSupabaseOk] = useState(false);
+  const [adminUser, setAdminUser] = useState<any>(null);
   const [appName, setAppName] = useState(initialAppName || '');
   const [appSubtitle, setAppSubtitle] = useState(initialAppSubtitle ?? '');
   const [brandTagline, setBrandTagline] = useState(initialBrandTagline ?? '');
@@ -58,6 +59,7 @@ export default function HomeHeader({
   const [showMenu, setShowMenu] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isDark, setIsDark] = useState(false);
+
   const [userName, setUserName] = useState<string>('bạn');
   const [showNameModal, setShowNameModal] = useState(false);
   const [nameInput, setNameInput] = useState('');
@@ -123,9 +125,10 @@ export default function HomeHeader({
   };
 
   useEffect(() => {
-    checkAdminStatus().then(({ isAdmin, supabaseOk }) => {
+    checkAdminStatus().then(({ isAdmin, supabaseOk, user }) => {
       setIsAdmin(isAdmin);
       setSupabaseOk(supabaseOk);
+      setAdminUser(user);
     });
     setAppName(initialAppName || '');
     setAppSubtitle(initialAppSubtitle ?? '');
@@ -223,32 +226,38 @@ export default function HomeHeader({
               }`}
             />
             <span className="text-[13px] sm:text-[14px] font-black text-white/95 tracking-tight truncate">
-              {supabaseOk ? 'Sẵn sàng' : 'Chưa kết nối'}
+              {isSuperAdmin(adminUser)
+                ? (supabaseOk ? 'Quản trị viên' : 'Chưa kết nối')
+                : `Giảng viên: ${adminUser?.name || 'Giảng viên'}`}
             </span>
           </div>
 
           {/* Các nút hành động to rõ, hiển thị chữ đầy đủ trên 1 dòng */}
           <div className="flex items-center gap-1.5 shrink-0">
-            <button
-              type="button"
-              onClick={handleBackup}
-              disabled={isExporting}
-              className="flex items-center gap-1.5 h-7.5 sm:h-8 px-2.5 sm:px-3 rounded-[8px] bg-white/15 hover:bg-white/25 active:bg-white/30 text-white transition-all cursor-pointer disabled:opacity-50 text-[12px] sm:text-[12.5px] font-bold shrink-0 shadow-2xs"
-              title="Tải file sao lưu dữ liệu"
-            >
-              <Download size={13} strokeWidth={2.4} />
-              <span>{isExporting ? 'Đang tải...' : 'Sao lưu'}</span>
-            </button>
+            {isSuperAdmin(adminUser) && (
+              <>
+                <button
+                  type="button"
+                  onClick={handleBackup}
+                  disabled={isExporting}
+                  className="flex items-center gap-1.5 h-7.5 sm:h-8 px-2.5 sm:px-3 rounded-[8px] bg-white/15 hover:bg-white/25 active:bg-white/30 text-white transition-all cursor-pointer disabled:opacity-50 text-[12px] sm:text-[12.5px] font-bold shrink-0 shadow-2xs"
+                  title="Tải file sao lưu dữ liệu"
+                >
+                  <Download size={13} strokeWidth={2.4} />
+                  <span>{isExporting ? 'Đang tải...' : 'Sao lưu'}</span>
+                </button>
 
-            <button
-              type="button"
-              onClick={() => setShowEditApp(true)}
-              className="flex items-center gap-1.5 h-7.5 sm:h-8 px-2.5 sm:px-3 rounded-[8px] bg-white/15 hover:bg-white/25 active:bg-white/30 text-white transition-all cursor-pointer text-[12px] sm:text-[12.5px] font-bold shrink-0 shadow-2xs"
-              title="Đổi tên app và logo"
-            >
-              <Edit2 size={13} strokeWidth={2.4} />
-              <span>Đổi tên</span>
-            </button>
+                <button
+                  type="button"
+                  onClick={() => setShowSettings(true)}
+                  className="flex items-center gap-1.5 h-7.5 sm:h-8 px-2.5 sm:px-3 rounded-[8px] bg-primary hover:bg-primary-dark text-white transition-all cursor-pointer text-[12px] sm:text-[12.5px] font-bold shrink-0 shadow-2xs"
+                  title="Cài đặt quản trị & Phân quyền giảng viên"
+                >
+                  <Settings size={13} strokeWidth={2.4} />
+                  <span>Cài đặt</span>
+                </button>
+              </>
+            )}
 
             <button
               type="button"
@@ -263,6 +272,7 @@ export default function HomeHeader({
           </div>
         </div>
       )}
+
 
       {/* HEADER PHONG CÁCH IPHONE CHUẨN (HELLO + BRAND CARD) */}
       <header className="relative flex flex-col gap-2.5 pt-1">

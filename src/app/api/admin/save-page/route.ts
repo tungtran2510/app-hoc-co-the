@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { checkIsAdminRequest } from '../../../../lib/authServer';
+import { checkIsAdminRequest, getAdminUserFromRequest } from '../../../../lib/authServer';
 import { getSupabaseServer } from '../../../../lib/supabaseServer';
 import { generateUuid, isValidUuid } from '../../../../lib/uuid';
 
 export async function POST(req: NextRequest) {
-  if (!checkIsAdminRequest(req)) {
+  const user = getAdminUserFromRequest(req);
+  if (!user) {
     return NextResponse.json({ error: 'Chưa đăng nhập quyền quản trị' }, { status: 401 });
   }
 
@@ -57,12 +58,30 @@ export async function POST(req: NextRequest) {
     resolvedTopicId = String(resolvedTopicId).trim();
 
     if (!isValidUuid(resolvedTopicId)) {
-      const { data: topicData } = await supabase.from('topics').select('id').eq('slug', resolvedTopicId).maybeSingle();
+      const { data: topicData } = await supabase.from('topics').select('id, slug').eq('slug', resolvedTopicId).maybeSingle();
       if (!topicData) {
         return NextResponse.json({ error: `Không tìm thấy chủ đề tương ứng (${resolvedTopicId})` }, { status: 400 });
       }
       resolvedTopicId = topicData.id;
     }
+
+    // Kiểm tra quyền hạn nếu tài khoản là Giảng viên (instructor)
+    if (user.role === 'instructor') {
+      const allowed = user.allowed_topic_ids || [];
+      if (!allowed.includes('*')) {
+        let isAllowed = allowed.includes(resolvedTopicId);
+        if (!isAllowed) {
+          const { data: tRow } = await supabase.from('topics').select('slug').eq('id', resolvedTopicId).maybeSingle();
+          if (tRow && allowed.includes(tRow.slug)) {
+            isAllowed = true;
+          }
+        }
+        if (!isAllowed) {
+          return NextResponse.json({ error: 'Bạn không có quyền chỉnh sửa chủ đề này' }, { status: 403 });
+        }
+      }
+    }
+
 
     // 3. Chuẩn hóa page.id: BẮT BUỘC là UUID v4 hợp lệ
     let finalPageId = existingPage?.id;

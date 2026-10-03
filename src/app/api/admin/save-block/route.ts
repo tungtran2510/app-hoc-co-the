@@ -1,11 +1,12 @@
 import { revalidatePath } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
-import { checkIsAdminRequest } from '../../../../lib/authServer';
+import { checkIsAdminRequest, getAdminUserFromRequest } from '../../../../lib/authServer';
 import { getSupabaseServer } from '../../../../lib/supabaseServer';
 import { generateUuid, isValidUuid } from '../../../../lib/uuid';
 
 export async function POST(req: NextRequest) {
-  if (!checkIsAdminRequest(req)) {
+  const user = getAdminUserFromRequest(req);
+  if (!user) {
     return NextResponse.json({ error: 'Chưa đăng nhập quyền quản trị' }, { status: 401 });
   }
 
@@ -13,6 +14,7 @@ export async function POST(req: NextRequest) {
   if (!supabase) {
     return NextResponse.json({ error: 'Chưa lưu được – chưa kết nối dữ liệu' }, { status: 503 });
   }
+
 
   try {
     const { block } = await req.json();
@@ -28,6 +30,28 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: `Không tìm thấy trang tương ứng (${resolvedPageId})` }, { status: 400 });
       }
       resolvedPageId = pageData.id;
+    }
+
+    // Kiểm tra quyền hạn nếu tài khoản là Giảng viên (instructor)
+    if (user.role === 'instructor') {
+      const allowed = user.allowed_topic_ids || [];
+      if (!allowed.includes('*')) {
+        const { data: pageRow } = await supabase.from('pages').select('topic_id').eq('id', resolvedPageId).single();
+        if (!pageRow) {
+          return NextResponse.json({ error: 'Không tìm thấy trang của bài học này' }, { status: 404 });
+        }
+        const tId = pageRow.topic_id;
+        let isAllowed = allowed.includes(tId) || allowed.includes(String(tId));
+        if (!isAllowed) {
+          const { data: topicRow } = await supabase.from('topics').select('slug').eq('id', tId).maybeSingle();
+          if (topicRow && allowed.includes(topicRow.slug)) {
+            isAllowed = true;
+          }
+        }
+        if (!isAllowed) {
+          return NextResponse.json({ error: 'Bạn không có quyền chỉnh sửa chủ đề này' }, { status: 403 });
+        }
+      }
     }
 
     // 2. Chuẩn hóa block.id: nếu không phải UUID hợp lệ thì tạo mới

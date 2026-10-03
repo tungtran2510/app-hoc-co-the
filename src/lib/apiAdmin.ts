@@ -157,3 +157,43 @@ export async function changePasswordApi(
   }
 }
 
+export async function getInstructorAccountsApi(): Promise<{
+  success: boolean;
+  accounts?: any[];
+  error?: string;
+}> {
+  try {
+    const res = await fetch('/api/admin/manage-accounts', {
+      headers: getAdminHeaders(),
+      cache: 'no-store',
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      return { success: false, error: data.error || 'Chưa tải được danh sách tài khoản' };
+    }
+    return { success: true, accounts: data.accounts || [] };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Lỗi mạng khi tải tài khoản' };
+  }
+}
+
+export async function saveInstructorAccountApi(
+  action: 'create' | 'update' | 'delete' | 'toggle',
+  payload: { account?: any; accountId?: string }
+): Promise<{ success: boolean; accounts?: any[]; error?: string }> {
+  try {
+    const res = await fetch('/api/admin/manage-accounts', {
+      method: 'POST',
+      headers: getAdminHeaders(),
+      body: JSON.stringify({ action, ...payload }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      return { success: false, error: data.error || 'Thao tác tài khoản thất bại' };
+    }
+    return { success: true, accounts: data.accounts || [] };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Lỗi mạng khi cập nhật tài khoản' };
+  }
+}
+

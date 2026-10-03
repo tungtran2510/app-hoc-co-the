@@ -57,9 +57,21 @@ Hệ thống hỗ trợ đầy đủ **10 khối nội dung chuẩn**:
 
 ---
 
-## 5. ĐỊNH HƯỚNG THƯƠNG MẠI HÓA TRONG TƯƠNG LAI
-- **Mô hình Quản lý Giảng viên / Đa khóa học:**
-  - Thêm tính năng phân quyền trong Admin: Chủ sở hữu (`0974248716`) có thể tự tạo tài khoản con (SĐT + Mật khẩu) và gán quyền quản lý từng chủ đề/khóa học cụ thể cho từng người khác.
-  - Người được cấp quyền đăng nhập vào chỉ nhìn thấy và biên tập đúng khóa học của mình.
+## 5. HỆ THỐNG PHÂN QUYỀN ĐA KHÓA HỌC & GIẢNG VIÊN (RBAC) - ĐÃ HOÀN TẤT
+- **Chủ sở hữu tối cao (Super Admin):**
+  - SĐT: `0974248716` (Tùng Dinh Dưỡng) hoặc mật khẩu quản trị máy chủ.
+  - Toàn quyền 100%: Quản lý tất cả khóa học, cài đặt chung, sao lưu CSDL, và trực tiếp cấp/sửa/xóa tài khoản giảng viên con tại tab "Giảng viên" trong Cài đặt quản trị.
+- **Tài khoản Giảng viên (Instructor Sub-Accounts):**
+  - Đăng nhập bằng SĐT + Mật khẩu riêng tại `/dang-nhap`.
+  - Phân quyền theo danh sách chủ đề (`allowed_topic_ids`): Chỉ thấy nút sửa, thêm khối, quản lý bài học trên những chủ đề được bàn giao.
+  - Tự động chặn quyền chỉnh sửa tại cả 2 tầng:
+    + Client: Không hiện các nút quản trị trên bài học ngoài phạm vi.
+    + Server API: `/api/admin/save-block`, `/api/admin/delete-block`, `/api/admin/save-page` kiểm tra quyền sở hữu chủ đề trước khi ghi vào Supabase.
+  - Ẩn hoàn toàn các chức năng nhạy cảm (Đổi tên app, Đổi mật khẩu hệ thống, Sao lưu CSDL).
+
+---
+
+## 6. ĐỊNH HƯỚNG THƯƠNG MẠI HÓA TIẾP THEO
 - **Mô hình White-label (Bán cho đối tác theo tên miền riêng):**
   - Cung cấp web riêng với logo, thương hiệu và nội dung độc lập cho từng khách hàng hoặc phòng khám.
+
