@@ -382,60 +382,34 @@ async function getOrBuildLessonCatalog(): Promise<LessonCatalogItem[]> {
   return catalog;
 }
 
-// Fallback siêu tốc khi không có API key hoặc lỗi mạng (gọn gàng, đúng trọng tâm, TUYỆT ĐỐI KHÔNG CHÈN DOCTORLOAN)
+// Fallback an toàn khi mạng chập chờn (gọn gàng, đúng trọng tâm, TUYỆT ĐỐI KHÔNG CHÈN DOCTORLOAN HAY BẢN NÓI ĐÀO TẠO)
 function fastFallbackSearch(query: string, catalog: LessonCatalogItem[]) {
-  const isAskingDoctorLoan = /doctor\s*loan/i.test(query);
-  const matchedDocs = searchFastKnowledge(query, 2);
   const selectedPages = rankCatalogPages(query, catalog);
+  const primaryPage = selectedPages[0];
 
-  if (matchedDocs.length > 0) {
-    const doc = matchedDocs[0];
-    const excerptLines = doc.excerpt
-      .split('\n')
-      .map((l) => l.trim())
-      .filter((l) => {
-        if (l.length < 10 || l.startsWith('#')) return false;
-        if (!isAskingDoctorLoan && (l.toLowerCase().includes('doctorloan') || l.toLowerCase().includes('doctor loan'))) {
-          return false;
-        }
-        return true;
-      })
-      .slice(0, 3);
+  let answerText = '';
+  const lowerQ = query.toLowerCase();
 
-    const bulletText = excerptLines.length > 0
-      ? excerptLines.map((l) => `• ${l.replace(/^[-*•\d.]+\s*/, '')}`).join('\n')
-      : `• Áp dụng tư thế sinh hoạt chuẩn, tránh gập cong lưng hoặc vặn xoắn đột ngột.\n• Nằm nghỉ ngơi giải áp, kê nhẹ gối dưới khoeo chân.\n• Vận động kéo giãn nhẹ nhàng để tăng tuần hoàn nuôi dưỡng sụn khớp.`;
-
-    return {
-      answer: `Theo tài liệu hướng dẫn của tác giả Tùng dinh dưỡng:\n\n${bulletText}\n\nMời bạn mở bài học bên dưới để xem hình ảnh và video giải phẫu trực quan.`,
-      suggested_pages: selectedPages.map((s) => ({
-        title: s.page_title,
-        topic_title: s.topic_title,
-        topic_slug: s.topic_slug,
-        page_slug: s.page_slug,
-        reason: `Hướng dẫn chuyên sâu theo bài học ${s.page_title}.`,
-      })),
-      follow_up_questions: [
-        'Tư thế sinh hoạt đúng cần chú ý gì?',
-        'Cách phân biệt đau mỏi thông thường?',
-      ],
-      provider: 'fallback_clean',
-    };
+  if (lowerQ.includes('cổ') || lowerQ.includes('vai') || lowerQ.includes('gáy') || lowerQ.includes('ngực')) {
+    answerText = `• Giữ thẳng trục cột sống cổ, đặt màn hình làm việc hoặc điện thoại ngang tầm mắt.\n• Thay đổi tư thế mỗi 30 - 45 phút, xoay nhẹ khớp vai và ngửa cổ thư giãn cơ dựng sống.\n• Chườm ấm vùng cổ vai gáy 10 - 15 phút vào buổi tối để tăng tuần hoàn máu.`;
+  } else if (lowerQ.includes('lưng') || lowerQ.includes('đĩa đệm') || lowerQ.includes('thoát vị') || lowerQ.includes('tọa')) {
+    answerText = `• Giữ thẳng lưng khi ngồi và sinh hoạt, luôn gập gối hạ thấp trọng tâm khi nâng nhặt đồ vật.\n• Nằm ngửa kê gối mỏng dưới khoeo chân (hoặc kẹp giữa hai gối khi nằm nghiêng) để giải nén cột sống.\n• Đi lại nhẹ nhàng mỗi 30 phút, tránh ngồi tĩnh tại quá lâu làm tăng áp lực nội đĩa đệm.`;
+  } else if (lowerQ.includes('nước') || lowerQ.includes('uống')) {
+    answerText = `• Uống từng ngụm nhỏ, rải đều trong suốt cả ngày thay vì uống dồn một lượng lớn.\n• Bổ sung nước ấm vào buổi sáng sau khi thức dậy để kích hoạt nhu động đường tiêu hóa.\n• Khi vận động ra nhiều mồ hôi, nên bù thêm khoáng điện giải tự nhiên.`;
+  } else if (lowerQ.includes('ăn') || lowerQ.includes('tiêu hóa') || lowerQ.includes('dạ dày') || lowerQ.includes('đầy bụng')) {
+    answerText = `• Ăn chậm, nhai kỹ để giảm gánh nặng co bóp và tiết acid cho dạ dày.\n• Hạn chế đồ ăn quá nhiều dầu mỡ, đồ cay nóng hoặc nằm ngay sau khi ăn no.\n• Duy trì khoảng cách tối thiểu 2 - 3 giờ giữa bữa tối và giờ đi ngủ.`;
+  } else {
+    answerText = `• Lắng nghe các tín hiệu của cơ thể, duy trì lối sống điều độ và chế độ dinh dưỡng lành mạnh.\n• Duy trì vận động nhịp nhàng mỗi ngày để tăng cường tuần hoàn và trao đổi chất.\n• Xem chi tiết bài học y học trực quan bên dưới để nắm rõ cơ chế và cách ứng dụng.`;
   }
 
   return {
-    answer:
-`Để chăm sóc sức khỏe chủ động theo tài liệu tác giả Tùng dinh dưỡng, bạn nên lưu ý:
-
-• Giữ vững đường cong sinh lý tự nhiên của cột sống trong mọi tư thế ngồi, đứng và nằm.
-• Duy trì vận động nhịp nhàng mỗi ngày để nuôi dưỡng sụn khớp và đĩa đệm qua cơ chế thẩm thấu.
-• Uống đủ nước và bổ sung dinh dưỡng cân bằng để hỗ trợ tái tạo mô liên kết.`,
+    answer: `Hướng dẫn chăm sóc sức khỏe chủ động:\n\n${answerText}`,
     suggested_pages: selectedPages.map((s) => ({
       title: s.page_title,
       topic_title: s.topic_title,
       topic_slug: s.topic_slug,
       page_slug: s.page_slug,
-      reason: 'Xem chi tiết hướng dẫn của tác giả trong bài học này.',
+      reason: `Tham khảo kiến thức chuẩn trong bài "${s.page_title}".`,
     })),
     follow_up_questions: [
       'Tư thế sinh hoạt đúng cần chú ý gì?',
@@ -574,7 +548,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
     if (deepseekKey) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3500);
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
 
         const deepseekRes = await fetch('https://api.deepseek.com/chat/completions', {
           method: 'POST',
@@ -593,7 +567,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
               })),
               { role: 'user', content: question },
             ],
-            max_tokens: 350,
+            max_tokens: 800,
             temperature: 0.3,
           }),
           signal: controller.signal,
@@ -614,11 +588,11 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
       }
     }
 
-    // 6. GỌI SECONDARY (FALLBACK): GOOGLE GEMINI 3.5 FLASH LITE VỚI TIMEOUT 3500ms
+    // 6. GỌI SECONDARY (FALLBACK): GOOGLE GEMINI VỚI TIMEOUT 4500ms
     if (!rawText && geminiKey) {
       const candidateModels = [
-        'gemini-3.5-flash-lite',
-        'gemini-3.8-flash',
+        'gemini-1.5-flash',
+        'gemini-2.0-flash',
       ];
 
       const geminiPrompt = `${systemPrompt}\n\nCÂU HỎI CỦA NGƯỜI HỌC: "${question}"\n\nLỊCH SỬ:\n${history.slice(-2).map((h: any) => `${h.role === 'user' ? 'Người học' : 'Trợ lý'}: ${h.text}`).join('\n')}`;
@@ -626,7 +600,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
       for (const model of candidateModels) {
         try {
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 3500);
+          const timeoutId = setTimeout(() => controller.abort(), 4500);
 
           const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`;
           const geminiRes = await fetch(geminiUrl, {
@@ -637,7 +611,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
               generationConfig: {
                 responseMimeType: 'application/json',
                 temperature: 0.3,
-                maxOutputTokens: 350,
+                maxOutputTokens: 800,
               },
             }),
             signal: controller.signal,
@@ -681,6 +655,21 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
         } catch {
           parsedJson = null;
         }
+      }
+    }
+
+    // Phục hồi dữ liệu nếu JSON bị ngắt quãng giữa chừng
+    if (!parsedJson) {
+      try {
+        const answerMatch = rawText.match(/"answer"\s*:\s*"((?:[^"\\]|\\.)*)/);
+        if (answerMatch && answerMatch[1]) {
+          parsedJson = {
+            answer: answerMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\t/g, ' '),
+            suggested_pages: topCatalog.slice(0, 2),
+          };
+        }
+      } catch {
+        parsedJson = null;
       }
     }
 
