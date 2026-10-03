@@ -26,9 +26,11 @@ export function getBookFlipbookPages(book?: BookInfoInput | null): FlipbookPage[
   const title = (book?.title || '').toLowerCase();
   const id = book?.id || '';
 
-  // ƯU TIÊN SỐ 1: BỘ TRANG TÀI LIỆU XEM THỬ 3D (TỪ FILE PDF, WORD HOẶC BỘ ẢNH TRANG)
-  const customPages = Array.isArray(book?.flipbook_pages) && book.flipbook_pages.length > 0
+  // ƯU TIÊN SỐ 1: BỘ TRANG TÀI LIỆU XEM THỬ 3D (TỪ FILE PDF, WORD HOẶC BỘ ẢNH TRANG / GALLERY)
+  const customPages = (Array.isArray(book?.flipbook_pages) && book.flipbook_pages.length > 0)
     ? book.flipbook_pages
+    : (Array.isArray(book?.gallery_images) && book.gallery_images.length > 0)
+    ? book.gallery_images
     : null;
 
   if (customPages && customPages.length > 0) {
@@ -873,8 +875,8 @@ export function getBookFlipbookPages(book?: BookInfoInput | null): FlipbookPage[
     {
       id: 'atlas-p1',
       pageNum: 1,
-      title: 'Atlas Giải Phẫu Cột Sống & Đĩa Đệm 3D',
-      imageUrl: '/documents/covers/cover_atlas_y_khoa_toan_dien.png',
+      title: book?.title || 'Atlas Giải Phẫu Cột Sống & Đĩa Đệm 3D',
+      imageUrl: book?.cover_url || '/documents/covers/cover_atlas_y_khoa_toan_dien.png',
     },
     {
       id: 'atlas-p2',

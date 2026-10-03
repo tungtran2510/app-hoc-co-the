@@ -27,7 +27,7 @@ export default function AdaptiveImage({
   return (
     <div
       onClick={onClick}
-      className={`relative w-full overflow-hidden rounded-[16px] bg-slate-100 dark:bg-purple-950/40 border border-line ${aspectClass} ${containerClassName}`}
+      className={`relative w-full overflow-hidden rounded-[16px] bg-slate-100 dark:bg-slate-800/40 border border-line ${aspectClass} ${containerClassName}`}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img

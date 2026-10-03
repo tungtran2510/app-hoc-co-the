@@ -14,28 +14,28 @@ interface ModernBookCoverProps {
 
 const LUXURY_PALETTES = [
   {
-    bg: 'from-[#1C123D] via-[#160D30] to-[#0E0720]',
-    border: 'border-[#F8DF7B]/50',
-    accent: 'text-[#F8DF7B]',
-    badge: 'bg-[#F8DF7B] text-[#160C2C]',
+    bg: 'from-[#0F172A] via-[#1E293B] to-[#0A0F1D]',
+    border: 'border-amber-300/40',
+    accent: 'text-amber-300',
+    badge: 'bg-amber-400 text-slate-900',
   },
   {
-    bg: 'from-[#241548] via-[#1A0E38] to-[#100724]',
-    border: 'border-purple-400/40',
-    accent: 'text-purple-200',
-    badge: 'bg-purple-950/80 text-purple-200 border-purple-700/40',
+    bg: 'from-[#1E3A8A] via-[#172554] to-[#0F172A]',
+    border: 'border-blue-300/40',
+    accent: 'text-blue-200',
+    badge: 'bg-blue-900 text-blue-200 border-blue-700/40',
   },
   {
-    bg: 'from-[#2A1030] via-[#1E0B24] to-[#120516]',
-    border: 'border-rose-400/40',
-    accent: 'text-rose-200',
-    badge: 'bg-rose-950/80 text-rose-200 border-rose-700/40',
+    bg: 'from-[#134E4A] via-[#0F3633] to-[#0A201E]',
+    border: 'border-emerald-300/40',
+    accent: 'text-emerald-200',
+    badge: 'bg-emerald-950 text-emerald-200 border-emerald-700/40',
   },
   {
-    bg: 'from-[#2B1F08] via-[#1F1605] to-[#120D03]',
-    border: 'border-amber-400/50',
+    bg: 'from-[#1E293B] via-[#0F172A] to-[#020617]',
+    border: 'border-amber-400/40',
     accent: 'text-amber-200',
-    badge: 'bg-amber-950/80 text-amber-200 border-amber-700/40',
+    badge: 'bg-slate-900 text-amber-200 border-amber-700/40',
   },
 ];
 
@@ -54,15 +54,22 @@ export default function ModernBookCover({
     setImgError(false);
   }, [coverUrl]);
 
+  // Chuẩn hóa nhãn huy hiệu ngắn gọn, không bị cắt cụt dấu ba chấm
+  const displayBadge = React.useMemo(() => {
+    if (!badgeText) return null;
+    if (badgeText.toUpperCase().includes('TÀI LIỆU NÊN ĐỌC')) return 'NÊN ĐỌC';
+    return badgeText;
+  }, [badgeText]);
+
   return (
     <div
       className={`relative aspect-[3/4] w-full select-none transition-transform duration-300 group-hover:-translate-y-1 ${className}`}
     >
-      {/* THẺ TAG CỦA SÁCH: Ở TRÊN CÙNG GÓC TRÁI, CHỜM RA NGOÀI VIỀN 1 NỬA (50% TRONG, 50% NGOÀI), TĨNH KHÔNG FLASH */}
-      {badgeText && (
-        <div className="absolute -top-2 -left-2 sm:-top-2.5 sm:-left-2 z-30 rounded-[5px] bg-gradient-to-r from-[#991B1B] via-[#DC2626] to-[#991B1B] text-white font-black text-[8px] sm:text-[8.5px] px-1.5 py-[2px] shadow-md shadow-red-950/50 border border-red-300/50 flex items-center gap-1 select-none pointer-events-none drop-shadow-xs max-w-[92%] truncate">
-          <Sparkles size={8} className="text-white fill-white shrink-0" />
-          <span className="tracking-wider uppercase drop-shadow-xs truncate">{badgeText}</span>
+      {/* THẺ TAG CỦA SÁCH: MÀU XANH NAVY CHỮ VÀNG, KÍCH THƯỚC BÉ TINH TẾ & DỊCH LÊN TRÊN */}
+      {displayBadge && (
+        <div className="absolute -top-2.5 -left-1 sm:-top-3 sm:-left-1.5 z-30 rounded-[4px] bg-[#1E3A8A] text-[#FDE047] font-bold text-[7px] sm:text-[7.5px] px-1.5 py-[1.5px] shadow-sm border border-amber-300/40 flex items-center gap-1 select-none pointer-events-none max-w-[92%] truncate">
+          <Sparkles size={7} className="text-[#FDE047] fill-[#FDE047] shrink-0" />
+          <span className="tracking-wider uppercase truncate">{displayBadge}</span>
         </div>
       )}
 
@@ -125,7 +132,7 @@ export default function ModernBookCover({
           {/* Đầu bìa: Nhãn chuyên san */}
           <div className="relative z-10 pl-3 pt-1 flex items-center justify-between">
             <span
-              className={`text-[9px] sm:text-[10px] font-black uppercase tracking-[1.5px] ${palette.accent}`}
+              className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-[1.5px] ${palette.accent}`}
             >
               Sức Khỏe · Cơ Thể
             </span>
@@ -141,7 +148,7 @@ export default function ModernBookCover({
             </div>
 
             <h3
-              className="text-[13.5px] sm:text-[15px] font-black text-white leading-snug line-clamp-3 tracking-wide drop-shadow-sm"
+              className="text-[13.5px] sm:text-[15px] font-bold text-white leading-snug line-clamp-3 tracking-wide drop-shadow-sm font-sans"
             >
               {title}
             </h3>

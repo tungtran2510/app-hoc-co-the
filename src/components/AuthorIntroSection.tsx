@@ -121,7 +121,7 @@ export function AuthorBioDetailModal({ profile, onClose }: AuthorBioDetailModalP
           </div>
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-1.5">
-              <h4 className="text-[18px] sm:text-[20px] font-black tracking-tight text-slate-900 dark:text-white uppercase font-serif">
+              <h4 className="text-[18px] sm:text-[20px] font-black tracking-tight text-slate-900 dark:text-white uppercase">
                 {profile.name && profile.name.toLowerCase().includes('tùng') ? 'Tùng Dinh Dưỡng' : (profile.name || 'Tùng Dinh Dưỡng')}
               </h4>
               <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-500 text-slate-950 font-black shrink-0">
@@ -148,14 +148,14 @@ export function AuthorBioDetailModal({ profile, onClose }: AuthorBioDetailModalP
 
         {/* Lời tựa / Triết lý nếu có */}
         {cleanPhilosophyQuote && (
-          <div className="p-3.5 rounded-xl bg-amber-50/60 dark:bg-purple-950/40 border border-amber-200/80 dark:border-purple-800/40 flex flex-col gap-1.5">
+          <div className="p-3.5 rounded-xl bg-amber-50/60 dark:bg-slate-800/60 border border-amber-200/80 dark:border-slate-700 flex flex-col gap-1.5">
             <div className="flex items-center gap-1.5 text-amber-800 dark:text-amber-300">
               <Quote size={13} className="rotate-180" strokeWidth={2.5} />
               <span className="text-[11px] font-bold uppercase tracking-wider">
                 {profile.extra_title || 'Triết lý phụng sự'}
               </span>
             </div>
-            <p className="font-serif italic text-[13px] text-slate-700 dark:text-slate-200 leading-relaxed">
+            <p className="italic text-[13px] text-slate-700 dark:text-slate-200 leading-relaxed">
               &ldquo;{cleanPhilosophyQuote}&rdquo;
             </p>
           </div>
@@ -170,7 +170,7 @@ export function AuthorBioDetailModal({ profile, onClose }: AuthorBioDetailModalP
             {profile.phone && (
               <a
                 href={`tel:${profile.phone.replace(/[^0-9+]/g, '')}`}
-                className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-amber-400 hover:bg-amber-50/40 dark:hover:bg-purple-950/20 transition-all text-slate-800 dark:text-slate-200 group"
+                className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-amber-400 hover:bg-amber-50/40 dark:hover:bg-slate-800/40 transition-all text-slate-800 dark:text-slate-200 group"
               >
                 <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
                   <Phone size={15} />
@@ -189,7 +189,7 @@ export function AuthorBioDetailModal({ profile, onClose }: AuthorBioDetailModalP
                 href={profile.zalo_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-amber-400 hover:bg-amber-50/40 dark:hover:bg-purple-950/20 transition-all text-slate-800 dark:text-slate-200 group"
+                className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-amber-400 hover:bg-amber-50/40 dark:hover:bg-slate-800/40 transition-all text-slate-800 dark:text-slate-200 group"
               >
                 <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-700 dark:text-amber-400 flex items-center justify-center shrink-0">
                   <MessageCircle size={15} />
@@ -263,14 +263,14 @@ export function AuthorProfileSection({
 
       {/* THẺ MASTER SINGLE CARD (ĐÚNG 1 KHUNG DUY NHẤT, NỀN TRẮNG SẠCH ĐỒNG BỘ APP) */}
       <ScrollReveal animation="slide-left" delay={40}>
-        <div className="relative p-4 sm:p-5 rounded-[16px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-sm dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] dark:border-white/15 dark:text-white overflow-hidden flex flex-col gap-3">
+        <div className="relative p-4 sm:p-5 rounded-[16px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-sm dark:bg-gradient-to-br dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0B132B] dark:border-white/15 dark:text-white overflow-hidden flex flex-col gap-3">
           {/* Họa tiết trang trí viền cao cấp góc phải */}
-          <div className="absolute top-0 right-0 w-32 h-32 opacity-10 dark:opacity-20 pointer-events-none bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-200 dark:from-purple-400 via-transparent to-transparent" />
+          <div className="absolute top-0 right-0 w-32 h-32 opacity-10 dark:opacity-20 pointer-events-none bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-200 dark:from-blue-400 via-transparent to-transparent" />
 
           {/* 1. Phần Tiêu Đề Tác GiẢ Ở Trên Cùng (Editorial Magazine Header) */}
           <div className="relative z-10 flex flex-col gap-0.5">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-[22px] sm:text-[25px] font-black tracking-tight text-slate-900 dark:text-white uppercase font-serif leading-tight">
+              <h3 className="text-[22px] sm:text-[25px] font-black tracking-tight text-slate-900 dark:text-white uppercase leading-tight">
                 {profile.name && profile.name.toLowerCase().includes('tùng') ? 'Tùng Dinh Dưỡng' : (profile.name || 'Tùng Dinh Dưỡng')}
               </h3>
               <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-500 text-slate-950 shrink-0 shadow-2xs" title="Chuyên gia được xác thực">
@@ -279,7 +279,7 @@ export function AuthorProfileSection({
             </div>
 
             {profile.title && (
-              <p className="text-[12.5px] sm:text-[13px] font-semibold text-amber-700 dark:text-[#A5B4FC] tracking-wide">
+              <p className="text-[12.5px] sm:text-[13px] font-semibold text-amber-700 dark:text-amber-300 tracking-wide">
                 {profile.title.replace(/\.$/, '')}
               </p>
             )}
@@ -372,7 +372,7 @@ export function AuthorProfileSection({
                 )}
               </div>
 
-              <p className="font-serif italic text-[14px] sm:text-[14.5px] text-slate-700 dark:text-slate-200 leading-relaxed font-normal pl-0.5">
+              <p className="italic text-[14px] sm:text-[14.5px] text-slate-700 dark:text-slate-200 leading-relaxed font-normal pl-0.5">
                 &ldquo;{cleanPhilosophyQuote}&rdquo;
               </p>
 
@@ -449,18 +449,12 @@ export function AuthorBooksSection({
         />
       )}
 
-      {/* Tiêu đề mục sách ngắn gọn 4 từ, tự co giãn xuống dòng an toàn, bỏ hẳn badge số tài liệu */}
+      {/* Tiêu đề mục sách tác giả */}
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center justify-between gap-2">
           <h3 className="text-[18px] sm:text-[19px] font-extrabold text-ink leading-tight break-words line-clamp-2">
-            Tài Liệu Chuyên Sâu
+            Sách & Tác phẩm đã làm
           </h3>
-        </div>
-
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-[12.5px] text-muted">
-            Một bên là tài liệu, một bên là mô tả chi tiết & video
-          </p>
         </div>
       </div>
 
@@ -479,84 +473,85 @@ export function AuthorBooksSection({
                 delay={idx * 140}
               >
                 <div
-                  className={`p-3.5 sm:p-4 rounded-[16px] bg-white text-slate-900 border border-slate-200/90 dark:border-white/10 shadow-xs hover:shadow-md hover:border-[#1E3A8A]/40 dark:hover:border-[#F8DF7B]/60 transition-all duration-300 flex flex-col gap-3 group ${
+                  className={`p-3.5 sm:p-4 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-lg hover:shadow-blue-950/10 hover:border-amber-400/80 dark:hover:border-[#F8DF7B]/60 dark:hover:shadow-[0_12px_28px_rgba(248,223,123,0.15)] hover:-translate-y-1.5 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 flex flex-row gap-3 sm:gap-4.5 group ${
                     isBookHidden ? 'opacity-70 border-dashed border-amber-300' : ''
                   }`}
                 >
-                  {/* PHẦN TRÊN: Bìa sách bên trái & Khung chi tiết bên phải */}
+                  {/* BÊN TRÁI: Bìa sách to rõ chuẩn tỷ lệ 3:4 với ModernBookCover */}
                   <div
                     onClick={() => onSelectBook?.(book)}
-                    className="flex flex-row gap-3 sm:gap-4 items-start cursor-pointer"
+                    className="w-[116px] sm:w-[138px] aspect-[3/4] shrink-0 relative flex items-center justify-center cursor-pointer"
                   >
-                    {/* BÊN TRÁI: Bìa sách to rõ chuẩn tỷ lệ 3:4 với ModernBookCover */}
-                    <div className="w-[110px] sm:w-[130px] aspect-[3/4] shrink-0 relative flex items-center justify-center">
-                      <ModernBookCover
-                        title={book.title}
-                        coverUrl={book.cover_url}
-                        author={profile.name || 'Tùng Dinh Dưỡng'}
-                        index={idx}
-                        badgeText={book.year ? `NĂM ${book.year}` : 'CHUYÊN SÂU'}
-                      />
+                    <ModernBookCover
+                      title={book.title}
+                      coverUrl={book.cover_url}
+                      author={profile.name || 'Tùng Dinh Dưỡng'}
+                      index={idx}
+                      badgeText={book.year ? `NĂM ${book.year}` : 'NỔI BẬT'}
+                    />
 
-                      {/* Nhãn Đang ẩn nếu admin */}
-                      {isBookHidden && isAdmin && (
-                        <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/75 text-amber-300 text-[9.5px] font-black z-30">
-                          Ẩn tạm
+                    {/* Nhãn Đang ẩn nếu admin */}
+                    {isBookHidden && isAdmin && (
+                      <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/75 text-amber-300 text-[9.5px] font-black z-30">
+                        Ẩn tạm
+                      </div>
+                    )}
+                  </div>
+
+                  {/* BÊN PHẢI: Tag videos, Tiêu đề, Khung Xem thử 3D màu vàng ở TRÊN, Chi tiết sách ở DƯỚI */}
+                  <div className="flex-1 flex flex-col justify-between min-w-0 py-0.5">
+                    <div className="flex flex-col gap-1.5">
+                      {hasVideo && (
+                        <div className="flex items-center gap-1.5">
+                          <span className="flex items-center gap-1 px-2 py-0.5 rounded-[5px] bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/80 dark:text-red-300 dark:border-red-800/40 text-[10.5px] font-extrabold uppercase">
+                            <Play size={10} className="fill-red-600 dark:fill-red-400" />
+                            <span>videos</span>
+                          </span>
                         </div>
+                      )}
+
+                      <h4
+                        onClick={() => onSelectBook?.(book)}
+                        className="text-[15.5px] sm:text-[16.5px] font-bold text-[#1D3985] dark:text-[#93C5FD] leading-snug line-clamp-2 break-normal group-hover:text-blue-700 dark:group-hover:text-amber-300 transition-colors cursor-pointer"
+                      >
+                        {book.title}
+                      </h4>
+                      {book.description && (
+                        <p className="text-[12px] sm:text-[12.5px] text-slate-500 dark:text-slate-400 line-clamp-1 leading-normal font-normal">
+                          {book.description}
+                        </p>
                       )}
                     </div>
 
-                    {/* BÊN PHẢI: Khung chi tiết sách tách bạch */}
-                    <div className="flex-1 flex flex-col justify-between min-w-0 self-stretch py-0.5">
-                      <div className="flex flex-col gap-1.5">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          {hasVideo && (
-                            <span className="flex items-center gap-1 px-2 py-0.5 rounded-[5px] bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/80 dark:text-rose-300 dark:border-rose-800/40 text-[10.5px] font-extrabold uppercase">
-                              <Play size={10} className="fill-rose-600 dark:fill-rose-400" />
-                              <span>videos</span>
-                            </span>
-                          )}
-                          <span className="text-[10.5px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">
-                            Tài liệu chuyên sâu
-                          </span>
-                        </div>
+                    {/* CỤM HÀNH ĐỘNG: Xem thử 3D màu vàng sáng full bề ngang, Chi tiết sách ở DƯỚI */}
+                    <div className="pt-2 flex flex-col gap-1.5 mt-auto">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPreviewBook(book);
+                        }}
+                        className="animate-bubble-float relative w-full h-[36px] sm:h-[38px] rounded-xl bg-gradient-to-r from-[#FEF08A] via-[#FACC15] to-[#EAB308] hover:from-[#FFF59D] hover:to-[#F59E0B] text-[#1E293B] font-bold text-[12px] sm:text-[12.5px] shadow-[0_2px_12px_rgba(250,204,21,0.32)] flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] cursor-pointer border border-[#FDE047]"
+                        title="Xem thử 3D"
+                      >
+                        <BookOpen size={14} strokeWidth={2.2} className="shrink-0 text-[#1E293B]" />
+                        <span className="tracking-wide">Xem thử 3D</span>
+                      </button>
 
-                        <h4 className="text-[16px] sm:text-[17.5px] font-black text-slate-900 dark:text-white leading-snug line-clamp-2 break-normal group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] transition-colors">
-                          {book.title}
-                        </h4>
-                      </div>
-
-                      {/* Khung nút Chi tiết sách riêng biệt */}
-                      <div className="pt-2 mt-auto">
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[9px] bg-slate-100 hover:bg-slate-200/90 dark:bg-white/10 dark:hover:bg-white/15 text-[#1E3A8A] dark:text-[#F8DF7B] text-[12px] font-extrabold border border-slate-200/80 dark:border-white/10 transition-colors">
-                          <FileText size={13} strokeWidth={2.2} />
+                      <div className="flex items-center justify-center">
+                        <span
+                          onClick={() => onSelectBook?.(book)}
+                          className="text-[11.5px] sm:text-[12px] font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white inline-flex items-center gap-0.5 cursor-pointer transition-colors"
+                        >
                           <span>Chi tiết sách</span>
-                          <ChevronRight size={13} strokeWidth={2.5} />
+                          <ChevronRight size={12} strokeWidth={2} />
                         </span>
                       </div>
                     </div>
-                  </div>
-
-                  {/* PHẦN DƯỚI: KHUNG XEM THỬ 3D TO RỘNG, TÁCH HẲN RA BẰNG HÀNG ĐỘC LẬP */}
-                  <div className="pt-2.5 border-t border-slate-100 dark:border-white/10">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setPreviewBook(book);
-                      }}
-                      className="animate-bubble-float relative w-full h-[46px] sm:h-[48px] rounded-[13px] bg-gradient-to-r from-[#1E3A8A] via-[#1D4ED8] to-[#0F2454] hover:from-[#1E40AF] hover:to-[#172554] text-white font-black text-[13.5px] sm:text-[14.5px] tracking-wide shadow-md shadow-blue-950/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer border border-blue-400/30"
-                      title="Mở trình đọc xem thử sách 3D"
-                    >
-                      <BookOpen size={17} strokeWidth={2.8} className="text-amber-300 shrink-0" />
-                      <span>Xem thử 3D (Lật sách tương tác)</span>
-                      <Sparkles size={14} className="text-amber-300 shrink-0" />
-                    </button>
-                  </div>
 
                   {isAdmin && (
                     <div
-                      className="mt-2 pt-1.5 border-t border-dashed border-[#2D5B94]/25 dark:border-purple-500/30 flex items-center justify-between gap-1.5"
+                      className="mt-2 pt-1.5 border-t border-dashed border-[#2D5B94]/25 dark:border-slate-800 flex items-center justify-between gap-1.5"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted">
@@ -569,7 +564,7 @@ export function AuthorBooksSection({
                               type="button"
                               disabled={idx === 0}
                               onClick={() => onMoveBook(idx, 'up')}
-                              className="w-6 h-6 rounded-[6px] bg-slate-100 hover:bg-slate-200 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors shadow-2xs"
+                              className="w-6 h-6 rounded-[6px] bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors shadow-2xs"
                               title="Chuyển sách lên trên"
                             >
                               <ArrowUp size={11} />
@@ -578,7 +573,7 @@ export function AuthorBooksSection({
                               type="button"
                               disabled={idx === books.length - 1}
                               onClick={() => onMoveBook(idx, 'down')}
-                              className="w-6 h-6 rounded-[6px] bg-slate-100 hover:bg-slate-200 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors shadow-2xs"
+                              className="w-6 h-6 rounded-[6px] bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors shadow-2xs"
                               title="Chuyển sách xuống dưới"
                             >
                               <ArrowDown size={11} />
@@ -592,7 +587,7 @@ export function AuthorBooksSection({
                             className={`w-6 h-6 rounded-[6px] flex items-center justify-center cursor-pointer transition-colors shadow-2xs ${
                               isBookHidden
                                 ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200'
-                                : 'bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-purple-950 dark:text-purple-200'
+                                : 'bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-200'
                             }`}
                             title={isBookHidden ? 'Cuốn sách này đang ẨN với khách – Bấm để HIỆN' : 'Cuốn sách này đang HIỆN – Bấm để ẨN TẠM'}
                           >
@@ -628,6 +623,7 @@ export function AuthorBooksSection({
                       </div>
                     </div>
                   )}
+                  </div>
                 </div>
             </ScrollReveal>
           );
@@ -716,8 +712,8 @@ export function AuthorPhilosophySection({
       )}
 
       <ScrollReveal animation="slide-right" delay={40}>
-        <div className="p-4 sm:p-5 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-sm dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] dark:border-white/15 dark:text-white flex flex-col gap-2">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-purple-800/40 pb-2">
+        <div className="p-4 sm:p-5 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-sm dark:bg-gradient-to-br dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0B132B] dark:border-white/15 dark:text-white flex flex-col gap-2">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
             <div className="flex items-center gap-1.5 text-amber-600 dark:text-[#F8DF7B]">
               <Sparkles size={16} strokeWidth={2.5} />
               <h4 className="text-[13.5px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-[#F8DF7B]">
@@ -726,7 +722,7 @@ export function AuthorPhilosophySection({
             </div>
           </div>
 
-          <p className="text-[14px] sm:text-[15px] font-medium text-slate-700 dark:text-purple-100/90 leading-relaxed pt-1 italic">
+          <p className="text-[14px] sm:text-[15px] font-medium text-slate-700 dark:text-slate-200 leading-relaxed pt-1 italic">
             &ldquo;{profile.extra_content || 'Bấm sửa để thêm thông điệp triết lý phụng sự...'}&rdquo;
           </p>
         </div>
@@ -780,8 +776,8 @@ export function AuthorContactSection({
       )}
 
       <ScrollReveal animation="slide-right" delay={40}>
-        <div className="p-4 sm:p-5 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-sm dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] dark:border-white/15 dark:text-white flex flex-col gap-3.5">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-purple-800/40 pb-2.5">
+        <div className="p-4 sm:p-5 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-sm dark:bg-gradient-to-br dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0B132B] dark:border-white/15 dark:text-white flex flex-col gap-3.5">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
             <div className="flex items-center gap-2 min-w-0">
               <div className="w-7 h-7 rounded-[8px] bg-amber-50 text-amber-800 border border-amber-300 dark:bg-[#F8DF7B] dark:text-[#160C2C] dark:border-0 flex items-center justify-center shrink-0 shadow-xs">
                 <PhoneCall size={16} strokeWidth={2.5} />
@@ -790,7 +786,7 @@ export function AuthorContactSection({
                 <h3 className="text-[16px] font-extrabold text-slate-900 dark:text-white leading-tight truncate">
                   Thông tin liên hệ & Kết nối
                 </h3>
-                <span className="text-[12px] text-slate-500 dark:text-purple-300/80 truncate block">
+                <span className="text-[12px] text-slate-500 dark:text-slate-400 truncate block">
                   Kết nối trực tiếp cùng chuyên gia / tác giả
                 </span>
               </div>
@@ -799,7 +795,7 @@ export function AuthorContactSection({
 
           {/* Lời nhắn kết nối */}
           {profile.contact_note && (
-            <p className="text-[14px] text-slate-600 dark:text-purple-200/90 leading-relaxed font-normal">
+            <p className="text-[14px] text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
               {profile.contact_note}
             </p>
           )}
@@ -809,7 +805,7 @@ export function AuthorContactSection({
             {profile.phone && (
               <a
                 href={`tel:${profile.phone.replace(/[^0-9+]/g, '')}`}
-                className="group relative flex items-center justify-between p-3 px-3.5 rounded-[14px] bg-gradient-to-r from-amber-50/70 via-slate-50 to-amber-50/50 border border-amber-200/80 text-slate-900 shadow-xs hover:border-amber-400 dark:bg-gradient-to-r dark:from-[#3B1F7A] dark:via-[#2A1359] dark:to-[#160833] dark:text-white dark:border-amber-300/60 overflow-hidden gap-2 cursor-pointer transition-all active:scale-[0.98]"
+                className="group relative flex items-center justify-between p-3 px-3.5 rounded-[14px] bg-gradient-to-r from-amber-50/70 via-slate-50 to-amber-50/50 border border-amber-200/80 text-slate-900 shadow-xs hover:border-amber-400 dark:bg-slate-800 dark:text-white dark:border-slate-700 overflow-hidden gap-2 cursor-pointer transition-all active:scale-[0.98]"
               >
                 {/* Tia sáng viền trên */}
                 <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-amber-400/50 dark:via-amber-300/60 to-transparent" />

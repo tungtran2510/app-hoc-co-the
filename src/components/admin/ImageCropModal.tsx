@@ -311,23 +311,23 @@ export default function ImageCropModal({
   return (
     <div className="fixed inset-0 z-[150] bg-black/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 animate-in fade-in duration-200">
       <div
-        className="w-full max-w-xl bg-[#160D2D] rounded-[24px] border border-purple-500/30 shadow-2xl overflow-hidden flex flex-col max-h-[96vh] my-auto text-white"
+        className="w-full max-w-xl bg-[#0B132B] rounded-[24px] border border-slate-700/60 shadow-2xl overflow-hidden flex flex-col max-h-[96vh] my-auto text-white"
         onClick={(e) => e.stopPropagation()}
       >
         {/* HEADER MODAL */}
-        <div className="px-4 py-3 sm:px-5 sm:py-3.5 border-b border-purple-500/20 bg-gradient-to-r from-[#211142] via-[#1A0E35] to-[#160D2D] flex items-center justify-between shrink-0">
+        <div className="px-4 py-3 sm:px-5 sm:py-3.5 border-b border-slate-800 bg-gradient-to-r from-[#0F172A] via-[#1E293B] to-[#0B132B] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-[10px] bg-purple-900 text-amber-300 flex items-center justify-center shadow-xs shrink-0">
+            <div className="w-8 h-8 rounded-[10px] bg-slate-800 text-amber-300 flex items-center justify-center shadow-xs shrink-0 border border-slate-700">
               <Crop size={17} strokeWidth={2.5} />
             </div>
             <div className="min-w-0">
-              <h3 className="text-[15.5px] font-black text-white leading-tight truncate">
+              <h3 className="text-[15.5px] font-bold text-white leading-tight truncate">
                 {title}
               </h3>
-              <p className="text-[11.5px] text-purple-200/70 truncate flex items-center gap-1.5">
+              <p className="text-[11.5px] text-slate-400 truncate flex items-center gap-1.5">
                 <span>Kéo trượt phóng to, di chuyển tâm ảnh & chọn tỷ lệ</span>
                 {detectedRatio && (
-                  <span className="px-1.5 py-0.2 rounded bg-amber-400/20 text-[#F8DF7B] text-[10px] font-extrabold border border-amber-400/30">
+                  <span className="px-1.5 py-0.2 rounded bg-amber-400/20 text-amber-300 text-[10px] font-bold border border-amber-400/30">
                     Gốc: {detectedRatio.label} ({detectedRatio.width}×{detectedRatio.height}px)
                   </span>
                 )}
@@ -337,7 +337,7 @@ export default function ImageCropModal({
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-purple-950 hover:bg-purple-900 text-purple-300 flex items-center justify-center transition-colors cursor-pointer shrink-0 ml-2"
+            className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition-colors cursor-pointer shrink-0 ml-2"
           >
             <X size={18} />
           </button>
@@ -354,7 +354,7 @@ export default function ImageCropModal({
         {/* VÙNG KHÔNG GIAN CẮT ẢNH TƯƠNG TÁC (CROP VIEWPORT) */}
         <div
           ref={containerRef}
-          className="relative w-full h-[320px] sm:h-[360px] bg-[#0E061D] overflow-hidden flex items-center justify-center select-none cursor-grab active:cursor-grabbing touch-none"
+          className="relative w-full h-[320px] sm:h-[360px] bg-[#030712] overflow-hidden flex items-center justify-center select-none cursor-grab active:cursor-grabbing touch-none"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
@@ -433,13 +433,13 @@ export default function ImageCropModal({
         </div>
 
         {/* BẢNG ĐIỀU KHIỂN: NÚT KÉO TRƯỢT PHÓNG TO, XOAY, VÀ CHỌN TỶ LỆ */}
-        <div className="p-3.5 sm:p-4 bg-[#180E33] border-t border-purple-500/20 space-y-3 shrink-0">
+        <div className="p-3.5 sm:p-4 bg-[#0F172A] border-t border-slate-800 space-y-3 shrink-0">
           {/* HÀNG 1: THANH KÉO TRƯỢT (SLIDER) PHÓNG TO / THU NHỎ */}
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => handleZoomChange(scale - 0.15)}
-              className="w-8 h-8 rounded-[8px] bg-purple-900/60 hover:bg-purple-800 text-purple-200 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+              className="w-8 h-8 rounded-[8px] bg-slate-800 hover:bg-slate-700 text-slate-200 flex items-center justify-center transition-colors cursor-pointer shrink-0 border border-slate-700"
               title="Thu nhỏ"
             >
               <ZoomOut size={15} />
@@ -453,9 +453,9 @@ export default function ImageCropModal({
                 step="0.02"
                 value={scale}
                 onChange={(e) => handleZoomChange(parseFloat(e.target.value))}
-                className="w-full h-2 bg-purple-950 rounded-lg appearance-none cursor-pointer accent-amber-400 focus:outline-hidden"
+                className="w-full h-2 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-amber-400 focus:outline-hidden"
               />
-              <span className="w-12 text-right text-[12px] font-black text-amber-300 font-mono shrink-0">
+              <span className="w-12 text-right text-[12px] font-bold text-amber-300 font-mono shrink-0">
                 {Math.round(scale * 100)}%
               </span>
             </div>
@@ -463,7 +463,7 @@ export default function ImageCropModal({
             <button
               type="button"
               onClick={() => handleZoomChange(scale + 0.15)}
-              className="w-8 h-8 rounded-[8px] bg-purple-900/60 hover:bg-purple-800 text-purple-200 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+              className="w-8 h-8 rounded-[8px] bg-slate-800 hover:bg-slate-700 text-slate-200 flex items-center justify-center transition-colors cursor-pointer shrink-0 border border-slate-700"
               title="Phóng to"
             >
               <ZoomIn size={15} />
@@ -473,7 +473,7 @@ export default function ImageCropModal({
             <button
               type="button"
               onClick={handleRotate}
-              className="h-8 px-2.5 rounded-[8px] bg-purple-900/60 hover:bg-purple-800 text-purple-200 text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer shrink-0 ml-1"
+              className="h-8 px-2.5 rounded-[8px] bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer shrink-0 ml-1 border border-slate-700"
               title="Xoay 90 độ"
             >
               <RotateCw size={13} />
@@ -484,7 +484,7 @@ export default function ImageCropModal({
             <button
               type="button"
               onClick={handleReset}
-              className="h-8 px-2.5 rounded-[8px] bg-purple-950 hover:bg-purple-900 text-purple-300 text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer shrink-0"
+              className="h-8 px-2.5 rounded-[8px] bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer shrink-0 border border-slate-700"
               title="Đặt lại vị trí ban đầu"
             >
               <RefreshCw size={12} />
@@ -494,7 +494,7 @@ export default function ImageCropModal({
 
           {/* HÀNG 2: BỘ CHỌN NHANH TỶ LỆ KHUNG HÌNH (ASPECT RATIO PRESETS) */}
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-[11px] text-purple-300/80 font-bold">
+            <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold">
               <span>Chọn tỷ lệ khung hình căn chỉnh:</span>
               <span className="text-[10px] text-amber-300/80 italic">Chạm vào ảnh để kéo di chuyển</span>
             </div>
@@ -518,12 +518,12 @@ export default function ImageCropModal({
                     }}
                     className={`py-1.5 px-1 rounded-[10px] border flex flex-col items-center justify-center transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-amber-400 text-slate-950 font-black border-amber-300 shadow-md shadow-amber-400/20'
-                        : 'bg-purple-950/70 hover:bg-purple-900 text-purple-200 border-purple-500/30'
+                        ? 'bg-amber-400 text-slate-950 font-bold border-amber-300 shadow-md shadow-amber-400/20'
+                        : 'bg-slate-800/80 hover:bg-slate-700 text-slate-200 border-slate-700'
                     }`}
                   >
                     <span className="text-[11.5px] leading-tight">{opt.label}</span>
-                    <span className={`text-[9px] leading-tight truncate w-full text-center ${isSelected ? 'text-slate-900' : 'text-purple-300/60'}`}>
+                    <span className={`text-[9px] leading-tight truncate w-full text-center ${isSelected ? 'text-slate-900' : 'text-slate-400'}`}>
                       {opt.desc}
                     </span>
                   </button>
@@ -534,12 +534,12 @@ export default function ImageCropModal({
         </div>
 
         {/* FOOTER ACTIONS */}
-        <div className="px-4 py-3 sm:px-5 sm:py-3.5 border-t border-purple-500/20 bg-[#140B28] flex items-center justify-between gap-3 shrink-0">
+        <div className="px-4 py-3 sm:px-5 sm:py-3.5 border-t border-slate-800 bg-[#0B132B] flex items-center justify-between gap-3 shrink-0">
           <button
             type="button"
             onClick={onClose}
             disabled={isProcessing}
-            className="h-9 px-4 rounded-[10px] bg-purple-950 hover:bg-purple-900 text-purple-200 text-[12.5px] font-bold transition-colors cursor-pointer disabled:opacity-50"
+            className="h-9 px-4 rounded-[10px] bg-slate-800 hover:bg-slate-700 text-slate-200 text-[12.5px] font-semibold transition-colors cursor-pointer disabled:opacity-50 border border-slate-700"
           >
             Hủy bỏ
           </button>
@@ -548,7 +548,7 @@ export default function ImageCropModal({
             type="button"
             onClick={handleCropAndSave}
             disabled={isProcessing || !imageLoaded}
-            className="h-9.5 px-5 rounded-[10px] bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-[13px] flex items-center gap-2 shadow-md shadow-amber-500/20 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+            className="h-9.5 px-5 rounded-[10px] bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold text-[13px] flex items-center gap-2 shadow-md shadow-amber-500/20 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
           >
             {isProcessing ? (
               <>

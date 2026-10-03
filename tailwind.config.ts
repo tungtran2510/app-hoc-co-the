@@ -32,9 +32,11 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["var(--font-be-vietnam-pro)", "-apple-system", "BlinkMacSystemFont", "'Segoe UI'", "Roboto", "sans-serif"],
+        sans: ["var(--font-be-vietnam-pro)", "var(--font-inter)", "-apple-system", "BlinkMacSystemFont", "'Segoe UI'", "Roboto", "sans-serif"],
+        inter: ["var(--font-inter)", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+        vietnam: ["var(--font-be-vietnam-pro)", "sans-serif"],
         heading: ["var(--font-be-vietnam-pro)", "-apple-system", "BlinkMacSystemFont", "'Segoe UI'", "Roboto", "sans-serif"],
-        serif: ["var(--font-lora)", "Georgia", "Cambria", "'Times New Roman'", "Times", "serif"],
+        serif: ["var(--font-be-vietnam-pro)", "var(--font-lora)", "Georgia", "serif"],
       },
     },
   },

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Be_Vietnam_Pro, Lora } from 'next/font/google';
+import { Be_Vietnam_Pro, Lora, Inter } from 'next/font/google';
 import './globals.css';
 import PwaRegistrar from '../components/PwaRegistrar';
 
@@ -14,6 +14,13 @@ const lora = Lora({
   weight: ['400', '500', '600', '700'],
   subsets: ['vietnamese', 'latin'],
   variable: '--font-lora',
+  display: 'swap',
+});
+
+const inter = Inter({
+  weight: ['400', '500', '600', '700'],
+  subsets: ['vietnamese', 'latin'],
+  variable: '--font-inter',
   display: 'swap',
 });
 
@@ -50,7 +57,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi" className={`${beVietnamPro.variable} ${lora.variable} ${beVietnamPro.className}`}>
+    <html lang="vi" className={`${beVietnamPro.variable} ${lora.variable} ${inter.variable} ${beVietnamPro.className}`}>
       <head>
         <meta name="referrer" content="strict-origin-when-cross-origin" />
         <meta name="theme-color" id="app-theme-color" content="#FFFFFF" />

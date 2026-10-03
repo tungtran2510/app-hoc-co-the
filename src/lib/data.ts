@@ -87,6 +87,7 @@ export const DEFAULT_HOME_SECTIONS_ORDER = [
   'author_books',
   'author_philosophy',
   'recommended_books',
+  'flat_books',
   'author_contact',
 ];
 
@@ -125,6 +126,16 @@ export function normalizeHomeSectionsOrder(raw?: any): string[] {
       unique.splice(topicsIdx + 1, 0, 'recent_activity');
     } else {
       unique.push('recent_activity');
+    }
+  }
+
+  // Tự động bổ sung flat_books ngay sau recommended_books nếu dữ liệu cũ chưa có
+  if (!unique.includes('flat_books')) {
+    const recIdx = unique.indexOf('recommended_books');
+    if (recIdx !== -1) {
+      unique.splice(recIdx + 1, 0, 'flat_books');
+    } else {
+      unique.push('flat_books');
     }
   }
 

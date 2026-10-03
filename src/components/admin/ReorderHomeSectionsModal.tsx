@@ -76,6 +76,12 @@ const SECTION_DEFS: Record<string, SectionMeta> = {
     desc: 'Bộ sưu tập các tài liệu y khoa khuyên đọc chuyên sâu về cơ thể',
     icon: BookOpen,
   },
+  flat_books: {
+    key: 'flat_books',
+    name: 'Tủ Sách Tối Giản (Phong cách phẳng)',
+    desc: 'Hiển thị sách phong cách phẳng tối giản (hàng ngang & lưới 2 cột)',
+    icon: BookOpen,
+  },
 };
 
 interface ReorderHomeSectionsModalProps {
