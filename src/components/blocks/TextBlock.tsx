@@ -16,6 +16,7 @@ import { Image as ImageType, FileItem, Video } from '../../lib/types';
 import { FontSizeOption } from '../PageHeaderBar';
 import Lightbox from '../Lightbox';
 import YouTubeEmbed from '../YouTubeEmbed';
+import sanitizeLib from 'sanitize-html';
 
 interface TextBlockProps {
   displayStyle: string;
@@ -59,11 +60,55 @@ function renderFormattedLine(text: string) {
   });
 }
 
+const SAFE_TAGS = [
+  'h1','h2','h3','h4','h5','h6','p','br','hr','blockquote','pre','code','ul','ol','li',
+  'b','i','u','s','strong','em','mark','small','sub','sup','a','img','span','div',
+  'table','thead','tbody','tr','td','th','figure','figcaption','section','video','source',
+];
+
 export function sanitizeHtml(raw: string): string {
   if (!raw) return '';
-  return raw
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/\bon\w+\s*=\s*["'][^"']*["']/gi, '');
+  return sanitizeLib(raw, {
+    allowedTags: SAFE_TAGS,
+    allowedAttributes: {
+      '*': ['style', 'class', 'title'],
+      a: ['href', 'target', 'rel'],
+      img: ['src', 'alt', 'width', 'height', 'loading'],
+      video: ['src', 'controls', 'poster', 'width', 'height'],
+      source: ['src', 'type'],
+      td: ['colspan', 'rowspan'],
+      th: ['colspan', 'rowspan'],
+    },
+    allowedSchemes: ['http', 'https', 'mailto', 'tel'],
+    allowedSchemesByTag: { img: ['http', 'https', 'data'] },
+    allowProtocolRelative: false,
+    transformTags: {
+      a: (tagName: string, attribs: Record<string, string>) => ({
+        tagName,
+        attribs: { ...attribs, rel: 'noopener noreferrer nofollow' },
+      }),
+    },
+    allowedStyles: {
+      '*': {
+        color: [/^[#\w(),.\s%-]+$/],
+        'background-color': [/^[#\w(),.\s%-]+$/],
+        'text-align': [/^(left|right|center|justify)$/],
+        'font-size': [/^[\d.]+(px|em|rem|%)$/],
+        'font-weight': [/^[\w]+$/],
+        'font-style': [/^[\w]+$/],
+        'line-height': [/^[\d.]+(px|em|rem|%)?$/],
+        'text-decoration': [/^[\w\s-]+$/],
+        margin: [/^[\d.\sa-z%-]+$/],
+        padding: [/^[\d.\sa-z%-]+$/],
+        border: [/^[#\w(),.\s%-]+$/],
+        'border-radius': [/^[\d.\sa-z%-]+$/],
+        width: [/^[\d.]+(px|em|rem|%|vw)$/],
+        'max-width': [/^[\d.]+(px|em|rem|%|vw)$/],
+        height: [/^[\d.]+(px|em|rem|%|vh)$/],
+        display: [/^(block|inline|inline-block|flex|grid|none)$/],
+      },
+    },
+  });
 }
 
 export default function TextBlock({

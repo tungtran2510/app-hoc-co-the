@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { rateLimit, getClientIp } from '../../../../lib/authServer';
 import { getSettings } from '../../../../lib/data';
 import { sampleTopics, samplePages } from '../../../../data/sample';
 import { getSupabaseClient } from '../../../../lib/supabaseClient';
@@ -419,6 +420,9 @@ function fastFallbackSearch(query: string, catalog: LessonCatalogItem[]) {
 }
 
 export async function POST(req: NextRequest) {
+  if (!rateLimit('ai:' + getClientIp(req), 20, 10 * 60 * 1000)) {
+    return NextResponse.json({ error: 'Bạn hỏi quá nhanh, vui lòng thử lại sau ít phút.' }, { status: 429 });
+  }
   try {
     const body = await req.json();
     const question = (body.question || '').trim();

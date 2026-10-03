@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { checkIsAdminRequest } from '../../../../lib/authServer';
 import { getSupabaseServer } from '../../../../lib/supabaseServer';
@@ -29,6 +30,12 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const { data: tp } = await supabase.from('pages').select('id').eq('topic_id', targetId);
+    const pids = (tp || []).map((p: any) => p.id);
+    if (pids.length) {
+      await supabase.from('blocks').delete().in('page_id', pids);
+      await supabase.from('pages').delete().in('id', pids);
+    }
     const { error } = await supabase.from('topics').delete().eq('id', targetId);
     if (error) {
       return NextResponse.json({ error: error.message || 'Chưa lưu được – chưa kết nối dữ liệu' }, { status: 500 });
@@ -37,6 +44,7 @@ export async function POST(req: NextRequest) {
     try {
       const { clearDataCache } = await import('../../../../lib/data');
       clearDataCache();
+      revalidatePath('/', 'layout');
     } catch {
       // Bỏ qua
     }
