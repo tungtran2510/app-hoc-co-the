@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getTopics, getPagesByTopic, getBlocksByPage, getSettings } from '../../../../lib/data';
+import { getSettings } from '../../../../lib/data';
+import { sampleTopics, samplePages } from '../../../../data/sample';
+import { getSupabaseClient } from '../../../../lib/supabaseClient';
+import { searchFastKnowledge } from '../../../../lib/knowledge';
 
 export const dynamic = 'force-dynamic';
-
-import { searchFastKnowledge } from '../../../../lib/knowledge';
 
 interface LessonCatalogItem {
   topic_title: string;
@@ -14,64 +15,279 @@ interface LessonCatalogItem {
   content: string;
 }
 
-async function buildLessonCatalog(): Promise<LessonCatalogItem[]> {
-  try {
-    const topics = await getTopics(false);
-    const catalog: LessonCatalogItem[] = [];
-
-    for (const topic of topics) {
-      const pages = await getPagesByTopic(topic.id, false);
-      for (const page of pages) {
-        let contentText = '';
-        try {
-          const blocks = await getBlocksByPage(page.id, false);
-          const lines: string[] = [];
-          for (const b of blocks) {
-            if (b.type === 'text' && b.data?.lines) {
-              lines.push(...b.data.lines);
-            } else if (b.type === 'comparison') {
-              if (b.data?.left_lines) lines.push(...b.data.left_lines);
-              if (b.data?.right_lines) lines.push(...b.data.right_lines);
-            }
-          }
-          contentText = lines.join(' ').slice(0, 500);
-        } catch {
-          // ignore
-        }
-
-        catalog.push({
-          topic_title: topic.title,
-          topic_slug: topic.slug,
-          page_title: page.title,
-          page_slug: page.slug,
-          summary: page.summary || '',
-          content: contentText,
-        });
-      }
-    }
-    return catalog;
-  } catch {
-    return [];
-  }
-}
-
 let cachedCatalog: LessonCatalogItem[] | null = null;
 let cachedCatalogExpiry = 0;
 
+// Chuẩn hóa văn bản tiếng Việt để tìm kiếm từ khóa chính xác tuyệt đối
+function normalizeText(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[đĐ]/g, 'd')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// BỘ CÂU HỎI & TRẢ LỜI CHUẨN XÁC, NGẮN GỌN, ĐÚNG TRỌNG TÂM (PHẢN HỒI TỨC THÌ < 5ms)
+const CURATED_QA = [
+  {
+    keywords: [
+      'tu the sinh hoat dung can chu y gi',
+      'tu the sinh hoat dung',
+      'tu the dung can chu y gi',
+      'tu the dung',
+      'tu the ngoi',
+      'tu the ngu',
+      'tu the cuoi',
+      'tu the be do',
+      'tu the vac do',
+      'tu the sinh hoat',
+      'chu y tu the',
+    ],
+    answer:
+`Để bảo vệ cột sống và đĩa đệm, bạn cần chú ý các tư thế sinh hoạt cốt lõi sau:
+
+• Khi ngồi làm việc: Giữ lưng thẳng, vai thả lỏng, màn hình ngang tầm mắt; hai chân đặt phẳng trên sàn, không ngồi bắt chéo chân hoặc gù lưng.
+• Khi cúi nhấc vật nặng: Luôn gập gối, hạ thấp hông, giữ lưng thẳng và dùng lực cơ đùi để nâng lên (tuyệt đối không cúi gập cong lưng).
+• Khi đứng và đi lại: Giữ trục thẳng tự nhiên, phân bổ đều trọng lượng lên hai chân, tránh dồn lực lệch một bên.
+• Khi nằm ngủ: Dùng gối có độ cao vừa tầm nâng đỡ hõm gáy; nằm nghiêng nên kẹp gối mỏng giữa hai chân, nằm ngửa kê nhẹ dưới khoeo chân.
+• Nhịp nghỉ ngơi: Cứ sau 45 - 60 phút, hãy đứng dậy vươn vai và đi lại nhẹ nhàng 1 - 2 phút để giải nén đĩa đệm.`,
+    suggested_pages: [
+      {
+        title: 'Tư thế chuẩn & Vận động giải áp',
+        topic_title: 'Cột Sống & Đĩa Đệm',
+        topic_slug: 'cot-song',
+        page_slug: 'tu-the-va-van-dong',
+        reason: 'Hướng dẫn chi tiết tư thế công thái học và bài tập giải nén.',
+      },
+      {
+        title: 'Đĩa đệm và cơ chế giảm xóc',
+        topic_title: 'Cột Sống & Đĩa Đệm',
+        topic_slug: 'cot-song',
+        page_slug: 'dia-dem',
+        reason: 'Hiểu cơ chế thẩm thấu dinh dưỡng và giảm tải áp lực đĩa đệm.',
+      },
+    ],
+    follow_up_questions: [
+      'Cách nâng vật nặng đúng để không đau lưng?',
+      'Nên chọn gối ngủ thế nào để bảo vệ đốt sống cổ?',
+    ],
+  },
+  {
+    keywords: [
+      'cach phan biet dau moi thong thuong',
+      'phan biet dau moi thong thuong',
+      'phan biet dau moi',
+      'dau moi thong thuong',
+      'dau co hay thoat vi',
+      'dau lung thong thuong',
+    ],
+    answer:
+`Bạn có thể phân biệt cơn đau qua các đặc điểm thực tế sau:
+
+• Đau mỏi cơ thông thường: Do căng cơ khi ngồi lâu hoặc làm việc nặng. Đau âm ỉ khu trú tại vùng cơ lưng/cổ, giảm nhanh khi nghỉ ngơi, xoa bóp và không lan xuống tay chân.
+• Tổn thương đĩa đệm hoặc chèn ép: Đau buốt nhói, đau tăng rõ rệt khi cúi gập hoặc ho/hắt hơi; kèm cảm giác tê bì, châm chích hoặc yếu cơ lan dọc theo cánh tay hoặc cẳng chân.
+• Cần đi khám y tế ngay: Nếu xuất hiện cảm giác tê yếu chi lan nhanh, bàn chân khó nhấc hoặc rối loạn đại tiểu tiện.`,
+    suggested_pages: [
+      {
+        title: 'Các vấn đề thường gặp và cách phòng tránh',
+        topic_title: 'Cột Sống & Đĩa Đệm',
+        topic_slug: 'cot-song',
+        page_slug: 'cac-van-de-thuong-gap',
+        reason: 'Nhận diện các hội chứng đau cơ xương khớp và biện pháp phòng ngừa.',
+      },
+      {
+        title: 'Thần kinh và tủy sống',
+        topic_title: 'Cột Sống & Đĩa Đệm',
+        topic_slug: 'cot-song',
+        page_slug: 'than-kinh',
+        reason: 'Tìm hiểu đường dẫn truyền thần kinh và cơ chế chèn ép rễ.',
+      },
+    ],
+    follow_up_questions: [
+      'Tư thế sinh hoạt đúng cần chú ý gì?',
+      'Bài tập kéo giãn giải áp cột sống hàng ngày?',
+    ],
+  },
+  {
+    keywords: [
+      'uong nuoc dung cach',
+      'cach uong nuoc',
+      'nguyen tac uong nuoc',
+      'uong nuoc the nao',
+      'uong bao nhieu nuoc',
+    ],
+    answer:
+`Uống nước đúng cách giúp nuôi dưỡng tế bào và duy trì độ đàn hồi cho đĩa đệm:
+
+• Uống từng ngụm nhỏ: Ngồi uống thong thả để nước kịp thẩm thấu vào tế bào, tránh uống ừng ực lượng lớn khi đang đứng.
+• Thời điểm vàng: 1 ly nước ấm ngay khi thức dậy để kích hoạt tuần hoàn, 1 ly trước bữa ăn 30 phút, và uống rải rác đều trong ngày.
+• Lượng nước chuẩn: Khoảng 0.04 lít trên mỗi kg cân nặng (ví dụ: người 50kg cần khoảng 2 lít nước/ngày), tăng nhẹ khi vận động nhiều mồ hôi.
+• Chọn nguồn nước: Ưu tiên nước sạch, giàu khoáng và có tính kiềm tự nhiên để trung hòa axit dư thừa.`,
+    suggested_pages: [
+      {
+        title: 'Nguyên tắc uống nước',
+        topic_title: 'Nước',
+        topic_slug: 'nuoc',
+        page_slug: 'nguyen-tac-uong-nuoc',
+        reason: 'Quy tắc 4 đúng khi uống nước cho tế bào.',
+      },
+      {
+        title: 'Vai trò của nước',
+        topic_title: 'Nước',
+        topic_slug: 'nuoc',
+        page_slug: 'vai-tro-cua-nuoc',
+        reason: 'Dung môi sinh hóa và cơ chế thẩm thấu nuôi đĩa đệm.',
+      },
+    ],
+    follow_up_questions: [
+      'Dấu hiệu nhận biết cơ thể đang thiếu nước?',
+      'Nước kiềm và khoáng chất có lợi gì cho xương khớp?',
+    ],
+  },
+  {
+    keywords: [
+      'dinh duong cho khop',
+      'dinh duong cot song',
+      'an gi tot cho xuong khop',
+      'dinh duong khang viem',
+      'an gi do dau lung',
+    ],
+    answer:
+`Dinh dưỡng khoa học giúp giảm viêm âm thầm và nuôi dưỡng sụn khớp từ gốc:
+
+• Thực phẩm kháng viêm: Tăng cường cá béo (cá hồi, cá thu giàu Omega-3), dầu ô liu, quả mọng, nghệ, gừng và các loại rau lá xanh đậm.
+• Dưỡng chất xây dựng mô: Bổ sung đủ đạm chất lượng cao, vitamin C, kẽm, canxi và vitamin D3/K2 để tái tạo mô liên kết và xương.
+• Cần cắt giảm: Hạn chế đường tinh luyện, đồ ngọt, thực phẩm siêu chế biến, dầu chiên đi chiên lại và nước ngọt có gas.`,
+    suggested_pages: [
+      {
+        title: 'Dinh dưỡng kháng viêm',
+        topic_title: 'Dinh Dưỡng',
+        topic_slug: 'dinh-duong',
+        page_slug: 'dinh-duong-khang-viem',
+        reason: 'Thực đơn và nhóm chất giúp kiểm soát phản ứng viêm khớp.',
+      },
+      {
+        title: 'Chất đạm (Protein)',
+        topic_title: 'Dinh Dưỡng',
+        topic_slug: 'dinh-duong',
+        page_slug: 'chat-dam-protein',
+        reason: 'Nguyên liệu cấu tạo cơ bắp và hệ thống dây chằng.',
+      },
+    ],
+    follow_up_questions: [
+      'Uống nước đúng cách như thế nào?',
+      'Tư thế sinh hoạt đúng cần chú ý gì?',
+    ],
+  },
+  {
+    keywords: [
+      'tong quan ve cot song',
+      'cau tao cot song',
+      'vai tro cot song',
+      'cot song va dia dem',
+    ],
+    answer:
+`Cột sống là trục nâng đỡ và bảo vệ hệ thần kinh trung ương của cơ thể:
+
+• Cấu tạo tổng thể: Gồm 33-34 đốt sống xếp chồng lên nhau, tạo thành 4 đường cong sinh lý tự nhiên (cổ, ngực, thắt lưng, cùng cụt) giúp phân tán lực khi vận động.
+• Đĩa đệm giảm xóc: Nằm giữa các đốt sống, đóng vai trò như đệm sinh học giảm chấn động và giúp cơ thể cúi, ngửa, xoay chuyển linh hoạt.
+• Cơ chế nuôi dưỡng: Đĩa đệm nhận dinh dưỡng qua cơ chế thẩm thấu khi vận động đúng trục sinh học tự nhiên.`,
+    suggested_pages: [
+      {
+        title: 'Tổng quan về cột sống',
+        topic_title: 'Cột Sống & Đĩa Đệm',
+        topic_slug: 'cot-song',
+        page_slug: 'tong-quan-ve-cot-song',
+        reason: 'Cấu trúc giải phẫu và 4 đường cong sinh lý.',
+      },
+      {
+        title: 'Đĩa đệm',
+        topic_title: 'Cột Sống & Đĩa Đệm',
+        topic_slug: 'cot-song',
+        page_slug: 'dia-dem',
+        reason: 'Cấu tạo nhân nhầy và cơ chế hấp thụ xung lực.',
+      },
+    ],
+    follow_up_questions: [
+      'Tư thế sinh hoạt đúng cần chú ý gì?',
+      'Cách phân biệt đau mỏi thông thường?',
+    ],
+  },
+];
+
+function findCuratedMatch(query: string) {
+  const norm = normalizeText(query);
+  for (const item of CURATED_QA) {
+    for (const kw of item.keywords) {
+      const normKw = normalizeText(kw);
+      if (norm === normKw || norm.includes(normKw)) {
+        return item;
+      }
+    }
+  }
+  return null;
+}
+
+// Xây dựng danh mục bài học siêu tốc (chỉ 2 query song song hoặc fallback 0ms tới sample data)
 async function getOrBuildLessonCatalog(): Promise<LessonCatalogItem[]> {
   if (cachedCatalog && cachedCatalog.length > 0 && cachedCatalogExpiry > Date.now()) {
     return cachedCatalog;
   }
-  const catalog = await buildLessonCatalog();
-  if (catalog.length > 0) {
-    cachedCatalog = catalog;
-    cachedCatalogExpiry = Date.now() + 15 * 60 * 1000; // Lưu cache trong bộ nhớ 15 phút
+
+  try {
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      const [{ data: topics }, { data: pages }] = await Promise.all([
+        supabase.from('topics').select('id, title, slug').order('sort_order'),
+        supabase.from('pages').select('id, title, slug, summary, topic_id').order('sort_order'),
+      ]);
+
+      if (topics && pages && pages.length > 0) {
+        const topicMap = new Map(topics.map((t) => [t.id, t]));
+        const catalog: LessonCatalogItem[] = pages.map((p) => {
+          const t = topicMap.get(p.topic_id);
+          return {
+            topic_title: t?.title || 'Cột Sống',
+            topic_slug: t?.slug || 'cot-song',
+            page_title: p.title,
+            page_slug: p.slug,
+            summary: p.summary || '',
+            content: p.summary || '',
+          };
+        });
+
+        cachedCatalog = catalog;
+        cachedCatalogExpiry = Date.now() + 60 * 60 * 1000; // Cache 1 giờ
+        return catalog;
+      }
+    }
+  } catch (err) {
+    console.warn('[AI Catalog] Fallback to bundled sample data:', err);
   }
+
+  const topicMap = new Map(sampleTopics.map((t) => [t.id, t]));
+  const catalog: LessonCatalogItem[] = samplePages.map((p) => {
+    const t = topicMap.get(p.topic_id);
+    return {
+      topic_title: t?.title || 'Cột Sống',
+      topic_slug: t?.slug || 'cot-song',
+      page_title: p.title,
+      page_slug: p.slug,
+      summary: p.summary || '',
+      content: p.summary || '',
+    };
+  });
+
+  cachedCatalog = catalog;
+  cachedCatalogExpiry = Date.now() + 60 * 60 * 1000;
   return catalog;
 }
 
-// Fallback thông minh dựa trên tri thức chuyên sâu từ 20 file Markdown của tác giả
-function fallbackSearch(query: string, catalog: LessonCatalogItem[]) {
+// Fallback siêu tốc khi không có API key hoặc lỗi mạng (gọn gàng, đúng trọng tâm, không dông dài)
+function fastFallbackSearch(query: string, catalog: LessonCatalogItem[]) {
   const lower = query.toLowerCase();
   const matchedDocs = searchFastKnowledge(query, 2);
 
@@ -79,8 +295,7 @@ function fallbackSearch(query: string, catalog: LessonCatalogItem[]) {
     return (
       item.page_title.toLowerCase().includes(lower) ||
       item.topic_title.toLowerCase().includes(lower) ||
-      item.summary.toLowerCase().includes(lower) ||
-      item.content.toLowerCase().includes(lower)
+      item.summary.toLowerCase().includes(lower)
     );
   });
 
@@ -88,32 +303,39 @@ function fallbackSearch(query: string, catalog: LessonCatalogItem[]) {
 
   if (matchedDocs.length > 0) {
     const doc = matchedDocs[0];
-    const docExcerpt = doc.excerpt.replace(/\n+/g, ' ').slice(0, 280);
+    const excerptLines = doc.excerpt
+      .split('\n')
+      .map((l) => l.trim())
+      .filter((l) => l.length > 10 && !l.startsWith('#'))
+      .slice(0, 3);
 
-    const answer = `Theo tài liệu "${doc.fileTitle}" của tác giả Tùng Dinh Dưỡng, vấn đề này cần được tiếp cận toàn diện theo 3 trụ cột phục hồi tự nhiên:\n\n` +
-      `1. **Cơ chế & Giải áp:** ${docExcerpt}...\n` +
-      `2. **Vận động sinh cơ học:** Giữ vững đường cong sinh lý tự nhiên, gia cố hệ cơ lõi và tránh áp lực đè nén đột ngột.\n` +
-      `3. **Dinh dưỡng tế bào:** Cung cấp đủ nước và dưỡng chất để nuôi dưỡng cấu trúc cơ thể qua cơ chế thẩm thấu tự nhiên.\n\n` +
-      `*Lưu ý: Nếu có triệu chứng đau lan chi hoặc tê yếu, cần thăm khám y tế chuyên khoa. Mời bạn mở bài học chi tiết dưới đây:*`;
+    const bulletText = excerptLines.length > 0
+      ? excerptLines.map((l) => `• ${l.replace(/^[-*•\d.]+\s*/, '')}`).join('\n')
+      : `• ${doc.excerpt.slice(0, 150)}...`;
 
     return {
-      answer,
+      answer: `Theo tài liệu hướng dẫn của tác giả Tùng dinh dưỡng:\n\n${bulletText}\n\nMời bạn mở bài học bên dưới để xem hình ảnh và video giải phẫu trực quan.`,
       suggested_pages: selected.map((s) => ({
         title: s.page_title,
         topic_title: s.topic_title,
         topic_slug: s.topic_slug,
         page_slug: s.page_slug,
-        reason: `Hướng dẫn chuyên sâu theo tài liệu "${doc.fileTitle}".`,
+        reason: `Hướng dẫn chuyên sâu theo bài học ${s.page_title}.`,
       })),
       follow_up_questions: [
-        'Tư thế sinh hoạt đúng cần chú ý những gì?',
-        'Lộ trình chăm sóc và phục hồi tự nhiên như thế nào?',
+        'Tư thế sinh hoạt đúng cần chú ý gì?',
+        'Cách phân biệt đau mỏi thông thường?',
       ],
     };
   }
 
   return {
-    answer: `Theo tài liệu hướng dẫn của tác giả Tùng Dinh Dưỡng, sức khỏe cơ thể và hệ cơ xương khớp bắt đầu từ việc khôi phục độ cong sinh lý tự nhiên, vận động đúng cơ chế sinh học và nuôi dưỡng tế bào qua đường thẩm thấu.\n\nMời bạn mở bài học chi tiết dưới đây để xem video và hướng dẫn thực hành của tác giả:`,
+    answer:
+`Để chăm sóc sức khỏe chủ động theo tài liệu tác giả Tùng dinh dưỡng, bạn nên lưu ý:
+
+• Giữ vững đường cong sinh lý tự nhiên của cột sống trong mọi tư thế ngồi, đứng và nằm.
+• Duy trì vận động nhịp nhàng mỗi ngày để nuôi dưỡng sụn khớp và đĩa đệm qua cơ chế thẩm thấu.
+• Uống đủ nước và bổ sung dinh dưỡng cân bằng để hỗ trợ tái tạo mô liên kết.`,
     suggested_pages: selected.map((s) => ({
       title: s.page_title,
       topic_title: s.topic_title,
@@ -123,7 +345,7 @@ function fallbackSearch(query: string, catalog: LessonCatalogItem[]) {
     })),
     follow_up_questions: [
       'Tư thế sinh hoạt đúng cần chú ý gì?',
-      'Cách phân biệt đau mỏi thông thường và sai lệch trục?',
+      'Cách phân biệt đau mỏi thông thường?',
     ],
   };
 }
@@ -138,6 +360,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Vui lòng nhập câu hỏi.' }, { status: 400 });
     }
 
+    // 1. KIỂM TRA PHẢN HỒI TỨC THÌ TỪ DANH SÁCH CÂU HỎI MẪU CHUẨN XÁC (< 5ms)
+    const curated = findCuratedMatch(question);
+    if (curated) {
+      return NextResponse.json({
+        answer: curated.answer,
+        suggested_pages: curated.suggested_pages,
+        follow_up_questions: curated.follow_up_questions,
+        provider: 'curated_instant',
+      });
+    }
+
+    // Lấy catalog bài học siêu nhanh
     const [catalog, settings] = await Promise.all([
       getOrBuildLessonCatalog(),
       getSettings(),
@@ -146,7 +380,7 @@ export async function POST(req: NextRequest) {
     const aiTraining = settings?.ai_training;
     const lowerQ = question.toLowerCase();
 
-    // KIỂM TRA PHẢN HỒI SIÊU TỐC TỪ CÂU HỎI MẪU FAQ CỦA TÁC GIẢ (< 5ms)
+    // 2. KIỂM TRA FAQ DO TÁC GIẢ TỰ CẤU HÌNH TRONG ADMIN (< 5ms)
     if (Array.isArray(aiTraining?.faqs) && aiTraining.faqs.length > 0) {
       const matchedFaq = aiTraining.faqs.find((f) => {
         const fq = f.question.toLowerCase();
@@ -154,7 +388,6 @@ export async function POST(req: NextRequest) {
       });
 
       if (matchedFaq && matchedFaq.answer) {
-        // Tìm 1-2 bài học liên quan nhất từ catalog đã nạp sẵn trong bộ nhớ
         const relatedPages = catalog
           .filter((c) => {
             const text = `${c.page_title} ${c.topic_title} ${c.summary}`.toLowerCase();
@@ -173,9 +406,10 @@ export async function POST(req: NextRequest) {
             reason: 'Tài liệu hướng dẫn trực tiếp từ chuyên gia.',
           })),
           follow_up_questions: [
-            'Lộ trình chăm sóc cụ thể như thế nào?',
+            'Tư thế sinh hoạt đúng cần chú ý gì?',
             'Có lưu ý gì trong sinh hoạt hàng ngày không?',
           ],
+          provider: 'admin_faq',
         });
       }
     }
@@ -184,85 +418,59 @@ export async function POST(req: NextRequest) {
     const geminiKey = process.env.GEMINI_API_KEY;
 
     if (!deepseekKey && !geminiKey) {
-      const fallbackResult = fallbackSearch(question, catalog);
-      return NextResponse.json(fallbackResult);
+      return NextResponse.json(fastFallbackSearch(question, catalog));
     }
 
-    // 1. Lọc thông minh 3-4 bài học liên quan nhất từ catalog (giảm 80% độ trễ suy nghĩ của AI)
+    // 3. LỌC 2-3 BÀI HỌC LIÊN QUAN NHẤT TỪ CATALOG (GIẢM 90% ĐỘ TRỄ SUY NGHĨ CỦA AI)
     const lowerTokens = lowerQ.split(/[\s,?.!;:()\[\]{}"]+/).filter((w: string) => w.length >= 2);
     const scoredCatalog = catalog.map((c) => {
       let score = 0;
-      const text = `${c.page_title} ${c.topic_title} ${c.summary} ${c.content}`.toLowerCase();
+      const text = `${c.page_title} ${c.topic_title} ${c.summary}`.toLowerCase();
       lowerTokens.forEach((t: string) => {
         if (text.includes(t)) score += 1;
       });
       return { c, score };
     });
     scoredCatalog.sort((a, b) => b.score - a.score);
-    const topCatalog = scoredCatalog[0]?.score > 0 ? scoredCatalog.slice(0, 4).map((sc: { c: LessonCatalogItem }) => sc.c) : catalog.slice(0, 3);
+    const topCatalog = scoredCatalog[0]?.score > 0 ? scoredCatalog.slice(0, 3).map((sc: { c: LessonCatalogItem }) => sc.c) : catalog.slice(0, 2);
 
     const catalogText = topCatalog
-      .map(
-        (c, idx) =>
-          `[Bài ${idx + 1}] Chủ đề: "${c.topic_title}" | Bài: "${c.page_title}" (slug: ${c.topic_slug}/${c.page_slug})\n- Tóm tắt: ${c.summary}\n- Nội dung tác giả hướng dẫn: ${c.content || 'Xem bài giảng chi tiết.'}`
-      )
-      .join('\n\n');
+      .map((c, idx) => `[Bài ${idx + 1}] "${c.page_title}" (Chủ đề: ${c.topic_title}, slug: ${c.topic_slug}/${c.page_slug}): ${c.summary}`)
+      .join('\n');
 
-    // 2. Tra cứu siêu tốc từ các file Markdown chuyên sâu nguyên văn của tác giả
-    const matchedDocs = searchFastKnowledge(question, 2);
-    const authorDocsText = matchedDocs.length > 0
-      ? '\n\nCÁC TÀI LIỆU CHUYÊN SÂU NGUYÊN VĂN CỦA TÁC GIẢ:\n' +
-        matchedDocs.map((m, i) => `=== [Tài liệu ${i + 1}: ${m.fileTitle} (${m.sourceFile})] ===\n${m.excerpt}`).join('\n\n')
-      : (aiTraining?.documents && aiTraining.documents.length > 0
-          ? '\n\nCÁC TÀI LIỆU & SÁCH CHUYÊN SÂU TÁC GIẢ NẠP THÊM:\n' +
-            aiTraining.documents.map((d, i) => `=== [Tài liệu ${i + 1}: ${d.title}] ===\n${d.content}`).join('\n\n')
-          : '');
+    // 4. HỆ THỐNG PROMPT TỐI ƯU: ĐÚNG TRỌNG TÂM, NGẮN GỌN, TUYỆT ĐỐI KHÔNG DÀI DÒNG
+    const systemPrompt = `Bạn là Trợ lý Sức Khỏe AI trong ứng dụng "Học Cơ Thể" (Tủ Sách Y Khoa Qbiz Books của tác giả Tùng dinh dưỡng).
 
-    // 3. Câu hỏi và trả lời mẫu do tác giả định sẵn
-    const authorFaqsText =
-      aiTraining?.faqs && aiTraining.faqs.length > 0
-        ? '\n\nCÁC CÂU HỎI & TRẢ LỜI MẪU CỦA TÁC GIẢ:\n' +
-          aiTraining.faqs.map((f) => `Q: "${f.question}" -> A: "${f.answer}"`).join('\n')
-        : '';
+NGUYÊN TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ NGHIÊM NGẶT):
+1. ĐÚNG TRỌNG TÂM CÂU HỎI (P0):
+   - Người học hỏi vấn đề gì, hãy trả lời trực diện, chính xác vào đúng vấn đề đó.
+   - Hỏi về tư thế: Chỉ giải thích về tư thế sinh hoạt đúng (ngồi, đứng, cúi vác, nằm ngủ).
+   - Hỏi về dinh dưỡng: Chỉ nói về dinh dưỡng, thực phẩm, kháng viêm.
+   - Hỏi về nước: Chỉ nói về nước và cách uống nước.
+   - Hỏi về tập luyện: Chỉ hướng dẫn bài tập và kéo giãn cơ.
+   - TUYỆT ĐỐI KHÔNG lan man sang các chủ đề không liên quan.
 
-    // 4. Lời dặn và nguyên tắc cốt lõi
-    const authorGuidelines =
-      aiTraining?.guidelines ||
-      '1. VAI TRÒ CHUYÊN MÔN: Trợ lý Sức Khỏe AI chia sẻ kiến thức giáo dục về cấu trúc cơ thể, cơ chế sinh học, thói quen sinh hoạt đúng và phục hồi tự nhiên theo tài liệu của tác giả Tùng dinh dưỡng.\n2. NGUYÊN TẮC AN TOÀN Y KHOA: Cung cấp thông tin tham khảo khoa học, không đưa ra chẩn đoán hay điều trị y khoa thay thế bác sĩ chuyên khoa.\n3. PHONG CÁCH TRẢ LỜI: Trả lời thông minh, thấu đáo, chuẩn y lý theo Bộ quy chuẩn 3 Tầng Vàng (120-160 từ), chia nhánh rõ ràng, có luận điểm khoa học và giải pháp thực tế.\n4. TUYỆT ĐỐI CẤM: Tuyệt đối không nhắc đến các cụm từ như "tác giả không phải bác sĩ", "Tùng không phải bác sĩ" hay giải thích danh xưng.';
+2. NGẮN GỌN & SÚC TÍCH (P0):
+   - Độ dài: 60 đến 90 từ (tối đa 110 từ).
+   - Trình bày thông thoáng bằng 3 đến 4 gạch đầu dòng rõ ràng, dễ áp dụng ngay trong đời sống.
 
-    const systemPrompt = `Bạn là Trợ lý Sức Khỏe AI đồng hành, hướng dẫn người học DỰA TRÊN CHÍNH TÀI LIỆU VÀ BÀI GIẢNG CỦA TÁC GIẢ (Tùng dinh dưỡng) trong ứng dụng "Học Cơ Thể".
+3. TUYỆT ĐỐI CẤM (VI PHẠM SẼ BỊ HỦY BỎ):
+   - CẤM TUYỆT ĐỐI chia kiểu máy móc: "TẦNG 1", "TẦNG 2", "TẦNG 3".
+   - CẤM tự ý chèn sản phẩm/sáng chế DoctorLoan nếu người học không hỏi về công cụ hỗ trợ.
+   - CẤM tự ý đưa công thức nước 0.04 hay cảnh báo cấp cứu/bệnh viện vào các câu hỏi sinh hoạt thông thường.
+   - CẤM các từ: "chữa bệnh", "khám chữa bệnh", "điều trị dứt điểm", "bác sĩ".
+   - CẤM các câu trần tình như "tôi không phải bác sĩ", "tác giả không phải bác sĩ".
 
-NGUYÊN TẮC VÀ LỜI DẶN CỐT LÕI CỦA TÁC GIẢ:
-${authorGuidelines}
-
-BỘ QUY CHUẨN TRẢ LỜI 3 TẦNG VÀNG (BẮT BUỘC TUÂN THỦ NGHIÊM NGẶT):
-Mỗi câu trả lời chuyên môn phải có độ dài chuẩn mực từ 120 đến 160 từ, diễn giải thông minh, chuẩn y lý, chia thành 3 phần rõ ràng:
-1. TẦNG 1: CƠ CHẾ & BẢN CHẤT CỐT LÕI (30-40 từ):
-   - Giải thích bản chất vì sao cơ thể bị đau/tổn thương (ví dụ: mất độ cong sinh lý tự nhiên, áp lực cơ học đè nén, nhân nhầy chèn ép, thiếu thẩm thấu dinh dưỡng).
-2. TẦNG 2: 3 TRỤ CỘT HÀNH ĐỘNG THỰC TẾ (70-90 từ - trình bày bằng gạch đầu dòng hoặc đánh số 1, 2, 3 rõ ràng):
-   - Trụ cột 1 (Cơ học & Tư thế): Khôi phục và nâng đỡ độ cong sinh lý tự nhiên khi ngồi và ngủ (giải pháp DoctorLoan, giữ lưng thẳng, tránh cúi gập vặn xoắn).
-   - Trụ cột 2 (Vận động sinh cơ học): Kích hoạt và gia cố hệ cơ lõi (vùng bụng, lưng) để nâng đỡ tải trọng thay cho cột sống; tránh bất động quá lâu gây xơ cứng.
-   - Trụ cột 3 (Dinh dưỡng tế bào): Uống đủ nước theo công thức (0.04 x trọng lượng), bổ sung chất nền sụn khớp và chất chống oxy hóa để nuôi dưỡng đĩa đệm qua cơ chế thẩm thấu.
-3. TẦNG 3: CỜ ĐỎ AN TOÀN & ĐIỀU HƯỚNG BÀI HỌC (20-30 từ):
-   - Nhắc nhở: Nếu có dấu hiệu tê yếu chân lan nhanh hoặc rối loạn bài tiết, cần thăm khám y tế chuyên khoa ngay.
-   - Gợi ý người học mở bài học chi tiết bên dưới để xem video và hình ảnh giải phẫu trực quan.
-
-ĐẶC BIỆT LƯU Ý & CÁC QUY TẮC AN TOÀN:
-- TUYỆT ĐỐI CẤM: CẤM TUYỆT ĐỐI NÓI CÁC CÂU NHƯ "Tác giả không phải là bác sĩ", "Tùng không phải bác sĩ", "tôi không phải bác sĩ" hay bất kỳ câu trần tình, giải thích danh xưng nào.
-- VAI TRÒ: Chia sẻ kiến thức giáo dục về cấu trúc cơ thể, cơ chế sinh học, thói quen sinh hoạt đúng và vận động khoa học theo tài liệu của tác giả. Không kê đơn thuốc, không cam kết "chữa khỏi dứt điểm", dùng thuật ngữ "phục hồi tự nhiên", "hỗ trợ điều chỉnh độ cong sinh lý", "nuôi dưỡng tái tạo".
-- ĐIỀU HƯỚNG: CHỌN 1 ĐẾN 2 BÀI HỌC CHÍNH XÁC NHẤT trong danh mục bài học dưới đây để người học mở ra xem chi tiết.
-
-TOÀN BỘ TÀI LIỆU & NỘI DUNG TÁC GIẢ HƯỚNG DẪN TRONG HỆ THỐNG:
+4. ĐỊNH HƯỚNG BÀI HỌC:
+   - Chọn đúng 1-2 bài học liên quan nhất trong danh mục dưới đây để gợi ý người học mở ra xem:
 ${catalogText}
-${authorDocsText}
-${authorFaqsText}
 
-BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON (không kèm văn bản nào khác):
+BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
 {
-  "answer": "Câu trả lời theo đúng chuẩn 3 Tầng Vàng (120-160 từ, chia dòng thông thoáng, đánh số 1-2-3)...",
+  "answer": "Nội dung trả lời ngắn gọn theo 3-4 gạch đầu dòng...",
   "suggested_pages": [
     {
-      "title": "Tên bài học chính xác trong tài liệu",
+      "title": "Tên bài học chính xác trong danh mục",
       "topic_title": "Tên chủ đề",
       "topic_slug": "slug_chu_de",
       "page_slug": "slug_bai_hoc",
@@ -270,19 +478,19 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON (không kèm văn bả
     }
   ],
   "follow_up_questions": [
-    "Câu hỏi gợi ý mở rộng 1?",
-    "Câu hỏi gợi ý mở rộng 2?"
+    "Câu hỏi gợi ý 1?",
+    "Câu hỏi gợi ý 2?"
   ]
 }`;
 
     let rawText = '';
     let usedProvider = '';
 
-    // 1. ƯU TIÊN 1 (PRIMARY): DEEPSEEK V3 (deepseek-chat)
+    // 5. GỌI PRIMARY: DEEPSEEK V3 VỚI TIMEOUT 3500ms
     if (deepseekKey) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 12000);
+        const timeoutId = setTimeout(() => controller.abort(), 3500);
 
         const deepseekRes = await fetch('https://api.deepseek.com/chat/completions', {
           method: 'POST',
@@ -294,21 +502,15 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON (không kèm văn bả
             model: 'deepseek-chat',
             response_format: { type: 'json_object' },
             messages: [
-              {
-                role: 'system',
-                content: systemPrompt,
-              },
+              { role: 'system', content: systemPrompt },
               ...history.slice(-2).map((h: any) => ({
                 role: h.role === 'user' ? 'user' : 'assistant',
                 content: h.text,
               })),
-              {
-                role: 'user',
-                content: question,
-              },
+              { role: 'user', content: question },
             ],
-            max_tokens: 1200,
-            temperature: 0.2,
+            max_tokens: 350,
+            temperature: 0.3,
           }),
           signal: controller.signal,
         });
@@ -324,60 +526,61 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON (không kèm văn bả
           }
         }
       } catch (err: any) {
-        console.warn('[AI] DeepSeek primary call failed or timed out, auto-falling back to Gemini...', err?.message);
+        console.warn('[AI] DeepSeek timed out or failed, falling back to Gemini Flash Lite...', err?.message);
       }
     }
 
-    // 2. ƯU TIÊN 2 (SECONDARY / FALLBACK): GOOGLE GEMINI FLASH LITE
+    // 6. GỌI SECONDARY (FALLBACK): GOOGLE GEMINI 3.5 FLASH LITE VỚI TIMEOUT 3500ms
     if (!rawText && geminiKey) {
       const candidateModels = [
-        'gemini-flash-lite-latest',
         'gemini-3.5-flash-lite',
-        'gemini-3.1-flash-lite',
+        'gemini-3.8-flash',
       ];
 
-      const geminiPrompt = `${systemPrompt}\n\nCÂU HỎI CỦA NGƯỜI HỌC: "${question}"\n\nLỊCH SỬ HỘI THOẠI TRƯỚC:\n${history.slice(-2).map((h: any) => `${h.role === 'user' ? 'Người học' : 'Trợ lý'}: ${h.text}`).join('\n')}`;
+      const geminiPrompt = `${systemPrompt}\n\nCÂU HỎI CỦA NGƯỜI HỌC: "${question}"\n\nLỊCH SỬ:\n${history.slice(-2).map((h: any) => `${h.role === 'user' ? 'Người học' : 'Trợ lý'}: ${h.text}`).join('\n')}`;
 
       for (const model of candidateModels) {
         try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 3500);
+
           const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`;
           const geminiRes = await fetch(geminiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              contents: [
-                {
-                  parts: [{ text: geminiPrompt }],
-                },
-              ],
+              contents: [{ parts: [{ text: geminiPrompt }] }],
               generationConfig: {
-                temperature: 0.2,
-                maxOutputTokens: 1200,
+                responseMimeType: 'application/json',
+                temperature: 0.3,
+                maxOutputTokens: 350,
               },
             }),
+            signal: controller.signal,
           });
+
+          clearTimeout(timeoutId);
 
           if (geminiRes.ok) {
             const geminiData = await geminiRes.json();
             const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
             if (text) {
               rawText = text;
-              usedProvider = 'gemini';
+              usedProvider = model;
               break;
             }
           }
         } catch {
-          // thử model tiếp theo
+          // Thử model tiếp theo
         }
       }
     }
 
     if (!rawText) {
-      const fallbackResult = fallbackSearch(question, catalog);
-      return NextResponse.json(fallbackResult);
+      return NextResponse.json(fastFallbackSearch(question, catalog));
     }
 
-    // Bóc tách JSON an toàn từ phản hồi của Gemini
+    // 7. BÓC TÁCH JSON VÀ LÀM SẠCH KẾT QUẢ
     let parsedJson: any = null;
     try {
       const cleaned = rawText
@@ -398,7 +601,6 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON (không kèm văn bả
     }
 
     if (parsedJson && parsedJson.answer) {
-      // Làm sạch triệt để mọi tàn dư nếu model vô tình sinh ra cụm từ "không phải bác sĩ"
       let cleanAnswer = String(parsedJson.answer)
         .replace(/(?:tác giả\s+)?(?:tùng\s+)?(?:dinh dưỡng\s+)?(?:không phải|chưa phải)(?:\s+là)?\s+bác sĩ[.,;:\-—–]?\s*/gi, '')
         .replace(/tôi không phải(?:\s+là)?\s+bác sĩ[.,;:\-—–]?\s*/gi, '')
@@ -413,6 +615,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON (không kèm văn bả
         .replace(/nắn\s+chỉnh/gi, 'hỗ trợ điều chỉnh tư thế')
         .replace(/uốn\s+nắn/gi, 'hỗ trợ điều chỉnh')
         .trim();
+
       if (cleanAnswer.length > 0) {
         cleanAnswer = cleanAnswer.charAt(0).toUpperCase() + cleanAnswer.slice(1);
       }
@@ -442,7 +645,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON (không kèm văn bả
       });
     }
 
-    return NextResponse.json(fallbackSearch(question, catalog));
+    return NextResponse.json(fastFallbackSearch(question, catalog));
   } catch (error: any) {
     return NextResponse.json(
       {

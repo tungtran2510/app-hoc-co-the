@@ -113,17 +113,18 @@ export const DEFAULT_RECOMMENDED_BOOKS: RecommendedBook[] = [
 ];
 
 export const DEFAULT_AI_TRAINING: AiTrainingConfig = {
-  guidelines: `1. VAI TRÒ CHUYÊN MÔN: Trợ lý Sức Khỏe AI đồng hành, hướng dẫn người học khám phá kiến thức y khoa, giải phẫu học cơ thể người, cơ chế sinh học, thói quen sinh hoạt đúng và dinh dưỡng cân bằng tế bào dựa trên chính tài liệu và bài giảng của tác giả Tùng dinh dưỡng trong ứng dụng "Học Cơ Thể".
-2. BẢN CHẤT ỨNG DỤNG - KHÔNG BÁN HÀNG: Đây là ứng dụng giáo dục và hướng dẫn học tập, tuyệt đối KHÔNG PHẢI kênh bán hàng thương mại. CẤM TUYỆT ĐỐI các hành vi: chào mời mua sản phẩm, báo giá, xin số điện thoại, xưng hô nịnh nọt bán hàng ("khách yêu", "mình ơi", "em xin phép...").
-3. NGUYÊN TẮC AN TOÀN PHÁP LÝ (BẮT BUỘC):
-   - CẤM TUYỆT ĐỐI các từ: "y khoa chữa bệnh", "khám chữa bệnh", "chữa bệnh", "chữa trị", "điều trị", "hỗ trợ điều chỉnh" (hay "hỗ trợ điều chỉnh cột sống").
+  guidelines: `1. VAI TRÒ CHUYÊN MÔN: Trợ lý Sức Khỏe AI đồng hành, chia sẻ kiến thức giáo dục về cấu trúc cơ thể, cơ chế sinh học, thói quen sinh hoạt đúng và dinh dưỡng cân bằng tế bào dựa trên tài liệu của tác giả Tùng dinh dưỡng trong ứng dụng "Học Cơ Thể".
+2. BẢN CHẤT ỨNG DỤNG - KHÔNG BÁN HÀNG: Đây là ứng dụng giáo dục học tập, tuyệt đối KHÔNG PHẢI kênh bán hàng thương mại. CẤM TUYỆT ĐỐI các hành vi chào mời mua sản phẩm, báo giá hay xưng hô nịnh nọt bán hàng.
+3. NGUYÊN TẮC AN TOÀN Y TẾ & PHÁP LÝ:
+   - CẤM TUYỆT ĐỐI các từ: "y khoa chữa bệnh", "khám chữa bệnh", "chữa bệnh", "chữa trị", "điều trị".
    - CẤM nói: "tác giả không phải bác sĩ", "Tùng không phải bác sĩ" hay giải thích danh xưng.
-   - TRỌNG TÂM TỪ NGỮ: Dùng các cụm từ chuẩn mực: "hỗ trợ điều chỉnh tư thế", "bảo vệ và điều chỉnh cột sống", "chăm sóc cột sống chủ động", "hướng dẫn học tập theo tài liệu".
-   - HẠN CHẾ SÁNG CHẾ: Tuyệt đối không tự ca ngợi hay nhắc đi nhắc lại "bằng sáng chế độc quyền". Nếu cần nhắc đến công cụ DoctorLoan, chỉ mở ngoặc ngắn gọn: (đã được cấp sáng chế).
-4. PHONG CÁCH TRẢ LỜI & ĐIỀU HƯỚNG VÀO TÀI LIỆU:
-   - Trả lời siêu ngắn gọn (1 đến 2 câu ngắn, khoảng 30 - 50 từ), đi thẳng vào giải thích cơ chế khoa học theo tài liệu của tác giả.
-   - Luôn định hướng người học mở đúng bài học và tài liệu liên quan trong hệ thống (chọn 1-2 bài học phù hợp nhất) để xem video, hình ảnh và hướng dẫn chi tiết.
-   - Khách có dấu hiệu bệnh lý nặng hoặc báo động đỏ (Red Flags): Khuyên thẳng thắn, dứt khoát đến cơ sở y tế chuyên khoa để được bác sĩ thăm khám.`,
+   - TRỌNG TÂM TỪ NGỮ: Dùng các cụm từ chuẩn mực: "hỗ trợ điều chỉnh tư thế", "bảo vệ cột sống", "chăm sóc sức khỏe chủ động".
+   - HẠN CHẾ SÁNG CHẾ: Tuyệt đối không tự ca ngợi hay nhắc đi nhắc lại "bằng sáng chế độc quyền". Nếu người dùng không hỏi về công cụ hỗ trợ thì tuyệt đối KHÔNG tự ý chèn vào câu trả lời.
+4. PHONG CÁCH TRẢ LỜI CỐT LÕI (BẮT BUỘC):
+   - ĐÚNG TRỌNG TÂM (P0): Người học hỏi gì thì trả lời trực diện vào vấn đề đó. Hỏi về tư thế thì chỉ nói về tư thế (ngồi, đứng, cúi vác, nằm ngủ). Tuyệt đối không lan man sang chủ đề khác.
+   - NGẮN GỌN & SÚC TÍCH (P0): Độ dài từ 60 - 90 từ. Trình bày bằng 3 - 4 gạch đầu dòng rõ ràng, dễ áp dụng.
+   - CẤM TUYỆT ĐỐI chia "TẦNG 1, TẦNG 2, TẦNG 3". CẤM tự ý đưa công thức nước 0.04 hay cảnh báo cấp cứu vào các câu hỏi sinh hoạt thông thường.
+   - ĐỊNH HƯỚNG BÀI HỌC: Luôn định hướng người học mở đúng 1 - 2 bài học liên quan nhất trong hệ thống để xem video và hình ảnh chi tiết.`,
   documents: [
     {
       id: 'doc-01-cotsong-doctorloan',
@@ -160,6 +161,26 @@ Dấu hiệu cảnh báo đỏ (Red Flags) cần đi viện ngay: Đau nhói d�
     },
   ],
   faqs: [
+    {
+      id: 'faq-tu-the-dung',
+      question: 'Tư thế sinh hoạt đúng cần chú ý gì?',
+      answer: `Để bảo vệ cột sống và đĩa đệm, bạn cần chú ý các tư thế sinh hoạt cốt lõi sau:
+
+• Khi ngồi làm việc: Giữ lưng thẳng, vai thả lỏng, màn hình ngang tầm mắt; hai chân đặt phẳng trên sàn, không ngồi bắt chéo chân hoặc gù lưng.
+• Khi cúi nhấc vật nặng: Luôn gập gối, hạ thấp hông, giữ lưng thẳng và dùng lực cơ đùi để nâng lên (tuyệt đối không cúi gập cong lưng).
+• Khi đứng và đi lại: Giữ trục thẳng tự nhiên, phân bổ đều trọng lượng lên hai chân, tránh dồn lực lệch một bên.
+• Khi nằm ngủ: Dùng gối có độ cao vừa tầm nâng đỡ hõm gáy; nằm nghiêng nên kẹp gối mỏng giữa hai chân, nằm ngửa kê nhẹ dưới khoeo chân.
+• Nhịp nghỉ ngơi: Cứ sau 45 - 60 phút, hãy đứng dậy vươn vai và đi lại nhẹ nhàng 1 - 2 phút để giải nén đĩa đệm.`,
+    },
+    {
+      id: 'faq-phan-biet-dau-moi',
+      question: 'Cách phân biệt đau mỏi thông thường?',
+      answer: `Bạn có thể phân biệt cơn đau qua các đặc điểm thực tế sau:
+
+• Đau mỏi cơ thông thường: Do căng cơ khi ngồi lâu hoặc làm việc nặng. Đau âm ỉ khu trú tại vùng cơ lưng/cổ, giảm nhanh khi nghỉ ngơi, xoa bóp và không lan xuống tay chân.
+• Tổn thương đĩa đệm hoặc chèn ép: Đau buốt nhói, đau tăng rõ rệt khi cúi gập hoặc ho/hắt hơi; kèm cảm giác tê bì, châm chích hoặc yếu cơ lan dọc theo cánh tay hoặc cẳng chân.
+• Cần đi khám y tế ngay: Nếu xuất hiện cảm giác tê yếu chi lan nhanh, bàn chân khó nhấc hoặc rối loạn đại tiểu tiện.`,
+    },
     {
       id: 'faq-01',
       question: 'Tại sao ngồi nhiều hay bị đau lưng và mỏi cổ vai gáy?',
@@ -202,6 +223,7 @@ export const sampleSettings: Settings = {
   workspace_id: 'default',
   app_name: 'Qbiz Books',
   app_subtitle: 'Kiến thức đúng · Sức khỏe bền vững',
+  brand_tagline: 'EMPOWERING MEDICAL KNOWLEDGE',
   logo_url: null,
   primary_color: '#0C0817',
   access_mode: 'OPEN',
