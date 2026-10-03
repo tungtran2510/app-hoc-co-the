@@ -3,8 +3,8 @@
 // Đạt tốc độ phản hồi tức thì (< 1ms) khi người dùng chuyển đổi các mục hoặc vào bài học
 // TUÂN THỦ CHỈ THỊ: Chỉ tải từ mạng khi người dùng ấn vào tài liệu sách / video dung lượng lớn
 
-const CACHE_NAME = 'qbiz-books-shell-v8';
-const STATIC_ASSETS_CACHE = 'qbiz-books-static-v8';
+const CACHE_NAME = 'qbiz-books-shell-v10';
+const STATIC_ASSETS_CACHE = 'qbiz-books-static-v10';
 
 // Danh sách tài nguyên Shell và các trang cốt lõi cần tải sẵn vào bộ nhớ điện thoại
 const PRECACHE_SHELL_URLS = [
@@ -24,8 +24,6 @@ const PRECACHE_SHELL_URLS = [
   '/icon-512.png',
   '/images/book_cover_blank.jpg',
   '/spine_hero_clean.png',
-  '/manifest.json',
-  '/manifest.webmanifest',
 ];
 
 // Cài đặt SW & Tải sẵn Shell ngầm vào điện thoại
@@ -76,17 +74,7 @@ self.addEventListener('fetch', (event) => {
 
   // 2b. MANIFEST.JSON: Luôn nạp mới từ mạng để cập nhật theme_color và icon chuẩn tức thì
   if (url.pathname === '/manifest.json' || url.pathname === '/manifest.webmanifest') {
-    event.respondWith(
-      fetch(request)
-        .then((networkResponse) => {
-          if (networkResponse.status === 200) {
-            const clone = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-          }
-          return networkResponse;
-        })
-        .catch(() => caches.match(request))
-    );
+    event.respondWith(fetch(request));
     return;
   }
 

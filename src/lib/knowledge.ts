@@ -59,8 +59,19 @@ export function searchFastKnowledge(query: string, maxResults: number = 2): Know
 
   const scoredFiles: { cat: ManifestCategory; file: ManifestCategory['files'][0]; score: number }[] = [];
 
+  const isAskingDoctorLoan = lowerQ.includes('doctorloan') || lowerQ.includes('doctor loan');
+
   for (const cat of manifest.categories) {
+    // Nếu người dùng KHÔNG hỏi về DoctorLoan, tuyệt đối không duyệt thư mục bán hàng DoctorLoan
+    if (!isAskingDoctorLoan && cat.folder.toLowerCase().includes('doctorloan')) {
+      continue;
+    }
+
     for (const f of cat.files) {
+      if (!isAskingDoctorLoan && f.name.toLowerCase().includes('doctorloan')) {
+        continue;
+      }
+
       let fileScore = 0;
 
       // So khớp cụm từ khóa đầy đủ
@@ -104,7 +115,13 @@ export function searchFastKnowledge(query: string, maxResults: number = 2): Know
       const paragraphs = rawContent
         .split(/\n\s*\n/)
         .map((p) => p.trim())
-        .filter((p) => p.length > 50 && !p.startsWith('# '));
+        .filter((p) => {
+          if (p.length < 50 || p.startsWith('# ')) return false;
+          if (!isAskingDoctorLoan && (p.toLowerCase().includes('doctorloan') || p.toLowerCase().includes('doctor loan'))) {
+            return false;
+          }
+          return true;
+        });
 
       const scoredParas = paragraphs.map((p) => {
         let pScore = 0;

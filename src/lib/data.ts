@@ -188,6 +188,7 @@ export async function getSettings(): Promise<Settings> {
             hotline: finalHotline,
             zalo_url: finalZaloUrl,
             app_subtitle: data.app_subtitle !== undefined ? data.app_subtitle : (data.block_styles?.app_subtitle !== undefined ? data.block_styles.app_subtitle : null),
+            brand_tagline: data.brand_tagline !== undefined ? data.brand_tagline : (data.block_styles?.brand_tagline !== undefined ? data.block_styles.brand_tagline : 'EMPOWERING MEDICAL KNOWLEDGE'),
             author_profile: {
               ...authProfile,
               phone: finalHotline,

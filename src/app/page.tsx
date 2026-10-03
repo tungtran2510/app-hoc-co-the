@@ -31,6 +31,7 @@ export default async function HomePage() {
       <HomeHeader
         initialAppName={settings.app_name}
         initialAppSubtitle={settings.app_subtitle}
+        initialBrandTagline={settings.brand_tagline}
         initialLogoUrl={settings.logo_url}
         initialHotline={settings.hotline}
         initialZaloUrl={settings.zalo_url}
@@ -49,6 +50,7 @@ export default async function HomePage() {
         initialBooksLayout={settings.recommended_books_layout}
         appName={settings.app_name}
         appSubtitle={settings.app_subtitle}
+        brandTagline={settings.brand_tagline}
         logoUrl={settings.logo_url}
         hotline={settings.hotline}
         zaloUrl={settings.zalo_url}

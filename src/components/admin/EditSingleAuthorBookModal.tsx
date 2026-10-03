@@ -328,28 +328,24 @@ export default function EditSingleAuthorBookModal({
               type="text"
               value={youtubeUrl}
               onChange={(e) => setYoutubeUrl(e.target.value)}
-              placeholder="VD: https://www.youtube.com/watch?v=... hoặc link Shorts / Livestream"
+              placeholder="Dán link YouTube (VD: https://youtu.be/... hoặc shorts)"
               className="w-full h-9 px-3.5 rounded-[11px] bg-white dark:bg-[#130926] border border-slate-200 dark:border-purple-500/30 text-slate-900 dark:text-white font-medium text-[12.5px] focus:outline-hidden focus:ring-2 focus:ring-red-500"
             />
 
             {detectedYtId ? (
-              <div className="mt-2">
+              <div className="mt-2 rounded-[12px] overflow-hidden border border-slate-200 dark:border-purple-500/30">
                 <YouTubeEmbed
                   youtubeId={detectedYtId}
                   title={`Video giới thiệu ${title || 'cuốn sách'}`}
-                  showAdminTip={true}
+                  showAdminTip={false}
                   showExternalLink={true}
                 />
               </div>
             ) : youtubeUrl.trim() ? (
               <p className="text-[11.5px] text-amber-600 dark:text-amber-400 font-medium">
-                ⚠️ Không nhận diện được mã video từ link trên. Hãy kiểm tra lại định dạng link YouTube.
+                ⚠️ Không nhận diện được video từ link này. Vui lòng kiểm tra lại đường dẫn YouTube.
               </p>
-            ) : (
-              <p className="text-[11.5px] text-slate-500 dark:text-purple-300/70">
-                Gắn link YouTube giúp độc giả xem video giới thiệu hoặc tác giả thuyết trình về cuốn sách này.
-              </p>
-            )}
+            ) : null}
           </div>
 
           {/* 4. MÔ TẢ CHI TIẾT */}

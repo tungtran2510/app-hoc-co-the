@@ -37,7 +37,7 @@ export default function WelcomeModal({
   isOpen,
   onClose,
   appName = 'Qbiz Books',
-  appSubtitle = 'Kiến thức đúng · Sức khỏe bền vững',
+  appSubtitle = '',
   logoUrl,
   hotline = '0974.248.716',
   zaloUrl = 'https://zalo.me/0987792400',

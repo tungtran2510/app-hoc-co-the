@@ -10,6 +10,7 @@ interface EditAppModalProps {
   isOpen: boolean;
   initialName: string;
   initialSubtitle?: string | null;
+  initialBrandTagline?: string | null;
   initialLogoUrl?: string | null;
   initialHotline?: string | null;
   initialZaloUrl?: string | null;
@@ -19,22 +20,25 @@ interface EditAppModalProps {
     newSubtitle: string,
     newLogoUrl: string | null,
     newHotline: string,
-    newZaloUrl: string
+    newZaloUrl: string,
+    newBrandTagline?: string
   ) => void;
 }
 
 export default function EditAppModal({
   isOpen,
   initialName,
-  initialSubtitle = 'Kiến thức đúng · Sức khỏe bền vững',
+  initialSubtitle = '',
+  initialBrandTagline = '',
   initialLogoUrl = null,
   initialHotline = '',
   initialZaloUrl = '',
   onClose,
   onSaved,
 }: EditAppModalProps) {
-  const [appName, setAppName] = useState(initialName);
-  const [appSubtitle, setAppSubtitle] = useState(initialSubtitle || 'Kiến thức đúng · Sức khỏe bền vững');
+  const [appName, setAppName] = useState(initialName || '');
+  const [appSubtitle, setAppSubtitle] = useState(initialSubtitle ?? '');
+  const [brandTagline, setBrandTagline] = useState(initialBrandTagline ?? '');
   const [logoUrl, setLogoUrl] = useState<string | null>(initialLogoUrl);
   const [zaloUrl, setZaloUrl] = useState(initialZaloUrl || '');
   const [hotline, setHotline] = useState(initialHotline || '');
@@ -46,10 +50,11 @@ export default function EditAppModal({
   React.useEffect(() => {
     setAppName(initialName || '');
     setAppSubtitle(initialSubtitle ?? '');
+    setBrandTagline(initialBrandTagline ?? '');
     setLogoUrl(initialLogoUrl || null);
     setZaloUrl(initialZaloUrl || '');
     setHotline(initialHotline || '');
-  }, [isOpen, initialName, initialSubtitle, initialLogoUrl, initialHotline, initialZaloUrl]);
+  }, [isOpen, initialName, initialSubtitle, initialBrandTagline, initialLogoUrl, initialHotline, initialZaloUrl]);
 
   if (!isOpen) return null;
 
@@ -87,12 +92,14 @@ export default function EditAppModal({
 
       const cleanName = appName.trim() || 'Qbiz Books';
       const cleanSubtitle = appSubtitle.trim();
+      const cleanBrandTagline = brandTagline.trim();
       const cleanHotline = hotline.trim();
       const cleanZalo = zaloUrl.trim();
 
       const res = await saveSettingsApi({
         app_name: cleanName,
-        app_subtitle: cleanSubtitle || null,
+        app_subtitle: cleanSubtitle,
+        brand_tagline: cleanBrandTagline,
         logo_url: logoUrl,
         hotline: cleanHotline || null,
         zalo_url: cleanZalo || null,
@@ -106,13 +113,7 @@ export default function EditAppModal({
         throw new Error(res.error || 'Chưa lưu được cài đặt, thử lại');
       }
 
-      await saveStoredAppSettings({
-        app_name: cleanName,
-        zalo_url: cleanZalo,
-        hotline: cleanHotline,
-      });
-
-      onSaved(cleanName, cleanSubtitle, logoUrl, cleanHotline, cleanZalo);
+      onSaved(cleanName, cleanSubtitle, logoUrl, cleanHotline, cleanZalo, cleanBrandTagline);
       onClose();
     } catch (err: any) {
       setErrorMsg(err.message || 'Lỗi kết nối máy chủ.');
@@ -167,6 +168,23 @@ export default function EditAppModal({
             />
           </div>
 
+          {/* Dòng chữ phụ thương hiệu (In hoa) */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[14px] font-bold text-ink">
+              Dòng chữ phụ thương hiệu (In hoa)
+            </label>
+            <input
+              type="text"
+              value={brandTagline}
+              onChange={(e) => setBrandTagline(e.target.value)}
+              placeholder="VD: EMPOWERING MEDICAL KNOWLEDGE (Để trống để ẩn)"
+              className="w-full h-11 px-3.5 rounded-[12px] border border-line text-[15px] text-ink font-semibold focus:border-primary"
+            />
+            <span className="text-[12px] text-muted">
+              Dòng chữ in hoa nhỏ nằm giữa Tên ứng dụng và Khẩu hiệu (Để trống để ẩn).
+            </span>
+          </div>
+
           {/* Khẩu hiệu / Phụ đề trang chủ */}
           <div className="flex flex-col gap-1.5">
             <label className="text-[14px] font-bold text-ink">
@@ -176,11 +194,11 @@ export default function EditAppModal({
               type="text"
               value={appSubtitle}
               onChange={(e) => setAppSubtitle(e.target.value)}
-              placeholder="Kiến thức đúng · Sức khỏe bền vững"
+              placeholder="VD: Kiến thức đúng · Sức khỏe bền vững (Để trống để ẩn)"
               className="w-full h-11 px-3.5 rounded-[12px] border border-line text-[15px] text-ink font-semibold focus:border-primary"
             />
             <span className="text-[12px] text-muted">
-              Dòng chữ nhỏ hiển thị ngay dưới tên ứng dụng ở thanh đầu trang.
+              Dòng chữ hiển thị dưới tên ứng dụng ở cả thanh đầu trang và thẻ thương hiệu (Để trống để ẩn).
             </span>
           </div>
 

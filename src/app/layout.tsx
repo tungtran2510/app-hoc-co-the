@@ -57,13 +57,17 @@ export default function RootLayout({
     <html lang="vi" className={`${beVietnamPro.variable} ${lora.variable} ${beVietnamPro.className}`}>
       <head>
         <meta name="referrer" content="strict-origin-when-cross-origin" />
+        <meta name="theme-color" content="#FFFFFF" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
         <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
         <link rel="apple-touch-icon" href="/apple-icon.png" />
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('giao_dien');var isDark=t==='dark'||(!t&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(isDark){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}var color=isDark?'#0C0817':'#FFFFFF';var m=document.querySelector('meta[name="theme-color"]');if(m){m.setAttribute('content',color)}else{var n=document.createElement('meta');n.name='theme-color';n.content=color;document.head.appendChild(n)}}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('giao_dien');var isDark=t==='dark'||(!t&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);var color=isDark?'#0C0817':'#FFFFFF';if(isDark){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}var metas=document.querySelectorAll('meta[name="theme-color"]');if(metas.length>0){metas.forEach(function(m){m.setAttribute('content',color);m.removeAttribute('media');});}else{var n=document.createElement('meta');n.name='theme-color';n.content=color;document.head.appendChild(n);}}catch(e){}})();`,
           }}
         />
       </head>

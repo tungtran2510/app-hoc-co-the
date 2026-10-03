@@ -6,6 +6,7 @@ import { searchFastKnowledge } from '../../../../lib/knowledge';
 
 export const dynamic = 'force-dynamic';
 
+
 interface LessonCatalogItem {
   topic_title: string;
   topic_slug: string;
@@ -32,6 +33,54 @@ function normalizeText(text: string): string {
 
 // BỘ CÂU HỎI & TRẢ LỜI CHUẨN XÁC, NGẮN GỌN, ĐÚNG TRỌNG TÂM (PHẢN HỒI TỨC THÌ < 5ms)
 const CURATED_QA = [
+  {
+    keywords: [
+      'thoat vi dia dem l4 can lam gi',
+      'thoat vi dia dem l4',
+      'thoat vi dia dem l5',
+      'thoat vi dia dem that lung',
+      'thoat vi dia dem',
+      'thoat vi',
+      'bi thoat vi dia dem',
+      'thoat vi dia dem can lam gi',
+      'thoat vi dia dem phai lam sao',
+    ],
+    answer:
+`Đối với tình trạng thoát vị đĩa đệm (đặc biệt vùng thắt lưng L4-L5), bạn cần chú ý các nguyên tắc chăm sóc và bảo vệ sau:
+
+• Giữ thẳng trục thắt lưng: Tuyệt đối tránh cúi gập cong lưng hoặc vặn xoắn đột ngột; khi cúi nhặt vật luôn gập gối, hạ thấp trọng tâm và dùng lực từ đùi.
+• Giảm tải áp lực đĩa đệm: Nằm nghỉ ngơi trên đệm phẳng vừa phải, kê một gối mỏng dưới khoeo chân (hoặc kẹp giữa hai gối khi nằm nghiêng) để giải phóng lực căng thắt lưng.
+• Tránh ngồi tĩnh tại quá lâu: Không ngồi liên tục quá 30 - 45 phút; nên đứng dậy đi lại nhẹ nhàng để tăng tuần hoàn và nuôi dưỡng đĩa đệm qua cơ chế thẩm thấu.
+• Vận động an toàn: Thực hiện các bài tập kéo giãn cơ dựng sống nhẹ nhàng; tránh tập các động tác gập bụng truyền thống (sit-ups) gây chèn ép nhân nhầy ra sau.
+• Cảnh báo y tế cần khám ngay: Nếu xuất hiện cảm giác đau nhói buốt lan nhanh xuống chân, tê mất cảm giác bàn chân hoặc rối loạn đại tiểu tiện.`,
+    suggested_pages: [
+      {
+        title: 'Đĩa đệm và cơ chế giảm xóc',
+        topic_title: 'Cột Sống & Đĩa Đệm',
+        topic_slug: 'cot-song',
+        page_slug: 'dia-dem',
+        reason: 'Hiểu rõ cấu trúc nhân nhầy và cơ chế thẩm thấu nuôi dưỡng đĩa đệm.',
+      },
+      {
+        title: 'Tư thế chuẩn & Vận động giải áp',
+        topic_title: 'Cột Sống & Đĩa Đệm',
+        topic_slug: 'cot-song',
+        page_slug: 'tu-the-va-van-dong',
+        reason: 'Hướng dẫn các tư thế công thái học và bài tập giải nén an toàn.',
+      },
+      {
+        title: 'Các vấn đề thường gặp và cách phòng tránh',
+        topic_title: 'Cột Sống & Đĩa Đệm',
+        topic_slug: 'cot-song',
+        page_slug: 'cac-van-de-thuong-gap',
+        reason: 'Nhận diện các hội chứng đau cơ xương khớp và cách phòng ngừa thoái hóa.',
+      },
+    ],
+    follow_up_questions: [
+      'Tư thế nằm ngủ nào tốt cho người thoát vị đĩa đệm?',
+      'Cách cúi nhấc vật nặng an toàn không đau lưng?',
+    ],
+  },
   {
     keywords: [
       'tu the sinh hoat dung can chu y gi',
@@ -231,6 +280,53 @@ function findCuratedMatch(query: string) {
   return null;
 }
 
+// Xếp hạng bài học thông minh theo từ khóa chuyên môn (tránh gợi ý sai chủ đề)
+function rankCatalogPages(query: string, catalog: LessonCatalogItem[]): LessonCatalogItem[] {
+  const normQ = normalizeText(query);
+  const tokens = normQ.split(/\s+/).filter((w) => w.length >= 2);
+
+  const scored = catalog.map((c) => {
+    let score = 0;
+    const text = normalizeText(`${c.page_title} ${c.topic_title} ${c.summary}`);
+
+    // Phân loại chủ đề theo từ khóa câu hỏi
+    if (
+      (normQ.includes('dia dem') ||
+        normQ.includes('thoat vi') ||
+        normQ.includes('cot song') ||
+        normQ.includes('lung') ||
+        normQ.includes('l4') ||
+        normQ.includes('l5') ||
+        normQ.includes('co') ||
+        normQ.includes('gay')) &&
+      c.topic_slug === 'cot-song'
+    ) {
+      score += 15;
+    }
+
+    if ((normQ.includes('nuoc') || normQ.includes('uong')) && c.topic_slug === 'nuoc') {
+      score += 15;
+    }
+
+    if ((normQ.includes('dinh duong') || normQ.includes('an') || normQ.includes('khang viem')) && c.topic_slug === 'dinh-duong') {
+      score += 15;
+    }
+
+    if ((normQ.includes('da day') || normQ.includes('ruot') || normQ.includes('tieu hoa')) && c.topic_slug === 'tieu-hoa') {
+      score += 15;
+    }
+
+    tokens.forEach((t) => {
+      if (text.includes(t)) score += 2;
+    });
+
+    return { c, score };
+  });
+
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, 2).map((s) => s.c);
+}
+
 // Xây dựng danh mục bài học siêu tốc (chỉ 2 query song song hoặc fallback 0ms tới sample data)
 async function getOrBuildLessonCatalog(): Promise<LessonCatalogItem[]> {
   if (cachedCatalog && cachedCatalog.length > 0 && cachedCatalogExpiry > Date.now()) {
@@ -250,7 +346,7 @@ async function getOrBuildLessonCatalog(): Promise<LessonCatalogItem[]> {
         const catalog: LessonCatalogItem[] = pages.map((p) => {
           const t = topicMap.get(p.topic_id);
           return {
-            topic_title: t?.title || 'Cột Sống',
+            topic_title: t?.title || 'Cột Sống & Đĩa Đệm',
             topic_slug: t?.slug || 'cot-song',
             page_title: p.title,
             page_slug: p.slug,
@@ -272,7 +368,7 @@ async function getOrBuildLessonCatalog(): Promise<LessonCatalogItem[]> {
   const catalog: LessonCatalogItem[] = samplePages.map((p) => {
     const t = topicMap.get(p.topic_id);
     return {
-      topic_title: t?.title || 'Cột Sống',
+      topic_title: t?.title || 'Cột Sống & Đĩa Đệm',
       topic_slug: t?.slug || 'cot-song',
       page_title: p.title,
       page_slug: p.slug,
@@ -286,36 +382,33 @@ async function getOrBuildLessonCatalog(): Promise<LessonCatalogItem[]> {
   return catalog;
 }
 
-// Fallback siêu tốc khi không có API key hoặc lỗi mạng (gọn gàng, đúng trọng tâm, không dông dài)
+// Fallback siêu tốc khi không có API key hoặc lỗi mạng (gọn gàng, đúng trọng tâm, TUYỆT ĐỐI KHÔNG CHÈN DOCTORLOAN)
 function fastFallbackSearch(query: string, catalog: LessonCatalogItem[]) {
-  const lower = query.toLowerCase();
+  const isAskingDoctorLoan = /doctor\s*loan/i.test(query);
   const matchedDocs = searchFastKnowledge(query, 2);
-
-  const matched = catalog.filter((item) => {
-    return (
-      item.page_title.toLowerCase().includes(lower) ||
-      item.topic_title.toLowerCase().includes(lower) ||
-      item.summary.toLowerCase().includes(lower)
-    );
-  });
-
-  const selected = (matched.length > 0 ? matched : catalog).slice(0, 2);
+  const selectedPages = rankCatalogPages(query, catalog);
 
   if (matchedDocs.length > 0) {
     const doc = matchedDocs[0];
     const excerptLines = doc.excerpt
       .split('\n')
       .map((l) => l.trim())
-      .filter((l) => l.length > 10 && !l.startsWith('#'))
+      .filter((l) => {
+        if (l.length < 10 || l.startsWith('#')) return false;
+        if (!isAskingDoctorLoan && (l.toLowerCase().includes('doctorloan') || l.toLowerCase().includes('doctor loan'))) {
+          return false;
+        }
+        return true;
+      })
       .slice(0, 3);
 
     const bulletText = excerptLines.length > 0
       ? excerptLines.map((l) => `• ${l.replace(/^[-*•\d.]+\s*/, '')}`).join('\n')
-      : `• ${doc.excerpt.slice(0, 150)}...`;
+      : `• Áp dụng tư thế sinh hoạt chuẩn, tránh gập cong lưng hoặc vặn xoắn đột ngột.\n• Nằm nghỉ ngơi giải áp, kê nhẹ gối dưới khoeo chân.\n• Vận động kéo giãn nhẹ nhàng để tăng tuần hoàn nuôi dưỡng sụn khớp.`;
 
     return {
       answer: `Theo tài liệu hướng dẫn của tác giả Tùng dinh dưỡng:\n\n${bulletText}\n\nMời bạn mở bài học bên dưới để xem hình ảnh và video giải phẫu trực quan.`,
-      suggested_pages: selected.map((s) => ({
+      suggested_pages: selectedPages.map((s) => ({
         title: s.page_title,
         topic_title: s.topic_title,
         topic_slug: s.topic_slug,
@@ -326,6 +419,7 @@ function fastFallbackSearch(query: string, catalog: LessonCatalogItem[]) {
         'Tư thế sinh hoạt đúng cần chú ý gì?',
         'Cách phân biệt đau mỏi thông thường?',
       ],
+      provider: 'fallback_clean',
     };
   }
 
@@ -336,7 +430,7 @@ function fastFallbackSearch(query: string, catalog: LessonCatalogItem[]) {
 • Giữ vững đường cong sinh lý tự nhiên của cột sống trong mọi tư thế ngồi, đứng và nằm.
 • Duy trì vận động nhịp nhàng mỗi ngày để nuôi dưỡng sụn khớp và đĩa đệm qua cơ chế thẩm thấu.
 • Uống đủ nước và bổ sung dinh dưỡng cân bằng để hỗ trợ tái tạo mô liên kết.`,
-    suggested_pages: selected.map((s) => ({
+    suggested_pages: selectedPages.map((s) => ({
       title: s.page_title,
       topic_title: s.topic_title,
       topic_slug: s.topic_slug,
@@ -347,6 +441,7 @@ function fastFallbackSearch(query: string, catalog: LessonCatalogItem[]) {
       'Tư thế sinh hoạt đúng cần chú ý gì?',
       'Cách phân biệt đau mỏi thông thường?',
     ],
+    provider: 'fallback_clean',
   };
 }
 
@@ -359,6 +454,8 @@ export async function POST(req: NextRequest) {
     if (!question) {
       return NextResponse.json({ error: 'Vui lòng nhập câu hỏi.' }, { status: 400 });
     }
+
+    const isAskingDoctorLoan = /doctor\s*loan/i.test(question);
 
     // 1. KIỂM TRA PHẢN HỒI TỨC THÌ TỪ DANH SÁCH CÂU HỎI MẪU CHUẨN XÁC (< 5ms)
     const curated = findCuratedMatch(question);
@@ -388,29 +485,26 @@ export async function POST(req: NextRequest) {
       });
 
       if (matchedFaq && matchedFaq.answer) {
-        const relatedPages = catalog
-          .filter((c) => {
-            const text = `${c.page_title} ${c.topic_title} ${c.summary}`.toLowerCase();
-            const words = matchedFaq.question.toLowerCase().split(/\s+/).filter((w) => w.length > 2);
-            return words.some((w) => text.includes(w));
-          })
-          .slice(0, 2);
+        // Nếu người dùng KHÔNG hỏi DoctorLoan nhưng FAQ chứa DoctorLoan, bỏ qua để AI sinh nội dung chuẩn
+        if (isAskingDoctorLoan || !/doctor\s*loan/i.test(matchedFaq.answer)) {
+          const selectedPages = rankCatalogPages(question, catalog);
 
-        return NextResponse.json({
-          answer: matchedFaq.answer,
-          suggested_pages: (relatedPages.length > 0 ? relatedPages : catalog.slice(0, 2)).map((s) => ({
-            title: s.page_title,
-            topic_title: s.topic_title,
-            topic_slug: s.topic_slug,
-            page_slug: s.page_slug,
-            reason: 'Tài liệu hướng dẫn trực tiếp từ chuyên gia.',
-          })),
-          follow_up_questions: [
-            'Tư thế sinh hoạt đúng cần chú ý gì?',
-            'Có lưu ý gì trong sinh hoạt hàng ngày không?',
-          ],
-          provider: 'admin_faq',
-        });
+          return NextResponse.json({
+            answer: matchedFaq.answer,
+            suggested_pages: selectedPages.map((s) => ({
+              title: s.page_title,
+              topic_title: s.topic_title,
+              topic_slug: s.topic_slug,
+              page_slug: s.page_slug,
+              reason: 'Tài liệu hướng dẫn trực tiếp từ chuyên gia.',
+            })),
+            follow_up_questions: [
+              'Tư thế sinh hoạt đúng cần chú ý gì?',
+              'Có lưu ý gì trong sinh hoạt hàng ngày không?',
+            ],
+            provider: 'admin_faq',
+          });
+        }
       }
     }
 
@@ -421,33 +515,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(fastFallbackSearch(question, catalog));
     }
 
-    // 3. LỌC 2-3 BÀI HỌC LIÊN QUAN NHẤT TỪ CATALOG (GIẢM 90% ĐỘ TRỄ SUY NGHĨ CỦA AI)
-    const lowerTokens = lowerQ.split(/[\s,?.!;:()\[\]{}"]+/).filter((w: string) => w.length >= 2);
-    const scoredCatalog = catalog.map((c) => {
-      let score = 0;
-      const text = `${c.page_title} ${c.topic_title} ${c.summary}`.toLowerCase();
-      lowerTokens.forEach((t: string) => {
-        if (text.includes(t)) score += 1;
-      });
-      return { c, score };
-    });
-    scoredCatalog.sort((a, b) => b.score - a.score);
-    const topCatalog = scoredCatalog[0]?.score > 0 ? scoredCatalog.slice(0, 3).map((sc: { c: LessonCatalogItem }) => sc.c) : catalog.slice(0, 2);
+    // 3. LỌC 2-3 BÀI HỌC LIÊN QUAN NHẤT TỪ CATALOG BẰNG THUẬT TOÁN ĐIỂM CHỦ ĐỀ
+    const topCatalog = rankCatalogPages(question, catalog);
 
     const catalogText = topCatalog
       .map((c, idx) => `[Bài ${idx + 1}] "${c.page_title}" (Chủ đề: ${c.topic_title}, slug: ${c.topic_slug}/${c.page_slug}): ${c.summary}`)
       .join('\n');
 
-    // 4. HỆ THỐNG PROMPT TỐI ƯU: ĐÚNG TRỌNG TÂM, NGẮN GỌN, TUYỆT ĐỐI KHÔNG DÀI DÒNG
-    const systemPrompt = `Bạn là Trợ lý Sức Khỏe AI trong ứng dụng "Học Cơ Thể" (Tủ Sách Y Khoa Qbiz Books của tác giả Tùng dinh dưỡng).
+    // 4. HỆ THỐNG PROMPT TỐI ƯU: ĐÚNG TRỌNG TÂM, NGẮN GỌN, TUYỆT ĐỐI CẤM BÁN HÀNG DOCTORLOAN
+    const systemPrompt = `Bạn là Trợ lý Sức Khỏe AI trong ứng dụng giáo dục y học "Học Cơ Thể" (Tủ Sách Y Khoa Qbiz Books của tác giả Tùng dinh dưỡng).
 
 NGUYÊN TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ NGHIÊM NGẶT):
 1. ĐÚNG TRỌNG TÂM CÂU HỎI (P0):
    - Người học hỏi vấn đề gì, hãy trả lời trực diện, chính xác vào đúng vấn đề đó.
+   - Hỏi về thoát vị đĩa đệm (L4, L5, thắt lưng, cổ): Giải thích các nguyên tắc tự bảo vệ cột sống, tư thế nằm nghỉ, tránh cúi vặn xoắn và bài tập giải nén.
    - Hỏi về tư thế: Chỉ giải thích về tư thế sinh hoạt đúng (ngồi, đứng, cúi vác, nằm ngủ).
    - Hỏi về dinh dưỡng: Chỉ nói về dinh dưỡng, thực phẩm, kháng viêm.
    - Hỏi về nước: Chỉ nói về nước và cách uống nước.
-   - Hỏi về tập luyện: Chỉ hướng dẫn bài tập và kéo giãn cơ.
    - TUYỆT ĐỐI KHÔNG lan man sang các chủ đề không liên quan.
 
 2. NGẮN GỌN & SÚC TÍCH (P0):
@@ -455,8 +539,8 @@ NGUYÊN TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ NGHIÊM NGẶT):
    - Trình bày thông thoáng bằng 3 đến 4 gạch đầu dòng rõ ràng, dễ áp dụng ngay trong đời sống.
 
 3. TUYỆT ĐỐI CẤM (VI PHẠM SẼ BỊ HỦY BỎ):
+   - CẤM TUYỆT ĐỐI nhắc đến thương hiệu DoctorLoan, ghế DoctorLoan, gối DoctorLoan hay bất kỳ sản phẩm bán hàng nào (trừ khi người dùng đích thân hỏi từ "DoctorLoan").
    - CẤM TUYỆT ĐỐI chia kiểu máy móc: "TẦNG 1", "TẦNG 2", "TẦNG 3".
-   - CẤM tự ý chèn sản phẩm/sáng chế DoctorLoan nếu người học không hỏi về công cụ hỗ trợ.
    - CẤM tự ý đưa công thức nước 0.04 hay cảnh báo cấp cứu/bệnh viện vào các câu hỏi sinh hoạt thông thường.
    - CẤM các từ: "chữa bệnh", "khám chữa bệnh", "điều trị dứt điểm", "bác sĩ".
    - CẤM các câu trần tình như "tôi không phải bác sĩ", "tác giả không phải bác sĩ".
@@ -615,6 +699,14 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
         .replace(/nắn\s+chỉnh/gi, 'hỗ trợ điều chỉnh tư thế')
         .replace(/uốn\s+nắn/gi, 'hỗ trợ điều chỉnh')
         .trim();
+
+      // BẢO VỆ TUYỆT ĐỐI: NẾU NGƯỜI DÙNG KHÔNG HỎI DOCTORLOAN, LOẠI BỎ TRIỆT ĐỂ
+      if (!isAskingDoctorLoan) {
+        cleanAnswer = cleanAnswer
+          .replace(/.*(?:doctor\s*loan|ghế\s+nhựa\s+doctorloan|gối\s+doctorloan).*\n?/gi, '')
+          .replace(/\bdoctor\s*loan\b/gi, '')
+          .trim();
+      }
 
       if (cleanAnswer.length > 0) {
         cleanAnswer = cleanAnswer.charAt(0).toUpperCase() + cleanAnswer.slice(1);

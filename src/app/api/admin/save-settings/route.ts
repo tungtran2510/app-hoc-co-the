@@ -31,7 +31,8 @@ export async function POST(req: NextRequest) {
     const updatedBlockStyles = {
       ...existingBlockStyles,
       ...(settings.block_styles || {}),
-      app_subtitle: settings.app_subtitle !== undefined ? settings.app_subtitle : (existingBlockStyles.app_subtitle ?? 'Kiến thức đúng · Sức khỏe bền vững'),
+      app_subtitle: settings.app_subtitle !== undefined ? settings.app_subtitle : (existingBlockStyles.app_subtitle !== undefined ? existingBlockStyles.app_subtitle : null),
+      brand_tagline: settings.brand_tagline !== undefined ? settings.brand_tagline : (existingBlockStyles.brand_tagline !== undefined ? existingBlockStyles.brand_tagline : null),
       home_greeting: settings.home_greeting !== undefined ? settings.home_greeting : (existingBlockStyles.home_greeting ?? 'Xin chào!'),
       home_title: settings.home_title !== undefined ? settings.home_title : (existingBlockStyles.home_title ?? 'Hôm nay mình học gì?'),
       search_placeholder: settings.search_placeholder !== undefined ? settings.search_placeholder : (existingBlockStyles.search_placeholder ?? 'Tìm bài, ví dụ: đĩa đệm'),
@@ -102,6 +103,7 @@ export async function POST(req: NextRequest) {
       settings: {
         ...merged,
         app_subtitle: updatedBlockStyles.app_subtitle,
+        brand_tagline: updatedBlockStyles.brand_tagline,
       },
     });
   } catch (err: any) {

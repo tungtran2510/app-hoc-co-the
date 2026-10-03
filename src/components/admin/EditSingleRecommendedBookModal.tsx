@@ -372,23 +372,19 @@ export default function EditSingleRecommendedBookModal({
             />
 
             {extractYouTubeId(youtubeUrl) ? (
-              <div className="mt-2">
+              <div className="mt-2 rounded-[12px] overflow-hidden border border-line">
                 <YouTubeEmbed
                   youtubeId={extractYouTubeId(youtubeUrl)!}
                   title={`Video giới thiệu ${title || 'cuốn sách'}`}
-                  showAdminTip={true}
+                  showAdminTip={false}
                   showExternalLink={true}
                 />
               </div>
             ) : youtubeUrl.trim() ? (
               <p className="text-[11.5px] text-amber-600 dark:text-amber-400 font-medium">
-                ⚠️ Không nhận diện được mã video từ link trên. Hãy kiểm tra lại định dạng link YouTube.
+                ⚠️ Không nhận diện được video từ link trên. Vui lòng kiểm tra lại đường dẫn YouTube.
               </p>
-            ) : (
-              <p className="text-[11.5px] text-muted">
-                Gắn link YouTube giúp độc giả xem video giới thiệu hoặc tác giả thuyết trình về cuốn sách này.
-              </p>
-            )}
+            ) : null}
           </div>
 
           {/* 7. Ảnh bên trong tài liệu (Gallery) */}

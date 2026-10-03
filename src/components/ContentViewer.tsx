@@ -251,7 +251,10 @@ export default function ContentViewer({
       }
         const targetColor = mode === 'dark' ? '#0C0817' : '#FFFFFF';
         const metas = document.querySelectorAll('meta[name="theme-color"]');
-        metas.forEach((m) => m.setAttribute('content', targetColor));
+        metas.forEach((m) => {
+          m.setAttribute('content', targetColor);
+          m.removeAttribute('media');
+        });
         window.dispatchEvent(new Event('giao_dien_changed'));
       } catch {
         // Bỏ qua

@@ -28,6 +28,7 @@ import { getUserPhone, LEARNING_PROGRESS_EVENT } from '../lib/userSync';
 interface HomeHeaderProps {
   initialAppName: string;
   initialAppSubtitle?: string | null;
+  initialBrandTagline?: string | null;
   initialLogoUrl?: string | null;
   initialHotline?: string | null;
   initialZaloUrl?: string | null;
@@ -36,6 +37,7 @@ interface HomeHeaderProps {
 export default function HomeHeader({
   initialAppName,
   initialAppSubtitle,
+  initialBrandTagline,
   initialLogoUrl,
   initialHotline,
   initialZaloUrl,
@@ -44,6 +46,7 @@ export default function HomeHeader({
   const [supabaseOk, setSupabaseOk] = useState(false);
   const [appName, setAppName] = useState(initialAppName || '');
   const [appSubtitle, setAppSubtitle] = useState(initialAppSubtitle ?? '');
+  const [brandTagline, setBrandTagline] = useState(initialBrandTagline ?? '');
   const [logoUrl, setLogoUrl] = useState<string | null>(initialLogoUrl || null);
   const [hotline, setHotline] = useState<string | null>(initialHotline || null);
   const [zaloUrl, setZaloUrl] = useState<string | null>(initialZaloUrl || null);
@@ -71,7 +74,10 @@ export default function HomeHeader({
       }
       const targetColor = darkActive ? '#0C0817' : '#FFFFFF';
       const metas = document.querySelectorAll('meta[name="theme-color"]');
-      metas.forEach((m) => m.setAttribute('content', targetColor));
+      metas.forEach((m) => {
+        m.setAttribute('content', targetColor);
+        m.removeAttribute('media');
+      });
     } catch {
       setIsDark(false);
     }
@@ -90,7 +96,10 @@ export default function HomeHeader({
       }
       const targetColor = nextDark ? '#0C0817' : '#FFFFFF';
       const metas = document.querySelectorAll('meta[name="theme-color"]');
-      metas.forEach((m) => m.setAttribute('content', targetColor));
+      metas.forEach((m) => {
+        m.setAttribute('content', targetColor);
+        m.removeAttribute('media');
+      });
       window.dispatchEvent(new Event('giao_dien_changed'));
     } catch {}
   };
@@ -464,13 +473,15 @@ export default function HomeHeader({
           isOpen={true}
           initialName={appName}
           initialSubtitle={appSubtitle}
+          initialBrandTagline={brandTagline}
           initialLogoUrl={logoUrl}
           initialHotline={hotline || ''}
           initialZaloUrl={zaloUrl || ''}
           onClose={() => setShowEditApp(false)}
-          onSaved={(newName, newSubtitle, newLogo, newHotline, newZalo) => {
+          onSaved={(newName, newSubtitle, newLogo, newHotline, newZalo, newTagline) => {
             setAppName(newName);
             setAppSubtitle(newSubtitle);
+            if (newTagline !== undefined) setBrandTagline(newTagline);
             setLogoUrl(newLogo);
             setHotline(newHotline);
             setZaloUrl(newZalo);

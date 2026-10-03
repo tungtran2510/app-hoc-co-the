@@ -24,7 +24,10 @@ export default function PwaRegistrar() {
         const isDark = stored === 'dark' || (!stored && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
         const targetColor = isDark ? '#0C0817' : '#FFFFFF';
         const metas = document.querySelectorAll('meta[name="theme-color"]');
-        metas.forEach((m) => m.setAttribute('content', targetColor));
+        metas.forEach((m) => {
+          m.setAttribute('content', targetColor);
+          m.removeAttribute('media');
+        });
       };
       syncThemeColor();
       window.addEventListener('giao_dien_changed', syncThemeColor);
