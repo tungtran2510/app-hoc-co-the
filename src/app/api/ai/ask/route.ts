@@ -716,6 +716,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
               l = l.replace(/gối\s+cao\s+vừa\s+phải/gi, 'độ dốc vừa phải');
               l = l.replace(/ngủ\s+sai\s+gối/gi, 'nằm sai tư thế cổ');
               l = l.replace(/(?<!(?:đầu|khớp|gập|chùng)\s*)gối/gi, '');
+              l = l.replace(/(?:,\s*)?(?:không\s+dùng|tránh)\s*(?=\))/gi, '');
               l = l.replace(/\s*\(\s*(?:không\s+dùng|tránh)?\s*\)/gi, '');
               l = l.replace(/\s*\(\s*\)/g, '');
               return l.replace(/\s{2,}/g, ' ').trim();
