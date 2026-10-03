@@ -12,12 +12,16 @@ import {
   Check,
   Plus,
   Trash2,
+  Crop,
+  Link2,
 } from 'lucide-react';
 import { RecommendedBook } from '../../lib/types';
 import { uploadImageFile } from '../../lib/storageUpload';
 import { extractYouTubeId } from '../../lib/youtube';
 import YouTubeEmbed from '../YouTubeEmbed';
 import BookFlipbookAdminSection from './BookFlipbookAdminSection';
+import ImageCropModal, { AspectRatioOption } from './ImageCropModal';
+import { useImageAspectRatio } from '../../lib/imageAspectRatio';
 
 interface EditSingleRecommendedBookModalProps {
   isOpen: boolean;
@@ -48,12 +52,24 @@ export default function EditSingleRecommendedBookModal({
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [isUploadingGallery, setIsUploadingGallery] = useState(false);
   const [singleGalleryUrl, setSingleGalleryUrl] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
-  const [successNotice, setSuccessNotice] = useState('');
+  const [showCoverUrlInput, setShowCoverUrlInput] = useState(false);
+  const [showGalleryUrlInput, setShowGalleryUrlInput] = useState(false);
+
+  // Quản lý Modal Cắt Khung Ảnh
+  const [cropModalData, setCropModalData] = useState<{
+    isOpen: boolean;
+    url: string;
+    title: string;
+    aspect: AspectRatioOption;
+    target: 'cover' | { galleryIndex: number };
+  } | null>(null);
 
   const coverInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
+  const { dimensions: coverDimensions } = useImageAspectRatio(coverUrl);
+  const [isSaving, setIsSaving] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [successNotice, setSuccessNotice] = useState('');
 
   useEffect(() => {
     if (isOpen && book) {
@@ -310,33 +326,86 @@ export default function EditSingleRecommendedBookModal({
 
           {/* KHỐI 2: ẢNH BÌA & VIDEO YOUTUBE (GỌN 2 CỘT) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {/* Cột 1: Ảnh bìa sách (Tỷ lệ 3:4) */}
+            {/* Cột 1: Ảnh bìa sách (Tỷ lệ 3:4 & Cắt khung) */}
             <div className="p-3 rounded-[16px] bg-surface-2/60 border border-line space-y-2">
               <div className="flex items-center justify-between">
                 <label className="text-[12px] font-extrabold text-ink uppercase tracking-wide flex items-center gap-1.5">
                   <ImageIcon size={14} className="text-primary" />
                   <span>Ảnh bìa (Tỷ lệ 3:4)</span>
                 </label>
-                {coverUrl && (
-                  <button
-                    type="button"
-                    onClick={() => setCoverUrl(null)}
-                    className="text-[11px] text-red-600 font-bold hover:underline cursor-pointer"
-                  >
-                    Xóa bìa
-                  </button>
-                )}
+                <div className="flex items-center gap-2">
+                  {coverUrl && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setCropModalData({
+                            isOpen: true,
+                            url: coverUrl,
+                            title: 'Cắt Khung Ảnh Bìa Sách',
+                            aspect: '3:4',
+                            target: 'cover',
+                          })
+                        }
+                        className="text-[11px] text-amber-600 dark:text-amber-400 hover:underline font-bold flex items-center gap-1 cursor-pointer"
+                        title="Cắt chỉnh khung ảnh bìa"
+                      >
+                        <Crop size={12} strokeWidth={2.5} />
+                        <span>Cắt ảnh</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setCoverUrl(null)}
+                        className="text-[11px] text-red-600 font-bold hover:underline cursor-pointer"
+                      >
+                        Xóa bìa
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
 
               <div className="flex items-center gap-2.5">
-                <div className="w-[70px] aspect-[3/4] rounded-[10px] overflow-hidden border border-line bg-surface shrink-0 shadow-2xs relative">
+                {/* Vùng xem trước ảnh bìa - Nhấn vào để cắt ảnh */}
+                <div
+                  onClick={() => {
+                    if (coverUrl) {
+                      setCropModalData({
+                        isOpen: true,
+                        url: coverUrl,
+                        title: 'Cắt Khung Ảnh Bìa Sách',
+                        aspect: '3:4',
+                        target: 'cover',
+                      });
+                    } else {
+                      coverInputRef.current?.click();
+                    }
+                  }}
+                  className={`w-[70px] aspect-[3/4] rounded-[10px] overflow-hidden border border-line bg-surface shrink-0 shadow-2xs relative flex items-center justify-center group cursor-pointer ${
+                    coverUrl ? 'hover:border-amber-400' : ''
+                  }`}
+                  title={coverUrl ? 'Nhấn để cắt và chỉnh khung ảnh bìa' : 'Nhấn để chọn ảnh từ máy'}
+                >
                   {coverUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={coverUrl}
-                      alt="Bìa sách"
-                      className="w-full h-full object-cover"
-                    />
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={coverUrl}
+                        alt="Bìa sách"
+                        className="w-full h-full object-cover"
+                      />
+                      {/* Lớp phủ hover cắt ảnh */}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-0.5 text-white">
+                        <Crop size={15} strokeWidth={2.5} className="text-amber-300" />
+                        <span className="text-[8px] font-black uppercase text-amber-300">Cắt ảnh</span>
+                      </div>
+                      {/* Badge tỷ lệ tự động nhận diện */}
+                      {coverDimensions && (
+                        <div className="absolute bottom-0.5 left-0.5 px-1 py-0.2 rounded bg-black/75 text-amber-300 font-black text-[7.5px] uppercase">
+                          {coverDimensions.label.split(' ')[0]}
+                        </div>
+                      )}
+                    </>
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center p-1 text-center bg-primary-soft/30 text-muted">
                       <BookOpen size={18} className="text-primary/70 mb-0.5" />
@@ -353,32 +422,69 @@ export default function EditSingleRecommendedBookModal({
                     accept="image/*"
                     className="hidden"
                   />
-                  <button
-                    type="button"
-                    onClick={() => coverInputRef.current?.click()}
-                    disabled={isUploadingCover}
-                    className="w-full h-8 px-2 rounded-[9px] bg-white dark:bg-white/10 border border-line text-ink font-bold text-[11.5px] hover:border-primary cursor-pointer shadow-2xs transition-colors flex items-center justify-center gap-1.5"
-                  >
-                    {isUploadingCover ? (
-                      <>
-                        <Loader2 size={12} className="animate-spin text-primary" />
-                        <span>Đang tải...</span>
-                      </>
-                    ) : (
-                      <>
-                        <ImageIcon size={12} className="text-primary" />
-                        <span>Chọn ảnh bìa từ máy</span>
-                      </>
-                    )}
-                  </button>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => coverInputRef.current?.click()}
+                      disabled={isUploadingCover}
+                      className="flex-1 h-8 px-2 rounded-[9px] bg-white dark:bg-white/10 border border-line text-ink font-bold text-[11.5px] hover:border-primary cursor-pointer shadow-2xs transition-colors flex items-center justify-center gap-1.5"
+                    >
+                      {isUploadingCover ? (
+                        <>
+                          <Loader2 size={12} className="animate-spin text-primary" />
+                          <span>Đang tải...</span>
+                        </>
+                      ) : (
+                        <>
+                          <ImageIcon size={12} className="text-primary" />
+                          <span>Chọn ảnh bìa từ máy</span>
+                        </>
+                      )}
+                    </button>
 
-                  <input
-                    type="url"
-                    value={coverUrl || ''}
-                    onChange={(e) => setCoverUrl(e.target.value.trim() || null)}
-                    placeholder="Hoặc dán URL ảnh bìa..."
-                    className="w-full h-7.5 px-2.5 rounded-[8px] border border-line text-[11px] text-ink focus:border-primary bg-surface"
-                  />
+                    {/* Nút cắt nhanh */}
+                    {coverUrl && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setCropModalData({
+                            isOpen: true,
+                            url: coverUrl,
+                            title: 'Cắt Khung Ảnh Bìa Sách',
+                            aspect: '3:4',
+                            target: 'cover',
+                          })
+                        }
+                        className="h-8 px-2.5 rounded-[9px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[11px] flex items-center gap-1 cursor-pointer transition-colors shrink-0 shadow-xs"
+                        title="Kéo trượt cắt khung vừa ý"
+                      >
+                        <Crop size={12} strokeWidth={2.5} />
+                        <span>Cắt</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Nút thu gọn / mở ô dán link URL */}
+                  <div className="flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={() => setShowCoverUrlInput(!showCoverUrlInput)}
+                      className="text-[10.5px] text-muted hover:text-primary font-bold flex items-center gap-1 cursor-pointer"
+                    >
+                      <Link2 size={11} />
+                      <span>{showCoverUrlInput ? 'Ẩn ô dán link' : 'Hoặc dán link URL ảnh'}</span>
+                    </button>
+                  </div>
+
+                  {showCoverUrlInput && (
+                    <input
+                      type="url"
+                      value={coverUrl || ''}
+                      onChange={(e) => setCoverUrl(e.target.value.trim() || null)}
+                      placeholder="Dán URL ảnh bìa https://..."
+                      className="w-full h-7.5 px-2.5 rounded-[8px] border border-line text-[11px] text-ink focus:border-primary bg-surface animate-in fade-in duration-150"
+                    />
+                  )}
                 </div>
               </div>
 
@@ -401,7 +507,7 @@ export default function EditSingleRecommendedBookModal({
                 </div>
 
                 <p className="text-[10.5px] text-muted leading-tight">
-                  Ảnh chụp thực tế cuốn sách (hiển thị ở mục &quot;Hình ảnh&quot; cho độc giả phóng to xem)
+                  Chạm vào ảnh để kéo trượt cắt khung vừa ý
                 </p>
 
                 {/* Input file chọn nhiều ảnh chụp sách */}
@@ -414,12 +520,22 @@ export default function EditSingleRecommendedBookModal({
                   className="hidden"
                 />
 
-                {/* Dãy các khung ảnh rất nhỏ dưới ảnh bìa */}
+                {/* Dãy các khung ảnh dưới ảnh bìa: Cắt ảnh khi bấm */}
                 <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
                   {galleryImages.map((imgUrl, gIdx) => (
                     <div
                       key={gIdx}
-                      className="relative w-12 h-16 sm:w-13 sm:h-17 aspect-[3/4] rounded-[8px] overflow-hidden border border-line bg-surface shadow-2xs group shrink-0"
+                      onClick={() =>
+                        setCropModalData({
+                          isOpen: true,
+                          url: imgUrl,
+                          title: `Cắt Ảnh #${gIdx + 1} Của Sách`,
+                          aspect: 'auto',
+                          target: { galleryIndex: gIdx },
+                        })
+                      }
+                      className="relative w-12 h-16 sm:w-13 sm:h-17 aspect-[3/4] rounded-[8px] overflow-hidden border border-line bg-surface shadow-2xs group shrink-0 cursor-pointer hover:border-amber-400 transition-all"
+                      title={`Nhấn vào ảnh #${gIdx + 1} để kéo trượt cắt khung`}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
@@ -427,15 +543,38 @@ export default function EditSingleRecommendedBookModal({
                         alt={`Ảnh sách ${gIdx + 1}`}
                         className="w-full h-full object-cover"
                       />
-                      <button
-                        type="button"
-                        onClick={() => setGalleryImages(galleryImages.filter((_, idx) => idx !== gIdx))}
-                        className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-red-600/90 text-white flex items-center justify-center opacity-90 hover:opacity-100 hover:scale-110 transition-all cursor-pointer shadow-xs"
-                        title="Xóa ảnh này"
-                      >
-                        <X size={10} />
-                      </button>
-                      <span className="absolute bottom-0.5 left-0.5 px-1 py-0.2 rounded bg-black/75 text-white text-[8px] font-black leading-none">
+                      {/* Nút cắt & xóa nổi khi hover */}
+                      <div className="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCropModalData({
+                              isOpen: true,
+                              url: imgUrl,
+                              title: `Cắt Ảnh #${gIdx + 1} Của Sách`,
+                              aspect: 'auto',
+                              target: { galleryIndex: gIdx },
+                            });
+                          }}
+                          className="w-5 h-5 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center hover:scale-110 transition-transform cursor-pointer shadow-xs"
+                          title="Cắt ảnh này"
+                        >
+                          <Crop size={11} strokeWidth={2.5} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setGalleryImages(galleryImages.filter((_, idx) => idx !== gIdx));
+                          }}
+                          className="w-5 h-5 rounded-full bg-red-600/90 text-white flex items-center justify-center hover:scale-110 transition-transform cursor-pointer shadow-xs"
+                          title="Xóa ảnh này"
+                        >
+                          <X size={11} strokeWidth={2.5} />
+                        </button>
+                      </div>
+                      <span className="absolute bottom-0.5 left-0.5 px-1 py-0.2 rounded bg-black/75 text-white text-[8px] font-black leading-none pointer-events-none">
                         #{gIdx + 1}
                       </span>
                     </div>
@@ -471,6 +610,17 @@ export default function EditSingleRecommendedBookModal({
                     <Plus size={11} />
                     <span>Chọn ảnh từ máy</span>
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowGalleryUrlInput(!showGalleryUrlInput)}
+                    className="text-[10px] text-muted hover:text-primary font-bold flex items-center gap-0.5 cursor-pointer ml-auto"
+                  >
+                    <Link2 size={10} />
+                    <span>{showGalleryUrlInput ? 'Ẩn URL' : 'Dán URL'}</span>
+                  </button>
+                </div>
+
+                {showGalleryUrlInput && (
                   <input
                     type="url"
                     value={singleGalleryUrl}
@@ -481,10 +631,10 @@ export default function EditSingleRecommendedBookModal({
                         handleAddSingleGalleryUrl();
                       }
                     }}
-                    placeholder="Hoặc dán URL ảnh + Enter..."
-                    className="flex-1 h-6.5 px-2 rounded-[6px] border border-line text-[10.5px] font-medium text-ink focus:border-primary bg-surface"
+                    placeholder="Dán link ảnh + Enter..."
+                    className="w-full h-6.5 px-2 rounded-[6px] border border-line text-[10.5px] text-ink focus:border-primary bg-surface animate-in fade-in duration-150"
                   />
-                </div>
+                )}
               </div>
             </div>
 
@@ -583,6 +733,32 @@ export default function EditSingleRecommendedBookModal({
           </button>
         </div>
       </div>
+
+      {/* MODAL CẮT VÀ CĂN KHUNG ẢNH */}
+      {cropModalData && (
+        <ImageCropModal
+          isOpen={cropModalData.isOpen}
+          imageUrl={cropModalData.url}
+          title={cropModalData.title}
+          defaultAspect={cropModalData.aspect}
+          onClose={() => setCropModalData(null)}
+          onCropSaved={async (newUrl) => {
+            if (cropModalData.target === 'cover') {
+              setCoverUrl(newUrl);
+              setSuccessNotice('✓ Đã cắt và cập nhật ảnh bìa sách thành công!');
+            } else {
+              const idx = cropModalData.target.galleryIndex;
+              setGalleryImages((prev) => {
+                const next = [...prev];
+                next[idx] = newUrl;
+                return next;
+              });
+              setSuccessNotice(`✓ Đã cắt và cập nhật ảnh #${idx + 1} của cuốn sách!`);
+            }
+            setCropModalData(null);
+          }}
+        />
+      )}
     </div>
   );
 }

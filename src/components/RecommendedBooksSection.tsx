@@ -205,7 +205,7 @@ export default function RecommendedBooksSection({
                 onClick={() => toggleLayoutMode('grid')}
                 className={`w-7 h-7 rounded-[7px] flex items-center justify-center transition-all cursor-pointer ${
                   layoutMode === 'grid'
-                    ? 'bg-purple-900 text-amber-300 shadow-xs font-bold'
+                    ? 'bg-[#1E3A8A] text-amber-300 shadow-xs font-bold'
                     : 'text-slate-400 hover:text-slate-700 dark:text-purple-300 dark:hover:text-white'
                 }`}
                 title="Xem dạng lưới 2 cột"
@@ -218,7 +218,7 @@ export default function RecommendedBooksSection({
                 onClick={() => toggleLayoutMode('lookbook')}
                 className={`w-7 h-7 rounded-[7px] flex items-center justify-center transition-all cursor-pointer ${
                   layoutMode === 'lookbook'
-                    ? 'bg-purple-900 text-amber-300 shadow-xs font-bold'
+                    ? 'bg-[#1E3A8A] text-amber-300 shadow-xs font-bold'
                     : 'text-slate-400 hover:text-slate-700 dark:text-purple-300 dark:hover:text-white'
                 }`}
                 title="Xem dạng danh sách chi tiết"
@@ -271,7 +271,7 @@ export default function RecommendedBooksSection({
               >
                 <div
                   onClick={() => setSelectedBook(book)}
-                  className={`group p-3 sm:p-4 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-lg hover:shadow-purple-900/10 hover:border-purple-400/60 dark:hover:border-[#F8DF7B]/60 dark:hover:shadow-[0_12px_28px_rgba(248,223,123,0.15)] hover:-translate-y-1.5 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 flex flex-row gap-3 sm:gap-4.5 cursor-pointer relative ${
+                  className={`group p-3 sm:p-4 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-lg hover:shadow-blue-900/10 hover:border-[#1E3A8A]/50 dark:hover:border-[#F8DF7B]/60 dark:hover:shadow-[0_12px_28px_rgba(248,223,123,0.15)] hover:-translate-y-1.5 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 flex flex-row gap-3 sm:gap-4.5 cursor-pointer relative ${
                     isBookHidden ? 'opacity-70 border-dashed border-amber-300' : ''
                   }`}
                 >
@@ -294,43 +294,28 @@ export default function RecommendedBooksSection({
                   {/* THÔNG TIN CHI TIẾT BÊN PHẢI - RỘNG RÃI */}
                   <div className="flex-1 flex flex-col justify-between min-w-0 py-0.5">
                     <div className="flex flex-col gap-1.5">
-                      {/* Đầu mục / Thể loại sách có thể tùy chỉnh (Cột sống, Dinh dưỡng, Cơ xương khớp...) */}
-                      <div className="flex items-center gap-1.5">
-                        <span className="px-2 py-0.5 rounded-[5px] bg-amber-50 text-amber-800 border border-amber-300 dark:bg-purple-950/80 dark:text-purple-200 dark:border-purple-800/40 text-[10px] font-extrabold tracking-wide uppercase shrink-0">
-                          {book.category || book.tag || (idx === 0 ? 'Cơ Xương Khớp' : idx === 1 ? 'Cột Sống' : idx === 2 ? 'Dinh Dưỡng' : 'Cột Sống Cổ')}
-                        </span>
-                      </div>
-
-                      <h3 className="text-[15px] sm:text-[16.5px] font-extrabold text-slate-900 dark:text-white leading-snug line-clamp-2 break-normal group-hover:text-purple-700 dark:group-hover:text-[#F8DF7B] transition-colors">
+                      <h3 className="text-[16px] sm:text-[17.5px] font-black text-slate-900 dark:text-white leading-snug line-clamp-2 break-normal group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] transition-colors">
                         {book.title}
                       </h3>
-
-                      {book.description && (
-                        <p className="text-[12px] sm:text-[12.5px] text-slate-600 dark:text-purple-200/90 leading-relaxed line-clamp-1">
-                          {book.description}
-                        </p>
-                      )}
                     </div>
 
-                    <div className="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-purple-800/40 mt-1.5">
+                    <div className="pt-2.5 flex items-center justify-between border-t border-slate-100 dark:border-purple-800/40 mt-2 gap-2">
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           setFlipbookPreviewBook(book);
                         }}
-                        className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[9px] bg-gradient-to-r from-[#FFF0BA] via-[#ECC45F] to-[#D4A028] hover:from-[#FFF5CE] hover:to-[#DFAC32] text-[#1A1608] font-black text-[11.5px] sm:text-[12px] shadow-xs shadow-[#D4A028]/25 cursor-pointer transition-all active:scale-95 border border-[#F3D37A] overflow-hidden shrink-0"
+                        className="animate-bubble-float relative inline-flex items-center gap-2 px-4 py-2 sm:px-4.5 sm:py-2.5 rounded-[12px] bg-gradient-to-r from-[#FFF0BA] via-[#ECC45F] to-[#D4A028] hover:from-[#FFF5CE] hover:to-[#DFAC32] text-[#1A1608] font-black text-[13px] sm:text-[14px] shadow-md shadow-[#D4A028]/35 cursor-pointer transition-all active:scale-95 border border-[#F3D37A] shrink-0"
                         title="Xem thử 3D"
                       >
-                        {/* Vệt sáng Flash quét định kỳ */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/70 to-transparent -translate-x-full animate-flash-sweep pointer-events-none" />
-                        <BookOpen size={12} strokeWidth={2.8} className="shrink-0 text-[#1A1608]" />
-                        <span>Xem thử 3D</span>
+                        <BookOpen size={16} strokeWidth={2.8} className="shrink-0 text-[#1A1608]" />
+                        <span className="tracking-wide">Xem thử 3D</span>
                       </button>
 
-                      <span className="text-[12px] font-black text-purple-700 dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0 ml-auto">
+                      <span className="text-[12.5px] sm:text-[13px] font-black text-[#1E3A8A] dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0 ml-auto">
                         <span>Chi tiết</span>
-                        <ChevronRight size={13} strokeWidth={2.5} />
+                        <ChevronRight size={14} strokeWidth={2.5} />
                       </span>
                     </div>
 
@@ -414,7 +399,7 @@ export default function RecommendedBooksSection({
               >
                 <div
                   onClick={() => setSelectedBook(book)}
-                  className={`group p-3 sm:p-3.5 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-lg hover:shadow-purple-950/10 hover:border-amber-400/80 dark:hover:border-[#F8DF7B]/60 dark:hover:shadow-[0_12px_28px_rgba(248,223,123,0.15)] hover:-translate-y-1.5 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 flex flex-col cursor-pointer relative h-full ${
+                  className={`group p-3 sm:p-3.5 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-lg hover:shadow-blue-950/10 hover:border-[#1E3A8A]/50 dark:hover:border-[#F8DF7B]/60 dark:hover:shadow-[0_12px_28px_rgba(248,223,123,0.15)] hover:-translate-y-1.5 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 flex flex-col cursor-pointer relative h-full ${
                     isBookHidden ? 'opacity-70 border-dashed border-amber-300' : ''
                   }`}
                 >
@@ -435,40 +420,28 @@ export default function RecommendedBooksSection({
                   </div>
 
                   {/* NỘI DUNG CHÂN THẺ */}
-                  <div className="flex-1 flex flex-col pt-1.5 gap-1 min-w-0">
-                    <span className="self-start px-1.5 py-0.5 rounded-[4px] bg-amber-50 text-amber-800 border border-amber-300/70 dark:bg-purple-950/80 dark:text-purple-200 dark:border-purple-800/40 text-[9.5px] font-extrabold tracking-wider uppercase truncate max-w-full">
-                      {book.category || book.tag || (idx === 0 ? 'Cơ Xương Khớp' : idx === 1 ? 'Cột Sống' : idx === 2 ? 'Dinh Dưỡng' : 'Cột Sống Cổ')}
-                    </span>
-
-                    <h3 className="text-[13.5px] sm:text-[14.5px] font-extrabold text-slate-900 dark:text-white leading-snug line-clamp-2 min-h-[36px] group-hover:text-amber-700 dark:group-hover:text-[#F8DF7B] transition-colors">
+                  <div className="flex-1 flex flex-col pt-1 gap-1.5 min-w-0">
+                    <h3 className="text-[14px] sm:text-[15px] font-black text-slate-900 dark:text-white leading-snug line-clamp-2 min-h-[36px] group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] transition-colors">
                       {book.title}
                     </h3>
 
-                    {book.description && (
-                      <p className="text-[11px] sm:text-[11.5px] text-slate-600 dark:text-purple-200/90 leading-relaxed line-clamp-1">
-                        {book.description}
-                      </p>
-                    )}
-
-                    <div className="mt-auto pt-2 flex items-center justify-between border-t border-slate-100 dark:border-purple-800/40 gap-1">
+                    <div className="mt-auto pt-2 flex items-center justify-between border-t border-slate-100 dark:border-purple-800/40 gap-1.5">
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           setFlipbookPreviewBook(book);
                         }}
-                        className="relative inline-flex items-center justify-center gap-1 px-2.5 py-1 rounded-[7px] bg-gradient-to-r from-[#FFF0BA] via-[#ECC45F] to-[#D4A028] hover:from-[#FFF5CE] hover:to-[#DFAC32] text-[#1A1608] font-black text-[10.5px] shadow-xs shadow-[#D4A028]/20 cursor-pointer transition-all active:scale-95 border border-[#F3D37A] overflow-hidden shrink-0"
+                        className="animate-bubble-float relative inline-flex items-center justify-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-[9px] sm:rounded-[10px] bg-gradient-to-r from-[#FFF0BA] via-[#ECC45F] to-[#D4A028] hover:from-[#FFF5CE] hover:to-[#DFAC32] text-[#1A1608] font-black text-[11.5px] sm:text-[12.5px] shadow-sm shadow-[#D4A028]/25 cursor-pointer transition-all active:scale-95 border border-[#F3D37A] shrink-0"
                         title="Đọc thử tài liệu 3D chân thực"
                       >
-                        {/* Vệt sáng Flash quét định kỳ */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/70 to-transparent -translate-x-full animate-flash-sweep pointer-events-none" />
-                        <BookOpen size={11} strokeWidth={2.8} className="shrink-0 text-[#1A1608]" />
+                        <BookOpen size={13} strokeWidth={2.8} className="shrink-0 text-[#1A1608]" />
                         <span>Đọc thử 3D</span>
                       </button>
 
-                      <span className="text-[10.5px] sm:text-[11px] font-black text-purple-700 dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0 ml-auto">
+                      <span className="text-[11px] sm:text-[12px] font-black text-[#1E3A8A] dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0 ml-auto">
                         <span>Chi tiết</span>
-                        <ChevronRight size={11} strokeWidth={2.5} />
+                        <ChevronRight size={12} strokeWidth={2.5} />
                       </span>
                     </div>
 

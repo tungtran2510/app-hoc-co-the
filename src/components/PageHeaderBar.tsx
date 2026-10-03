@@ -233,7 +233,7 @@ export default function PageHeaderBar({
           <Link
             href={`/${topicSlug}`}
             prefetch={true}
-            className="flex items-center gap-1 text-purple-700 hover:text-purple-900 dark:text-purple-300 text-[16px] sm:text-[17px] font-extrabold min-h-[44px] transition-colors truncate"
+            className="flex items-center gap-1 text-[#1E3A8A] hover:text-[#172554] dark:text-purple-300 text-[16px] sm:text-[17px] font-extrabold min-h-[44px] transition-colors truncate"
             aria-label={`Về chủ đề ${topicTitle}`}
             title={`Về chủ đề ${topicTitle}`}
           >
@@ -252,7 +252,7 @@ export default function PageHeaderBar({
             className={`flex items-center justify-center w-[44px] h-[44px] rounded-[14px] border-[1.5px] transition-all shadow-2xs cursor-pointer active:scale-95 ${
               isSaved
                 ? 'bg-amber-50 border-amber-400 text-amber-600 dark:bg-purple-900/50 dark:border-[#F8DF7B] dark:text-[#F8DF7B]'
-                : 'bg-white border-slate-200 text-slate-700 hover:border-purple-500 hover:text-purple-700 dark:bg-[#160D30] dark:border-purple-900/50 dark:text-purple-200 dark:hover:border-purple-600'
+                : 'bg-white border-slate-200 text-slate-700 hover:border-[#1E3A8A] hover:text-[#1E3A8A] dark:bg-[#160D30] dark:border-purple-900/50 dark:text-purple-200 dark:hover:border-purple-600'
             }`}
             aria-label={isSaved ? 'Bỏ lưu bài học này' : 'Lưu bài học này'}
             title={isSaved ? 'Đã lưu (Bấm để bỏ lưu)' : 'Lưu bài học'}
@@ -272,8 +272,8 @@ export default function PageHeaderBar({
             }}
             className={`flex items-center justify-center w-[44px] h-[44px] rounded-[14px] border-[1.5px] transition-all shadow-2xs cursor-pointer active:scale-95 ${
               showOptions
-                ? 'bg-purple-50 border-purple-500 text-purple-700 dark:bg-purple-900/50 dark:border-purple-500 dark:text-purple-200'
-                : 'bg-white border-slate-200 text-slate-700 hover:border-purple-500 hover:text-purple-700 dark:bg-[#160D30] dark:border-purple-900/50 dark:text-purple-200 dark:hover:border-purple-600'
+                ? 'bg-blue-50 border-[#1E3A8A] text-[#1E3A8A] dark:bg-purple-900/50 dark:border-purple-500 dark:text-purple-200'
+                : 'bg-white border-slate-200 text-slate-700 hover:border-[#1E3A8A] hover:text-[#1E3A8A] dark:bg-[#160D30] dark:border-purple-900/50 dark:text-purple-200 dark:hover:border-purple-600'
             }`}
             aria-expanded={showOptions}
             aria-label="Tùy chọn"
@@ -363,15 +363,15 @@ export default function PageHeaderBar({
                   key={item.id}
                   type="button"
                   onClick={() => handleScrollToBlock(item.id)}
-                  className="w-full flex items-center justify-between min-h-[44px] py-2 px-2 rounded-[12px] text-left text-[14px] font-bold text-ink dark:text-white hover:bg-purple-50 dark:hover:bg-purple-900/40 hover:text-purple-800 dark:hover:text-[#F8DF7B] active:scale-[0.98] transition-all cursor-pointer group"
+                  className="w-full flex items-center justify-between min-h-[44px] py-2 px-2 rounded-[12px] text-left text-[14px] font-bold text-ink dark:text-white hover:bg-blue-50 dark:hover:bg-purple-900/40 hover:text-[#1E3A8A] dark:hover:text-[#F8DF7B] active:scale-[0.98] transition-all cursor-pointer group"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="w-5 h-5 rounded-full bg-surface-2 dark:bg-purple-950 group-hover:bg-purple-700 group-hover:text-white text-muted dark:text-purple-300 text-[11px] font-extrabold flex items-center justify-center shrink-0 transition-colors">
+                    <span className="w-5 h-5 rounded-full bg-surface-2 dark:bg-purple-950 group-hover:bg-[#1E3A8A] group-hover:text-white text-muted dark:text-purple-300 text-[11px] font-extrabold flex items-center justify-center shrink-0 transition-colors">
                       {idx + 1}
                     </span>
                     <span className="truncate">{item.label}</span>
                   </div>
-                  <span className="text-muted/60 dark:text-purple-400/60 text-[15px] font-bold shrink-0 ml-2 group-hover:text-purple-800 dark:group-hover:text-[#F8DF7B] transition-colors">›</span>
+                  <span className="text-muted/60 dark:text-purple-400/60 text-[15px] font-bold shrink-0 ml-2 group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] transition-colors">›</span>
                 </button>
               ))}
             </div>

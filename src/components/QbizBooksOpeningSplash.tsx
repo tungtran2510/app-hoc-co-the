@@ -8,17 +8,23 @@ interface QbizBooksOpeningSplashProps {
   forceShow?: boolean;
 }
 
+// Cờ theo dõi trong bộ nhớ phiên làm việc của tab để khi người dùng đang lướt bài học rồi ấn quay về Trang chủ không bị hiện lại liên tục
+let hasShownIntroInSession = false;
+
 export default function QbizBooksOpeningSplash({
   onFinish,
   forceShow = false,
 }: QbizBooksOpeningSplashProps) {
-  // Mặc định false để không bị chớp màn hình khi tải trang hoặc quay lại
+  // Mặc định false để SSR không bị lệch hydration
   const [isVisible, setIsVisible] = useState(false);
   const [isBookOpened, setIsBookOpened] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
 
   useEffect(() => {
     try {
+      // Dọn dẹp khóa cũ trong localStorage nếu có để không bị khóa vĩnh viễn
+      localStorage.removeItem('qbiz_books_intro_seen');
+
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('skip_intro') === '1') {
         setIsVisible(false);
@@ -27,22 +33,16 @@ export default function QbizBooksOpeningSplash({
 
       const force = urlParams.get('intro') === '1' || forceShow;
 
-      if (!force) {
-        // QUY TẮC: Chỉ hiện 1 lần duy nhất khi người dùng mới vào app lần đầu tiên
-        // Mỗi lần quay lại trang chủ hoặc chuyển qua lại giữa các bài, tuyệt đối KHÔNG hiện lại
-        const hasSeenIntro = localStorage.getItem('qbiz_books_intro_seen');
-        if (hasSeenIntro) {
-          setIsVisible(false);
-          return;
-        }
+      // Nếu đang trong cùng phiên lướt trang của tab (chuyển qua lại các bài) và không ép buộc thì bỏ qua
+      if (!force && hasShownIntroInSession) {
+        setIsVisible(false);
+        return;
       }
 
-      // Đánh dấu đã xem vào localStorage ngay lập tức để không bao giờ hiện lại khi quay lại
-      localStorage.setItem('qbiz_books_intro_seen', '1');
+      hasShownIntroInSession = true;
       setIsVisible(true);
     } catch {
-      setIsVisible(false);
-      return;
+      setIsVisible(true);
     }
 
     // 1. Sau 650ms: Bìa sách 3D mở ra

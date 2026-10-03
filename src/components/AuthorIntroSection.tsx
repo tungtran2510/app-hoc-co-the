@@ -264,7 +264,7 @@ export function AuthorProfileSection({
       <ScrollReveal animation="slide-left" delay={40}>
         <div className="relative p-4 sm:p-5 rounded-[16px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-sm dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] dark:border-white/15 dark:text-white overflow-hidden flex flex-col gap-3">
           {/* Họa tiết trang trí viền cao cấp góc phải */}
-          <div className="absolute top-0 right-0 w-32 h-32 opacity-10 dark:opacity-20 pointer-events-none bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-300 dark:from-purple-400 via-transparent to-transparent" />
+          <div className="absolute top-0 right-0 w-32 h-32 opacity-10 dark:opacity-20 pointer-events-none bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-200 dark:from-purple-400 via-transparent to-transparent" />
 
           {/* 1. Phần Tiêu Đề Tác GiẢ Ở Trên Cùng (Editorial Magazine Header) */}
           <div className="relative z-10 flex flex-col gap-0.5">
@@ -479,7 +479,7 @@ export function AuthorBooksSection({
               >
                 <div
                   onClick={() => onSelectBook?.(book)}
-                  className={`p-3.5 sm:p-4 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-lg hover:shadow-purple-950/10 hover:border-amber-400/80 dark:hover:border-[#F8DF7B]/60 dark:hover:shadow-[0_12px_28px_rgba(248,223,123,0.15)] hover:-translate-y-1.5 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 cursor-pointer flex flex-row gap-3 sm:gap-4 group ${
+                  className={`p-3.5 sm:p-4 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-lg hover:shadow-blue-950/10 hover:border-amber-400/80 dark:hover:border-[#F8DF7B]/60 dark:hover:shadow-[0_12px_28px_rgba(248,223,123,0.15)] hover:-translate-y-1.5 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 cursor-pointer flex flex-row gap-3 sm:gap-4 group ${
                     isBookHidden ? 'opacity-70 border-dashed border-amber-300' : ''
                   }`}
                 >
@@ -501,51 +501,40 @@ export function AuthorBooksSection({
                   )}
                 </div>
 
-                {/* BÊN PHẢI: Miêu tả, tiêu đề, năm phát hành & nút xem chi tiết */}
+                {/* BÊN PHẢI: Tiêu đề, tag videos & nút xem thử 3D to nổi dạng bong bóng */}
                 <div className="flex-1 flex flex-col justify-between min-w-0 py-0.5">
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      {book.year && (
-                        <span className="px-2 py-0.5 rounded-[5px] bg-amber-50 text-amber-800 border border-amber-300/70 dark:bg-purple-950/80 dark:text-purple-200 dark:border-purple-800/40 text-[10.5px] font-extrabold">
-                          Năm {book.year}
-                        </span>
-                      )}
-                      {hasVideo && (
-                        <span className="flex items-center gap-1 px-2 py-0.5 rounded-[5px] bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/80 dark:text-red-300 dark:border-red-800/40 text-[10.5px] font-extrabold">
+                  <div className="flex flex-col gap-1.5">
+                    {hasVideo && (
+                      <div className="flex items-center gap-1.5">
+                        <span className="flex items-center gap-1 px-2 py-0.5 rounded-[5px] bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/80 dark:text-red-300 dark:border-red-800/40 text-[10.5px] font-extrabold uppercase">
                           <Play size={10} className="fill-red-600 dark:fill-red-400" />
-                          <span>Có video</span>
+                          <span>videos</span>
                         </span>
-                      )}
-                    </div>
+                      </div>
+                    )}
 
-                    <h4 className="text-[15px] sm:text-[16.5px] font-extrabold text-slate-900 dark:text-white leading-snug line-clamp-2 break-normal group-hover:text-amber-700 dark:group-hover:text-[#F8DF7B] transition-colors">
+                    <h4 className="text-[16px] sm:text-[17.5px] font-black text-slate-900 dark:text-white leading-snug line-clamp-2 break-normal group-hover:text-[#1E3A8A] dark:group-hover:text-[#F8DF7B] transition-colors">
                       {book.title}
                     </h4>
-
-                    <p className="text-[12px] sm:text-[12.5px] text-slate-600 dark:text-purple-200/90 leading-relaxed line-clamp-2 sm:line-clamp-3">
-                      {book.description || 'Chưa có mô tả ngắn cho cuốn sách này.'}
-                    </p>
                   </div>
 
-                  <div className="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-purple-800/40 mt-1 gap-2">
+                  <div className="pt-2.5 flex items-center justify-between border-t border-slate-100 dark:border-purple-800/40 mt-2 gap-2">
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         setPreviewBook(book);
                       }}
-                      className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[9px] bg-gradient-to-r from-[#FFF0BA] via-[#ECC45F] to-[#D4A028] hover:from-[#FFF5CE] hover:to-[#DFAC32] text-[#1A1608] font-black text-[12px] shadow-xs shadow-[#D4A028]/25 cursor-pointer transition-all active:scale-95 border border-[#F3D37A] overflow-hidden shrink-0"
+                      className="animate-bubble-float relative inline-flex items-center gap-2 px-4 py-2 sm:px-4.5 sm:py-2.5 rounded-[12px] bg-gradient-to-r from-[#FFF0BA] via-[#ECC45F] to-[#D4A028] hover:from-[#FFF5CE] hover:to-[#DFAC32] text-[#1A1608] font-black text-[13px] sm:text-[14px] shadow-md shadow-[#D4A028]/35 cursor-pointer transition-all active:scale-95 border border-[#F3D37A] shrink-0"
                       title="Xem thử 3D"
                     >
-                      {/* Vệt sáng Flash quét định kỳ */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/70 to-transparent -translate-x-full animate-flash-sweep pointer-events-none" />
-                      <BookOpen size={12} strokeWidth={2.8} className="shrink-0 text-[#1A1608]" />
-                      <span>Xem thử 3D</span>
+                      <BookOpen size={16} strokeWidth={2.8} className="shrink-0 text-[#1A1608]" />
+                      <span className="tracking-wide">Xem thử 3D</span>
                     </button>
 
-                    <span className="text-[12px] font-black text-amber-700 dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0 ml-auto">
+                    <span className="text-[12.5px] sm:text-[13px] font-black text-amber-700 dark:text-[#F8DF7B] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform whitespace-nowrap shrink-0 ml-auto">
                       <span>Chi tiết</span>
-                      <ChevronRight size={13} strokeWidth={2.5} />
+                      <ChevronRight size={14} strokeWidth={2.5} />
                     </span>
                   </div>
 

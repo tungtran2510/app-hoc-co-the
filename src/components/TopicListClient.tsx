@@ -223,7 +223,7 @@ export default function TopicListClient({
           <Link
             href="/cot-song"
             prefetch={true}
-            className="text-[13px] font-black uppercase tracking-wider text-purple-700 hover:text-purple-900 dark:text-[#F8DF7B] dark:hover:text-amber-200 flex items-center gap-0.5 cursor-pointer active:opacity-75 transition-colors"
+            className="text-[13px] font-black uppercase tracking-wider text-[#1E3A8A] hover:text-[#172554] dark:text-[#F8DF7B] dark:hover:text-amber-200 flex items-center gap-0.5 cursor-pointer active:opacity-75 transition-colors"
             title="Xem danh sách bài học chủ đề Cột sống"
           >
             <span>Xem tất cả</span>

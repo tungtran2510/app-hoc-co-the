@@ -286,7 +286,7 @@ export default function WelcomeModal({
                 </div>
 
                 <div className="flex items-start gap-2.5">
-                  <div className="w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-purple-900/60 text-[#1E3A8A] dark:text-purple-300 flex items-center justify-center shrink-0 mt-0.5">
                     <Sparkles size={12} strokeWidth={2.5} />
                   </div>
                   <div className="flex-1 min-w-0">

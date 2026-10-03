@@ -87,24 +87,24 @@ export default async function TopicPage({ params }: TopicPageProps) {
 
       {/* 2. Header Chủ đề: Tinh gọn, chuyên nghiệp, không chiếm diện tích */}
       {/* 2. Header Chủ đề: Thẻ Chuyên Đề Đào Tạo cao cấp, gọn 2/3, bo viền hiện đại toàn bộ, nổi bật */}
-      <section className="w-full rounded-[14px] p-3.5 sm:p-4 bg-gradient-to-br from-white via-purple-50/20 to-slate-50/60 dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] text-slate-900 dark:text-white border-[1.5px] border-purple-200 dark:border-purple-400/40 shadow-[0_4px_16px_rgba(124,58,237,0.08)] dark:shadow-[0_4px_22px_rgba(168,85,247,0.2)] relative overflow-hidden flex flex-col gap-2">
+      <section className="w-full rounded-[14px] p-3.5 sm:p-4 bg-gradient-to-br from-white via-slate-50/60 to-blue-50/30 dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] text-slate-900 dark:text-white border-[1.5px] border-slate-200 dark:border-purple-400/40 shadow-[0_4px_16px_rgba(30,58,138,0.06)] dark:shadow-[0_4px_22px_rgba(168,85,247,0.2)] relative overflow-hidden flex flex-col gap-2">
         {/* Tia sáng viền trên cao cấp */}
-        <div className="dark:hidden absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-purple-400/30 via-purple-600 to-purple-400/30" />
+        <div className="dark:hidden absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-blue-900/20 via-[#1E3A8A] to-blue-900/20" />
         <div className="hidden dark:block absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#F8DF7B]/60 to-transparent" />
 
         {/* Họa tiết trang trí nền */}
         <div className="hidden dark:block absolute -right-8 -top-8 w-40 h-40 rounded-full bg-purple-600/20 pointer-events-none blur-2xl" />
         <div className="absolute right-2.5 bottom-2.5 opacity-10 dark:opacity-20 pointer-events-none">
           {topic.slug === 'cot-song' ? (
-            <SpineIllustration className="w-20 h-20 text-purple-900 dark:text-white" />
+            <SpineIllustration className="w-20 h-20 text-[#1E3A8A] dark:text-white" />
           ) : (
-            <TopicIcon name={topic.icon || 'body'} size={56} className="text-purple-900 dark:text-white" />
+            <TopicIcon name={topic.icon || 'body'} size={56} className="text-[#1E3A8A] dark:text-white" />
           )}
         </div>
 
         {/* Hàng 1: Badge Chuyên Đề + Tác giả trên cùng 1 hàng gọn gàng */}
         <div className="flex items-center justify-between gap-2 z-10">
-          <span className="text-[10px] sm:text-[10.5px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-purple-900 text-amber-300 shadow-2xs dark:bg-purple-950/90 dark:text-[#F8DF7B] dark:border dark:border-purple-700/60">
+          <span className="text-[10px] sm:text-[10.5px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-[#1E3A8A] text-amber-300 shadow-2xs dark:bg-purple-950/90 dark:text-[#F8DF7B] dark:border dark:border-purple-700/60">
             CHUYÊN ĐỀ ĐÀO TẠO
           </span>
           <span className="text-[11.5px] sm:text-[12px] text-slate-600 dark:text-white/80 font-medium">
@@ -141,7 +141,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
         <div className="z-10 mt-0.5 pt-2 border-t border-slate-200/80 dark:border-white/10 flex flex-col gap-1">
           <div className="flex items-center justify-between text-[11px] sm:text-[11.5px] font-bold text-slate-700 dark:text-white/90">
             <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-purple-700 dark:bg-amber-400" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#1E3A8A] dark:bg-amber-400" />
               Tiến độ chuyên đề
             </span>
             <span className="text-[11px] text-slate-500 dark:text-white/70 font-semibold">Lộ trình {pages.length} bước</span>

@@ -26,12 +26,14 @@ import {
   Edit2,
   Check,
   Type,
+  Crop,
 } from 'lucide-react';
 import { checkIsAdminClient } from '../lib/adminAuth';
 import { renderPageToCanvas } from '../lib/atlasCanvasGenerator';
 import SideBooksFlipEngine, { SideBooksFlipEngineRef } from './SideBooksFlipEngine';
 import { getBookFlipbookPages, BookInfoInput } from '../lib/bookFlipbookData';
 import { uploadImageFile } from '../lib/storageUpload';
+import ImageCropModal from './admin/ImageCropModal';
 
 export interface FlipbookPage {
   id: string;
@@ -476,6 +478,7 @@ export default function FlipbookViewer({
   const [tempCoverUrl, setTempCoverUrl] = useState<string>(currentCoverUrl);
   const [showCoverModal, setShowCoverModal] = useState<boolean>(false);
   const [isUploadingCover, setIsUploadingCover] = useState<boolean>(false);
+  const [isCropCoverOpen, setIsCropCoverOpen] = useState<boolean>(false);
 
   // Tự động nhận diện tỷ lệ khung hình thật của ảnh bìa (đứng, vuông hay ngang)
   const [coverAspect, setCoverAspect] = useState<number | null>(null);
@@ -1298,6 +1301,20 @@ export default function FlipbookViewer({
                 <ImageIcon size={12} strokeWidth={2.5} />
                 <span>Thay bìa</span>
               </button>
+
+              {/* Nút Cắt & Căn Khung Ảnh Bìa */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsCropCoverOpen(true);
+                }}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-[8px] bg-[#1E3A8A] hover:bg-[#172554] text-amber-200 font-black text-[11px] shadow-lg border border-blue-400/40 cursor-pointer backdrop-blur-xs transition-transform active:scale-95"
+                title="Cắt và căn khung ảnh bìa theo ý muốn"
+              >
+                <Crop size={12} strokeWidth={2.5} />
+                <span>Cắt bìa</span>
+              </button>
             </div>
           )}
 
@@ -1959,12 +1976,19 @@ export default function FlipbookViewer({
 
             {/* Xem trước bìa trực quan */}
             <div className="flex items-center gap-3 p-3 rounded-[16px] bg-black/40 border border-white/10">
-              <div className="w-20 h-28 rounded-[10px] bg-slate-900 border border-amber-400/50 overflow-hidden relative shrink-0 shadow-md flex items-center justify-center">
+              <div
+                onClick={() => setIsCropCoverOpen(true)}
+                className="w-20 h-28 rounded-[10px] bg-slate-900 border border-amber-400/50 overflow-hidden relative shrink-0 shadow-md flex items-center justify-center cursor-pointer group hover:border-amber-300 transition-colors"
+                title="Nhấn để cắt và chỉnh khung ảnh bìa"
+              >
                 <img
                   src={tempCoverUrl || currentCoverUrl}
                   alt="Xem trước bìa"
                   className="w-full h-full object-cover"
                 />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white z-20">
+                  <Crop size={18} className="text-amber-300" />
+                </div>
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center p-1 text-center">
                   <span className="text-[9px] font-serif font-black text-amber-200 line-clamp-3 leading-tight drop-shadow">
                     {tempTitle || bookTitle}
@@ -1979,9 +2003,14 @@ export default function FlipbookViewer({
                 <p className="text-[13px] text-slate-100 font-serif font-bold line-clamp-2">
                   {tempTitle || bookTitle}
                 </p>
-                <p className="text-[11px] text-slate-400 mt-1 line-clamp-2">
-                  Lớp phủ bìa sạch này giúp học viên nhận biết tài liệu và chạm mở đọc ngay.
-                </p>
+                <button
+                  type="button"
+                  onClick={() => setIsCropCoverOpen(true)}
+                  className="mt-2 h-7 px-2.5 rounded-[8px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
+                >
+                  <Crop size={12} strokeWidth={2.5} />
+                  <span>Cắt & căn khung ảnh này</span>
+                </button>
               </div>
             </div>
 
@@ -2132,6 +2161,22 @@ export default function FlipbookViewer({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Modal cắt và căn khung ảnh bìa sách */}
+      {isCropCoverOpen && (tempCoverUrl || currentCoverUrl) && (
+        <ImageCropModal
+          isOpen={isCropCoverOpen}
+          imageUrl={tempCoverUrl || currentCoverUrl}
+          title="Cắt & Căn Khung Ảnh Bìa Sách"
+          defaultAspect="3:4"
+          onClose={() => setIsCropCoverOpen(false)}
+          onCropSaved={async (newUrl) => {
+            setTempCoverUrl(newUrl);
+            handleSaveCover(newUrl);
+            setIsCropCoverOpen(false);
+          }}
+        />
       )}
     </>
   );

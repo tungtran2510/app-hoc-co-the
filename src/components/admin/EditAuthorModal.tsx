@@ -21,11 +21,14 @@ import {
   MapPin,
   Globe,
   Images,
+  Crop,
 } from 'lucide-react';
 import { AuthorProfile, AuthorBook } from '../../lib/types';
 import { uploadImageFile } from '../../lib/storageUpload';
 import { saveSettingsApi } from '../../lib/apiAdmin';
 import { normalizeAuthorProfile } from '../../lib/data';
+import ImageCropModal, { AspectRatioOption } from './ImageCropModal';
+import { useImageAspectRatio } from '../../lib/imageAspectRatio';
 
 interface EditAuthorModalProps {
   isOpen: boolean;
@@ -49,6 +52,15 @@ export default function EditAuthorModal({
   const [uploadingBookId, setUploadingBookId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+
+  // Modal cắt ảnh
+  const [cropModalData, setCropModalData] = useState<{
+    isOpen: boolean;
+    url: string;
+    title: string;
+    aspect: AspectRatioOption;
+    target: 'avatar' | 'intro';
+  } | null>(null);
 
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const introImageInputRef = useRef<HTMLInputElement>(null);
@@ -391,14 +403,39 @@ export default function EditAuthorModal({
                   Ảnh tác giả / Logo (không khung tròn)
                 </label>
                 <div className="flex items-center gap-3">
-                  <div className="w-16 h-16 rounded-[12px] flex items-center justify-center overflow-hidden shrink-0 border border-line bg-surface">
+                  {/* Preview avatar - Nhấn để cắt */}
+                  <div
+                    onClick={() => {
+                      if (profile.avatar_url) {
+                        setCropModalData({
+                          isOpen: true,
+                          url: profile.avatar_url,
+                          title: 'Cắt & Căn Khung Ảnh Đại Diện (1:1)',
+                          aspect: '1:1',
+                          target: 'avatar',
+                        });
+                      } else {
+                        avatarInputRef.current?.click();
+                      }
+                    }}
+                    className={`w-16 h-16 rounded-[12px] flex items-center justify-center overflow-hidden shrink-0 border border-line bg-surface relative group cursor-pointer ${
+                      profile.avatar_url ? 'hover:border-amber-400' : ''
+                    }`}
+                    title={profile.avatar_url ? 'Nhấn để cắt và chỉnh khung ảnh đại diện (1:1)' : 'Nhấn để chọn ảnh mới'}
+                  >
                     {profile.avatar_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={profile.avatar_url}
-                        alt="Avatar/Logo"
-                        className="w-full h-full object-cover rounded-[12px]"
-                      />
+                      <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={profile.avatar_url}
+                          alt="Avatar/Logo"
+                          className="w-full h-full object-cover rounded-[12px]"
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white">
+                          <Crop size={14} className="text-amber-300" />
+                          <span className="text-[7.5px] font-black uppercase text-amber-300">Cắt ảnh</span>
+                        </div>
+                      </>
                     ) : (
                       <div className="w-full h-full bg-primary-soft rounded-[12px] flex items-center justify-center">
                         <User size={30} className="text-primary" />
@@ -407,36 +444,60 @@ export default function EditAuthorModal({
                   </div>
 
                   <div className="flex-1 flex flex-col gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => avatarInputRef.current?.click()}
-                      disabled={isUploadingAvatar}
-                      className="flex items-center justify-center gap-1.5 h-10 px-3 rounded-[10px] bg-white border border-line text-ink font-bold text-[13px] hover:border-primary cursor-pointer shadow-2xs"
-                    >
-                      {isUploadingAvatar ? (
-                        <>
-                          <Loader2 size={14} className="animate-spin text-primary" />
-                          <span>Đang nén & tải ảnh...</span>
-                        </>
-                      ) : (
-                        <>
-                          <ImageIcon size={14} className="text-primary" />
-                          <span>Chọn ảnh tác giả / logo mới</span>
-                        </>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => avatarInputRef.current?.click()}
+                        disabled={isUploadingAvatar}
+                        className="flex-1 flex items-center justify-center gap-1.5 h-9 px-3 rounded-[10px] bg-white dark:bg-white/10 border border-line text-ink font-bold text-[12.5px] hover:border-primary cursor-pointer shadow-2xs"
+                      >
+                        {isUploadingAvatar ? (
+                          <>
+                            <Loader2 size={13} className="animate-spin text-primary" />
+                            <span>Đang nén & tải ảnh...</span>
+                          </>
+                        ) : (
+                          <>
+                            <ImageIcon size={13} className="text-primary" />
+                            <span>Chọn ảnh đại diện từ máy</span>
+                          </>
+                        )}
+                      </button>
+
+                      {profile.avatar_url && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCropModalData({
+                              isOpen: true,
+                              url: profile.avatar_url!,
+                              title: 'Cắt & Căn Khung Ảnh Đại Diện (1:1)',
+                              aspect: '1:1',
+                              target: 'avatar',
+                            })
+                          }
+                          className="h-9 px-2.5 rounded-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[11.5px] flex items-center gap-1 cursor-pointer transition-colors shadow-xs shrink-0"
+                          title="Kéo trượt cắt khung vừa ý"
+                        >
+                          <Crop size={12} strokeWidth={2.5} />
+                          <span>Cắt ảnh</span>
+                        </button>
                       )}
-                    </button>
+                    </div>
+
                     <input
                       type="text"
                       value={profile.avatar_url || ''}
                       onChange={(e) => setProfile({ ...profile, avatar_url: e.target.value.trim() || null })}
-                      placeholder="Hoặc dán URL ảnh trực tiếp..."
-                      className="w-full h-8 px-2.5 rounded-[8px] border border-line text-[12px] text-ink focus:border-primary"
+                      placeholder="Hoặc dán link URL ảnh..."
+                      className="w-full h-7.5 px-2.5 rounded-[8px] border border-line text-[11.5px] text-ink focus:border-primary"
                     />
+
                     {profile.avatar_url && (
                       <button
                         type="button"
                         onClick={() => setProfile({ ...profile, avatar_url: null })}
-                        className="text-[12px] text-red-600 font-bold hover:underline text-left cursor-pointer"
+                        className="text-[11.5px] text-red-600 font-bold hover:underline text-left cursor-pointer"
                       >
                         Xóa ảnh (dùng icon mặc định)
                       </button>
@@ -488,18 +549,40 @@ export default function EditAuthorModal({
                 />
               </div>
 
-              {/* Ảnh minh họa thêm (tùy chọn) */}
+              {/* Ảnh minh họa thêm (tùy chọn) - Có tính năng cắt ảnh */}
               <div className="flex flex-col gap-1.5 pt-2 border-t border-line">
                 <label className="text-[14px] font-bold text-ink">
                   Ảnh minh họa thêm (chứng chỉ / hoạt động)
                 </label>
                 <div className="flex items-center gap-2">
+                  {profile.intro_image_url && (
+                    <div
+                      onClick={() =>
+                        setCropModalData({
+                          isOpen: true,
+                          url: profile.intro_image_url!,
+                          title: 'Cắt & Căn Khung Ảnh Minh Họa',
+                          aspect: 'auto',
+                          target: 'intro',
+                        })
+                      }
+                      className="w-10 h-10 rounded-[8px] overflow-hidden border border-line shrink-0 cursor-pointer relative group hover:border-amber-400"
+                      title="Bấm để cắt chỉnh ảnh này"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={profile.intro_image_url} alt="" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                        <Crop size={12} className="text-amber-300" />
+                      </div>
+                    </div>
+                  )}
+
                   <input
                     type="text"
                     value={profile.intro_image_url || ''}
                     onChange={(e) => setProfile({ ...profile, intro_image_url: e.target.value })}
                     placeholder="URL ảnh hoặc bấm tải lên..."
-                    className="flex-1 h-10 px-3 rounded-[10px] border border-line text-[14px] text-ink focus:border-primary"
+                    className="flex-1 h-10 px-3 rounded-[10px] border border-line text-[13.5px] text-ink focus:border-primary"
                   />
                   <button
                     type="button"
@@ -514,6 +597,26 @@ export default function EditAuthorModal({
                     )}
                     <span>Tải ảnh</span>
                   </button>
+
+                  {profile.intro_image_url && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCropModalData({
+                          isOpen: true,
+                          url: profile.intro_image_url!,
+                          title: 'Cắt & Căn Khung Ảnh Minh Họa',
+                          aspect: 'auto',
+                          target: 'intro',
+                        })
+                      }
+                      className="h-10 px-2.5 rounded-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[12px] flex items-center gap-1 cursor-pointer transition-colors shrink-0 shadow-xs"
+                      title="Cắt căn khung ảnh minh họa"
+                    >
+                      <Crop size={13} strokeWidth={2.5} />
+                      <span>Cắt</span>
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -936,6 +1039,25 @@ export default function EditAuthorModal({
           </div>
         </form>
       </div>
+
+      {/* MODAL CẮT KHUNG ẢNH TÁC GIẢ */}
+      {cropModalData && (
+        <ImageCropModal
+          isOpen={cropModalData.isOpen}
+          imageUrl={cropModalData.url}
+          title={cropModalData.title}
+          defaultAspect={cropModalData.aspect}
+          onClose={() => setCropModalData(null)}
+          onCropSaved={async (newUrl) => {
+            if (cropModalData.target === 'avatar') {
+              setProfile((prev) => ({ ...prev, avatar_url: newUrl }));
+            } else if (cropModalData.target === 'intro') {
+              setProfile((prev) => ({ ...prev, intro_image_url: newUrl }));
+            }
+            setCropModalData(null);
+          }}
+        />
+      )}
     </div>
   );
 }

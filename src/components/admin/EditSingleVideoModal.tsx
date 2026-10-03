@@ -271,7 +271,7 @@ export default function EditSingleVideoModal({
                 onClick={() => setIsVertical(!isVertical)}
                 className={`h-9 px-3 rounded-[10px] border flex items-center justify-center text-[12px] font-extrabold transition-colors cursor-pointer shadow-2xs ${
                   isVertical
-                    ? 'bg-purple-100 text-purple-900 border-purple-300 dark:bg-purple-900/60 dark:text-purple-200 dark:border-purple-600'
+                    ? 'bg-blue-50 text-[#1E3A8A] border-blue-200 dark:bg-purple-900/60 dark:text-purple-200 dark:border-purple-600'
                     : 'bg-slate-100 text-slate-700 border-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700'
                 }`}
               >

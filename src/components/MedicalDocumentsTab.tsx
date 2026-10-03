@@ -413,7 +413,7 @@ export default function MedicalDocumentsTab({
       {/* HEADER GIỚI THIỆU TỦ TÀI LIỆU HỌC TẬP */}
       <div className="flex items-center justify-between px-1 flex-wrap gap-2">
         <div className="flex items-center gap-2">
-          <FileCheck size={18} className="text-purple-700 dark:text-[#F8DF7B]" />
+          <FileCheck size={18} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
           <h4 className="text-[14px] sm:text-[15.5px] font-black text-slate-900 dark:text-white uppercase tracking-wider">
             TÀI LIỆU HỌC TẬP & CẨM NANG Y KHOA
           </h4>
@@ -441,7 +441,7 @@ export default function MedicalDocumentsTab({
       {/* 1. TÀI LIỆU ĐÍNH KÈM TỪ HỆ THỐNG / GIẢNG VIÊN (NẾU CÓ) */}
       {customFiles.length > 0 && (
         <div className="flex flex-col gap-2.5 mb-1">
-          <span className="text-[12px] font-black text-purple-700 dark:text-purple-300 uppercase tracking-wide px-1">
+          <span className="text-[12px] font-black text-[#1E3A8A] dark:text-purple-300 uppercase tracking-wide px-1">
             File đính kèm từ bài giảng:
           </span>
           {customFiles.map((file, idx) => (
@@ -466,7 +466,7 @@ export default function MedicalDocumentsTab({
                 href={file.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-900 text-white dark:bg-[#F8DF7B] dark:text-[#160C2C] text-[12px] font-bold shrink-0 hover:opacity-90 transition-opacity"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1E3A8A] text-white dark:bg-[#F8DF7B] dark:text-[#160C2C] text-[12px] font-bold shrink-0 hover:opacity-90 transition-opacity"
               >
                 <ExternalLink size={13} />
                 <span>Xem</span>
@@ -571,7 +571,7 @@ export default function MedicalDocumentsTab({
                 <button
                   type="button"
                   onClick={() => handleDownload(doc, 'pdf')}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-900 hover:bg-purple-950 text-white dark:bg-[#F8DF7B] dark:hover:bg-amber-300 dark:text-[#160C2C] text-[12px] font-black transition-colors cursor-pointer active:scale-95 shadow-2xs"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1E3A8A] hover:bg-[#172554] text-white dark:bg-[#F8DF7B] dark:hover:bg-amber-300 dark:text-[#160C2C] text-[12px] font-black transition-colors cursor-pointer active:scale-95 shadow-2xs"
                   title="Tải file PDF y khoa thực tế về máy"
                 >
                   <Download size={14} />
@@ -626,7 +626,7 @@ export default function MedicalDocumentsTab({
                   onClick={() => setReaderTab('pdf')}
                   className={`flex items-center gap-1 px-3 py-1 rounded-[8px] text-[12px] font-bold cursor-pointer transition-colors ${
                     readerTab === 'pdf'
-                      ? 'bg-purple-900 text-white shadow-2xs'
+                      ? 'bg-[#1E3A8A] text-white shadow-2xs'
                       : 'bg-white dark:bg-purple-900/40 text-slate-700 dark:text-purple-200 hover:bg-slate-50'
                   }`}
                 >
@@ -639,7 +639,7 @@ export default function MedicalDocumentsTab({
                   onClick={() => setReaderTab('summary')}
                   className={`flex items-center gap-1 px-3 py-1 rounded-[8px] text-[12px] font-bold cursor-pointer transition-colors ${
                     readerTab === 'summary'
-                      ? 'bg-purple-900 text-white shadow-2xs'
+                      ? 'bg-[#1E3A8A] text-white shadow-2xs'
                       : 'bg-white dark:bg-purple-900/40 text-slate-700 dark:text-purple-200 hover:bg-slate-50'
                   }`}
                 >
@@ -653,7 +653,7 @@ export default function MedicalDocumentsTab({
                     onClick={() => setReaderTab('image')}
                     className={`flex items-center gap-1 px-3 py-1 rounded-[8px] text-[12px] font-bold cursor-pointer transition-colors ${
                       readerTab === 'image'
-                        ? 'bg-purple-900 text-white shadow-2xs'
+                        ? 'bg-[#1E3A8A] text-white shadow-2xs'
                         : 'bg-white dark:bg-purple-900/40 text-slate-700 dark:text-purple-200 hover:bg-slate-50'
                     }`}
                   >
@@ -704,7 +704,7 @@ export default function MedicalDocumentsTab({
                     <button
                       type="button"
                       onClick={() => handleOpenNativePdf(selectedDoc)}
-                      className="text-purple-700 dark:text-[#F8DF7B] font-bold hover:underline cursor-pointer"
+                      className="text-[#1E3A8A] dark:text-[#F8DF7B] font-bold hover:underline cursor-pointer"
                     >
                       Bấm vào đây nếu muốn xem toàn màn hình
                     </button>
@@ -844,7 +844,7 @@ export default function MedicalDocumentsTab({
                 <button
                   type="button"
                   onClick={() => handleDownload(selectedDoc, 'pdf')}
-                  className="flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-full bg-purple-900 text-white dark:bg-[#F8DF7B] dark:text-[#160C2C] font-black text-[12.5px] hover:opacity-90 transition-opacity cursor-pointer shadow-xs"
+                  className="flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-full bg-[#1E3A8A] text-white dark:bg-[#F8DF7B] dark:text-[#160C2C] font-black text-[12.5px] hover:opacity-90 transition-opacity cursor-pointer shadow-xs"
                   title="Tải file PDF chuẩn A4 về máy"
                 >
                   <Download size={14} />

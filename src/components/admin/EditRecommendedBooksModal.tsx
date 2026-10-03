@@ -17,10 +17,12 @@ import {
   Images,
   LayoutGrid,
   List,
+  Crop,
 } from 'lucide-react';
 import { RecommendedBook } from '../../lib/types';
 import { uploadImageFile } from '../../lib/storageUpload';
 import { saveSettingsApi } from '../../lib/apiAdmin';
+import ImageCropModal from './ImageCropModal';
 
 interface EditRecommendedBooksModalProps {
   isOpen: boolean;
@@ -60,6 +62,14 @@ export default function EditRecommendedBooksModal({
   const [activeBookForGallery, setActiveBookForGallery] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [cropModalData, setCropModalData] = useState<{
+    isOpen: boolean;
+    url: string;
+    title: string;
+    aspect: 'auto' | '1:1' | '3:4' | '16:9' | '4:3' | 'free';
+    bookId: string;
+    target: 'cover' | { galleryIndex: number };
+  } | null>(null);
 
   const coverInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
@@ -452,14 +462,36 @@ export default function EditRecommendedBooksModal({
                     <div className="flex flex-col sm:flex-row gap-3 items-start">
                       {/* Ảnh bìa nhỏ gọn (64x86px) + nút hành động */}
                       <div className="flex sm:flex-col items-center sm:items-stretch gap-2 shrink-0 w-full sm:w-auto">
-                        <div className="relative w-16 h-22 sm:w-18 sm:h-24 aspect-[3/4] rounded-[9px] bg-surface-2 border border-line overflow-hidden flex items-center justify-center shrink-0 shadow-2xs group">
+                        <div
+                          onClick={() => {
+                            if (book.cover_url) {
+                              setCropModalData({
+                                isOpen: true,
+                                url: book.cover_url,
+                                title: `Cắt Ảnh Bìa: ${book.title || 'Sách'}`,
+                                aspect: '3:4',
+                                bookId: book.id,
+                                target: 'cover',
+                              });
+                            }
+                          }}
+                          className={`relative w-16 h-22 sm:w-18 sm:h-24 aspect-[3/4] rounded-[9px] bg-surface-2 border border-line overflow-hidden flex items-center justify-center shrink-0 shadow-2xs group ${
+                            book.cover_url ? 'cursor-pointer hover:border-amber-400' : ''
+                          }`}
+                          title={book.cover_url ? 'Nhấn để cắt và chỉnh khung ảnh bìa' : undefined}
+                        >
                           {book.cover_url ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={book.cover_url}
-                              alt={book.title}
-                              className="w-full h-full object-cover"
-                            />
+                            <>
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={book.cover_url}
+                                alt={book.title}
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                                <Crop size={16} className="text-amber-300" />
+                              </div>
+                            </>
                           ) : (
                             <div className="flex flex-col items-center justify-center p-1 text-center text-muted">
                               <BookOpen size={18} className="text-primary/60" />
@@ -488,8 +520,29 @@ export default function EditRecommendedBooksModal({
                           {book.cover_url && (
                             <button
                               type="button"
+                              onClick={() => {
+                                setCropModalData({
+                                  isOpen: true,
+                                  url: book.cover_url!,
+                                  title: `Cắt Ảnh Bìa: ${book.title || 'Sách'}`,
+                                  aspect: '3:4',
+                                  bookId: book.id,
+                                  target: 'cover',
+                                });
+                              }}
+                              className="w-full h-6 rounded-[6px] bg-amber-500 hover:bg-amber-400 text-slate-950 text-[10px] font-black flex items-center justify-center gap-0.5 cursor-pointer shadow-2xs"
+                              title="Cắt ảnh bìa"
+                            >
+                              <Crop size={11} strokeWidth={2.5} />
+                              <span>Cắt bìa</span>
+                            </button>
+                          )}
+
+                          {book.cover_url && (
+                            <button
+                              type="button"
                               onClick={() => handleUpdateBook(book.id, { cover_url: null })}
-                              className="w-full h-5.5 rounded-[6px] bg-surface-2 hover:bg-red-50 text-muted hover:text-red-600 text-[10px] font-medium"
+                              className="w-full h-5 rounded-[6px] bg-surface-2 hover:bg-red-50 text-muted hover:text-red-600 text-[9.5px] font-medium cursor-pointer"
                               title="Gỡ ảnh"
                             >
                               Gỡ bìa
@@ -636,7 +689,18 @@ export default function EditRecommendedBooksModal({
                           {book.gallery_images.map((imgUrl, imgIdx) => (
                             <div
                               key={imgIdx}
-                              className="relative w-11 h-15 aspect-[3/4] rounded-[6px] bg-surface-2 border border-line overflow-hidden shrink-0 group shadow-2xs"
+                              onClick={() => {
+                                setCropModalData({
+                                  isOpen: true,
+                                  url: imgUrl,
+                                  title: `Cắt Ảnh #${imgIdx + 1} của sách`,
+                                  aspect: 'auto',
+                                  bookId: book.id,
+                                  target: { galleryIndex: imgIdx },
+                                });
+                              }}
+                              className="relative w-11 h-15 aspect-[3/4] rounded-[6px] bg-surface-2 border border-line overflow-hidden shrink-0 group shadow-2xs cursor-pointer hover:border-amber-400"
+                              title="Nhấn để cắt ảnh này"
                             >
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
@@ -644,10 +708,16 @@ export default function EditRecommendedBooksModal({
                                 alt={`Trang ${imgIdx + 1}`}
                                 className="w-full h-full object-cover"
                               />
+                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                                <Crop size={12} className="text-amber-300" />
+                              </div>
                               <button
                                 type="button"
-                                onClick={() => handleDeleteGalleryImage(book.id, imgIdx)}
-                                className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-red-600 text-white flex items-center justify-center cursor-pointer shadow-xs opacity-90 hover:opacity-100"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteGalleryImage(book.id, imgIdx);
+                                }}
+                                className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-red-600 text-white flex items-center justify-center cursor-pointer shadow-xs opacity-90 hover:opacity-100 z-10"
                                 title="Xóa ảnh này"
                               >
                                 <X size={9} strokeWidth={3} />
@@ -695,6 +765,31 @@ export default function EditRecommendedBooksModal({
           </button>
         </div>
       </div>
+
+      {/* MODAL CẮT VÀ CĂN KHUNG ẢNH */}
+      {cropModalData && (
+        <ImageCropModal
+          isOpen={cropModalData.isOpen}
+          imageUrl={cropModalData.url}
+          title={cropModalData.title}
+          defaultAspect={cropModalData.aspect}
+          onClose={() => setCropModalData(null)}
+          onCropSaved={async (newUrl) => {
+            if (cropModalData.target === 'cover') {
+              handleUpdateBook(cropModalData.bookId, { cover_url: newUrl });
+            } else {
+              const gIdx = cropModalData.target.galleryIndex;
+              const targetBook = books.find((b) => b.id === cropModalData.bookId);
+              if (targetBook && targetBook.gallery_images) {
+                const next = [...targetBook.gallery_images];
+                next[gIdx] = newUrl;
+                handleUpdateBook(cropModalData.bookId, { gallery_images: next });
+              }
+            }
+            setCropModalData(null);
+          }}
+        />
+      )}
     </div>
   );
 }

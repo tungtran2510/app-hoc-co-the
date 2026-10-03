@@ -20,12 +20,12 @@ const config: Config = {
         line: "var(--color-line, #E2E4F0)",
         "line-strong": "var(--color-line-strong, #C9CCE0)",
         primary: {
-          DEFAULT: "var(--color-primary, #7C3AED)",
-          dark: "var(--color-primary-dark, #6D28D9)",
-          soft: "var(--color-primary-soft, #EDE9FE)",
-          track: "var(--color-primary-track, #DDD6FE)",
+          DEFAULT: "var(--color-primary, #1E3A8A)",
+          dark: "var(--color-primary-dark, #172554)",
+          soft: "var(--color-primary-soft, #EFF6FF)",
+          track: "var(--color-primary-track, #DBEAFE)",
         },
-        "on-primary-muted": "var(--color-on-primary-muted, #6D28D9)",
+        "on-primary-muted": "var(--color-on-primary-muted, #1E40AF)",
         accent: {
           DEFAULT: "#F8DF7B",
           soft: "#3D3012",

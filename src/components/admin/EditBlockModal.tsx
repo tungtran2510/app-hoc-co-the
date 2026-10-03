@@ -24,11 +24,13 @@ import {
   AlignJustify,
   Type,
   HelpCircle,
+  Crop,
 } from 'lucide-react';
 import { Block, Image as ImageType, FileItem, Video } from '../../lib/types';
 import { extractYouTubeId, fetchYouTubeMeta } from '../../lib/youtube';
 import { uploadImageFile, uploadPdfFile } from '../../lib/storageUpload';
 import { generateUuid } from '../../lib/uuid';
+import ImageCropModal, { AspectRatioOption } from './ImageCropModal';
 
 const TITLE_COLORS = [
   { name: 'Đen than', hex: '#1E293B' },
@@ -161,6 +163,15 @@ export default function EditBlockModal({
   const [inputVideoUrl, setInputVideoUrl] = useState('');
   const [isLoadingVideo, setIsLoadingVideo] = useState(false);
   const [isUploadingMedia, setIsUploadingMedia] = useState(false);
+
+  // Modal cắt khung ảnh cho mọi loại ảnh trong block
+  const [cropModalData, setCropModalData] = useState<{
+    isOpen: boolean;
+    url: string;
+    title: string;
+    aspect: AspectRatioOption;
+    onSave: (newUrl: string) => void;
+  } | null>(null);
 
   // State cho images block gốc
   const [imageList, setImageList] = useState<ImageType[]>(
@@ -1234,21 +1245,104 @@ export default function EditBlockModal({
                     Thêm
                   </button>
                 </div>
+
+                {newImgUrl && (
+                  <div className="flex items-center gap-2 p-2 rounded-[10px] bg-surface-2 border border-line">
+                    <div
+                      onClick={() =>
+                        setCropModalData({
+                          isOpen: true,
+                          url: newImgUrl,
+                          title: 'Cắt & Căn Khung Ảnh Vừa Chọn',
+                          aspect: 'auto',
+                          onSave: (newUrl) => setNewImgUrl(newUrl),
+                        })
+                      }
+                      className="w-10 h-10 rounded-[6px] overflow-hidden shrink-0 cursor-pointer relative group border border-line hover:border-amber-400"
+                      title="Nhấn để cắt ảnh vừa chọn"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={newImgUrl} alt="" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                        <Crop size={12} className="text-amber-300" />
+                      </div>
+                    </div>
+                    <span className="flex-1 text-[12px] text-muted truncate">{newImgUrl}</span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCropModalData({
+                          isOpen: true,
+                          url: newImgUrl,
+                          title: 'Cắt & Căn Khung Ảnh Vừa Chọn',
+                          aspect: 'auto',
+                          onSave: (newUrl) => setNewImgUrl(newUrl),
+                        })
+                      }
+                      className="px-2.5 py-1 rounded-[6px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
+                    >
+                      <Crop size={11} strokeWidth={2.5} />
+                      <span>Cắt khung</span>
+                    </button>
+                  </div>
+                )}
               </div>
 
               <label className="text-[14px] font-bold text-ink">
-                Danh sách ảnh ({imageList.length})
+                Danh sách ảnh ({imageList.length}) - Chạm ảnh để cắt khung
               </label>
               <div className="flex flex-col gap-2">
                 {imageList.map((img, idx) => (
                   <div key={idx} className="flex items-center gap-3 p-2.5 rounded-[12px] bg-surface-2 border border-line">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={img.url} alt="" className="w-12 h-12 rounded-[8px] object-cover" />
+                    <div
+                      onClick={() =>
+                        setCropModalData({
+                          isOpen: true,
+                          url: img.url,
+                          title: `Cắt Ảnh #${idx + 1} Trong Khối`,
+                          aspect: 'auto',
+                          onSave: (newUrl) => {
+                            setImageList((prev) =>
+                              prev.map((item, i) => (i === idx ? { ...item, url: newUrl } : item))
+                            );
+                          },
+                        })
+                      }
+                      className="w-12 h-12 rounded-[8px] overflow-hidden shrink-0 cursor-pointer relative group border border-line hover:border-amber-400"
+                      title="Nhấn vào để cắt khung ảnh"
+                    >
+                      <img src={img.url} alt="" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                        <Crop size={14} className="text-amber-300" />
+                      </div>
+                    </div>
                     <span className="flex-1 text-[13px] truncate">{img.caption || img.url}</span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCropModalData({
+                          isOpen: true,
+                          url: img.url,
+                          title: `Cắt Ảnh #${idx + 1} Trong Khối`,
+                          aspect: 'auto',
+                          onSave: (newUrl) => {
+                            setImageList((prev) =>
+                              prev.map((item, i) => (i === idx ? { ...item, url: newUrl } : item))
+                            );
+                          },
+                        })
+                      }
+                      className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-md cursor-pointer"
+                      title="Cắt ảnh này"
+                    >
+                      <Crop size={16} />
+                    </button>
                     <button
                       type="button"
                       onClick={() => setImageList(imageList.filter((_, i) => i !== idx))}
                       className="p-1.5 text-red-600 hover:bg-red-50 rounded-md cursor-pointer"
+                      title="Xóa ảnh này"
                     >
                       <Trash2 size={16} />
                     </button>
@@ -1328,12 +1422,33 @@ export default function EditBlockModal({
 
                 {/* Xem trước và Tự tải ảnh lên */}
                 <div className="flex items-center gap-3 pt-2 border-t border-amber-400/20">
-                  <div className="w-16 h-20 rounded-[10px] bg-slate-900 border border-amber-400/50 overflow-hidden relative shrink-0 shadow-sm flex items-center justify-center">
+                  <div
+                    onClick={() => {
+                      if (bookCoverUrl) {
+                        setCropModalData({
+                          isOpen: true,
+                          url: bookCoverUrl,
+                          title: 'Cắt & Căn Khung Ảnh Bìa Sách',
+                          aspect: '3:4',
+                          onSave: (newUrl) => setBookCoverUrl(newUrl),
+                        });
+                      }
+                    }}
+                    className={`w-16 h-20 rounded-[10px] bg-slate-900 border border-amber-400/50 overflow-hidden relative shrink-0 shadow-sm flex items-center justify-center group ${
+                      bookCoverUrl ? 'cursor-pointer hover:border-amber-300' : ''
+                    }`}
+                    title={bookCoverUrl ? 'Nhấn để cắt khung ảnh bìa' : undefined}
+                  >
                     <img
                       src={bookCoverUrl || '/documents/covers/clean_cover_navy.png'}
                       alt="Bìa sách"
                       className="w-full h-full object-cover"
                     />
+                    {bookCoverUrl && (
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                        <Crop size={16} className="text-amber-300" />
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex-1 flex flex-col gap-2">
@@ -1365,8 +1480,28 @@ export default function EditBlockModal({
                           className="hidden"
                         />
                       </label>
-                      <span className="text-[11px] text-muted font-medium">Tự tải ảnh lên (JPG, PNG, WebP)</span>
+
+                      {bookCoverUrl && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCropModalData({
+                              isOpen: true,
+                              url: bookCoverUrl,
+                              title: 'Cắt & Căn Khung Ảnh Bìa Sách',
+                              aspect: '3:4',
+                              onSave: (newUrl) => setBookCoverUrl(newUrl),
+                            })
+                          }
+                          className="h-9 px-3 rounded-[10px] bg-surface-2 hover:bg-surface border border-line text-ink font-bold text-[12px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
+                        >
+                          <Crop size={13} className="text-amber-500" />
+                          <span>Cắt ảnh</span>
+                        </button>
+                      )}
                     </div>
+
+                    <span className="text-[11px] text-muted font-medium">Tự tải ảnh lên (JPG, PNG, WebP)</span>
 
                     <input
                       type="url"
@@ -1803,6 +1938,21 @@ export default function EditBlockModal({
           </button>
         </div>
       </div>
+
+      {/* MODAL CẮT VÀ CĂN KHUNG ẢNH */}
+      {cropModalData && (
+        <ImageCropModal
+          isOpen={cropModalData.isOpen}
+          imageUrl={cropModalData.url}
+          title={cropModalData.title}
+          defaultAspect={cropModalData.aspect}
+          onClose={() => setCropModalData(null)}
+          onCropSaved={async (newUrl) => {
+            cropModalData.onSave(newUrl);
+            setCropModalData(null);
+          }}
+        />
+      )}
     </div>
   );
 }

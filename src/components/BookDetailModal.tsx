@@ -428,17 +428,14 @@ export default function BookDetailModal({
                   {book.title}
                 </h4>
 
-                {/* NÚT ĐỌC THỬ TÀI LIỆU 3D TO NỔI BẬT - VÀNG KIM CHAMPAGNE SANG TRỌNG THEO YÊU CẦU */}
+                {/* NÚT ĐỌC THỬ TÀI LIỆU 3D TO NỔI BẬT - BONG BÓNG NỔI SANG TRỌNG */}
                 <div className="mt-2.5 w-full">
                   <button
                     type="button"
                     onClick={() => setShow3DFlipbook(true)}
-                    className="relative w-full py-2.5 sm:py-3 px-4 rounded-[13px] bg-gradient-to-r from-[#FFF0BA] via-[#ECC45F] to-[#D4A028] hover:from-[#FFF5CE] hover:to-[#DFAC32] text-[#1A1608] font-black text-[14px] shadow-md shadow-[#D4A028]/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer overflow-hidden border border-[#F3D37A]"
+                    className="animate-bubble-float relative w-full py-2.5 sm:py-3 px-4 rounded-[13px] bg-gradient-to-r from-[#FFF0BA] via-[#ECC45F] to-[#D4A028] hover:from-[#FFF5CE] hover:to-[#DFAC32] text-[#1A1608] font-black text-[14px] shadow-md shadow-[#D4A028]/35 flex items-center justify-center gap-2 transition-transform active:scale-[0.98] cursor-pointer border border-[#F3D37A]"
                   >
-                    {/* Hiệu ứng vệt sáng kim cương quét định kỳ */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/70 to-transparent -translate-x-full animate-flash-sweep pointer-events-none" />
-                    
-                    <BookOpen size={16} strokeWidth={2.8} className="shrink-0 text-[#1A1608]" />
+                    <BookOpen size={17} strokeWidth={2.8} className="shrink-0 text-[#1A1608]" />
                     <span className="tracking-wide">Đọc thử tài liệu 3D</span>
                   </button>
                 </div>

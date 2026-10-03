@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Save, Upload, Image as ImageIcon } from 'lucide-react';
+import { X, Save, Upload, Image as ImageIcon, Crop } from 'lucide-react';
 import { Topic } from '../../lib/types';
 import { generateSlug } from '../../lib/slug';
 import { uploadImageFile } from '../../lib/storageUpload';
 import { saveTopicApi } from '../../lib/apiAdmin';
 import { generateUuid, isValidUuid } from '../../lib/uuid';
 import TopicIcon from '../TopicIcon';
+import ImageCropModal from './ImageCropModal';
 
 const AVAILABLE_ICONS = [
   { key: 'spine', label: 'Cột sống' },
@@ -57,6 +58,7 @@ export default function EditTopicModal({
 
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isCropOpen, setIsCropOpen] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   const handleTitleChange = (val: string) => {
@@ -283,22 +285,37 @@ export default function EditTopicModal({
             {/* Thumbnail xem trước nếu đã có ảnh */}
             {coverUrl && (
               <div className="flex items-center gap-3 p-2.5 rounded-[14px] bg-surface-2 border border-line">
-                <div className="w-14 h-14 rounded-[10px] overflow-hidden bg-white border border-line shrink-0 shadow-2xs">
+                <div
+                  onClick={() => setIsCropOpen(true)}
+                  className="w-14 h-14 rounded-[10px] overflow-hidden bg-white border border-line shrink-0 shadow-2xs relative group cursor-pointer hover:border-amber-400"
+                  title="Nhấn để cắt và chỉnh khung ảnh bìa"
+                >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={coverUrl}
                     alt="Xem trước ảnh bìa"
                     className="w-full h-full object-cover"
                   />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                    <Crop size={14} className="text-amber-300" />
+                  </div>
                 </div>
                 <div className="flex-1 min-w-0">
                   <span className="text-[12px] font-bold text-ink block truncate">
-                    Đã chọn ảnh bìa
+                    Đã chọn ảnh bìa (Chạm ảnh để cắt)
                   </span>
                   <span className="text-[11px] text-muted block truncate font-mono">
                     {coverUrl}
                   </span>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setIsCropOpen(true)}
+                  className="h-8 px-2.5 rounded-[8px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[11.5px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs shrink-0"
+                >
+                  <Crop size={12} strokeWidth={2.5} />
+                  <span>Cắt ảnh</span>
+                </button>
               </div>
             )}
 
@@ -345,6 +362,21 @@ export default function EditTopicModal({
           </button>
         </div>
       </div>
+
+      {/* MODAL CẮT VÀ CĂN KHUNG ẢNH */}
+      {isCropOpen && coverUrl && (
+        <ImageCropModal
+          isOpen={isCropOpen}
+          imageUrl={coverUrl}
+          title="Cắt & Căn Khung Ảnh Bìa Chủ Đề"
+          defaultAspect="1:1"
+          onClose={() => setIsCropOpen(false)}
+          onCropSaved={async (newUrl) => {
+            setCoverUrl(newUrl);
+            setIsCropOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }

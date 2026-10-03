@@ -11,11 +11,11 @@
   --color-muted: #475569;
   --color-line: #E2E8F0;
   --color-line-strong: #CBD5E1;
-  --color-primary: #7C3AED;
-  --color-primary-dark: #6D28D9;
-  --color-primary-soft: #F5F3FF;
-  --color-primary-track: #EDE9FE;
-  --color-on-primary-muted: #6D28D9;
+  --color-primary: #1E3A8A; /* Xanh Navy Hoàng Gia Lịch Lãm & Đẳng Cấp Y Khoa */
+  --color-primary-dark: #172554;
+  --color-primary-soft: #EFF6FF;
+  --color-primary-track: #DBEAFE;
+  --color-on-primary-muted: #1E40AF;
 }
 
 html {
@@ -30,7 +30,7 @@ body {
   padding: 0;
   background-color: var(--color-bg);
   background-image: 
-    radial-gradient(ellipse 90% 40% at 50% -10%, rgba(124, 58, 237, 0.05), transparent 70%),
+    radial-gradient(ellipse 90% 40% at 50% -10%, rgba(30, 58, 138, 0.04), transparent 70%),
     radial-gradient(ellipse 60% 30% at 100% 50%, rgba(15, 23, 42, 0.03), transparent 60%);
   background-repeat: no-repeat;
   color: var(--color-ink);
@@ -46,13 +46,13 @@ h1, h2, h3, h4, h5, h6 {
   font-feature-settings: "kern" 1, "liga" 1;
 }
 
-/* Tối ưu thanh cuộn và chống viền xanh trình duyệt */
+/* Tối ưu thanh cuộn và chống viền xanh thô kệch mặc định của Chrome */
 * {
   scrollbar-color: rgba(148, 148, 160, 0.28) transparent;
   scrollbar-width: thin;
 }
 :focus, :focus-visible {
-  outline-color: #8B5CF6;
+  outline-color: #D97706; /* Vàng hổ phách sang trọng, loại bỏ hoàn toàn viền xanh lơ của trình duyệt */
 }
 ::-webkit-scrollbar {
   width: 5px;
@@ -399,11 +399,11 @@ html.gray ::-webkit-scrollbar-thumb {
 /* 6. Hiệu ứng Hào Quang Nhịp Thở Sáng (Pulse Glow) chuẩn Y Khoa */
 @keyframes pulse-glow-light {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.2), 0 2px 6px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 0 0 0 rgba(30, 58, 138, 0.25), 0 2px 6px rgba(0, 0, 0, 0.08);
     transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 16px 2.5px rgba(245, 158, 11, 0.35), 0 4px 12px rgba(124, 58, 237, 0.15);
+    box-shadow: 0 0 16px 2.5px rgba(245, 158, 11, 0.35), 0 4px 12px rgba(30, 58, 138, 0.15);
     transform: scale(1.02);
   }
 }
@@ -451,6 +451,26 @@ html.dark .animate-pulse-glow {
 }
 
 /* ============================================================================
+   7.5 HIỆU ỨNG BONG BÓNG NỔI SANG TRỌNG (LUXURY BUBBLE FLOAT) CHO NÚT XEM THỬ 3D
+   Chuyển động nâng lên hạ xuống êm dịu, không chớp nháy, đổ bóng mềm mại cao cấp
+   ============================================================================ */
+@keyframes bubble-float {
+  0%, 100% {
+    transform: translateY(0);
+    box-shadow: 0 4px 14px rgba(212, 160, 40, 0.32), 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+  50% {
+    transform: translateY(-3.5px);
+    box-shadow: 0 9px 24px rgba(212, 160, 40, 0.52), 0 2px 8px rgba(0, 0, 0, 0.14);
+  }
+}
+
+.animate-bubble-float {
+  animation: bubble-float 2.8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  will-change: transform, box-shadow;
+}
+
+/* ============================================================================
    8. HIỆU ỨNG BRAND CARD: NHỊP THỞ SINH HỌC ÊM ÁI (BIO-BREATHING AURA)
    ============================================================================ */
 @keyframes bio-breathing-light {
@@ -461,7 +481,7 @@ html.dark .animate-pulse-glow {
   }
   50% {
     border-color: rgba(245, 158, 11, 0.5);
-    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.08), 0 0 16px rgba(245, 158, 11, 0.15);
+    box-shadow: 0 6px 20px rgba(30, 58, 138, 0.1), 0 0 16px rgba(245, 158, 11, 0.15);
     transform: translateY(-1.5px);
   }
 }

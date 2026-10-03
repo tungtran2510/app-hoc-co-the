@@ -156,7 +156,7 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
           <button
             type="button"
             onClick={() => setIsCreating(true)}
-            className="flex items-center gap-1 h-7.5 px-2.5 rounded-full bg-purple-900 hover:bg-purple-950 text-amber-300 font-bold text-[11.5px] shadow-xs cursor-pointer transition-all shrink-0"
+            className="flex items-center gap-1 h-7.5 px-2.5 rounded-full bg-[#1E3A8A] hover:bg-[#172554] text-amber-300 font-bold text-[11.5px] shadow-xs cursor-pointer transition-all shrink-0"
           >
             <Plus size={14} strokeWidth={2.5} />
             <span>Thêm bài</span>

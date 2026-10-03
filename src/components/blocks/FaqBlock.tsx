@@ -58,10 +58,10 @@ export default function FaqBlock({
 
   return (
     <div id={blockId} className="w-full scroll-mt-20 my-2">
-      <div className="p-4 sm:p-5 rounded-[22px] bg-gradient-to-b from-slate-50 to-purple-50/25 dark:from-[#1A0E35] dark:to-[#130826] border border-slate-200/90 dark:border-purple-500/25 shadow-2xs flex flex-col gap-3">
+      <div className="p-4 sm:p-5 rounded-[22px] bg-gradient-to-b from-slate-50 to-blue-50/30 dark:from-[#1A0E35] dark:to-[#130826] border border-slate-200/90 dark:border-purple-500/25 shadow-2xs flex flex-col gap-3">
         {/* Header khối FAQ */}
         <div className="flex items-center gap-2 pb-2.5 border-b border-slate-200/80 dark:border-purple-500/20">
-          <div className="w-7 h-7 rounded-[8px] bg-purple-900 text-amber-300 dark:bg-purple-800 dark:text-amber-200 flex items-center justify-center shrink-0 shadow-2xs">
+          <div className="w-7 h-7 rounded-[8px] bg-[#1E3A8A] text-amber-300 dark:bg-purple-800 dark:text-amber-200 flex items-center justify-center shrink-0 shadow-2xs">
             <HelpCircle size={16} strokeWidth={2.5} />
           </div>
           <div className="min-w-0">
@@ -80,8 +80,8 @@ export default function FaqBlock({
                 key={item.id || idx}
                 className={`rounded-[14px] border transition-all duration-200 overflow-hidden ${
                   isOpen
-                    ? 'bg-white dark:bg-[#1F113E] border-purple-300/80 dark:border-purple-500/50 shadow-xs'
-                    : 'bg-white/80 dark:bg-[#160D2C] border-slate-200/80 dark:border-purple-500/20 hover:border-purple-200'
+                    ? 'bg-white dark:bg-[#1F113E] border-blue-900/30 dark:border-purple-500/50 shadow-xs'
+                    : 'bg-white/80 dark:bg-[#160D2C] border-slate-200/80 dark:border-purple-500/20 hover:border-slate-300'
                 }`}
               >
                 {/* Nút bấm mở/đóng câu hỏi */}
@@ -92,7 +92,7 @@ export default function FaqBlock({
                   aria-expanded={isOpen}
                 >
                   <div className="flex items-start gap-2.5 min-w-0">
-                    <span className="w-5 h-5 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300 text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                    <span className="w-5 h-5 rounded-full bg-blue-50 dark:bg-purple-950 text-[#1E3A8A] dark:text-purple-300 text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
                       Q{idx + 1}
                     </span>
                     <span
@@ -105,7 +105,7 @@ export default function FaqBlock({
                   <div
                     className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-transform duration-200 ${
                       isOpen
-                        ? 'bg-purple-900 text-white rotate-180'
+                        ? 'bg-[#1E3A8A] text-white rotate-180'
                         : 'bg-slate-100 dark:bg-purple-950 text-slate-600 dark:text-purple-300'
                     }`}
                   >

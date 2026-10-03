@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { X, Image as ImageIcon, Save, Loader2, BookOpen } from 'lucide-react';
+import { X, Image as ImageIcon, Save, Loader2, BookOpen, Crop } from 'lucide-react';
 import { uploadImageFile } from '../../lib/storageUpload';
 import { saveSettingsApi } from '../../lib/apiAdmin';
 import { getStoredAppSettings, saveStoredAppSettings } from '../../lib/storage';
+import ImageCropModal from './ImageCropModal';
 
 interface EditAppModalProps {
   isOpen: boolean;
@@ -44,6 +45,7 @@ export default function EditAppModal({
   const [hotline, setHotline] = useState(initialHotline || '');
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isCropOpen, setIsCropOpen] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -208,16 +210,27 @@ export default function EditAppModal({
               Logo ứng dụng
             </label>
             <div className="flex items-center gap-3">
-              <div className="w-14 h-14 rounded-[14px] bg-primary-soft flex items-center justify-center overflow-hidden border border-line shrink-0">
+              <div
+                onClick={() => logoUrl && setIsCropOpen(true)}
+                className={`w-14 h-14 rounded-[14px] bg-primary-soft flex items-center justify-center overflow-hidden border border-line shrink-0 relative group ${
+                  logoUrl ? 'cursor-pointer hover:border-amber-400' : ''
+                }`}
+                title={logoUrl ? 'Nhấn để cắt và chỉnh khung logo' : undefined}
+              >
                 {logoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                      <Crop size={14} className="text-amber-300" />
+                    </div>
+                  </>
                 ) : (
                   <BookOpen size={24} className="text-primary" />
                 )}
               </div>
 
-              <div className="flex-1 flex flex-col gap-1">
+              <div className="flex-1 flex flex-col gap-1.5">
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -225,24 +238,39 @@ export default function EditAppModal({
                   onChange={handleLogoFileChange}
                   className="hidden"
                 />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploading}
-                  className="flex items-center justify-center gap-1.5 h-10 px-3 rounded-[10px] bg-white border border-line text-ink font-bold text-[13px] hover:border-primary cursor-pointer shadow-2xs"
-                >
-                  {isUploading ? (
-                    <>
-                      <Loader2 size={14} className="animate-spin text-primary" />
-                      <span>Đang nén & tải ảnh...</span>
-                    </>
-                  ) : (
-                    <>
-                      <ImageIcon size={14} className="text-primary" />
-                      <span>Chọn ảnh logo mới</span>
-                    </>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                    className="flex-1 flex items-center justify-center gap-1.5 h-9 px-3 rounded-[10px] bg-white border border-line text-ink font-bold text-[12.5px] hover:border-primary cursor-pointer shadow-2xs"
+                  >
+                    {isUploading ? (
+                      <>
+                        <Loader2 size={13} className="animate-spin text-primary" />
+                        <span>Đang tải...</span>
+                      </>
+                    ) : (
+                      <>
+                        <ImageIcon size={13} className="text-primary" />
+                        <span>Chọn ảnh mới</span>
+                      </>
+                    )}
+                  </button>
+
+                  {logoUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setIsCropOpen(true)}
+                      className="h-9 px-2.5 rounded-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[12px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs shrink-0"
+                      title="Cắt khung hình logo"
+                    >
+                      <Crop size={13} strokeWidth={2.5} />
+                      <span>Cắt logo</span>
+                    </button>
                   )}
-                </button>
+                </div>
+
                 {logoUrl && (
                   <button
                     type="button"
@@ -319,6 +347,21 @@ export default function EditAppModal({
           </div>
         </form>
       </div>
+
+      {/* Modal cắt và chỉnh khung logo */}
+      {isCropOpen && logoUrl && (
+        <ImageCropModal
+          isOpen={isCropOpen}
+          imageUrl={logoUrl}
+          defaultAspect="1:1"
+          title="Cắt khung hình Logo ứng dụng"
+          onClose={() => setIsCropOpen(false)}
+          onCropSaved={async (newUrl) => {
+            setLogoUrl(newUrl);
+            setIsCropOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }

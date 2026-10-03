@@ -20,7 +20,7 @@ export default function TopicHeaderNav() {
         <Link
           href="/"
           prefetch={true}
-          className="inline-flex items-center gap-1 h-[48px] min-h-[48px] text-primary text-[17px] font-bold transition-opacity active:opacity-75"
+          className="inline-flex items-center gap-1 h-[48px] min-h-[48px] text-[#1E3A8A] hover:text-[#172554] dark:text-[#F8DF7B] text-[17px] font-extrabold transition-opacity active:opacity-75"
           aria-label="Quay lại Trang chủ"
         >
           <ChevronLeft size={24} strokeWidth={2.5} />
@@ -31,7 +31,7 @@ export default function TopicHeaderNav() {
           <button
             type="button"
             onClick={() => setShowSettings(true)}
-            className="flex items-center gap-1 h-8 px-2.5 rounded-full bg-primary-soft text-primary font-bold text-[12px] border border-primary/30 shadow-2xs hover:bg-primary-soft/80"
+            className="flex items-center gap-1 h-8 px-2.5 rounded-full bg-blue-50 text-[#1E3A8A] dark:bg-purple-950 dark:text-[#F8DF7B] font-bold text-[12px] border border-blue-200 dark:border-purple-700/60 shadow-2xs hover:bg-blue-100"
             title="Cài đặt quản trị"
           >
             <Settings size={14} />

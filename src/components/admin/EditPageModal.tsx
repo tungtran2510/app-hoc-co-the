@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Save, Edit, Upload, Check, Sparkles } from 'lucide-react';
+import { X, Save, Edit, Upload, Check, Sparkles, Crop } from 'lucide-react';
 import { Page } from '../../lib/types';
 import { generateSlug } from '../../lib/slug';
 import { uploadImageFile } from '../../lib/storageUpload';
 import { savePageApi } from '../../lib/apiAdmin';
 import { generateUuid, isValidUuid } from '../../lib/uuid';
+import ImageCropModal from './ImageCropModal';
 
 const ANATOMY_PRESETS = [
   {
@@ -62,6 +63,7 @@ export default function EditPageModal({
 
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isCropOpen, setIsCropOpen] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   if (!isOpen) return null;
@@ -226,22 +228,37 @@ export default function EditPageModal({
             {/* Thumbnail xem trước nếu đã có ảnh */}
             {coverUrl && (
               <div className="flex items-center gap-3 p-2.5 rounded-[14px] bg-surface-2 border border-line">
-                <div className="w-14 h-14 rounded-[10px] overflow-hidden bg-white border border-line shrink-0 shadow-2xs">
+                <div
+                  onClick={() => setIsCropOpen(true)}
+                  className="w-14 h-14 rounded-[10px] overflow-hidden bg-white border border-line shrink-0 shadow-2xs relative group cursor-pointer hover:border-amber-400"
+                  title="Nhấn để cắt và chỉnh khung ảnh bài học"
+                >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={coverUrl}
                     alt="Xem trước ảnh bài học"
                     className="w-full h-full object-cover"
                   />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                    <Crop size={14} className="text-amber-300" />
+                  </div>
                 </div>
                 <div className="flex-1 min-w-0">
                   <span className="text-[12px] font-bold text-ink block truncate">
-                    Đang dùng ảnh này
+                    Đang dùng ảnh này (Chạm ảnh để cắt)
                   </span>
                   <span className="text-[11px] text-muted block truncate font-mono">
                     {coverUrl}
                   </span>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setIsCropOpen(true)}
+                  className="h-8 px-2.5 rounded-[8px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[11.5px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs shrink-0"
+                >
+                  <Crop size={12} strokeWidth={2.5} />
+                  <span>Cắt ảnh</span>
+                </button>
               </div>
             )}
 
@@ -362,6 +379,21 @@ export default function EditPageModal({
           </button>
         </div>
       </div>
+
+      {/* Modal cắt và chỉnh khung ảnh bài học */}
+      {isCropOpen && coverUrl && (
+        <ImageCropModal
+          isOpen={isCropOpen}
+          imageUrl={coverUrl}
+          defaultAspect="1:1"
+          title="Cắt ảnh đại diện bài học"
+          onClose={() => setIsCropOpen(false)}
+          onCropSaved={async (newUrl) => {
+            setCoverUrl(newUrl);
+            setIsCropOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }
