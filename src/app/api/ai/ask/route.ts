@@ -49,7 +49,7 @@ const CURATED_QA = [
 `Đối với tình trạng thoát vị đĩa đệm (đặc biệt vùng thắt lưng L4-L5), bạn cần chú ý các nguyên tắc chăm sóc và bảo vệ sau:
 
 • Giữ thẳng trục thắt lưng: Tuyệt đối tránh cúi gập cong lưng hoặc vặn xoắn đột ngột; khi cúi nhặt vật luôn gập gối, hạ thấp trọng tâm và dùng lực từ đùi.
-• Giảm tải áp lực đĩa đệm: Nằm nghỉ ngơi trên đệm phẳng vừa phải, kê một gối mỏng dưới khoeo chân (hoặc kẹp giữa hai gối khi nằm nghiêng) để giải phóng lực căng thắt lưng.
+• Giảm tải áp lực đĩa đệm: Nằm nghỉ ngơi trên đệm phẳng vừa phải, hai chân co nhẹ tự nhiên để giải phóng lực căng thắt lưng.
 • Tránh ngồi tĩnh tại quá lâu: Không ngồi liên tục quá 30 - 45 phút; nên đứng dậy đi lại nhẹ nhàng để tăng tuần hoàn và nuôi dưỡng đĩa đệm qua cơ chế thẩm thấu.
 • Vận động an toàn: Thực hiện các bài tập kéo giãn cơ dựng sống nhẹ nhàng; tránh tập các động tác gập bụng truyền thống (sit-ups) gây chèn ép nhân nhầy ra sau.
 • Cảnh báo y tế cần khám ngay: Nếu xuất hiện cảm giác đau nhói buốt lan nhanh xuống chân, tê mất cảm giác bàn chân hoặc rối loạn đại tiểu tiện.`,
@@ -77,7 +77,7 @@ const CURATED_QA = [
       },
     ],
     follow_up_questions: [
-      'Tư thế nằm ngủ nào tốt cho người thoát vị đĩa đệm?',
+      'Thời điểm nào nên đi bộ nhẹ nhàng để phục hồi đĩa đệm?',
       'Cách cúi nhấc vật nặng an toàn không đau lưng?',
     ],
   },
@@ -101,7 +101,7 @@ const CURATED_QA = [
 • Khi ngồi làm việc: Giữ lưng thẳng, vai thả lỏng, màn hình ngang tầm mắt; hai chân đặt phẳng trên sàn, không ngồi bắt chéo chân hoặc gù lưng.
 • Khi cúi nhấc vật nặng: Luôn gập gối, hạ thấp hông, giữ lưng thẳng và dùng lực cơ đùi để nâng lên (tuyệt đối không cúi gập cong lưng).
 • Khi đứng và đi lại: Giữ trục thẳng tự nhiên, phân bổ đều trọng lượng lên hai chân, tránh dồn lực lệch một bên.
-• Khi nằm ngủ: Dùng gối có độ cao vừa tầm nâng đỡ hõm gáy; nằm nghiêng nên kẹp gối mỏng giữa hai chân, nằm ngửa kê nhẹ dưới khoeo chân.
+• Khi nằm ngủ: Nằm thẳng trục trên đệm phẳng có độ đàn hồi tốt; tránh nằm võng hoặc đệm lún sâu làm cong gập cột sống.
 • Nhịp nghỉ ngơi: Cứ sau 45 - 60 phút, hãy đứng dậy vươn vai và đi lại nhẹ nhàng 1 - 2 phút để giải nén đĩa đệm.`,
     suggested_pages: [
       {
@@ -121,7 +121,7 @@ const CURATED_QA = [
     ],
     follow_up_questions: [
       'Cách nâng vật nặng đúng để không đau lưng?',
-      'Nên chọn gối ngủ thế nào để bảo vệ đốt sống cổ?',
+      'Bài tập kéo giãn giải áp cột sống cổ tại chỗ?',
     ],
   },
   {
@@ -393,7 +393,7 @@ function fastFallbackSearch(query: string, catalog: LessonCatalogItem[]) {
   if (lowerQ.includes('cổ') || lowerQ.includes('vai') || lowerQ.includes('gáy') || lowerQ.includes('ngực')) {
     answerText = `• Giữ thẳng trục cột sống cổ, đặt màn hình làm việc hoặc điện thoại ngang tầm mắt.\n• Thay đổi tư thế mỗi 30 - 45 phút, xoay nhẹ khớp vai và ngửa cổ thư giãn cơ dựng sống.\n• Chườm ấm vùng cổ vai gáy 10 - 15 phút vào buổi tối để tăng tuần hoàn máu.`;
   } else if (lowerQ.includes('lưng') || lowerQ.includes('đĩa đệm') || lowerQ.includes('thoát vị') || lowerQ.includes('tọa')) {
-    answerText = `• Giữ thẳng lưng khi ngồi và sinh hoạt, luôn gập gối hạ thấp trọng tâm khi nâng nhặt đồ vật.\n• Nằm ngửa kê gối mỏng dưới khoeo chân (hoặc kẹp giữa hai gối khi nằm nghiêng) để giải nén cột sống.\n• Đi lại nhẹ nhàng mỗi 30 phút, tránh ngồi tĩnh tại quá lâu làm tăng áp lực nội đĩa đệm.`;
+    answerText = `• Giữ thẳng lưng khi ngồi và sinh hoạt, luôn gập gối hạ thấp trọng tâm khi nâng nhặt đồ vật.\n• Nằm ngửa thư giãn trên đệm phẳng có độ đàn hồi tốt, co nhẹ chân để giải tỏa áp lực thắt lưng.\n• Đi lại nhẹ nhàng mỗi 30 phút, tránh ngồi tĩnh tại quá lâu làm tăng áp lực nội đĩa đệm.`;
   } else if (lowerQ.includes('nước') || lowerQ.includes('uống')) {
     answerText = `• Uống từng ngụm nhỏ, rải đều trong suốt cả ngày thay vì uống dồn một lượng lớn.\n• Bổ sung nước ấm vào buổi sáng sau khi thức dậy để kích hoạt nhu động đường tiêu hóa.\n• Khi vận động ra nhiều mồ hôi, nên bù thêm khoáng điện giải tự nhiên.`;
   } else if (lowerQ.includes('ăn') || lowerQ.includes('tiêu hóa') || lowerQ.includes('dạ dày') || lowerQ.includes('đầy bụng')) {
@@ -514,6 +514,7 @@ NGUYÊN TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ NGHIÊM NGẶT):
 
 3. TUYỆT ĐỐI CẤM (VI PHẠM SẼ BỊ HỦY BỎ):
    - CẤM TUYỆT ĐỐI nhắc đến thương hiệu DoctorLoan, ghế DoctorLoan, gối DoctorLoan hay bất kỳ sản phẩm bán hàng nào (trừ khi người dùng đích thân hỏi từ "DoctorLoan").
+   - CẤM TUYỆT ĐỐI tư vấn về gối, chọn gối, kê gối, thử gối hay sinh câu hỏi gợi ý liên quan đến gối (Tác giả Tùng Dinh Dưỡng KHÔNG có tài liệu và KHÔNG tư vấn về gối).
    - CẤM TUYỆT ĐỐI chia kiểu máy móc: "TẦNG 1", "TẦNG 2", "TẦNG 3".
    - CẤM tự ý đưa công thức nước 0.04 hay cảnh báo cấp cứu/bệnh viện vào các câu hỏi sinh hoạt thông thường.
    - CẤM các từ: "chữa bệnh", "khám chữa bệnh", "điều trị dứt điểm", "bác sĩ".
@@ -697,6 +698,14 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
           .trim();
       }
 
+      // LOẠI BỎ TRIỆT ĐỂ VIỆC TƯ VẤN GỐI KHI NGƯỜI DÙNG KHÔNG HỎI VỀ GỐI
+      const isAskingPillows = /gối/i.test(question);
+      if (!isAskingPillows) {
+        cleanAnswer = cleanAnswer
+          .replace(/.*(?:gối ngủ|chọn gối|kê gối|kẹp gối|xuống gối|thử gối).*\n?/gi, '')
+          .trim();
+      }
+
       if (cleanAnswer.length > 0) {
         cleanAnswer = cleanAnswer.charAt(0).toUpperCase() + cleanAnswer.slice(1);
       }
@@ -718,10 +727,14 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
           })
         : [];
 
+      const filteredFollowUps = Array.isArray(parsedJson.follow_up_questions)
+        ? parsedJson.follow_up_questions.filter((q: string) => isAskingPillows || !/gối/i.test(q))
+        : [];
+
       return NextResponse.json({
         answer: cleanAnswer || parsedJson.answer,
         suggested_pages: normalizedSuggested,
-        follow_up_questions: Array.isArray(parsedJson.follow_up_questions) ? parsedJson.follow_up_questions : [],
+        follow_up_questions: filteredFollowUps,
         provider: usedProvider || 'ai',
       });
     }

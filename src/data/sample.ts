@@ -169,7 +169,7 @@ Dấu hiệu cảnh báo đỏ (Red Flags) cần đi viện ngay: Đau nhói d�
 • Khi ngồi làm việc: Giữ lưng thẳng, vai thả lỏng, màn hình ngang tầm mắt; hai chân đặt phẳng trên sàn, không ngồi bắt chéo chân hoặc gù lưng.
 • Khi cúi nhấc vật nặng: Luôn gập gối, hạ thấp hông, giữ lưng thẳng và dùng lực cơ đùi để nâng lên (tuyệt đối không cúi gập cong lưng).
 • Khi đứng và đi lại: Giữ trục thẳng tự nhiên, phân bổ đều trọng lượng lên hai chân, tránh dồn lực lệch một bên.
-• Khi nằm ngủ: Dùng gối có độ cao vừa tầm nâng đỡ hõm gáy; nằm nghiêng nên kẹp gối mỏng giữa hai chân, nằm ngửa kê nhẹ dưới khoeo chân.
+• Khi nằm ngủ: Nằm thẳng trục trên đệm phẳng có độ đàn hồi tốt; tránh nằm võng hoặc đệm lún sâu làm cong gập cột sống.
 • Nhịp nghỉ ngơi: Cứ sau 45 - 60 phút, hãy đứng dậy vươn vai và đi lại nhẹ nhàng 1 - 2 phút để giải nén đĩa đệm.`,
     },
     {
@@ -188,13 +188,8 @@ Dấu hiệu cảnh báo đỏ (Red Flags) cần đi viện ngay: Đau nhói d�
     },
     {
       id: 'faq-02',
-      question: 'Thoát vị đĩa đệm thì giải pháp DoctorLoan hỗ trợ thế nào?',
-      answer: 'Giải pháp DoctorLoan (đã được cấp sáng chế) hỗ trợ điều chỉnh tư thế tự nhiên khi ngồi, nằm, ngủ để giải tỏa áp lực đĩa đệm và phục hồi hệ cơ. Mời bạn xem chi tiết tại bài học "Đĩa đệm và cơ chế giảm xóc" trong chủ đề Cột Sống.',
-    },
-    {
-      id: 'faq-03',
-      question: 'Mới sử dụng gối hoặc thiết bị điều chỉnh tư thế thấy hơi mỏi thì có sao không?',
-      answer: 'Đây là phản ứng thích nghi sinh học bình thường trong 1-3 ngày đầu khi các nhóm cơ co rút lâu ngày được kéo giãn và điều chỉnh lại. Bạn hãy xem hướng dẫn chi tiết trong bài "Tư thế chuẩn & Vận động giải áp".',
+      question: 'Thoát vị đĩa đệm thì tập luyện phục hồi thế nào?',
+      answer: 'Cần ưu tiên các bài tập kéo giãn cơ dựng sống nhẹ nhàng, đi bộ và giải nén cột sống; tránh các động tác cúi gập cong lưng hoặc xoay vặn đột ngột. Mời bạn xem chi tiết tại bài học "Đĩa đệm và cơ chế giảm xóc" trong chủ đề Cột Sống.',
     },
     {
       id: 'faq-04',
@@ -208,8 +203,8 @@ Dấu hiệu cảnh báo đỏ (Red Flags) cần đi viện ngay: Đau nhói d�
     },
     {
       id: 'faq-06',
-      question: 'DoctorLoan có phải là thuốc hay chữa dứt điểm bệnh không?',
-      answer: 'DoctorLoan là giải pháp hỗ trợ điều chỉnh tư thế tự nhiên (đã được cấp sáng chế), không phải là thuốc và không thay thế can thiệp y tế. Mời bạn tham khảo tài liệu học tập trong hệ thống để nắm vững phương pháp chăm sóc cột sống chủ động.',
+      question: 'Thoái hóa cột sống có chữa khỏi hoàn toàn được không?',
+      answer: 'Thoái hóa là quá trình lão hóa tự nhiên của cơ thể theo thời gian, không thể phục hồi như thời trẻ nhưng hoàn toàn có thể kiểm soát, giảm đau và phục hồi vận động nếu duy trì tư thế đúng và dinh dưỡng kháng viêm.',
     },
     {
       id: 'faq-07',
