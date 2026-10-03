@@ -340,10 +340,22 @@ export interface FlipbookViewerProps {
   onMoveDown?: () => void;
   isFirst?: boolean;
   isLast?: boolean;
+  /** Khối sách trong bài học: chỉ hiển thị file PDF admin đã nạp (không dùng trang mẫu) */
+  blockMode?: boolean;
+  pdfUrl?: string;
   mode?: 'inline' | 'modal-only';
   isOpen?: boolean;
   onClose?: () => void;
 }
+
+const makeCoverPageFor = (title: string, coverUrl?: string): FlipbookPage => ({
+  id: 'cover-only',
+  pageNum: 1,
+  title: title || 'Tài liệu',
+  category: 'BÌA SÁCH',
+  badge: 'BÌA',
+  imageUrl: coverUrl || '',
+});
 
 export default function FlipbookViewer({
   initialPages,
@@ -362,13 +374,17 @@ export default function FlipbookViewer({
   onMoveDown,
   isFirst = false,
   isLast = false,
+  blockMode = false,
+  pdfUrl,
   mode = 'inline',
   isOpen,
   onClose,
 }: FlipbookViewerProps) {
+  const makeCoverPage = () => makeCoverPageFor(title, coverUrl);
   const [pages, setPages] = useState<FlipbookPage[]>(() => {
     let p: FlipbookPage[];
-    if (initialPages && initialPages.length > 0) p = initialPages;
+    if (blockMode) p = [makeCoverPage()];
+    else if (initialPages && initialPages.length > 0) p = initialPages;
     else if (book) p = getBookFlipbookPages(book);
     else if (title && title !== 'Tài liệu tham khảo' && title !== 'Đọc thử sách 3D' && title !== 'Đọc thử tài liệu 3D') {
       const cleanTitle = title.replace(/^Đọc thử:\s*/i, '').replace(/^Đọc thử tài liệu 3D:\s*/i, '');
@@ -382,7 +398,10 @@ export default function FlipbookViewer({
   // Tự động đồng bộ danh sách trang khi initialPages, book, title thay đổi
   useEffect(() => {
     let p: FlipbookPage[] = [];
-    if (initialPages && initialPages.length > 0) {
+    if (blockMode) {
+      if (pdfUrl) return;
+      p = [makeCoverPage()];
+    } else if (initialPages && initialPages.length > 0) {
       p = [...initialPages];
     } else if (book) {
       p = getBookFlipbookPages(book);
@@ -393,7 +412,70 @@ export default function FlipbookViewer({
       p = [...DEFAULT_ANATOMY_PAGES];
     }
     setPages(p);
-  }, [initialPages, book, title]);
+  }, [initialPages, book, title, blockMode, pdfUrl, coverUrl]);
+
+  // Đọc file PDF admin đã nạp vào khối sách và dựng thành các trang lật
+  useEffect(() => {
+    if (!blockMode || !pdfUrl) return;
+    let cancelled = false;
+    (async () => {
+      setIsLoadingPdf(true);
+      setPdfProgressText('Đang tải tài liệu...');
+      try {
+        if (!(window as any).pdfjsLib) {
+          await new Promise<void>((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+            script.onload = () => resolve();
+            script.onerror = () => reject(new Error('Không thể tải PDF.js'));
+            document.head.appendChild(script);
+          });
+        }
+        const pdfjsLib = (window as any).pdfjsLib;
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+          'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const pdf = await pdfjsLib.getDocument({ url: pdfUrl }).promise;
+        const total = Math.min(pdf.numPages, 80);
+        const out: FlipbookPage[] = [];
+        for (let i = 1; i <= total; i++) {
+          if (cancelled) return;
+          setPdfProgressText('Đang dựng trang ' + i + ' / ' + total + '...');
+          const page = await pdf.getPage(i);
+          const viewport = page.getViewport({ scale: 1.4 });
+          const canvas = document.createElement('canvas');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) continue;
+          await page.render({ canvasContext: ctx, viewport }).promise;
+          out.push({
+            id: 'pdf-' + i,
+            pageNum: i,
+            title: 'Trang ' + i,
+            category: 'TÀI LIỆU PDF',
+            badge: 'TRANG ' + i,
+            imageUrl: canvas.toDataURL('image/jpeg', 0.82),
+          });
+        }
+        if (!cancelled && out.length > 0) {
+          setPages(out);
+          setCurrentPage(1);
+        }
+      } catch (err) {
+        console.error('Không đọc được PDF', err);
+        if (!cancelled) setPdfProgressText('');
+      } finally {
+        if (!cancelled) {
+          setIsLoadingPdf(false);
+          setPdfProgressText('');
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blockMode, pdfUrl]);
 
   const [pageImages, setPageImages] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);

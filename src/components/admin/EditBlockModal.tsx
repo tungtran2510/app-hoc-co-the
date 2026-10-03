@@ -1561,8 +1561,9 @@ export default function EditBlockModal({
                         try {
                           setIsUploadingMedia(true);
                           const res = await uploadPdfFile(file);
-                          setNewFileName(res.fileName);
-                          setNewFileUrl(res.url);
+                          setFileList((prev) => [...prev, { name: res.fileName, url: res.url, size_bytes: file.size }]);
+                          setNewFileName('');
+                          setNewFileUrl('');
                         } catch (err: any) {
                           alert(err.message || 'Lỗi tải file PDF');
                         } finally {

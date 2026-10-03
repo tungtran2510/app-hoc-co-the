@@ -676,6 +676,13 @@ export default function ContentViewer({
             pageTitle={currentPage.title}
             title={flipbookTitle}
             coverUrl={coverUrl}
+            blockMode
+            pdfUrl={
+              block.type === 'files'
+                ? (block.data.files || []).find((f) => /\.pdf(\?|$)/i.test(f.url || ''))?.url ||
+                  (block.data.files || [])[0]?.url
+                : undefined
+            }
             onUpdateCover={(newCoverUrl: string) => {
               const updated = blockList.map((b) => {
                 if (b.id === block.id && b.type === 'files') {
