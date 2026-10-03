@@ -381,6 +381,18 @@ export async function getPageById(id: string): Promise<Page | null> {
   return page || null;
 }
 
+/**
+ * Khối Hỏi-Đáp (FAQ) được lưu trong bảng blocks dưới dạng type 'text' + data.__kind = 'faq'
+ * (vì ràng buộc blocks_type_check của CSDL chưa cho phép type 'faq'). Hàm này giải mã lại khi đọc.
+ */
+export function decodeBlockRow(row: any): Block {
+  if (row && row.type === 'text' && row.data && row.data.__kind === 'faq') {
+    const { __kind, __style, ...rest } = row.data;
+    return { ...row, type: 'faq', display_style: __style || 'accordion', data: rest } as Block;
+  }
+  return row as Block;
+}
+
 export async function getBlocksByPage(pageId: string, includeHidden = false): Promise<Block[]> {
   const cacheKey = `blocks_by_page:${pageId}:${includeHidden}`;
   return getCachedOrFetch(cacheKey, async () => {
@@ -392,7 +404,7 @@ export async function getBlocksByPage(pageId: string, includeHidden = false): Pr
           query = query.eq('is_visible', true);
         }
         const { data } = await query.order('sort_order', { ascending: true });
-        if (data && data.length > 0) return data as Block[];
+        if (data && data.length > 0) return data.map(decodeBlockRow);
       } catch {
         // fallback
       }

@@ -61,7 +61,7 @@ export default function FaqBlock({
       <div className="p-4 sm:p-5 rounded-[22px] bg-gradient-to-b from-slate-50 to-blue-50/30 dark:from-[#1A0E35] dark:to-[#130826] border border-slate-200/90 dark:border-purple-500/25 shadow-2xs flex flex-col gap-3">
         {/* Header khối FAQ */}
         <div className="flex items-center gap-2 pb-2.5 border-b border-slate-200/80 dark:border-purple-500/20">
-          <div className="w-7 h-7 rounded-[8px] bg-[#1E3A8A] text-amber-300 dark:bg-purple-800 dark:text-amber-200 flex items-center justify-center shrink-0 shadow-2xs">
+          <div className="w-7 h-7 rounded-[8px] bg-[#1E3A8A] text-blue-300 dark:bg-purple-800 dark:text-blue-200 flex items-center justify-center shrink-0 shadow-2xs">
             <HelpCircle size={16} strokeWidth={2.5} />
           </div>
           <div className="min-w-0">
@@ -116,7 +116,7 @@ export default function FaqBlock({
                 {/* Phần câu trả lời mở rộng */}
                 {isOpen && (
                   <div className="px-3.5 pb-3.5 pt-0 sm:px-4 sm:pb-4 border-t border-slate-100 dark:border-purple-500/15 animate-in fade-in duration-150">
-                    <div className="pt-2.5 pl-2.5 border-l-2 border-amber-500/70 dark:border-amber-400/80 text-slate-700 dark:text-purple-100">
+                    <div className="pt-2.5 pl-2.5 border-l-2 border-blue-600/70 dark:border-blue-400/80 text-slate-700 dark:text-purple-100">
                       <p
                         className={`${answerSizeClass} font-medium leading-relaxed whitespace-pre-line`}
                       >

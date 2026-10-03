@@ -53,11 +53,9 @@ export default function AddBlockDrawer({
       let html: string | undefined = undefined;
 
       if (displayStyle === 'html') {
-        title = 'Khối HTML tùy biến';
-        title_color = '#1E293B';
         mode = 'html';
-        html = `<div style="background: linear-gradient(135deg, #fdfbf7 0%, #fef3c7 100%); border-left: 4px solid #d97706; padding: 14px 16px; border-radius: 12px; margin: 8px 0;">\n  <div style="font-weight: 700; color: #92400e; margin-bottom: 4px;">💡 Điểm cốt lõi cần nhớ</div>\n  <p style="margin: 0; color: #78350f; line-height: 1.6; font-size: 15px;">Nội dung giải thích chi tiết, định dạng HTML chuyên nghiệp và dễ tùy biến.</p>\n</div>`;
-        defaultLines = ['Khối nội dung HTML tùy biến'];
+        html = `<div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-left: 4px solid #1E3A8A; padding: 14px 16px; border-radius: 12px; margin: 8px 0;">\n  <div style="font-weight: 600; color: #1E3A8A; margin-bottom: 4px;">Tiêu đề khối</div>\n  <p style="margin: 0; color: #334155; line-height: 1.6; font-size: 15px;">Nhập nội dung của bạn tại đây. Bạn có thể dùng HTML, ảnh hoặc văn bản thường.</p>\n</div>`;
+        defaultLines = [];
       } else if (displayStyle === 'diem_can_nho') {
         format = 'numbered';
         defaultLines = ['Ý quan trọng thứ nhất.', 'Ý quan trọng thứ hai.'];

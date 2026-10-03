@@ -607,7 +607,11 @@ export default function ContentViewer({
     return Math.max(mins, 3);
   })();
 
-  const textBlocks = blockList.filter((b) => b.type === 'text');
+  const isHtmlTextBlock = (b: Block) =>
+    b.type === 'text' && ((b.data as any)?.mode === 'html' || b.display_style === 'html');
+  const textBlocks = blockList.filter(
+    (b): b is Extract<Block, { type: 'text' }> => b.type === 'text' && !isHtmlTextBlock(b)
+  );
   const filesBlocks = blockList.filter((b) => b.type === 'files');
   const customFiles: FileItem[] = filesBlocks.flatMap((b) => (b.type === 'files' ? b.data.files : []));
   const relatedLinksBlock = blockList.find((b) => b.type === 'links' && b.display_style === 'related');
@@ -1084,7 +1088,7 @@ export default function ContentViewer({
             if (!isAdmin && !b.is_visible) return false;
             // Nếu bài học có khối video, các khối text đã nằm trong tab 'Tóm tắt cốt lõi'
             // Tuyệt đối không hiển thị lặp lại ở ngoài trang chính có danh sách phát nữa
-            if (videoBlock && b.type === 'text') return false;
+            if (videoBlock && b.type === 'text' && !isHtmlTextBlock(b)) return false;
             return true;
           })
           .map((block) => {

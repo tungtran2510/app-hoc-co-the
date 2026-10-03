@@ -34,13 +34,14 @@ export async function POST(req: NextRequest) {
     const inputBlockId = block.id ? String(block.id).trim() : '';
     const finalBlockId = isValidUuid(inputBlockId) ? inputBlockId : generateUuid();
 
+    const isFaq = block.type === 'faq';
     const payload = {
       id: finalBlockId,
       workspace_id: block.workspace_id || 'default',
       page_id: resolvedPageId,
-      type: block.type,
-      display_style: block.display_style,
-      data: block.data || {},
+      type: isFaq ? 'text' : block.type,
+      display_style: isFaq ? 'faq' : block.display_style,
+      data: isFaq ? { ...(block.data || {}), __kind: 'faq', __style: block.display_style || 'accordion' } : block.data || {},
       sort_order: block.sort_order ?? 0,
       is_visible: block.is_visible ?? true,
       updated_at: new Date().toISOString(),
@@ -65,7 +66,8 @@ export async function POST(req: NextRequest) {
       // Bỏ qua
     }
 
-    return NextResponse.json({ success: true, block: savedData || payload });
+    const decoded = savedData && isFaq ? { ...savedData, type: 'faq', display_style: block.display_style || 'accordion', data: block.data || {} } : savedData;
+    return NextResponse.json({ success: true, block: decoded || { ...payload, ...(isFaq ? { type: 'faq', display_style: block.display_style, data: block.data } : {}) } });
   } catch (err: any) {
     console.error('[Save Block Exception]', err);
     return NextResponse.json({ error: err.message || 'Lỗi hệ thống khi lưu khối' }, { status: 500 });
