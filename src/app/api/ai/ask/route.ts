@@ -46,12 +46,12 @@ const CURATED_QA = [
       'thoat vi dia dem phai lam sao',
     ],
     answer:
-`Đối với tình trạng thoát vị đĩa đệm (đặc biệt vùng thắt lưng L4-L5), bạn cần chú ý các nguyên tắc chăm sóc và bảo vệ sau:
+`Đối với tình trạng thoát vị đĩa đệm (đặc biệt vùng thắt lưng L4-L5), bạn cần chú ý các nguyên tắc bảo vệ sau:
 
-• Giữ thẳng trục thắt lưng: Tuyệt đối tránh cúi gập cong lưng hoặc vặn xoắn đột ngột; khi cúi nhặt vật luôn gập gối, hạ thấp trọng tâm và dùng lực từ đùi.
-• Giảm tải áp lực đĩa đệm: Nằm nghỉ ngơi trên đệm phẳng vừa phải, hai chân co nhẹ tự nhiên để giải phóng lực căng thắt lưng.
-• Tránh ngồi tĩnh tại quá lâu: Không ngồi liên tục quá 30 - 45 phút; nên đứng dậy đi lại nhẹ nhàng để tăng tuần hoàn và nuôi dưỡng đĩa đệm qua cơ chế thẩm thấu.
-• Vận động an toàn: Thực hiện các bài tập kéo giãn cơ dựng sống nhẹ nhàng; tránh tập các động tác gập bụng truyền thống (sit-ups) gây chèn ép nhân nhầy ra sau.
+• Giữ thẳng trục thắt lưng: Tránh các động tác cúi gập cong lưng hoặc vặn xoắn đột ngột; khi nâng nhấc đồ vật luôn giữ lưng thẳng và hạ thấp trọng tâm.
+• Duy trì tư thế nằm chuẩn và ngồi chuẩn: Giữ cột sống ở trục sinh lý tự nhiên trong các sinh hoạt hàng ngày để giảm áp lực nội đĩa đệm.
+• Tránh tư thế tĩnh tại quá lâu: Không ngồi hoặc đứng liên tục quá 30 - 45 phút; nên đi lại nhẹ nhàng định kỳ để tăng cường tuần hoàn và nuôi dưỡng đĩa đệm.
+• Lắng nghe phản hồi của cơ thể: Do thể trạng và mức độ tổn thương của mỗi người là khác nhau, cần vận động nhẹ nhàng vừa sức và tránh các tư thế gây đau tăng.
 • Cảnh báo y tế cần khám ngay: Nếu xuất hiện cảm giác đau nhói buốt lan nhanh xuống chân, tê mất cảm giác bàn chân hoặc rối loạn đại tiểu tiện.`,
     suggested_pages: [
       {
@@ -66,7 +66,7 @@ const CURATED_QA = [
         topic_title: 'Cột Sống & Đĩa Đệm',
         topic_slug: 'cot-song',
         page_slug: 'tu-the-va-van-dong',
-        reason: 'Hướng dẫn các tư thế công thái học và bài tập giải nén an toàn.',
+        reason: 'Hướng dẫn các nguyên tắc công thái học và bảo vệ cột sống an toàn.',
       },
       {
         title: 'Các vấn đề thường gặp và cách phòng tránh',
@@ -77,8 +77,8 @@ const CURATED_QA = [
       },
     ],
     follow_up_questions: [
-      'Thời điểm nào nên đi bộ nhẹ nhàng để phục hồi đĩa đệm?',
-      'Cách cúi nhấc vật nặng an toàn không đau lưng?',
+      'Tư thế sinh hoạt đúng cần chú ý gì?',
+      'Chế độ dinh dưỡng nào giúp hỗ trợ sụn khớp?',
     ],
   },
   {
@@ -96,20 +96,19 @@ const CURATED_QA = [
       'chu y tu the',
     ],
     answer:
-`Để bảo vệ cột sống và đĩa đệm, bạn cần chú ý các tư thế sinh hoạt cốt lõi sau:
+`Để bảo vệ cột sống và đĩa đệm, bạn cần chú ý các nguyên tắc tư thế chuẩn chung sau:
 
-• Khi ngồi làm việc: Giữ lưng thẳng, vai thả lỏng, màn hình ngang tầm mắt; hai chân đặt phẳng trên sàn, không ngồi bắt chéo chân hoặc gù lưng.
-• Khi cúi nhấc vật nặng: Luôn gập gối, hạ thấp hông, giữ lưng thẳng và dùng lực cơ đùi để nâng lên (tuyệt đối không cúi gập cong lưng).
-• Khi đứng và đi lại: Giữ trục thẳng tự nhiên, phân bổ đều trọng lượng lên hai chân, tránh dồn lực lệch một bên.
-• Khi nằm ngủ: Nằm thẳng trục trên đệm phẳng có độ đàn hồi tốt; tránh nằm võng hoặc đệm lún sâu làm cong gập cột sống.
-• Nhịp nghỉ ngơi: Cứ sau 45 - 60 phút, hãy đứng dậy vươn vai và đi lại nhẹ nhàng 1 - 2 phút để giải nén đĩa đệm.`,
+• Duy trì tư thế ngồi chuẩn, nằm chuẩn: Giữ các đường cong sinh lý tự nhiên của cột sống thẳng trục, tránh gù lưng hoặc vẹo lệch một bên.
+• Khi nâng nhấc vật nặng: Luôn giữ lưng thẳng, hạ thấp trọng tâm và dùng lực từ đùi để nâng lên, tuyệt đối không cúi gập cong lưng.
+• Tránh tư thế tĩnh tại: Không ngồi hoặc đứng yên một chỗ quá 45 - 60 phút; hãy đứng dậy vươn người nhẹ nhàng để giải tỏa áp lực cho đĩa đệm.
+• Lắng nghe cơ thể: Do thể trạng và cơ địa mỗi người khác nhau, không có một tư thế cố định áp dụng cho tất cả; hãy điều chỉnh tư thế sao cho cột sống được nâng đỡ thoải mái và tự nhiên nhất.`,
     suggested_pages: [
       {
         title: 'Tư thế chuẩn & Vận động giải áp',
         topic_title: 'Cột Sống & Đĩa Đệm',
         topic_slug: 'cot-song',
         page_slug: 'tu-the-va-van-dong',
-        reason: 'Hướng dẫn chi tiết tư thế công thái học và bài tập giải nén.',
+        reason: 'Hướng dẫn chi tiết nguyên tắc tư thế công thái học bảo vệ cột sống.',
       },
       {
         title: 'Đĩa đệm và cơ chế giảm xóc',
@@ -120,8 +119,8 @@ const CURATED_QA = [
       },
     ],
     follow_up_questions: [
-      'Cách nâng vật nặng đúng để không đau lưng?',
-      'Bài tập kéo giãn giải áp cột sống cổ tại chỗ?',
+      'Dinh dưỡng kháng viêm hỗ trợ sụn khớp như thế nào?',
+      'Cách uống nước đúng để nuôi dưỡng đĩa đệm?',
     ],
   },
   {
@@ -157,7 +156,7 @@ const CURATED_QA = [
     ],
     follow_up_questions: [
       'Tư thế sinh hoạt đúng cần chú ý gì?',
-      'Bài tập kéo giãn giải áp cột sống hàng ngày?',
+      'Dinh dưỡng kháng viêm hỗ trợ sụn khớp như thế nào?',
     ],
   },
   {
@@ -391,9 +390,9 @@ function fastFallbackSearch(query: string, catalog: LessonCatalogItem[]) {
   const lowerQ = query.toLowerCase();
 
   if (lowerQ.includes('cổ') || lowerQ.includes('vai') || lowerQ.includes('gáy') || lowerQ.includes('ngực')) {
-    answerText = `• Giữ thẳng trục cột sống cổ, đặt màn hình làm việc hoặc điện thoại ngang tầm mắt.\n• Thay đổi tư thế mỗi 30 - 45 phút, xoay nhẹ khớp vai và ngửa cổ thư giãn cơ dựng sống.\n• Chườm ấm vùng cổ vai gáy 10 - 15 phút vào buổi tối để tăng tuần hoàn máu.`;
+    answerText = `• Duy trì tư thế ngồi chuẩn, nằm chuẩn để bảo vệ trục cột sống cổ tự nhiên.\n• Tránh giữ nguyên một tư thế quá lâu; nghỉ ngơi và thả lỏng cơ định kỳ.\n• Chườm ấm nhẹ nhàng vùng cổ vai gáy vào buổi tối để tăng cường tuần hoàn máu.`;
   } else if (lowerQ.includes('lưng') || lowerQ.includes('đĩa đệm') || lowerQ.includes('thoát vị') || lowerQ.includes('tọa')) {
-    answerText = `• Giữ thẳng lưng khi ngồi và sinh hoạt, luôn gập gối hạ thấp trọng tâm khi nâng nhặt đồ vật.\n• Nằm ngửa thư giãn trên đệm phẳng có độ đàn hồi tốt, co nhẹ chân để giải tỏa áp lực thắt lưng.\n• Đi lại nhẹ nhàng mỗi 30 phút, tránh ngồi tĩnh tại quá lâu làm tăng áp lực nội đĩa đệm.`;
+    answerText = `• Duy trì tư thế nằm chuẩn, ngồi chuẩn để bảo vệ trục sinh lý cột sống và giảm áp lực cho đĩa đệm.\n• Tránh ngồi tĩnh tại liên tục một chỗ quá lâu, nên đứng dậy đi lại nhẹ nhàng sau mỗi 30 - 45 phút.\n• Khi nâng nhấc đồ vật, luôn giữ thẳng lưng và hạ thấp trọng tâm, tránh cúi gập vặn xoắn đột ngột.`;
   } else if (lowerQ.includes('nước') || lowerQ.includes('uống')) {
     answerText = `• Uống từng ngụm nhỏ, rải đều trong suốt cả ngày thay vì uống dồn một lượng lớn.\n• Bổ sung nước ấm vào buổi sáng sau khi thức dậy để kích hoạt nhu động đường tiêu hóa.\n• Khi vận động ra nhiều mồ hôi, nên bù thêm khoáng điện giải tự nhiên.`;
   } else if (lowerQ.includes('ăn') || lowerQ.includes('tiêu hóa') || lowerQ.includes('dạ dày') || lowerQ.includes('đầy bụng')) {
@@ -502,26 +501,31 @@ export async function POST(req: NextRequest) {
 NGUYÊN TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ NGHIÊM NGẶT):
 1. ĐÚNG TRỌNG TÂM CÂU HỎI (P0):
    - Người học hỏi vấn đề gì, hãy trả lời trực diện, chính xác vào đúng vấn đề đó.
-   - Hỏi về thoát vị đĩa đệm (L4, L5, thắt lưng, cổ): Giải thích các nguyên tắc tự bảo vệ cột sống, tư thế nằm nghỉ, tránh cúi vặn xoắn và bài tập giải nén.
-   - Hỏi về tư thế: Chỉ giải thích về tư thế sinh hoạt đúng (ngồi, đứng, cúi vác, nằm ngủ).
-   - Hỏi về dinh dưỡng: Chỉ nói về dinh dưỡng, thực phẩm, kháng viêm.
-   - Hỏi về nước: Chỉ nói về nước và cách uống nước.
+   - Ngắn gọn & súc tích: 60 đến 90 từ (tối đa 110 từ). Trình bày thông thoáng bằng 3 đến 4 gạch đầu dòng rõ ràng, dễ hiểu.
    - TUYỆT ĐỐI KHÔNG lan man sang các chủ đề không liên quan.
 
-2. NGẮN GỌN & SÚC TÍCH (P0):
-   - Độ dài: 60 đến 90 từ (tối đa 110 từ).
-   - Trình bày thông thoáng bằng 3 đến 4 gạch đầu dòng rõ ràng, dễ áp dụng ngay trong đời sống.
+2. NGUYÊN TẮC QUAN TRỌNG VỀ TƯ THẾ & VẬN ĐỘNG (TUYỆT ĐỐI TUÂN THỦ THEO TÁC GIẢ):
+   - CẤM TIỂU TƯ VẤN NẰM/NGỒI CHI TIẾT:
+     + Tuyệt đối KHÔNG hướng dẫn cụ thể nằm kiểu gì (không chỉ định nằm nghiêng trái, nằm ngửa, co chân, kê cao đầu giường 15-20cm, kê vật gì dưới đệm...).
+     + Tuyệt đối KHÔNG hướng dẫn cụ thể ngồi kiểu gì (không quy định góc khuỷu tay 90 độ, không quy định mắt cách vở/bàn bao nhiêu cm, không chỉ định chân đặt thế nào...).
+   - CẤM TƯ VẤN GỐI & GHẾ:
+     + Tuyệt đối KHÔNG tư vấn về gối hay ghế (loại gối, kê gối, chọn gối, loại ghế, chỉnh ghế...). Tác giả Tùng Dinh Dưỡng KHÔNG có tài liệu và KHÔNG tư vấn về gối hay ghế.
+   - CẤM TƯ VẤN BÀI TẬP CỤ THỂ:
+     + Tuyệt đối KHÔNG kê toa hoặc chỉ định bài tập thể dục, động tác tập cụ thể (không bảo đu xà, bơi lội, squat, plank, bài tập kéo giãn chi tiết...).
+   - NẾU CÓ ĐỀ CẬP ĐẾN TƯ THẾ HOẶC SINH HOẠT:
+     + CHỈ ĐƯỢC NÓI CHUNG theo nguyên tắc: "Duy trì tư thế nằm chuẩn, ngồi chuẩn để bảo vệ trục cột sống và độ cong sinh lý tự nhiên", "tránh duy trì tư thế tĩnh tại một chỗ quá lâu, nên đứng dậy đi lại nhẹ nhàng định kỳ", "vận động nhẹ nhàng phù hợp với thể trạng của bản thân".
+   - LÝ DO CHUYÊN MÔN: Thể trạng, cơ địa và mức độ tổn thương của mỗi người là khác nhau, không ai giống ai nên không áp đặt một tư thế nằm ngồi hay bài tập cố định cho tất cả mọi người.
 
-3. TUYỆT ĐỐI CẤM (VI PHẠM SẼ BỊ HỦY BỎ):
+3. TUYỆT ĐỐI CẤM KHÁC:
    - CẤM TUYỆT ĐỐI nhắc đến thương hiệu DoctorLoan, ghế DoctorLoan hay bất kỳ sản phẩm bán hàng nào (trừ khi người dùng đích thân hỏi từ "DoctorLoan").
-   - CẤM TUYỆT ĐỐI dùng từ "gối" dưới dạng vật dụng (gối ngủ, kê gối, chọn gối, kẹp gối, gối cao, gối mềm...). Tác giả Tùng Dinh Dưỡng KHÔNG có tài liệu và KHÔNG tư vấn về gối. Khi nói về tư thế nằm/ngủ, CHỈ hướng dẫn nằm trên đệm phẳng có độ đàn hồi tốt, co nhẹ chân tự nhiên, giữ thẳng trục đầu - cổ - thắt lưng.
-   - CẤM TUYỆT ĐỐI chia kiểu máy móc: "TẦNG 1", "TẦNG 2", "TẦNG 3".
+   - CẤM chia kiểu máy móc: "TẦNG 1", "TẦNG 2", "TẦNG 3".
    - CẤM tự ý đưa công thức nước 0.04 hay cảnh báo cấp cứu/bệnh viện vào các câu hỏi sinh hoạt thông thường.
    - CẤM các từ: "chữa bệnh", "khám chữa bệnh", "điều trị dứt điểm", "bác sĩ".
    - CẤM các câu trần tình như "tôi không phải bác sĩ", "tác giả không phải bác sĩ".
+   - CÂU HỎI TIẾP THEO (follow_up_questions): Tuyệt đối KHÔNG gợi ý các câu hỏi về bài tập, tư thế nằm ngủ, cách nằm, gối hay ghế. Chỉ gợi ý câu hỏi về dinh dưỡng, nước, kiến thức giải phẫu, cơ chế bệnh học hoặc nguyên tắc tư thế chuẩn chung.
 
 4. ĐỊNH HƯỚNG BÀI HỌC:
-   - Chọn đúng 1-2 bài học liên quan nhất trong danh mục dưới đây để gợi ý người học mở ra xem:
+   - Chọn đúng 1-2 bài học liên quan nhất trong danh mục dưới đây:
 ${catalogText}
 
 BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
@@ -698,34 +702,63 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
           .trim();
       }
 
-      // LOẠI BỎ TRIỆT ĐỂ VIỆC TƯ VẤN GỐI KHI NGƯỜI DÙNG KHÔNG HỎI VỀ GỐI
+      // LOẠI BỎ TRIỆT ĐỂ VIỆC TIỂU TƯ VẤN: NẰM CỤ THỂ, NGỒI CỤ THỂ, GỐI, GHẾ, BÀI TẬP CỤ THỂ
       const isAskingPillows = /gối/i.test(question);
-      if (!isAskingPillows) {
-        cleanAnswer = cleanAnswer
-          .split('\n')
-          .map((line) => {
-            if (/gối/i.test(line) && !/(?:đầu\s*gối|khớp\s*gối|gập\s*gối|chùng\s*gối)/i.test(line)) {
-              let l = line;
-              l = l.replace(/kê\s+(?:một\s+)?gối\s+(?:mỏng|mềm|nhẹ)?\s+(?:dưới|ở)\s+cổ/gi, 'giữ cổ thẳng trục tự nhiên');
-              l = l.replace(/(?:kê\s+)?đệm\s+phẳng\s+mỏng\s+dưới\s+khoeo\s+chân/gi, 'chân co nhẹ tự nhiên');
-              l = l.replace(/(?:kẹp\s+)?gối\s+giữa\s+hai\s+(?:đầu\s+)?gối/gi, 'hai chân co nhẹ song song');
-              l = l.replace(/(?:bằng|dùng)\s+gối\s+mềm/gi, '');
-              l = l.replace(/không\s+dùng\s+gối\s+cao/gi, 'không nằm gập đầu cổ');
-              l = l.replace(/(?:hoặc\s+)?(?:gối|đệm\s+phẳng)\s+(?:kê\s+)?quá\s+cao(?:\s*[\/\-]\s*thấp)?/gi, 'tư thế gập cong cổ');
-              l = l.replace(/tránh\s+gối\s+quá\s+cao/gi, 'tránh nằm gập cổ');
-              l = l.replace(/gối\s+cao\s+vừa\s+phải/gi, 'độ dốc vừa phải');
-              l = l.replace(/ngủ\s+sai\s+gối/gi, 'nằm sai tư thế cổ');
-              l = l.replace(/(?<!(?:đầu|khớp|gập|chùng)\s*)gối/gi, '');
-              l = l.replace(/(?:,\s*)?(?:không\s+dùng|tránh)\s*(?=\))/gi, '');
-              l = l.replace(/\s*\(\s*(?:không\s+dùng|tránh)?\s*\)/gi, '');
-              l = l.replace(/\s*\(\s*\)/g, '');
-              return l.replace(/\s{2,}/g, ' ').trim();
-            }
-            return line;
-          })
-          .filter((l) => l.trim().length > 0)
-          .join('\n');
-      }
+      cleanAnswer = cleanAnswer
+        .split('\n')
+        .map((line) => {
+          let l = line;
+
+          // 1. Khử gối khi người dùng không hỏi về gối (bảo tồn giải phẫu: đầu gối, khớp gối, gập gối, chùng gối)
+          if (!isAskingPillows && /gối/i.test(l) && !/(?:đầu\s*gối|khớp\s*gối|gập\s*gối|chùng\s*gối)/i.test(l)) {
+            l = l.replace(/kê\s+(?:một\s+)?gối\s+(?:mỏng|mềm|nhẹ)?\s+(?:dưới|ở)\s+cổ/gi, 'giữ cổ thẳng trục tự nhiên');
+            l = l.replace(/(?:kê\s+)?đệm\s+phẳng\s+mỏng\s+dưới\s+khoeo\s+chân/gi, 'thả lỏng tự nhiên');
+            l = l.replace(/(?:kẹp\s+)?gối\s+giữa\s+hai\s+(?:đầu\s+)?gối/gi, 'thả lỏng hai chân');
+            l = l.replace(/(?:bằng|dùng)\s+gối\s+mềm/gi, '');
+            l = l.replace(/không\s+dùng\s+gối\s+cao/gi, 'không nằm gập đầu cổ');
+            l = l.replace(/(?:hoặc\s+)?(?:gối|đệm\s+phẳng)\s+(?:kê\s+)?quá\s+cao(?:\s*[\/\-]\s*thấp)?/gi, 'tư thế gập cong cổ');
+            l = l.replace(/tránh\s+gối\s+quá\s+cao/gi, 'tránh nằm gập cổ');
+            l = l.replace(/gối\s+cao\s+vừa\s+phải/gi, 'độ dốc vừa phải');
+            l = l.replace(/ngủ\s+sai\s+gối/gi, 'nằm sai tư thế');
+            l = l.replace(/(?<!(?:đầu|khớp|gập|chùng)\s*)gối/gi, '');
+          }
+
+          // 2. Khử tiểu tư vấn nằm kiểu gì (nằm nghiêng trái, nằm ngửa co chân, kê đầu giường 15-20cm...)
+          l = l.replace(/nằm\s+nghiêng\s+(?:bên\s+)?trái/gi, 'duy trì tư thế nằm chuẩn');
+          l = l.replace(/nằm\s+nghiêng\s+sang\s+một\s+bên/gi, 'duy trì tư thế nằm chuẩn');
+          l = l.replace(/nằm\s+ngửa\s+trên\s+đệm\s+phẳng/gi, 'duy trì tư thế nằm chuẩn');
+          l = l.replace(/nằm\s+ngửa/gi, 'duy trì tư thế nằm chuẩn');
+          l = l.replace(/kê\s+cao\s+(?:phần\s+)?đầu\s+(?:giường|đệm)(?:\s*\([^)]*\))?/gi, 'nghỉ ngơi ở tư thế thoải mái');
+          l = l.replace(/kê\s+cao\s+chân\s+hơn\s+(?:mức\s+)?tim(?:\s*\([^)]*\))?/gi, 'thả lỏng chân thoải mái');
+          l = l.replace(/(?:hai\s+)?chân\s+co\s+nhẹ(?:\s+tự\s+nhiên|\s+song\s+song)?/gi, 'thả lỏng cơ thể');
+          l = l.replace(/co\s+nhẹ\s+(?:hai\s+)?chân(?:\s+tự\s+nhiên|\s+song\s+song)?/gi, 'thả lỏng cơ thể');
+
+          // 3. Khử tiểu tư vấn ngồi kiểu gì & ghế
+          l = l.replace(/mắt\s+(?:cách\s+vở|ngang\s+tầm\s+sách|ngang\s+tầm)[^,;.\n]*/gi, 'ngồi thẳng lưng tự nhiên');
+          l = l.replace(/khuỷu\s+tay\s+vuông\s+góc/gi, 'thả lỏng vai và tay');
+          l = l.replace(/(?:hai\s+)?chân\s+(?:đặt\s+phẳng\s+trên\s+sàn|chạm\s+đất)/gi, 'tư thế ngồi thoải mái');
+          l = l.replace(/lưng\s+thẳng\s+dựa\s+vào\s+thành\s+ghế/gi, 'ngồi giữ thẳng lưng tự nhiên');
+          l = l.replace(/điều\s+chỉnh\s+bàn\s+ghế\s+phù\s+hợp(?:\s+chiều\s+cao)?/gi, 'giữ tư thế ngồi học và làm việc chuẩn');
+          l = l.replace(/bàn\s+ghế\s+phù\s+hợp/gi, 'tư thế ngồi chuẩn');
+          l = l.replace(/\bghế\s+công\s+thái\s+học\b/gi, 'chỗ ngồi phù hợp');
+
+          // 4. Khử bài tập cụ thể (đu xà, bơi lội, bài tập kéo giãn, squat, plank...)
+          l = l.replace(/(?:tập\s+)?bơi\s*(?:lội)?,\s*(?:đu\s+xà|treo\s+xà(?:\s+đơn)?)\s*(?:nhẹ)?/gi, 'vận động nhẹ nhàng phù hợp thể trạng');
+          l = l.replace(/(?:đu\s+xà|treo\s+xà(?:\s+đơn)?|bơi\s+lội)/gi, 'vận động nhẹ nhàng vừa sức');
+          l = l.replace(/bài\s+tập\s+(?:kéo\s+giãn|giải\s+nén|vai\s+sau|lưng|cơ\s+lưng)/gi, 'vận động nhẹ nhàng');
+
+          // 5. Dọn dẹp dấu ngoặc rỗng, dấu phẩy thừa
+          l = l.replace(/(?:,\s*)?(?:không\s+dùng|tránh)\s*(?=\))/gi, '');
+          l = l.replace(/\s*\(\s*(?:không\s+dùng|tránh)?\s*\)/gi, '');
+          l = l.replace(/\s*\(\s*\)/g, '');
+          l = l.replace(/,\s*,/g, ',');
+          l = l.replace(/:\s*,\s*/g, ': ');
+          l = l.replace(/\s{2,}/g, ' ').trim();
+
+          return l;
+        })
+        .filter((l) => l.trim().length > 0)
+        .join('\n');
 
       if (cleanAnswer.length > 0) {
         cleanAnswer = cleanAnswer.charAt(0).toUpperCase() + cleanAnswer.slice(1);
@@ -749,8 +782,30 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
         : [];
 
       const filteredFollowUps = Array.isArray(parsedJson.follow_up_questions)
-        ? parsedJson.follow_up_questions.filter((q: string) => isAskingPillows || !/gối/i.test(q))
+        ? parsedJson.follow_up_questions.filter((q: string) => {
+            const lq = q.toLowerCase();
+            if (
+              lq.includes('gối') ||
+              lq.includes('ghế') ||
+              lq.includes('bài tập') ||
+              lq.includes('tập gì') ||
+              lq.includes('tập luyện') ||
+              lq.includes('nằm ngủ') ||
+              lq.includes('tư thế ngủ') ||
+              lq.includes('nằm thế nào') ||
+              lq.includes('nằm kiểu') ||
+              lq.includes('ngồi kiểu')
+            ) {
+              return false;
+            }
+            return true;
+          })
         : [];
+
+      if (filteredFollowUps.length < 2) {
+        filteredFollowUps.push('Nguyên tắc duy trì tư thế chuẩn để bảo vệ cột sống?');
+        filteredFollowUps.push('Chế độ dinh dưỡng khoa học hỗ trợ phục hồi khớp?');
+      }
 
       return NextResponse.json({
         answer: cleanAnswer || parsedJson.answer,
