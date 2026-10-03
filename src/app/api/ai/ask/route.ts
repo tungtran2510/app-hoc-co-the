@@ -513,8 +513,8 @@ NGUYÊN TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ NGHIÊM NGẶT):
    - Trình bày thông thoáng bằng 3 đến 4 gạch đầu dòng rõ ràng, dễ áp dụng ngay trong đời sống.
 
 3. TUYỆT ĐỐI CẤM (VI PHẠM SẼ BỊ HỦY BỎ):
-   - CẤM TUYỆT ĐỐI nhắc đến thương hiệu DoctorLoan, ghế DoctorLoan, gối DoctorLoan hay bất kỳ sản phẩm bán hàng nào (trừ khi người dùng đích thân hỏi từ "DoctorLoan").
-   - CẤM TUYỆT ĐỐI tư vấn về gối, chọn gối, kê gối, thử gối hay sinh câu hỏi gợi ý liên quan đến gối (Tác giả Tùng Dinh Dưỡng KHÔNG có tài liệu và KHÔNG tư vấn về gối).
+   - CẤM TUYỆT ĐỐI nhắc đến thương hiệu DoctorLoan, ghế DoctorLoan hay bất kỳ sản phẩm bán hàng nào (trừ khi người dùng đích thân hỏi từ "DoctorLoan").
+   - CẤM TUYỆT ĐỐI dùng từ "gối" dưới dạng vật dụng (gối ngủ, kê gối, chọn gối, kẹp gối, gối cao, gối mềm...). Tác giả Tùng Dinh Dưỡng KHÔNG có tài liệu và KHÔNG tư vấn về gối. Khi nói về tư thế nằm/ngủ, CHỈ hướng dẫn nằm trên đệm phẳng có độ đàn hồi tốt, co nhẹ chân tự nhiên, giữ thẳng trục đầu - cổ - thắt lưng.
    - CẤM TUYỆT ĐỐI chia kiểu máy móc: "TẦNG 1", "TẦNG 2", "TẦNG 3".
    - CẤM tự ý đưa công thức nước 0.04 hay cảnh báo cấp cứu/bệnh viện vào các câu hỏi sinh hoạt thông thường.
    - CẤM các từ: "chữa bệnh", "khám chữa bệnh", "điều trị dứt điểm", "bác sĩ".
@@ -707,14 +707,16 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
             if (/gối/i.test(line) && !/(?:đầu\s*gối|khớp\s*gối|gập\s*gối|chùng\s*gối)/i.test(line)) {
               let l = line;
               l = l.replace(/kê\s+(?:một\s+)?gối\s+(?:mỏng|mềm|nhẹ)?\s+(?:dưới|ở)\s+cổ/gi, 'giữ cổ thẳng trục tự nhiên');
+              l = l.replace(/(?:kê\s+)?đệm\s+phẳng\s+mỏng\s+dưới\s+khoeo\s+chân/gi, 'chân co nhẹ tự nhiên');
+              l = l.replace(/(?:kẹp\s+)?gối\s+giữa\s+hai\s+(?:đầu\s+)?gối/gi, 'hai chân co nhẹ song song');
               l = l.replace(/(?:bằng|dùng)\s+gối\s+mềm/gi, '');
-              l = l.replace(/không\s+dùng\s+gối\s+cao/gi, 'không kê gập cổ');
-              l = l.replace(/(?:hoặc\s+)?gối\s+quá\s+cao(?:\s*[\/\-]\s*thấp)?/gi, 'tư thế gập cổ');
+              l = l.replace(/không\s+dùng\s+gối\s+cao/gi, 'không nằm gập đầu cổ');
+              l = l.replace(/(?:hoặc\s+)?(?:gối|đệm\s+phẳng)\s+(?:kê\s+)?quá\s+cao(?:\s*[\/\-]\s*thấp)?/gi, 'tư thế gập cong cổ');
               l = l.replace(/tránh\s+gối\s+quá\s+cao/gi, 'tránh nằm gập cổ');
               l = l.replace(/gối\s+cao\s+vừa\s+phải/gi, 'độ dốc vừa phải');
               l = l.replace(/ngủ\s+sai\s+gối/gi, 'nằm sai tư thế cổ');
-              l = l.replace(/(?<!(?:đầu|khớp|gập|chùng)\s*)gối/gi, 'đệm phẳng');
-              return l;
+              l = l.replace(/(?<!(?:đầu|khớp|gập|chùng)\s*)gối/gi, '');
+              return l.replace(/\s{2,}/g, ' ').trim();
             }
             return line;
           })
