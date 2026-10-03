@@ -1013,10 +1013,10 @@ export default function ContentViewer({
       <section className="flex flex-col gap-1.5 mt-1">
         <div className="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
           <div className="flex items-center gap-1.5 shrink-0">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-300 text-amber-800 dark:bg-purple-950/60 dark:border-purple-800/40 dark:text-purple-300 text-[12px] font-black tracking-wider uppercase shrink-0">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-300 text-blue-900 dark:bg-purple-950/60 dark:border-purple-800/40 dark:text-purple-300 text-[12px] font-black tracking-wider uppercase shrink-0">
               <span>BÀI {formattedOrder}</span>
               {totalPages > 0 && (
-                <span className="text-amber-800/70 dark:text-purple-300/60 font-semibold">/ {String(totalPages).padStart(2, '0')}</span>
+                <span className="text-blue-900/70 dark:text-purple-300/60 font-semibold">/ {String(totalPages).padStart(2, '0')}</span>
               )}
             </div>
 
@@ -1147,22 +1147,22 @@ export default function ContentViewer({
             href={consultSettings.zalo_url || `https://zalo.me/${consultSettings.hotline}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-between p-3 sm:p-3.5 rounded-[16px] bg-amber-50/70 dark:bg-purple-950/40 border border-amber-300/80 dark:border-purple-800/50 hover:border-amber-500 transition-all shadow-2xs mt-1.5 group active:scale-[0.99]"
+            className="flex items-center justify-between p-3 sm:p-3.5 rounded-[16px] bg-white dark:bg-purple-950/40 border border-[#0068FF]/30 dark:border-[#0068FF]/50 hover:border-[#0068FF] transition-all shadow-2xs mt-1.5 group active:scale-[0.99]"
           >
             <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-[12px] bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 flex items-center justify-center shrink-0 shadow-sm font-black text-[13px] tracking-tight">
+              <div className="w-10 h-10 rounded-[12px] bg-[#0068FF] text-white flex items-center justify-center shrink-0 shadow-sm font-black text-[13px] tracking-tight">
                 Zalo
               </div>
               <div className="flex flex-col min-w-0 text-left">
                 <span className="text-[13px] sm:text-[13.5px] font-black text-slate-900 dark:text-white leading-tight">
                   Cần tư vấn về cơ thể?
                 </span>
-                <span className="text-[11.5px] font-semibold text-amber-800 dark:text-amber-300 leading-tight mt-0.5">
+                <span className="text-[11.5px] font-semibold text-[#0068FF] dark:text-sky-300 leading-tight mt-0.5">
                   Nhắn tin trao đổi qua Zalo
                 </span>
               </div>
             </div>
-            <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-amber-500 hover:bg-amber-600 text-slate-950 text-[12px] font-black shadow-xs shrink-0 ml-2 transition-colors">
+            <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#0068FF] hover:bg-[#0055D4] text-white text-[12px] font-black shadow-xs shrink-0 ml-2 transition-colors">
               <span>Nhắn Zalo</span>
               <span className="text-[13px] font-bold">›</span>
             </div>
@@ -1210,12 +1210,12 @@ export default function ContentViewer({
                 href={`/${topic.slug}/${nextPage.slug}`}
                 prefetch={true}
                 onClick={playTapSound}
-                className="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-[10px] bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 text-slate-950 font-black shadow-sm shadow-amber-500/20 border border-amber-300/50 hover:brightness-105 transition-all group active:scale-[0.98] h-[36px] overflow-hidden"
+                className="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-[10px] bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white font-black shadow-sm shadow-blue-600/20 border border-blue-300/50 hover:brightness-105 transition-all group active:scale-[0.98] h-[36px] overflow-hidden"
               >
-                <span className="text-[11.5px] sm:text-[12px] font-black text-slate-950 truncate">
+                <span className="text-[11.5px] sm:text-[12px] font-black text-white truncate">
                   Bài {String(nextPageIndex).padStart(2, '0')}: {nextPage.title}
                 </span>
-                <ArrowRight size={13} strokeWidth={2.5} className="shrink-0 text-slate-950 group-hover:translate-x-0.5 transition-transform" />
+                <ArrowRight size={13} strokeWidth={2.5} className="shrink-0 text-white group-hover:translate-x-0.5 transition-transform" />
               </Link>
             ) : (
               <Link
@@ -1290,7 +1290,7 @@ export default function ContentViewer({
             <button
               type="button"
               onClick={handleToggleAdmin}
-              className="text-[#8A3A14] dark:text-[#F8DF7B] font-bold py-1 hover:underline cursor-pointer"
+              className="text-[#8A3A14] dark:text-[#93C5FD] font-bold py-1 hover:underline cursor-pointer"
             >
               Thoát sửa
             </button>

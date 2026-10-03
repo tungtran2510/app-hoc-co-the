@@ -489,7 +489,7 @@ export default function VideosBlock({
               className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border transition-colors cursor-pointer whitespace-nowrap ${
                 isVertical
                   ? 'bg-blue-900/80 text-blue-100 border-blue-400/50 hover:bg-blue-800'
-                  : 'bg-slate-800/80 text-amber-200 border-amber-500/40 hover:bg-slate-700'
+                  : 'bg-slate-800/80 text-blue-200 border-blue-600/40 hover:bg-slate-700'
               }`}
               title="Bấm để chuyển đổi giữa khung dọc và khung ngang"
             >
@@ -544,7 +544,7 @@ export default function VideosBlock({
                   )}
                   <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors" />
 
-                  <div className="relative z-10 w-[64px] h-[64px] sm:w-[70px] sm:h-[70px] rounded-full bg-white/95 flex items-center justify-center text-[#1E3A8A] shadow-2xl transition-transform group-hover:scale-105 active:scale-95 ring-4 ring-amber-400/40">
+                  <div className="relative z-10 w-[64px] h-[64px] sm:w-[70px] sm:h-[70px] rounded-full bg-white/95 flex items-center justify-center text-[#1E3A8A] shadow-2xl transition-transform group-hover:scale-105 active:scale-95 ring-4 ring-blue-400/40">
                     <Play size={28} fill="currentColor" className="ml-1 text-[#1E3A8A]" />
                   </div>
 
@@ -573,7 +573,7 @@ export default function VideosBlock({
                     alert('Video đang được cập nhật.');
                   }
                 }}
-                className="relative z-10 w-[72px] h-[72px] rounded-full bg-white flex items-center justify-center text-[#1E3A8A] shadow-lg transition-transform active:scale-95 ring-4 ring-amber-400/40"
+                className="relative z-10 w-[72px] h-[72px] rounded-full bg-white flex items-center justify-center text-[#1E3A8A] shadow-lg transition-transform active:scale-95 ring-4 ring-blue-400/40"
                 aria-label={`Phát video: ${currentVideo.title}`}
               >
                 <Play size={32} fill="currentColor" className="ml-1 text-[#1E3A8A]" />
@@ -621,7 +621,7 @@ export default function VideosBlock({
       {/* 1. THANH TÙY CHỈNH TỐC ĐỘ PHÁT VIDEO CHUYÊN NGHIỆP (ĐẶT Ở TRÊN, SÁT DƯỚI KHUNG VIDEO THEO YÊU CẦU) */}
       <div className="flex items-center justify-between gap-1.5 px-2.5 py-1 rounded-[11px] bg-slate-50 dark:bg-[#160D30]/80 border border-slate-200/80 dark:border-purple-900/40 text-[11px] font-bold">
         <span className="flex items-center gap-1.5 text-slate-700 dark:text-purple-300 font-extrabold shrink-0">
-          <Gauge size={13} className="text-amber-600 dark:text-[#F8DF7B]" />
+          <Gauge size={13} className="text-blue-700 dark:text-[#93C5FD]" />
           <span>Tốc độ phát:</span>
         </span>
         <div className="flex items-center gap-1 shrink-0 overflow-x-auto">
@@ -632,7 +632,7 @@ export default function VideosBlock({
               onClick={() => handleSetSpeed(spd)}
               className={`px-2 py-0.5 rounded-[6px] text-[10.5px] font-extrabold transition-all cursor-pointer ${
                 playbackRate === spd
-                  ? 'bg-[#1E3A8A] text-white dark:bg-[#F8DF7B] dark:text-[#160C2C] shadow-2xs font-black'
+                  ? 'bg-[#1E3A8A] text-white dark:bg-[#93C5FD] dark:text-[#160C2C] shadow-2xs font-black'
                   : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200/80 dark:bg-purple-950/60 dark:text-purple-200 dark:border-purple-800/40'
               }`}
               title={`Phát video ở tốc độ ${spd}x`}
@@ -648,7 +648,7 @@ export default function VideosBlock({
         <div className="flex items-center justify-between text-[12.5px] font-bold text-ink">
           <span className="flex items-center gap-1.5 text-muted">
             <span>Tiến độ bài học:</span>
-            <strong className="text-amber-600 dark:text-[#F8DF7B] font-black">
+            <strong className="text-blue-700 dark:text-[#93C5FD] font-black">
               {Math.min(100, Math.round(((videoList.filter((_, idx) => watchedList.includes(idx + 1)).length) / (videoList.length || 1)) * 100))}%
             </strong>
             <span>
@@ -663,7 +663,7 @@ export default function VideosBlock({
         </div>
         <div className="w-full h-1.5 rounded-full bg-slate-200 dark:bg-purple-950/80 border border-slate-300/60 dark:border-purple-900/30 overflow-hidden p-0.5">
           <div
-            className="h-full rounded-full bg-amber-500 dark:bg-gradient-to-r dark:from-purple-500 dark:to-[#F8DF7B] transition-all duration-500"
+            className="h-full rounded-full bg-blue-600 dark:bg-gradient-to-r dark:from-purple-500 dark:to-[#93C5FD] transition-all duration-500"
             style={{
               width: `${Math.max(
                 Math.min(100, Math.round(((videoList.filter((_, idx) => watchedList.includes(idx + 1)).length) / (videoList.length || 1)) * 100)),
@@ -729,7 +729,7 @@ export default function VideosBlock({
               onClick={() => handleSelectVideo(idx)}
               className={`w-full flex items-center gap-2.5 p-2 sm:p-2.5 rounded-[12px] text-left transition-all duration-150 cursor-pointer group active:scale-[0.99] ${
                 isActive
-                  ? 'bg-amber-50/60 dark:bg-gradient-to-br dark:from-[#24154B] dark:via-[#1B0F3B] dark:to-[#120829] border-[1.5px] border-amber-400 dark:border-amber-400/60 shadow-xs ring-1 ring-amber-400/20'
+                  ? 'bg-blue-50/60 dark:bg-gradient-to-br dark:from-[#24154B] dark:via-[#1B0F3B] dark:to-[#120829] border-[1.5px] border-blue-400 dark:border-blue-400/60 shadow-xs ring-1 ring-blue-400/20'
                   : 'bg-white dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-900/40 hover:border-slate-300 dark:hover:border-purple-600/50 shadow-2xs'
               }`}
               role="button"
@@ -755,7 +755,7 @@ export default function VideosBlock({
                 <div
                   className={`absolute top-0.5 left-0.5 px-1.5 py-0.2 rounded-[3.5px] text-[8.5px] sm:text-[9px] font-black tracking-wide uppercase shadow-xs backdrop-blur-xs flex items-center gap-0.5 ${
                     isActive
-                      ? 'bg-amber-500 text-white dark:bg-amber-400 dark:text-slate-950'
+                      ? 'bg-blue-600 text-white dark:bg-blue-400 dark:text-slate-950'
                       : 'bg-black/75 text-white'
                   }`}
                 >
@@ -769,8 +769,8 @@ export default function VideosBlock({
 
                 {/* Lớp phủ & Nút Play khi Active hoặc Hover */}
                 {isActive ? (
-                  <div className="absolute inset-0 bg-amber-500/15 dark:bg-amber-500/25 flex items-center justify-center pointer-events-none">
-                    <div className="w-5 h-5 rounded-full bg-amber-500 text-white dark:bg-amber-400 dark:text-slate-950 flex items-center justify-center shadow-md ring-1.5 ring-white/80 dark:ring-amber-300/80">
+                  <div className="absolute inset-0 bg-blue-600/15 dark:bg-blue-600/25 flex items-center justify-center pointer-events-none">
+                    <div className="w-5 h-5 rounded-full bg-blue-600 text-white dark:bg-blue-400 dark:text-slate-950 flex items-center justify-center shadow-md ring-1.5 ring-white/80 dark:ring-blue-300/80">
                       <Play size={8.5} fill="currentColor" className="ml-0.5" />
                     </div>
                   </div>
@@ -788,8 +788,8 @@ export default function VideosBlock({
                 <h4
                   className={`text-[13px] sm:text-[14px] font-extrabold leading-snug line-clamp-2 transition-colors ${
                     isActive
-                      ? 'text-slate-950 dark:text-amber-100 group-hover:text-amber-700'
-                      : 'text-slate-900 dark:text-white group-hover:text-amber-600'
+                      ? 'text-slate-950 dark:text-blue-100 group-hover:text-blue-800'
+                      : 'text-slate-900 dark:text-white group-hover:text-blue-700'
                   }`}
                   title={vid.title}
                 >
@@ -818,7 +818,7 @@ export default function VideosBlock({
                     playTapSound();
                     setEditingVideoIndex(idx);
                   }}
-                  className="shrink-0 inline-flex items-center gap-1 px-2 py-1 rounded-[6px] bg-amber-500 hover:bg-amber-600 text-white text-[10.5px] font-black tracking-wide uppercase transition-transform active:scale-95 shadow-2xs cursor-pointer"
+                  className="shrink-0 inline-flex items-center gap-1 px-2 py-1 rounded-[6px] bg-blue-600 hover:bg-blue-700 text-white text-[10.5px] font-black tracking-wide uppercase transition-transform active:scale-95 shadow-2xs cursor-pointer"
                   title="Sửa trực tiếp video này: tiêu đề, link YouTube, thời lượng"
                   aria-label={`Sửa video ${vid.title}`}
                 >
