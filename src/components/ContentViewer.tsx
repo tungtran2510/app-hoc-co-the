@@ -37,7 +37,7 @@ import AdminSettingsModal from './admin/AdminSettingsModal';
 import MedicalDocumentsTab from './MedicalDocumentsTab';
 import FlipbookViewer from './FlipbookViewer';
 import { checkAdminStatus, setAdminClient } from '../lib/adminAuth';
-import { deleteBlockApi } from '../lib/apiAdmin';
+import { deleteBlockApi, saveBlockApi } from '../lib/apiAdmin';
 import {
   getStoredBlocks,
   saveStoredBlocks,
@@ -449,17 +449,32 @@ export default function ContentViewer({
   };
 
   // Lưu khối sau khi sửa
-  const handleSaveBlock = (updatedBlock: Block) => {
+  const handleSaveBlock = async (updatedBlock: Block) => {
     const updated = blockList.map((b) => (b.id === updatedBlock.id ? updatedBlock : b));
     setBlockList(updated);
-    triggerSaveBlocks(updated);
+    const res = await saveBlockApi(updatedBlock);
+    if (!res.success) {
+      setSaveErrorMsg(res.error || 'Chưa lưu được khối, vui lòng thử lại');
+      setTimeout(() => setSaveErrorMsg(''), 4000);
+    } else {
+      setShareNoticeMsg('Đã lưu thay đổi khối thành công!');
+      setTimeout(() => setShareNoticeMsg(''), 2500);
+    }
   };
 
   // Thêm khối mới
-  const handleAddBlock = (newBlock: Block) => {
-    const updated = [...blockList, { ...newBlock, sort_order: blockList.length + 1 }];
+  const handleAddBlock = async (newBlock: Block) => {
+    const blockWithOrder = { ...newBlock, sort_order: blockList.length + 1 };
+    const updated = [...blockList, blockWithOrder];
     setBlockList(updated);
-    triggerSaveBlocks(updated);
+    const res = await saveBlockApi(blockWithOrder);
+    if (!res.success) {
+      setSaveErrorMsg(res.error || 'Chưa lưu được khối mới, vui lòng thử lại');
+      setTimeout(() => setSaveErrorMsg(''), 4000);
+    } else {
+      setShareNoticeMsg('Đã thêm khối mới thành công!');
+      setTimeout(() => setShareNoticeMsg(''), 2500);
+    }
   };
 
     // Lưu video sau khi quản lý
@@ -756,11 +771,7 @@ export default function ContentViewer({
               <button
                 type="button"
                 onClick={() => {
-                  if (block.type === 'videos') {
-                    setShowVideoManager(true);
-                  } else {
-                    setEditingBlock(block);
-                  }
+                  setEditingBlock(block);
                 }}
                 className="flex items-center gap-1 h-8 px-3 rounded-[10px] bg-white dark:bg-[#1C123D] border border-line text-ink font-bold text-[13px] hover:border-primary shadow-2xs cursor-pointer"
               >
@@ -1086,9 +1097,6 @@ export default function ContentViewer({
         {blockList
           .filter((b) => {
             if (!isAdmin && !b.is_visible) return false;
-            // Nếu bài học có khối video, các khối text đã nằm trong tab 'Tóm tắt cốt lõi'
-            // Tuyệt đối không hiển thị lặp lại ở ngoài trang chính có danh sách phát nữa
-            if (videoBlock && b.type === 'text' && !isHtmlTextBlock(b)) return false;
             return true;
           })
           .map((block) => {

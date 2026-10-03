@@ -110,6 +110,7 @@ export default function BlockRenderer({
           blockId={blockId}
           displayStyle={block.display_style}
           images={block.data.images}
+          isAdmin={isAdmin}
         />
       );
 

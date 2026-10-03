@@ -9,6 +9,7 @@ interface ImagesBlockProps {
   displayStyle: 'single' | 'gallery';
   images: ImageType[];
   blockId?: string;
+  isAdmin?: boolean;
 }
 
 function GalleryImageItem({
@@ -41,6 +42,9 @@ function GalleryImageItem({
           alt={img.alt || img.caption || `Hình ${idx + 1}`}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
           loading="lazy"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = '/spine_hero_clean.png';
+          }}
         />
         {dimensions && (
           <span className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded-[4px] bg-black/60 text-white text-[9px] font-bold pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
@@ -84,6 +88,9 @@ function SingleImageItem({
         alt={img.alt || img.caption || 'Hình ảnh'}
         className={`w-full h-auto object-contain ${aspectClass} group-hover:opacity-95 transition-opacity`}
         loading="lazy"
+        onError={(e) => {
+          (e.target as HTMLImageElement).src = '/spine_hero_clean.png';
+        }}
       />
     </div>
   );
@@ -93,11 +100,22 @@ export default function ImagesBlock({
   displayStyle,
   images,
   blockId,
+  isAdmin = false,
 }: ImagesBlockProps) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  if (!images || images.length === 0) return null;
+  if (!images || images.length === 0) {
+    if (isAdmin) {
+      return (
+        <div id={blockId} className="w-full p-5 rounded-[18px] border-2 border-dashed border-line text-center flex flex-col items-center justify-center gap-2 bg-slate-50/50 dark:bg-white/5 scroll-mt-20">
+          <p className="text-[14px] text-muted font-bold m-0">Chưa có hình ảnh nào trong khối này</p>
+          <span className="text-[12px] text-primary font-medium">Bấm nút &quot;Sửa&quot; ở góc trên để tải ảnh từ máy lên</span>
+        </div>
+      );
+    }
+    return null;
+  }
 
   const handleOpenLightbox = (index: number) => {
     setSelectedIndex(index);

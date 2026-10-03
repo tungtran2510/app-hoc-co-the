@@ -62,6 +62,12 @@ export default function AddBlockDrawer({
       } else if (displayStyle === 'giai_phap') {
         format = 'bullet';
         defaultLines = ['Hành động ứng dụng cụ thể.', 'Thói quen duy trì mỗi ngày.'];
+      } else if (displayStyle === 'y_nghia') {
+        defaultLines = ['Ý nghĩa y khoa cốt lõi giúp bạn hiểu rõ cơ chế và bản chất của cơ thể.'];
+      } else if (displayStyle === 'chu_y') {
+        defaultLines = ['Lưu ý quan trọng cần ghi nhớ để tránh ảnh hưởng xấu đến sức khỏe.'];
+      } else if (displayStyle === 'sai_lam') {
+        defaultLines = ['Sai lầm thường gặp trong thói quen sinh hoạt và cách khắc phục.'];
       }
 
       newBlock = {
@@ -91,10 +97,11 @@ export default function AddBlockDrawer({
         data: {
           videos: [
             {
-              youtube_id: '',
-              title: 'Video mẫu mới',
-              duration_text: '5 phút',
-              description: 'Bấm Quản lý danh sách video để dán link YouTube.',
+              youtube_id: 'c9kmCxFKHPY',
+              title: '01. Cấu tạo & chức năng cột sống',
+              duration_text: '4 phút',
+              thumbnail_url: 'https://i.ytimg.com/vi/c9kmCxFKHPY/hqdefault.jpg',
+              description: 'Bấm Sửa để dán link YouTube bài giảng của bạn.',
             },
           ],
         },
@@ -110,8 +117,8 @@ export default function AddBlockDrawer({
         data: {
           images: [
             {
-              url: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80',
-              caption: 'Hình ảnh giải phẫu minh họa',
+              url: '/spine_hero_clean.png',
+              caption: 'Hình ảnh giải phẫu minh họa (Bấm Sửa để đổi ảnh)',
             },
           ],
         },

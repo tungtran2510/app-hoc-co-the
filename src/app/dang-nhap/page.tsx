@@ -8,12 +8,17 @@ import { loginAdmin } from '../../lib/adminAuth';
 
 export default function LoginPage() {
   const router = useRouter();
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   React.useEffect(() => {
     document.title = 'Đăng nhập quản trị · Học Cơ Thể';
+    if (typeof window !== 'undefined') {
+      const savedPhone = localStorage.getItem('app_user_phone');
+      if (savedPhone) setPhone(savedPhone);
+    }
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,7 +26,7 @@ export default function LoginPage() {
     setIsSubmitting(true);
     setErrorMsg('');
 
-    const res = await loginAdmin(password);
+    const res = await loginAdmin(password, phone);
     if (res.success) {
       let targetUrl = '/';
       if (typeof window !== 'undefined') {
@@ -33,7 +38,7 @@ export default function LoginPage() {
       }
       window.location.href = targetUrl;
     } else {
-      setErrorMsg(res.error || 'Mật khẩu quản trị không đúng. Vui lòng thử lại.');
+      setErrorMsg(res.error || 'Số điện thoại hoặc mật khẩu không đúng. Vui lòng thử lại.');
       setIsSubmitting(false);
     }
   };
@@ -63,12 +68,30 @@ export default function LoginPage() {
             Quản trị nội dung
           </h1>
           <p className="text-[17px] text-muted font-normal leading-relaxed">
-            Nhập mật khẩu quản trị để thực hiện chỉnh sửa, thêm chủ đề, bài học và đa phương tiện.
+            Đăng nhập tài khoản quản trị để chỉnh sửa nội dung bài học, hình ảnh và tài liệu.
           </p>
         </div>
 
         {/* Form đăng nhập */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-2">
+          <div className="flex flex-col gap-1.5">
+            <label
+              htmlFor="admin-phone"
+              className="text-[16px] font-bold text-ink"
+            >
+              Số điện thoại
+            </label>
+            <input
+              id="admin-phone"
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="0974248716"
+              className="w-full h-[58px] min-h-[48px] px-4 rounded-[18px] bg-white border-[1.5px] border-line text-[18px] text-ink placeholder:text-muted focus:outline-hidden focus:border-primary transition-colors shadow-2xs"
+              autoFocus
+            />
+          </div>
+
           <div className="flex flex-col gap-1.5">
             <label
               htmlFor="admin-password"
@@ -81,9 +104,8 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Nhập mật khẩu quản trị"
+              placeholder="Nhập mật khẩu (ví dụ: Tung@2510)"
               className="w-full h-[58px] min-h-[48px] px-4 rounded-[18px] bg-white border-[1.5px] border-line text-[18px] text-ink placeholder:text-muted focus:outline-hidden focus:border-primary transition-colors shadow-2xs"
-              autoFocus
               required
             />
           </div>

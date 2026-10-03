@@ -38,12 +38,15 @@ export async function checkIsAdminClient(): Promise<boolean> {
   return status.isAdmin;
 }
 
-export async function loginAdmin(password: string): Promise<{ success: boolean; error?: string }> {
+export async function loginAdmin(
+  password: string,
+  phone?: string
+): Promise<{ success: boolean; error?: string; user?: { phone: string; name: string; role: string } }> {
   try {
     const res = await fetch('/api/admin/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password }),
+      body: JSON.stringify({ password, phone: phone?.trim() || undefined }),
     });
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
@@ -53,7 +56,11 @@ export async function loginAdmin(password: string): Promise<{ success: boolean; 
     if (data.token && typeof window !== 'undefined') {
       localStorage.setItem('app_admin_token', data.token);
     }
-    return { success: true };
+    if (data.user && typeof window !== 'undefined') {
+      localStorage.setItem('app_user_phone', data.user.phone || '');
+      localStorage.setItem('app_user_display_name', data.user.name || '');
+    }
+    return { success: true, user: data.user };
   } catch (err: any) {
     return { success: false, error: err.message || 'Lỗi kết nối máy chủ' };
   }
@@ -63,6 +70,8 @@ export async function logoutAdmin(): Promise<void> {
   try {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('app_admin_token');
+      localStorage.removeItem('app_user_phone');
+      localStorage.removeItem('app_user_display_name');
     }
     const token = getAdminTokenClient();
     const headers: Record<string, string> = {};

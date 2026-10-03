@@ -118,7 +118,7 @@ export default function EditBlockModal({
   );
   const [htmlContent, setHtmlContent] = useState<string>(
     block.type === 'text'
-      ? block.data.html || (block.display_style === 'html' ? block.data.lines.join('\n') : '')
+      ? block.data.html || (block.display_style === 'html' ? (block.data.lines || []).join('\n') : '')
       : ''
   );
   const [showHtmlPreview, setShowHtmlPreview] = useState<boolean>(false);
@@ -128,7 +128,7 @@ export default function EditBlockModal({
     block.type === 'text'
       ? block.display_style === 'html' && !block.data.html
         ? ''
-        : block.data.lines.join('\n')
+        : (block.data.lines || []).join('\n')
       : ''
   );
   const [displayStyle, setDisplayStyle] = useState<string>(
@@ -179,10 +179,18 @@ export default function EditBlockModal({
 
   // State cho images block gốc
   const [imageList, setImageList] = useState<ImageType[]>(
-    block.type === 'images' ? [...block.data.images] : []
+    block.type === 'images' && Array.isArray(block.data.images) ? [...block.data.images] : []
   );
-  const [newImgUrl, setNewImgUrl] = useState('');
-  const [newImgCaption, setNewImgCaption] = useState('');
+  const [newImgUrl, setNewImgUrl] = useState<string>(
+    block.type === 'images' && block.display_style === 'single' && Array.isArray(block.data.images) && block.data.images[0]?.url
+      ? block.data.images[0].url
+      : ''
+  );
+  const [newImgCaption, setNewImgCaption] = useState<string>(
+    block.type === 'images' && block.display_style === 'single' && Array.isArray(block.data.images) && block.data.images[0]?.caption
+      ? block.data.images[0].caption
+      : ''
+  );
 
   // State cho files block gốc
   const [fileList, setFileList] = useState<FileItem[]>(
@@ -206,12 +214,28 @@ export default function EditBlockModal({
 
   // State cho videos block gốc
   const [videoList, setVideoList] = useState<Video[]>(
-    block.type === 'videos' ? [...block.data.videos] : []
+    block.type === 'videos' && Array.isArray(block.data.videos) ? [...block.data.videos] : []
   );
-  const [newVidUrl, setNewVidUrl] = useState('');
-  const [newVidTitle, setNewVidTitle] = useState('');
-  const [newVidDuration, setNewVidDuration] = useState('5 phút');
-  const [newVidThumb, setNewVidThumb] = useState('');
+  const [newVidUrl, setNewVidUrl] = useState<string>(
+    block.type === 'videos' && block.display_style === 'single' && Array.isArray(block.data.videos) && block.data.videos[0]?.youtube_id
+      ? `https://www.youtube.com/watch?v=${block.data.videos[0].youtube_id}`
+      : ''
+  );
+  const [newVidTitle, setNewVidTitle] = useState<string>(
+    block.type === 'videos' && block.display_style === 'single' && Array.isArray(block.data.videos) && block.data.videos[0]?.title
+      ? block.data.videos[0].title
+      : ''
+  );
+  const [newVidDuration, setNewVidDuration] = useState<string>(
+    block.type === 'videos' && block.display_style === 'single' && Array.isArray(block.data.videos) && block.data.videos[0]?.duration_text
+      ? block.data.videos[0].duration_text
+      : '5 phút'
+  );
+  const [newVidThumb, setNewVidThumb] = useState<string>(
+    block.type === 'videos' && block.display_style === 'single' && Array.isArray(block.data.videos) && block.data.videos[0]?.thumbnail_url
+      ? block.data.videos[0].thumbnail_url
+      : ''
+  );
 
   // State cho comparison block
   const [leftTitle, setLeftTitle] = useState(
@@ -388,6 +412,27 @@ export default function EditBlockModal({
       const isHtml = blockMode === 'html';
       const cleanHtml = isHtml ? htmlContent.trim() : undefined;
 
+      const finalAttachedImages = [...attachedImages];
+      if (inputImageUrl.trim()) {
+        finalAttachedImages.push({ url: inputImageUrl.trim(), caption: inputImageCaption.trim() || undefined });
+      }
+      const finalAttachedFiles = [...attachedFiles];
+      if (inputFileUrl.trim()) {
+        finalAttachedFiles.push({ name: inputFileName.trim() || 'Tài liệu PDF', url: inputFileUrl.trim(), size_bytes: 2000000 });
+      }
+      const finalAttachedVideos = [...attachedVideos];
+      if (inputVideoUrl.trim()) {
+        const yid = extractYouTubeId(inputVideoUrl);
+        if (yid) {
+          finalAttachedVideos.push({
+            youtube_id: yid,
+            title: 'Video bài giảng',
+            thumbnail_url: `https://i.ytimg.com/vi/${yid}/hqdefault.jpg`,
+            duration_text: '5 phút',
+          });
+        }
+      }
+
       const updated: Block = {
         ...block,
         display_style: isHtml ? 'html' : displayStyle,
@@ -401,43 +446,103 @@ export default function EditBlockModal({
           font_size: fontSize,
           text_color: textColor.trim() || undefined,
           text_align: textAlign,
-          images: attachedImages.length > 0 ? attachedImages : undefined,
-          files: attachedFiles.length > 0 ? attachedFiles : undefined,
-          videos: attachedVideos.length > 0 ? attachedVideos : undefined,
+          images: finalAttachedImages.length > 0 ? finalAttachedImages : undefined,
+          files: finalAttachedFiles.length > 0 ? finalAttachedFiles : undefined,
+          videos: finalAttachedVideos.length > 0 ? finalAttachedVideos : undefined,
         },
       };
       onSaveBlock(updated);
     } else if (block.type === 'images') {
+      let finalImages = [...imageList];
+      if (block.display_style === 'single') {
+        const targetUrl = newImgUrl.trim() || (imageList[0]?.url || '');
+        if (targetUrl) {
+          finalImages = [
+            {
+              url: targetUrl,
+              caption: newImgCaption.trim() || undefined,
+            },
+          ];
+        } else {
+          finalImages = [];
+        }
+      } else {
+        if (newImgUrl.trim()) {
+          finalImages.push({
+            url: newImgUrl.trim(),
+            caption: newImgCaption.trim() || undefined,
+          });
+        }
+      }
       const updated: Block = {
         ...block,
         data: {
-          images: imageList,
+          images: finalImages,
         },
       };
       onSaveBlock(updated);
     } else if (block.type === 'files') {
+      const finalFiles = [...fileList];
+      if (newFileUrl.trim()) {
+        finalFiles.push({
+          name: newFileName.trim() || 'Tài liệu PDF',
+          url: newFileUrl.trim(),
+          size_bytes: 1500000,
+        });
+      }
       const updated: Block = {
         ...block,
         data: {
-          files: fileList,
+          files: finalFiles,
           title: bookTitleInput.trim() || undefined,
           cover_url: bookCoverUrl.trim() || undefined,
         },
       };
       onSaveBlock(updated);
     } else if (block.type === 'links') {
+      const finalLinks = [...linkList];
+      if (newLinkLabel.trim() || newLinkUrl.trim()) {
+        finalLinks.push({
+          label: newLinkLabel.trim() || 'Liên kết',
+          url: newLinkUrl.trim() || '#',
+        });
+      }
       const updated: Block = {
         ...block,
         data: {
-          items: linkList,
+          items: finalLinks,
         },
       };
       onSaveBlock(updated);
     } else if (block.type === 'videos') {
+      let finalVideos = [...videoList];
+      if (block.display_style === 'single') {
+        const yid = extractYouTubeId(newVidUrl) || '';
+        finalVideos = [
+          {
+            youtube_id: yid,
+            title: newVidTitle.trim() || (yid ? `Video bài học (${yid})` : 'Video bài học'),
+            duration_text: newVidDuration.trim() || '5 phút',
+            thumbnail_url: newVidThumb.trim() || (yid ? `https://i.ytimg.com/vi/${yid}/hqdefault.jpg` : undefined),
+          },
+        ];
+      } else {
+        if (newVidUrl.trim()) {
+          const yid = extractYouTubeId(newVidUrl) || '';
+          if (yid || newVidTitle.trim()) {
+            finalVideos.push({
+              youtube_id: yid,
+              title: newVidTitle.trim() || (yid ? `Video bài học (${yid})` : 'Video bài học'),
+              duration_text: newVidDuration.trim() || '5 phút',
+              thumbnail_url: newVidThumb.trim() || (yid ? `https://i.ytimg.com/vi/${yid}/hqdefault.jpg` : undefined),
+            });
+          }
+        }
+      }
       const updated: Block = {
         ...block,
         data: {
-          videos: videoList,
+          videos: finalVideos,
         },
       };
       onSaveBlock(updated);
@@ -1045,7 +1150,13 @@ export default function EditBlockModal({
                             try {
                               setIsUploadingMedia(true);
                               const res = await uploadImageFile(file);
-                              setInputImageUrl(res.url);
+                              setAttachedImages((prev) => [
+                                ...prev,
+                                { url: res.url, caption: inputImageCaption.trim() || undefined },
+                              ]);
+                              setInputImageUrl('');
+                              setInputImageCaption('');
+                              setActiveAttachTab('none');
                             } catch (err: any) {
                               alert(err.message || 'Lỗi tải ảnh');
                             } finally {
@@ -1100,12 +1211,18 @@ export default function EditBlockModal({
                             try {
                               setIsUploadingMedia(true);
                               const res = await uploadPdfFile(file);
-                              setInputFileName(res.fileName);
-                              setInputFileUrl(res.url);
+                              setAttachedFiles((prev) => [
+                                ...prev,
+                                { name: inputFileName.trim() || res.fileName, url: res.url, size_bytes: file.size },
+                              ]);
+                              setInputFileName('');
+                              setInputFileUrl('');
+                              setActiveAttachTab('none');
                             } catch (err: any) {
                               alert(err.message || 'Lỗi tải file PDF');
                             } finally {
                               setIsUploadingMedia(false);
+                              e.target.value = '';
                             }
                           }}
                           disabled={isUploadingMedia}
@@ -1214,161 +1331,250 @@ export default function EditBlockModal({
           {/* Dành cho block images gốc */}
           {block.type === 'images' && (
             <div className="flex flex-col gap-3">
-              <div className="flex flex-col gap-1.5 p-3 rounded-[14px] bg-surface-2 border border-line">
-                <span className="text-[13px] font-bold text-ink">+ Thêm ảnh mới</span>
-                <div className="flex gap-1.5">
-                  <input
-                    type="url"
-                    value={newImgUrl}
-                    onChange={(e) => setNewImgUrl(e.target.value)}
-                    placeholder="Dán đường dẫn ảnh..."
-                    className="flex-1 h-10 px-3 rounded-[10px] border border-line text-[14px]"
-                  />
-                  <label className="flex items-center gap-1 h-10 px-3 rounded-[10px] bg-primary-soft text-primary font-bold text-[13px] border border-primary/30 cursor-pointer hover:bg-primary-soft/80 shrink-0">
-                    <Upload size={14} />
-                    <span>{isUploadingMedia ? 'Đang nén...' : 'Chọn từ máy'}</span>
+              {block.display_style === 'single' ? (
+                /* GIAO DIỆN ẢNH ĐƠN (SINGLE IMAGE) */
+                <div className="flex flex-col gap-3 p-3.5 rounded-[16px] bg-surface-2 border border-line">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[14px] font-bold text-ink flex items-center gap-1.5">
+                      <ImageIcon size={16} className="text-primary" />
+                      <span>Cài đặt ảnh đơn</span>
+                    </span>
+                    {(newImgUrl || imageList[0]?.url) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNewImgUrl('');
+                          setImageList([]);
+                        }}
+                        className="text-[12px] text-red-500 hover:text-red-700 font-bold underline cursor-pointer"
+                      >
+                        Xóa ảnh này
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Xem trước ảnh đơn */}
+                  {(newImgUrl || imageList[0]?.url) ? (
+                    <div className="relative rounded-[12px] overflow-hidden border border-line bg-surface max-h-[260px] flex items-center justify-center group">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={newImgUrl || imageList[0]?.url}
+                        alt="Ảnh đơn"
+                        className="w-full h-auto max-h-[260px] object-contain rounded-[12px]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setCropModalData({
+                            isOpen: true,
+                            url: newImgUrl || imageList[0]?.url || '',
+                            title: 'Cắt & Căn Khung Ảnh Đơn',
+                            aspect: 'auto',
+                            onSave: (newUrl) => {
+                              setNewImgUrl(newUrl);
+                              setImageList([{ url: newUrl, caption: newImgCaption.trim() || undefined }]);
+                            },
+                          })
+                        }
+                        className="absolute bottom-2.5 right-2.5 px-3 py-1.5 rounded-[8px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[12px] flex items-center gap-1.5 cursor-pointer shadow-md transition-all"
+                      >
+                        <Crop size={14} strokeWidth={2.5} />
+                        <span>Cắt & Căn khung</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="py-8 px-4 border-2 border-dashed border-line rounded-[14px] flex flex-col items-center justify-center text-center gap-2 bg-surface">
+                      <ImageIcon size={32} className="text-muted/60" />
+                      <span className="text-[13px] text-muted font-medium">Chưa có ảnh nào được chọn</span>
+                    </div>
+                  )}
+
+                  {/* Nút tải ảnh hoặc dán link */}
+                  <div className="flex flex-col gap-2">
+                    <div className="flex gap-2">
+                      <label className="flex-1 flex items-center justify-center gap-2 h-11 px-4 rounded-[12px] bg-primary text-white font-bold text-[14px] cursor-pointer hover:bg-primary/90 transition-colors shadow-2xs">
+                        <Upload size={16} />
+                        <span>{isUploadingMedia ? 'Đang nén ảnh...' : 'Chọn ảnh từ thiết bị'}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            try {
+                              setIsUploadingMedia(true);
+                              const res = await uploadImageFile(file);
+                              setNewImgUrl(res.url);
+                              setImageList([{ url: res.url, caption: newImgCaption.trim() || undefined }]);
+                            } catch (err: any) {
+                              alert(err.message || 'Lỗi tải ảnh');
+                            } finally {
+                              setIsUploadingMedia(false);
+                              e.target.value = '';
+                            }
+                          }}
+                          disabled={isUploadingMedia}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+
+                    <div className="flex gap-1.5 items-center">
+                      <input
+                        type="url"
+                        value={newImgUrl}
+                        onChange={(e) => {
+                          setNewImgUrl(e.target.value);
+                          if (e.target.value.trim()) {
+                            setImageList([{ url: e.target.value.trim(), caption: newImgCaption.trim() || undefined }]);
+                          }
+                        }}
+                        placeholder="Hoặc dán URL ảnh (https://...)..."
+                        className="flex-1 h-10 px-3 rounded-[10px] border border-line text-[13px] bg-surface"
+                      />
+                    </div>
+
                     <input
-                      type="file"
-                      accept="image/*"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-                        try {
-                          setIsUploadingMedia(true);
-                          const res = await uploadImageFile(file);
-                          setNewImgUrl(res.url);
-                        } catch (err: any) {
-                          alert(err.message || 'Lỗi tải ảnh');
-                        } finally {
-                          setIsUploadingMedia(false);
-                          e.target.value = '';
+                      type="text"
+                      value={newImgCaption}
+                      onChange={(e) => {
+                        setNewImgCaption(e.target.value);
+                        if (newImgUrl || imageList[0]?.url) {
+                          setImageList([{ url: newImgUrl || imageList[0]?.url || '', caption: e.target.value.trim() || undefined }]);
                         }
                       }}
-                      disabled={isUploadingMedia}
-                      className="hidden"
+                      placeholder="Chú thích ảnh (tùy chọn)..."
+                      className="w-full h-10 px-3 rounded-[10px] border border-line text-[13px] bg-surface"
                     />
+                  </div>
+                </div>
+              ) : (
+                /* GIAO DIỆN BỘ SƯU TẬP ẢNH (GALLERY) */
+                <>
+                  <div className="flex flex-col gap-2 p-3.5 rounded-[14px] bg-surface-2 border border-line">
+                    <span className="text-[13px] font-bold text-ink">+ Thêm ảnh vào bộ sưu tập</span>
+                    <div className="flex gap-2">
+                      <label className="flex-1 flex items-center justify-center gap-1.5 h-10 px-3 rounded-[10px] bg-primary text-white font-bold text-[13px] cursor-pointer hover:bg-primary/90 transition-colors shadow-2xs">
+                        <Upload size={15} />
+                        <span>{isUploadingMedia ? 'Đang nén...' : 'Chọn ảnh từ máy'}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            try {
+                              setIsUploadingMedia(true);
+                              const res = await uploadImageFile(file);
+                              setImageList((prev) => [
+                                ...prev,
+                                { url: res.url, caption: newImgCaption.trim() || undefined },
+                              ]);
+                              setNewImgUrl('');
+                              setNewImgCaption('');
+                            } catch (err: any) {
+                              alert(err.message || 'Lỗi tải ảnh');
+                            } finally {
+                              setIsUploadingMedia(false);
+                              e.target.value = '';
+                            }
+                          }}
+                          disabled={isUploadingMedia}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+
+                    <div className="flex gap-1.5">
+                      <input
+                        type="url"
+                        value={newImgUrl}
+                        onChange={(e) => setNewImgUrl(e.target.value)}
+                        placeholder="Hoặc dán đường dẫn ảnh..."
+                        className="flex-1 h-9 px-3 rounded-[8px] border border-line text-[13px] bg-surface"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={newImgCaption}
+                        onChange={(e) => setNewImgCaption(e.target.value)}
+                        placeholder="Chú thích ảnh..."
+                        className="flex-1 h-9 px-3 rounded-[8px] border border-line text-[13px] bg-surface"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddImageToBlock}
+                        className="h-9 px-4 rounded-[8px] bg-primary text-white font-bold text-[13px] cursor-pointer"
+                      >
+                        Thêm
+                      </button>
+                    </div>
+                  </div>
+
+                  <label className="text-[13px] font-bold text-ink">
+                    Danh sách ảnh ({imageList.length}) - Chạm ảnh để cắt khung
                   </label>
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newImgCaption}
-                    onChange={(e) => setNewImgCaption(e.target.value)}
-                    placeholder="Chú thích ảnh..."
-                    className="flex-1 h-10 px-3 rounded-[10px] border border-line text-[14px]"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddImageToBlock}
-                    className="h-10 px-4 rounded-[10px] bg-primary text-white font-bold text-[14px] cursor-pointer"
-                  >
-                    Thêm
-                  </button>
-                </div>
-
-                {newImgUrl && (
-                  <div className="flex items-center gap-2 p-2 rounded-[10px] bg-surface-2 border border-line">
-                    <div
-                      onClick={() =>
-                        setCropModalData({
-                          isOpen: true,
-                          url: newImgUrl,
-                          title: 'Cắt & Căn Khung Ảnh Vừa Chọn',
-                          aspect: 'auto',
-                          onSave: (newUrl) => setNewImgUrl(newUrl),
-                        })
-                      }
-                      className="w-10 h-10 rounded-[6px] overflow-hidden shrink-0 cursor-pointer relative group border border-line hover:border-amber-400"
-                      title="Nhấn để cắt ảnh vừa chọn"
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={newImgUrl} alt="" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-                        <Crop size={12} className="text-amber-300" />
+                  <div className="flex flex-col gap-2">
+                    {imageList.map((img, idx) => (
+                      <div key={idx} className="flex items-center gap-3 p-2.5 rounded-[12px] bg-surface-2 border border-line">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <div
+                          onClick={() =>
+                            setCropModalData({
+                              isOpen: true,
+                              url: img.url,
+                              title: `Cắt Ảnh #${idx + 1} Trong Khối`,
+                              aspect: 'auto',
+                              onSave: (newUrl) => {
+                                setImageList((prev) =>
+                                  prev.map((item, i) => (i === idx ? { ...item, url: newUrl } : item))
+                                );
+                              },
+                            })
+                          }
+                          className="w-12 h-12 rounded-[8px] overflow-hidden shrink-0 cursor-pointer relative group border border-line hover:border-amber-400"
+                          title="Nhấn vào để cắt khung ảnh"
+                        >
+                          <img src={img.url} alt="" className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                            <Crop size={14} className="text-amber-300" />
+                          </div>
+                        </div>
+                        <span className="flex-1 text-[13px] truncate">{img.caption || img.url}</span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCropModalData({
+                              isOpen: true,
+                              url: img.url,
+                              title: `Cắt Ảnh #${idx + 1} Trong Khối`,
+                              aspect: 'auto',
+                              onSave: (newUrl) => {
+                                setImageList((prev) =>
+                                  prev.map((item, i) => (i === idx ? { ...item, url: newUrl } : item))
+                                );
+                              },
+                            })
+                          }
+                          className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-md cursor-pointer"
+                          title="Cắt ảnh này"
+                        >
+                          <Crop size={16} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setImageList(imageList.filter((_, i) => i !== idx))}
+                          className="p-1.5 text-red-600 hover:bg-red-50 rounded-md cursor-pointer"
+                          title="Xóa ảnh này"
+                        >
+                          <Trash2 size={16} />
+                        </button>
                       </div>
-                    </div>
-                    <span className="flex-1 text-[12px] text-muted truncate">{newImgUrl}</span>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setCropModalData({
-                          isOpen: true,
-                          url: newImgUrl,
-                          title: 'Cắt & Căn Khung Ảnh Vừa Chọn',
-                          aspect: 'auto',
-                          onSave: (newUrl) => setNewImgUrl(newUrl),
-                        })
-                      }
-                      className="px-2.5 py-1 rounded-[6px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
-                    >
-                      <Crop size={11} strokeWidth={2.5} />
-                      <span>Cắt khung</span>
-                    </button>
+                    ))}
                   </div>
-                )}
-              </div>
-
-              <label className="text-[14px] font-bold text-ink">
-                Danh sách ảnh ({imageList.length}) - Chạm ảnh để cắt khung
-              </label>
-              <div className="flex flex-col gap-2">
-                {imageList.map((img, idx) => (
-                  <div key={idx} className="flex items-center gap-3 p-2.5 rounded-[12px] bg-surface-2 border border-line">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <div
-                      onClick={() =>
-                        setCropModalData({
-                          isOpen: true,
-                          url: img.url,
-                          title: `Cắt Ảnh #${idx + 1} Trong Khối`,
-                          aspect: 'auto',
-                          onSave: (newUrl) => {
-                            setImageList((prev) =>
-                              prev.map((item, i) => (i === idx ? { ...item, url: newUrl } : item))
-                            );
-                          },
-                        })
-                      }
-                      className="w-12 h-12 rounded-[8px] overflow-hidden shrink-0 cursor-pointer relative group border border-line hover:border-amber-400"
-                      title="Nhấn vào để cắt khung ảnh"
-                    >
-                      <img src={img.url} alt="" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-                        <Crop size={14} className="text-amber-300" />
-                      </div>
-                    </div>
-                    <span className="flex-1 text-[13px] truncate">{img.caption || img.url}</span>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setCropModalData({
-                          isOpen: true,
-                          url: img.url,
-                          title: `Cắt Ảnh #${idx + 1} Trong Khối`,
-                          aspect: 'auto',
-                          onSave: (newUrl) => {
-                            setImageList((prev) =>
-                              prev.map((item, i) => (i === idx ? { ...item, url: newUrl } : item))
-                            );
-                          },
-                        })
-                      }
-                      className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-md cursor-pointer"
-                      title="Cắt ảnh này"
-                    >
-                      <Crop size={16} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setImageList(imageList.filter((_, i) => i !== idx))}
-                      className="p-1.5 text-red-600 hover:bg-red-50 rounded-md cursor-pointer"
-                      title="Xóa ảnh này"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                ))}
-              </div>
+                </>
+              )}
             </div>
           )}
 
@@ -1662,99 +1868,254 @@ export default function EditBlockModal({
           {/* Dành cho block videos gốc nếu mở qua EditBlockModal */}
           {block.type === 'videos' && (
             <div className="flex flex-col gap-3">
-              <div className="flex flex-col gap-1.5 p-3 rounded-[14px] bg-surface-2 border border-line">
-                <span className="text-[13px] font-bold text-ink">+ Thêm video YouTube mới</span>
-                <input
-                  type="url"
-                  value={newVidUrl}
-                  onChange={(e) => setNewVidUrl(e.target.value)}
-                  placeholder="Dán link YouTube (youtube.com/watch?v=... hoặc youtu.be/...)"
-                  className="h-10 px-3 rounded-[10px] border border-line text-[14px]"
-                />
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newVidTitle}
-                    onChange={(e) => setNewVidTitle(e.target.value)}
-                    placeholder="Tiêu đề video..."
-                    className="flex-1 h-10 px-3 rounded-[10px] border border-line text-[14px]"
-                  />
-                  <input
-                    type="text"
-                    value={newVidDuration}
-                    onChange={(e) => setNewVidDuration(e.target.value)}
-                    placeholder="5 phút"
-                    className="w-20 h-10 px-2 rounded-[10px] border border-line text-[14px]"
-                  />
-                </div>
-                <div className="flex gap-1.5">
-                  <input
-                    type="url"
-                    value={newVidThumb}
-                    onChange={(e) => setNewVidThumb(e.target.value)}
-                    placeholder="Lớp phủ ảnh (URL ảnh bìa / thumbnail)..."
-                    className="flex-1 h-10 px-3 rounded-[10px] border border-line text-[14px]"
-                  />
-                  <label className="flex items-center gap-1 h-10 px-3 rounded-[10px] bg-primary-soft text-primary font-bold text-[13px] border border-primary/30 cursor-pointer hover:bg-primary-soft/80 shrink-0">
-                    <Upload size={14} />
-                    <span>{isUploadingMedia ? 'Đang nén...' : 'Chọn ảnh bìa'}</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-                        try {
-                          setIsUploadingMedia(true);
-                          const res = await uploadImageFile(file);
-                          setNewVidThumb(res.url);
-                        } catch (err: any) {
-                          alert(err.message || 'Lỗi tải ảnh');
-                        } finally {
-                          setIsUploadingMedia(false);
-                          e.target.value = '';
-                        }
-                      }}
-                      disabled={isUploadingMedia}
-                      className="hidden"
-                    />
-                  </label>
-                  <button
-                    type="button"
-                    onClick={handleAddVideoToBlock}
-                    className="h-10 px-4 rounded-[10px] bg-primary text-white font-bold text-[14px] cursor-pointer"
-                  >
-                    Thêm
-                  </button>
-                </div>
-              </div>
+              {block.display_style === 'single' ? (
+                /* GIAO DIỆN VIDEO ĐƠN (SINGLE VIDEO) */
+                <div className="flex flex-col gap-3 p-3.5 rounded-[16px] bg-surface-2 border border-line">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[14px] font-bold text-ink flex items-center gap-1.5">
+                      <VideoIcon size={16} className="text-primary" />
+                      <span>Cài đặt video đơn</span>
+                    </span>
+                    {(newVidUrl || videoList[0]?.youtube_id) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNewVidUrl('');
+                          setNewVidTitle('');
+                          setNewVidThumb('');
+                          setVideoList([]);
+                        }}
+                        className="text-[12px] text-red-500 hover:text-red-700 font-bold underline cursor-pointer"
+                      >
+                        Xóa video này
+                      </button>
+                    )}
+                  </div>
 
-              <label className="text-[14px] font-bold text-ink">
-                Danh sách video ({videoList.length})
-              </label>
-              <div className="flex flex-col gap-2">
-                {videoList.map((vid, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-2.5 rounded-[12px] bg-surface-2 border border-line">
-                    <div className="flex items-center gap-2 min-w-0 pr-2">
-                      {vid.thumbnail_url && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={vid.thumbnail_url} alt="" className="w-12 h-8 rounded-[6px] object-cover" />
-                      )}
-                      <div className="flex flex-col min-w-0">
-                        <span className="text-[14px] font-bold truncate">{vid.title}</span>
-                        <span className="text-[12px] text-muted truncate">{vid.duration_text} · {vid.youtube_id}</span>
+                  {/* Xem trước video hoặc thumbnail */}
+                  {(() => {
+                    const yid = extractYouTubeId(newVidUrl) || videoList[0]?.youtube_id;
+                    const thumb = newVidThumb || (yid ? `https://i.ytimg.com/vi/${yid}/hqdefault.jpg` : videoList[0]?.thumbnail_url);
+                    if (thumb) {
+                      return (
+                        <div className="relative rounded-[12px] overflow-hidden border border-line aspect-video bg-black flex items-center justify-center">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={thumb} alt="Video preview" className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                            <div className="w-12 h-12 rounded-full bg-red-600 text-white flex items-center justify-center shadow-lg">
+                              <VideoIcon size={24} className="ml-0.5" />
+                            </div>
+                          </div>
+                          {yid && (
+                            <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-[4px] bg-black/70 text-white text-[11px] font-mono">
+                              YouTube ID: {yid}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    }
+                    return (
+                      <div className="py-8 px-4 border-2 border-dashed border-line rounded-[14px] flex flex-col items-center justify-center text-center gap-2 bg-surface">
+                        <VideoIcon size={32} className="text-muted/60" />
+                        <span className="text-[13px] text-muted font-medium">Chưa có link video YouTube</span>
+                      </div>
+                    );
+                  })()}
+
+                  <div className="flex flex-col gap-2.5">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[12px] font-bold text-ink">Đường dẫn YouTube:</label>
+                      <input
+                        type="url"
+                        value={newVidUrl}
+                        onChange={async (e) => {
+                          const url = e.target.value;
+                          setNewVidUrl(url);
+                          const yid = extractYouTubeId(url);
+                          if (yid) {
+                            try {
+                              const meta = await fetchYouTubeMeta(yid);
+                              if (!newVidTitle.trim()) setNewVidTitle(meta.title);
+                              if (!newVidThumb.trim()) setNewVidThumb(meta.thumbnail_url);
+                            } catch {}
+                          }
+                        }}
+                        placeholder="Dán link YouTube (youtube.com/watch?v=... hoặc youtu.be/...)"
+                        className="h-10 px-3 rounded-[10px] border border-line text-[13px] bg-surface"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[12px] font-bold text-ink">Tiêu đề video:</label>
+                      <input
+                        type="text"
+                        value={newVidTitle}
+                        onChange={(e) => setNewVidTitle(e.target.value)}
+                        placeholder="Tiêu đề hiển thị..."
+                        className="h-10 px-3 rounded-[10px] border border-line text-[13px] bg-surface"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[12px] font-bold text-ink">Thời lượng:</label>
+                        <input
+                          type="text"
+                          value={newVidDuration}
+                          onChange={(e) => setNewVidDuration(e.target.value)}
+                          placeholder="5 phút"
+                          className="h-10 px-3 rounded-[10px] border border-line text-[13px] bg-surface"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[12px] font-bold text-ink">Ảnh bìa video:</label>
+                        <label className="flex items-center justify-center gap-1.5 h-10 px-2 rounded-[10px] bg-primary-soft text-primary font-bold text-[12px] border border-primary/30 cursor-pointer hover:bg-primary-soft/80 shrink-0">
+                          <Upload size={14} />
+                          <span>{isUploadingMedia ? 'Đang nén...' : 'Tải ảnh bìa'}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              try {
+                                setIsUploadingMedia(true);
+                                const res = await uploadImageFile(file);
+                                setNewVidThumb(res.url);
+                              } catch (err: any) {
+                                alert(err.message || 'Lỗi tải ảnh');
+                              } finally {
+                                setIsUploadingMedia(false);
+                                e.target.value = '';
+                              }
+                            }}
+                            disabled={isUploadingMedia}
+                            className="hidden"
+                          />
+                        </label>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => setVideoList(videoList.filter((_, i) => i !== idx))}
-                      className="p-1.5 text-red-600 hover:bg-red-50 rounded-md"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+
+                    {newVidThumb && (
+                      <input
+                        type="url"
+                        value={newVidThumb}
+                        onChange={(e) => setNewVidThumb(e.target.value)}
+                        placeholder="URL ảnh bìa..."
+                        className="h-8 px-2.5 rounded-[8px] border border-line text-[11px] text-muted bg-surface"
+                      />
+                    )}
                   </div>
-                ))}
-              </div>
+                </div>
+              ) : (
+                /* GIAO DIỆN DANH SÁCH VIDEO */
+                <>
+                  <div className="flex flex-col gap-2 p-3.5 rounded-[14px] bg-surface-2 border border-line">
+                    <span className="text-[13px] font-bold text-ink">+ Thêm video YouTube mới</span>
+                    <input
+                      type="url"
+                      value={newVidUrl}
+                      onChange={async (e) => {
+                        const url = e.target.value;
+                        setNewVidUrl(url);
+                        const yid = extractYouTubeId(url);
+                        if (yid && !newVidTitle) {
+                          try {
+                            const meta = await fetchYouTubeMeta(yid);
+                            setNewVidTitle(meta.title);
+                            setNewVidThumb(meta.thumbnail_url);
+                          } catch {}
+                        }
+                      }}
+                      placeholder="Dán link YouTube (youtube.com/watch?v=... hoặc youtu.be/...)"
+                      className="h-10 px-3 rounded-[10px] border border-line text-[13px] bg-surface"
+                    />
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={newVidTitle}
+                        onChange={(e) => setNewVidTitle(e.target.value)}
+                        placeholder="Tiêu đề video..."
+                        className="flex-1 h-9 px-3 rounded-[8px] border border-line text-[13px] bg-surface"
+                      />
+                      <input
+                        type="text"
+                        value={newVidDuration}
+                        onChange={(e) => setNewVidDuration(e.target.value)}
+                        placeholder="5 phút"
+                        className="w-20 h-9 px-2 rounded-[8px] border border-line text-[13px] bg-surface"
+                      />
+                    </div>
+                    <div className="flex gap-1.5">
+                      <input
+                        type="url"
+                        value={newVidThumb}
+                        onChange={(e) => setNewVidThumb(e.target.value)}
+                        placeholder="Lớp phủ ảnh (URL ảnh bìa / thumbnail)..."
+                        className="flex-1 h-9 px-3 rounded-[8px] border border-line text-[13px] bg-surface"
+                      />
+                      <label className="flex items-center gap-1 h-9 px-3 rounded-[8px] bg-primary-soft text-primary font-bold text-[12px] border border-primary/30 cursor-pointer hover:bg-primary-soft/80 shrink-0">
+                        <Upload size={13} />
+                        <span>{isUploadingMedia ? 'Đang nén...' : 'Chọn ảnh bìa'}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            try {
+                              setIsUploadingMedia(true);
+                              const res = await uploadImageFile(file);
+                              setNewVidThumb(res.url);
+                            } catch (err: any) {
+                              alert(err.message || 'Lỗi tải ảnh');
+                            } finally {
+                              setIsUploadingMedia(false);
+                              e.target.value = '';
+                            }
+                          }}
+                          disabled={isUploadingMedia}
+                          className="hidden"
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handleAddVideoToBlock}
+                        className="h-9 px-4 rounded-[8px] bg-primary text-white font-bold text-[13px] cursor-pointer"
+                      >
+                        Thêm
+                      </button>
+                    </div>
+                  </div>
+
+                  <label className="text-[13px] font-bold text-ink">
+                    Danh sách video ({videoList.length})
+                  </label>
+                  <div className="flex flex-col gap-2">
+                    {videoList.map((vid, idx) => (
+                      <div key={idx} className="flex items-center justify-between p-2.5 rounded-[12px] bg-surface-2 border border-line">
+                        <div className="flex items-center gap-2 min-w-0 pr-2">
+                          {vid.thumbnail_url && (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={vid.thumbnail_url} alt="" className="w-12 h-8 rounded-[6px] object-cover" />
+                          )}
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-[14px] font-bold truncate">{vid.title}</span>
+                            <span className="text-[12px] text-muted truncate">{vid.duration_text} · {vid.youtube_id}</span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setVideoList(videoList.filter((_, i) => i !== idx))}
+                          className="p-1.5 text-red-600 hover:bg-red-50 rounded-md cursor-pointer"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           )}
 
