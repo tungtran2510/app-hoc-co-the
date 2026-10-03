@@ -206,7 +206,11 @@ export default function ReorderHomeSectionsModal({
 
           <div className="flex flex-col gap-2.5">
             {order.map((key, idx) => {
-              const def = SECTION_DEFS[key];
+              const def =
+                SECTION_DEFS[key] ||
+                (key.startsWith('custom_')
+                  ? { key, name: 'Khối tùy biến (Ảnh · Văn bản · HTML)', desc: 'Khối do quản trị viên tự thêm', icon: Sparkles }
+                  : undefined);
               if (!def) return null;
               const Icon = def.icon;
               const isFirst = idx === 0;

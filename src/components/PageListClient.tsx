@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Plus, Edit2, ArrowUp, ArrowDown, Eye, EyeOff, Trash2, FileText, Check, Play } from 'lucide-react';
 import PageCard from './PageCard';
 import { Page, Topic } from '../lib/types';
@@ -21,6 +22,7 @@ interface PageListClientProps {
 }
 
 export default function PageListClient({ initialPages, topic }: PageListClientProps) {
+  const router = useRouter();
   const [pagesWithCount, setPagesWithCount] = useState<PageItemData[]>(initialPages);
   const [activePageId, setActivePageId] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -139,6 +141,7 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
         ];
       }
     });
+    router.refresh();
   };
 
   const visiblePages = pagesWithCount.filter(

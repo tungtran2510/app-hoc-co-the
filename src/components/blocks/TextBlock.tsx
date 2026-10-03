@@ -59,7 +59,7 @@ function renderFormattedLine(text: string) {
   });
 }
 
-function sanitizeHtml(raw: string): string {
+export function sanitizeHtml(raw: string): string {
   if (!raw) return '';
   return raw
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
@@ -125,6 +125,21 @@ export default function TextBlock({
           >
             {title}
           </h3>
+        )}
+
+        {html && lines.filter((l) => l && l !== 'Khối nội dung HTML').length > 0 && (
+          <div
+            className={`w-full text-ink leading-relaxed ${resolvedTextSizeClass} flex flex-col gap-2`}
+            style={contentCustomStyle}
+          >
+            {lines
+              .filter((l) => l && l !== 'Khối nội dung HTML')
+              .map((l, i) => (
+                <p key={i} className="m-0 whitespace-pre-wrap">
+                  {l}
+                </p>
+              ))}
+          </div>
         )}
 
         <div

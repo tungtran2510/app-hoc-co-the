@@ -26,9 +26,9 @@ function getYearMonth(): string {
  * 2. Tầng 2: Nếu có bất kỳ lỗi nào (CORS, thiết bị di động, bộ nhớ Canvas), tự động chuyển sang tải trực tiếp qua Server Route /api/admin/upload
  */
 export async function uploadImageFile(file: File): Promise<{ url: string; thumb_url: string }> {
+  let mainBlob: Blob | null = null;
   try {
     // 1. Thử nén ảnh client-side sang định dạng WebP siêu nhẹ, sắc nét
-    let mainBlob: Blob | null = null;
     let thumbBlob: Blob | null = null;
 
     try {
@@ -98,7 +98,11 @@ export async function uploadImageFile(file: File): Promise<{ url: string; thumb_
 
   // 3. DỰ PHÒNG TỐI CAO: Gửi file trực tiếp qua Server Route /api/admin/upload
   const formData = new FormData();
-  formData.append('file', file);
+  if (mainBlob && mainBlob !== file) {
+    formData.append('file', mainBlob, 'image.webp');
+  } else {
+    formData.append('file', file);
+  }
 
   const serverRes = await fetch('/api/admin/upload', {
     method: 'POST',
@@ -108,6 +112,12 @@ export async function uploadImageFile(file: File): Promise<{ url: string; thumb_
 
   if (!serverRes.ok) {
     const errData = await serverRes.json().catch(() => ({}));
+    if (serverRes.status === 413) {
+      throw new Error('Ảnh quá lớn (trên 4.5MB). Vui lòng chọn ảnh nhỏ hơn hoặc chụp lại ở chất lượng thấp hơn.');
+    }
+    if (serverRes.status === 401) {
+      throw new Error('Phiên quản trị đã hết hạn. Vui lòng đăng nhập lại.');
+    }
     throw new Error(errData.error || 'Chưa thể tải ảnh lên kho lưu trữ. Vui lòng kiểm tra kết nối mạng.');
   }
 

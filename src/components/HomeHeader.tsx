@@ -58,7 +58,7 @@ export default function HomeHeader({
   const [showMenu, setShowMenu] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isDark, setIsDark] = useState(false);
-  const [userName, setUserName] = useState<string>('Dr. Tùng');
+  const [userName, setUserName] = useState<string>('bạn');
   const [showNameModal, setShowNameModal] = useState(false);
   const [nameInput, setNameInput] = useState('');
 
@@ -174,7 +174,7 @@ export default function HomeHeader({
         window.dispatchEvent(new CustomEvent('app_user_name_changed', { detail: { name: trimmed } }));
       } catch {}
     } else {
-      setUserName('Dr. Tùng');
+      setUserName('bạn');
       try {
         localStorage.removeItem('app_user_display_name');
       } catch {}
@@ -273,7 +273,7 @@ export default function HomeHeader({
               <button
                 type="button"
                 onClick={() => {
-                  setNameInput(userName === 'Dr. Tùng' ? '' : userName);
+                  setNameInput(userName === 'bạn' ? '' : userName);
                   setShowNameModal(true);
                 }}
                 className="flex items-center gap-1.5 text-left group cursor-pointer hover:opacity-90 transition-opacity"
@@ -281,7 +281,7 @@ export default function HomeHeader({
               >
                 <div className="flex items-center gap-1.5 animate-greeting-bounce">
                   <span className="text-[17px] sm:text-[18px] font-black text-ink tracking-tight group-hover:text-amber-600 dark:group-hover:text-[#F8DF7B] transition-colors">
-                    Hi, {userName || 'Dr. Tùng'}!
+                    Hi, {userName || 'bạn'}!
                   </span>
                   {/* 1 biểu tượng duy nhất ngay cạnh tên: Chuông thông báo & Đồng bộ */}
                   <span

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseServer } from '../../../../lib/supabaseServer';
 import { UserProgressSyncData } from '../../../../lib/types';
+import crypto from 'crypto';
+import { rateLimit, getClientIp } from '../../../../lib/authServer';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,8 +11,17 @@ function cleanPhoneNumber(raw?: string | null): string {
   return raw.replace(/[^0-9]/g, '');
 }
 
+function hashedSyncKey(cleanPhone: string): string {
+  const pepper = process.env.USER_SYNC_PEPPER || process.env.ADMIN_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || 'qbiz-user-sync';
+  return 'user_sync:' + crypto.createHmac('sha256', pepper).update(cleanPhone).digest('hex').slice(0, 40);
+}
+
 export async function POST(req: NextRequest) {
   try {
+    // Chặn dò số điện thoại hàng loạt: tối đa 40 lần / 10 phút cho mỗi IP
+    if (!rateLimit(`usersync:${getClientIp(req)}`, 40, 10 * 60 * 1000)) {
+      return NextResponse.json({ error: 'Thao tác quá nhanh, vui lòng thử lại sau ít phút' }, { status: 429 });
+    }
     const body = await req.json();
     const { phone, action = 'sync', localData } = body;
 
@@ -30,7 +41,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const syncKey = `user_sync:${cleanPhone}`;
+    // Khóa lưu trữ đã băm: không để số điện thoại xuất hiện dạng chữ rõ trong bảng dữ liệu
+    const syncKey = hashedSyncKey(cleanPhone);
+    const legacyKey = `user_sync:${cleanPhone}`;
 
     // Lấy dữ liệu đã lưu trên đám mây của số điện thoại này
     const { data: record, error: fetchErr } = await supabase
@@ -46,8 +59,20 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Tương thích dữ liệu cũ (khóa chứa số điện thoại): đọc rồi tự chuyển sang khóa đã băm khi lưu
+    let legacyRecord: any = null;
+    if (!record) {
+      const { data: legacy } = await supabase
+        .from('settings')
+        .select('block_styles, updated_at')
+        .eq('workspace_id', legacyKey)
+        .maybeSingle();
+      legacyRecord = legacy || null;
+    }
+
+    const sourceRecord = record || legacyRecord;
     const cloudData: UserProgressSyncData | null =
-      record?.block_styles?.user_progress || record?.block_styles || null;
+      sourceRecord?.block_styles?.user_progress || sourceRecord?.block_styles || null;
 
     // 1. Chỉ lấy dữ liệu từ đám mây (GET)
     if (action === 'get') {
@@ -103,7 +128,7 @@ export async function POST(req: NextRequest) {
     }
 
     const mergedPayload: UserProgressSyncData = {
-      phone: cleanPhone,
+      phone: '',
       xem_tiep: mergedXemTiep,
       tien_do: mergedTienDo,
       bai_da_luu: mergedBaiDaLuu,
@@ -115,7 +140,7 @@ export async function POST(req: NextRequest) {
     const { error: upsertErr } = await supabase.from('settings').upsert(
       {
         workspace_id: syncKey,
-        app_name: `Học viên: ${cleanPhone}`,
+        app_name: 'Học viên',
         primary_color: '#0C0817',
         access_mode: 'OPEN',
         block_styles: { user_progress: mergedPayload },
@@ -129,6 +154,11 @@ export async function POST(req: NextRequest) {
         { error: upsertErr.message || 'Lỗi khi lưu dữ liệu học tập lên máy chủ' },
         { status: 500 }
       );
+    }
+
+    // Đã chuyển sang khóa đã băm → xóa bản ghi cũ chứa số điện thoại
+    if (legacyRecord || (!record && legacyKey !== syncKey)) {
+      await supabase.from('settings').delete().eq('workspace_id', legacyKey);
     }
 
     return NextResponse.json({

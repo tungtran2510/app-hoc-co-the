@@ -125,7 +125,11 @@ export default function EditBlockModal({
 
   // State cho text block
   const [textLines, setTextLines] = useState<string>(
-    block.type === 'text' ? block.data.lines.join('\n') : ''
+    block.type === 'text'
+      ? block.display_style === 'html' && !block.data.html
+        ? ''
+        : block.data.lines.join('\n')
+      : ''
   );
   const [displayStyle, setDisplayStyle] = useState<string>(
     block.type === 'text' ? (block.display_style === 'html' ? 'van_ban' : block.display_style) : 'van_ban'
@@ -679,6 +683,22 @@ export default function EditBlockModal({
                       placeholder="<div>Nhập hoặc dán mã HTML tại đây...</div>"
                       className="w-full p-3 rounded-[14px] border border-line text-[13.5px] font-mono leading-relaxed focus:border-primary bg-slate-900 text-emerald-400 dark:bg-black/60 focus:outline-none"
                     />
+                  </div>
+
+                  {/* Văn bản thường đi kèm (hiển thị phía trên HTML) */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[14px] font-bold text-ink flex items-center justify-between">
+                      <span>Văn bản thường (tùy chọn)</span>
+                      <span className="text-[11.5px] text-muted font-normal">Hiện phía trên mã HTML · mỗi dòng 1 đoạn</span>
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={htmlContent.trim() && textLines === 'Khối nội dung HTML' ? '' : textLines}
+                      onChange={(e) => setTextLines(e.target.value)}
+                      placeholder="Nhập văn bản thường nếu cần..."
+                      className="w-full p-3 rounded-[14px] border border-line text-[15px] text-ink leading-relaxed focus:border-primary"
+                    />
+                    <span className="text-[11.5px] text-muted">Ảnh, PDF, video: dùng nút "+ Ảnh / + PDF / + Video" ở mục Đính kèm bên dưới.</span>
                   </div>
 
                   {/* Khung xem trước trực tiếp */}
@@ -1411,7 +1431,7 @@ export default function EditBlockModal({
                             : 'border-line bg-surface hover:border-amber-400/50'
                         }`}
                       >
-                        <div className="w-full aspect-[3/4] rounded-[4px] overflow-hidden bg-slate-900 border border-black/10">
+                        <div className="w-full aspect-square rounded-[4px] overflow-hidden bg-slate-900 border border-black/10">
                           <img src={preset.url} alt={preset.name} className="w-full h-full object-cover" />
                         </div>
                         <span className="text-[10px] text-ink truncate w-full text-center">{preset.name}</span>
@@ -1429,12 +1449,12 @@ export default function EditBlockModal({
                           isOpen: true,
                           url: bookCoverUrl,
                           title: 'Cắt & Căn Khung Ảnh Bìa Sách',
-                          aspect: '3:4',
+                          aspect: '1:1',
                           onSave: (newUrl) => setBookCoverUrl(newUrl),
                         });
                       }
                     }}
-                    className={`w-16 h-20 rounded-[10px] bg-slate-900 border border-amber-400/50 overflow-hidden relative shrink-0 shadow-sm flex items-center justify-center group ${
+                    className={`w-16 h-16 rounded-[10px] bg-slate-900 border border-amber-400/50 overflow-hidden relative shrink-0 shadow-sm flex items-center justify-center group ${
                       bookCoverUrl ? 'cursor-pointer hover:border-amber-300' : ''
                     }`}
                     title={bookCoverUrl ? 'Nhấn để cắt khung ảnh bìa' : undefined}
@@ -1460,20 +1480,18 @@ export default function EditBlockModal({
                           type="file"
                           accept="image/*"
                           onChange={async (e) => {
-                            const file = e.target.files?.[0];
+                            const input = e.target;
+                            const file = input.files?.[0];
                             if (!file) return;
                             try {
                               setIsUploadingMedia(true);
                               const res = await uploadImageFile(file);
                               setBookCoverUrl(res.url);
                             } catch (err: any) {
-                              const reader = new FileReader();
-                              reader.onload = (re) => {
-                                if (re.target?.result) setBookCoverUrl(String(re.target.result));
-                              };
-                              reader.readAsDataURL(file);
+                              alert(err?.message || 'Không tải được ảnh lên. Vui lòng thử lại.');
                             } finally {
                               setIsUploadingMedia(false);
+                              input.value = '';
                             }
                           }}
                           disabled={isUploadingMedia}
@@ -1489,7 +1507,7 @@ export default function EditBlockModal({
                               isOpen: true,
                               url: bookCoverUrl,
                               title: 'Cắt & Căn Khung Ảnh Bìa Sách',
-                              aspect: '3:4',
+                              aspect: '1:1',
                               onSave: (newUrl) => setBookCoverUrl(newUrl),
                             })
                           }

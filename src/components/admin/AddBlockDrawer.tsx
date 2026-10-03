@@ -341,7 +341,7 @@ export default function AddBlockDrawer({
                 className="col-span-2 flex items-center justify-center gap-2.5 p-3 rounded-[16px] bg-gradient-to-r from-purple-50 to-amber-50 dark:from-purple-950/60 dark:to-amber-950/60 hover:opacity-95 transition-all font-bold text-[15px] border border-purple-200 dark:border-purple-500/40 shadow-2xs"
               >
                 <Code size={20} className="text-primary dark:text-purple-300 shrink-0" />
-                <span className="text-ink dark:text-white">Khối HTML tùy biến (Rich HTML)</span>
+                <span className="text-ink dark:text-white">Khối HTML tùy biến (Ảnh + Văn bản + HTML)</span>
               </button>
               <button
                 type="button"

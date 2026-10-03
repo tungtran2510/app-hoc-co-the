@@ -59,6 +59,7 @@ export default async function HomePage() {
         welcomeTitle={settings.welcome_title}
         welcomeMessage={settings.welcome_message}
         welcomeVideoUrl={settings.welcome_video_url}
+        initialCustomBlocks={settings.home_custom_blocks}
       />
 
       {/* 3. Thanh điều hướng dưới cùng */}

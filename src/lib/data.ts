@@ -100,10 +100,14 @@ export const DEFAULT_HOME_SECTIONS_ORDER = [
   'author_contact',
 ];
 
+export function isCustomHomeSectionKey(key: string): boolean {
+  return /^custom_[A-Za-z0-9-]{4,64}$/.test(key);
+}
+
 export function normalizeHiddenHomeSections(raw?: any): string[] {
   if (!Array.isArray(raw)) return [];
   const validSet = new Set(DEFAULT_HOME_SECTIONS_ORDER);
-  return raw.filter((key): key is string => typeof key === 'string' && validSet.has(key));
+  return raw.filter((key): key is string => typeof key === 'string' && (validSet.has(key) || isCustomHomeSectionKey(key)));
 }
 
 export function normalizeHomeSectionsOrder(raw?: any): string[] {
@@ -121,7 +125,7 @@ export function normalizeHomeSectionsOrder(raw?: any): string[] {
   }
 
   const validSet = new Set(DEFAULT_HOME_SECTIONS_ORDER);
-  const unique = Array.from(new Set(expanded)).filter((k) => validSet.has(k));
+  const unique = Array.from(new Set(expanded)).filter((k) => validSet.has(k) || isCustomHomeSectionKey(k));
 
   // Tự động bổ sung brand_card lên đầu nếu dữ liệu cũ chưa có
   if (!unique.includes('brand_card')) {
@@ -230,6 +234,7 @@ export async function getSettings(): Promise<Settings> {
             welcome_title: data.welcome_title || data.block_styles?.welcome_title || 'Chào mừng bạn đến với Qbiz Books',
             welcome_message: data.welcome_message || data.block_styles?.welcome_message || 'Hi vọng nền tảng học hiểu cơ thể và chăm sóc sức khỏe chủ động này sẽ giúp bạn hiểu sâu hơn về cơ thể mình, nuôi dưỡng hệ cơ xương khớp và sống khỏe mỗi ngày.',
             welcome_video_url: data.welcome_video_url || data.block_styles?.welcome_video_url || 'https://www.youtube.com/watch?v=c9kmCxFKHPY',
+            home_custom_blocks: (data.block_styles?.home_custom_blocks && typeof data.block_styles.home_custom_blocks === 'object') ? data.block_styles.home_custom_blocks : {},
           } as Settings;
         }
       } catch {

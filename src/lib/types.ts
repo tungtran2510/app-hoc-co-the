@@ -106,6 +106,15 @@ export interface Settings {
   welcome_title?: string | null;
   welcome_message?: string | null;
   welcome_video_url?: string | null;
+  home_custom_blocks?: Record<string, CustomHtmlBlockData> | null;
+}
+
+/** Khối tùy biến ở Trang chủ: tiêu đề + ảnh + văn bản thường + HTML */
+export interface CustomHtmlBlockData {
+  title?: string;
+  images?: { url: string; caption?: string }[];
+  text?: string;
+  html?: string;
 }
 
 export interface Topic {

@@ -28,11 +28,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Không tìm thấy file để tải lên' }, { status: 400 });
     }
 
+    const MAX_BYTES = 25 * 1024 * 1024;
+    if (file.size > MAX_BYTES) {
+      return NextResponse.json({ error: 'File quá lớn (tối đa 25MB)' }, { status: 413 });
+    }
     const ym = getYearMonth();
     const uuid = generateUuid();
     const origExt = file.name.split('.').pop()?.toLowerCase() || 'webp';
     const isDoc = ['pdf', 'doc', 'docx'].includes(origExt);
-    const safeExt = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'heic', 'heif', 'pdf', 'doc', 'docx'].includes(origExt) ? origExt : 'webp';
+    // Không cho tải SVG (có thể chứa mã script); định dạng lạ bị chuyển về webp như trước
+    const safeExt = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'heic', 'heif', 'pdf', 'doc', 'docx'].includes(origExt) ? origExt : 'webp';
     const folder = isDoc ? 'documents' : 'images';
     const filePath = `${folder}/${ym}/${uuid}.${safeExt}`;
 

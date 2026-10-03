@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     if (!existingPage && page.slug && page.topic_id) {
       let tId = String(page.topic_id).trim();
       if (!isValidUuid(tId)) {
-        const { data: topicData } = await supabase.from('topics').select('id').or(`id.eq.${tId},slug.eq.${tId}`).maybeSingle();
+        const { data: topicData } = await supabase.from('topics').select('id').eq('slug', tId).maybeSingle();
         if (topicData) tId = topicData.id;
       }
       if (isValidUuid(tId)) {
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
     resolvedTopicId = String(resolvedTopicId).trim();
 
     if (!isValidUuid(resolvedTopicId)) {
-      const { data: topicData } = await supabase.from('topics').select('id').or(`id.eq.${resolvedTopicId},slug.eq.${resolvedTopicId}`).maybeSingle();
+      const { data: topicData } = await supabase.from('topics').select('id').eq('slug', resolvedTopicId).maybeSingle();
       if (!topicData) {
         return NextResponse.json({ error: `Không tìm thấy chủ đề tương ứng (${resolvedTopicId})` }, { status: 400 });
       }
@@ -106,6 +106,12 @@ export async function POST(req: NextRequest) {
     try {
       const { clearDataCache } = await import('../../../../lib/data');
       clearDataCache();
+    } catch {
+      // Bỏ qua
+    }
+    try {
+      const { revalidatePath } = await import('next/cache');
+      revalidatePath('/', 'layout');
     } catch {
       // Bỏ qua
     }

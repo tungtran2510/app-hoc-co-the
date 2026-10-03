@@ -143,10 +143,6 @@ export default function SavedPages() {
 
       {/* 2. Tiêu đề trang trọng */}
       <section className="flex flex-col gap-1.5 pt-1">
-        <div className="inline-flex items-center gap-1.5 text-amber-600 dark:text-[#F8DF7B] text-[11px] font-black tracking-wider uppercase">
-          <Sparkles size={13} />
-          <span>TỦ BÀI HỌC CÁ NHÂN</span>
-        </div>
         <h1 className="text-[24px] sm:text-[26px] font-black text-slate-900 dark:text-white leading-tight">
           Bài học đã lưu
         </h1>
@@ -157,25 +153,6 @@ export default function SavedPages() {
         </p>
       </section>
 
-      {/* 3. Dải thông tin tiện ích (Mini Stats Bar) */}
-      {savedList.length > 0 && (
-        <div className="grid grid-cols-3 gap-2 p-2.5 rounded-[16px] bg-slate-50 dark:bg-[#160D30] border border-slate-200/80 dark:border-purple-800/40 text-center">
-          <div className="flex flex-col items-center justify-center py-1">
-            <span className="text-[10px] font-bold text-slate-500 dark:text-purple-300 uppercase tracking-wide">Số lượng</span>
-            <span className="text-[14px] font-black text-purple-700 dark:text-[#F8DF7B] mt-0.5">{savedList.length} bài</span>
-          </div>
-          <div className="flex flex-col items-center justify-center py-1 border-x border-slate-200 dark:border-purple-800/40">
-            <span className="text-[10px] font-bold text-slate-500 dark:text-purple-300 uppercase tracking-wide">Truy cập</span>
-            <span className="text-[14px] font-black text-emerald-600 dark:text-emerald-400 mt-0.5">1 Chạm</span>
-          </div>
-          <div className="flex flex-col items-center justify-center py-1">
-            <span className="text-[10px] font-bold text-slate-500 dark:text-purple-300 uppercase tracking-wide">Thiết bị</span>
-            <span className="text-[14px] font-black text-slate-800 dark:text-white mt-0.5">
-              {userPhone ? 'Đã đồng bộ' : 'Bộ nhớ máy'}
-            </span>
-          </div>
-        </div>
-      )}
 
       {/* 4. Danh sách bài học đã lưu (Giao diện thẻ Chuyên nghiệp) */}
       {isLoading ? (
@@ -269,7 +246,7 @@ export default function SavedPages() {
                 {/* Hàng dưới: Nút mở bài học rõ ràng chuyên nghiệp */}
                 <Link
                   href={`/${item.topic_slug}/${item.page_slug}`}
-                  className="w-full h-10 rounded-[12px] bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:opacity-95 text-slate-950 font-black text-[12.5px] sm:text-[13px] flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.99] transition-all cursor-pointer"
+                  className="w-full h-10 rounded-[12px] bg-slate-900 dark:bg-white/10 dark:border dark:border-white/15 hover:opacity-95 text-white font-bold text-[13px] flex items-center justify-center gap-1.5 active:scale-[0.99] transition-all cursor-pointer"
                 >
                   <span>Mở học bài này</span>
                   <ArrowRight size={14} />

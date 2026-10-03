@@ -192,7 +192,7 @@ export default function VideoManagerModal({
   };
 
   // Lưu video mới hoặc cập nhật video
-  const handleSaveVideoItem = async () => {
+  const handleSaveVideoItem = async (finish: boolean = false) => {
     const yid = extractYouTubeId(inputUrl) || '';
     if (inputUrl.trim() && !yid) {
       alert('Đường dẫn YouTube không hợp lệ. Vui lòng kiểm tra lại link (ví dụ: youtube.com/watch?v=... hoặc youtu.be/... hoặc ID 11 ký tự).');
@@ -232,13 +232,20 @@ export default function VideoManagerModal({
       aspect_ratio: isVert ? 'vertical' : 'horizontal',
     };
 
+    let nextList: Video[];
     if (editingIndex !== null) {
-      const updated = [...videoList];
-      updated[editingIndex] = newVideoItem;
-      setVideoList(updated);
+      nextList = [...videoList];
+      nextList[editingIndex] = newVideoItem;
+      setVideoList(nextList);
       setEditingIndex(null);
     } else {
-      setVideoList([...videoList, newVideoItem]);
+      nextList = [...videoList, newVideoItem];
+      setVideoList(nextList);
+    }
+    if (finish) {
+      onSaveVideos(nextList);
+      onClose();
+      return;
     }
 
     // Reset form
@@ -299,6 +306,10 @@ export default function VideoManagerModal({
   };
 
   const handleFinish = () => {
+    if (addMode === 'youtube' && (inputUrl.trim() || (editingIndex !== null && inputTitle.trim()))) {
+      void handleSaveVideoItem(true);
+      return;
+    }
     onSaveVideos(videoList);
     onClose();
   };
@@ -821,7 +832,7 @@ export default function VideoManagerModal({
                   </button>
                   <button
                     type="button"
-                    onClick={handleSaveVideoItem}
+                    onClick={() => handleSaveVideoItem(false)}
                     className="h-10 px-5 rounded-[12px] bg-primary text-white text-[14px] font-bold shadow-xs"
                   >
                     {editingIndex !== null ? 'Cập nhật video' : 'Thêm vào danh sách'}

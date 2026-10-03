@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
       welcome_title: settings.welcome_title !== undefined ? settings.welcome_title : (existingBlockStyles.welcome_title ?? 'Chào mừng bạn đến với Qbiz Books'),
       welcome_message: settings.welcome_message !== undefined ? settings.welcome_message : (existingBlockStyles.welcome_message ?? 'Hi vọng nền tảng học hiểu cơ thể và chăm sóc sức khỏe chủ động này sẽ giúp bạn hiểu sâu hơn về cơ thể mình, nuôi dưỡng hệ cơ xương khớp và sống khỏe mỗi ngày.'),
       welcome_video_url: settings.welcome_video_url !== undefined ? settings.welcome_video_url : (existingBlockStyles.welcome_video_url ?? null),
+      home_custom_blocks: settings.home_custom_blocks !== undefined ? settings.home_custom_blocks : (existingBlockStyles.home_custom_blocks ?? {}),
     };
 
     const existingAuthorProfile = existing?.author_profile || {};
@@ -80,7 +81,7 @@ export async function POST(req: NextRequest) {
       hotline: finalHotline,
       zalo_url: finalZaloUrl,
       author_profile: updatedAuthorProfile,
-      admin_password: settings.admin_password ?? existing?.admin_password ?? null,
+      admin_password: existing?.admin_password ?? null,
       updated_at: new Date().toISOString(),
     };
 

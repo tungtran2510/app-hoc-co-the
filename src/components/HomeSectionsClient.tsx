@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Edit2, EyeOff } from 'lucide-react';
-import { Topic, AuthorProfile, RecommendedBook, AuthorBook } from '../lib/types';
+import { Edit2, EyeOff, Plus } from 'lucide-react';
+import { Topic, AuthorProfile, RecommendedBook, AuthorBook, CustomHtmlBlockData } from '../lib/types';
 import { checkIsAdminClient } from '../lib/adminAuth';
 import { saveSettingsApi } from '../lib/apiAdmin';
-import { normalizeAuthorProfile, normalizeHomeSectionsOrder } from '../lib/data';
+import { generateUuid } from '../lib/uuid';
+import CustomHtmlSection, { CustomHtmlModal } from './CustomHtmlSection';
+import { normalizeAuthorProfile, normalizeHomeSectionsOrder, isCustomHomeSectionKey } from '../lib/data';
 import TopicListClient from './TopicListClient';
 import AuthorIntroSection, {
   AuthorProfileSection,
@@ -48,6 +50,7 @@ interface HomeSectionsClientProps {
   welcomeTitle?: string | null;
   welcomeMessage?: string | null;
   welcomeVideoUrl?: string | null;
+  initialCustomBlocks?: Record<string, CustomHtmlBlockData> | null;
 }
 
 export default function HomeSectionsClient({
@@ -71,7 +74,15 @@ export default function HomeSectionsClient({
   welcomeTitle: initialWelcomeTitle,
   welcomeMessage: initialWelcomeMessage,
   welcomeVideoUrl: initialWelcomeVideoUrl,
+  initialCustomBlocks,
 }: HomeSectionsClientProps) {
+  const [customBlocks, setCustomBlocks] = useState<Record<string, CustomHtmlBlockData>>(
+    () => initialCustomBlocks || {}
+  );
+  const [customEditing, setCustomEditing] = useState<{ key: string | null; data: CustomHtmlBlockData } | null>(null);
+  useEffect(() => {
+    if (initialCustomBlocks) setCustomBlocks(initialCustomBlocks);
+  }, [initialCustomBlocks]);
   const [sectionsOrder, setSectionsOrder] = useState<string[]>(() =>
     normalizeHomeSectionsOrder(initialSectionsOrder)
   );
@@ -232,6 +243,45 @@ export default function HomeSectionsClient({
     }
   };
 
+  // ===== KHỐI TÙY BIẾN (ẢNH · VĂN BẢN · HTML) =====
+  const handleSaveCustomBlock = async (key: string | null, data: CustomHtmlBlockData) => {
+    const newKey = key || `custom_${generateUuid().slice(0, 12)}`;
+    const nextBlocks = { ...customBlocks, [newKey]: data };
+    const nextOrder = key ? sectionsOrder : [...sectionsOrder, newKey];
+    const res = await saveSettingsApi({
+      home_custom_blocks: nextBlocks,
+      home_sections_order: nextOrder,
+    });
+    if (!res.success) {
+      alert(res.error || 'Chưa lưu được khối – vui lòng thử lại.');
+      return;
+    }
+    setCustomBlocks(nextBlocks);
+    setSectionsOrder(nextOrder);
+    setCustomEditing(null);
+  };
+
+  const handleDeleteCustomBlock = async (key: string) => {
+    if (!confirm('Xóa khối tùy biến này khỏi Trang chủ?')) return;
+    const nextBlocks = { ...customBlocks };
+    delete nextBlocks[key];
+    const nextOrder = sectionsOrder.filter((k) => k !== key);
+    const nextHidden = hiddenSections.filter((k) => k !== key);
+    const res = await saveSettingsApi({
+      home_custom_blocks: nextBlocks,
+      home_sections_order: nextOrder,
+      hidden_home_sections: nextHidden,
+    });
+    if (!res.success) {
+      alert(res.error || 'Chưa xóa được khối – vui lòng thử lại.');
+      return;
+    }
+    setCustomBlocks(nextBlocks);
+    setSectionsOrder(nextOrder);
+    setHiddenSections(nextHidden);
+    setCustomEditing(null);
+  };
+
   return (
     <>
       {sectionsOrder.map((sectionKey, index) => {
@@ -257,6 +307,27 @@ export default function HomeSectionsClient({
             </button>
           </div>
         ) : null;
+
+        // KHỐI TÙY BIẾN (ẢNH · VĂN BẢN · HTML) do quản trị viên thêm
+        if (isCustomHomeSectionKey(sectionKey)) {
+          return (
+            <React.Fragment key={sectionKey}>
+              {hiddenBanner}
+              <CustomHtmlSection
+                data={customBlocks[sectionKey] || {}}
+                isAdmin={isAdmin}
+                isHidden={isHidden}
+                sectionIndex={index}
+                totalSections={sectionsOrder.length}
+                onToggleVisibility={() => handleToggleSectionVisibility(sectionKey)}
+                onMoveUp={() => handleMoveSection(index, 'up')}
+                onMoveDown={() => handleMoveSection(index, 'down')}
+                onOpenReorderModal={() => setShowReorderModal(true)}
+                onEdit={() => setCustomEditing({ key: sectionKey, data: customBlocks[sectionKey] || {} })}
+              />
+            </React.Fragment>
+          );
+        }
 
         // KHỐI 1: THƯƠNG HIỆU (BRAND CARD)
         if (sectionKey === 'brand_card') {
@@ -319,7 +390,7 @@ export default function HomeSectionsClient({
                 </div>
 
                 {/* Huy hiệu Vàng Kim bên phải - Icon quả tim đập nhịp y khoa */}
-                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[15px] bg-gradient-to-br from-amber-50 via-slate-50 to-amber-100/60 border border-amber-300/80 dark:bg-slate-800 dark:border-amber-300/70 p-[2px] shadow-md shrink-0 flex items-center justify-center relative overflow-hidden">
+                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[15px] bg-gradient-to-br from-amber-50 via-slate-50 to-amber-100/60 border border-amber-300/80 dark:bg-none dark:bg-[#0B132B] dark:border-amber-400 p-[2px] shadow-md shrink-0 flex items-center justify-center relative overflow-hidden">
                   <div className="flex flex-col items-center justify-center text-amber-600 dark:text-amber-300">
                     <svg className="w-5 h-5 text-amber-600 dark:text-amber-300 drop-shadow-xs dark:drop-shadow-[0_1px_3px_rgba(245,158,11,0.8)] animate-medica-heartbeat" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" fill="currentColor" fillOpacity="0.25" />
@@ -545,6 +616,26 @@ export default function HomeSectionsClient({
 
         return null;
       })}
+
+      {isAdmin && (
+        <button
+          type="button"
+          onClick={() => setCustomEditing({ key: null, data: {} })}
+          className="w-full h-12 rounded-[14px] border-2 border-dashed border-slate-400 dark:border-white/30 text-slate-800 dark:text-white font-bold text-[14.5px] flex items-center justify-center gap-2 cursor-pointer hover:border-[#0068FF]"
+        >
+          <Plus size={18} /> Thêm khối tùy biến (Ảnh · Văn bản · HTML)
+        </button>
+      )}
+
+      {customEditing && (
+        <CustomHtmlModal
+          initial={customEditing.data}
+          onClose={() => setCustomEditing(null)}
+          onSave={(data) => handleSaveCustomBlock(customEditing.key, data)}
+          onDelete={customEditing.key ? () => handleDeleteCustomBlock(customEditing.key as string) : undefined}
+        />
+      )}
+
 
       {/* Modal chi tiết sách của tác giả */}
       {selectedAuthorBook && (

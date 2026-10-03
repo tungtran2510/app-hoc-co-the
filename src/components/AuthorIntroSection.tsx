@@ -781,102 +781,83 @@ export function AuthorContactSection({
       )}
 
       <ScrollReveal animation="slide-right" delay={40}>
-        <div className="p-4 sm:p-5 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-sm dark:bg-gradient-to-br dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0B132B] dark:border-white/15 dark:text-white flex flex-col gap-3.5">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
-            <div className="flex items-center gap-2 min-w-0">
-              <div className="w-7 h-7 rounded-[8px] bg-amber-50 text-amber-800 border border-amber-300 dark:bg-[#F8DF7B] dark:text-[#160C2C] dark:border-0 flex items-center justify-center shrink-0 shadow-xs">
-                <PhoneCall size={16} strokeWidth={2.5} />
-              </div>
-              <div className="min-w-0">
-                <h3 className="text-[16px] font-extrabold text-slate-900 dark:text-white leading-tight truncate">
-                  {profile.contact_title || 'Thông tin liên hệ & Kết nối'}
-                </h3>
-                <span className="text-[12px] text-slate-500 dark:text-slate-400 truncate block">
-                  {profile.contact_subtitle || 'Kết nối trực tiếp cùng chuyên gia / tác giả'}
-                </span>
-              </div>
+        <div className="p-4 sm:p-5 rounded-[16px] bg-white text-slate-900 border border-slate-200 shadow-sm dark:bg-[#111827] dark:border-white/15 dark:text-white flex flex-col gap-3.5">
+          <div className="flex items-center gap-2.5 min-w-0 pb-3 border-b border-slate-200 dark:border-white/10">
+            <div className="w-8 h-8 rounded-[10px] bg-slate-100 text-slate-800 dark:bg-white/10 dark:text-white flex items-center justify-center shrink-0">
+              <PhoneCall size={16} strokeWidth={2.2} />
+            </div>
+            <div className="min-w-0">
+              <h3 className="text-[16px] font-bold text-slate-900 dark:text-white leading-tight truncate">
+                {profile.contact_title || 'Thông tin liên hệ & Kết nối'}
+              </h3>
+              <span className="text-[12.5px] text-slate-600 dark:text-slate-300 truncate block">
+                {profile.contact_subtitle || 'Kết nối trực tiếp cùng chuyên gia / tác giả'}
+              </span>
             </div>
           </div>
 
-          {/* Lời nhắn kết nối */}
           {profile.contact_note && (
-            <p className="text-[14px] text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
+            <p className="text-[14px] text-slate-700 dark:text-slate-200 leading-relaxed font-normal">
               {profile.contact_note}
             </p>
           )}
 
-          {/* Các nút gọi điện & nhắn tin nhanh */}
-          <div className="flex flex-col gap-2.5 pt-0.5">
-            {profile.phone && (
-              <a
-                href={`tel:${profile.phone.replace(/[^0-9+]/g, '')}`}
-                className="group relative flex items-center justify-between p-3 px-3.5 rounded-[14px] bg-gradient-to-r from-amber-50/70 via-slate-50 to-amber-50/50 border border-amber-200/80 text-slate-900 shadow-xs hover:border-amber-400 dark:bg-slate-800 dark:text-white dark:border-slate-700 overflow-hidden gap-2 cursor-pointer transition-all active:scale-[0.98]"
-              >
-                {/* Tia sáng viền trên */}
-                <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-amber-400/50 dark:via-amber-300/60 to-transparent" />
-
-                <div className="flex items-center gap-2.5 min-w-0 z-10">
-                  <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-800 dark:bg-gradient-to-br dark:from-amber-200 dark:to-amber-500 dark:text-slate-900 flex items-center justify-center shrink-0 shadow-xs">
-                    <Phone size={16} strokeWidth={2.5} />
-                  </div>
-                  <div className="flex flex-col min-w-0">
-                    <span className="text-[11px] text-slate-500 dark:text-amber-200 font-bold uppercase tracking-wider leading-tight">Hotline tư vấn</span>
-                    <span className="text-[14.5px] sm:text-[15.5px] font-black tracking-wide truncate text-amber-900 dark:text-white drop-shadow-xs">{profile.phone}</span>
-                  </div>
-                </div>
-                <span className="z-10 text-[12px] font-black px-3 py-1 rounded-[9px] bg-amber-500 text-slate-950 font-black hover:bg-amber-600 dark:bg-gradient-to-b dark:from-amber-300 dark:to-amber-500 dark:text-slate-900 shrink-0 whitespace-nowrap shadow-xs group-hover:scale-105 transition-transform">Gọi ngay</span>
-              </a>
-            )}
-
+          <div className="flex flex-col gap-2.5">
             {profile.zalo_url && (
               <a
                 href={profile.zalo_url.startsWith('http') ? profile.zalo_url : `https://zalo.me/${profile.zalo_url.replace(/[^0-9]/g, '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative flex items-center justify-between p-3 px-3.5 rounded-[14px] bg-[#0068FF] text-white border border-white/20 shadow-sm hover:bg-[#0056D2] active:scale-[0.98] transition-all gap-2 overflow-hidden"
+                className="flex items-center justify-between p-3 px-3.5 rounded-[12px] bg-[#0068FF] text-white hover:bg-[#0057d9] active:scale-[0.98] transition-all gap-2"
               >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center font-extrabold text-[15px] shrink-0">
-                    Z
-                  </div>
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-9 h-9 rounded-full bg-white text-[#0068FF] flex items-center justify-center font-black text-[17px] shrink-0">Z</div>
                   <div className="flex flex-col min-w-0">
-                    <span className="text-[11px] text-white/90 font-medium leading-tight">Chat Zalo</span>
-                    <span className="text-[14px] sm:text-[15px] font-extrabold truncate">Nhắn tin trực tiếp</span>
+                    <span className="text-[12px] text-white font-medium leading-tight">Chat Zalo</span>
+                    <span className="text-[15px] font-bold truncate">Nhắn tin trực tiếp</span>
                   </div>
                 </div>
-                <span className="text-[12px] font-bold px-2.5 py-1 rounded-[8px] bg-white/20 shrink-0 whitespace-nowrap">Mở Zalo</span>
+                <span className="text-[12.5px] font-bold px-3 py-1.5 rounded-[8px] bg-white text-[#0068FF] shrink-0 whitespace-nowrap">Mở Zalo</span>
+              </a>
+            )}
+
+            {profile.phone && (
+              <a
+                href={`tel:${profile.phone.replace(/[^0-9+]/g, '')}`}
+                className="flex items-center justify-between p-3 px-3.5 rounded-[12px] bg-slate-50 border border-slate-300 text-slate-900 hover:bg-slate-100 dark:bg-[#1F2937] dark:border-white/20 dark:text-white dark:hover:bg-[#273449] gap-2 cursor-pointer transition-all active:scale-[0.98]"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-9 h-9 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 flex items-center justify-center shrink-0">
+                    <Phone size={16} strokeWidth={2.4} />
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-[12px] text-slate-600 dark:text-slate-300 font-medium leading-tight">Hotline tư vấn</span>
+                    <span className="text-[16px] font-bold tracking-wide truncate text-slate-900 dark:text-white">{profile.phone}</span>
+                  </div>
+                </div>
+                <span className="text-[12.5px] font-bold px-3 py-1.5 rounded-[8px] bg-slate-900 text-white dark:bg-white dark:text-slate-900 shrink-0 whitespace-nowrap">Gọi ngay</span>
               </a>
             )}
           </div>
 
-          {/* Chi tiết phụ: Facebook, Email, Địa chỉ */}
           {(profile.address || profile.email || profile.facebook_url) && (
-            <div className="flex flex-col gap-2 pt-2 text-[13px] text-slate-600 dark:text-muted border-t border-slate-100 dark:border-line/60">
+            <div className="flex flex-col gap-2.5 pt-3 text-[13.5px] border-t border-slate-200 dark:border-white/10">
               {profile.address && (
                 <div className="flex items-center gap-2">
-                  <MapPin size={15} className="text-amber-700 dark:text-primary shrink-0" />
-                  <span className="text-slate-800 dark:text-ink/80 font-medium">{profile.address}</span>
+                  <MapPin size={15} className="text-slate-500 dark:text-slate-300 shrink-0" />
+                  <span className="text-slate-800 dark:text-slate-100 font-medium">{profile.address}</span>
                 </div>
               )}
               {profile.email && (
                 <div className="flex items-center gap-2">
-                  <Mail size={15} className="text-amber-700 dark:text-primary shrink-0" />
-                  <a href={`mailto:${profile.email}`} className="text-amber-700 dark:text-primary font-bold hover:underline">
-                    {profile.email}
-                  </a>
+                  <Mail size={15} className="text-slate-500 dark:text-slate-300 shrink-0" />
+                  <a href={`mailto:${profile.email}`} className="text-slate-900 dark:text-white font-semibold hover:underline">{profile.email}</a>
                 </div>
               )}
               {profile.facebook_url && (
                 <div className="flex items-center gap-2">
-                  <Globe size={15} className="text-amber-700 dark:text-primary shrink-0" />
-                  <a
-                    href={profile.facebook_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-amber-700 dark:text-primary font-bold hover:underline"
-                  >
-                    Kênh cá nhân / Fanpage Facebook
-                  </a>
+                  <Globe size={15} className="text-slate-500 dark:text-slate-300 shrink-0" />
+                  <a href={profile.facebook_url} target="_blank" rel="noopener noreferrer" className="text-[#0068FF] dark:text-[#6AA5FF] font-semibold hover:underline">Kênh cá nhân / Fanpage Facebook</a>
                 </div>
               )}
             </div>

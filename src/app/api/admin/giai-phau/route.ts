@@ -10,8 +10,12 @@ import {
   AnatomyStructure
 } from '../../../../lib/anatomyAdminData';
 import { runAnatomyQC } from '../../../../lib/anatomyQC';
+import { checkIsAdminRequest } from '../../../../lib/authServer';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  if (!checkIsAdminRequest(req)) {
+    return NextResponse.json({ error: 'Chưa đăng nhập quyền quản trị' }, { status: 401 });
+  }
   try {
     const structures = getAnatomyStructures();
     const auditLogs = getAuditLogs();
@@ -42,6 +46,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  if (!checkIsAdminRequest(req)) {
+    return NextResponse.json({ error: 'Chưa đăng nhập quyền quản trị' }, { status: 401 });
+  }
   try {
     const body = await req.json();
     const { action, structure, partId, version, description, author } = body;

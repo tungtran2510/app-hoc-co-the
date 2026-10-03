@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { checkIsAdminRequest } from '../../../../lib/authServer';
+import { checkIsAdminRequest, hashPassword, verifyPassword, rateLimit, getClientIp } from '../../../../lib/authServer';
 import { getSupabaseServer } from '../../../../lib/supabaseServer';
 
 export async function POST(req: NextRequest) {
   if (!checkIsAdminRequest(req)) {
     return NextResponse.json({ error: 'Chưa đăng nhập quyền quản trị' }, { status: 401 });
+  }
+
+  if (!rateLimit(`chpw:${getClientIp(req)}`, 8, 10 * 60 * 1000)) {
+    return NextResponse.json({ error: 'Thao tác quá nhiều lần, thử lại sau ít phút' }, { status: 429 });
   }
 
   const supabase = getSupabaseServer();
@@ -15,8 +19,8 @@ export async function POST(req: NextRequest) {
   try {
     const { currentPassword, newPassword } = await req.json();
 
-    if (!newPassword || newPassword.trim().length < 4) {
-      return NextResponse.json({ error: 'Mật khẩu mới phải có tối thiểu 4 ký tự' }, { status: 400 });
+    if (typeof newPassword !== 'string' || newPassword.trim().length < 8) {
+      return NextResponse.json({ error: 'Mật khẩu mới phải có tối thiểu 8 ký tự' }, { status: 400 });
     }
 
     // 1. Kiểm tra mật khẩu hiện tại
@@ -31,15 +35,15 @@ export async function POST(req: NextRequest) {
       expectedPassword = currentSettings.admin_password;
     }
 
-    if (expectedPassword && currentPassword !== expectedPassword) {
+    if (expectedPassword && !verifyPassword(String(currentPassword || ''), expectedPassword)) {
       return NextResponse.json({ error: 'Mật khẩu hiện tại không chính xác' }, { status: 400 });
     }
 
-    // 2. Cập nhật mật khẩu mới vào cơ sở dữ liệu Supabase
+    // 2. Lưu mật khẩu mới dưới dạng đã băm (scrypt + muối)
     const { error } = await supabase
       .from('settings')
       .update({
-        admin_password: newPassword.trim(),
+        admin_password: hashPassword(newPassword.trim()),
         updated_at: new Date().toISOString(),
       })
       .eq('workspace_id', 'default');
