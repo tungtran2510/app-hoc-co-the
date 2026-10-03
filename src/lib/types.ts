@@ -226,6 +226,22 @@ export type Block =
         right_title?: string;
         right_lines: string[];
       };
+    }
+  | {
+      id: string;
+      page_id: string;
+      type: 'faq';
+      display_style: 'accordion' | 'card' | string;
+      sort_order: number;
+      is_visible: boolean;
+      data: {
+        title?: string;
+        items: Array<{
+          id: string;
+          question: string;
+          answer: string;
+        }>;
+      };
     };
 
 export interface ContinueInfo {

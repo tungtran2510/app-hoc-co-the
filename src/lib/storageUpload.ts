@@ -150,11 +150,16 @@ export async function uploadDocumentFile(file: File): Promise<{ url: string; fil
 
     if (res.ok) {
       const data = await res.json();
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s timeout
+
       const putRes = await fetch(data.signedUrl, {
         method: 'PUT',
         headers: { 'Content-Type': mimeType },
         body: file,
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
 
       if (putRes.ok) {
         const mb = (file.size / (1024 * 1024)).toFixed(1);
@@ -167,10 +172,14 @@ export async function uploadDocumentFile(file: File): Promise<{ url: string; fil
       }
     }
   } catch (err) {
-    console.warn('Document signed upload error, falling back to server route:', err);
+    console.warn('Document signed upload error, attempting fallback if size permits:', err);
   }
 
-  // Server fallback for Document
+  // Server fallback for Document (Vercel max payload limit is 4.5MB)
+  if (file.size > 4.5 * 1024 * 1024) {
+    throw new Error('Tệp PDF vượt quá 4.5MB nên không thể tải tệp gốc qua máy chủ Vercel. Các trang xem thử 3D vẫn được trích xuất bình thường.');
+  }
+
   const formData = new FormData();
   formData.append('file', file);
 

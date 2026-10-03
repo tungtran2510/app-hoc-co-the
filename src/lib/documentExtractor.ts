@@ -6,8 +6,23 @@ export interface ProgressCallback {
   (message: string, current?: number, total?: number): void;
 }
 
+const PDFJS_CDNS = [
+  {
+    script: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+    worker: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',
+  },
+  {
+    script: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js',
+    worker: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js',
+  },
+  {
+    script: 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js',
+    worker: 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js',
+  },
+];
+
 /**
- * Đảm bảo thư viện PDF.js được tải đầy đủ trong môi trường trình duyệt
+ * Đảm bảo thư viện PDF.js được tải đầy đủ với cơ chế đa CDN dự phòng và timeout
  */
 export async function ensurePdfJsLoaded(): Promise<any> {
   if (typeof window === 'undefined') {
@@ -15,38 +30,64 @@ export async function ensurePdfJsLoaded(): Promise<any> {
   }
 
   const win = window as any;
-  if (!win.pdfjsLib) {
-    await new Promise<void>((resolve, reject) => {
-      // Kiểm tra xem script đã được append trước đó chưa
-      const existingScript = document.querySelector('script[src*="pdf.js"]') || document.querySelector('script[src*="pdf.min.js"]');
-      if (existingScript) {
-        existingScript.addEventListener('load', () => resolve());
-        existingScript.addEventListener('error', () => reject(new Error('Lỗi nạp thư viện PDF.js')));
-        // Nếu đã có sẵn đối tượng
-        if (win.pdfjsLib) return resolve();
-        return;
+  if (win.pdfjsLib) {
+    if (!win.pdfjsLib.GlobalWorkerOptions.workerSrc) {
+      win.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS_CDNS[0].worker;
+    }
+    return win.pdfjsLib;
+  }
+
+  let lastError: any = null;
+
+  for (const cdn of PDFJS_CDNS) {
+    try {
+      await new Promise<void>((resolve, reject) => {
+        // Kiểm tra xem script đã có trên trang chưa
+        const existingScript = document.querySelector(`script[src="${cdn.script}"]`) as HTMLScriptElement | null;
+        if (existingScript && win.pdfjsLib) {
+          return resolve();
+        }
+
+        const script = document.createElement('script');
+        script.src = cdn.script;
+        script.async = true;
+
+        const timeoutId = setTimeout(() => {
+          script.onerror = null;
+          script.onload = null;
+          reject(new Error(`Timeout nạp PDF.js từ CDN ${cdn.script}`));
+        }, 12000);
+
+        script.onload = () => {
+          clearTimeout(timeoutId);
+          resolve();
+        };
+
+        script.onerror = () => {
+          clearTimeout(timeoutId);
+          reject(new Error(`Không thể nạp PDF.js từ ${cdn.script}`));
+        };
+
+        document.head.appendChild(script);
+      });
+
+      if (win.pdfjsLib) {
+        win.pdfjsLib.GlobalWorkerOptions.workerSrc = cdn.worker;
+        return win.pdfjsLib;
       }
-
-      const script = document.createElement('script');
-      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-      script.async = true;
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error('Không thể tải công cụ giải mã PDF.js từ CDN'));
-      document.head.appendChild(script);
-    });
+    } catch (err) {
+      lastError = err;
+      console.warn(`[PDF.js CDN Fallback] Thử CDN tiếp theo:`, err);
+    }
   }
 
-  const pdfjsLib = win.pdfjsLib;
-  if (pdfjsLib && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
-    pdfjsLib.GlobalWorkerOptions.workerSrc =
-      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-  }
-
-  return pdfjsLib;
+  throw lastError || new Error('Không thể tải công cụ giải mã PDF từ các máy chủ CDN.');
 }
 
 /**
- * Bóc tách các trang từ file PDF thành ảnh HD và tải lên lưu trữ đám mây cho Flipbook 3D
+ * Bóc tách các trang từ file PDF thành ảnh HD và tải lên lưu trữ đám mây cho Flipbook 3D.
+ * ƯU TIÊN SỐ 1: Bóc tách trang cục bộ từ bộ nhớ máy trước (không bị nghẽn mạng),
+ * sau đó mới lưu tệp gốc đính kèm.
  */
 export async function extractPdfToFlipbookImages(
   file: File,
@@ -56,19 +97,16 @@ export async function extractPdfToFlipbookImages(
   }
 ): Promise<{
   pageUrls: string[];
-  docFile: { url: string; fileName: string; sizeText: string };
+  docFile: { url: string; fileName: string; sizeText: string } | null;
   totalPagesInDoc: number;
 }> {
   const onProgress = options?.onProgress || (() => {});
-  const maxPages = options?.maxPages || 30; // Giới hạn tối đa 30 trang để duyệt 3D mượt mà
+  const maxPages = options?.maxPages || 40; // Tối đa 40 trang đọc thử
 
-  onProgress('Đang tải file PDF gốc lên hệ thống lưu trữ...', 0, 1);
-  const docFile = await uploadDocumentFile(file);
-
-  onProgress('Đang nạp công cụ đọc PDF chuẩn y khoa...', 0, 1);
+  onProgress('Đang nạp công cụ đọc PDF chuẩn y khoa...', 0, 10);
   const pdfjsLib = await ensurePdfJsLoaded();
 
-  onProgress('Đang phân tích cấu trúc các trang sách...', 0, 1);
+  onProgress('Đang phân tích cấu trúc các trang sách...', 1, 10);
   const arrayBuffer = await file.arrayBuffer();
   const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
   const totalPagesInDoc = pdfDoc.numPages;
@@ -78,18 +116,20 @@ export async function extractPdfToFlipbookImages(
 
   for (let pageNum = 1; pageNum <= pagesToExtract; pageNum++) {
     onProgress(
-      `Đang trích xuất & tối ưu trang ${pageNum} / ${pagesToExtract} (Tổng ${totalPagesInDoc} trang)...`,
+      `Đang trích xuất trang ${pageNum} / ${pagesToExtract} (Tổng ${totalPagesInDoc} trang)...`,
       pageNum,
       pagesToExtract
     );
 
     const page = await pdfDoc.getPage(pageNum);
-    // Scale 1.8 để text và hình giải phẫu sắc nét trên cả màn hình Retina
-    const viewport = page.getViewport({ scale: 1.8 });
+    const unscaledViewport = page.getViewport({ scale: 1 });
+    // Giới hạn chiều rộng tối đa 1400px để vừa siêu nét Retina vừa nhẹ bộ nhớ di động
+    const scale = Math.min(1.8, Math.max(1.0, 1400 / (unscaledViewport.width || 800)));
+    const viewport = page.getViewport({ scale });
 
     const canvas = document.createElement('canvas');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
+    canvas.width = Math.floor(viewport.width);
+    canvas.height = Math.floor(viewport.height);
     const ctx = canvas.getContext('2d');
 
     if (!ctx) {
@@ -98,20 +138,33 @@ export async function extractPdfToFlipbookImages(
 
     await page.render({ canvasContext: ctx, viewport }).promise;
 
-    // Chuyển sang WebP / JPEG blob
+    // Chuyển sang JPEG nén 85% tối ưu
     const blob = await new Promise<Blob | null>((resolve) => {
-      canvas.toBlob((b) => resolve(b), 'image/jpeg', 0.88);
+      canvas.toBlob((b) => resolve(b), 'image/jpeg', 0.85);
     });
 
     if (blob) {
-      const cleanBaseName = file.name.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9_\u00C0-\u024F\u1EA0-\u1EF9-]/g, '_');
-      const pageFile = new File([blob], `${cleanBaseName}_trang_${pageNum}.jpg`, { type: 'image/jpeg' });
-      
+      const cleanBaseName = file.name
+        .replace(/\.[^/.]+$/, '')
+        .replace(/[^a-zA-Z0-9_\u00C0-\u024F\u1EA0-\u1EF9-]/g, '_');
+      const pageFile = new File([blob], `${cleanBaseName}_trang_${pageNum}.jpg`, {
+        type: 'image/jpeg',
+      });
+
       const uploadRes = await uploadImageFile(pageFile);
       if (uploadRes && uploadRes.url) {
         pageUrls.push(uploadRes.url);
       }
     }
+  }
+
+  // Tải tệp PDF gốc lên hệ thống lưu trữ (an toàn, không làm nghẽn tiến trình trích xuất)
+  let docFile: { url: string; fileName: string; sizeText: string } | null = null;
+  try {
+    onProgress('Đang hoàn tất lưu tệp tài liệu...', pagesToExtract, pagesToExtract);
+    docFile = await uploadDocumentFile(file);
+  } catch (err: any) {
+    console.warn('[PDF Raw Attachment skipped/warning]:', err?.message || err);
   }
 
   onProgress(`Đã hoàn tất trích xuất ${pageUrls.length} trang sách 3D!`, pagesToExtract, pagesToExtract);

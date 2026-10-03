@@ -23,10 +23,12 @@ import {
   AlignCenter,
   AlignJustify,
   Type,
+  HelpCircle,
 } from 'lucide-react';
 import { Block, Image as ImageType, FileItem, Video } from '../../lib/types';
 import { extractYouTubeId, fetchYouTubeMeta } from '../../lib/youtube';
 import { uploadImageFile, uploadPdfFile } from '../../lib/storageUpload';
+import { generateUuid } from '../../lib/uuid';
 
 const TITLE_COLORS = [
   { name: 'Đen than', hex: '#1E293B' },
@@ -209,6 +211,45 @@ export default function EditBlockModal({
   const [rightLinesText, setRightLinesText] = useState(
     block.type === 'comparison' && block.data.right_lines ? block.data.right_lines.join('\n') : ''
   );
+
+  // State cho FAQ block
+  const [faqTitle, setFaqTitle] = useState(
+    block.type === 'faq' ? block.data.title || 'Hỏi - Đáp Thường Gặp (FAQ)' : 'Hỏi - Đáp Thường Gặp (FAQ)'
+  );
+  const [faqItems, setFaqItems] = useState<Array<{ id: string; question: string; answer: string }>>(
+    block.type === 'faq' && Array.isArray(block.data.items)
+      ? block.data.items.map((it) => ({ ...it }))
+      : []
+  );
+
+  const handleAddFaqItem = () => {
+    setFaqItems([
+      ...faqItems,
+      {
+        id: generateUuid(),
+        question: 'Câu hỏi mới?',
+        answer: 'Nội dung giải thích chi tiết...',
+      },
+    ]);
+  };
+
+  const handleUpdateFaqItem = (id: string, updates: Partial<{ question: string; answer: string }>) => {
+    setFaqItems(faqItems.map((item) => (item.id === id ? { ...item, ...updates } : item)));
+  };
+
+  const handleDeleteFaqItem = (id: string) => {
+    setFaqItems(faqItems.filter((item) => item.id !== id));
+  };
+
+  const handleMoveFaqItem = (index: number, direction: 'up' | 'down') => {
+    const nextIndex = direction === 'up' ? index - 1 : index + 1;
+    if (nextIndex < 0 || nextIndex >= faqItems.length) return;
+    const next = [...faqItems];
+    const temp = next[index];
+    next[index] = next[nextIndex];
+    next[nextIndex] = temp;
+    setFaqItems(next);
+  };
 
   if (!isOpen) return null;
 
@@ -401,6 +442,32 @@ export default function EditBlockModal({
           left_lines: leftLines.length > 0 ? leftLines : ['Nội dung cột 1'],
           right_title: rightTitle.trim() || 'Tránh làm / Nguy cơ thoái hóa',
           right_lines: rightLines.length > 0 ? rightLines : ['Nội dung cột 2'],
+        },
+      };
+      onSaveBlock(updated);
+    } else if (block.type === 'faq') {
+      const cleanItems = faqItems
+        .map((it) => ({
+          id: it.id || generateUuid(),
+          question: it.question.trim(),
+          answer: it.answer.trim(),
+        }))
+        .filter((it) => it.question.length > 0 || it.answer.length > 0);
+
+      const updated: Block = {
+        ...block,
+        data: {
+          title: faqTitle.trim() || 'Hỏi - Đáp Thường Gặp (FAQ)',
+          items:
+            cleanItems.length > 0
+              ? cleanItems
+              : [
+                  {
+                    id: generateUuid(),
+                    question: 'Câu hỏi mới?',
+                    answer: 'Nội dung giải thích...',
+                  },
+                ],
         },
       };
       onSaveBlock(updated);
@@ -1592,6 +1659,126 @@ export default function EditBlockModal({
                     className="w-full p-3 rounded-[10px] bg-white border border-[#9B3B32]/30 text-[15px] text-ink leading-relaxed"
                   />
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Form chỉnh sửa khối FAQ (Accordion) */}
+          {block.type === 'faq' && (
+            <div className="flex flex-col gap-3.5">
+              {/* Tiêu đề khối FAQ */}
+              <div className="p-3.5 rounded-[16px] bg-slate-50 dark:bg-white/5 border border-line flex flex-col gap-2">
+                <label className="text-[13px] font-black text-ink uppercase tracking-wide flex items-center gap-1.5">
+                  <HelpCircle size={15} className="text-purple-700 dark:text-purple-300" />
+                  <span>Tiêu đề khối Hỏi - Đáp</span>
+                </label>
+                <input
+                  type="text"
+                  value={faqTitle}
+                  onChange={(e) => setFaqTitle(e.target.value)}
+                  placeholder="Ví dụ: Hỏi - Đáp Thường Gặp (FAQ)"
+                  className="w-full h-9.5 px-3 rounded-[10px] bg-white dark:bg-[#160E2E] border border-line text-[14px] font-bold text-ink focus:border-primary focus:outline-hidden"
+                />
+              </div>
+
+              {/* Danh sách các câu hỏi & trả lời */}
+              <div className="flex flex-col gap-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[13px] font-black text-ink uppercase tracking-wide">
+                    Danh sách câu hỏi & trả lời ({faqItems.length})
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleAddFaqItem}
+                    className="flex items-center gap-1 h-7.5 px-2.5 rounded-[8px] bg-primary text-white text-[12px] font-bold hover:bg-primary-hover cursor-pointer shadow-2xs"
+                  >
+                    <Plus size={13} strokeWidth={2.5} />
+                    <span>Thêm câu hỏi</span>
+                  </button>
+                </div>
+
+                {faqItems.length === 0 ? (
+                  <div className="p-5 rounded-[14px] border border-dashed border-line text-center flex flex-col items-center justify-center gap-1.5 bg-slate-50/50">
+                    <HelpCircle size={22} className="text-muted/60" />
+                    <p className="text-[12.5px] text-muted font-medium">Chưa có câu hỏi nào trong khối này.</p>
+                    <button
+                      type="button"
+                      onClick={handleAddFaqItem}
+                      className="text-[12px] font-bold text-primary hover:underline cursor-pointer"
+                    >
+                      + Nhấn vào đây để thêm câu hỏi đầu tiên
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    {faqItems.map((item, idx) => (
+                      <div
+                        key={item.id || idx}
+                        className="p-3 sm:p-3.5 rounded-[16px] bg-white dark:bg-[#1A0E35] border border-line shadow-xs flex flex-col gap-2.5"
+                      >
+                        <div className="flex items-center justify-between pb-1.5 border-b border-line/60">
+                          <span className="text-[11px] font-extrabold text-purple-800 dark:text-purple-300 bg-purple-100 dark:bg-purple-950 px-2 py-0.5 rounded-full">
+                            Câu hỏi #{idx + 1}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              disabled={idx === 0}
+                              onClick={() => handleMoveFaqItem(idx, 'up')}
+                              className="w-6.5 h-6.5 rounded-[6px] bg-surface-2 text-muted hover:text-ink disabled:opacity-30 flex items-center justify-center cursor-pointer"
+                              title="Lên trên"
+                            >
+                              <ChevronUp size={13} />
+                            </button>
+                            <button
+                              type="button"
+                              disabled={idx === faqItems.length - 1}
+                              onClick={() => handleMoveFaqItem(idx, 'down')}
+                              className="w-6.5 h-6.5 rounded-[6px] bg-surface-2 text-muted hover:text-ink disabled:opacity-30 flex items-center justify-center cursor-pointer"
+                              title="Xuống dưới"
+                            >
+                              <ChevronDown size={13} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteFaqItem(item.id)}
+                              className="w-6.5 h-6.5 rounded-[6px] bg-red-50 text-red-600 hover:bg-red-100 flex items-center justify-center ml-0.5 cursor-pointer"
+                              title="Xóa câu hỏi này"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[11.5px] font-bold text-ink">
+                            Câu hỏi <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={item.question}
+                            onChange={(e) => handleUpdateFaqItem(item.id, { question: e.target.value })}
+                            placeholder="Ví dụ: Tại sao cần duy trì tư thế đúng khi làm việc?"
+                            className="w-full h-8.5 px-2.5 rounded-[8px] bg-surface border border-line text-[13px] font-bold text-ink focus:border-primary focus:outline-hidden"
+                          />
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[11.5px] font-bold text-ink">
+                            Câu trả lời giải thích <span className="text-red-500">*</span>
+                          </label>
+                          <textarea
+                            rows={3}
+                            value={item.answer}
+                            onChange={(e) => handleUpdateFaqItem(item.id, { answer: e.target.value })}
+                            placeholder="Nhập nội dung giải đáp khoa học, rõ ràng và dễ hiểu..."
+                            className="w-full p-2.5 rounded-[8px] bg-surface border border-line text-[12.5px] text-ink leading-relaxed focus:border-primary focus:outline-hidden resize-none"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}

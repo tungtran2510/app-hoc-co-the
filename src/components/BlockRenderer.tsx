@@ -6,6 +6,7 @@ import ImagesBlock from './blocks/ImagesBlock';
 import LinksBlock from './blocks/LinksBlock';
 import FilesBlock from './blocks/FilesBlock';
 import ComparisonBlock from './blocks/ComparisonBlock';
+import FaqBlock from './blocks/FaqBlock';
 import { FontSizeOption } from './PageHeaderBar';
 
 interface BlockRendererProps {
@@ -136,6 +137,16 @@ export default function BlockRenderer({
           leftLines={block.data.left_lines}
           rightTitle={block.data.right_title}
           rightLines={block.data.right_lines}
+          fontSizeMode={fontSizeMode}
+        />
+      );
+
+    case 'faq':
+      return (
+        <FaqBlock
+          blockId={blockId}
+          title={block.data.title}
+          items={block.data.items}
           fontSizeMode={fontSizeMode}
         />
       );

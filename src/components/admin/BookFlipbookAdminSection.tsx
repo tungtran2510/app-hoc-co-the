@@ -280,8 +280,8 @@ export default function BookFlipbookAdminSection({
                 {effectivePages.length} trang
               </span>
             </div>
-            <p className="text-[11.5px] text-slate-600 dark:text-purple-200/70">
-              Nạp từ file PDF, tài liệu Word hoặc ảnh trang sách để độc giả lật trang 3D chân thực
+            <p className="text-[11px] text-slate-500 dark:text-purple-200/70">
+              Trình đọc lật trang 3D trực tiếp cho độc giả
             </p>
           </div>
         </div>
@@ -496,7 +496,7 @@ export default function BookFlipbookAdminSection({
         <div className="space-y-2 pt-1">
           <div className="flex items-center justify-between">
             <span className="text-[11.5px] font-bold text-slate-700 dark:text-purple-200">
-              Danh sách các trang sách đọc thử (Bấm vào nút đỏ để xóa trang):
+              Trang xem thử 3D ({effectivePages.length}):
             </span>
             <button
               type="button"
@@ -536,14 +536,9 @@ export default function BookFlipbookAdminSection({
           </div>
         </div>
       ) : (
-        <div className="p-4 rounded-[12px] border-2 border-dashed border-slate-200 dark:border-purple-500/20 text-center bg-white/50 dark:bg-white/5 space-y-1">
-          <BookOpen size={22} className="mx-auto text-slate-400 dark:text-purple-300/50" />
-          <p className="text-[12px] font-bold text-slate-600 dark:text-purple-200">
-            Chưa có trang đọc thử 3D nào
-          </p>
-          <p className="text-[11px] text-slate-400 dark:text-purple-400/60 max-w-sm mx-auto">
-            Hãy chọn nút &quot;File PDF&quot; để tự động bóc tách trang, hoặc &quot;Bộ Ảnh Trang&quot; để tạo trải nghiệm lật trang chân thực cho độc giả.
-          </p>
+        <div className="py-3 px-3.5 rounded-[12px] border border-dashed border-slate-200 dark:border-purple-500/20 text-center bg-white/40 dark:bg-white/5 flex items-center justify-center gap-2 text-slate-500 dark:text-purple-300/70 text-[11.5px] font-medium">
+          <BookOpen size={16} className="text-slate-400 shrink-0" />
+          <span>Chưa có trang 3D. Chọn nút <strong>File PDF</strong> hoặc <strong>Bộ Ảnh Trang</strong> ở trên để nạp nhanh.</span>
         </div>
       )}
 

@@ -18,6 +18,7 @@ import {
   FileArchive,
   Columns2,
   Code,
+  HelpCircle,
 } from 'lucide-react';
 import { Block } from '../../lib/types';
 import { generateUuid } from '../../lib/uuid';
@@ -152,6 +153,30 @@ export default function AddBlockDrawer({
             'Cúi gập cổ nhìn điện thoại quá lâu',
             'Ngồi vắt chéo chân hoặc gù lưng',
             'Mang vác vật nặng sai tư thế',
+          ],
+        },
+      };
+    } else if (type === 'faq') {
+      newBlock = {
+        id,
+        page_id: pageId,
+        type: 'faq',
+        display_style: 'accordion',
+        sort_order: nextSortOrder,
+        is_visible: true,
+        data: {
+          title: 'Hỏi - Đáp Thường Gặp (FAQ)',
+          items: [
+            {
+              id: generateUuid(),
+              question: 'Tại sao cần chăm sóc cột sống đúng cách mỗi ngày?',
+              answer: 'Cột sống là trụ cột nâng đỡ toàn bộ cơ thể và bảo vệ tủy sống. Duy trì tư thế đúng và vận động hợp lý giúp ngăn ngừa thoát vị đĩa đệm và thoái hóa sớm.',
+            },
+            {
+              id: generateUuid(),
+              question: 'Dấu hiệu nào cho thấy tôi nên đi khám chuyên khoa?',
+              answer: 'Khi có cơn đau lan xuống tay/chân, tê bì, yếu cơ hoặc đau kéo dài trên 1-2 tuần không thuyên giảm khi nghỉ ngơi.',
+            },
           ],
         },
       };
@@ -317,6 +342,14 @@ export default function AddBlockDrawer({
               >
                 <Code size={20} className="text-primary dark:text-purple-300 shrink-0" />
                 <span className="text-ink dark:text-white">Khối HTML tùy biến (Rich HTML)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => createAndAdd('faq', 'accordion')}
+                className="col-span-2 flex items-center justify-center gap-2.5 p-3 rounded-[16px] bg-gradient-to-r from-purple-50 to-emerald-50 dark:from-purple-950/60 dark:to-emerald-950/60 hover:opacity-95 transition-all font-bold text-[15px] border border-purple-200 dark:border-purple-500/40 shadow-2xs"
+              >
+                <HelpCircle size={20} className="text-purple-700 dark:text-purple-300 shrink-0" />
+                <span className="text-ink dark:text-white">Khối Hỏi - Đáp (FAQ Accordion)</span>
               </button>
             </div>
           </div>
