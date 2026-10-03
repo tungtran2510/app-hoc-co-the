@@ -731,3 +731,9 @@ html.dark .animate-bio-breathing {
 
 
 
+
+/* Gi?m d? d?m tiêu d? cho d? nhìn, d?ng b? Be Vietnam Pro */
+html h1, html h2, html h3, html h4, html h5, html h6 { font-weight: 600 !important; letter-spacing: -0.01em; }
+html .font-black { font-weight: 700; }
+html .font-extrabold { font-weight: 600; }
+
