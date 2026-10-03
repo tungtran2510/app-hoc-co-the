@@ -26,6 +26,7 @@ interface BlockRendererProps {
   pageSlugMap?: Record<string, { slug: string; topicSlug: string; title: string; cover_url?: string }>;
   nextPage?: { slug: string; title: string; orderNumber: number } | null;
   summaryContent?: React.ReactNode;
+  progressAction?: React.ReactNode;
   resourcesContent?: React.ReactNode;
   activeTab?: 'syllabus' | 'summary' | 'resources';
   onTabChange?: (tab: 'syllabus' | 'summary' | 'resources') => void;
@@ -48,6 +49,7 @@ export default function BlockRenderer({
   pageSlugMap,
   nextPage,
   summaryContent,
+  progressAction,
   resourcesContent,
   activeTab,
   onTabChange,
@@ -95,6 +97,7 @@ export default function BlockRenderer({
           pageCoverUrl={pageCoverUrl}
           nextPage={nextPage}
           summaryContent={summaryContent}
+          progressAction={progressAction}
           resourcesContent={resourcesContent}
           activeTab={activeTab}
           onTabChange={onTabChange}

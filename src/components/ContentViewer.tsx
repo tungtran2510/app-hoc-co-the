@@ -860,6 +860,30 @@ export default function ContentViewer({
           pageNumber={pageIndex}
           pageCoverUrl={currentPage.cover_url}
           pageSlugMap={pageSlugMap}
+          progressAction={
+            <button
+              type="button"
+              onClick={handleToggleCompleted}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[11.5px] font-bold transition-all shadow-2xs cursor-pointer active:scale-95 shrink-0 ${
+                isCompleted
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-500 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-500 animate-breathe-emerald'
+                  : 'bg-white text-slate-700 border-slate-300 hover:border-emerald-500 hover:text-emerald-700 dark:bg-[#1E1342] dark:text-purple-200 dark:border-purple-800/60'
+              }`}
+              title={isCompleted ? 'Bấm để hủy đánh dấu' : 'Bấm để đánh dấu đã hiểu bài này'}
+            >
+              {isCompleted ? (
+                <>
+                  <CheckCircle2 size={15} className="text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />
+                  <span>Đã hiểu bài ✓</span>
+                </>
+              ) : (
+                <>
+                  <Circle size={14} className="text-slate-400 dark:text-purple-400 stroke-[2]" />
+                  <span>Đánh dấu đã hiểu</span>
+                </>
+              )}
+            </button>
+          }
           nextPage={
             nextPage
               ? {
@@ -1011,47 +1035,9 @@ export default function ContentViewer({
 
       {/* 3. Phần đầu bài viết: Badge BÀI 01 / 04 + Tiêu đề lớn (Không lặp lại tên chủ đề) */}
       <section className="flex flex-col gap-1.5 mt-1">
-        <div className="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
-          <div className="flex items-center gap-1.5 shrink-0">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-300 text-blue-900 dark:bg-purple-950/60 dark:border-purple-800/40 dark:text-purple-300 text-[12px] font-black tracking-wider uppercase shrink-0">
-              <span>BÀI {formattedOrder}</span>
-              {totalPages > 0 && (
-                <span className="text-blue-900/70 dark:text-purple-300/60 font-semibold">/ {String(totalPages).padStart(2, '0')}</span>
-              )}
-            </div>
-
-            {estimatedStudyMinutes > 0 && (
-              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200/90 dark:bg-purple-950/50 dark:border-purple-800/40 dark:text-purple-300 text-[11px] font-bold shrink-0">
-                <Clock size={12} className="text-slate-500 dark:text-purple-400 stroke-[2.3]" />
-                <span>~{estimatedStudyMinutes} phút</span>
-              </div>
-            )}
-          </div>
+        <div className="flex items-center justify-end gap-2 flex-wrap sm:flex-nowrap">
 
           <div className="flex items-center gap-2 shrink-0">
-            {/* Thanh Tab nhỏ Đã hiểu bài trên cùng chuẩn người dùng yêu cầu */}
-            <button
-              type="button"
-              onClick={handleToggleCompleted}
-              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[12px] font-bold transition-all shadow-2xs cursor-pointer active:scale-95 shrink-0 ${
-                isCompleted
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-500 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-500 animate-breathe-emerald'
-                  : 'bg-white text-slate-700 border-slate-300 hover:border-emerald-500 hover:text-emerald-700 dark:bg-[#1E1342] dark:text-purple-200 dark:border-purple-800/60'
-              }`}
-              title={isCompleted ? 'Bấm để hủy đánh dấu' : 'Bấm để đánh dấu đã hiểu bài này'}
-            >
-              {isCompleted ? (
-                <>
-                  <CheckCircle2 size={15} className="text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />
-                  <span>Đã hiểu bài ✓</span>
-                </>
-              ) : (
-                <>
-                  <Circle size={14} className="text-slate-400 dark:text-purple-400 stroke-[2]" />
-                  <span>Đánh dấu đã hiểu</span>
-                </>
-              )}
-            </button>
 
             {isAdmin && (
               <div className="flex items-center gap-1.5 shrink-0">

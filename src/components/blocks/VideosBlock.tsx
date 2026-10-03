@@ -41,6 +41,7 @@ interface VideosBlockProps {
   pageCoverUrl?: string | null;
   nextPage?: { slug: string; title: string; orderNumber: number } | null;
   summaryContent?: React.ReactNode;
+  progressAction?: React.ReactNode;
   resourcesContent?: React.ReactNode;
   activeTab?: 'syllabus' | 'summary' | 'resources';
   onTabChange?: (tab: 'syllabus' | 'summary' | 'resources') => void;
@@ -63,6 +64,7 @@ export default function VideosBlock({
   pageCoverUrl,
   nextPage,
   summaryContent,
+  progressAction,
   resourcesContent,
   activeTab,
   onTabChange,
@@ -461,50 +463,13 @@ export default function VideosBlock({
     >
       {/* KHUNG TRÌNH PHÁT VIDEO ĐẲNG CẤP (TỰ ĐỘNG THÍCH ỨNG DẠNG DỌC 9:16 HOẶC DẠNG NGANG 16:9 + TỰ ĐỘNG PHÁT) */}
       <div
-        className={`relative w-full p-2 sm:p-2.5 rounded-[22px] sm:rounded-[26px] bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 border-[2px] border-slate-700/80 shadow-[0_12px_28px_rgba(15,23,42,0.22)] dark:border-purple-800/50 transition-all duration-300 ${
+        className={`relative w-full p-0 overflow-hidden rounded-[18px] sm:rounded-[22px] bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 border-[2px] border-slate-700/80 shadow-[0_12px_28px_rgba(15,23,42,0.22)] dark:border-purple-800/50 transition-all duration-300 ${
           isVertical ? 'max-w-[340px] sm:max-w-[360px] mx-auto' : 'max-w-full'
         }`}
       >
-        {/* Header thông tin màn hình & nút đổi dạng khung: Luôn nằm trên 1 dòng duy nhất, không xuống dòng */}
-        <div className="flex items-center justify-between gap-1.5 px-2 pb-1.5 text-[11px] font-semibold text-slate-300 flex-nowrap overflow-hidden">
-          <div className="flex items-center gap-1.5 min-w-0 shrink">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-            <span className="tracking-wide uppercase text-[10px] font-extrabold text-slate-200 whitespace-nowrap">
-              {isVertical ? 'VIDEO DỌC · SHORTS' : 'VIDEO BÀI GIẢNG'}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-1.5 shrink-0">
-            {/* Nút bấm chuyển đổi nhanh tỷ lệ khung hình Dọc / Ngang */}
-            <button
-              type="button"
-              onClick={() => {
-                playTapSound();
-                setManualOverrideAspect((prev) => {
-                  if (prev === 'vertical') return 'horizontal';
-                  if (prev === 'horizontal') return 'vertical';
-                  return isDetectedVertical ? 'horizontal' : 'vertical';
-                });
-              }}
-              className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border transition-colors cursor-pointer whitespace-nowrap ${
-                isVertical
-                  ? 'bg-blue-900/80 text-blue-100 border-blue-400/50 hover:bg-blue-800'
-                  : 'bg-slate-800/80 text-blue-200 border-blue-600/40 hover:bg-slate-700'
-              }`}
-              title="Bấm để chuyển đổi giữa khung dọc và khung ngang"
-            >
-              <span>{isVertical ? '↕ Dạng dọc' : '↔ Dạng ngang'}</span>
-            </button>
-
-            <span className="text-[10px] px-1.5 py-0.2 rounded-xs bg-slate-800 text-slate-300 font-mono border border-slate-700/60 whitespace-nowrap shrink-0">
-              HD 1080p
-            </span>
-          </div>
-        </div>
-
         {/* Khung màn hình hiển thị: Tự động co giãn theo dạng dọc (9:16) hoặc dạng ngang (16:9) */}
         <div
-          className={`relative w-full rounded-[15px] sm:rounded-[18px] bg-black overflow-hidden shadow-inner flex items-center justify-center border border-white/10 transition-all duration-300 ${
+          className={`relative w-full rounded-none bg-black overflow-hidden flex items-center justify-center transition-all duration-300 ${
             isVertical ? 'aspect-[9/16] max-h-[68vh]' : 'aspect-video'
           }`}
         >
@@ -620,11 +585,23 @@ export default function VideosBlock({
 
       {/* 1. THANH TÙY CHỈNH TỐC ĐỘ PHÁT VIDEO CHUYÊN NGHIỆP (ĐẶT Ở TRÊN, SÁT DƯỚI KHUNG VIDEO THEO YÊU CẦU) */}
       <div className="flex items-center justify-between gap-1.5 px-2.5 py-1 rounded-[11px] bg-slate-50 dark:bg-[#160D30]/80 border border-slate-200/80 dark:border-purple-900/40 text-[11px] font-bold">
-        <span className="flex items-center gap-1.5 text-slate-700 dark:text-purple-300 font-extrabold shrink-0">
-          <Gauge size={13} className="text-blue-700 dark:text-[#93C5FD]" />
-          <span>Tốc độ phát:</span>
-        </span>
+        <button
+          type="button"
+          onClick={() => {
+            playTapSound();
+            setManualOverrideAspect((prev) => {
+              if (prev === 'vertical') return 'horizontal';
+              if (prev === 'horizontal') return 'vertical';
+              return isDetectedVertical ? 'horizontal' : 'vertical';
+            });
+          }}
+          className="flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full border border-blue-300 bg-blue-50 text-blue-900 dark:bg-purple-950/60 dark:border-purple-800/50 dark:text-blue-200 cursor-pointer whitespace-nowrap shrink-0"
+          title="Bấm để chuyển đổi giữa khung dọc và khung ngang"
+        >
+          <span>{isVertical ? '↕ Dạng dọc' : '↔ Dạng ngang'}</span>
+        </button>
         <div className="flex items-center gap-1 shrink-0 overflow-x-auto">
+          <Gauge size={13} className="text-blue-700 dark:text-[#93C5FD] shrink-0" />
           {[0.75, 1, 1.25, 1.5, 2].map((spd) => (
             <button
               key={spd}
@@ -647,7 +624,7 @@ export default function VideosBlock({
       <div className="flex flex-col gap-1 px-0.5">
         <div className="flex items-center justify-between text-[12.5px] font-bold text-ink">
           <span className="flex items-center gap-1.5 text-muted">
-            <span>Tiến độ bài học:</span>
+            <span>Tiến độ:</span>
             <strong className="text-blue-700 dark:text-[#93C5FD] font-black">
               {Math.min(100, Math.round(((videoList.filter((_, idx) => watchedList.includes(idx + 1)).length) / (videoList.length || 1)) * 100))}%
             </strong>
@@ -655,7 +632,10 @@ export default function VideosBlock({
               ({videoList.filter((_, idx) => watchedList.includes(idx + 1)).length}/{videoList.length} video)
             </span>
           </span>
-          {videoList.filter((_, idx) => watchedList.includes(idx + 1)).length === videoList.length && videoList.length > 0 && (
+          {progressAction ? (
+            <div className="shrink-0">{progressAction}</div>
+          ) : null}
+          {!progressAction && videoList.filter((_, idx) => watchedList.includes(idx + 1)).length === videoList.length && videoList.length > 0 && (
             <span className="text-emerald-700 dark:text-emerald-300 text-[10.5px] font-black bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-500/30 px-2 py-0.5 rounded-full">
               ĐÃ HOÀN THÀNH
             </span>
