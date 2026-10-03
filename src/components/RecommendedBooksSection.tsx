@@ -39,6 +39,8 @@ interface RecommendedBooksSectionProps {
   onMoveUp?: () => void;
   onMoveDown?: () => void;
   onOpenReorderModal?: () => void;
+  hotline?: string | null;
+  zaloUrl?: string | null;
 }
 
 export default function RecommendedBooksSection({
@@ -53,6 +55,8 @@ export default function RecommendedBooksSection({
   onMoveUp,
   onMoveDown,
   onOpenReorderModal,
+  hotline,
+  zaloUrl,
 }: RecommendedBooksSectionProps) {
   const [title, setTitle] = useState(initialTitle || 'Tài Liệu Y Khoa');
   const [subtitle, setSubtitle] = useState(
@@ -530,6 +534,8 @@ export default function RecommendedBooksSection({
       <BookDetailModal
         book={selectedUnifiedBook}
         isAdmin={isAdmin}
+        hotline={hotline}
+        zaloUrl={zaloUrl}
         onClose={() => setSelectedBook(null)}
         onEdit={() => {
           const b = selectedBook;

@@ -225,7 +225,7 @@ export default function QbizBooksOpeningSplash({
 
           {/* TRANG LÕI BÊN PHẢI (RIGHT INNER PAGE - NẰM TRONG SÁCH) */}
           <div
-            className="absolute inset-0 rounded-r-[12px] rounded-l-[4px] p-5 flex flex-col justify-between overflow-hidden shadow-2xl z-0"
+            className="book-inner-page absolute inset-0 rounded-r-[12px] rounded-l-[4px] p-5 flex flex-col justify-between overflow-hidden shadow-2xl z-0"
             style={{
               backgroundColor: '#FAF7F0',
               backgroundImage: `
@@ -242,7 +242,10 @@ export default function QbizBooksOpeningSplash({
 
             {/* Phần đầu trang trong */}
             <div className="flex flex-col items-center text-center mt-2 relative z-10">
-              <span className="text-[9px] font-black uppercase tracking-[0.25em] text-amber-800/70 mb-1">
+              <span
+                className="text-[9px] font-black uppercase tracking-[0.25em] mb-1"
+                style={{ color: '#92400E' }}
+              >
                 PHIÊN BẢN ĐIỆN TỬ TƯƠNG TÁC
               </span>
               <div className="w-12 h-12 rounded-[14px] bg-[#0C152B] border border-amber-400/60 p-0.5 shadow-md flex items-center justify-center mb-1.5">
@@ -252,10 +255,16 @@ export default function QbizBooksOpeningSplash({
                   className="w-full h-full object-cover rounded-[11px]"
                 />
               </div>
-              <h3 className="text-[17px] font-black text-slate-900 tracking-tight leading-tight">
+              <h3
+                className="text-[17px] font-black tracking-tight leading-tight"
+                style={{ color: '#0F172A' }}
+              >
                 CƠ THỂ NGƯỜI
               </h3>
-              <p className="text-[11px] font-bold text-amber-700 uppercase tracking-wider mt-0.5">
+              <p
+                className="text-[11px] font-bold uppercase tracking-wider mt-0.5"
+                style={{ color: '#B45309' }}
+              >
                 KHOA HỌC & GIẢI PHẪU 3D
               </p>
             </div>
@@ -269,10 +278,16 @@ export default function QbizBooksOpeningSplash({
                 <span className="w-12 h-[1px] bg-amber-400/50" />
                 <span>✦</span>
               </div>
-              <p className="text-[11.5px] italic text-slate-700 leading-relaxed font-serif px-2">
+              <p
+                className="text-[11.5px] italic leading-relaxed font-serif px-2"
+                style={{ color: '#334155' }}
+              >
                 "Hiểu rõ cấu trúc là chìa khóa để bảo vệ cột sống và chăm sóc sức khỏe chủ động trọn đời."
               </p>
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-2">
+              <span
+                className="text-[10px] font-black uppercase tracking-widest mt-2"
+                style={{ color: '#64748B' }}
+              >
                 — DR. TÙNG DINH DƯỠNG —
               </span>
             </div>

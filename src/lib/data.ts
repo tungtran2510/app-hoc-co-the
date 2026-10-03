@@ -47,6 +47,10 @@ export function normalizeRecommendedBooks(raw?: any): RecommendedBook[] {
     link_url: item.link_url || '',
     youtube_url: item.youtube_url || null,
     gallery_images: Array.isArray(item.gallery_images) ? item.gallery_images.filter(Boolean) : [],
+    flipbook_pages: Array.isArray(item.flipbook_pages) ? item.flipbook_pages.filter(Boolean) : [],
+    file_url: item.file_url || null,
+    file_name: item.file_name || null,
+    pdf_url: item.pdf_url || null,
     is_visible: item.is_visible !== undefined ? Boolean(item.is_visible) : true,
   }));
 }
@@ -59,23 +63,28 @@ export function normalizeAuthorProfile(raw?: any): AuthorProfile {
     ...DEFAULT_AUTHOR_PROFILE,
     ...raw,
     name: raw.name?.trim() ? raw.name : DEFAULT_AUTHOR_PROFILE.name,
-    title: raw.title?.trim() ? raw.title : DEFAULT_AUTHOR_PROFILE.title,
+    title: raw.title !== undefined && raw.title !== null ? raw.title : DEFAULT_AUTHOR_PROFILE.title,
     avatar_url: raw.avatar_url !== undefined && raw.avatar_url !== null && raw.avatar_url !== '' ? raw.avatar_url : DEFAULT_AUTHOR_PROFILE.avatar_url,
-    extra_title: raw.extra_title !== undefined && raw.extra_title !== null && raw.extra_title !== '' ? raw.extra_title : DEFAULT_AUTHOR_PROFILE.extra_title,
-    extra_content: raw.extra_content !== undefined && raw.extra_content !== null && raw.extra_content !== '' ? raw.extra_content : DEFAULT_AUTHOR_PROFILE.extra_content,
-    books: Array.isArray(raw.books) && raw.books.length > 0
+    extra_title: raw.extra_title !== undefined && raw.extra_title !== null ? raw.extra_title : DEFAULT_AUTHOR_PROFILE.extra_title,
+    extra_content: raw.extra_content !== undefined && raw.extra_content !== null ? raw.extra_content : DEFAULT_AUTHOR_PROFILE.extra_content,
+    books_title: raw.books_title !== undefined && raw.books_title !== null ? raw.books_title : 'Sách & Tác phẩm đã làm',
+    books_subtitle: raw.books_subtitle !== undefined && raw.books_subtitle !== null ? raw.books_subtitle : '',
+    contact_title: raw.contact_title !== undefined && raw.contact_title !== null ? raw.contact_title : 'Thông tin liên hệ & Kết nối',
+    contact_subtitle: raw.contact_subtitle !== undefined && raw.contact_subtitle !== null ? raw.contact_subtitle : 'Kết nối trực tiếp cùng chuyên gia / tác giả',
+    books: Array.isArray(raw.books)
       ? raw.books.map((b: any) => ({
           ...b,
           gallery_images: Array.isArray(b.gallery_images) ? b.gallery_images.filter(Boolean) : [],
+          flipbook_pages: Array.isArray(b.flipbook_pages) ? b.flipbook_pages.filter(Boolean) : [],
           is_visible: b.is_visible !== undefined ? Boolean(b.is_visible) : true,
         }))
       : DEFAULT_AUTHOR_PROFILE.books,
-    phone: raw.phone !== undefined && raw.phone !== null && raw.phone !== '' ? raw.phone : DEFAULT_AUTHOR_PROFILE.phone,
-    zalo_url: raw.zalo_url !== undefined && raw.zalo_url !== null && raw.zalo_url !== '' ? raw.zalo_url : DEFAULT_AUTHOR_PROFILE.zalo_url,
-    email: raw.email !== undefined && raw.email !== null && raw.email !== '' ? raw.email : DEFAULT_AUTHOR_PROFILE.email,
-    facebook_url: raw.facebook_url !== undefined && raw.facebook_url !== null && raw.facebook_url !== '' ? raw.facebook_url : DEFAULT_AUTHOR_PROFILE.facebook_url,
-    address: raw.address !== undefined && raw.address !== null && raw.address !== '' ? raw.address : DEFAULT_AUTHOR_PROFILE.address,
-    contact_note: raw.contact_note !== undefined && raw.contact_note !== null && raw.contact_note !== '' ? raw.contact_note : DEFAULT_AUTHOR_PROFILE.contact_note,
+    phone: raw.phone !== undefined && raw.phone !== null ? raw.phone : DEFAULT_AUTHOR_PROFILE.phone,
+    zalo_url: raw.zalo_url !== undefined && raw.zalo_url !== null ? raw.zalo_url : DEFAULT_AUTHOR_PROFILE.zalo_url,
+    email: raw.email !== undefined && raw.email !== null ? raw.email : DEFAULT_AUTHOR_PROFILE.email,
+    facebook_url: raw.facebook_url !== undefined && raw.facebook_url !== null ? raw.facebook_url : DEFAULT_AUTHOR_PROFILE.facebook_url,
+    address: raw.address !== undefined && raw.address !== null ? raw.address : DEFAULT_AUTHOR_PROFILE.address,
+    contact_note: raw.contact_note !== undefined && raw.contact_note !== null ? raw.contact_note : DEFAULT_AUTHOR_PROFILE.contact_note,
   };
 }
 
@@ -208,14 +217,13 @@ export async function getSettings(): Promise<Settings> {
             home_greeting: data.home_greeting || data.block_styles?.home_greeting || 'Xin chào!',
             home_title: data.home_title || data.block_styles?.home_title || 'Hôm nay mình học gì?',
             search_placeholder: data.search_placeholder || data.block_styles?.search_placeholder || 'Tìm bài, ví dụ: đĩa đệm',
-            topics_title: (data.topics_title && data.topics_title !== 'Chọn chủ đề') ? data.topics_title : (data.block_styles?.topics_title || 'Chuyên Đề Học'),
-            recommended_books_title: (data.recommended_books_title && data.recommended_books_title !== 'Tài Liệu Y Khoa Chuyên Sâu')
-              ? data.recommended_books_title
-              : (data.block_styles?.recommended_books_title && data.block_styles.recommended_books_title !== 'Tài Liệu Y Khoa Chuyên Sâu'
-                  ? data.block_styles.recommended_books_title
-                  : 'Tài Liệu Y Khoa'),
+            topics_title: data.topics_title || data.block_styles?.topics_title || 'Chuyên Đề Học',
+            recommended_books_title: data.recommended_books_title || data.block_styles?.recommended_books_title || 'Tài Liệu Y Khoa',
+            recommended_books_subtitle: data.recommended_books_subtitle || data.block_styles?.recommended_books_subtitle || 'Tài liệu tham khảo chuyên sâu giúp bạn hiểu và chăm sóc cơ thể mỗi ngày',
             recommended_books: normalizeRecommendedBooks(data.recommended_books || data.block_styles?.recommended_books),
             recommended_books_layout: data.recommended_books_layout || data.block_styles?.recommended_books_layout || 'grid',
+            flat_books_title: data.flat_books_title || data.block_styles?.flat_books_title || 'Tủ Sách Tối Giản',
+            flat_books: normalizeRecommendedBooks(data.flat_books || data.block_styles?.flat_books || DEFAULT_RECOMMENDED_BOOKS),
             home_sections_order: normalizeHomeSectionsOrder(data.home_sections_order || data.block_styles?.home_sections_order),
             hidden_home_sections: normalizeHiddenHomeSections(data.hidden_home_sections || data.block_styles?.hidden_home_sections),
             ai_training: normalizeAiTraining(data.ai_training || data.block_styles?.ai_training),

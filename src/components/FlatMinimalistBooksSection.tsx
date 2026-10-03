@@ -21,6 +21,7 @@ import SectionOrderControls from './admin/SectionOrderControls';
 import FlipbookViewer from './FlipbookViewer';
 import BookDetailModal from './BookDetailModal';
 import EditSingleRecommendedBookModal from './admin/EditSingleRecommendedBookModal';
+import { saveSettingsApi } from '../lib/apiAdmin';
 
 export const DEFAULT_FLAT_BOOKS: RecommendedBook[] = [
   {
@@ -101,6 +102,8 @@ interface FlatMinimalistBooksSectionProps {
   onMoveUp?: () => void;
   onMoveDown?: () => void;
   onOpenReorderModal?: () => void;
+  hotline?: string | null;
+  zaloUrl?: string | null;
 }
 
 export default function FlatMinimalistBooksSection({
@@ -113,6 +116,8 @@ export default function FlatMinimalistBooksSection({
   onMoveUp,
   onMoveDown,
   onOpenReorderModal,
+  hotline,
+  zaloUrl,
 }: FlatMinimalistBooksSectionProps) {
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -135,8 +140,42 @@ export default function FlatMinimalistBooksSection({
   const [selectedBook, setSelectedBook] = useState<RecommendedBook | null>(null);
   const [flipbookPreviewBook, setFlipbookPreviewBook] = useState<RecommendedBook | null>(null);
   const [editingSingleBook, setEditingSingleBook] = useState<RecommendedBook | null>(null);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [titleDraft, setTitleDraft] = useState<string>(title);
 
-  const handleMoveBook = (idx: number, dir: 'up' | 'down') => {
+  const handleSaveTitle = async () => {
+    const trimmed = titleDraft.trim() || 'Tủ Sách Tối Giản';
+    setTitle(trimmed);
+    setIsEditingTitle(false);
+    if (isAdmin) {
+      await saveSettingsApi({ flat_books_title: trimmed });
+    }
+  };
+
+  const handleAddNewBook = async () => {
+    const newBook: RecommendedBook = {
+      id: `flat-book-${Date.now()}`,
+      title: 'Tài liệu mới',
+      category: 'Chuyên Sâu',
+      badge_tag: 'MỚI',
+      tag: 'Tài Liệu Mới',
+      cover_url: null,
+      description: 'Mô tả ngắn gọn về tài liệu này...',
+      author: 'Tùng Dinh Dưỡng',
+      link_url: '',
+      youtube_url: null,
+      gallery_images: [],
+      is_visible: true,
+    };
+    const next = [...books, newBook];
+    setBooks(next);
+    if (isAdmin) {
+      await saveSettingsApi({ flat_books: next });
+    }
+    setEditingSingleBook(newBook);
+  };
+
+  const handleMoveBook = async (idx: number, dir: 'up' | 'down') => {
     const targetIdx = dir === 'up' ? idx - 1 : idx + 1;
     if (targetIdx < 0 || targetIdx >= books.length) return;
     const next = [...books];
@@ -144,27 +183,40 @@ export default function FlatMinimalistBooksSection({
     next[idx] = next[targetIdx];
     next[targetIdx] = temp;
     setBooks(next);
+    if (isAdmin) {
+      await saveSettingsApi({ flat_books: next });
+    }
   };
 
-  const handleToggleBookVisibility = (idx: number) => {
+  const handleToggleBookVisibility = async (idx: number) => {
     const next = [...books];
     next[idx] = {
       ...next[idx],
       is_visible: next[idx].is_visible === false ? true : false,
     };
     setBooks(next);
+    if (isAdmin) {
+      await saveSettingsApi({ flat_books: next });
+    }
   };
 
-  const handleDeleteBook = (idx: number) => {
+  const handleDeleteBook = async (idx: number) => {
     if (typeof window !== 'undefined' && !window.confirm('Bạn có chắc muốn xóa cuốn sách này khỏi khối tối giản?')) {
       return;
     }
     const next = books.filter((_, i) => i !== idx);
     setBooks(next);
+    if (isAdmin) {
+      await saveSettingsApi({ flat_books: next });
+    }
   };
 
-  const handleSaveSingleBook = (updated: RecommendedBook) => {
-    setBooks((prev) => prev.map((b) => (b.id === updated.id ? updated : b)));
+  const handleSaveSingleBook = async (updated: RecommendedBook) => {
+    const next = books.map((b) => (b.id === updated.id ? updated : b));
+    setBooks(next);
+    if (isAdmin) {
+      await saveSettingsApi({ flat_books: next });
+    }
     setEditingSingleBook(null);
   };
 
@@ -184,10 +236,8 @@ export default function FlatMinimalistBooksSection({
           onMoveDown={onMoveDown}
           onOpenReorderModal={onOpenReorderModal}
           onEdit={() => {
-            const newTitle = prompt('Nhập tiêu đề khối sách tối giản:', title);
-            if (newTitle && newTitle.trim()) {
-              setTitle(newTitle.trim());
-            }
+            setTitleDraft(title);
+            setIsEditingTitle(true);
           }}
           editLabel="Đổi tiêu đề"
         />
@@ -195,12 +245,65 @@ export default function FlatMinimalistBooksSection({
 
       {/* TIÊU ĐỀ KHỐI VÀ NÚT CHUYỂN ĐỔI CHẾ ĐỘ (LƯỚI / DANH SÁCH) */}
       <div className="flex items-center justify-between gap-2.5 px-0.5">
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="text-[18px] select-none">📖</span>
-          <h2 className="text-[18px] sm:text-[19px] font-black text-ink leading-tight truncate">
-            {title}
-          </h2>
-        </div>
+        {isAdmin && isEditingTitle ? (
+          <div className="flex items-center gap-1.5 flex-1 min-w-0">
+            <input
+              type="text"
+              value={titleDraft}
+              onChange={(e) => setTitleDraft(e.target.value)}
+              className="h-8 px-2.5 rounded-[8px] border border-primary text-[14px] font-bold text-ink focus:outline-hidden flex-1 max-w-[240px]"
+              autoFocus
+            />
+            <button
+              type="button"
+              onClick={handleSaveTitle}
+              className="h-8 px-2.5 rounded-[8px] bg-primary text-white text-[12px] font-bold cursor-pointer hover:bg-primary-dark"
+            >
+              Lưu
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setTitleDraft(title);
+                setIsEditingTitle(false);
+              }}
+              className="h-8 px-2 rounded-[8px] bg-surface-2 text-muted text-[12px] font-bold cursor-pointer hover:text-ink"
+            >
+              Hủy
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-[18px] select-none">📖</span>
+            <h2 className="text-[18px] sm:text-[19px] font-black text-ink leading-tight truncate">
+              {title}
+            </h2>
+            {isAdmin && (
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTitleDraft(title);
+                    setIsEditingTitle(true);
+                  }}
+                  className="w-6 h-6 rounded-[6px] bg-surface-2 text-muted hover:text-ink flex items-center justify-center cursor-pointer"
+                  title="Sửa tiêu đề"
+                >
+                  <Edit2 size={12} />
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAddNewBook}
+                  className="h-6 px-2 rounded-[6px] bg-primary-soft text-primary text-[11px] font-bold flex items-center gap-1 hover:bg-primary-soft/80 cursor-pointer shadow-2xs"
+                  title="Thêm sách vào tủ sách tối giản"
+                >
+                  <Plus size={11} strokeWidth={2.5} />
+                  <span>Thêm sách</span>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Nút chuyển đổi kiểu hiển thị tối giản */}
         <div className="inline-flex items-center bg-slate-100 dark:bg-[#1E293B] rounded-[10px] p-0.5 shadow-2xs shrink-0">
@@ -531,6 +634,9 @@ export default function FlatMinimalistBooksSection({
                 year: '2026',
                 youtube_url: selectedBook.youtube_url,
                 gallery_images: selectedBook.gallery_images,
+                flipbook_pages: selectedBook.flipbook_pages,
+                file_url: selectedBook.file_url,
+                file_name: selectedBook.file_name,
                 pdf_url: selectedBook.pdf_url,
                 link_url: selectedBook.link_url,
                 type: 'recommended',
@@ -538,6 +644,8 @@ export default function FlatMinimalistBooksSection({
             : null
         }
         isAdmin={isAdmin}
+        hotline={hotline}
+        zaloUrl={zaloUrl}
         onClose={() => setSelectedBook(null)}
         onEdit={() => {
           const b = selectedBook;

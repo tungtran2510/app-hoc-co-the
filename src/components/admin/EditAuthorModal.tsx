@@ -643,6 +643,34 @@ export default function EditAuthorModal({
           {/* TAB 2: QUẢN LÝ SÁCH ĐÃ LÀM */}
           {activeTab === 'books' && (
             <div className="flex flex-col gap-4">
+              {/* Tiêu đề & Mô tả hiển thị trên trang chủ */}
+              <div className="flex flex-col gap-2 p-3.5 rounded-[16px] bg-slate-50 dark:bg-white/5 border border-line">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[13px] font-bold text-ink">
+                    Tiêu đề khối sách (Hiển thị trên trang chủ)
+                  </label>
+                  <input
+                    type="text"
+                    value={profile.books_title ?? 'Sách & Tác phẩm đã làm'}
+                    onChange={(e) => setProfile({ ...profile, books_title: e.target.value })}
+                    placeholder="Mặc định: Sách & Tác phẩm đã làm"
+                    className="w-full h-10 px-3 rounded-[10px] border border-line text-[14px] text-ink font-bold focus:border-primary"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[12px] font-medium text-muted">
+                    Mô tả phụ khối sách (Tùy chọn)
+                  </label>
+                  <input
+                    type="text"
+                    value={profile.books_subtitle || ''}
+                    onChange={(e) => setProfile({ ...profile, books_subtitle: e.target.value })}
+                    placeholder="Ví dụ: Các ấn phẩm và công trình nghiên cứu đã phát hành..."
+                    className="w-full h-9 px-3 rounded-[8px] border border-line text-[13px] text-ink focus:border-primary"
+                  />
+                </div>
+              </div>
+
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="text-[15px] font-extrabold text-ink">
@@ -878,6 +906,34 @@ export default function EditAuthorModal({
           {/* TAB 3: THÔNG TIN LIÊN HỆ & KẾT NỐI */}
           {activeTab === 'contact' && (
             <div className="flex flex-col gap-4">
+              {/* Tiêu đề & Mô tả hiển thị trên trang chủ */}
+              <div className="flex flex-col gap-2 p-3.5 rounded-[16px] bg-slate-50 dark:bg-white/5 border border-line">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[13px] font-bold text-ink">
+                    Tiêu đề khối liên hệ (Hiển thị trên trang chủ)
+                  </label>
+                  <input
+                    type="text"
+                    value={profile.contact_title ?? 'Thông tin liên hệ & Kết nối'}
+                    onChange={(e) => setProfile({ ...profile, contact_title: e.target.value })}
+                    placeholder="Mặc định: Thông tin liên hệ & Kết nối"
+                    className="w-full h-10 px-3 rounded-[10px] border border-line text-[14px] text-ink font-bold focus:border-primary"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[12px] font-medium text-muted">
+                    Mô tả phụ khối liên hệ
+                  </label>
+                  <input
+                    type="text"
+                    value={profile.contact_subtitle ?? 'Kết nối trực tiếp cùng chuyên gia / tác giả'}
+                    onChange={(e) => setProfile({ ...profile, contact_subtitle: e.target.value })}
+                    placeholder="Mặc định: Kết nối trực tiếp cùng chuyên gia / tác giả"
+                    className="w-full h-9 px-3 rounded-[8px] border border-line text-[13px] text-ink focus:border-primary"
+                  />
+                </div>
+              </div>
+
               <div className="p-3 bg-primary-soft/50 rounded-[14px] border border-primary/20 flex flex-col gap-1 text-[13px] text-ink">
                 <span className="font-extrabold text-primary flex items-center gap-1.5">
                   <PhoneCall size={14} />

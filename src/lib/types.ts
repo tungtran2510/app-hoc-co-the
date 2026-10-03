@@ -23,6 +23,10 @@ export interface AuthorProfile {
   intro_image_url?: string | null;
   intro_video_url?: string | null;
   books: AuthorBook[];
+  books_title?: string | null;
+  books_subtitle?: string | null;
+  contact_title?: string | null;
+  contact_subtitle?: string | null;
   extra_title?: string;
   extra_content?: string;
   contact_note?: string;
@@ -94,6 +98,8 @@ export interface Settings {
   recommended_books_subtitle?: string | null;
   recommended_books?: RecommendedBook[];
   recommended_books_layout?: 'grid' | 'lookbook' | null;
+  flat_books_title?: string | null;
+  flat_books?: RecommendedBook[];
   home_sections_order?: string[] | null;
   hidden_home_sections?: string[] | null;
   ai_training?: AiTrainingConfig | null;

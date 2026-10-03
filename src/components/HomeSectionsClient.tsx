@@ -37,6 +37,8 @@ interface HomeSectionsClientProps {
   recommendedBooksSubtitle?: string | null;
   recommendedBooks?: RecommendedBook[];
   initialBooksLayout?: 'grid' | 'lookbook' | null;
+  flatBooksTitle?: string | null;
+  flatBooks?: RecommendedBook[];
   appName?: string | null;
   appSubtitle?: string | null;
   brandTagline?: string | null;
@@ -58,6 +60,8 @@ export default function HomeSectionsClient({
   recommendedBooksSubtitle,
   recommendedBooks = [],
   initialBooksLayout,
+  flatBooksTitle,
+  flatBooks,
   appName: initialAppName,
   appSubtitle: initialAppSubtitle,
   brandTagline: initialBrandTagline,
@@ -470,6 +474,8 @@ export default function HomeSectionsClient({
                 onMoveUp={() => handleMoveSection(index, 'up')}
                 onMoveDown={() => handleMoveSection(index, 'down')}
                 onOpenReorderModal={() => setShowReorderModal(true)}
+                hotline={hotline}
+                zaloUrl={zaloUrl}
               />
             </React.Fragment>
           );
@@ -481,6 +487,8 @@ export default function HomeSectionsClient({
             <React.Fragment key="flat_books">
               {hiddenBanner}
               <FlatMinimalistBooksSection
+                initialTitle={flatBooksTitle}
+                initialBooks={flatBooks}
                 sectionIndex={index}
                 totalSections={sectionsOrder.length}
                 isHidden={isHidden}
@@ -488,6 +496,8 @@ export default function HomeSectionsClient({
                 onMoveUp={() => handleMoveSection(index, 'up')}
                 onMoveDown={() => handleMoveSection(index, 'down')}
                 onOpenReorderModal={() => setShowReorderModal(true)}
+                hotline={hotline}
+                zaloUrl={zaloUrl}
               />
             </React.Fragment>
           );
@@ -545,6 +555,8 @@ export default function HomeSectionsClient({
             type: 'author',
           }}
           isAdmin={isAdmin}
+          hotline={hotline}
+          zaloUrl={zaloUrl}
           onClose={() => setSelectedAuthorBook(null)}
           onEdit={() => {
             const b = selectedAuthorBook;
@@ -563,6 +575,8 @@ export default function HomeSectionsClient({
           onClose={() => setShowAuthorModal(false)}
           onSaved={(newProfile) => {
             setAuthorProfile(newProfile);
+            if (newProfile.phone) setHotline(newProfile.phone);
+            if (newProfile.zalo_url) setZaloUrl(newProfile.zalo_url);
           }}
         />
       )}

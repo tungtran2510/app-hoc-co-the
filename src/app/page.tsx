@@ -48,6 +48,8 @@ export default async function HomePage() {
         recommendedBooksSubtitle={settings.recommended_books_subtitle}
         recommendedBooks={settings.recommended_books}
         initialBooksLayout={settings.recommended_books_layout}
+        flatBooksTitle={settings.flat_books_title}
+        flatBooks={settings.flat_books}
         appName={settings.app_name}
         appSubtitle={settings.app_subtitle}
         brandTagline={settings.brand_tagline}

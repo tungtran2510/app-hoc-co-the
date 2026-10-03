@@ -135,6 +135,59 @@ html.dark strong {
   color: #F8FAFC !important;
 }
 
+/* Bảo toàn màu chữ tối tự nhiên cho các trang giấy sách 3D, flipbook và tài liệu nền sáng trong chế độ tối */
+html.dark .book-inner-page,
+html.dark .book-paper,
+html.dark .preserve-light-surface,
+html.dark #qbiz-books-3d-splash .book-inner-page {
+  background-color: #FAF7F0 !important;
+}
+
+html.dark .book-inner-page h1,
+html.dark .book-inner-page h2,
+html.dark .book-inner-page h3,
+html.dark .book-inner-page h4,
+html.dark .book-inner-page h5,
+html.dark .book-inner-page h6,
+html.dark .book-paper h1,
+html.dark .book-paper h2,
+html.dark .book-paper h3,
+html.dark .book-paper h4,
+html.dark #qbiz-books-3d-splash .book-inner-page h1,
+html.dark #qbiz-books-3d-splash .book-inner-page h2,
+html.dark #qbiz-books-3d-splash .book-inner-page h3,
+html.dark #qbiz-books-3d-splash .book-inner-page h4 {
+  color: #0F172A !important;
+}
+
+html.dark .book-inner-page p,
+html.dark .book-paper p,
+html.dark #qbiz-books-3d-splash .book-inner-page p {
+  color: #334155 !important;
+}
+
+html.dark .book-inner-page .text-amber-700,
+html.dark .book-inner-page .text-amber-800,
+html.dark #qbiz-books-3d-splash .book-inner-page .text-amber-700,
+html.dark #qbiz-books-3d-splash .book-inner-page .text-amber-800 {
+  color: #B45309 !important;
+}
+
+html.dark .book-inner-page .text-slate-700,
+html.dark #qbiz-books-3d-splash .book-inner-page .text-slate-700 {
+  color: #334155 !important;
+}
+
+html.dark .book-inner-page .text-slate-500,
+html.dark #qbiz-books-3d-splash .book-inner-page .text-slate-500 {
+  color: #64748B !important;
+}
+
+html.dark .book-inner-page span,
+html.dark #qbiz-books-3d-splash .book-inner-page span {
+  color: inherit;
+}
+
 html.dark .text-ink-2 {
   color: #DDD6FE !important;
 }

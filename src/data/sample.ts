@@ -235,6 +235,8 @@ export const sampleSettings: Settings = {
   recommended_books_subtitle: 'Tài liệu tham khảo chuyên sâu giúp bạn hiểu và chăm sóc cơ thể mỗi ngày',
   recommended_books_layout: 'grid',
   recommended_books: DEFAULT_RECOMMENDED_BOOKS,
+  flat_books_title: 'Tủ Sách Tối Giản',
+  flat_books: DEFAULT_RECOMMENDED_BOOKS,
   home_sections_order: [
     'brand_card',
     'topics',
@@ -243,6 +245,7 @@ export const sampleSettings: Settings = {
     'author_books',
     'author_philosophy',
     'recommended_books',
+    'flat_books',
     'author_contact',
   ],
   ai_training: DEFAULT_AI_TRAINING,

@@ -122,7 +122,7 @@ export function AuthorBioDetailModal({ profile, onClose }: AuthorBioDetailModalP
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-1.5">
               <h4 className="text-[18px] sm:text-[20px] font-black tracking-tight text-slate-900 dark:text-white uppercase">
-                {profile.name && profile.name.toLowerCase().includes('tùng') ? 'Tùng Dinh Dưỡng' : (profile.name || 'Tùng Dinh Dưỡng')}
+                {profile.name || 'Tùng Dinh Dưỡng'}
               </h4>
               <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-500 text-slate-950 font-black shrink-0">
                 <Check size={10} strokeWidth={3.5} />
@@ -271,7 +271,7 @@ export function AuthorProfileSection({
           <div className="relative z-10 flex flex-col gap-0.5">
             <div className="flex items-center gap-2 flex-wrap">
               <h3 className="text-[22px] sm:text-[25px] font-black tracking-tight text-slate-900 dark:text-white uppercase leading-tight">
-                {profile.name && profile.name.toLowerCase().includes('tùng') ? 'Tùng Dinh Dưỡng' : (profile.name || 'Tùng Dinh Dưỡng')}
+                {profile.name || 'Tùng Dinh Dưỡng'}
               </h3>
               <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-500 text-slate-950 shrink-0 shadow-2xs" title="Chuyên gia được xác thực">
                 <Check size={11} strokeWidth={3.5} />
@@ -356,7 +356,7 @@ export function AuthorProfileSection({
                 <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
                   <Quote size={12} className="rotate-180 text-amber-600 dark:text-amber-400" strokeWidth={2.5} />
                   <span className="text-[11px] sm:text-[11.5px] font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                    {profile.extra_title || 'Lời tựa'}
+                    {profile.extra_title || 'Triết lý phụng sự'}
                   </span>
                 </div>
                 {isAdmin && onEditPhilosophy && (
@@ -378,7 +378,7 @@ export function AuthorProfileSection({
 
               <div className="text-right pt-0.5">
                 <span className="text-[12.5px] sm:text-[13px] font-bold text-slate-800 dark:text-slate-200 tracking-tight">
-                  — {profile.name && profile.name.toLowerCase().includes('tùng') ? 'Tùng Dinh Dưỡng' : (profile.name || 'Tùng Dinh Dưỡng')}
+                  — {profile.name || 'Tùng Dinh Dưỡng'}
                 </span>
               </div>
             </div>
@@ -450,12 +450,17 @@ export function AuthorBooksSection({
       )}
 
       {/* Tiêu đề mục sách tác giả */}
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-1">
         <div className="flex items-center justify-between gap-2">
           <h3 className="text-[18px] sm:text-[19px] font-extrabold text-ink leading-tight break-words line-clamp-2">
-            Sách & Tác phẩm đã làm
+            {profile.books_title || 'Sách & Tác phẩm đã làm'}
           </h3>
         </div>
+        {profile.books_subtitle && (
+          <p className="text-[12px] sm:text-[12.5px] text-slate-500 dark:text-slate-400 leading-normal">
+            {profile.books_subtitle}
+          </p>
+        )}
       </div>
 
       {/* Danh sách các cuốn sách */}
@@ -784,10 +789,10 @@ export function AuthorContactSection({
               </div>
               <div className="min-w-0">
                 <h3 className="text-[16px] font-extrabold text-slate-900 dark:text-white leading-tight truncate">
-                  Thông tin liên hệ & Kết nối
+                  {profile.contact_title || 'Thông tin liên hệ & Kết nối'}
                 </h3>
                 <span className="text-[12px] text-slate-500 dark:text-slate-400 truncate block">
-                  Kết nối trực tiếp cùng chuyên gia / tác giả
+                  {profile.contact_subtitle || 'Kết nối trực tiếp cùng chuyên gia / tác giả'}
                 </span>
               </div>
             </div>

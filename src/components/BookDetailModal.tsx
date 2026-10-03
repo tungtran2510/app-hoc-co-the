@@ -14,6 +14,9 @@ import {
   Play,
   Sparkles,
   MessageCircle,
+  FileText,
+  Download,
+  Eye,
 } from 'lucide-react';
 import { extractYouTubeId } from '../lib/youtube';
 import ModernBookCover from './ModernBookCover';
@@ -42,6 +45,8 @@ interface BookDetailModalProps {
   isAdmin?: boolean;
   onClose: () => void;
   onEdit?: () => void;
+  hotline?: string | null;
+  zaloUrl?: string | null;
 }
 
 export default function BookDetailModal({
@@ -49,6 +54,8 @@ export default function BookDetailModal({
   isAdmin = false,
   onClose,
   onEdit,
+  hotline,
+  zaloUrl,
 }: BookDetailModalProps) {
   const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
   const [show3DFlipbook, setShow3DFlipbook] = useState(false);
@@ -465,6 +472,59 @@ export default function BookDetailModal({
               </p>
             </div>
 
+            {/* 2.5. TÀI LIỆU ĐÍNH KÈM & TỆP ĐỌC (PDF / WORD / TÀI LIỆU HỌC TẬP) */}
+            {(book.file_url || book.pdf_url) && (
+              <div className="flex flex-col gap-2 p-3.5 sm:p-4 rounded-[18px] bg-surface-2/90 border border-line">
+                <div className="flex items-center justify-between">
+                  <span className="text-[12px] font-extrabold text-ink uppercase tracking-wider flex items-center gap-1.5">
+                    <FileText size={13} className="text-primary" />
+                    <span>Tài liệu đính kèm & Tệp đọc</span>
+                  </span>
+                  <span className="text-[10.5px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200/80 dark:border-emerald-800/40 px-2 py-0.5 rounded-full">
+                    Sẵn sàng đọc
+                  </span>
+                </div>
+
+                <div className="p-3 rounded-[13px] bg-surface border border-line flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-9 h-9 rounded-[10px] bg-red-100 dark:bg-red-950/80 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0 shadow-2xs">
+                      <FileText size={18} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-bold text-ink truncate leading-tight">
+                        {book.file_name || `${book.title} (Bản đọc đầy đủ)`}
+                      </p>
+                      <p className="text-[11px] text-muted truncate mt-0.5">
+                        Định dạng tài liệu điện tử (PDF / Ebook)
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <a
+                      href={book.pdf_url || book.file_url || '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="h-8 px-3 rounded-[8px] bg-primary hover:bg-primary-dark text-white font-bold text-[11.5px] flex items-center gap-1 transition-all active:scale-95 shadow-xs"
+                      title="Mở đọc trực tiếp trên trình duyệt"
+                    >
+                      <Eye size={12} />
+                      <span>Xem online</span>
+                    </a>
+                    <a
+                      href={book.file_url || book.pdf_url || '#'}
+                      download={book.file_name || `${book.title}.pdf`}
+                      className="h-8 px-2.5 rounded-[8px] bg-surface-2 hover:bg-line border border-line text-ink font-bold text-[11.5px] flex items-center gap-1 transition-all active:scale-95"
+                      title="Tải tệp về máy"
+                    >
+                      <Download size={12} />
+                      <span className="hidden sm:inline">Tải về</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* 3. MỤC VIDEO GIỚI THIỆU & CHIA SẺ (KHOẢNG CÁCH THOÁNG ĐẸP, KHÔNG BỊ SÁT VIỀN) */}
             <div className="flex flex-col gap-2.5 pt-2 border-t border-line/60">
               <div className="flex items-center justify-between">
@@ -474,19 +534,63 @@ export default function BookDetailModal({
                   </div>
                   <span>Video giới thiệu & chia sẻ</span>
                 </span>
-                {youtubeId && (
+                {youtubeId ? (
                   <span className="text-[11px] font-bold text-red-600 bg-red-50 border border-red-200/60 px-2 py-0.5 rounded-full shrink-0">
                     YouTube HD
                   </span>
-                )}
+                ) : book.youtube_url ? (
+                  <span className="text-[11px] font-bold text-blue-600 bg-blue-50 border border-blue-200/60 px-2 py-0.5 rounded-full shrink-0">
+                    Video ngoài
+                  </span>
+                ) : null}
               </div>
 
               {youtubeId ? (
-                <YouTubeEmbed
-                  youtubeId={youtubeId}
-                  title={`Video giới thiệu ${book.title}`}
-                  showExternalLink={true}
-                />
+                <div className="flex flex-col gap-2">
+                  <YouTubeEmbed
+                    youtubeId={youtubeId}
+                    title={`Video giới thiệu ${book.title}`}
+                    showExternalLink={true}
+                  />
+                  {book.youtube_url && (
+                    <div className="flex justify-end">
+                      <a
+                        href={book.youtube_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[11.5px] font-bold text-red-600 hover:underline flex items-center gap-1"
+                      >
+                        <span>Mở trực tiếp trên YouTube</span>
+                        <ExternalLink size={11} />
+                      </a>
+                    </div>
+                  )}
+                </div>
+              ) : book.youtube_url ? (
+                <div className="p-3.5 rounded-[16px] bg-surface-2 border border-line flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-7 h-7 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+                      <Play size={12} className="fill-red-600" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[12.5px] font-bold text-ink truncate">
+                        Video giới thiệu cuốn sách
+                      </p>
+                      <p className="text-[11px] text-muted truncate">
+                        Nhấn nút để mở xem video
+                      </p>
+                    </div>
+                  </div>
+                  <a
+                    href={book.youtube_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="h-8 px-3.5 rounded-[8px] bg-red-600 hover:bg-red-700 text-white font-bold text-[12px] flex items-center gap-1.5 shrink-0 shadow-xs transition-transform active:scale-95"
+                  >
+                    <span>Xem video</span>
+                    <ExternalLink size={11} />
+                  </a>
+                </div>
               ) : (
                 <div className="p-4 rounded-[16px] bg-surface-2 border border-line text-center flex flex-col items-center justify-center gap-1.5 text-muted">
                   <Film size={22} className="text-muted/60" />
@@ -582,7 +686,7 @@ export default function BookDetailModal({
             {/* 5. KHUNG ĐẶT SÁCH LIÊN HỆ ZALO DƯỚI ẢNH THEO YÊU CẦU */}
             <div className="pt-2">
               <a
-                href={book.link_url || 'https://zalo.me/0987792400'}
+                href={book.link_url || zaloUrl || 'https://zalo.me/0987792400'}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group relative w-full py-3.5 px-4 rounded-[14px] bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-slate-950 font-black text-[14px] shadow-md shadow-amber-500/20 flex items-center justify-center gap-2.5 transition-all active:scale-[0.98] cursor-pointer overflow-hidden border border-amber-300/60"
@@ -591,7 +695,9 @@ export default function BookDetailModal({
                   <MessageCircle size={14} className="text-slate-950 fill-slate-950" />
                 </div>
                 <span className="tracking-wide">Đặt sách liên hệ Zalo</span>
-                <span className="text-[12px] opacity-90 font-bold font-sans">· 0974.248.716</span>
+                <span className="text-[12px] opacity-90 font-bold font-sans">
+                  · {hotline || '0974.248.716'}
+                </span>
               </a>
             </div>
           </div>
