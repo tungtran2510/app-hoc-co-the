@@ -25,6 +25,7 @@ interface AdminSettingsModalProps {
   onClose: () => void;
   onSettingsSaved?: () => void;
   onLogout?: () => void;
+  initialTab?: 'chung' | 'trai_nghiem' | 'du_lieu' | 'giang_vien';
 }
 
 export default function AdminSettingsModal({
@@ -32,6 +33,7 @@ export default function AdminSettingsModal({
   onClose,
   onSettingsSaved,
   onLogout,
+  initialTab,
 }: AdminSettingsModalProps) {
   const [activeTab, setActiveTab] = useState<'chung' | 'trai_nghiem' | 'du_lieu' | 'giang_vien'>('chung');
   const [isSuper, setIsSuper] = useState(false);
@@ -51,6 +53,9 @@ export default function AdminSettingsModal({
 
   useEffect(() => {
     if (isOpen) {
+      if (initialTab) {
+        setActiveTab(initialTab);
+      }
       setSettings(getStoredAppSettings());
       setSaveSuccessMsg('');
       setPasswordError('');
@@ -59,7 +64,8 @@ export default function AdminSettingsModal({
         setIsSuper(isSuperAdmin(st.user));
       });
     }
-  }, [isOpen]);
+  }, [isOpen, initialTab]);
+
 
 
   const handleChangePassword = async (e: React.FormEvent) => {

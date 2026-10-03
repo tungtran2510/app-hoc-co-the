@@ -16,6 +16,7 @@ import {
   Search,
   Sun,
   Moon,
+  Users,
 } from 'lucide-react';
 import { checkAdminStatus, logoutAdmin, isSuperAdmin } from '../lib/adminAuth';
 import { getStoredAppSettings } from '../lib/storage';
@@ -52,6 +53,8 @@ export default function HomeHeader({
   const [hotline, setHotline] = useState<string | null>(initialHotline || null);
   const [zaloUrl, setZaloUrl] = useState<string | null>(initialZaloUrl || null);
   const [showSettings, setShowSettings] = useState(false);
+  const [settingsTab, setSettingsTab] = useState<'chung' | 'trai_nghiem' | 'du_lieu' | 'giang_vien'>('chung');
+
   const [showEditApp, setShowEditApp] = useState(false);
   const [showPwaInstall, setShowPwaInstall] = useState(false);
   const [showPhoneSync, setShowPhoneSync] = useState(false);
@@ -238,26 +241,32 @@ export default function HomeHeader({
               <>
                 <button
                   type="button"
-                  onClick={handleBackup}
-                  disabled={isExporting}
-                  className="flex items-center gap-1.5 h-7.5 sm:h-8 px-2.5 sm:px-3 rounded-[8px] bg-white/15 hover:bg-white/25 active:bg-white/30 text-white transition-all cursor-pointer disabled:opacity-50 text-[12px] sm:text-[12.5px] font-bold shrink-0 shadow-2xs"
-                  title="Tải file sao lưu dữ liệu"
+                  onClick={() => {
+                    setSettingsTab('giang_vien');
+                    setShowSettings(true);
+                  }}
+                  className="flex items-center gap-1.5 h-7.5 sm:h-8 px-2.5 sm:px-3 rounded-[8px] bg-primary hover:bg-primary-dark text-white transition-all cursor-pointer text-[12px] sm:text-[12.5px] font-bold shrink-0 shadow-2xs"
+                  title="Phân quyền & Quản lý Giảng viên"
                 >
-                  <Download size={13} strokeWidth={2.4} />
-                  <span>{isExporting ? 'Đang tải...' : 'Sao lưu'}</span>
+                  <Users size={13} strokeWidth={2.4} />
+                  <span>Giảng viên</span>
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => setShowSettings(true)}
-                  className="flex items-center gap-1.5 h-7.5 sm:h-8 px-2.5 sm:px-3 rounded-[8px] bg-primary hover:bg-primary-dark text-white transition-all cursor-pointer text-[12px] sm:text-[12.5px] font-bold shrink-0 shadow-2xs"
-                  title="Cài đặt quản trị & Phân quyền giảng viên"
+                  onClick={() => {
+                    setSettingsTab('chung');
+                    setShowSettings(true);
+                  }}
+                  className="flex items-center gap-1.5 h-7.5 sm:h-8 px-2.5 sm:px-3 rounded-[8px] bg-white/15 hover:bg-white/25 active:bg-white/30 text-white transition-all cursor-pointer text-[12px] sm:text-[12.5px] font-bold shrink-0 shadow-2xs"
+                  title="Cài đặt quản trị"
                 >
                   <Settings size={13} strokeWidth={2.4} />
                   <span>Cài đặt</span>
                 </button>
               </>
             )}
+
 
             <button
               type="button"
@@ -446,6 +455,7 @@ export default function HomeHeader({
                   type="button"
                   onClick={() => {
                     setShowMenu(false);
+                    setSettingsTab('chung');
                     setShowSettings(true);
                   }}
                   className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-white dark:hover:bg-[#25154D] cursor-pointer"
@@ -453,6 +463,22 @@ export default function HomeHeader({
                   <Settings size={16} className="text-[#1E3A8A] dark:text-purple-300" />
                   <span>Cài đặt quản trị</span>
                 </button>
+
+                {isSuperAdmin(adminUser) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowMenu(false);
+                      setSettingsTab('giang_vien');
+                      setShowSettings(true);
+                    }}
+                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-white dark:hover:bg-[#25154D] cursor-pointer"
+                  >
+                    <Users size={16} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
+                    <span>Phân quyền Giảng viên</span>
+                  </button>
+                )}
+
 
                 <Link
                   href="/tro-ly-ai"
@@ -522,11 +548,13 @@ export default function HomeHeader({
       {showSettings && (
         <AdminSettingsModal
           isOpen={true}
+          initialTab={settingsTab}
           onClose={() => setShowSettings(false)}
           onSettingsSaved={() => {
             const stored = getStoredAppSettings();
             if (stored.app_name) setAppName(stored.app_name);
           }}
+
           onLogout={() => setIsAdmin(false)}
         />
       )}
