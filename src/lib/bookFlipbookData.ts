@@ -6,10 +6,18 @@ export interface BookInfoInput {
   cover_url?: string | null;
   author?: string | null;
   description?: string | null;
+  gallery_images?: string[];
+  flipbook_pages?: string[];
+  file_url?: string | null;
+  file_name?: string | null;
+  pdf_url?: string | null;
 }
 
 /**
  * Sinh bộ trang sách thật 3D cho từng đầu sách / tài liệu y khoa
+ * - Ưu tiên số 1: Hiển thị đúng các trang thật được admin nạp vào flipbook_pages (từ PDF, Word hoặc Ảnh trang)
+ * - Nếu là sách mẫu chuẩn (Hiểu Đúng Về Cột Sống / sách giải phẫu): Dùng bộ trang giải phẫu chuyên sâu chuẩn y khoa tương ứng
+ * - Nếu là sách tùy chỉnh khác: Tận dụng gallery_images làm fallback
  * - Trang 1: Bìa sách thật mạ vàng hoàng gia (Front Cover)
  * - Các trang giữa: Nội dung chuyên môn y khoa sâu theo đúng chủ đề sách
  * - Trang cuối: Bìa sau sách thật (Back Cover) có tóm tắt, trích dẫn tác giả và mã vạch ISBN
@@ -18,7 +26,40 @@ export function getBookFlipbookPages(book?: BookInfoInput | null): FlipbookPage[
   const title = (book?.title || '').toLowerCase();
   const id = book?.id || '';
 
-  // 1. SÁCH 1: HIỂU ĐÚNG VỀ CỘT SỐNG
+  // ƯU TIÊN SỐ 1: BỘ TRANG TÀI LIỆU XEM THỬ 3D (TỪ FILE PDF, WORD HOẶC BỘ ẢNH TRANG)
+  const customPages = Array.isArray(book?.flipbook_pages) && book.flipbook_pages.length > 0
+    ? book.flipbook_pages
+    : null;
+
+  if (customPages && customPages.length > 0) {
+    const rawImages = customPages.filter((img) => typeof img === 'string' && img.trim().length > 0);
+    if (rawImages.length > 0) {
+      const images = [...rawImages];
+      // Nếu có ảnh bìa sách riêng và chưa nằm ở trang đầu tiên, đưa ảnh bìa lên làm trang 1 (Front Cover)
+      if (book?.cover_url && !images.includes(book.cover_url)) {
+        images.unshift(book.cover_url);
+      }
+      return images.map((imgUrl, idx) => {
+        const pageNum = idx + 1;
+        const isCover = idx === 0;
+        const isBackCover = idx === images.length - 1 && images.length > 1;
+        return {
+          id: `${id || 'custom-book'}-p${pageNum}-${idx}`,
+          pageNum,
+          title: isCover
+            ? (book?.title || 'Bìa sách')
+            : isBackCover
+            ? `Bìa sau · ${book?.title || 'Sách'}`
+            : `Trang ${pageNum} · ${book?.title || 'Nội dung sách'}`,
+          category: isCover ? 'BÌA SÁCH' : 'TÀI LIỆU ĐỌC THỬ 3D',
+          badge: isCover ? 'TRANG BÌA' : `TRANG ${pageNum}`,
+          imageUrl: imgUrl,
+        };
+      });
+    }
+  }
+
+  // 1. SÁCH 1: HIỂU ĐÚNG VỀ CỘT SỐNG (BỘ ATLAS Y KHOA CHUYÊN SÂU 11 TRANG)
   if (id === 'book-1' || title.includes('hiểu đúng về cột sống')) {
     return [
       {

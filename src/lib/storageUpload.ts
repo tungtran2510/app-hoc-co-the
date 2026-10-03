@@ -119,15 +119,29 @@ export async function uploadImageFile(file: File): Promise<{ url: string; thumb_
 }
 
 export async function uploadPdfFile(file: File): Promise<{ url: string; fileName: string; sizeText: string }> {
-  const maxBytes = 25 * 1024 * 1024;
+  return uploadDocumentFile(file);
+}
+
+export async function uploadDocumentFile(file: File): Promise<{ url: string; fileName: string; sizeText: string; ext: string }> {
+  const maxBytes = 50 * 1024 * 1024;
   if (file.size > maxBytes) {
-    throw new Error('File quá lớn, tối đa 25MB');
+    throw new Error('Tệp quá lớn, vui lòng chọn file dưới 50MB');
+  }
+
+  const origExt = file.name.split('.').pop()?.toLowerCase() || 'pdf';
+  const ym = getYearMonth();
+  const uuid = generateUuid();
+  const filePath = `documents/${ym}/${uuid}.${origExt}`;
+
+  let mimeType = file.type;
+  if (!mimeType) {
+    if (origExt === 'pdf') mimeType = 'application/pdf';
+    else if (origExt === 'doc') mimeType = 'application/msword';
+    else if (origExt === 'docx') mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    else mimeType = 'application/octet-stream';
   }
 
   try {
-    const uuid = generateUuid();
-    const filePath = `files/${uuid}.pdf`;
-
     const res = await fetch('/api/admin/upload-url', {
       method: 'POST',
       headers: getAdminHeaders(),
@@ -138,7 +152,7 @@ export async function uploadPdfFile(file: File): Promise<{ url: string; fileName
       const data = await res.json();
       const putRes = await fetch(data.signedUrl, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/pdf' },
+        headers: { 'Content-Type': mimeType },
         body: file,
       });
 
@@ -147,15 +161,16 @@ export async function uploadPdfFile(file: File): Promise<{ url: string; fileName
         return {
           url: data.publicUrl,
           fileName: file.name,
-          sizeText: `${mb} MB`,
+          sizeText: Number(mb) < 0.1 ? `${Math.round(file.size / 1024)} KB` : `${mb} MB`,
+          ext: origExt,
         };
       }
     }
   } catch (err) {
-    console.warn('PDF signed upload error, falling back to server route:', err);
+    console.warn('Document signed upload error, falling back to server route:', err);
   }
 
-  // Server fallback for PDF
+  // Server fallback for Document
   const formData = new FormData();
   formData.append('file', file);
 
@@ -167,7 +182,7 @@ export async function uploadPdfFile(file: File): Promise<{ url: string; fileName
 
   if (!serverRes.ok) {
     const errData = await serverRes.json().catch(() => ({}));
-    throw new Error(errData.error || 'Tải file PDF lên kho lưu trữ thất bại.');
+    throw new Error(errData.error || 'Tải tài liệu lên kho lưu trữ thất bại.');
   }
 
   const serverData = await serverRes.json();
@@ -175,6 +190,7 @@ export async function uploadPdfFile(file: File): Promise<{ url: string; fileName
   return {
     url: serverData.url,
     fileName: file.name,
-    sizeText: `${mb} MB`,
+    sizeText: Number(mb) < 0.1 ? `${Math.round(file.size / 1024)} KB` : `${mb} MB`,
+    ext: origExt,
   };
 }

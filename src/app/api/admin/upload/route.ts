@@ -31,11 +31,20 @@ export async function POST(req: NextRequest) {
     const ym = getYearMonth();
     const uuid = generateUuid();
     const origExt = file.name.split('.').pop()?.toLowerCase() || 'webp';
-    const safeExt = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'heic', 'heif'].includes(origExt) ? origExt : 'webp';
-    const filePath = `images/${ym}/${uuid}.${safeExt}`;
+    const isDoc = ['pdf', 'doc', 'docx'].includes(origExt);
+    const safeExt = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'heic', 'heif', 'pdf', 'doc', 'docx'].includes(origExt) ? origExt : 'webp';
+    const folder = isDoc ? 'documents' : 'images';
+    const filePath = `${folder}/${ym}/${uuid}.${safeExt}`;
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const contentType = file.type || (safeExt === 'webp' ? 'image/webp' : 'image/jpeg');
+    let contentType = file.type;
+    if (!contentType) {
+      if (safeExt === 'pdf') contentType = 'application/pdf';
+      else if (safeExt === 'doc') contentType = 'application/msword';
+      else if (safeExt === 'docx') contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      else if (safeExt === 'webp') contentType = 'image/webp';
+      else contentType = 'image/jpeg';
+    }
 
     const { data, error } = await supabase.storage.from('media').upload(filePath, buffer, {
       contentType,

@@ -710,7 +710,7 @@ export default function EditAuthorModal({
                           <label className="text-[12px] font-bold text-ink flex items-center gap-1.5">
                             <Images size={13} className="text-primary" />
                             <span>
-                              Ảnh bên trong trang sách ({book.gallery_images?.length || 0})
+                              Hình ảnh của sách ({book.gallery_images?.length || 0} ảnh)
                             </span>
                           </label>
 
@@ -728,13 +728,13 @@ export default function EditAuthorModal({
                             ) : (
                               <>
                                 <Plus size={12} strokeWidth={2.5} />
-                                <span>Tải ảnh trang sách</span>
+                                <span>Tải ảnh chụp sách</span>
                               </>
                             )}
                           </button>
                         </div>
 
-                        {/* Danh sách ảnh trang sách đã tải lên */}
+                        {/* Danh sách ảnh chụp sách đã tải lên */}
                         {book.gallery_images && book.gallery_images.length > 0 ? (
                           <div className="flex gap-2 overflow-x-auto py-1">
                             {book.gallery_images.map((imgUrl, imgIdx) => (
@@ -745,7 +745,7 @@ export default function EditAuthorModal({
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                   src={imgUrl}
-                                  alt={`Trang ${imgIdx + 1}`}
+                                  alt={`Ảnh sách ${imgIdx + 1}`}
                                   className="w-full h-full object-cover"
                                 />
                                 <button
@@ -761,7 +761,7 @@ export default function EditAuthorModal({
                           </div>
                         ) : (
                           <p className="text-[11.5px] text-muted italic">
-                            Chưa có ảnh chụp trang sách. Bấm &quot;Tải ảnh trang sách&quot; để thêm ảnh minh họa bên trong.
+                            Chưa có ảnh chụp sách. Bấm &quot;Tải ảnh chụp sách&quot; để thêm ảnh thực tế hiển thị trong chi tiết sách.
                           </p>
                         )}
                       </div>

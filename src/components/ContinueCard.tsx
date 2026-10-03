@@ -26,7 +26,7 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
     <Link
       href={targetUrl}
       prefetch={true}
-      className="group relative block overflow-hidden rounded-[20px] bg-white text-slate-900 border border-slate-200 border-l-[4px] border-l-[#1E3A8A] shadow-md hover:shadow-[0_0_24px_rgba(248,223,123,0.35),0_10px_28px_rgba(30,58,138,0.2)] hover:border-blue-400 dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] dark:border-t-white/15 dark:border-r-black/50 dark:border-b-black/70 dark:border-l-[#A78BFA] dark:text-white dark:hover:border-amber-300/80 dark:hover:shadow-[0_0_26px_rgba(248,223,123,0.4),0_10px_28px_rgba(109,40,217,0.35)] px-4 py-3 sm:px-5 sm:py-3.5 transition-all duration-300 hover:-translate-y-1 active:scale-[0.98] cursor-pointer"
+      className="group relative block overflow-hidden rounded-[20px] bg-white text-slate-900 border border-slate-200/90 border-l-[4px] border-l-amber-500 shadow-md hover:shadow-[0_0_24px_rgba(248,223,123,0.35)] hover:border-amber-400 dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] dark:border-t-white/15 dark:border-r-black/50 dark:border-b-black/70 dark:border-l-[#A78BFA] dark:text-white dark:hover:border-amber-300/80 dark:hover:shadow-[0_0_26px_rgba(248,223,123,0.4),0_10px_28px_rgba(109,40,217,0.35)] px-4 py-3 sm:px-5 sm:py-3.5 transition-all duration-300 hover:-translate-y-1 active:scale-[0.98] cursor-pointer"
       aria-label={`Xem tiếp ${info.topic_title} bài ${info.page_title}`}
     >
       {/* Tia sáng vàng kim viền trên (dark mode) */}
@@ -54,8 +54,8 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
       <div className="relative z-10 flex flex-col gap-1 sm:gap-1.5">
         {/* Dòng 1: Huy hiệu chủ đề có icon Play + Nút sửa ảnh (nếu Admin) + Vị trí video */}
         <div className="flex items-center justify-between gap-1.5">
-          <div className="flex items-center gap-1.5 text-[#1E3A8A] dark:text-white/90 text-[11.5px] sm:text-[12px] font-bold min-w-0 flex-1">
-            <span className="w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full bg-blue-100 text-[#1E3A8A] dark:bg-[#F8DF7B] dark:text-[#160C2C] flex items-center justify-center shrink-0 shadow-2xs">
+          <div className="flex items-center gap-1.5 text-amber-600 dark:text-white/90 text-[11.5px] sm:text-[12px] font-bold min-w-0 flex-1">
+            <span className="w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full bg-amber-100 text-amber-700 dark:bg-[#F8DF7B] dark:text-[#160C2C] flex items-center justify-center shrink-0 shadow-2xs">
               <Play size={8} fill="currentColor" className="ml-0.5" />
             </span>
             <span className="truncate">Đang xem · {info.topic_title || 'Cột sống'}</span>
@@ -70,7 +70,7 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
                   e.stopPropagation();
                   onEditPage();
                 }}
-                className="px-2 py-0.5 rounded-full bg-blue-50 text-[#1E3A8A] border border-blue-200 hover:bg-blue-100 dark:bg-white/20 dark:hover:bg-white/35 dark:text-white text-[10px] sm:text-[10.5px] font-bold flex items-center gap-1 backdrop-blur-xs cursor-pointer transition-colors shadow-2xs shrink-0 whitespace-nowrap"
+                className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 dark:bg-white/20 dark:hover:bg-white/35 dark:text-white text-[10px] sm:text-[10.5px] font-bold flex items-center gap-1 backdrop-blur-xs cursor-pointer transition-colors shadow-2xs shrink-0 whitespace-nowrap"
                 title="Cài đặt ảnh đại diện & thông tin bài học này"
               >
                 <Edit2 size={10} />
@@ -105,24 +105,24 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
               aria-valuemax={100}
             >
               <div
-                className="h-full bg-[#1E3A8A] dark:bg-gradient-to-r dark:from-amber-300 dark:via-amber-400 dark:to-amber-500 rounded-full transition-all duration-300 shadow-xs"
+                className="h-full bg-amber-500 dark:bg-gradient-to-r dark:from-amber-300 dark:via-amber-400 dark:to-amber-500 rounded-full transition-all duration-300 shadow-xs"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <span className="text-[11px] font-extrabold text-[#1E3A8A] dark:text-amber-300 shrink-0 font-mono">
+            <span className="text-[11px] font-extrabold text-amber-700 dark:text-amber-300 shrink-0 font-mono">
               {progressPercent}%
             </span>
           </div>
 
           {/* Nút Xem tiếp: Hiệu ứng nhịp thở phát sáng (Pulse-glow) + Vệt sáng quét ngang (Shimmer Sweep) + Đèn tín hiệu Live */}
-          <div className="relative shrink-0 flex items-center gap-1.5 h-[29px] sm:h-[31px] px-3 sm:px-3.5 rounded-full bg-gradient-to-r from-[#1E3A8A] via-[#1D4ED8] to-[#1E3A8A] text-white hover:from-[#172554] hover:to-[#1E3A8A] dark:bg-gradient-to-r dark:from-[#FDE68A] dark:via-[#F8DF7B] dark:to-[#F59E0B] dark:text-[#160C2C] font-black text-[12px] sm:text-[12.5px] shadow-sm transition-all duration-300 animate-pulse-glow overflow-hidden select-none">
+          <div className="relative shrink-0 flex items-center gap-1.5 h-[29px] sm:h-[31px] px-3 sm:px-3.5 rounded-full bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 hover:from-amber-600 hover:to-amber-700 dark:from-[#FDE68A] dark:via-[#F8DF7B] dark:to-[#F59E0B] text-slate-950 font-black text-[12px] sm:text-[12.5px] shadow-sm transition-all duration-300 animate-pulse-glow overflow-hidden select-none">
             {/* Vệt sáng quét ngang lấp lánh (Shimmer Sweep Light) */}
             <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 dark:via-white/60 to-transparent animate-shimmer-sweep" />
 
             {/* Chấm tròn phát sáng nhịp tim LIVE / Đang học dở */}
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-300 dark:bg-amber-800 opacity-80" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-200 dark:bg-[#160C2C]" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-200 dark:bg-amber-800 opacity-80" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-300 dark:bg-[#160C2C]" />
             </span>
 
             <span className="tracking-tight">Xem tiếp</span>

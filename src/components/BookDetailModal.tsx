@@ -29,6 +29,10 @@ export interface UnifiedBookItem {
   description: string;
   youtube_url?: string | null;
   gallery_images?: string[];
+  flipbook_pages?: string[];
+  file_url?: string | null;
+  file_name?: string | null;
+  pdf_url?: string | null;
   link_url?: string | null;
   type?: 'author' | 'recommended';
 }

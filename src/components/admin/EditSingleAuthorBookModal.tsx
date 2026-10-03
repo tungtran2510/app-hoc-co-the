@@ -5,19 +5,19 @@ import {
   X,
   BookOpen,
   Image as ImageIcon,
+  Images,
   Save,
   Loader2,
   Film,
-  Images,
-  Sparkles,
+  Check,
   Plus,
   Trash2,
-  Check,
 } from 'lucide-react';
 import { AuthorBook } from '../../lib/types';
 import { uploadImageFile } from '../../lib/storageUpload';
 import { extractYouTubeId } from '../../lib/youtube';
 import YouTubeEmbed from '../YouTubeEmbed';
+import BookFlipbookAdminSection from './BookFlipbookAdminSection';
 
 interface EditSingleAuthorBookModalProps {
   isOpen: boolean;
@@ -38,9 +38,14 @@ export default function EditSingleAuthorBookModal({
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [flipbookPages, setFlipbookPages] = useState<string[]>([]);
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [isUploadingGallery, setIsUploadingGallery] = useState(false);
+  const [singleGalleryUrl, setSingleGalleryUrl] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successNotice, setSuccessNotice] = useState('');
@@ -56,6 +61,11 @@ export default function EditSingleAuthorBookModal({
       setCoverUrl(book.cover_url || null);
       setYoutubeUrl(book.youtube_url || '');
       setGalleryImages(Array.isArray(book.gallery_images) ? [...book.gallery_images] : []);
+      setFlipbookPages(Array.isArray(book.flipbook_pages) ? [...book.flipbook_pages] : []);
+      setFileUrl(book.file_url || null);
+      setFileName(book.file_name || null);
+      setPdfUrl(book.pdf_url || null);
+      setSingleGalleryUrl('');
       setErrorMsg('');
       setSuccessNotice('');
     }
@@ -84,33 +94,43 @@ export default function EditSingleAuthorBookModal({
     }
   };
 
-  // Upload ảnh bộ sưu tập bên trong
+  // Upload nhiều ảnh chụp thực tế cuốn sách (gallery_images)
   const handleGalleryFilesChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
     try {
       setIsUploadingGallery(true);
       setErrorMsg('');
-      const uploadedUrls: string[] = [];
+      const newUrls: string[] = [];
       for (let i = 0; i < files.length; i++) {
-        const res = await uploadImageFile(files[i]);
+        const file = files[i];
+        const res = await uploadImageFile(file);
         if (res && res.url) {
-          uploadedUrls.push(res.url);
+          newUrls.push(res.url);
         }
       }
-      if (uploadedUrls.length > 0) {
-        setGalleryImages((prev) => [...prev, ...uploadedUrls]);
+      if (newUrls.length > 0) {
+        setGalleryImages((prev) => [...prev, ...newUrls]);
+        setSuccessNotice(`✓ Đã thêm ${newUrls.length} ảnh vào bộ ảnh chụp thực tế cuốn sách!`);
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Lỗi khi tải ảnh trang sách.');
+      setErrorMsg(err.message || 'Lỗi khi tải ảnh chụp sách.');
     } finally {
       setIsUploadingGallery(false);
       e.target.value = '';
     }
   };
 
-  const handleRemoveGalleryImage = (indexToRemove: number) => {
-    setGalleryImages((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+  const handleAddSingleGalleryUrl = () => {
+    const trimmed = singleGalleryUrl.trim();
+    if (!trimmed) return;
+    if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://') && !trimmed.startsWith('/')) {
+      setErrorMsg('URL ảnh không hợp lệ. Vui lòng nhập link bắt đầu bằng https:// hoặc /');
+      return;
+    }
+    setGalleryImages((prev) => [...prev, trimmed]);
+    setSingleGalleryUrl('');
+    setSuccessNotice('✓ Đã thêm 1 ảnh từ URL vào bộ ảnh chụp sách.');
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -123,7 +143,7 @@ export default function EditSingleAuthorBookModal({
     try {
       setIsSaving(true);
       setErrorMsg('');
-      
+
       const updatedBook: AuthorBook = {
         ...book,
         title: title.trim(),
@@ -131,14 +151,18 @@ export default function EditSingleAuthorBookModal({
         description: description.trim(),
         cover_url: coverUrl ? coverUrl.trim() : null,
         youtube_url: youtubeUrl.trim() || null,
-        gallery_images: galleryImages,
+        gallery_images: galleryImages.filter(Boolean),
+        flipbook_pages: flipbookPages.filter(Boolean),
+        file_url: fileUrl ? fileUrl.trim() : null,
+        file_name: fileName ? fileName.trim() : null,
+        pdf_url: pdfUrl ? pdfUrl.trim() : (fileUrl?.toLowerCase().endsWith('.pdf') ? fileUrl.trim() : null),
       };
 
       await onSaved(updatedBook);
-      setSuccessNotice('Đã lưu thành công cuốn sách!');
+      setSuccessNotice('✓ Đã lưu thành công cuốn sách!');
       setTimeout(() => {
         onClose();
-      }, 600);
+      }, 500);
     } catch (err: any) {
       setErrorMsg(err.message || 'Lỗi khi lưu sách.');
     } finally {
@@ -149,35 +173,35 @@ export default function EditSingleAuthorBookModal({
   const detectedYtId = youtubeUrl ? extractYouTubeId(youtubeUrl) : null;
 
   return (
-    <div className="fixed inset-0 z-[120] bg-black/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[120] bg-black/75 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
       <div
-        className="w-full max-w-xl bg-white dark:bg-[#160D2D] rounded-[24px] border border-slate-200/90 dark:border-purple-500/30 shadow-2xl overflow-hidden flex flex-col max-h-[92vh] my-auto"
+        className="w-full max-w-2xl bg-white dark:bg-[#160D2D] rounded-[24px] border border-slate-200/90 dark:border-purple-500/30 shadow-2xl overflow-hidden flex flex-col max-h-[94vh] my-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* HEADER MODAL */}
-        <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-purple-500/20 bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-white dark:from-[#211142] dark:to-[#160D2D] flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-[12px] bg-[#1E3A8A] text-white flex items-center justify-center shadow-md shadow-blue-900/20">
-              <BookOpen size={20} />
+        {/* HEADER MODAL TINH GỌN */}
+        <div className="px-4 py-3 sm:px-5 sm:py-3.5 border-b border-slate-100 dark:border-purple-500/20 bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-white dark:from-[#211142] dark:to-[#160D2D] flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-9 h-9 rounded-[10px] bg-[#1E3A8A] text-white flex items-center justify-center shadow-xs shrink-0">
+              <BookOpen size={18} strokeWidth={2.5} />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h3 className="text-[17px] font-black text-slate-900 dark:text-white leading-tight">
-                  Chỉnh Sửa Cuốn Sách Này
+                <h3 className="text-[16px] font-black text-slate-900 dark:text-white leading-tight truncate">
+                  Cài Đặt Sách: {title || book.title}
                 </h3>
-                <span className="px-2 py-0.5 rounded-[6px] bg-blue-100 text-[#1E3A8A] dark:bg-purple-900/60 dark:text-purple-200 text-[10.5px] font-black uppercase">
+                <span className="px-2 py-0.5 rounded-[6px] bg-blue-100 text-[#1E3A8A] dark:bg-purple-900/60 dark:text-purple-200 text-[10px] font-black uppercase shrink-0">
                   Tác giả
                 </span>
               </div>
-              <p className="text-[12px] text-slate-500 dark:text-purple-200/70 mt-0.5 line-clamp-1">
-                {book.title || 'Sách chuyên sâu'}
+              <p className="text-[11.5px] text-slate-500 dark:text-purple-200/70 truncate">
+                Chỉnh sửa thông tin, bìa sách 3:4, video và tệp đọc thử 3D
               </p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-300 flex items-center justify-center transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-600 dark:text-purple-300 flex items-center justify-center transition-colors cursor-pointer shrink-0 ml-2"
           >
             <X size={18} />
           </button>
@@ -185,87 +209,99 @@ export default function EditSingleAuthorBookModal({
 
         {/* THÔNG BÁO LỖI / THÀNH CÔNG */}
         {errorMsg && (
-          <div className="px-5 py-2.5 bg-red-50 border-b border-red-200 text-red-700 text-[13px] font-medium flex items-center justify-between">
+          <div className="px-4 py-2 bg-red-50 border-b border-red-200 text-red-700 text-[12.5px] font-bold flex items-center justify-between">
             <span>{errorMsg}</span>
             <button type="button" onClick={() => setErrorMsg('')} className="text-red-500 font-bold ml-2">×</button>
           </div>
         )}
         {successNotice && (
-          <div className="px-5 py-2.5 bg-emerald-50 border-b border-emerald-200 text-emerald-800 text-[13px] font-bold flex items-center gap-2">
-            <Check size={16} className="text-emerald-600" />
+          <div className="px-4 py-2 bg-emerald-50 border-b border-emerald-200 text-emerald-800 text-[12.5px] font-bold flex items-center gap-2">
+            <Check size={15} className="text-emerald-600" />
             <span>{successNotice}</span>
           </div>
         )}
 
         {/* FORM NỘI DUNG CUỘN */}
-        <form onSubmit={handleSave} className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 text-slate-800 dark:text-purple-100 text-[13.5px]">
-          {/* 1. TÊN SÁCH & NĂM */}
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-            <div className="sm:col-span-3 space-y-1.5">
-              <label className="block text-[12.5px] font-black text-slate-700 dark:text-purple-200 uppercase tracking-wide">
-                Tên cuốn sách <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="VD: Hiểu Đúng Về Cột Sống..."
-                className="w-full h-10 px-3.5 rounded-[12px] bg-slate-50 dark:bg-[#1E113B] border border-slate-200 dark:border-purple-500/30 text-slate-900 dark:text-white font-bold text-[14px] focus:outline-hidden focus:ring-2 focus:ring-[#1E3A8A]"
-                required
-              />
+        <form onSubmit={handleSave} className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 text-slate-800 dark:text-purple-100 text-[13px]">
+          {/* KHỐI 1: THÔNG TIN CƠ BẢN TINH GỌN */}
+          <div className="space-y-2.5 p-3 rounded-[16px] bg-slate-50/80 dark:bg-[#1A0E35]/60 border border-slate-200/80 dark:border-purple-500/20">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
+              <div className="sm:col-span-3 space-y-1">
+                <label className="block text-[12px] font-black text-slate-700 dark:text-purple-200 uppercase tracking-wide">
+                  Tên cuốn sách <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="VD: Hiểu Đúng Về Cột Sống..."
+                  className="w-full h-9.5 px-3 rounded-[10px] bg-white dark:bg-[#120824] border border-slate-200 dark:border-purple-500/30 text-slate-900 dark:text-white font-bold text-[13.5px] focus:outline-hidden focus:ring-2 focus:ring-[#1E3A8A]"
+                  required
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-[12px] font-black text-slate-700 dark:text-purple-200 uppercase tracking-wide">
+                  Năm xuất bản
+                </label>
+                <input
+                  type="text"
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                  placeholder="VD: 2025"
+                  className="w-full h-9.5 px-3 rounded-[10px] bg-white dark:bg-[#120824] border border-slate-200 dark:border-purple-500/30 text-slate-900 dark:text-white font-bold text-[13.5px] focus:outline-hidden focus:ring-2 focus:ring-[#1E3A8A]"
+                />
+              </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="block text-[12.5px] font-black text-slate-700 dark:text-purple-200 uppercase tracking-wide">
-                Năm xuất bản
+            <div className="space-y-1">
+              <label className="block text-[12px] font-black text-slate-700 dark:text-purple-200 uppercase tracking-wide">
+                Mô tả tóm tắt nội dung cuốn sách
               </label>
-              <input
-                type="text"
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-                placeholder="VD: 2025"
-                className="w-full h-10 px-3 rounded-[12px] bg-slate-50 dark:bg-[#1E113B] border border-slate-200 dark:border-purple-500/30 text-slate-900 dark:text-white font-bold text-[14px] focus:outline-hidden focus:ring-2 focus:ring-[#1E3A8A]"
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={2}
+                placeholder="Nhập nội dung tóm tắt, giá trị cốt lõi hoặc đối tượng độc giả..."
+                className="w-full p-2.5 rounded-[10px] bg-white dark:bg-[#120824] border border-slate-200 dark:border-purple-500/30 text-slate-900 dark:text-white font-medium text-[12.5px] leading-relaxed focus:outline-hidden focus:ring-2 focus:ring-[#1E3A8A]"
               />
             </div>
           </div>
 
-          {/* 2. BÌA SÁCH (TỶ LỆ 3:4) */}
-          <div className="space-y-2 p-3.5 rounded-[16px] bg-slate-50/80 dark:bg-[#1C1037]/70 border border-slate-200/80 dark:border-purple-500/25">
-            <div className="flex items-center justify-between">
-              <label className="text-[12.5px] font-black text-slate-800 dark:text-purple-200 uppercase tracking-wide flex items-center gap-1.5">
-                <ImageIcon size={14} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
-                <span>Ảnh bìa cuốn sách (Tỷ lệ đứng 3:4)</span>
-              </label>
-              {coverUrl && (
-                <button
-                  type="button"
-                  onClick={() => setCoverUrl(null)}
-                  className="text-[11.5px] text-red-500 hover:text-red-700 font-bold cursor-pointer"
-                >
-                  Xóa ảnh bìa
-                </button>
-              )}
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-center gap-3.5">
-              {/* Preview Bìa */}
-              <div className="w-[100px] aspect-[3/4] rounded-[12px] bg-slate-200 dark:bg-[#251547] overflow-hidden shrink-0 shadow-md border border-slate-300 dark:border-purple-400/40 relative flex items-center justify-center">
-                {coverUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={coverUrl} alt="Bìa sách" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="flex flex-col items-center justify-center p-2 text-center text-slate-400">
-                    <BookOpen size={24} />
-                    <span className="text-[9px] font-bold mt-1">Chưa có ảnh</span>
-                  </div>
+          {/* KHỐI 2: ẢNH BÌA & VIDEO YOUTUBE (GỌN 2 CỘT) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Cột 1: Ảnh bìa sách (Tỷ lệ 3:4) */}
+            <div className="p-3 rounded-[16px] bg-slate-50/80 dark:bg-[#1A0E35]/60 border border-slate-200/80 dark:border-purple-500/20 space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-[12px] font-black text-slate-800 dark:text-purple-200 uppercase tracking-wide flex items-center gap-1.5">
+                  <ImageIcon size={14} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
+                  <span>Ảnh bìa (Tỷ lệ 3:4)</span>
+                </label>
+                {coverUrl && (
+                  <button
+                    type="button"
+                    onClick={() => setCoverUrl(null)}
+                    className="text-[11px] text-red-500 hover:text-red-700 font-bold cursor-pointer"
+                  >
+                    Xóa bìa
+                  </button>
                 )}
-                {/* Gáy sách bóng */}
-                <div className="absolute inset-y-0 left-0 w-2 bg-gradient-to-r from-black/25 to-transparent pointer-events-none" />
               </div>
 
-              {/* Nút Upload & Nhập URL */}
-              <div className="flex-1 w-full space-y-2">
-                <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
+                <div className="w-[70px] aspect-[3/4] rounded-[10px] bg-slate-200 dark:bg-[#251547] overflow-hidden shrink-0 shadow-xs border border-slate-300 dark:border-purple-400/40 relative flex items-center justify-center">
+                  {coverUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={coverUrl} alt="Bìa sách" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center p-1 text-center text-slate-400">
+                      <BookOpen size={18} />
+                      <span className="text-[8.5px] font-bold mt-0.5">Chưa có ảnh</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex-1 min-w-0 space-y-1.5">
                   <input
                     type="file"
                     ref={coverInputRef}
@@ -277,175 +313,208 @@ export default function EditSingleAuthorBookModal({
                     type="button"
                     disabled={isUploadingCover}
                     onClick={() => coverInputRef.current?.click()}
-                    className="flex-1 h-9 px-3 rounded-[10px] bg-[#1E3A8A] hover:bg-[#152a65] text-white text-[12.5px] font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+                    className="w-full h-8 px-2.5 rounded-[9px] bg-[#1E3A8A] hover:bg-[#152a65] text-white text-[11.5px] font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
                   >
                     {isUploadingCover ? (
                       <>
-                        <Loader2 size={14} className="animate-spin" />
-                        <span>Đang tải ảnh lên...</span>
+                        <Loader2 size={12} className="animate-spin" />
+                        <span>Đang tải...</span>
                       </>
                     ) : (
                       <>
-                        <ImageIcon size={14} />
-                        <span>Tải ảnh từ máy / điện thoại</span>
+                        <ImageIcon size={12} />
+                        <span>Tải ảnh bìa từ máy</span>
+                      </>
+                    )}
+                  </button>
+
+                  <input
+                    type="url"
+                    value={coverUrl || ''}
+                    onChange={(e) => setCoverUrl(e.target.value)}
+                    placeholder="Hoặc dán URL ảnh bìa..."
+                    className="w-full h-7.5 px-2.5 rounded-[8px] bg-white dark:bg-[#120824] border border-slate-200 dark:border-purple-500/30 text-[11px] font-medium focus:outline-hidden focus:ring-1 focus:ring-[#1E3A8A]"
+                  />
+                </div>
+              </div>
+
+              {/* NGAY DƯỚI ẢNH BÌA: CÁC KHUNG RẤT NHỎ CHO "HÌNH ẢNH CỦA SÁCH" */}
+              <div className="pt-2.5 border-t border-slate-200/80 dark:border-purple-500/20 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-[11.5px] font-black text-slate-800 dark:text-purple-200 uppercase tracking-wide flex items-center gap-1.5">
+                    <Images size={13} className="text-emerald-600 dark:text-emerald-400" />
+                    <span>Hình ảnh của sách ({galleryImages.length} ảnh)</span>
+                  </label>
+                  {galleryImages.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setGalleryImages([])}
+                      className="text-[10.5px] text-red-500 hover:text-red-700 font-bold cursor-pointer"
+                    >
+                      Xóa tất cả
+                    </button>
+                  )}
+                </div>
+
+                <p className="text-[10.5px] text-slate-500 dark:text-purple-300/70 leading-tight">
+                  Ảnh chụp thực tế cuốn sách (hiển thị ở mục &quot;Hình ảnh&quot; cho độc giả phóng to xem)
+                </p>
+
+                {/* Input file chọn nhiều ảnh chụp sách */}
+                <input
+                  type="file"
+                  ref={galleryInputRef}
+                  onChange={handleGalleryFilesChange}
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                />
+
+                {/* Dãy các khung ảnh rất nhỏ dưới ảnh bìa */}
+                <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                  {galleryImages.map((imgUrl, gIdx) => (
+                    <div
+                      key={gIdx}
+                      className="relative w-12 h-16 sm:w-13 sm:h-17 aspect-[3/4] rounded-[8px] overflow-hidden border border-slate-300 dark:border-purple-400/40 bg-slate-100 dark:bg-purple-950/40 shadow-2xs group shrink-0"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={imgUrl}
+                        alt={`Ảnh sách ${gIdx + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setGalleryImages(galleryImages.filter((_, idx) => idx !== gIdx))}
+                        className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-red-600/90 text-white flex items-center justify-center opacity-90 hover:opacity-100 hover:scale-110 transition-all cursor-pointer shadow-xs"
+                        title="Xóa ảnh này"
+                      >
+                        <X size={10} />
+                      </button>
+                      <span className="absolute bottom-0.5 left-0.5 px-1 py-0.2 rounded bg-black/75 text-white text-[8px] font-black leading-none">
+                        #{gIdx + 1}
+                      </span>
+                    </div>
+                  ))}
+
+                  {/* Nút thêm ảnh: Khung nhỏ nét đứt dấu + */}
+                  <button
+                    type="button"
+                    disabled={isUploadingGallery}
+                    onClick={() => galleryInputRef.current?.click()}
+                    className="w-12 h-16 sm:w-13 sm:h-17 aspect-[3/4] rounded-[8px] border-2 border-dashed border-[#1E3A8A]/40 hover:border-[#1E3A8A] dark:border-purple-400/40 dark:hover:border-purple-300 bg-blue-50/40 hover:bg-blue-100/50 dark:bg-purple-950/30 text-[#1E3A8A] dark:text-purple-200 flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer disabled:opacity-50 shrink-0"
+                    title="Thêm ảnh chụp thực tế cuốn sách"
+                  >
+                    {isUploadingGallery ? (
+                      <Loader2 size={13} className="animate-spin text-[#1E3A8A]" />
+                    ) : (
+                      <>
+                        <Plus size={15} strokeWidth={2.5} />
+                        <span className="text-[8px] font-black uppercase text-center leading-none">Thêm ảnh</span>
                       </>
                     )}
                   </button>
                 </div>
 
-                <div className="relative">
+                {/* Nút chọn ảnh từ máy & dán URL */}
+                <div className="flex items-center gap-1.5 pt-0.5">
+                  <button
+                    type="button"
+                    disabled={isUploadingGallery}
+                    onClick={() => galleryInputRef.current?.click()}
+                    className="h-6.5 px-2 rounded-[6px] bg-slate-200 hover:bg-slate-300 dark:bg-purple-900/60 dark:hover:bg-purple-800 text-slate-800 dark:text-purple-100 text-[10.5px] font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    <Plus size={11} />
+                    <span>Chọn ảnh từ máy</span>
+                  </button>
                   <input
                     type="url"
-                    value={coverUrl || ''}
-                    onChange={(e) => setCoverUrl(e.target.value)}
-                    placeholder="Hoặc dán trực tiếp link ảnh (https://...)"
-                    className="w-full h-8.5 px-3 rounded-[9px] bg-white dark:bg-[#130926] border border-slate-200 dark:border-purple-500/30 text-[12px] font-medium focus:outline-hidden focus:ring-1 focus:ring-[#1E3A8A]"
+                    value={singleGalleryUrl}
+                    onChange={(e) => setSingleGalleryUrl(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddSingleGalleryUrl();
+                      }
+                    }}
+                    placeholder="Hoặc dán URL ảnh + Enter..."
+                    className="flex-1 h-6.5 px-2 rounded-[6px] bg-white dark:bg-[#120824] border border-slate-200 dark:border-purple-500/30 text-[10.5px] font-medium text-slate-900 dark:text-white focus:outline-hidden focus:ring-1 focus:ring-[#1E3A8A]"
                   />
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* 3. VIDEO YOUTUBE GIỚI THIỆU SÁCH */}
-          <div className="space-y-2 p-3.5 rounded-[16px] bg-slate-50/80 dark:bg-[#1C1037]/70 border border-slate-200/80 dark:border-purple-500/25">
-            <div className="flex items-center justify-between">
-              <label className="text-[12.5px] font-black text-slate-800 dark:text-purple-200 uppercase tracking-wide flex items-center gap-1.5">
-                <Film size={14} className="text-red-500" />
-                <span>Link Video YouTube giới thiệu cuốn sách</span>
-              </label>
-              {youtubeUrl && (
-                <button
-                  type="button"
-                  onClick={() => setYoutubeUrl('')}
-                  className="text-[11.5px] text-red-500 hover:text-red-700 font-bold cursor-pointer"
-                >
-                  Xóa video
-                </button>
-              )}
-            </div>
-
-            <input
-              type="text"
-              value={youtubeUrl}
-              onChange={(e) => setYoutubeUrl(e.target.value)}
-              placeholder="Dán link YouTube (VD: https://youtu.be/... hoặc shorts)"
-              className="w-full h-9 px-3.5 rounded-[11px] bg-white dark:bg-[#130926] border border-slate-200 dark:border-purple-500/30 text-slate-900 dark:text-white font-medium text-[12.5px] focus:outline-hidden focus:ring-2 focus:ring-red-500"
-            />
-
-            {detectedYtId ? (
-              <div className="mt-2 rounded-[12px] overflow-hidden border border-slate-200 dark:border-purple-500/30">
-                <YouTubeEmbed
-                  youtubeId={detectedYtId}
-                  title={`Video giới thiệu ${title || 'cuốn sách'}`}
-                  showAdminTip={false}
-                  showExternalLink={true}
-                />
-              </div>
-            ) : youtubeUrl.trim() ? (
-              <p className="text-[11.5px] text-amber-600 dark:text-amber-400 font-medium">
-                ⚠️ Không nhận diện được video từ link này. Vui lòng kiểm tra lại đường dẫn YouTube.
-              </p>
-            ) : null}
-          </div>
-
-          {/* 4. MÔ TẢ CHI TIẾT */}
-          <div className="space-y-1.5">
-            <label className="block text-[12.5px] font-black text-slate-700 dark:text-purple-200 uppercase tracking-wide">
-              Mô tả chi tiết cuốn sách
-            </label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={4}
-              placeholder="Nhập nội dung tóm tắt, giá trị cốt lõi hoặc đối tượng độc giả..."
-              className="w-full p-3 rounded-[12px] bg-slate-50 dark:bg-[#1E113B] border border-slate-200 dark:border-purple-500/30 text-slate-900 dark:text-white font-medium text-[13px] leading-relaxed focus:outline-hidden focus:ring-2 focus:ring-[#1E3A8A]"
-            />
-          </div>
-
-          {/* 5. ẢNH CÁC TRANG SÁCH BÊN TRONG (ĐỌC THỬ) */}
-          <div className="space-y-2 p-3.5 rounded-[16px] bg-slate-50/80 dark:bg-[#1C1037]/70 border border-slate-200/80 dark:border-purple-500/25">
-            <div className="flex items-center justify-between">
-              <label className="text-[12.5px] font-black text-slate-800 dark:text-purple-200 uppercase tracking-wide flex items-center gap-1.5">
-                <Images size={14} className="text-emerald-600 dark:text-emerald-400" />
-                <span>Ảnh các trang đọc thử bên trong ({galleryImages.length} ảnh)</span>
-              </label>
-              {galleryImages.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => setGalleryImages([])}
-                  className="text-[11.5px] text-red-500 hover:text-red-700 font-bold cursor-pointer"
-                >
-                  Xóa tất cả ảnh trang
-                </button>
-              )}
-            </div>
-
-            <p className="text-[11.5px] text-slate-500 dark:text-purple-300/70">
-              Đăng tải ảnh chụp các trang hay nhất để độc giả lật trang đọc thử trực tiếp trong app.
-            </p>
-
-            {/* Danh sách ảnh hiện tại */}
-            {galleryImages.length > 0 && (
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 pt-1">
-                {galleryImages.map((imgUrl, gIdx) => (
-                  <div key={gIdx} className="relative aspect-[3/4] rounded-[10px] overflow-hidden border border-slate-300 dark:border-purple-400/40 group bg-slate-100 shadow-2xs">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={imgUrl} alt={`Trang ${gIdx + 1}`} className="w-full h-full object-cover" />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveGalleryImage(gIdx)}
-                      className="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-600/90 text-white flex items-center justify-center opacity-90 hover:opacity-100 hover:scale-110 transition-all cursor-pointer shadow-md"
-                      title="Xóa trang này"
-                    >
-                      <Trash2 size={12} />
-                    </button>
-                    <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/70 text-white text-[9.5px] font-black">
-                      #{gIdx + 1}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Nút thêm ảnh trang */}
-            <div className="pt-2">
-              <input
-                type="file"
-                ref={galleryInputRef}
-                onChange={handleGalleryFilesChange}
-                accept="image/*"
-                multiple
-                className="hidden"
-              />
-              <button
-                type="button"
-                disabled={isUploadingGallery}
-                onClick={() => galleryInputRef.current?.click()}
-                className="w-full h-9 rounded-[11px] border border-dashed border-[#1E3A8A]/50 dark:border-purple-400/50 bg-blue-50/50 dark:bg-purple-950/40 hover:bg-blue-100/60 text-[#1E3A8A] dark:text-purple-200 text-[12.5px] font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
-              >
-                {isUploadingGallery ? (
-                  <>
-                    <Loader2 size={14} className="animate-spin" />
-                    <span>Đang tải các trang sách lên...</span>
-                  </>
-                ) : (
-                  <>
-                    <Plus size={15} />
-                    <span>+ Tải thêm ảnh các trang sách (Chọn nhiều ảnh cùng lúc)</span>
-                  </>
+            {/* Cột 2: Video YouTube giới thiệu */}
+            <div className="p-3 rounded-[16px] bg-slate-50/80 dark:bg-[#1A0E35]/60 border border-slate-200/80 dark:border-purple-500/20 space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-[12px] font-black text-slate-800 dark:text-purple-200 uppercase tracking-wide flex items-center gap-1.5">
+                  <Film size={14} className="text-red-500" />
+                  <span>Video YouTube giới thiệu</span>
+                </label>
+                {youtubeUrl && (
+                  <button
+                    type="button"
+                    onClick={() => setYoutubeUrl('')}
+                    className="text-[11px] text-red-500 hover:text-red-700 font-bold cursor-pointer"
+                  >
+                    Xóa video
+                  </button>
                 )}
-              </button>
+              </div>
+
+              <input
+                type="text"
+                value={youtubeUrl}
+                onChange={(e) => setYoutubeUrl(e.target.value)}
+                placeholder="Dán link YouTube (VD: https://youtu.be/...)"
+                className="w-full h-8 px-2.5 rounded-[8px] bg-white dark:bg-[#120824] border border-slate-200 dark:border-purple-500/30 text-slate-900 dark:text-white font-medium text-[11.5px] focus:outline-hidden focus:ring-1 focus:ring-red-500"
+              />
+
+              {detectedYtId ? (
+                <div className="rounded-[10px] overflow-hidden border border-slate-200 dark:border-purple-500/30 max-h-[90px]">
+                  <YouTubeEmbed
+                    youtubeId={detectedYtId}
+                    title={`Video ${title || 'cuốn sách'}`}
+                    showAdminTip={false}
+                    showExternalLink={false}
+                  />
+                </div>
+              ) : (
+                <p className="text-[11px] text-slate-400 dark:text-purple-300/60 italic">
+                  Tùy chọn: Nhập link YouTube để hiển thị video giới thiệu trực tiếp cho cuốn sách.
+                </p>
+              )}
             </div>
           </div>
+
+          {/* KHỐI 3: TÀI LIỆU XEM THỬ 3D (FLIPBOOK) - Ở PHẦN DƯỚI CỦA HÌNH ẢNH SÁCH */}
+          <BookFlipbookAdminSection
+            bookTitle={title || book.title}
+            coverUrl={coverUrl}
+            flipbookPages={flipbookPages}
+            onChangeFlipbookPages={setFlipbookPages}
+            fileUrl={fileUrl}
+            fileName={fileName}
+            onChangeFile={(newUrl, newName) => {
+              setFileUrl(newUrl);
+              setFileName(newName);
+              if (newUrl?.toLowerCase().endsWith('.pdf')) {
+                setPdfUrl(newUrl);
+              }
+            }}
+            onSetCoverUrlIfNotSet={(firstPageUrl) => {
+              if (!coverUrl) setCoverUrl(firstPageUrl);
+            }}
+          />
         </form>
 
-        {/* FOOTER ACTIONS */}
-        <div className="p-3.5 sm:p-4 border-t border-slate-100 dark:border-purple-500/20 bg-slate-50/90 dark:bg-[#180E33] flex items-center justify-end gap-2.5 shrink-0">
+        {/* FOOTER ACTIONS TINH GỌN */}
+        <div className="px-4 py-3 sm:px-5 sm:py-3.5 border-t border-slate-100 dark:border-purple-500/20 bg-slate-50/90 dark:bg-[#180E33] flex items-center justify-end gap-2.5 shrink-0">
           <button
             type="button"
             onClick={onClose}
             disabled={isSaving}
-            className="h-10 px-4 rounded-[12px] bg-slate-200/90 hover:bg-slate-300 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-700 dark:text-purple-200 text-[13px] font-bold transition-colors cursor-pointer disabled:opacity-50"
+            className="h-9 px-4 rounded-[10px] bg-slate-200/90 hover:bg-slate-300 dark:bg-purple-950 dark:hover:bg-purple-900 text-slate-700 dark:text-purple-200 text-[12.5px] font-bold transition-colors cursor-pointer disabled:opacity-50"
           >
             Hủy bỏ
           </button>
@@ -454,16 +523,16 @@ export default function EditSingleAuthorBookModal({
             type="button"
             onClick={handleSave}
             disabled={isSaving}
-            className="h-10 px-5 rounded-[12px] bg-gradient-to-r from-[#1E3A8A] to-[#2563EB] hover:from-[#152a65] hover:to-[#1d4ed8] text-white text-[13.5px] font-black flex items-center gap-2 shadow-md shadow-blue-900/25 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+            className="h-9 px-5 rounded-[10px] bg-gradient-to-r from-[#1E3A8A] to-[#2563EB] hover:from-[#152a65] hover:to-[#1d4ed8] text-white text-[13px] font-black flex items-center gap-2 shadow-md shadow-blue-900/25 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
           >
             {isSaving ? (
               <>
-                <Loader2 size={16} className="animate-spin" />
+                <Loader2 size={15} className="animate-spin" />
                 <span>Đang lưu...</span>
               </>
             ) : (
               <>
-                <Save size={16} />
+                <Save size={15} />
                 <span>Lưu Thay Đổi Cuốn Sách Này</span>
               </>
             )}

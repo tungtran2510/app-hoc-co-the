@@ -38,14 +38,9 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#FFFFFF' },
-    { media: '(prefers-color-scheme: dark)', color: '#0C0817' },
-  ],
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  viewportFit: 'cover',
 };
 
 export default function RootLayout({
@@ -57,7 +52,7 @@ export default function RootLayout({
     <html lang="vi" className={`${beVietnamPro.variable} ${lora.variable} ${beVietnamPro.className}`}>
       <head>
         <meta name="referrer" content="strict-origin-when-cross-origin" />
-        <meta name="theme-color" content="#FFFFFF" />
+        <meta name="theme-color" id="app-theme-color" content="#FFFFFF" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -67,7 +62,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-icon.png" />
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('giao_dien');var isDark=t==='dark'||(!t&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);var color=isDark?'#0C0817':'#FFFFFF';if(isDark){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}var metas=document.querySelectorAll('meta[name="theme-color"]');if(metas.length>0){metas.forEach(function(m){m.setAttribute('content',color);m.removeAttribute('media');});}else{var n=document.createElement('meta');n.name='theme-color';n.content=color;document.head.appendChild(n);}}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('giao_dien');var isDark=t==='dark'||(!t&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);var color=isDark?'#0C0817':'#FFFFFF';if(isDark){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}var m=document.getElementById('app-theme-color')||document.querySelector('meta[name="theme-color"]');if(!m){m=document.createElement('meta');m.id='app-theme-color';m.name='theme-color';document.head.appendChild(m)}m.setAttribute('content',color);m.removeAttribute('media');var all=document.querySelectorAll('meta[name="theme-color"]');for(var i=0;i<all.length;i++){if(all[i]!==m){all[i].remove()}}}catch(e){}})();`,
           }}
         />
       </head>

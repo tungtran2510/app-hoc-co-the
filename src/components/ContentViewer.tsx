@@ -250,10 +250,19 @@ export default function ContentViewer({
         document.body.classList.add('dark');
       }
         const targetColor = mode === 'dark' ? '#0C0817' : '#FFFFFF';
-        const metas = document.querySelectorAll('meta[name="theme-color"]');
-        metas.forEach((m) => {
-          m.setAttribute('content', targetColor);
-          m.removeAttribute('media');
+        let m = document.getElementById('app-theme-color') as HTMLMetaElement | null;
+        if (!m) m = document.querySelector('meta[name="theme-color"]');
+        if (!m) {
+          m = document.createElement('meta');
+          m.id = 'app-theme-color';
+          m.name = 'theme-color';
+          document.head.appendChild(m);
+        }
+        m.setAttribute('content', targetColor);
+        m.removeAttribute('media');
+        const allMetas = document.querySelectorAll('meta[name="theme-color"]');
+        allMetas.forEach((el) => {
+          if (el !== m) el.remove();
         });
         window.dispatchEvent(new Event('giao_dien_changed'));
       } catch {

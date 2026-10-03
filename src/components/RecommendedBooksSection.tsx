@@ -162,6 +162,10 @@ export default function RecommendedBooksSection({
         description: selectedBook.description,
         youtube_url: selectedBook.youtube_url,
         gallery_images: selectedBook.gallery_images,
+        flipbook_pages: selectedBook.flipbook_pages,
+        file_url: selectedBook.file_url,
+        file_name: selectedBook.file_name,
+        pdf_url: selectedBook.pdf_url,
         link_url: selectedBook.link_url,
         type: 'recommended',
       }

@@ -8,6 +8,10 @@ export interface AuthorBook {
   year?: string;
   youtube_url?: string | null;
   gallery_images?: string[];
+  flipbook_pages?: string[];
+  file_url?: string | null;
+  file_name?: string | null;
+  pdf_url?: string | null;
   is_visible?: boolean;
 }
 
@@ -42,6 +46,10 @@ export interface RecommendedBook {
   color_theme?: string | null;
   youtube_url?: string | null;
   gallery_images?: string[];
+  flipbook_pages?: string[];
+  file_url?: string | null;
+  file_name?: string | null;
+  pdf_url?: string | null;
   is_visible?: boolean;
 }
 
