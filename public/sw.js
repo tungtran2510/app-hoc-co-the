@@ -3,8 +3,8 @@
 // Đạt tốc độ phản hồi tức thì (< 1ms) khi người dùng chuyển đổi các mục hoặc vào bài học
 // TUÂN THỦ CHỈ THỊ: Chỉ tải từ mạng khi người dùng ấn vào tài liệu sách / video dung lượng lớn
 
-const CACHE_NAME = 'qbiz-books-shell-v21';
-const STATIC_ASSETS_CACHE = 'qbiz-books-static-v21';
+const CACHE_NAME = 'qbiz-books-shell-v22';
+const STATIC_ASSETS_CACHE = 'qbiz-books-static-v22';
 
 // Danh sách tài nguyên Shell và các trang cốt lõi cần tải sẵn vào bộ nhớ điện thoại
 const PRECACHE_SHELL_URLS = [
@@ -22,6 +22,8 @@ const PRECACHE_SHELL_URLS = [
   '/app_logo.png',
   '/icon-192.png',
   '/icon-512.png',
+  '/icon-maskable-192.png',
+  '/icon-maskable-512.png',
   '/images/book_cover_blank.jpg',
   '/spine_hero_clean.png',
 ];
@@ -80,6 +82,8 @@ self.addEventListener('fetch', (event) => {
     url.pathname === '/app_logo.png' ||
     url.pathname === '/icon-192.png' ||
     url.pathname === '/icon-512.png' ||
+    url.pathname === '/icon-maskable-192.png' ||
+    url.pathname === '/icon-maskable-512.png' ||
     url.pathname === '/apple-icon.png' ||
     url.pathname === '/favicon.ico'
   ) {

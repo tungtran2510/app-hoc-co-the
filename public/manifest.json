@@ -11,45 +11,34 @@
   "lang": "vi",
   "icons": [
     {
-      "src": "/app_logo.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/app_logo.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "/icon-192.png",
+      "src": "/icon-192.png?v=22",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-192.png",
+      "src": "/icon-maskable-192.png?v=22",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/icon-512.png?v=22",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/icon-maskable-512.png?v=22",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/apple-icon.png",
-      "sizes": "180x180",
-      "type": "image/png"
+      "src": "/app_logo.png?v=22",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "shortcuts": [
@@ -58,14 +47,14 @@
       "short_name": "Trợ lý AI",
       "description": "Hỏi đáp & chăm sóc sức khỏe chủ động",
       "url": "/tro-ly-ai",
-      "icons": [{ "src": "/app_logo.png", "sizes": "512x512" }]
+      "icons": [{ "src": "/icon-192.png?v=22", "sizes": "192x192" }]
     },
     {
       "name": "Bài học đã lưu",
       "short_name": "Đã lưu",
       "description": "Xem lại các bài học đã đánh dấu",
       "url": "/da-luu",
-      "icons": [{ "src": "/app_logo.png", "sizes": "512x512" }]
+      "icons": [{ "src": "/icon-192.png?v=22", "sizes": "192x192" }]
     }
   ]
 }
