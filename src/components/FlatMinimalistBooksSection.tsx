@@ -351,7 +351,7 @@ export default function FlatMinimalistBooksSection({
             return (
               <div
                 key={book.id || idx}
-                className={`flex flex-col group relative rounded-[18px] border border-slate-200/70 bg-white p-2.5 pb-3 shadow-[0_10px_28px_-20px_rgba(15,23,42,.45)] transition-all ${
+                className={`flex flex-col group relative rounded-[18px] border border-slate-200/70 bg-white dark:bg-[#1A1236] dark:border-white/10 p-2.5 pb-3 shadow-[0_10px_28px_-20px_rgba(15,23,42,.45)] transition-all ${
                   isBookHidden ? 'opacity-60 ring-2 ring-dashed ring-amber-400 p-1 rounded-[14px]' : ''
                 }`}
               >
@@ -378,7 +378,7 @@ export default function FlatMinimalistBooksSection({
                 <div className="flex flex-col pt-1 min-w-0">
                   <h3
                     onClick={() => setSelectedBook(book)}
-                    className="text-[13px] sm:text-[15px] font-bold text-center text-[#071735] leading-snug line-clamp-2 min-h-[36px] flex items-center justify-center cursor-pointer"
+                    className="text-[13px] sm:text-[15px] font-bold text-center text-[#071735] dark:text-white leading-snug line-clamp-2 min-h-[36px] flex items-center justify-center cursor-pointer"
                   >
                     {book.title}
                   </h3>

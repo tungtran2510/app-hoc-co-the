@@ -451,12 +451,13 @@ export function AuthorBooksSection({
         })),
       ];
   const [previewBook, setPreviewBook] = useState<AuthorBook | null>(null);
+  const [videoBook, setVideoBook] = useState<AuthorBook | null>(null);
   const [internalEditingBook, setInternalEditingBook] = useState<AuthorBook | null>(null);
 
   if (displayBooks.length === 0 && !isAdmin) return null;
 
   return (
-    <section className="flex flex-col gap-2 mt-1 rounded-[18px] bg-[#F7F8FC] px-0 py-0.5">
+    <section className="flex flex-col gap-2 mt-1 rounded-[18px] bg-[#F7F8FC] dark:bg-transparent px-0 py-0.5">
       {/* KHỐI NÚT ĐIỀU KHIỂN DÀNH CHO ADMIN - ĐẶT TRÊN ĐẦU KHỐI */}
       {isAdmin && typeof sectionIndex === 'number' && typeof totalSections === 'number' && onMoveUp && onMoveDown && onOpenReorderModal && (
         <SectionOrderControls
@@ -479,7 +480,7 @@ export function AuthorBooksSection({
           <button
             type="button"
             onClick={() => window.history.back()}
-            className="flex h-[30px] w-[30px] items-center justify-center rounded-full text-[#071735] transition-colors hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#071735] dark:text-white"
+            className="flex h-[30px] w-[30px] items-center justify-center rounded-full text-[#071735] transition-colors hover:bg-white dark:hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#071735] dark:text-white"
             aria-label="Quay lại"
           >
             <ArrowLeft size={20} strokeWidth={2.6} />
@@ -489,7 +490,7 @@ export function AuthorBooksSection({
           </h3>
           <a
             href="/tim-kiem"
-            className="flex h-[30px] w-[30px] items-center justify-center rounded-full text-[#071735] transition-colors hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#071735] dark:text-white"
+            className="flex h-[30px] w-[30px] items-center justify-center rounded-full text-[#071735] transition-colors hover:bg-white dark:hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#071735] dark:text-white"
             aria-label="Tìm kiếm"
           >
             <Search size={20} strokeWidth={2.6} />
@@ -517,11 +518,11 @@ export function AuthorBooksSection({
                   <h4 className="text-[15px] sm:text-[18px] font-black tracking-tight text-[#071735] dark:text-white">
                     Các tác phẩm khác
                   </h4>
-                  <div className="flex items-center gap-1.5 text-[#071735]">
-                    <button type="button" className="flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-sm" aria-label="Tác phẩm trước">
+                  <div className="flex items-center gap-1.5 text-[#071735] dark:text-white">
+                    <button type="button" className="flex h-7 w-7 items-center justify-center rounded-full bg-white dark:bg-[#241548] dark:border dark:border-white/15 shadow-sm" aria-label="Tác phẩm trước">
                       <ChevronLeft size={16} strokeWidth={2.5} />
                     </button>
-                    <button type="button" className="flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-sm" aria-label="Tác phẩm tiếp theo">
+                    <button type="button" className="flex h-7 w-7 items-center justify-center rounded-full bg-white dark:bg-[#241548] dark:border dark:border-white/15 shadow-sm" aria-label="Tác phẩm tiếp theo">
                       <ChevronRight size={16} strokeWidth={2.5} />
                     </button>
                   </div>
@@ -533,14 +534,14 @@ export function AuthorBooksSection({
                 className={idx === 0 ? 'col-span-2' : ''}
               >
                 <div
-                  className={`h-full bg-white text-slate-900 border border-slate-200/70 shadow-[0_10px_30px_-20px_rgba(15,23,42,.38)] transition-all duration-300 flex group ${idx === 0 ? 'flex-row gap-2.5 p-2.5 sm:gap-4 sm:p-4 rounded-[18px]' : 'flex-col gap-0.5 p-1.5 pb-2 rounded-[14px]'} ${
+                  className={`h-full bg-white text-slate-900 border border-slate-200/70 dark:bg-[#1A1236] dark:text-white dark:border-white/10 shadow-[0_10px_30px_-20px_rgba(15,23,42,.38)] transition-all duration-300 flex group ${idx === 0 ? 'flex-row gap-2.5 p-2.5 sm:gap-4 sm:p-4 rounded-[18px]' : 'flex-col gap-0.5 p-1 pb-2 rounded-[14px]'} ${
                     isBookHidden ? 'opacity-70 border-dashed border-amber-300' : ''
                   }`}
                 >
                   {/* BÊN TRÁI: Bìa sách to rõ chuẩn tỷ lệ 3:4 với ModernBookCover */}
                   <div
                     onClick={() => onSelectBook?.(book)}
-                    className={`${idx === 0 ? 'w-[35%] max-w-[205px]' : 'w-[62%] mx-auto'} aspect-[3/4] shrink-0 relative flex items-center justify-center cursor-pointer`}
+                    className={`${idx === 0 ? 'w-[35%] max-w-[205px]' : 'w-[96%] mx-auto'} aspect-[3/4] shrink-0 relative flex items-center justify-center cursor-pointer`}
                   >
                     <ModernBookCover
                       title={book.title}
@@ -582,22 +583,20 @@ export function AuthorBooksSection({
                     {/* CỤM HÀNH ĐỘNG: Xem thử 3D màu vàng sáng full bề ngang, Chi tiết sách ở DƯỚI */}
                     <div className={`${idx === 0 ? 'pt-2' : 'pt-1'} flex flex-col gap-1.5 mt-auto`}>
                       {idx === 0 ? (
-                        <div className="grid grid-cols-[.78fr_.88fr_1.45fr] overflow-hidden rounded-[14px] border border-amber-300 bg-white shadow-[0_7px_22px_-12px_rgba(245,158,11,.65)]">
-                          <a
-                            href={hasVideo ? book.youtube_url || '#' : '#'}
-                            target={hasVideo ? '_blank' : undefined}
-                            rel={hasVideo ? 'noopener noreferrer' : undefined}
-                            onClick={(e) => { if (!hasVideo) e.preventDefault(); e.stopPropagation(); }}
-                            className="flex min-h-[42px] flex-col items-center justify-center gap-0.5 border-r border-slate-200 text-[8.5px] sm:text-[10px] font-bold text-[#071735]"
+                        <div className="grid grid-cols-[.78fr_.88fr_1.45fr] overflow-hidden rounded-[14px] border border-amber-300 dark:border-amber-400/60 bg-white dark:bg-[#241548] shadow-[0_7px_22px_-12px_rgba(245,158,11,.65)]">
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); if (hasVideo) setVideoBook(book); }}
+                            className="flex min-h-[42px] flex-col items-center justify-center gap-0.5 border-r border-slate-200 dark:border-white/15 text-[8.5px] sm:text-[10px] font-bold text-[#071735] dark:text-white cursor-pointer"
                             aria-disabled={!hasVideo}
                           >
                             <Play size={15} className="fill-red-600 text-red-600" />
                             <span>Video</span>
-                          </a>
+                          </button>
                           <button
                             type="button"
                             onClick={(e) => { e.stopPropagation(); onSelectBook?.(book); }}
-                            className="flex min-h-[42px] flex-col items-center justify-center gap-0.5 border-r border-slate-200 text-[8.5px] sm:text-[10px] font-bold text-[#071735]"
+                            className="flex min-h-[42px] flex-col items-center justify-center gap-0.5 border-r border-slate-200 dark:border-white/15 text-[8.5px] sm:text-[10px] font-bold text-[#071735] dark:text-white"
                           >
                             <FileText size={15} />
                             <span>Chi tiết</span>
@@ -729,6 +728,37 @@ export function AuthorBooksSection({
       )}
 
       {/* CUỐN SÁCH LẬT TRANG 3D ĐỌC THỬ (CHÂN THỰC TOÀN MÀN HÌNH THEO YÊU CẦU NGƯỜI DÙNG) */}
+      {/* POPUP VIDEO: phát ngay trong app, không chuyển sang YouTube */}
+      {videoBook && extractYouTubeId(videoBook.youtube_url || '') && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-3 backdrop-blur-xs"
+          onClick={() => setVideoBook(null)}
+        >
+          <div
+            className="relative w-full max-w-[560px] rounded-2xl bg-white dark:bg-[#181132] p-3 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <span className="line-clamp-1 text-[13px] font-bold text-slate-900 dark:text-white">{videoBook.title}</span>
+              <button
+                type="button"
+                onClick={() => setVideoBook(null)}
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-700 dark:bg-white/10 dark:text-white cursor-pointer"
+                aria-label="Đóng video"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <YouTubeEmbed
+              youtubeId={extractYouTubeId(videoBook.youtube_url || '') as string}
+              title={videoBook.title}
+              autoplay={true}
+              showExternalLink={false}
+            />
+          </div>
+        </div>
+      )}
+
       <FlipbookViewer
         mode="modal-only"
         isOpen={Boolean(previewBook)}
