@@ -3,8 +3,7 @@ import { rateLimit, getClientIp } from '../../../../lib/authServer';
 import { getSettings } from '../../../../lib/data';
 import { sampleTopics, samplePages } from '../../../../data/sample';
 import { getSupabaseClient } from '../../../../lib/supabaseClient';
-import { searchFastKnowledge } from '../../../../lib/knowledge';
-import { retrieveKnowledge, formatKnowledgeForPrompt } from '../../../../lib/aiKnowledgeRetrieval';
+import { retrieveKnowledge, formatKnowledgeForPrompt, KnowledgeExcerpt } from '../../../../lib/aiKnowledgeRetrieval';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -384,28 +383,62 @@ async function getOrBuildLessonCatalog(): Promise<LessonCatalogItem[]> {
   return catalog;
 }
 
-// Fallback an toàn khi mạng chập chờn (gọn gàng, đúng trọng tâm, TUYỆT ĐỐI KHÔNG CHÈN DOCTORLOAN HAY BẢN NÓI ĐÀO TẠO)
-function fastFallbackSearch(query: string, catalog: LessonCatalogItem[]) {
+// Fallback an toàn khi cả hai mạng AI gặp sự cố kết nối
+function fastFallbackSearch(query: string, catalog: LessonCatalogItem[], excerpts?: KnowledgeExcerpt[]) {
   const selectedPages = rankCatalogPages(query, catalog);
-  const primaryPage = selectedPages[0];
-
-  let answerText = '';
   const lowerQ = query.toLowerCase();
 
-  if (lowerQ.includes('cổ') || lowerQ.includes('vai') || lowerQ.includes('gáy') || lowerQ.includes('ngực')) {
-    answerText = `• Duy trì tư thế ngồi chuẩn, nằm chuẩn để bảo vệ trục cột sống cổ tự nhiên.\n• Tránh giữ nguyên một tư thế quá lâu; nghỉ ngơi và thả lỏng cơ định kỳ.\n• Chườm ấm nhẹ nhàng vùng cổ vai gáy vào buổi tối để tăng cường tuần hoàn máu.`;
-  } else if (lowerQ.includes('lưng') || lowerQ.includes('đĩa đệm') || lowerQ.includes('thoát vị') || lowerQ.includes('tọa')) {
-    answerText = `• Duy trì tư thế nằm chuẩn, ngồi chuẩn để bảo vệ trục sinh lý cột sống và giảm áp lực cho đĩa đệm.\n• Tránh ngồi tĩnh tại liên tục một chỗ quá lâu, nên đứng dậy đi lại nhẹ nhàng sau mỗi 30 - 45 phút.\n• Khi nâng nhấc đồ vật, luôn giữ thẳng lưng và hạ thấp trọng tâm, tránh cúi gập vặn xoắn đột ngột.`;
-  } else if (lowerQ.includes('nước') || lowerQ.includes('uống')) {
-    answerText = `• Uống từng ngụm nhỏ, rải đều trong suốt cả ngày thay vì uống dồn một lượng lớn.\n• Bổ sung nước ấm vào buổi sáng sau khi thức dậy để kích hoạt nhu động đường tiêu hóa.\n• Khi vận động ra nhiều mồ hôi, nên bù thêm khoáng điện giải tự nhiên.`;
-  } else if (lowerQ.includes('ăn') || lowerQ.includes('tiêu hóa') || lowerQ.includes('dạ dày') || lowerQ.includes('đầy bụng')) {
-    answerText = `• Ăn chậm, nhai kỹ để giảm gánh nặng co bóp và tiết acid cho dạ dày.\n• Hạn chế đồ ăn quá nhiều dầu mỡ, đồ cay nóng hoặc nằm ngay sau khi ăn no.\n• Duy trì khoảng cách tối thiểu 2 - 3 giờ giữa bữa tối và giờ đi ngủ.`;
-  } else {
-    answerText = `• Lắng nghe các tín hiệu của cơ thể, duy trì lối sống điều độ và chế độ dinh dưỡng lành mạnh.\n• Duy trì vận động nhịp nhàng mỗi ngày để tăng cường tuần hoàn và trao đổi chất.\n• Xem chi tiết bài học y học trực quan bên dưới để nắm rõ cơ chế và cách ứng dụng.`;
+  let answerText = '';
+
+  // 1. ƯU TIÊN SỐ 1: NẾU CÓ ĐOẠN TRÍCH TÀI LIỆU CỦA TÁC GIẢ, DÙNG TRỰC TIẾP
+  if (excerpts && excerpts.length > 0) {
+    const cleanLines = excerpts
+      .slice(0, 4)
+      .map((e) => {
+        const lines = e.text
+          .split('\n')
+          .map((l: string) => l.trim().replace(/^[-•*#\d.]+\s*/, ''))
+          .filter((l: string) => l.length > 20 && !l.includes('http'));
+        return lines[0] ? `• ${lines[0]}` : '';
+      })
+      .filter(Boolean);
+
+    if (cleanLines.length >= 2) {
+      answerText = cleanLines.join('\n');
+    }
+  }
+
+  // 2. NẾU CHƯA CÓ ĐOẠN TRÍCH, TRẢ LỜI ĐÚNG THEO NHÓM VẤN ĐỀ Y HỌC CỐT LÕI
+  if (!answerText) {
+    if (lowerQ.includes('cổ') || lowerQ.includes('vai') || lowerQ.includes('gáy') || lowerQ.includes('ngực')) {
+      answerText = `• Duy trì tư thế ngồi chuẩn, nằm chuẩn để bảo vệ trục cột sống cổ và độ cong sinh lý tự nhiên.\n• Tránh cúi gập đầu xem điện thoại hoặc máy tính quá lâu; thả lỏng cơ cổ và vận động nhẹ nhàng định kỳ.\n• Chườm ấm nhẹ nhàng vùng cổ vai gáy vào buổi tối để tăng cường lưu thông tuần hoàn máu.\n• Mời bạn xem các bài học giải phẫu trực quan bên dưới để nắm rõ cơ chế và tư thế bảo vệ cổ.`;
+    } else if (
+      lowerQ.includes('lưng') ||
+      lowerQ.includes('đĩa đệm') ||
+      lowerQ.includes('thoát vị') ||
+      lowerQ.includes('trượt') ||
+      lowerQ.includes('đốt sống') ||
+      lowerQ.includes('l4') ||
+      lowerQ.includes('l5') ||
+      lowerQ.includes('s1') ||
+      lowerQ.includes('cột sống') ||
+      lowerQ.includes('tọa') ||
+      lowerQ.includes('thoái hóa') ||
+      lowerQ.includes('xương') ||
+      lowerQ.includes('khớp')
+    ) {
+      answerText = `• Khi gặp tổn thương đĩa đệm hoặc trượt đốt sống (như tầng L4-L5), nguyên tắc cốt lõi là giữ vững trục giải phẫu và đường cong sinh lý tự nhiên của cột sống.\n• Luôn duy trì tư thế nằm chuẩn và ngồi chuẩn để giải tỏa tải trọng chèn ép lên đĩa đệm và hệ dây chằng bao quanh.\n• Tránh cúi gập người nâng vật nặng, không vặn xoắn cột sống đột ngột hoặc ngồi tĩnh tại một chỗ quá lâu.\n• Vận động nhẹ nhàng phù hợp với thể trạng; nếu có biểu hiện đau nhói buốt lan xuống chân hoặc tê yếu chi, cần đến cơ sở y tế chuyên khoa thăm khám.\n• Tham khảo chi tiết các bài học giải phẫu trực quan bên dưới để nắm rõ cấu trúc và phương pháp bảo vệ cột sống.`;
+    } else if (lowerQ.includes('nước') || lowerQ.includes('uống')) {
+      answerText = `• Uống từng ngụm nhỏ, ngồi uống thong thả để nước kịp thẩm thấu nuôi dưỡng tế bào và sụn khớp.\n• Bổ sung 1 ly nước ấm vào buổi sáng sớm để kích hoạt nhu động ruột và tuần hoàn cơ thể.\n• Duy trì lượng nước hợp lý trong ngày, rải đều các thời điểm thay vì uống dồn một lượng lớn.`;
+    } else if (lowerQ.includes('ăn') || lowerQ.includes('tiêu hóa') || lowerQ.includes('dạ dày') || lowerQ.includes('đầy bụng') || lowerQ.includes('dinh dưỡng')) {
+      answerText = `• Ăn chậm, nhai kỹ để giảm áp lực co bóp cơ học và tiết acid dư thừa của dạ dày.\n• Ưu tiên thực phẩm tươi tự nhiên, giàu chất chống oxy hóa và hỗ trợ hệ vi sinh đường ruột.\n• Hạn chế đồ ăn cay nóng, nhiều dầu mỡ và duy trì khoảng cách ít nhất 2 - 3 giờ trước khi đi ngủ.`;
+    } else {
+      answerText = `• Giữ trục tư thế chuẩn trong mọi hoạt động hàng ngày để bảo vệ hệ cơ xương khớp và tuần hoàn cơ thể.\n• Tránh duy trì một tư thế tĩnh tại quá lâu, nên đứng dậy đi lại nhẹ nhàng sau mỗi 45 phút.\n• Mời bạn xem các bài học y học trực quan bên dưới để tìm hiểu chi tiết cấu trúc giải phẫu và hướng dẫn chuyên môn.`;
+    }
   }
 
   return {
-    answer: `Hướng dẫn chăm sóc sức khỏe chủ động:\n\n${answerText}`,
+    answer: answerText,
     suggested_pages: selectedPages.map((s) => ({
       title: s.page_title,
       topic_title: s.topic_title,
@@ -414,8 +447,8 @@ function fastFallbackSearch(query: string, catalog: LessonCatalogItem[]) {
       reason: `Tham khảo kiến thức chuẩn trong bài "${s.page_title}".`,
     })),
     follow_up_questions: [
-      'Tư thế sinh hoạt đúng cần chú ý gì?',
-      'Cách phân biệt đau mỏi thông thường?',
+      'Nguyên tắc tư thế chuẩn để bảo vệ cột sống?',
+      'Chế độ dinh dưỡng khoa học hỗ trợ phục hồi đĩa đệm?',
     ],
     provider: 'fallback_clean',
   };
@@ -490,8 +523,13 @@ export async function POST(req: NextRequest) {
     const deepseekKey = process.env.DEEPSEEK_API_KEY;
     const geminiKey = process.env.GEMINI_API_KEY;
 
+    // 3b. TRUY XUẤT CÁC ĐOẠN TÀI LIỆU LIÊN QUAN TỪ KHO TÀI LIỆU TÁC GIẢ NẠP TRONG ADMIN
+    const excerpts = retrieveKnowledge(question, aiTraining?.documents);
+    const knowledgeText = formatKnowledgeForPrompt(excerpts);
+    const authorGuidelines = (aiTraining?.guidelines || '').trim();
+
     if (!deepseekKey && !geminiKey) {
-      return NextResponse.json(fastFallbackSearch(question, catalog));
+      return NextResponse.json(fastFallbackSearch(question, catalog, excerpts));
     }
 
     // 3. LỌC 2-3 BÀI HỌC LIÊN QUAN NHẤT TỪ CATALOG BẰNG THUẬT TOÁN ĐIỂM CHỦ ĐỀ
@@ -500,11 +538,6 @@ export async function POST(req: NextRequest) {
     const catalogText = topCatalog
       .map((c, idx) => `[Bài ${idx + 1}] "${c.page_title}" (Chủ đề: ${c.topic_title}, slug: ${c.topic_slug}/${c.page_slug}): ${c.summary}`)
       .join('\n');
-
-    // 3b. TRUY XUẤT CÁC ĐOẠN TÀI LIỆU LIÊN QUAN TỪ KHO TÀI LIỆU TÁC GIẢ NẠP TRONG ADMIN (trước đây chưa được dùng)
-    const excerpts = retrieveKnowledge(question, aiTraining?.documents);
-    const knowledgeText = formatKnowledgeForPrompt(excerpts);
-    const authorGuidelines = (aiTraining?.guidelines || '').trim();
 
     // 4. HỆ THỐNG PROMPT TỐI ƯU: ĐÚNG TRỌNG TÂM, NGẮN GỌN, TUYỆT ĐỐI CẤM BÁN HÀNG DOCTORLOAN
     const systemPrompt = `Bạn là Trợ lý Sức Khỏe AI trong ứng dụng giáo dục y học "Học Cơ Thể" (Tủ Sách Y Khoa Qbiz Books của tác giả Tùng dinh dưỡng).
@@ -565,11 +598,11 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
     let rawText = '';
     let usedProvider = '';
 
-    // 5. GỌI PRIMARY: DEEPSEEK V3 VỚI TIMEOUT 3500ms
+    // 5. GỌI PRIMARY: DEEPSEEK V3 VỚI TIMEOUT 8000ms
     if (deepseekKey) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 20000);
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
 
         const deepseekRes = await fetch('https://api.deepseek.com/chat/completions', {
           method: 'POST',
@@ -605,15 +638,15 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
           }
         }
       } catch (err: any) {
-        console.warn('[AI] DeepSeek timed out or failed, falling back to Gemini Flash Lite...', err?.message);
+        console.warn('[AI] DeepSeek timed out or failed, falling back to Gemini Flash...', err?.message);
       }
     }
 
-    // 6. GỌI SECONDARY (FALLBACK): GOOGLE GEMINI VỚI TIMEOUT 4500ms
+    // 6. GỌI SECONDARY (FALLBACK): GOOGLE GEMINI VỚI TIMEOUT 8000ms
     if (!rawText && geminiKey) {
       const candidateModels = [
-        'gemini-1.5-flash',
-        'gemini-2.0-flash',
+        'gemini-flash-latest',
+        'gemini-2.5-flash',
       ];
 
       const geminiPrompt = `${systemPrompt}\n\nCÂU HỎI CỦA NGƯỜI HỌC: "${question}"\n\nLỊCH SỬ:\n${history.slice(-4).map((h: any) => `${h.role === 'user' ? 'Người học' : 'Trợ lý'}: ${h.text}`).join('\n')}`;
@@ -621,7 +654,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
       for (const model of candidateModels) {
         try {
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 12000);
+          const timeoutId = setTimeout(() => controller.abort(), 8000);
 
           const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`;
           const geminiRes = await fetch(geminiUrl, {
@@ -656,7 +689,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
     }
 
     if (!rawText) {
-      return NextResponse.json(fastFallbackSearch(question, catalog));
+      return NextResponse.json(fastFallbackSearch(question, catalog, excerpts));
     }
 
     // 7. BÓC TÁCH JSON VÀ LÀM SẠCH KẾT QUẢ
@@ -691,6 +724,36 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
         }
       } catch {
         parsedJson = null;
+      }
+    }
+
+    // Nếu model trả về JSON hợp lệ nhưng dùng các trường tiếng Việt khác ngoài "answer"
+    if (parsedJson && !parsedJson.answer) {
+      const parts: string[] = [];
+      for (const [k, v] of Object.entries(parsedJson)) {
+        if (k === 'suggested_pages' || k === 'follow_up_questions') continue;
+        if (typeof v === 'string' && v.trim()) {
+          parts.push(`• ${v.trim()}`);
+        } else if (Array.isArray(v)) {
+          v.forEach((item) => {
+            if (typeof item === 'string' && item.trim()) {
+              parts.push(`• ${item.trim()}`);
+            }
+          });
+        } else if (typeof v === 'object' && v !== null) {
+          for (const subVal of Object.values(v)) {
+            if (Array.isArray(subVal)) {
+              subVal.forEach((item) => {
+                if (typeof item === 'string' && item.trim()) parts.push(`• ${item.trim()}`);
+              });
+            } else if (typeof subVal === 'string' && subVal.trim()) {
+              parts.push(`• ${subVal.trim()}`);
+            }
+          }
+        }
+      }
+      if (parts.length > 0) {
+        parsedJson.answer = parts.slice(0, 6).join('\n');
       }
     }
 
@@ -831,7 +894,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
       });
     }
 
-    return NextResponse.json(fastFallbackSearch(question, catalog));
+    return NextResponse.json(fastFallbackSearch(question, catalog, excerpts));
   } catch (error: any) {
     return NextResponse.json(
       {
