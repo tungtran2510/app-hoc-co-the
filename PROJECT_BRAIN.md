@@ -82,3 +82,16 @@ Hệ thống hỗ trợ đầy đủ **10 khối nội dung chuẩn**:
     + Bật/tắt khóa app khách hàng khi hết hạn dịch vụ hoặc tạm ngưng hợp đồng.
     + Bảo vệ dữ liệu tuyệt đối: Dữ liệu phân tách theo `workspace_id`, không bao giờ lẫn lộn hay đè lên dữ liệu gốc `default`.
 
+---
+
+## 7. HỆ THỐNG TRỢ LÝ AI & ĐỊNH VỊ CHÍNH XÁC VIDEO BÀI GIẢNG (AI COPILOT) - ĐÃ HOÀN TẤT
+- **Định vị chính xác từng video trong bài học:**
+  - AI Catalog tự động quét và đánh chỉ mục toàn bộ danh sách video (`videos` block) từ Supabase.
+  - Khi học viên hỏi bất kỳ vấn đề gì (bốc vác, ngồi văn phòng, uống nước, giải nén cột sống...), AI gợi ý đích danh thẻ video cụ thể (`video_index`, `video_title`), không chỉ dừng ở cấp trang chung.
+- **Tự động phát ngay lập tức (1-Click Instant Autoplay):**
+  - Nút gợi ý bài học đổi thành **"Phát ngay"** kèm icon Play nổi bật.
+  - URL điều hướng gắn trực tiếp tham số: `/[topicSlug]/[pageSlug]?v=[index]&autoplay=1`.
+  - Khung xem video (`VideosBlock.tsx`) tự động kích hoạt `isPlaying = true`, vượt qua màn hình thumbnail, tự động cuộn đến video và phát ngay lập tức mà người học không phải bấm thêm lần nào.
+- **Quy tắc kiểm duyệt thương hiệu tuyệt đối (Strict Zero-Brand Rule):**
+  - Toàn bộ tên thương hiệu (DoctorLoan, Hydro Gems, Gems, các thiết bị thương mại) bị loại bỏ 100% khỏi câu trả lời, câu hỏi gợi ý và cơ sở tri thức huấn luyện AI.
+
