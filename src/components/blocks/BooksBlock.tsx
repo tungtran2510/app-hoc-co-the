@@ -6,6 +6,8 @@ import { RecommendedBook } from '../../lib/types';
 import ModernBookCover from '../ModernBookCover';
 import FlipbookViewer from '../FlipbookViewer';
 import BookDetailModal from '../BookDetailModal';
+import LongPressSave from '../LongPressSave';
+import { usePathname } from 'next/navigation';
 
 interface BooksBlockProps {
   blockId: string;
@@ -17,11 +19,27 @@ interface BooksBlockProps {
 
 const FALLBACK_COVER = '/images/lessons/tong-quan-ve-cot-song.png';
 
+
 export default function BooksBlock({ blockId, displayStyle = 'list', title, books, isAdmin = false }: BooksBlockProps) {
   const [selectedBook, setSelectedBook] = useState<RecommendedBook | null>(null);
   const [previewBook, setPreviewBook] = useState<RecommendedBook | null>(null);
 
   const visible = (books || []).filter((b) => isAdmin || b.is_visible !== false);
+
+  const pathname = usePathname() || '/';
+  // Giữ lâu vào cuốn sách để lưu vào mục Đã lưu (mở lại sẽ về đúng trang chứa sách)
+  const bookItem = (book: RecommendedBook) => ({
+    page_id: `book:${book.id || book.title}`,
+    kind: 'book' as const,
+    topic_slug: '',
+    topic_title: 'Sách',
+    page_slug: '',
+    page_title: book.title,
+    page_number: 0,
+    href: `#`,
+    thumb: book.cover_url || null,
+    subtitle: book.author || '',
+  });
 
   const previewButton = (book: RecommendedBook, compact = false) => (
     <button
@@ -71,6 +89,7 @@ export default function BooksBlock({ blockId, displayStyle = 'list', title, book
     content = (
       <div className="grid grid-cols-2 gap-3">
         {visible.map((book, idx) => (
+          <LongPressSave key={book.id || idx} className="contents" item={bookItem(book)}>
           <div
             key={book.id || idx}
             className={`flex flex-col rounded-[18px] border border-slate-200/70 bg-white dark:bg-[#1A1236] dark:border-white/10 p-2.5 pb-3 shadow-[0_10px_28px_-20px_rgba(15,23,42,.45)] ${
@@ -89,6 +108,7 @@ export default function BooksBlock({ blockId, displayStyle = 'list', title, book
             </h3>
             <div className="mt-2">{previewButton(book, true)}</div>
           </div>
+          </LongPressSave>
         ))}
       </div>
     );
@@ -96,6 +116,7 @@ export default function BooksBlock({ blockId, displayStyle = 'list', title, book
     content = (
       <div className="flex flex-col gap-4">
         {visible.map((book, idx) => (
+          <LongPressSave key={book.id || idx} className="contents" item={bookItem(book)}>
           <div
             key={book.id || idx}
             className={`flex flex-col items-center gap-3 rounded-[22px] border border-slate-200/70 bg-white dark:bg-[#1A1236] dark:border-white/10 p-4 shadow-[0_14px_34px_-22px_rgba(15,23,42,.5)] ${
@@ -113,6 +134,7 @@ export default function BooksBlock({ blockId, displayStyle = 'list', title, book
             <div className="w-full">{previewButton(book)}</div>
             {detailLink(book)}
           </div>
+          </LongPressSave>
         ))}
       </div>
     );
@@ -120,6 +142,7 @@ export default function BooksBlock({ blockId, displayStyle = 'list', title, book
     content = (
       <div className="flex flex-col gap-3">
         {visible.map((book, idx) => (
+          <LongPressSave key={book.id || idx} className="contents" item={bookItem(book)}>
           <div
             key={book.id || idx}
             className={`flex flex-row gap-3.5 items-stretch p-3 rounded-[16px] bg-slate-50/80 dark:bg-[#1E293B]/50 border border-slate-200/60 dark:border-white/10 ${
@@ -149,6 +172,7 @@ export default function BooksBlock({ blockId, displayStyle = 'list', title, book
               </div>
             </div>
           </div>
+          </LongPressSave>
         ))}
       </div>
     );

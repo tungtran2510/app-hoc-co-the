@@ -404,7 +404,7 @@ export default function AiAssistantPage() {
                     ) : (
                       <div>
                         {/* Mini Header AI */}
-                        <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-100 dark:border-purple-800/30 text-[11px] font-extrabold text-purple-800 dark:text-[#F8DF7B]">
+                        <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-100 dark:border-purple-800/30 text-[11px] font-extrabold text-primary dark:text-[#F8DF7B]">
                           <div className="flex items-center gap-1.5">
                             <span className="w-4.5 h-4.5 rounded-[5px] bg-gradient-to-br from-purple-700 to-indigo-800 text-white flex items-center justify-center shrink-0 shadow-2xs">
                               <Sparkles size={10} className="text-amber-300" />
@@ -431,7 +431,7 @@ export default function AiAssistantPage() {
                   {/* THẺ BÀI HỌC GỢI Ý ĐI KÈM CỦA AI (CÓ ĐỦ LOGO CHUYÊN ĐỀ & FONT RÕ RÀNG) */}
                   {!isUser && msg.suggested_pages && msg.suggested_pages.length > 0 && (
                     <div className="w-full max-w-[96%] sm:max-w-[90%] flex flex-col gap-1.5 mt-1">
-                      <div className="flex items-center gap-1.5 px-0.5 text-[11px] font-black text-purple-800 dark:text-[#F8DF7B] uppercase tracking-wider">
+                      <div className="flex items-center gap-1.5 px-0.5 text-[11px] font-black text-primary dark:text-[#F8DF7B] uppercase tracking-wider">
                         <BookOpen size={13} strokeWidth={2.5} />
                         <span>Bài học đề xuất nên xem:</span>
                       </div>
@@ -448,7 +448,7 @@ export default function AiAssistantPage() {
                             <Link
                               key={sIdx}
                               href={lessonUrl}
-                              className="group flex items-center gap-3 p-2.5 rounded-[15px] bg-white hover:bg-purple-50/60 dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-800/40 hover:border-purple-600/50 dark:hover:border-[#F8DF7B]/60 shadow-xs hover:shadow-md transition-all cursor-pointer"
+                              className="group flex items-center gap-3 p-2.5 rounded-[15px] bg-white hover:bg-primary-soft dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-800/40 hover:border-primary/50 dark:hover:border-[#F8DF7B]/60 shadow-xs hover:shadow-md transition-all cursor-pointer"
                             >
                               {/* Logo Chuyên đề 3D đầy đủ */}
                               <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-[11px] bg-slate-50 dark:bg-purple-950/70 border border-slate-200 dark:border-purple-800/50 p-1 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform overflow-hidden">
@@ -463,17 +463,17 @@ export default function AiAssistantPage() {
                                     if (fallback) fallback.style.display = 'flex';
                                   }}
                                 />
-                                <div className="hidden w-full h-full items-center justify-center text-purple-700 dark:text-[#F8DF7B]">
+                                <div className="hidden w-full h-full items-center justify-center text-primary dark:text-[#F8DF7B]">
                                   <BookOpen size={16} />
                                 </div>
                               </div>
 
                               {/* Tiêu đề & Thông tin bài học (Font to rõ ràng) */}
                               <div className="flex-1 min-w-0">
-                                <div className="text-[10px] sm:text-[10.5px] font-black uppercase text-purple-800 dark:text-[#F8DF7B] tracking-wider truncate">
+                                <div className="text-[10px] sm:text-[10.5px] font-black uppercase text-primary dark:text-[#F8DF7B] tracking-wider truncate">
                                   {sp.topic_title}
                                 </div>
-                                <h4 className="text-[13.5px] sm:text-[14.5px] font-black text-slate-900 dark:text-white leading-snug truncate group-hover:text-purple-700 dark:group-hover:text-[#F8DF7B] transition-colors mt-0.5">
+                                <h4 className="text-[13.5px] sm:text-[14.5px] font-black text-slate-900 dark:text-white leading-snug truncate group-hover:text-primary dark:group-hover:text-[#F8DF7B] transition-colors mt-0.5">
                                   {sp.title}
                                 </h4>
                                 {sp.reason && (
@@ -484,7 +484,7 @@ export default function AiAssistantPage() {
                               </div>
 
                               {/* Nút hành động */}
-                              <div className="shrink-0 flex items-center gap-1 text-[11px] sm:text-[11.5px] font-black text-purple-800 bg-purple-50 group-hover:bg-purple-800 group-hover:text-white dark:bg-purple-950/80 dark:text-[#F8DF7B] dark:group-hover:bg-[#F8DF7B] dark:group-hover:text-slate-900 px-2.5 py-1.5 rounded-[8px] border border-purple-200/80 dark:border-purple-800/50 transition-colors whitespace-nowrap shadow-2xs">
+                              <div className="shrink-0 flex items-center gap-1 text-[11px] sm:text-[11.5px] font-black text-primary bg-primary-soft group-hover:bg-primary group-hover:text-white dark:bg-purple-950/80 dark:text-[#F8DF7B] dark:group-hover:bg-[#F8DF7B] dark:group-hover:text-slate-900 px-2.5 py-1.5 rounded-[8px] border border-primary/25 dark:border-purple-800/50 transition-colors whitespace-nowrap shadow-2xs">
                                 <span>Học ngay</span>
                                 <ChevronRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
                               </div>

@@ -867,7 +867,7 @@ export default function ContentViewer({
         {/* Nội dung khối */}
         <BlockRenderer
           block={block}
-          fontSizeMode={fontSizeMode}
+          fontSizeMode="normal"
           defaultActiveVideoIndex={defaultActiveVideoIndex}
           isAdmin={isAdmin}
           onOpenVideoManager={() => setShowVideoManager(true)}
@@ -1054,6 +1054,7 @@ export default function ContentViewer({
       />
 
       {/* 3. Phần đầu bài viết: Badge BÀI 01 / 04 + Tiêu đề lớn (Không lặp lại tên chủ đề) */}
+      <div className="flex flex-col gap-3 sm:gap-3.5" style={{ zoom: fontSizeMode === 'small' ? 0.9 : fontSizeMode === 'large' ? 1.15 : 1 } as React.CSSProperties}>
       <section className="flex flex-col gap-1.5 mt-1">
         <div className="flex items-center justify-end gap-2 flex-wrap sm:flex-nowrap">
 
@@ -1117,6 +1118,7 @@ export default function ContentViewer({
           </div>
         )}
       </div>
+      </div>{/* /font-zoom wrapper */}
 
       {/* 5. Nút "+ Thêm nội dung" (Hiện khi ở chế độ Admin, đặt ở cuối danh sách các khối) */}
       {isAdmin && (

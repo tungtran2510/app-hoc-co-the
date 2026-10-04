@@ -44,6 +44,7 @@ export default async function HomePage() {
         topicsWithCounts={topicsWithCounts}
         topicsTitle={settings.topics_title || 'Chuyên Đề Học'}
         topicsDisplay={settings.topics_display}
+        topicsDescription={settings.topics_description}
         authorProfile={settings.author_profile}
         recommendedBooksTitle={settings.recommended_books_title}
         recommendedBooksSubtitle={settings.recommended_books_subtitle}

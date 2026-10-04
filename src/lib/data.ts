@@ -236,6 +236,8 @@ export async function getSettings(): Promise<Settings> {
             welcome_video_url: data.welcome_video_url || data.block_styles?.welcome_video_url || 'https://www.youtube.com/watch?v=c9kmCxFKHPY',
             home_custom_blocks: (data.block_styles?.home_custom_blocks && typeof data.block_styles.home_custom_blocks === 'object') ? data.block_styles.home_custom_blocks : {},
             topics_display: ['card', 'text', 'logo', 'large'].includes(data.block_styles?.topics_display) ? data.block_styles.topics_display : 'card',
+            topics_description: data.block_styles?.topics_description || 'Hệ thống chuyên đề & bài học giải phẫu cơ thể',
+            topics_guide: (data.block_styles?.topics_guide && typeof data.block_styles.topics_guide === 'object') ? data.block_styles.topics_guide : null,
           } as Settings;
         }
       } catch {

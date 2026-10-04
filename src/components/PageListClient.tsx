@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Plus, Edit2, ArrowUp, ArrowDown, Eye, EyeOff, Trash2, FileText, Check, Play } from 'lucide-react';
 import PageCard from './PageCard';
 import { Page, Topic } from '../lib/types';
+import LongPressSave from './LongPressSave';
 import { checkIsAdminClient } from '../lib/adminAuth';
 import { savePageApi, deletePageApi } from '../lib/apiAdmin';
 import EditPageModal from './admin/EditPageModal';
@@ -204,6 +205,18 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
 
                     {/* Thẻ bài học PageCard */}
                     <div className="flex-1 min-w-0">
+                      <LongPressSave
+                        className="contents"
+                        item={{
+                          page_id: page.id,
+                          kind: 'page',
+                          topic_slug: topic.slug,
+                          topic_title: topic.title,
+                          page_slug: page.slug,
+                          page_title: page.title,
+                          page_number: orderNumber,
+                        }}
+                      >
                       <PageCard
                         page={page}
                         topic={topic}
@@ -215,6 +228,7 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
                         isActive={activePageId === page.id}
                         onActivate={() => setActivePageId(page.id)}
                       />
+                      </LongPressSave>
                     </div>
                   </div>
 

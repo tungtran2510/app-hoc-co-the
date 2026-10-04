@@ -51,6 +51,8 @@ export async function POST(req: NextRequest) {
       welcome_video_url: settings.welcome_video_url !== undefined ? settings.welcome_video_url : (existingBlockStyles.welcome_video_url ?? null),
       home_custom_blocks: settings.home_custom_blocks !== undefined ? settings.home_custom_blocks : (existingBlockStyles.home_custom_blocks ?? {}),
       topics_display: settings.topics_display !== undefined ? settings.topics_display : (existingBlockStyles.topics_display ?? 'card'),
+      topics_description: settings.topics_description !== undefined ? settings.topics_description : (existingBlockStyles.topics_description ?? null),
+      topics_guide: settings.topics_guide !== undefined ? settings.topics_guide : (existingBlockStyles.topics_guide ?? null),
     };
 
     const existingAuthorProfile = existing?.author_profile || {};

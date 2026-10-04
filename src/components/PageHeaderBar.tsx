@@ -334,7 +334,7 @@ export default function PageHeaderBar({
             {/* Header popup */}
             <div className="flex items-center justify-between pb-2.5 border-b border-line dark:border-purple-900/50">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-[10px] bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-[#F8DF7B] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-[10px] bg-purple-100 dark:bg-purple-900/60 text-primary dark:text-[#F8DF7B] flex items-center justify-center">
                   <ListOrdered size={18} strokeWidth={2.5} />
                 </div>
                 <div>

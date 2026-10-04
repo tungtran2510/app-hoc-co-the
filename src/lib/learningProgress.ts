@@ -114,6 +114,11 @@ export interface SavedPageInfo {
   page_title: string;
   page_number: number;
   saved_at: number;
+  // Các trường tùy chọn cho mục lưu dạng video / sách / danh sách phát (bài học thường không cần)
+  kind?: 'page' | 'video' | 'book' | 'playlist';
+  href?: string;
+  thumb?: string | null;
+  subtitle?: string;
 }
 
 const BAI_DA_LUU_KEY = 'bai_da_luu';

@@ -202,7 +202,7 @@ export default function SearchPage() {
             {matchedTopics.length > 0 && (
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-1.5 text-[12px] font-extrabold text-slate-500 dark:text-purple-300/70 uppercase tracking-wider px-1">
-                  <Layers size={14} className="text-purple-700 dark:text-[#F8DF7B]" />
+                  <Layers size={14} className="text-primary dark:text-[#F8DF7B]" />
                   <span>CHUYÊN ĐỀ ({matchedTopics.length})</span>
                 </div>
 
@@ -230,7 +230,7 @@ export default function SearchPage() {
                           </div>
 
                           <div className="flex flex-col min-w-0">
-                            <span className="text-[10px] font-black text-purple-700 dark:text-[#F8DF7B] uppercase tracking-wider">
+                            <span className="text-[10px] font-black text-primary dark:text-[#F8DF7B] uppercase tracking-wider">
                               Chuyên đề y khoa
                             </span>
                             <span className="text-[15px] font-black text-slate-900 dark:text-white leading-snug truncate group-hover:text-purple-700 dark:group-hover:text-[#F8DF7B] transition-colors">
@@ -258,7 +258,7 @@ export default function SearchPage() {
             {matchedPages.length > 0 && (
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-1.5 text-[12px] font-extrabold text-slate-500 dark:text-purple-300/70 uppercase tracking-wider px-1">
-                  <BookOpen size={14} className="text-purple-700 dark:text-[#F8DF7B]" />
+                  <BookOpen size={14} className="text-primary dark:text-[#F8DF7B]" />
                   <span>BÀI HỌC NỘI DUNG ({matchedPages.length})</span>
                 </div>
 

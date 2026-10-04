@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Plus, Edit2, ArrowUp, ArrowDown, Eye, EyeOff, Trash2, Check, X } from 'lucide-react';
+import { Plus, Edit2, ArrowUp, ArrowDown, Eye, EyeOff, Trash2, Check, X, BookOpen, LayoutGrid, Lightbulb } from 'lucide-react';
 import TopicTile, { TopicsDisplayMode, TOPICS_DISPLAY_OPTIONS, topicsContainerClass } from './TopicTile';
-import { Topic } from '../lib/types';
+import { Topic, TopicsGuide } from '../lib/types';
+import TopicsGuideModal from './TopicsGuideModal';
 import { checkIsAdminClient } from '../lib/adminAuth';
 import { saveTopicApi, deleteTopicApi } from '../lib/apiAdmin';
 import { saveSettingsApi } from '../lib/apiAdmin';
@@ -28,6 +29,8 @@ interface TopicListClientProps {
   initialDisplay?: TopicsDisplayMode | null;
   hideViewAll?: boolean;
   enableSearch?: boolean;
+  initialDescription?: string | null;
+  initialGuide?: TopicsGuide | null;
 }
 
 export default function TopicListClient({
@@ -43,6 +46,8 @@ export default function TopicListClient({
   initialDisplay,
   hideViewAll = false,
   enableSearch = false,
+  initialDescription,
+  initialGuide,
 }: TopicListClientProps) {
   const [topicsWithCounts, setTopicsWithCounts] = useState(initialTopics);
   const [topicsTitle, setTopicsTitle] = useState(
@@ -58,6 +63,30 @@ export default function TopicListClient({
   const [isCreating, setIsCreating] = useState(false);
   const [displayMode, setDisplayMode] = useState<TopicsDisplayMode>(initialDisplay || 'card');
   const [query, setQuery] = useState('');
+  const [topicsDesc, setTopicsDesc] = useState(initialDescription || 'Hệ thống chuyên đề & bài học giải phẫu cơ thể');
+  const [descDraft, setDescDraft] = useState(topicsDesc);
+  const [isEditingDesc, setIsEditingDesc] = useState(false);
+  const [guide, setGuide] = useState<TopicsGuide | null>(initialGuide || null);
+  const [showGuide, setShowGuide] = useState(false);
+  const [showDisplayMenu, setShowDisplayMenu] = useState(false);
+  const lessonFetchStarted = React.useRef(false);
+  // Tìm cả tên bài học: chỉ tải dữ liệu tìm kiếm một lần khi người dùng bắt đầu gõ
+  const [lessonIndex, setLessonIndex] = useState<
+    { id: string; title: string; slug: string; topic_slug: string; topic_title: string; page_number: number; summary: string | null }[] | null
+  >(null);
+
+  useEffect(() => {
+    if (!enableSearch || lessonFetchStarted.current || query.trim().length < 2) return;
+    lessonFetchStarted.current = true;
+    fetch('/api/search')
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d?.pages)) setLessonIndex(d.pages);
+      })
+      .catch(() => {
+        lessonFetchStarted.current = false;
+      });
+  }, [enableSearch, query]);
 
   useEffect(() => {
     checkIsAdminClient().then((admin) => setIsAdmin(admin));
@@ -155,6 +184,16 @@ export default function TopicListClient({
     await saveSettingsApi({ topics_title: trimmed });
   };
 
+  const handleSaveDesc = async () => {
+    const trimmed = descDraft.trim() || 'Hệ thống chuyên đề & bài học giải phẫu cơ thể';
+    setTopicsDesc(trimmed);
+    setIsEditingDesc(false);
+    const res = await saveSettingsApi({ topics_description: trimmed });
+    if (!res.success) {
+      alert(res.error || 'Chưa lưu được – chưa kết nối dữ liệu');
+    }
+  };
+
   const handleChangeDisplay = async (mode: TopicsDisplayMode) => {
     const prev = displayMode;
     setDisplayMode(mode);
@@ -249,29 +288,126 @@ export default function TopicListClient({
               <span className="text-[15px]">›</span>
             </Link>
           )}
+          {enableSearch && (
+            <button
+              type="button"
+              onClick={() => setShowGuide(true)}
+              className="relative overflow-hidden inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full bg-gradient-to-r from-primary to-[#3B82F6] border border-white/30 text-white text-[13px] font-extrabold cursor-pointer shadow-[0_6px_16px_-4px_rgba(30,58,138,0.55)] hover:shadow-[0_8px_20px_-4px_rgba(30,58,138,0.65)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-200"
+            >
+              <BookOpen size={16} strokeWidth={2.5} className="relative" />
+              <span className="relative">Hướng dẫn</span>
+              <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/45 to-transparent animate-shimmer-sweep" />
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Hàng 2: Mô tả phụ */}
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-[12px] text-muted">
-          Hệ thống chuyên đề & bài học giải phẫu cơ thể
-        </p>
-      </div>
+      {/* Hàng 2: Mô tả phụ (quản trị viên sửa được) */}
+      {isAdmin && isEditingDesc ? (
+        <div className="flex items-center gap-1.5">
+          <input
+            type="text"
+            value={descDraft}
+            onChange={(e) => setDescDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleSaveDesc();
+              if (e.key === 'Escape') setIsEditingDesc(false);
+            }}
+            className="h-8 px-2.5 rounded-[8px] border border-primary bg-white dark:bg-[#1E1342] text-[13px] text-ink flex-1 min-w-0 shadow-2xs"
+            placeholder="Mô tả chuyên đề..."
+            autoFocus
+          />
+          <button
+            type="button"
+            onClick={handleSaveDesc}
+            className="w-8 h-8 rounded-[8px] bg-primary text-white flex items-center justify-center shrink-0 cursor-pointer"
+            title="Lưu mô tả"
+          >
+            <Check size={16} strokeWidth={2.5} />
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsEditingDesc(false)}
+            className="w-8 h-8 rounded-[8px] bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-white flex items-center justify-center shrink-0 cursor-pointer"
+            title="Hủy"
+          >
+            <X size={16} strokeWidth={2.5} />
+          </button>
+        </div>
+      ) : (
+        <div className="flex items-center gap-1.5">
+          <p className="text-[12px] text-muted">{topicsDesc}</p>
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={() => {
+                setDescDraft(topicsDesc);
+                setIsEditingDesc(true);
+              }}
+              className="p-1 rounded hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-primary cursor-pointer shrink-0"
+              title="Sửa mô tả chuyên đề"
+            >
+              <Edit2 size={12} />
+            </button>
+          )}
+        </div>
+      )}
 
-      {/* Ô tìm chuyên đề (chỉ hiện ở trang Chuyên đề) */}
+      {/* Nút Hướng dẫn + ô tìm chuyên đề (chỉ hiện ở trang Chuyên đề) */}
       {enableSearch && (
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Tìm chuyên đề..."
-          className="w-full h-11 px-4 rounded-[14px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 text-[14px] text-ink focus:border-primary focus:outline-hidden"
-        />
+        <div className="flex items-center gap-2">
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Tìm chuyên đề..."
+            className="flex-1 min-w-0 h-11 px-4 rounded-[14px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 text-[14px] text-ink focus:border-primary focus:outline-hidden"
+          />
+          {isAdmin && (
+            <div className="relative shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowDisplayMenu((v) => !v)}
+                title="Kiểu hiển thị chuyên đề"
+                aria-label="Kiểu hiển thị chuyên đề"
+                className="w-11 h-11 rounded-[14px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 text-primary flex items-center justify-center cursor-pointer active:scale-95 transition-transform shadow-2xs"
+              >
+                <LayoutGrid size={18} />
+              </button>
+              {showDisplayMenu && (
+                <div className="absolute right-0 top-12 z-30 w-44 p-1.5 rounded-[14px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 shadow-lg flex flex-col gap-1">
+                  <span className="text-[10.5px] font-extrabold uppercase text-muted px-2 pt-1">Kiểu hiển thị</span>
+                  {TOPICS_DISPLAY_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => {
+                        handleChangeDisplay(opt.value);
+                        setShowDisplayMenu(false);
+                      }}
+                      className={`h-8 px-2.5 rounded-[8px] text-left text-[12.5px] font-bold cursor-pointer ${
+                        displayMode === opt.value ? 'bg-primary text-white' : 'text-slate-700 hover:bg-primary-soft'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          <TopicsGuideModal
+            isOpen={showGuide}
+            onClose={() => setShowGuide(false)}
+            guide={guide}
+            isAdmin={isAdmin}
+            onSaved={(g) => setGuide(g)}
+          />
+        </div>
       )}
 
       {/* Chọn kiểu hiển thị chuyên đề (chỉ quản trị viên thấy) */}
-      {isAdmin && (
+      {isAdmin && !enableSearch && (
         <div className="flex items-center gap-1.5 flex-wrap p-1.5 rounded-[12px] bg-slate-100 dark:bg-white/5 border border-line">
           <span className="text-[11px] font-extrabold uppercase text-muted px-1.5">Kiểu hiển thị</span>
           {TOPICS_DISPLAY_OPTIONS.map((opt) => (
@@ -290,6 +426,34 @@ export default function TopicListClient({
           ))}
         </div>
       )}
+
+      {enableSearch && query.trim().length >= 2 && lessonIndex && (() => {
+        const q = query.trim().toLowerCase();
+        const hits = lessonIndex
+          .filter((p) => p.title.toLowerCase().includes(q) || (p.summary || '').toLowerCase().includes(q))
+          .slice(0, 8);
+        if (hits.length === 0) return null;
+        return (
+          <div className="flex flex-col gap-1.5 p-2.5 rounded-[16px] bg-primary-soft/60 border border-primary/15">
+            <span className="text-[11px] font-extrabold uppercase tracking-wide text-primary px-1">Bài học phù hợp</span>
+            {hits.map((p) => (
+              <Link
+                key={p.id}
+                href={`/${p.topic_slug}/${p.slug}`}
+                className="flex items-center gap-2 px-3 py-2 rounded-[12px] bg-white border border-slate-200/80 active:scale-[0.99] transition-transform"
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-black uppercase tracking-wider text-primary truncate">{p.topic_title}</p>
+                  <p className="text-[13.5px] font-extrabold text-ink leading-snug line-clamp-1">
+                    Bài {p.page_number}: {p.title}
+                  </p>
+                </div>
+                <span className="text-primary text-[16px] shrink-0">›</span>
+              </Link>
+            ))}
+          </div>
+        );
+      })()}
 
       <div className={topicsContainerClass(displayMode)}>
         {topicsWithCounts.map(({ topic, pageCount }, index) => {
@@ -320,6 +484,16 @@ export default function TopicListClient({
                   </div>
                 )}
               </div>
+
+              {/* Ghi chú học tập (admin nhập ở "Sửa chủ đề"), tối đa 2 dòng */}
+              {topic.meta_note && topic.meta_note.trim() && (
+                <div className="mt-1.5 flex items-start gap-2 px-3 py-2 rounded-[12px] bg-primary-soft/70 dark:bg-purple-950/50 border border-primary/15 dark:border-purple-700/40 border-l-[3px] border-l-primary">
+                  <Lightbulb size={14} strokeWidth={2.4} className="text-primary dark:text-[#F8DF7B] mt-[2px] shrink-0" />
+                  <p className="text-[12px] leading-snug text-slate-700 dark:text-purple-100 font-medium line-clamp-2">
+                    {topic.meta_note}
+                  </p>
+                </div>
+              )}
 
               {/* Thanh công cụ quản trị trên mỗi thẻ chuyên đề */}
               {isAdmin && (

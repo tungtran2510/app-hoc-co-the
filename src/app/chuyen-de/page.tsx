@@ -21,6 +21,8 @@ export default async function AllTopicsPage() {
         initialTopics={topicsWithCounts}
         initialTopicsTitle={settings.topics_title || 'Chuyên Đề Học'}
         initialDisplay={settings.topics_display}
+        initialDescription={settings.topics_description}
+        initialGuide={settings.topics_guide}
         hideViewAll
         enableSearch
       />

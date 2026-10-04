@@ -207,15 +207,17 @@ export default function EditTopicModal({
           {/* Ghi chú thời lượng / meta */}
           <div className="flex flex-col gap-1.5">
             <label className="text-[14px] font-bold text-ink">
-              Ghi chú nhanh
+              Ghi chú học tập (hiện ngay dưới chuyên đề)
             </label>
-            <input
-              type="text"
+            <textarea
               value={metaNote}
               onChange={(e) => setMetaNote(e.target.value)}
-              placeholder="Ví dụ: Mỗi video 4–6 phút"
-              className="w-full h-10 px-3.5 rounded-[12px] border border-line text-[14px] text-ink focus:border-primary"
+              rows={2}
+              maxLength={160}
+              placeholder="Ví dụ: Nên học chuyên đề này đầu tiên vì nó giúp bạn hiểu nền tảng trước khi học các phần sau."
+              className="w-full p-3 rounded-[12px] border border-line text-[14px] text-ink focus:border-primary"
             />
+            <span className="text-[12px] text-muted">Hiển thị trong khung ghi chú, tối đa 2 dòng.</span>
           </div>
 
           {/* Biểu tượng (Icon) */}

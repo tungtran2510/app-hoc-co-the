@@ -1,13 +1,14 @@
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { Block, Video } from '../lib/types';
 import TextBlock from './blocks/TextBlock';
 import VideosBlock from './blocks/VideosBlock';
 import ImagesBlock from './blocks/ImagesBlock';
 import LinksBlock from './blocks/LinksBlock';
 import FilesBlock from './blocks/FilesBlock';
-import ComparisonBlock from './blocks/ComparisonBlock';
-import FaqBlock from './blocks/FaqBlock';
-import BooksBlock from './blocks/BooksBlock';
+const ComparisonBlock = dynamic(() => import('./blocks/ComparisonBlock'));
+const FaqBlock = dynamic(() => import('./blocks/FaqBlock'));
+const BooksBlock = dynamic(() => import('./blocks/BooksBlock'));
 import { FontSizeOption } from './PageHeaderBar';
 
 interface BlockRendererProps {

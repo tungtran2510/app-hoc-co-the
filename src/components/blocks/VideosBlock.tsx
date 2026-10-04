@@ -15,6 +15,7 @@ import {
   getStoredXemTiep,
 } from '../../lib/learningProgress';
 import { playTapSound } from '../../lib/audioFeedback';
+import LongPressSave from '../LongPressSave';
 
 // Khai báo kiểu YT toàn cục cho YouTube IFrame Player API
 declare global {
@@ -656,6 +657,21 @@ export default function VideosBlock({
 
       {/* 3. HỆ THỐNG 3 KHUNG TAB PHÂN TÁCH VỚI ĐƯỜNG KẺ NGĂN CÁCH (SẮP XẾP SÁT HỢP LÝ) */}
       <div className="grid grid-cols-3 items-stretch rounded-[14px] bg-slate-100 dark:bg-[#160D30] border border-slate-200 dark:border-purple-900/50 shadow-2xs divide-x divide-slate-200 dark:divide-purple-900/50 overflow-hidden mt-0.5">
+        <LongPressSave
+          className="contents"
+          item={{
+            page_id: `playlist:${pageId}`,
+            kind: 'playlist',
+            topic_slug: topicSlug,
+            topic_title: topicTitle,
+            page_slug: pageSlug,
+            page_title: pageTitle,
+            page_number: pageNumber,
+            href: `/${topicSlug}/${pageSlug}`,
+            thumb: pageCoverUrl || null,
+            subtitle: `${videoList.length} video`,
+          }}
+        >
         <button
           type="button"
           onClick={() => handleTabChange('syllabus')}
@@ -667,6 +683,7 @@ export default function VideosBlock({
         >
           <span>Giáo trình ({videoList.length})</span>
         </button>
+        </LongPressSave>
 
         <button
           type="button"
@@ -704,6 +721,22 @@ export default function VideosBlock({
             (vid.youtube_id ? `https://i.ytimg.com/vi/${vid.youtube_id}/hqdefault.jpg` : null);
 
           return (
+            <LongPressSave
+              key={`lp-${idx}`}
+              className="contents"
+              item={{
+                page_id: `video:${pageId}:${idx + 1}`,
+                kind: 'video',
+                topic_slug: topicSlug,
+                topic_title: topicTitle,
+                page_slug: pageSlug,
+                page_title: vid.title,
+                page_number: idx + 1,
+                href: `/${topicSlug}/${pageSlug}?v=${idx + 1}`,
+                thumb: thumbUrl,
+                subtitle: pageTitle,
+              }}
+            >
             <div
               key={idx}
               onClick={() => handleSelectVideo(idx)}
@@ -807,6 +840,7 @@ export default function VideosBlock({
                 </button>
               )}
             </div>
+            </LongPressSave>
           );
         })}
 

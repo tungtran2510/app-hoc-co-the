@@ -135,7 +135,7 @@ export default function TextBlock({
 
   // Xác định cỡ chữ: cỡ riêng của khối (nếu có) là cỡ gốc; cỡ chữ chung của trang (Nhỏ/Vừa/Lớn) luôn được cộng thêm lên trên,
   // để nút chỉnh cỡ chữ của người học hoạt động với MỌI khối (kể cả khối đã được chỉnh cỡ riêng).
-  const pageFontDelta = fontSizeMode === 'small' ? -3 : fontSizeMode === 'large' ? 3 : 0;
+  const pageFontDelta = 0; // Cỡ chữ toàn trang được áp bằng zoom ở ContentViewer
   const blockBaseFontPx =
     fontSize === 'small' || fontSize === '14px'
       ? 14
