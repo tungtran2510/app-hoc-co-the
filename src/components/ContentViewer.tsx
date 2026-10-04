@@ -637,6 +637,9 @@ export default function ContentViewer({
     if (block.display_style === 'flipbook') {
       return 'QUẢN TRỊ KHỐI SÁCH';
     }
+    if (block.type === 'books') {
+      return block.data.title?.trim() ? block.data.title.trim().toUpperCase() : 'KHỐI SÁCH';
+    }
     if (block.type === 'videos') {
       return 'DANH SÁCH VIDEO';
     }

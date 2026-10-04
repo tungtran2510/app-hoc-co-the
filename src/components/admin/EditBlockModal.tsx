@@ -26,7 +26,8 @@ import {
   HelpCircle,
   Crop,
 } from 'lucide-react';
-import { Block, Image as ImageType, FileItem, Video } from '../../lib/types';
+import { Block, Image as ImageType, FileItem, Video, RecommendedBook } from '../../lib/types';
+import EditSingleRecommendedBookModal from './EditSingleRecommendedBookModal';
 import { extractYouTubeId, fetchYouTubeMeta } from '../../lib/youtube';
 import { uploadImageFile, uploadPdfFile } from '../../lib/storageUpload';
 import { generateUuid } from '../../lib/uuid';
@@ -288,6 +289,36 @@ export default function EditBlockModal({
     next[index] = next[nextIndex];
     next[nextIndex] = temp;
     setFaqItems(next);
+  };
+
+  // State cho khối sách
+  const [booksTitle, setBooksTitle] = useState<string>(block.type === 'books' ? block.data.title || '' : '');
+  const [booksItems, setBooksItems] = useState<RecommendedBook[]>(
+    block.type === 'books' && Array.isArray(block.data.books) ? block.data.books.map((b) => ({ ...b })) : []
+  );
+  const [editingBook, setEditingBook] = useState<RecommendedBook | null>(null);
+
+  const handleAddBooksItem = () => {
+    const nb: RecommendedBook = {
+      id: generateUuid(),
+      title: 'Tên cuốn sách mới',
+      author: 'Tùng Dinh Dưỡng',
+      cover_url: null,
+      description: 'Mô tả ngắn gọn về cuốn sách này.',
+      is_visible: true,
+    };
+    setBooksItems([...booksItems, nb]);
+    setEditingBook(nb);
+  };
+
+  const handleMoveBooksItem = (index: number, direction: 'up' | 'down') => {
+    const nextIndex = direction === 'up' ? index - 1 : index + 1;
+    if (nextIndex < 0 || nextIndex >= booksItems.length) return;
+    const next = [...booksItems];
+    const temp = next[index];
+    next[index] = next[nextIndex];
+    next[nextIndex] = temp;
+    setBooksItems(next);
   };
 
   if (!isOpen) return null;
@@ -588,6 +619,15 @@ export default function EditBlockModal({
                     answer: 'Nội dung giải thích...',
                   },
                 ],
+        },
+      };
+      onSaveBlock(updated);
+    } else if (block.type === 'books') {
+      const updated: Block = {
+        ...block,
+        data: {
+          title: booksTitle.trim(),
+          books: booksItems.map((b) => ({ ...b, title: (b.title || '').trim() || 'Tên cuốn sách' })),
         },
       };
       onSaveBlock(updated);
@@ -2295,6 +2335,100 @@ export default function EditBlockModal({
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Form chỉnh sửa khối sách */}
+          {block.type === 'books' && (
+            <div className="flex flex-col gap-3.5">
+              <div className="p-3.5 rounded-[16px] bg-slate-50 dark:bg-white/5 border border-line flex flex-col gap-2">
+                <label className="text-[13px] font-black text-ink uppercase tracking-wide">Tiêu đề khối sách</label>
+                <input
+                  type="text"
+                  value={booksTitle}
+                  onChange={(e) => setBooksTitle(e.target.value)}
+                  placeholder="Ví dụ: Sách gợi ý"
+                  className="w-full h-9.5 px-3 rounded-[10px] bg-white dark:bg-[#160E2E] border border-line text-[14px] font-bold text-ink focus:border-primary focus:outline-hidden"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[13px] font-black text-ink uppercase tracking-wide">
+                    Danh sách sách ({booksItems.length})
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleAddBooksItem}
+                    className="flex items-center gap-1 h-7.5 px-2.5 rounded-[8px] bg-primary text-white text-[12px] font-bold hover:bg-primary-hover cursor-pointer shadow-2xs"
+                  >
+                    <Plus size={13} strokeWidth={2.5} />
+                    <span>Thêm sách</span>
+                  </button>
+                </div>
+
+                {booksItems.map((bk, idx) => (
+                  <div
+                    key={bk.id || idx}
+                    className="flex items-center gap-2.5 p-2.5 rounded-[14px] bg-white dark:bg-[#1A0E35] border border-line"
+                  >
+                    <div className="w-[42px] aspect-[3/4] shrink-0 rounded-[6px] overflow-hidden bg-surface-2 border border-line">
+                      {bk.cover_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={bk.cover_url} alt="" className="w-full h-full object-cover" />
+                      ) : null}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-bold text-ink line-clamp-2 leading-snug">{bk.title || 'Chưa có tên'}</p>
+                      <button
+                        type="button"
+                        onClick={() => setEditingBook(bk)}
+                        className="mt-1 text-[12px] font-bold text-primary hover:underline cursor-pointer"
+                      >
+                        Sửa sách này
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        type="button"
+                        disabled={idx === 0}
+                        onClick={() => handleMoveBooksItem(idx, 'up')}
+                        className="w-6.5 h-6.5 rounded-[6px] bg-surface-2 text-muted disabled:opacity-30 flex items-center justify-center cursor-pointer"
+                        title="Lên trên"
+                      >
+                        <ChevronUp size={13} />
+                      </button>
+                      <button
+                        type="button"
+                        disabled={idx === booksItems.length - 1}
+                        onClick={() => handleMoveBooksItem(idx, 'down')}
+                        className="w-6.5 h-6.5 rounded-[6px] bg-surface-2 text-muted disabled:opacity-30 flex items-center justify-center cursor-pointer"
+                        title="Xuống dưới"
+                      >
+                        <ChevronDown size={13} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setBooksItems(booksItems.filter((b) => b.id !== bk.id))}
+                        className="w-6.5 h-6.5 rounded-[6px] bg-red-50 text-red-600 flex items-center justify-center cursor-pointer"
+                        title="Xóa sách này"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <EditSingleRecommendedBookModal
+                isOpen={Boolean(editingBook)}
+                book={editingBook}
+                onClose={() => setEditingBook(null)}
+                onSaved={(updated: RecommendedBook) => {
+                  setBooksItems(booksItems.map((b) => (b.id === updated.id ? updated : b)));
+                  setEditingBook(null);
+                }}
+              />
             </div>
           )}
         </div>

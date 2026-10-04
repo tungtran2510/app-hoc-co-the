@@ -258,6 +258,18 @@ export type Block =
           answer: string;
         }>;
       };
+    }
+  | {
+      id: string;
+      page_id: string;
+      type: 'books';
+      display_style: 'list' | 'grid' | 'feature' | string;
+      sort_order: number;
+      is_visible: boolean;
+      data: {
+        title?: string;
+        books: RecommendedBook[];
+      };
     };
 
 export interface ContinueInfo {

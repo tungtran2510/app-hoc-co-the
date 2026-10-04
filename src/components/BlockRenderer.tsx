@@ -7,6 +7,7 @@ import LinksBlock from './blocks/LinksBlock';
 import FilesBlock from './blocks/FilesBlock';
 import ComparisonBlock from './blocks/ComparisonBlock';
 import FaqBlock from './blocks/FaqBlock';
+import BooksBlock from './blocks/BooksBlock';
 import { FontSizeOption } from './PageHeaderBar';
 
 interface BlockRendererProps {
@@ -152,6 +153,17 @@ export default function BlockRenderer({
           title={block.data.title}
           items={block.data.items}
           fontSizeMode={fontSizeMode}
+        />
+      );
+
+    case 'books':
+      return (
+        <BooksBlock
+          blockId={blockId}
+          displayStyle={block.display_style}
+          title={block.data.title}
+          books={block.data.books || []}
+          isAdmin={isAdmin}
         />
       );
 

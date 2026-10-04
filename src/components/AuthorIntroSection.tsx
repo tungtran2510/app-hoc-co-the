@@ -556,7 +556,7 @@ export function AuthorBooksSection({
                   {/* BÊN TRÁI: Bìa sách to rõ chuẩn tỷ lệ 3:4 với ModernBookCover */}
                   <div
                     onClick={() => onSelectBook?.(book)}
-                    className={`${idx === 0 ? (variant === 'large' ? 'w-[52%] max-w-[280px]' : 'w-[42%] max-w-[230px]') : 'w-[80%] mx-auto'} aspect-[3/4] shrink-0 relative flex items-center justify-center cursor-pointer`}
+                    className={`${idx === 0 ? (variant === 'large' ? 'w-[47%] max-w-[260px]' : 'w-[42%] max-w-[230px]') : 'w-[80%] mx-auto'} aspect-[3/4] shrink-0 relative flex items-center justify-center cursor-pointer`}
                   >
                     <ModernBookCover
                       title={book.title}

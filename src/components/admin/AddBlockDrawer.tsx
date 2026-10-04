@@ -19,6 +19,9 @@ import {
   Columns2,
   Code,
   HelpCircle,
+  List,
+  LayoutGrid,
+  BookOpen,
 } from 'lucide-react';
 import { Block } from '../../lib/types';
 import { generateUuid } from '../../lib/uuid';
@@ -185,6 +188,28 @@ export default function AddBlockDrawer({
           ],
         },
       };
+    } else if (type === 'books') {
+      newBlock = {
+        id,
+        page_id: pageId,
+        type: 'books',
+        display_style: displayStyle,
+        sort_order: nextSortOrder,
+        is_visible: true,
+        data: {
+          title: 'Sách gợi ý',
+          books: [
+            {
+              id: generateUuid(),
+              title: 'Tên cuốn sách (Bấm Sửa để thay đổi)',
+              author: 'Tùng Dinh Dưỡng',
+              cover_url: '/images/lessons/tong-quan-ve-cot-song.png',
+              description: 'Mô tả ngắn gọn về cuốn sách này.',
+              is_visible: true,
+            },
+          ],
+        },
+      };
     } else {
       newBlock = {
         id,
@@ -222,7 +247,7 @@ export default function AddBlockDrawer({
               Thêm nội dung mới
             </h3>
             <p className="text-[14px] text-muted">
-              Chọn 1 trong 13 dạng khối nội dung dưới đây
+              Chọn 1 trong 16 dạng khối nội dung dưới đây
             </p>
           </div>
           <button
@@ -388,6 +413,39 @@ export default function AddBlockDrawer({
               >
                 <FileArchive size={20} className="text-primary shrink-0" />
                 <span>Tài liệu (PDF)</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Nhóm 4: Khối sách */}
+          <div className="flex flex-col gap-2.5">
+            <span className="text-[13px] font-extrabold tracking-[0.5px] uppercase text-muted">
+              KHỐI SÁCH
+            </span>
+            <div className="grid grid-cols-2 gap-2.5">
+              <button
+                type="button"
+                onClick={() => createAndAdd('books', 'list')}
+                className="flex items-center gap-2.5 p-3 rounded-[16px] bg-surface-2 hover:bg-primary-soft hover:text-primary transition-all text-left font-bold text-[15px] border border-line"
+              >
+                <List size={20} className="text-primary shrink-0" />
+                <span>Sách dạng danh sách</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => createAndAdd('books', 'grid')}
+                className="flex items-center gap-2.5 p-3 rounded-[16px] bg-surface-2 hover:bg-primary-soft hover:text-primary transition-all text-left font-bold text-[15px] border border-line"
+              >
+                <LayoutGrid size={20} className="text-primary shrink-0" />
+                <span>Sách dạng lưới</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => createAndAdd('books', 'feature')}
+                className="col-span-2 flex items-center justify-center gap-2.5 p-3 rounded-[16px] bg-surface-2 hover:bg-primary-soft hover:text-primary transition-all font-bold text-[15px] border border-line"
+              >
+                <BookOpen size={20} className="text-primary shrink-0" />
+                <span>Sách dạng thẻ lớn</span>
               </button>
             </div>
           </div>

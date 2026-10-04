@@ -23,8 +23,6 @@ export default function PwaRegistrar() {
       // thì lập tức khóa cờ intro để khi họ ấn 'Trang chủ' tuyệt đối không bao giờ bị hiện splash
       if (window.location.pathname !== '/') {
         try {
-          document.cookie = 'qbiz_books_intro_seen=1; path=/; max-age=31536000; SameSite=Lax';
-          localStorage.setItem('qbiz_books_intro_seen', '1');
           sessionStorage.setItem('qbiz_books_intro_seen', '1');
           (window as any).__qbiz_books_intro_seen = true;
         } catch {}

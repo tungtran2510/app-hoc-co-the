@@ -390,6 +390,10 @@ export function decodeBlockRow(row: any): Block {
     const { __kind, __style, ...rest } = row.data;
     return { ...row, type: 'faq', display_style: __style || 'accordion', data: rest } as Block;
   }
+  if (row && row.type === 'text' && row.data && row.data.__kind === 'books') {
+    const { __kind, __style, ...rest } = row.data;
+    return { ...row, type: 'books', display_style: __style || 'list', data: rest } as Block;
+  }
   return row as Block;
 }
 

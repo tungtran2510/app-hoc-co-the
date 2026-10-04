@@ -11,16 +11,10 @@ interface QbizBooksOpeningSplashProps {
 // Cờ theo dõi trong bộ nhớ phiên làm việc của tab để khi người dùng đang lướt bài học rồi ấn quay về Trang chủ không bị hiện lại liên tục
 let hasShownIntroInSession = false;
 
-// Đánh dấu đã xem intro vĩnh viễn trên mọi tầng lưu trữ (Cookie 1 năm, localStorage, sessionStorage, window, module)
+// Đánh dấu đã chiếu intro trong LẦN MỞ APP HIỆN TẠI (sessionStorage + window + module).
+// Không lưu vĩnh viễn: mỗi lần mở app mới thì hiệu ứng chiếu lại đúng 1 lần.
 export function markIntroAsSeenPermanent() {
   try {
-    if (typeof document !== 'undefined') {
-      document.cookie = 'qbiz_books_intro_seen=1; path=/; max-age=31536000; SameSite=Lax';
-    }
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('qbiz_books_intro_seen', '1');
-      localStorage.setItem('qbiz_books_intro_timestamp', Date.now().toString());
-    }
     if (typeof sessionStorage !== 'undefined') {
       sessionStorage.setItem('qbiz_books_intro_seen', '1');
     }
@@ -31,14 +25,12 @@ export function markIntroAsSeenPermanent() {
   } catch {}
 }
 
-// Kiểm tra xem đã từng xem intro trên bất kỳ tầng lưu trữ nào chưa
+// Kiểm tra xem lần mở app hiện tại đã chiếu intro chưa
 export function hasSeenIntroAnywhere(): boolean {
   try {
     if (hasShownIntroInSession) return true;
     if (typeof window !== 'undefined' && (window as any).__qbiz_books_intro_seen) return true;
     if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('qbiz_books_intro_seen') === '1') return true;
-    if (typeof localStorage !== 'undefined' && localStorage.getItem('qbiz_books_intro_seen') === '1') return true;
-    if (typeof document !== 'undefined' && /(?:^|;\s*)qbiz_books_intro_seen=1/.test(document.cookie)) return true;
   } catch {}
   return false;
 }
@@ -52,35 +44,38 @@ export default function QbizBooksOpeningSplash({
   const [isBookOpened, setIsBookOpened] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
 
+  // Quyết định "có chiếu hay không" chỉ tính 1 lần cho mỗi lần gắn component
+  const decidedRef = React.useRef<boolean | null>(null);
+  // Tỉ lệ thu nhỏ khi sách mở ra để cả bìa trái + trang phải luôn nằm gọn trong màn hình điện thoại
+  const [openScale, setOpenScale] = useState(1);
+
   useEffect(() => {
+    try {
+      setOpenScale(Math.max(0.6, Math.min(1, (window.innerWidth - 24) / 640)));
+    } catch {}
+
     let shouldShow = false;
 
     try {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('skip_intro') === '1') {
-        markIntroAsSeenPermanent();
-        setIsVisible(false);
-        return;
+      if (decidedRef.current === null) {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('skip_intro') === '1') {
+          markIntroAsSeenPermanent();
+          decidedRef.current = false;
+        } else {
+          const force = urlParams.get('intro') === '1' || forceShow;
+          // Chỉ chiếu khi lần mở app này CHƯA chiếu (hoặc bị ép xem lại)
+          if (!force && hasSeenIntroAnywhere()) {
+            decidedRef.current = false;
+          } else {
+            // Đánh dấu NGAY để mọi thao tác sau đó (quay lại Trang chủ, chuyển trang, tải lại) không chiếu lần 2
+            markIntroAsSeenPermanent();
+            decidedRef.current = true;
+          }
+        }
       }
-
-      const force = urlParams.get('intro') === '1' || forceShow;
-
-      // 1. Kiểm tra xem người dùng có quay lại trang chủ từ các bài học nội bộ không
-      const isInternalNav = typeof document !== 'undefined' && !!document.referrer && document.referrer.includes(window.location.host);
-
-      // 2. Nếu đã từng xem ở bất kỳ đâu (Cookie 1 năm, Local, Session, Window flag) HOẶC quay lại từ trang khác HOẶC không ép buộc:
-      // -> TUYỆT ĐỐI KHÔNG HIỂN THỊ, KHÓA CHẶT 100%
-      if (!force && (hasSeenIntroAnywhere() || isInternalNav)) {
-        markIntroAsSeenPermanent();
-        setIsVisible(false);
-        return;
-      }
-
-      // Đánh dấu NGAY LẬP TỨC trên toàn bộ các tầng lưu trữ TRƯỚC KHI hiệu ứng chạy
-      // để bất kỳ thao tác nào sau đó (reload, chuyển tab, quay lại trang chủ) ĐỀU BỊ KHÓA LẠI
-      markIntroAsSeenPermanent();
-      shouldShow = true;
-      setIsVisible(true);
+      shouldShow = decidedRef.current === true;
+      setIsVisible(shouldShow);
     } catch {
       setIsVisible(false);
       return;
@@ -235,7 +230,7 @@ export default function QbizBooksOpeningSplash({
           style={{
             transformStyle: 'preserve-3d',
             transform: isBookOpened
-              ? 'rotateY(-10deg) rotateX(6deg) translateX(36px) translateY(-8px)'
+              ? `rotateY(-6deg) rotateX(4deg) scale(${openScale}) translateX(130px) translateY(-8px)`
               : 'rotateY(-18deg) rotateX(12deg) translateY(0px)',
           }}
         >
