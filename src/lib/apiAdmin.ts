@@ -197,3 +197,44 @@ export async function saveInstructorAccountApi(
   }
 }
 
+export async function getWorkspacesApi(): Promise<{
+  success: boolean;
+  workspaces?: any[];
+  error?: string;
+}> {
+  try {
+    const res = await fetch('/api/admin/manage-workspaces', {
+      headers: getAdminHeaders(),
+      cache: 'no-store',
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      return { success: false, error: data.error || 'Chưa tải được danh sách cơ sở' };
+    }
+    return { success: true, workspaces: data.workspaces || [] };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Lỗi mạng khi tải cơ sở' };
+  }
+}
+
+export async function saveWorkspaceApi(
+  action: 'create' | 'update' | 'delete' | 'toggle',
+  payload: { workspace?: any; workspaceId?: string }
+): Promise<{ success: boolean; workspaces?: any[]; error?: string }> {
+  try {
+    const res = await fetch('/api/admin/manage-workspaces', {
+      method: 'POST',
+      headers: getAdminHeaders(),
+      body: JSON.stringify({ action, ...payload }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      return { success: false, error: data.error || 'Thao tác cơ sở thất bại' };
+    }
+    return { success: true, workspaces: data.workspaces || [] };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Lỗi mạng khi cập nhật cơ sở' };
+  }
+}
+
+

@@ -19,13 +19,14 @@ import {
 import { logoutAdmin, isSuperAdmin, checkAdminStatus } from '../../lib/adminAuth';
 import { saveSettingsApi, changePasswordApi, getAdminHeaders } from '../../lib/apiAdmin';
 import InstructorManagerSection from './InstructorManagerSection';
+import WorkspaceManagerSection from './WorkspaceManagerSection';
 
 interface AdminSettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSettingsSaved?: () => void;
   onLogout?: () => void;
-  initialTab?: 'chung' | 'trai_nghiem' | 'du_lieu' | 'giang_vien';
+  initialTab?: 'chung' | 'trai_nghiem' | 'du_lieu' | 'giang_vien' | 'khach_hang';
 }
 
 export default function AdminSettingsModal({
@@ -35,8 +36,9 @@ export default function AdminSettingsModal({
   onLogout,
   initialTab,
 }: AdminSettingsModalProps) {
-  const [activeTab, setActiveTab] = useState<'chung' | 'trai_nghiem' | 'du_lieu' | 'giang_vien'>('chung');
+  const [activeTab, setActiveTab] = useState<'chung' | 'trai_nghiem' | 'du_lieu' | 'giang_vien' | 'khach_hang'>('chung');
   const [isSuper, setIsSuper] = useState(false);
+
 
   // Cài đặt chung
   const [settings, setSettings] = useState<AppCustomSettings>(getStoredAppSettings());
@@ -195,11 +197,11 @@ export default function AdminSettingsModal({
         </div>
 
         {/* Tabs */}
-        <div className={`grid ${isSuper ? 'grid-cols-4' : 'grid-cols-3'} border-b border-line bg-surface p-1.5 gap-1`}>
+        <div className={`grid ${isSuper ? 'grid-cols-5' : 'grid-cols-3'} border-b border-line bg-surface p-1.5 gap-1`}>
           <button
             type="button"
             onClick={() => setActiveTab('chung')}
-            className={`h-10 rounded-[10px] text-[13px] font-extrabold transition-all cursor-pointer ${
+            className={`h-10 rounded-[10px] text-[12px] sm:text-[13px] font-extrabold transition-all cursor-pointer ${
               activeTab === 'chung'
                 ? 'bg-white text-primary shadow-xs'
                 : 'text-muted hover:text-ink'
@@ -210,7 +212,7 @@ export default function AdminSettingsModal({
           <button
             type="button"
             onClick={() => setActiveTab('trai_nghiem')}
-            className={`h-10 rounded-[10px] text-[13px] font-extrabold transition-all cursor-pointer ${
+            className={`h-10 rounded-[10px] text-[12px] sm:text-[13px] font-extrabold transition-all cursor-pointer ${
               activeTab === 'trai_nghiem'
                 ? 'bg-white text-primary shadow-xs'
                 : 'text-muted hover:text-ink'
@@ -221,7 +223,7 @@ export default function AdminSettingsModal({
           <button
             type="button"
             onClick={() => setActiveTab('du_lieu')}
-            className={`h-10 rounded-[10px] text-[13px] font-extrabold transition-all cursor-pointer ${
+            className={`h-10 rounded-[10px] text-[12px] sm:text-[13px] font-extrabold transition-all cursor-pointer ${
               activeTab === 'du_lieu'
                 ? 'bg-white text-primary shadow-xs'
                 : 'text-muted hover:text-ink'
@@ -230,17 +232,30 @@ export default function AdminSettingsModal({
             Bảo mật
           </button>
           {isSuper && (
-            <button
-              type="button"
-              onClick={() => setActiveTab('giang_vien')}
-              className={`h-10 rounded-[10px] text-[13px] font-extrabold transition-all cursor-pointer ${
-                activeTab === 'giang_vien'
-                  ? 'bg-white text-primary shadow-xs'
-                  : 'text-muted hover:text-ink'
-              }`}
-            >
-              Giảng viên
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={() => setActiveTab('giang_vien')}
+                className={`h-10 rounded-[10px] text-[12px] sm:text-[13px] font-extrabold transition-all cursor-pointer ${
+                  activeTab === 'giang_vien'
+                    ? 'bg-white text-primary shadow-xs'
+                    : 'text-muted hover:text-ink'
+                }`}
+              >
+                Giảng viên
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('khach_hang')}
+                className={`h-10 rounded-[10px] text-[12px] sm:text-[13px] font-extrabold transition-all cursor-pointer ${
+                  activeTab === 'khach_hang'
+                    ? 'bg-white text-primary shadow-xs'
+                    : 'text-muted hover:text-ink'
+                }`}
+              >
+                Cơ sở SaaS
+              </button>
+            </>
           )}
         </div>
 
@@ -492,6 +507,11 @@ export default function AdminSettingsModal({
           {activeTab === 'giang_vien' && isSuper && (
             <InstructorManagerSection />
           )}
+
+          {/* TAB 5: QUẢN LÝ CƠ SỞ / KHÁCH HÀNG SAAS (CHỈ SUPER ADMIN) */}
+          {activeTab === 'khach_hang' && isSuper && (
+            <WorkspaceManagerSection />
+          )}
         </div>
 
 
@@ -512,14 +532,16 @@ export default function AdminSettingsModal({
             >
               Đóng
             </button>
-            <button
-              type="button"
-              onClick={handleSaveSettings}
-              className="flex items-center justify-center gap-1.5 h-[44px] px-5 rounded-[12px] bg-primary text-white font-extrabold text-[14px] shadow-sm cursor-pointer hover:bg-primary-dark"
-            >
-              <Save size={16} />
-              <span>Lưu cài đặt</span>
-            </button>
+            {activeTab !== 'giang_vien' && activeTab !== 'khach_hang' && (
+              <button
+                type="button"
+                onClick={handleSaveSettings}
+                className="flex items-center justify-center gap-1.5 h-[44px] px-5 rounded-[12px] bg-primary text-white font-extrabold text-[14px] shadow-sm cursor-pointer hover:bg-primary-dark"
+              >
+                <Save size={16} />
+                <span>Lưu cài đặt</span>
+              </button>
+            )}
           </div>
         </div>
       </div>

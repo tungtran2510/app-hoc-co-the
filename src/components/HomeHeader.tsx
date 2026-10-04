@@ -17,6 +17,7 @@ import {
   Sun,
   Moon,
   Users,
+  Building2,
 } from 'lucide-react';
 import { checkAdminStatus, logoutAdmin, isSuperAdmin } from '../lib/adminAuth';
 import { getStoredAppSettings } from '../lib/storage';
@@ -53,7 +54,7 @@ export default function HomeHeader({
   const [hotline, setHotline] = useState<string | null>(initialHotline || null);
   const [zaloUrl, setZaloUrl] = useState<string | null>(initialZaloUrl || null);
   const [showSettings, setShowSettings] = useState(false);
-  const [settingsTab, setSettingsTab] = useState<'chung' | 'trai_nghiem' | 'du_lieu' | 'giang_vien'>('chung');
+  const [settingsTab, setSettingsTab] = useState<'chung' | 'trai_nghiem' | 'du_lieu' | 'giang_vien' | 'khach_hang'>('chung');
 
   const [showEditApp, setShowEditApp] = useState(false);
   const [showPwaInstall, setShowPwaInstall] = useState(false);
@@ -465,18 +466,32 @@ export default function HomeHeader({
                 </button>
 
                 {isSuperAdmin(adminUser) && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowMenu(false);
-                      setSettingsTab('giang_vien');
-                      setShowSettings(true);
-                    }}
-                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-white dark:hover:bg-[#25154D] cursor-pointer"
-                  >
-                    <Users size={16} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
-                    <span>Phân quyền Giảng viên</span>
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowMenu(false);
+                        setSettingsTab('giang_vien');
+                        setShowSettings(true);
+                      }}
+                      className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-white dark:hover:bg-[#25154D] cursor-pointer"
+                    >
+                      <Users size={16} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
+                      <span>Phân quyền Giảng viên</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowMenu(false);
+                        setSettingsTab('khach_hang');
+                        setShowSettings(true);
+                      }}
+                      className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-white dark:hover:bg-[#25154D] cursor-pointer"
+                    >
+                      <Building2 size={16} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
+                      <span>Cơ sở / Khách hàng SaaS</span>
+                    </button>
+                  </>
                 )}
 
 

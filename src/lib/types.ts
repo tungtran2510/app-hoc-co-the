@@ -303,4 +303,21 @@ export interface AdminUserSession {
   name: string;
   role: 'super_admin' | 'admin' | 'instructor';
   allowed_topic_ids?: string[];
+  workspace_id?: string;
 }
+
+export interface WorkspaceTenant {
+  id: string; // Mã slug định danh workspace, vd: 'bs-tuan'
+  name: string; // Tên app/phòng khám, vd: 'Cột Sống Khỏe - Bs. Tuấn'
+  owner_name?: string; // Tên người sở hữu
+  owner_phone: string; // Số điện thoại quản trị
+  admin_password?: string; // Mật khẩu quản trị
+  custom_domain?: string | null; // Tên miền riêng nếu có
+  subdomain?: string | null; // Subdomain riêng nếu có
+  is_active: boolean; // Trạng thái hoạt động
+  created_at: string; // Ngày tạo
+  expires_at?: string | null; // Ngày hết hạn dịch vụ
+  copied_template?: boolean; // Đã sao chép khóa học mẫu
+  note?: string; // Ghi chú hợp đồng / thanh toán
+}
+
