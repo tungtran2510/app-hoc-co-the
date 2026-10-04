@@ -67,7 +67,7 @@ export default function ModernBookCover({
       style={{ perspective: '1100px' }}
     >
       {/* THÂN BÌA SÁCH 3D (ĐƯỢC BO GÓC & BẢO TOÀN HIỆU ỨNG GÁY SÁCH) */}
-      <div className="absolute bottom-[1%] left-[5%] right-[1%] h-[7%] rounded-[50%] bg-slate-950/25 blur-[7px]" />
+      <div className="absolute bottom-0 left-[7%] right-[3%] h-[2.2%] rounded-[50%] bg-slate-950/15 blur-[3px]" />
 
       <div
         className="w-full h-full rounded-r-[7px] rounded-l-[2px] overflow-visible relative transition-all duration-300 group-hover:shadow-[0_0_24px_rgba(248,223,123,0.28)]"
@@ -94,7 +94,7 @@ export default function ModernBookCover({
         </div>
       )}
       <div className="pointer-events-none absolute top-[1.5%] -right-[1.5%] bottom-[2.5%] w-[2%] z-0 rounded-r-[3px] border-r border-slate-300 bg-[repeating-linear-gradient(to_right,#fff_0px,#eef1f5_1px,#fff_2px)]" />
-      <div className="pointer-events-none absolute -bottom-[2.5%] left-[1%] right-[1.5%] h-[3%] z-0 rounded-b-[3px] border-b border-slate-300 bg-[repeating-linear-gradient(to_bottom,#fff_0px,#e5e7eb_1px,#fff_2px)]" />
+      <div className="pointer-events-none absolute -bottom-[1.3%] left-[1%] right-[1.5%] h-[1.6%] z-0 rounded-b-[2px] border-b border-slate-300/80 bg-[repeating-linear-gradient(to_bottom,#fff_0px,#e5e7eb_1px,#fff_2px)]" />
 
       <div className="absolute inset-0 z-10 overflow-hidden rounded-r-[7px] rounded-l-[2px] bg-white ring-1 ring-slate-900/10">
       {/* 1. Nếp gấp gáy sách */}
