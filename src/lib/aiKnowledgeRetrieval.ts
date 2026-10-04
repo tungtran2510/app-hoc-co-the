@@ -31,7 +31,7 @@ interface Chunk {
   norm: string;
 }
 
-const CHUNK_TARGET = 900;
+const CHUNK_TARGET = 1100;
 const chunkCache = new Map<string, Chunk[]>();
 
 function splitIntoChunks(doc: AiKnowledgeDoc): Chunk[] {
@@ -40,29 +40,36 @@ function splitIntoChunks(doc: AiKnowledgeDoc): Chunk[] {
   if (cached) return cached;
 
   const title = doc.title || 'Tài liệu';
-  const paragraphs = doc.content
+  const lines = doc.content
     .split(/\r?\n+/)
     .map((p) => p.trim())
-    .filter(Boolean);
+    .filter((p) => p && !/^[-*_]{3,}$/.test(p));
 
   const chunks: Chunk[] = [];
+  let heading = '';
   let buf = '';
   const flush = () => {
-    const t = buf.trim();
-    if (t.length > 40) chunks.push({ doc: title, text: t, norm: normalizeVi(t) });
+    const body = buf.trim();
     buf = '';
+    if (body.length <= 40) return;
+    // Giữ tiêu đề mục trong mỗi đoạn để không mất ngữ cảnh và truy xuất đúng mục
+    const text = heading && !body.startsWith(heading) ? `${heading}\n${body}` : body;
+    chunks.push({ doc: title, text, norm: normalizeVi(text) });
   };
 
-  for (const p of paragraphs) {
-    // Đoạn quá dài: tách tiếp theo câu
-    const pieces =
-      p.length > CHUNK_TARGET * 1.5 ? p.split(/(?<=[.!?;])\s+/) : [p];
+  for (const line of lines) {
+    // Dòng tiêu đề markdown: đóng đoạn hiện tại, mở mục mới
+    if (/^#{1,4}\s/.test(line)) {
+      flush();
+      heading = line.replace(/^#{1,4}\s*/, '').replace(/\*\*/g, '').trim();
+      continue;
+    }
+    // Dòng quá dài: tách tiếp theo câu
+    const pieces = line.length > CHUNK_TARGET * 1.5 ? line.split(/(?<=[.!?;])\s+/) : [line];
     for (const piece of pieces) {
       if (buf.length + piece.length + 1 > CHUNK_TARGET && buf.length > 0) flush();
       buf += (buf ? '\n' : '') + piece;
     }
-    // Mục ngắn (tiêu đề/danh sách) vẫn ghép tiếp với đoạn sau để giữ ngữ cảnh
-    if (buf.length >= CHUNK_TARGET) flush();
   }
   flush();
 
@@ -85,8 +92,8 @@ export function retrieveKnowledge(
   docs: AiKnowledgeDoc[] | undefined,
   opts: { maxChunks?: number; maxChars?: number } = {}
 ): KnowledgeExcerpt[] {
-  const maxChunks = opts.maxChunks ?? 7;
-  const maxChars = opts.maxChars ?? 7500;
+  const maxChunks = opts.maxChunks ?? 6;
+  const maxChars = opts.maxChars ?? 6500;
   if (!Array.isArray(docs) || docs.length === 0) return [];
 
   const qTokens = normalizeVi(question)

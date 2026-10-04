@@ -383,74 +383,22 @@ async function getOrBuildLessonCatalog(): Promise<LessonCatalogItem[]> {
   return catalog;
 }
 
-// Fallback an toàn khi cả hai mạng AI gặp sự cố kết nối
-function fastFallbackSearch(query: string, catalog: LessonCatalogItem[], excerpts?: KnowledgeExcerpt[]) {
+// Fallback khi cả hai AI không phản hồi kịp: nói thật là AI đang bận, KHÔNG bịa nội dung chung chung/lạc đề
+function fastFallbackSearch(query: string, catalog: LessonCatalogItem[], _excerpts?: KnowledgeExcerpt[]) {
   const selectedPages = rankCatalogPages(query, catalog);
-  const lowerQ = query.toLowerCase();
-
-  let answerText = '';
-
-  // 1. ƯU TIÊN SỐ 1: NẾU CÓ ĐOẠN TRÍCH TÀI LIỆU CỦA TÁC GIẢ, DÙNG TRỰC TIẾP
-  if (excerpts && excerpts.length > 0) {
-    const cleanLines = excerpts
-      .slice(0, 4)
-      .map((e) => {
-        const lines = e.text
-          .split('\n')
-          .map((l: string) => l.trim().replace(/^[-•*#\d.]+\s*/, ''))
-          .filter((l: string) => l.length > 20 && !l.includes('http'));
-        return lines[0] ? `• ${lines[0]}` : '';
-      })
-      .filter(Boolean);
-
-    if (cleanLines.length >= 2) {
-      answerText = cleanLines.join('\n');
-    }
-  }
-
-  // 2. NẾU CHƯA CÓ ĐOẠN TRÍCH, TRẢ LỜI ĐÚNG THEO NHÓM VẤN ĐỀ Y HỌC CỐT LÕI
-  if (!answerText) {
-    if (lowerQ.includes('cổ') || lowerQ.includes('vai') || lowerQ.includes('gáy') || lowerQ.includes('ngực')) {
-      answerText = `• Duy trì tư thế ngồi chuẩn, nằm chuẩn để bảo vệ trục cột sống cổ và độ cong sinh lý tự nhiên.\n• Tránh cúi gập đầu xem điện thoại hoặc máy tính quá lâu; thả lỏng cơ cổ và vận động nhẹ nhàng định kỳ.\n• Chườm ấm nhẹ nhàng vùng cổ vai gáy vào buổi tối để tăng cường lưu thông tuần hoàn máu.\n• Mời bạn xem các bài học giải phẫu trực quan bên dưới để nắm rõ cơ chế và tư thế bảo vệ cổ.`;
-    } else if (
-      lowerQ.includes('lưng') ||
-      lowerQ.includes('đĩa đệm') ||
-      lowerQ.includes('thoát vị') ||
-      lowerQ.includes('trượt') ||
-      lowerQ.includes('đốt sống') ||
-      lowerQ.includes('l4') ||
-      lowerQ.includes('l5') ||
-      lowerQ.includes('s1') ||
-      lowerQ.includes('cột sống') ||
-      lowerQ.includes('tọa') ||
-      lowerQ.includes('thoái hóa') ||
-      lowerQ.includes('xương') ||
-      lowerQ.includes('khớp')
-    ) {
-      answerText = `• Khi gặp tổn thương đĩa đệm hoặc trượt đốt sống (như tầng L4-L5), nguyên tắc cốt lõi là giữ vững trục giải phẫu và đường cong sinh lý tự nhiên của cột sống.\n• Luôn duy trì tư thế nằm chuẩn và ngồi chuẩn để giải tỏa tải trọng chèn ép lên đĩa đệm và hệ dây chằng bao quanh.\n• Tránh cúi gập người nâng vật nặng, không vặn xoắn cột sống đột ngột hoặc ngồi tĩnh tại một chỗ quá lâu.\n• Vận động nhẹ nhàng phù hợp với thể trạng; nếu có biểu hiện đau nhói buốt lan xuống chân hoặc tê yếu chi, cần đến cơ sở y tế chuyên khoa thăm khám.\n• Tham khảo chi tiết các bài học giải phẫu trực quan bên dưới để nắm rõ cấu trúc và phương pháp bảo vệ cột sống.`;
-    } else if (lowerQ.includes('nước') || lowerQ.includes('uống')) {
-      answerText = `• Uống từng ngụm nhỏ, ngồi uống thong thả để nước kịp thẩm thấu nuôi dưỡng tế bào và sụn khớp.\n• Bổ sung 1 ly nước ấm vào buổi sáng sớm để kích hoạt nhu động ruột và tuần hoàn cơ thể.\n• Duy trì lượng nước hợp lý trong ngày, rải đều các thời điểm thay vì uống dồn một lượng lớn.`;
-    } else if (lowerQ.includes('ăn') || lowerQ.includes('tiêu hóa') || lowerQ.includes('dạ dày') || lowerQ.includes('đầy bụng') || lowerQ.includes('dinh dưỡng')) {
-      answerText = `• Ăn chậm, nhai kỹ để giảm áp lực co bóp cơ học và tiết acid dư thừa của dạ dày.\n• Ưu tiên thực phẩm tươi tự nhiên, giàu chất chống oxy hóa và hỗ trợ hệ vi sinh đường ruột.\n• Hạn chế đồ ăn cay nóng, nhiều dầu mỡ và duy trì khoảng cách ít nhất 2 - 3 giờ trước khi đi ngủ.`;
-    } else {
-      answerText = `• Giữ trục tư thế chuẩn trong mọi hoạt động hàng ngày để bảo vệ hệ cơ xương khớp và tuần hoàn cơ thể.\n• Tránh duy trì một tư thế tĩnh tại quá lâu, nên đứng dậy đi lại nhẹ nhàng sau mỗi 45 phút.\n• Mời bạn xem các bài học y học trực quan bên dưới để tìm hiểu chi tiết cấu trúc giải phẫu và hướng dẫn chuyên môn.`;
-    }
-  }
 
   return {
-    answer: answerText,
+    answer:
+      'Trợ lý AI đang bận nên chưa kịp trả lời câu hỏi này của bạn. Bạn bấm gửi lại sau ít giây giúp mình nhé. Trong lúc chờ, bạn có thể xem các bài học liên quan bên dưới.',
     suggested_pages: selectedPages.map((s) => ({
       title: s.page_title,
       topic_title: s.topic_title,
       topic_slug: s.topic_slug,
       page_slug: s.page_slug,
-      reason: `Tham khảo kiến thức chuẩn trong bài "${s.page_title}".`,
+      reason: `Bài học liên quan: "${s.page_title}".`,
     })),
-    follow_up_questions: [
-      'Nguyên tắc tư thế chuẩn để bảo vệ cột sống?',
-      'Chế độ dinh dưỡng khoa học hỗ trợ phục hồi đĩa đệm?',
-    ],
-    provider: 'fallback_clean',
+    follow_up_questions: [] as string[],
+    provider: 'fallback_busy',
   };
 }
 
@@ -543,11 +491,13 @@ export async function POST(req: NextRequest) {
     const systemPrompt = `Bạn là Trợ lý Sức Khỏe AI trong ứng dụng giáo dục y học "Học Cơ Thể" (Tủ Sách Y Khoa Qbiz Books của tác giả Tùng dinh dưỡng).
 
 NGUYÊN TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ NGHIÊM NGẶT):
-1. ĐÚNG TRỌNG TÂM CÂU HỎI (P0):
-   - Người học hỏi vấn đề gì, hãy trả lời trực diện, chính xác vào đúng vấn đề đó.
-   - Trả lời ĐỦ Ý và hữu ích: khoảng 130 đến 200 từ (tối đa 260 từ). Mở đầu bằng 1 câu trả lời thẳng vào câu hỏi, sau đó 4 đến 6 gạch đầu dòng, mỗi gạch nêu rõ LÝ DO/CƠ CHẾ hoặc cách áp dụng cụ thể, dễ hiểu cho người không chuyên.
-   - Khi có TRÍCH ĐOẠN TÀI LIỆU bên dưới: dựa chủ yếu vào đó, diễn đạt lại bằng lời dễ hiểu, giữ đúng thuật ngữ và con số của tác giả; không bịa thêm điều tài liệu không nói.
-   - TUYỆT ĐỐI KHÔNG lan man sang các chủ đề không liên quan.
+1. ĐÚNG TRỌNG TÂM, GỌN, CHÍNH XÁC (P0):
+   - Trả lời đúng vấn đề người học hỏi, không lan man, không văn sáo rỗng, không lặp lại câu hỏi.
+   - Cấu trúc cố định: (a) 1 câu trả lời thẳng vào câu hỏi; (b) 3 đến 4 gạch đầu dòng, mỗi gạch 1 ý ngắn nêu CƠ CHẾ hoặc LÝ DO lấy từ tài liệu; (c) 1 câu cuối dẫn người học sang đúng bài học để xem sâu hơn. Tổng khoảng 80 đến 130 từ.
+   - Chỉ dùng thông tin có trong TRÍCH ĐOẠN TÀI LIỆU bên dưới, giữ đúng thuật ngữ và con số của tác giả. KHÔNG bịa số liệu. Nếu tài liệu không nói đến điều được hỏi, hãy nói rõ "Phần này chưa có trong tài liệu của tác giả" rồi chỉ nêu nguyên tắc chung rất ngắn và dẫn sang bài học gần nhất.
+   - Câu hỏi mơ hồ hoặc quá rộng (ví dụ "đau lưng", "mệt mỏi"): đừng liệt kê tràn lan. Trả lời 1 ý chính rồi hỏi lại đúng 1 câu làm rõ (đau ở vùng nào, bao lâu, kèm tê hay không).
+   - Có thông tin về hội chứng đỏ (tê yếu chi lan nhanh, rối loạn đại tiểu tiện, sốt kèm đau dữ dội): khuyên đi khám chuyên khoa ngay, ngắn gọn.
+   - Câu gợi ý hỏi tiếp (follow_up_questions): 3 câu, mỗi câu 8 đến 14 từ, đi tiếp theo mạch bài giảng (hiểu cơ chế, nguyên nhân gốc, rồi cách chăm sóc), nói như người học thật sự sẽ hỏi.
 
 2. NGUYÊN TẮC QUAN TRỌNG VỀ TƯ THẾ & VẬN ĐỘNG (TUYỆT ĐỐI TUÂN THỦ THEO TÁC GIẢ):
    - CẤM TIỂU TƯ VẤN NẰM/NGỒI CHI TIẾT:
@@ -578,7 +528,7 @@ ${catalogText}
 
 BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
 {
-  "answer": "1 câu trả lời thẳng vào câu hỏi, rồi 4-6 gạch đầu dòng giải thích rõ lý do/cách áp dụng...",
+  "answer": "1 câu trả lời thẳng, 3-4 gạch đầu dòng ngắn nêu cơ chế/lý do từ tài liệu, 1 câu cuối dẫn sang bài học liên quan",
   "suggested_pages": [
     {
       "title": "Tên bài học chính xác trong danh mục",
@@ -602,7 +552,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
     if (deepseekKey) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        const timeoutId = setTimeout(() => controller.abort(), 18000);
 
         const deepseekRes = await fetch('https://api.deepseek.com/chat/completions', {
           method: 'POST',
@@ -654,7 +604,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
       for (const model of candidateModels) {
         try {
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 8000);
+          const timeoutId = setTimeout(() => controller.abort(), 9000);
 
           const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`;
           const geminiRes = await fetch(geminiUrl, {
@@ -666,6 +616,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
                 responseMimeType: 'application/json',
                 temperature: 0.3,
                 maxOutputTokens: 1400,
+                thinkingConfig: { thinkingBudget: 0 },
               },
             }),
             signal: controller.signal,
