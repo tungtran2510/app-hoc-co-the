@@ -51,6 +51,9 @@ export async function POST(req: NextRequest) {
       welcome_video_url: settings.welcome_video_url !== undefined ? settings.welcome_video_url : (existingBlockStyles.welcome_video_url ?? null),
       home_custom_blocks: settings.home_custom_blocks !== undefined ? settings.home_custom_blocks : (existingBlockStyles.home_custom_blocks ?? {}),
       topics_display: settings.topics_display !== undefined ? settings.topics_display : (existingBlockStyles.topics_display ?? 'card'),
+      home_topics_display: settings.home_topics_display !== undefined ? settings.home_topics_display : (existingBlockStyles.home_topics_display ?? existingBlockStyles.topics_display ?? 'card'),
+      topics_page_display: settings.topics_page_display !== undefined ? settings.topics_page_display : (existingBlockStyles.topics_page_display ?? existingBlockStyles.topics_display ?? 'card'),
+      featured_topic_ids: settings.featured_topic_ids !== undefined ? settings.featured_topic_ids : (existingBlockStyles.featured_topic_ids ?? []),
       topics_description: settings.topics_description !== undefined ? settings.topics_description : (existingBlockStyles.topics_description ?? null),
       topics_guide: settings.topics_guide !== undefined ? settings.topics_guide : (existingBlockStyles.topics_guide ?? null),
     };
@@ -117,6 +120,9 @@ export async function POST(req: NextRequest) {
         flat_books_title: updatedBlockStyles.flat_books_title,
         flat_books: updatedBlockStyles.flat_books,
         topics_title: updatedBlockStyles.topics_title,
+        home_topics_display: updatedBlockStyles.home_topics_display,
+        topics_page_display: updatedBlockStyles.topics_page_display,
+        featured_topic_ids: updatedBlockStyles.featured_topic_ids,
       },
     });
   } catch (err: any) {

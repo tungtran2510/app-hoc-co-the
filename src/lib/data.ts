@@ -231,6 +231,9 @@ export async function getSettings(): Promise<Settings> {
             home_title: data.home_title || data.block_styles?.home_title || 'Hôm nay mình học gì?',
             search_placeholder: data.search_placeholder || data.block_styles?.search_placeholder || 'Tìm bài, ví dụ: đĩa đệm',
             topics_title: data.topics_title || data.block_styles?.topics_title || 'Chuyên Đề Học',
+            home_topics_display: data.block_styles?.home_topics_display || data.block_styles?.topics_display || 'card',
+            topics_page_display: data.block_styles?.topics_page_display || data.block_styles?.topics_display || 'card',
+            featured_topic_ids: Array.isArray(data.block_styles?.featured_topic_ids) ? data.block_styles.featured_topic_ids : [],
             recommended_books_title: data.recommended_books_title || data.block_styles?.recommended_books_title || 'Tài Liệu Y Khoa',
             recommended_books_subtitle: data.recommended_books_subtitle || data.block_styles?.recommended_books_subtitle || 'Tài liệu tham khảo chuyên sâu giúp bạn hiểu và chăm sóc cơ thể mỗi ngày',
             recommended_books: normalizeRecommendedBooks(data.recommended_books || data.block_styles?.recommended_books),
@@ -508,4 +511,3 @@ export async function getAllPageSlugMap(): Promise<Record<string, { slug: string
     return map;
   });
 }
-

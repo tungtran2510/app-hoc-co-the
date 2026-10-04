@@ -21,7 +21,9 @@ export default async function AllTopicsPage() {
       <TopicListClient
         initialTopics={topicsWithCounts}
         initialTopicsTitle={settings.topics_title || 'Chuyên Đề Học'}
-        initialDisplay={settings.topics_display}
+        initialDisplay={settings.topics_page_display || settings.topics_display}
+        initialFeaturedTopicIds={settings.featured_topic_ids}
+        settingsScope="page"
         initialDescription={settings.topics_description}
         initialGuide={settings.topics_guide}
         hideViewAll

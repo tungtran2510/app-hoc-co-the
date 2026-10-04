@@ -105,6 +105,9 @@ export interface Settings {
   topics_description?: string | null;
   topics_guide?: TopicsGuide | null;
   topics_display?: 'card' | 'text' | 'logo' | 'large' | null;
+  home_topics_display?: 'card' | 'text' | 'logo' | 'large' | 'catalog' | null;
+  topics_page_display?: 'card' | 'text' | 'logo' | 'large' | 'catalog' | null;
+  featured_topic_ids?: string[] | null;
   recommended_books_title?: string | null;
   recommended_books_subtitle?: string | null;
   recommended_books?: RecommendedBook[];
@@ -343,4 +346,3 @@ export interface WorkspaceTenant {
   copied_template?: boolean; // Đã sao chép khóa học mẫu
   note?: string; // Ghi chú hợp đồng / thanh toán
 }
-

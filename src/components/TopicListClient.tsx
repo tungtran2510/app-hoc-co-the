@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Plus, Edit2, ArrowUp, ArrowDown, Eye, EyeOff, Trash2, Check, X, BookOpen, LayoutGrid, Lightbulb } from 'lucide-react';
+import { Plus, Edit2, ArrowUp, ArrowDown, Eye, EyeOff, Trash2, Check, X, BookOpen, LayoutGrid, Lightbulb, Search, SlidersHorizontal, Star, Flame } from 'lucide-react';
 import TopicTile, { TopicsDisplayMode, TOPICS_DISPLAY_OPTIONS, topicsContainerClass } from './TopicTile';
+import { DEFAULT_TOPIC_COVERS } from './TopicCard';
 import { Topic, TopicsGuide } from '../lib/types';
 import TopicsGuideModal from './TopicsGuideModal';
 import { checkIsAdminClient } from '../lib/adminAuth';
@@ -31,6 +32,8 @@ interface TopicListClientProps {
   enableSearch?: boolean;
   initialDescription?: string | null;
   initialGuide?: TopicsGuide | null;
+  initialFeaturedTopicIds?: string[] | null;
+  settingsScope?: 'home' | 'page';
 }
 
 export default function TopicListClient({
@@ -48,6 +51,8 @@ export default function TopicListClient({
   enableSearch = false,
   initialDescription,
   initialGuide,
+  initialFeaturedTopicIds = [],
+  settingsScope = 'home',
 }: TopicListClientProps) {
   const [topicsWithCounts, setTopicsWithCounts] = useState(initialTopics);
   const [topicsTitle, setTopicsTitle] = useState(
@@ -69,11 +74,15 @@ export default function TopicListClient({
   const [guide, setGuide] = useState<TopicsGuide | null>(initialGuide || null);
   const [showGuide, setShowGuide] = useState(false);
   const [showDisplayMenu, setShowDisplayMenu] = useState(false);
+  const [featuredTopicIds, setFeaturedTopicIds] = useState<string[]>(initialFeaturedTopicIds || []);
   const lessonFetchStarted = React.useRef(false);
   // Tìm cả tên bài học: chỉ tải dữ liệu tìm kiếm một lần khi người dùng bắt đầu gõ
   const [lessonIndex, setLessonIndex] = useState<
     { id: string; title: string; slug: string; topic_slug: string; topic_title: string; page_number: number; summary: string | null }[] | null
   >(null);
+  const displayOptions = enableSearch
+    ? TOPICS_DISPLAY_OPTIONS.filter((opt) => ['card', 'logo', 'catalog'].includes(opt.value))
+    : TOPICS_DISPLAY_OPTIONS;
 
   useEffect(() => {
     if (!enableSearch || lessonFetchStarted.current || query.trim().length < 2) return;
@@ -104,6 +113,15 @@ export default function TopicListClient({
     window.addEventListener('home_texts_updated', handleTextsUpdated);
     return () => window.removeEventListener('home_texts_updated', handleTextsUpdated);
   }, [initialTopicsTitle]);
+
+  useEffect(() => {
+    if (isAdmin) return;
+    const storageKey = settingsScope === 'page' ? 'qbiz_topics_page_display' : 'qbiz_home_topics_display';
+    const saved = window.localStorage.getItem(storageKey);
+    if (saved && TOPICS_DISPLAY_OPTIONS.some((opt) => opt.value === saved)) {
+      setDisplayMode(saved as TopicsDisplayMode);
+    }
+  }, [settingsScope, isAdmin]);
 
   const handleMove = async (index: number, direction: 'up' | 'down') => {
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
@@ -199,10 +217,29 @@ export default function TopicListClient({
   const handleChangeDisplay = async (mode: TopicsDisplayMode) => {
     const prev = displayMode;
     setDisplayMode(mode);
-    const res = await saveSettingsApi({ topics_display: mode });
+    if (!isAdmin) {
+      const storageKey = settingsScope === 'page' ? 'qbiz_topics_page_display' : 'qbiz_home_topics_display';
+      window.localStorage.setItem(storageKey, mode);
+      return;
+    }
+    const field = settingsScope === 'page' ? 'topics_page_display' : 'home_topics_display';
+    const res = await saveSettingsApi({ [field]: mode });
     if (!res.success) {
       alert(res.error || 'Chưa lưu được – chưa kết nối dữ liệu');
       setDisplayMode(prev);
+    }
+  };
+
+  const handleToggleFeatured = async (topicId: string) => {
+    const previous = featuredTopicIds;
+    const next = previous.includes(topicId)
+      ? previous.filter((id) => id !== topicId)
+      : [...previous, topicId];
+    setFeaturedTopicIds(next);
+    const res = await saveSettingsApi({ featured_topic_ids: next });
+    if (!res.success) {
+      setFeaturedTopicIds(previous);
+      alert(res.error || 'Chưa lưu được chuyên đề nổi bật');
     }
   };
 
@@ -259,7 +296,7 @@ export default function TopicListClient({
           </div>
         ) : (
           <div className="flex items-center gap-1.5 shrink-0">
-            <h2 className="text-[18px] sm:text-[19px] font-black text-ink tracking-tight leading-tight whitespace-nowrap">
+            <h2 className={`${enableSearch ? 'text-[25px] sm:text-[28px]' : 'text-[18px] sm:text-[19px]'} font-black text-ink tracking-tight leading-tight whitespace-nowrap`}>
               {topicsTitle || 'Chuyên Đề Học'}
             </h2>
             {isAdmin && (
@@ -279,7 +316,7 @@ export default function TopicListClient({
         )}
 
         <div className="flex items-center gap-2 shrink-0">
-          {!hideViewAll && (
+          {!hideViewAll && enableSearch && (
             <Link
               href="/chuyen-de"
               prefetch={true}
@@ -289,6 +326,40 @@ export default function TopicListClient({
               <span>Xem tất cả</span>
               <span className="text-[15px]">›</span>
             </Link>
+          )}
+          {!enableSearch && (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowDisplayMenu((v) => !v)}
+                title="Chọn cách hiển thị chuyên đề"
+                aria-label="Chọn cách hiển thị chuyên đề"
+                aria-expanded={showDisplayMenu}
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-300/60 bg-slate-100/55 text-slate-400/75 transition-colors hover:bg-slate-200/70 hover:text-slate-500 active:scale-95"
+              >
+                <SlidersHorizontal size={16} strokeWidth={2} />
+              </button>
+              {showDisplayMenu && (
+                <div className="absolute right-0 top-10 z-30 w-44 rounded-[14px] border border-slate-200 bg-white p-1.5 shadow-lg">
+                  <span className="px-2 pt-1 text-[10.5px] font-extrabold uppercase text-muted">Chọn cách hiển thị</span>
+                  {displayOptions.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => {
+                        handleChangeDisplay(opt.value);
+                        setShowDisplayMenu(false);
+                      }}
+                      className={`block h-8 w-full rounded-[8px] px-2.5 text-left text-[12.5px] font-bold ${
+                        displayMode === opt.value ? 'bg-primary text-white' : 'text-slate-700 hover:bg-primary-soft'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
           {enableSearch && (
             <button
@@ -338,7 +409,7 @@ export default function TopicListClient({
         </div>
       ) : (
         <div className="flex items-center gap-1.5">
-          <p className="text-[12px] text-muted">{topicsDesc}</p>
+          <p className={`${enableSearch ? 'text-[13px] sm:text-[14px]' : 'text-[12px]'} text-muted`}>{topicsDesc}</p>
           {isAdmin && (
             <button
               type="button"
@@ -358,28 +429,30 @@ export default function TopicListClient({
       {/* Nút Hướng dẫn + ô tìm chuyên đề (chỉ hiện ở trang Chuyên đề) */}
       {enableSearch && (
         <div className="flex items-center gap-2">
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Tìm chuyên đề..."
-            className="flex-1 min-w-0 h-11 px-4 rounded-[14px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 text-[14px] text-ink focus:border-primary focus:outline-hidden"
-          />
-          {isAdmin && (
-            <div className="relative shrink-0">
+          <label className="relative flex-1 min-w-0">
+            <Search size={20} strokeWidth={2.4} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#071735]" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Tìm chuyên đề..."
+              className="w-full h-11 pl-12 pr-4 rounded-[15px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 text-[14px] text-ink focus:border-primary focus:outline-hidden shadow-2xs"
+            />
+          </label>
+          <div className="relative shrink-0">
               <button
                 type="button"
                 onClick={() => setShowDisplayMenu((v) => !v)}
                 title="Kiểu hiển thị chuyên đề"
                 aria-label="Kiểu hiển thị chuyên đề"
-                className="w-11 h-11 rounded-[14px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 text-primary flex items-center justify-center cursor-pointer active:scale-95 transition-transform shadow-2xs"
+                className="w-11 h-11 rounded-[15px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 text-[#1E3A8A] flex items-center justify-center cursor-pointer active:scale-95 transition-transform shadow-2xs"
               >
-                <LayoutGrid size={18} />
+                <SlidersHorizontal size={20} strokeWidth={2.4} />
               </button>
               {showDisplayMenu && (
-                <div className="absolute right-0 top-12 z-30 w-44 p-1.5 rounded-[14px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 shadow-lg flex flex-col gap-1">
-                  <span className="text-[10.5px] font-extrabold uppercase text-muted px-2 pt-1">Kiểu hiển thị</span>
-                  {TOPICS_DISPLAY_OPTIONS.map((opt) => (
+                <div className="absolute right-0 top-11 z-30 w-44 p-1.5 rounded-[14px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 shadow-lg flex flex-col gap-1">
+                  <span className="text-[10.5px] font-extrabold uppercase text-muted px-2 pt-1">Chọn bố cục</span>
+                  {displayOptions.map((opt) => (
                     <button
                       key={opt.value}
                       type="button"
@@ -396,8 +469,7 @@ export default function TopicListClient({
                   ))}
                 </div>
               )}
-            </div>
-          )}
+          </div>
           <TopicsGuideModal
             isOpen={showGuide}
             onClose={() => setShowGuide(false)}
@@ -412,7 +484,7 @@ export default function TopicListClient({
       {isAdmin && !enableSearch && (
         <div className="flex items-center gap-1.5 flex-wrap p-1.5 rounded-[12px] bg-slate-100 dark:bg-white/5 border border-line">
           <span className="text-[11px] font-extrabold uppercase text-muted px-1.5">Kiểu hiển thị</span>
-          {TOPICS_DISPLAY_OPTIONS.map((opt) => (
+          {displayOptions.map((opt) => (
             <button
               key={opt.value}
               type="button"
@@ -457,11 +529,56 @@ export default function TopicListClient({
         );
       })()}
 
+      {enableSearch && query.trim().length === 0 && (() => {
+        const featured = topicsWithCounts.filter(({ topic }) => topic.is_visible && featuredTopicIds.includes(topic.id));
+        if (featured.length === 0) return null;
+        return (
+          <section className="mt-2 flex flex-col gap-2.5" aria-label="Chuyên đề nổi bật">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="flex items-center gap-1.5 text-[17px] font-black text-[#071735]">
+                <Flame size={19} className="fill-orange-500 text-orange-500" />
+                Chuyên đề nổi bật
+              </h3>
+            </div>
+            <div role="region" aria-label="Chuyên đề nổi bật, vuốt ngang để xem thêm" tabIndex={0} className="-mx-4 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:gap-3 sm:px-0">
+              {featured.map(({ topic, pageCount }) => (
+                <div key={`featured-${topic.id}`} className="relative w-fit max-w-[86vw] shrink-0 snap-start">
+                  <Link href={`/${topic.slug}`} className="relative flex min-h-[82px] w-fit min-w-[190px] max-w-full items-center gap-2 rounded-[17px] border border-slate-200/80 bg-white p-2.5 pr-7 shadow-[0_10px_28px_-22px_rgba(15,23,42,.65)] active:scale-[0.98] transition-transform">
+                    <div className="h-[58px] w-[58px] shrink-0 overflow-hidden rounded-[13px] bg-[#170B3D]">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={topic.cover_url || DEFAULT_TOPIC_COVERS[topic.slug] || ''} alt={topic.title} className="h-full w-full object-cover" loading="lazy" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="line-clamp-2 max-w-[190px] text-[11.5px] font-black leading-[1.15] text-[#071735]">{topic.title}</p>
+                      <p className="mt-1 flex items-center gap-1 whitespace-nowrap text-[10px] font-semibold text-slate-500"><BookOpen size={11} />{pageCount > 0 ? `${pageCount} bài học` : 'Sắp ra mắt'}</p>
+                    </div>
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[18px] text-[#2D5B94]">›</span>
+                  </Link>
+                  {isAdmin && (
+                    <button type="button" onClick={() => handleToggleFeatured(topic.id)} className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-amber-400 text-[#071735] shadow" title="Bỏ nổi bật">
+                      <Star size={12} className="fill-current" />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+      })()}
+
+      {enableSearch && query.trim().length === 0 && (
+        <div className="mt-2 flex items-center gap-2">
+          <LayoutGrid size={18} className="text-[#1E3A8A]" />
+          <h3 className="text-[17px] font-black text-[#071735]">Theo nhóm chủ đề</h3>
+        </div>
+      )}
+
       <div className={topicsContainerClass(displayMode)}>
         {topicsWithCounts.map(({ topic, pageCount }, index) => {
           // Người xem bình thường không thấy chủ đề bị ẩn
           if (!topic.is_visible && !isAdmin) return null;
           if (query.trim() && !topic.title.toLowerCase().includes(query.trim().toLowerCase())) return null;
+          if (enableSearch && query.trim().length === 0 && featuredTopicIds.includes(topic.id)) return null;
 
           return (
             <ScrollReveal
@@ -489,7 +606,7 @@ export default function TopicListClient({
               </div>
 
               {/* Ghi chú học tập (admin nhập ở "Sửa chủ đề"), tối đa 2 dòng */}
-              {topic.meta_note && topic.meta_note.trim() && (
+              {!enableSearch && topic.meta_note && topic.meta_note.trim() && (
                 <div className="mt-1.5 flex items-start gap-2 px-3 py-2 rounded-[12px] bg-primary-soft/70 dark:bg-purple-950/50 border border-primary/15 dark:border-purple-700/40 border-l-[3px] border-l-primary">
                   <Lightbulb size={14} strokeWidth={2.4} className="text-primary dark:text-[#F8DF7B] mt-[2px] shrink-0" />
                   <p className="text-[12px] leading-snug text-slate-700 dark:text-purple-100 font-medium line-clamp-2">
@@ -509,6 +626,15 @@ export default function TopicListClient({
                   >
                     <Edit2 size={10} strokeWidth={2.5} />
                     <span>Sửa</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleToggleFeatured(topic.id)}
+                    className={`w-6 h-6 rounded-[6px] flex items-center justify-center cursor-pointer active:scale-90 ${featuredTopicIds.includes(topic.id) ? 'bg-amber-400 text-slate-950' : 'text-slate-300 hover:text-amber-300 hover:bg-white/15'}`}
+                    title={featuredTopicIds.includes(topic.id) ? 'Bỏ nổi bật' : 'Đặt làm nổi bật'}
+                  >
+                    <Star size={12} strokeWidth={2.2} className={featuredTopicIds.includes(topic.id) ? 'fill-current' : ''} />
                   </button>
 
                   <div className="flex items-center gap-0.5">
@@ -553,6 +679,17 @@ export default function TopicListClient({
           );
         })}
       </div>
+
+      {!enableSearch && !hideViewAll && (
+        <Link
+          href="/chuyen-de"
+          prefetch={true}
+          className="mt-1 inline-flex min-h-9 items-center justify-center gap-1 self-center rounded-full px-4 text-[12px] font-bold text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary"
+          title="Xem tất cả chuyên đề"
+        >
+          Xem tất cả chuyên đề <span aria-hidden="true">›</span>
+        </Link>
+      )}
 
       {/* Modal Sửa chủ đề */}
       {editingTopic && (

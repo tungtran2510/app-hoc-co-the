@@ -632,7 +632,7 @@ export function AuthorBooksSection({
                           e.stopPropagation();
                           setPreviewBook(book);
                         }}
-                        className="relative mx-auto h-[26px] w-[calc(100%_-_28px)] sm:h-[30px] sm:w-[calc(100%_-_36px)] rounded-[10px] bg-gradient-to-r from-[#FFE36C] to-[#FFC400] text-[#071735] font-black text-[9.5px] sm:text-[10.5px] shadow-[0_6px_15px_-10px_rgba(245,158,11,.8)] flex items-center justify-center gap-1 active:scale-[0.98] cursor-pointer border border-[#FFD52F]"
+                        className="relative mx-auto h-[25px] w-[calc(100%_-_36px)] sm:h-[29px] sm:w-[calc(100%_-_44px)] rounded-[9px] bg-gradient-to-r from-[#FFE36C] to-[#FFC400] text-[#071735] font-black text-[9.5px] sm:text-[10.5px] shadow-[0_6px_15px_-10px_rgba(245,158,11,.8)] flex items-center justify-center gap-1 active:scale-[0.98] cursor-pointer border border-[#FFD52F]"
                         title="Xem thử 3D"
                       >
                         <BookOpen size={13} strokeWidth={2.2} className="shrink-0 text-[#1E293B]" />

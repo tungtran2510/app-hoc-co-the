@@ -24,7 +24,7 @@ export default async function HomePage() {
   ]);
 
   return (
-    <main className="flex-1 flex flex-col px-4 sm:px-5 pt-3 pb-28 gap-4 sm:gap-5">
+    <main className="flex-1 flex flex-col bg-[radial-gradient(ellipse_75%_22%_at_50%_0%,rgba(214,179,106,0.10),transparent_75%),linear-gradient(180deg,#FBFAF7_0%,#F6F7F9_48%,#FBFAF7_100%)] px-4 sm:px-5 pt-3 pb-28 gap-4 sm:gap-5">
       {/* Hiệu ứng 3D mở sách Qbiz Books khi vào trang chủ */}
       <QbizBooksOpeningSplash />
 
@@ -44,7 +44,8 @@ export default async function HomePage() {
         initialHiddenSections={settings.hidden_home_sections}
         topicsWithCounts={topicsWithCounts}
         topicsTitle={settings.topics_title || 'Chuyên Đề Học'}
-        topicsDisplay={settings.topics_display}
+        topicsDisplay={settings.home_topics_display || settings.topics_display}
+        featuredTopicIds={settings.featured_topic_ids}
         topicsDescription={settings.topics_description}
         authorProfile={settings.author_profile}
         recommendedBooksTitle={settings.recommended_books_title}

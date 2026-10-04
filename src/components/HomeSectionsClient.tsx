@@ -34,7 +34,8 @@ interface HomeSectionsClientProps {
     pageCount: number;
   }[];
   topicsTitle?: string | null;
-  topicsDisplay?: 'card' | 'text' | 'logo' | 'large' | null;
+  topicsDisplay?: 'card' | 'text' | 'logo' | 'large' | 'catalog' | null;
+  featuredTopicIds?: string[] | null;
   topicsDescription?: string | null;
   authorProfile?: AuthorProfile | null;
   recommendedBooksTitle?: string | null;
@@ -61,6 +62,7 @@ export default function HomeSectionsClient({
   topicsWithCounts,
   topicsTitle,
   topicsDisplay,
+  featuredTopicIds,
   topicsDescription,
   authorProfile: initialAuthorProfile,
   recommendedBooksTitle,
@@ -417,6 +419,8 @@ export default function HomeSectionsClient({
                 initialTopics={topicsWithCounts}
                 initialTopicsTitle={topicsTitle}
                 initialDisplay={topicsDisplay}
+                initialFeaturedTopicIds={featuredTopicIds}
+                settingsScope="home"
                 initialDescription={topicsDescription}
                 sectionIndex={index}
                 totalSections={sectionsOrder.length}

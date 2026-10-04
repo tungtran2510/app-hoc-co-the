@@ -72,7 +72,7 @@ export default function ModernBookCover({
       <div
         className="w-full h-full rounded-r-[7px] rounded-l-[2px] overflow-visible relative transition-all duration-300 group-hover:shadow-[0_0_24px_rgba(248,223,123,0.28)]"
         style={{
-          transform: 'rotateY(-2.5deg)',
+          transform: 'rotateY(-4deg) rotateZ(-0.2deg)',
           transformOrigin: 'left center',
           boxShadow: '8px 12px 20px -10px rgba(15, 23, 42, 0.38)',
         }}
