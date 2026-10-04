@@ -21,10 +21,9 @@ export default function QbizBooksOpeningSplash({
   const [isFadingOut, setIsFadingOut] = useState(false);
 
   useEffect(() => {
-    try {
-      // Dọn dẹp khóa cũ trong localStorage nếu có để không bị khóa vĩnh viễn
-      localStorage.removeItem('qbiz_books_intro_seen');
+    let shouldShow = false;
 
+    try {
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('skip_intro') === '1') {
         setIsVisible(false);
@@ -33,17 +32,33 @@ export default function QbizBooksOpeningSplash({
 
       const force = urlParams.get('intro') === '1' || forceShow;
 
-      // Nếu đang trong cùng phiên lướt trang của tab (chuyển qua lại các bài) và không ép buộc thì bỏ qua
-      if (!force && hasShownIntroInSession) {
+      // 1. Kiểm tra cờ phiên trong sessionStorage (chỉ cho phép 1 lần khi mới bật app)
+      const seenInSession = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('qbiz_books_intro_seen') === '1';
+
+      // 2. Kiểm tra cờ đã từng xem trên thiết bị (localStorage)
+      const seenInLocal = typeof localStorage !== 'undefined' && localStorage.getItem('qbiz_books_intro_seen') === '1';
+
+      // 3. Kiểm tra xem người dùng có quay lại trang chủ từ các bài học nội bộ không
+      const isInternalNav = typeof document !== 'undefined' && !!document.referrer && document.referrer.includes(window.location.host);
+
+      // Nếu không ép buộc xem lại và đã từng mở trong phiên/thiết bị hoặc quay lại từ bài học -> TUYỆT ĐỐI BỎ QUA
+      if (!force && (seenInSession || seenInLocal || hasShownIntroInSession || isInternalNav)) {
         setIsVisible(false);
         return;
       }
 
+      // Đánh dấu ngay lập tức vào cả sessionStorage và localStorage để khi lướt bài học rồi ấn quay về Trang chủ KHÔNG BAO GIỜ bị hiện lại
+      if (typeof sessionStorage !== 'undefined') sessionStorage.setItem('qbiz_books_intro_seen', '1');
+      if (typeof localStorage !== 'undefined') localStorage.setItem('qbiz_books_intro_seen', '1');
       hasShownIntroInSession = true;
+      shouldShow = true;
       setIsVisible(true);
     } catch {
-      setIsVisible(true);
+      setIsVisible(false);
+      return;
     }
+
+    if (!shouldShow) return;
 
     // 1. Sau 650ms: Bìa sách 3D mở ra
     const tOpen = setTimeout(() => {
@@ -70,13 +85,17 @@ export default function QbizBooksOpeningSplash({
 
   // Lắng nghe sự kiện replay nếu người dùng muốn xem lại từ menu
   useEffect(() => {
+    let tOpen: NodeJS.Timeout;
+    let tFade: NodeJS.Timeout;
+    let tFinish: NodeJS.Timeout;
+
     const handleReplay = () => {
       setIsVisible(true);
       setIsBookOpened(false);
       setIsFadingOut(false);
-      setTimeout(() => setIsBookOpened(true), 650);
-      setTimeout(() => setIsFadingOut(true), 3200);
-      setTimeout(() => {
+      tOpen = setTimeout(() => setIsBookOpened(true), 650);
+      tFade = setTimeout(() => setIsFadingOut(true), 3200);
+      tFinish = setTimeout(() => {
         setIsVisible(false);
         if (onFinish) onFinish();
       }, 3700);
@@ -85,18 +104,23 @@ export default function QbizBooksOpeningSplash({
     window.addEventListener('replay_qbiz_books_intro', handleReplay);
     return () => {
       window.removeEventListener('replay_qbiz_books_intro', handleReplay);
+      clearTimeout(tOpen);
+      clearTimeout(tFade);
+      clearTimeout(tFinish);
     };
   }, [onFinish]);
 
   const handleDismiss = () => {
     try {
-      localStorage.setItem('qbiz_books_intro_seen', '1');
+      if (typeof sessionStorage !== 'undefined') sessionStorage.setItem('qbiz_books_intro_seen', '1');
+      if (typeof localStorage !== 'undefined') localStorage.setItem('qbiz_books_intro_seen', '1');
     } catch {}
+    hasShownIntroInSession = true;
     setIsFadingOut(true);
     setTimeout(() => {
       setIsVisible(false);
       if (onFinish) onFinish();
-    }, 400);
+    }, 300);
   };
 
   if (!isVisible) return null;
