@@ -166,7 +166,9 @@ export default function TopicListClient({
 
   const handleSaved = (savedTopic: Topic) => {
     setTopicsWithCounts((prev) => {
-      const idx = prev.findIndex((t) => t.topic.id === savedTopic.id);
+      const idx = prev.findIndex(
+        (t) => t.topic.id === savedTopic.id || (t.topic.slug && t.topic.slug === savedTopic.slug)
+      );
       if (idx >= 0) {
         const next = [...prev];
         next[idx] = { ...next[idx], topic: savedTopic };

@@ -18,6 +18,15 @@ import {
   AiTrainingConfig,
 } from './types';
 import { getSupabaseClient } from './supabaseClient';
+import { getSupabaseServer } from './supabaseServer';
+
+function getSupabase() {
+  if (typeof window === 'undefined') {
+    const srv = getSupabaseServer();
+    if (srv) return srv;
+  }
+  return getSupabaseClient();
+}
 
 export function normalizeAiTraining(raw?: any): AiTrainingConfig {
   if (!raw || typeof raw !== 'object') {
@@ -166,7 +175,7 @@ interface CacheEntry<T> {
   expiry: number;
 }
 const dataCache = new Map<string, CacheEntry<any>>();
-const CACHE_TTL_MS = 60 * 1000; // 60 giây, tự động làm mới hoặc xóa khi Quản trị viên lưu
+const CACHE_TTL_MS = 5 * 1000; // 5 giây để cập nhật tức thì khi Admin chỉnh sửa hoặc F5
 
 export function clearDataCache(keyPrefix?: string): void {
   if (!keyPrefix) {
@@ -192,7 +201,7 @@ async function getCachedOrFetch<T>(key: string, fetcher: () => Promise<T>, ttlMs
 
 export async function getSettings(): Promise<Settings> {
   return getCachedOrFetch('settings', async () => {
-    const supabase = getSupabaseClient();
+    const supabase = getSupabase();
     if (supabase) {
       try {
         const { data } = await supabase
@@ -251,7 +260,7 @@ export async function getSettings(): Promise<Settings> {
 export async function getTopics(includeHidden = false): Promise<Topic[]> {
   const cacheKey = `topics:${includeHidden}`;
   return getCachedOrFetch(cacheKey, async () => {
-    const supabase = getSupabaseClient();
+    const supabase = getSupabase();
     if (supabase) {
       try {
         let query = supabase.from('topics').select('*').eq('workspace_id', 'default');
@@ -273,7 +282,7 @@ export async function getTopics(includeHidden = false): Promise<Topic[]> {
 export async function getTopicBySlug(slug: string): Promise<Topic | null> {
   const cacheKey = `topic_by_slug:${slug}`;
   return getCachedOrFetch(cacheKey, async () => {
-    const supabase = getSupabaseClient();
+    const supabase = getSupabase();
     if (supabase) {
       try {
         const { data } = await supabase
@@ -295,7 +304,7 @@ export async function getTopicBySlug(slug: string): Promise<Topic | null> {
 export async function getPagesByTopic(topicId: string, includeHidden = false): Promise<Page[]> {
   const cacheKey = `pages_by_topic:${topicId}:${includeHidden}`;
   return getCachedOrFetch(cacheKey, async () => {
-    const supabase = getSupabaseClient();
+    const supabase = getSupabase();
     if (supabase) {
       try {
         let query = supabase.from('pages').select('*').eq('topic_id', topicId);
@@ -321,7 +330,7 @@ export async function getTopicsWithCounts(includeHidden = false): Promise<{ topi
   const cacheKey = `topics_with_counts:${includeHidden}`;
   return getCachedOrFetch(cacheKey, async () => {
     const topics = await getTopics(includeHidden);
-    const supabase = getSupabaseClient();
+    const supabase = getSupabase();
     const pageCounts: Record<string, number> = {};
 
     if (supabase) {

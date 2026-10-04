@@ -4,7 +4,8 @@ import { getSettings, getTopicsWithCounts } from '../../lib/data';
 import TopicListClient from '../../components/TopicListClient';
 import BottomNav from '../../components/BottomNav';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: 'Chuyên đề · Tất cả bài học',

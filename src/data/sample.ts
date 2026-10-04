@@ -259,7 +259,7 @@ export const sampleTopics: Topic[] = [
     title: 'Cột sống',
     description:
       'Hiểu cột sống từ cấu tạo đến cách chăm sóc hằng ngày. Mọi nội dung đều mở, xem phần nào cũng được.',
-    meta_note: 'Mỗi video 4–6 phút',
+    meta_note: null,
     cover_url: null,
     icon: 'spine',
     color_bg: '#E3ECF7',
