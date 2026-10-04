@@ -36,9 +36,10 @@ interface TopicTileProps {
   pageCount: number;
   isActive?: boolean;
   onActivate?: () => void;
+  boldTitle?: boolean;
 }
 
-export default function TopicTile({ mode, topic, pageCount, isActive, onActivate }: TopicTileProps) {
+export default function TopicTile({ mode, topic, pageCount, isActive, onActivate, boldTitle }: TopicTileProps) {
   const [imgError, setImgError] = useState(false);
   const coverUrl = topic.cover_url || DEFAULT_TOPIC_COVERS[topic.slug] || null;
   const hasCover = Boolean(coverUrl) && !imgError;
@@ -118,5 +119,5 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
     );
   }
 
-  return <TopicCard topic={topic} pageCount={pageCount} isActive={isActive} onActivate={onActivate} />;
+  return <TopicCard topic={topic} pageCount={pageCount} isActive={isActive} onActivate={onActivate} boldTitle={boldTitle} />;
 }

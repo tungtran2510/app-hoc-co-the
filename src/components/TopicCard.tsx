@@ -32,6 +32,8 @@ interface TopicCardProps {
   pageCount: number;
   isActive?: boolean;
   onActivate?: () => void;
+  /** Tiêu đề đậm hơn (chỉ dùng ở trang chủ) */
+  boldTitle?: boolean;
 }
 
 export default function TopicCard({
@@ -39,6 +41,7 @@ export default function TopicCard({
   pageCount,
   isActive = false,
   onActivate,
+  boldTitle = false,
 }: TopicCardProps) {
   const [imgError, setImgError] = useState(false);
   const isAvailable = pageCount > 0;
@@ -110,7 +113,7 @@ export default function TopicCard({
           </div>
 
           {/* Tiêu đề tiếng Việt in hoa ĐỒNG BỘ KÍCH THƯỚC, CHUẨN DẤU VÀ KHOẢNG CÁCH FONT */}
-          <h3 className="font-extrabold text-white uppercase tracking-normal leading-[1.25] drop-shadow-sm mt-0.5 line-clamp-2 text-[14.5px] sm:text-[15.5px] whitespace-pre-line">
+          <h3 className={`font-extrabold text-white uppercase tracking-normal leading-[1.25] drop-shadow-sm mt-0.5 line-clamp-2 text-[14.5px] sm:text-[15.5px] whitespace-pre-line ${boldTitle ? 'topic-card-title-bold' : ''}`}>
             {displayTitle}
           </h3>
         </div>

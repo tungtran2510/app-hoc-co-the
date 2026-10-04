@@ -4,8 +4,10 @@ import { getSettings } from '../../../../lib/data';
 import { sampleTopics, samplePages } from '../../../../data/sample';
 import { getSupabaseClient } from '../../../../lib/supabaseClient';
 import { searchFastKnowledge } from '../../../../lib/knowledge';
+import { retrieveKnowledge, formatKnowledgeForPrompt } from '../../../../lib/aiKnowledgeRetrieval';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 30;
 
 
 interface LessonCatalogItem {
@@ -499,13 +501,19 @@ export async function POST(req: NextRequest) {
       .map((c, idx) => `[Bài ${idx + 1}] "${c.page_title}" (Chủ đề: ${c.topic_title}, slug: ${c.topic_slug}/${c.page_slug}): ${c.summary}`)
       .join('\n');
 
+    // 3b. TRUY XUẤT CÁC ĐOẠN TÀI LIỆU LIÊN QUAN TỪ KHO TÀI LIỆU TÁC GIẢ NẠP TRONG ADMIN (trước đây chưa được dùng)
+    const excerpts = retrieveKnowledge(question, aiTraining?.documents);
+    const knowledgeText = formatKnowledgeForPrompt(excerpts);
+    const authorGuidelines = (aiTraining?.guidelines || '').trim();
+
     // 4. HỆ THỐNG PROMPT TỐI ƯU: ĐÚNG TRỌNG TÂM, NGẮN GỌN, TUYỆT ĐỐI CẤM BÁN HÀNG DOCTORLOAN
     const systemPrompt = `Bạn là Trợ lý Sức Khỏe AI trong ứng dụng giáo dục y học "Học Cơ Thể" (Tủ Sách Y Khoa Qbiz Books của tác giả Tùng dinh dưỡng).
 
 NGUYÊN TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ NGHIÊM NGẶT):
 1. ĐÚNG TRỌNG TÂM CÂU HỎI (P0):
    - Người học hỏi vấn đề gì, hãy trả lời trực diện, chính xác vào đúng vấn đề đó.
-   - Ngắn gọn & súc tích: 60 đến 90 từ (tối đa 110 từ). Trình bày thông thoáng bằng 3 đến 4 gạch đầu dòng rõ ràng, dễ hiểu.
+   - Trả lời ĐỦ Ý và hữu ích: khoảng 130 đến 200 từ (tối đa 260 từ). Mở đầu bằng 1 câu trả lời thẳng vào câu hỏi, sau đó 4 đến 6 gạch đầu dòng, mỗi gạch nêu rõ LÝ DO/CƠ CHẾ hoặc cách áp dụng cụ thể, dễ hiểu cho người không chuyên.
+   - Khi có TRÍCH ĐOẠN TÀI LIỆU bên dưới: dựa chủ yếu vào đó, diễn đạt lại bằng lời dễ hiểu, giữ đúng thuật ngữ và con số của tác giả; không bịa thêm điều tài liệu không nói.
    - TUYỆT ĐỐI KHÔNG lan man sang các chủ đề không liên quan.
 
 2. NGUYÊN TẮC QUAN TRỌNG VỀ TƯ THẾ & VẬN ĐỘNG (TUYỆT ĐỐI TUÂN THỦ THEO TÁC GIẢ):
@@ -528,13 +536,16 @@ NGUYÊN TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ NGHIÊM NGẶT):
    - CẤM các câu trần tình như "tôi không phải bác sĩ", "tác giả không phải bác sĩ".
    - CÂU HỎI TIẾP THEO (follow_up_questions): Tuyệt đối KHÔNG gợi ý các câu hỏi về bài tập, tư thế nằm ngủ, cách nằm, gối hay ghế. Chỉ gợi ý câu hỏi về dinh dưỡng, nước, kiến thức giải phẫu, cơ chế bệnh học hoặc nguyên tắc tư thế chuẩn chung.
 
-4. ĐỊNH HƯỚNG BÀI HỌC:
+4. KIẾN THỨC TỪ TÀI LIỆU CỦA TÁC GIẢ (ƯU TIÊN SỐ 1 - luôn tuân theo các nguyên tắc ở mục 2 và 3):
+${authorGuidelines ? `Chỉ dẫn riêng của tác giả: ${authorGuidelines}\n\n` : ''}${knowledgeText || '(Không tìm thấy đoạn tài liệu khớp trực tiếp; hãy trả lời theo kiến thức giải phẫu - dinh dưỡng phổ thông, thận trọng, đúng nguyên tắc ở trên.)'}
+
+5. ĐỊNH HƯỚNG BÀI HỌC:
    - Chọn đúng 1-2 bài học liên quan nhất trong danh mục dưới đây:
 ${catalogText}
 
 BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
 {
-  "answer": "Nội dung trả lời ngắn gọn theo 3-4 gạch đầu dòng...",
+  "answer": "1 câu trả lời thẳng vào câu hỏi, rồi 4-6 gạch đầu dòng giải thích rõ lý do/cách áp dụng...",
   "suggested_pages": [
     {
       "title": "Tên bài học chính xác trong danh mục",
@@ -545,8 +556,9 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
     }
   ],
   "follow_up_questions": [
-    "Câu hỏi gợi ý 1?",
-    "Câu hỏi gợi ý 2?"
+    "Câu hỏi tiếp theo THỰC TẾ 1 (8-14 từ, nói như người học thật sự sẽ hỏi, bám đúng nội dung vừa trả lời)?",
+    "Câu hỏi tiếp theo THỰC TẾ 2?",
+    "Câu hỏi tiếp theo THỰC TẾ 3?"
   ]
 }`;
 
@@ -557,7 +569,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
     if (deepseekKey) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
 
         const deepseekRes = await fetch('https://api.deepseek.com/chat/completions', {
           method: 'POST',
@@ -570,13 +582,13 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
             response_format: { type: 'json_object' },
             messages: [
               { role: 'system', content: systemPrompt },
-              ...history.slice(-2).map((h: any) => ({
+              ...history.slice(-4).map((h: any) => ({
                 role: h.role === 'user' ? 'user' : 'assistant',
                 content: h.text,
               })),
               { role: 'user', content: question },
             ],
-            max_tokens: 800,
+            max_tokens: 1400,
             temperature: 0.3,
           }),
           signal: controller.signal,
@@ -604,12 +616,12 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
         'gemini-2.0-flash',
       ];
 
-      const geminiPrompt = `${systemPrompt}\n\nCÂU HỎI CỦA NGƯỜI HỌC: "${question}"\n\nLỊCH SỬ:\n${history.slice(-2).map((h: any) => `${h.role === 'user' ? 'Người học' : 'Trợ lý'}: ${h.text}`).join('\n')}`;
+      const geminiPrompt = `${systemPrompt}\n\nCÂU HỎI CỦA NGƯỜI HỌC: "${question}"\n\nLỊCH SỬ:\n${history.slice(-4).map((h: any) => `${h.role === 'user' ? 'Người học' : 'Trợ lý'}: ${h.text}`).join('\n')}`;
 
       for (const model of candidateModels) {
         try {
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 4500);
+          const timeoutId = setTimeout(() => controller.abort(), 12000);
 
           const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`;
           const geminiRes = await fetch(geminiUrl, {
@@ -620,7 +632,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
               generationConfig: {
                 responseMimeType: 'application/json',
                 temperature: 0.3,
-                maxOutputTokens: 800,
+                maxOutputTokens: 1400,
               },
             }),
             signal: controller.signal,

@@ -737,3 +737,6 @@ html h1, html h2, html h3, html h4, html h5, html h6 { font-weight: 600 !importa
 html .font-black { font-weight: 700; }
 html .font-extrabold { font-weight: 600; }
 
+
+/* Tiêu đề thẻ chuyên đề ở TRANG CHỦ: đậm rõ hơn (ghi đè quy tắc h3 = 600 ở trên) */
+html .topic-card-title-bold { font-weight: 800 !important; letter-spacing: 0.005em !important; text-shadow: 0 1px 2px rgba(0,0,0,0.45); }

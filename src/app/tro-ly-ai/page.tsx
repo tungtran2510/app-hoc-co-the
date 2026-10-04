@@ -39,10 +39,11 @@ interface ChatMessage {
   timestamp: number;
 }
 
-const QUICK_PROMPTS = [
-  'Thoát vị đĩa đệm có tập xà đơn được không?',
-  'Bài tập giảm đau mỏi cổ vai gáy cho dân văn phòng?',
-  'Chế độ dinh dưỡng phục hồi sụn khớp và đĩa đệm?',
+const DEFAULT_QUICK_PROMPTS = [
+  'Thoát vị đĩa đệm có tập xà đơn và đi bộ được không?',
+  'Ngồi máy tính nhiều bị đau mỏi cổ vai gáy, cách xử lý thế nào?',
+  'Uống nước như thế nào để đĩa đệm và sụn khớp không bị khô?',
+  'Đau thắt lưng khi ngủ dậy: Nguyên nhân và cách khắc phục?',
 ];
 
 // Hàm format text markdown đơn giản (bold, bullet) siêu gọn gàng
@@ -110,13 +111,27 @@ export default function AiAssistantPage() {
   };
 
   useEffect(() => {
+    fetchTrainingConfig();
     checkAdminStatus().then(({ isAdmin: adminOk }) => {
       setIsAdmin(adminOk);
-      if (adminOk) {
-        fetchTrainingConfig();
-      }
     });
   }, []);
+
+  const dynamicQuickPrompts = React.useMemo(() => {
+    if (trainingConfig?.faqs && trainingConfig.faqs.length > 0) {
+      const activeFaqs = trainingConfig.faqs
+        .filter((f) => f.question?.trim())
+        .map((f) => f.question.trim());
+      if (activeFaqs.length >= 3) {
+        return activeFaqs.slice(0, 4);
+      }
+      if (activeFaqs.length > 0) {
+        const remaining = DEFAULT_QUICK_PROMPTS.filter((q) => !activeFaqs.includes(q));
+        return [...activeFaqs, ...remaining].slice(0, 4);
+      }
+    }
+    return DEFAULT_QUICK_PROMPTS;
+  }, [trainingConfig]);
 
   // Load lịch sử chat từ localStorage
   useEffect(() => {
@@ -357,7 +372,7 @@ export default function AiAssistantPage() {
               </p>
             </div>
 
-            {/* Gợi ý câu hỏi nhanh súc tích, thân thiện (chỉ 3 câu ngắn gọn) */}
+            {/* Gợi ý câu hỏi thực tế bám sát tài liệu & đời sống */}
             <div className="flex flex-col gap-1.5">
               <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-purple-300/70 px-1 flex items-center gap-1.5">
                 <Sparkles size={12} className="text-amber-500" />
@@ -365,14 +380,14 @@ export default function AiAssistantPage() {
               </span>
 
               <div className="flex flex-col gap-1.5">
-                {QUICK_PROMPTS.map((prompt, idx) => (
+                {dynamicQuickPrompts.map((prompt, idx) => (
                   <button
                     key={idx}
                     type="button"
                     onClick={() => handleSendMessage(prompt)}
                     className="text-left px-3.5 py-2.5 rounded-[13px] bg-white dark:bg-[#160D30] hover:bg-purple-50/70 dark:hover:bg-purple-900/40 border border-slate-200/90 dark:border-purple-800/40 hover:border-purple-500/50 text-[12.5px] font-bold text-slate-800 dark:text-white leading-snug transition-all cursor-pointer shadow-2xs group flex items-center justify-between gap-2 active:scale-[0.99]"
                   >
-                    <span className="truncate">{prompt}</span>
+                    <span className="line-clamp-2 flex-1 min-w-0">{prompt}</span>
                     <ChevronRight size={14} className="text-slate-400 group-hover:text-purple-700 dark:group-hover:text-[#F8DF7B] shrink-0 transition-transform group-hover:translate-x-0.5" />
                   </button>
                 ))}

@@ -475,6 +475,7 @@ export default function TopicListClient({
                   pageCount={pageCount}
                   isActive={activeTopicSlug === topic.slug}
                   onActivate={() => setActiveTopicSlug(topic.slug)}
+                  boldTitle={!enableSearch}
                 />
 
                 {/* Nhãn Đang ẩn nếu admin */}
