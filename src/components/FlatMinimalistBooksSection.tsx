@@ -21,6 +21,7 @@ import SectionOrderControls from './admin/SectionOrderControls';
 import FlipbookViewer from './FlipbookViewer';
 import BookDetailModal from './BookDetailModal';
 import EditSingleRecommendedBookModal from './admin/EditSingleRecommendedBookModal';
+import ModernBookCover from './ModernBookCover';
 import { saveSettingsApi } from '../lib/apiAdmin';
 
 export const DEFAULT_FLAT_BOOKS: RecommendedBook[] = [
@@ -223,7 +224,7 @@ export default function FlatMinimalistBooksSection({
   const visibleBooks = books.filter((b) => isAdmin || b.is_visible !== false);
 
   return (
-    <section className="flex flex-col gap-3 mt-3 pt-2">
+    <section className="flex flex-col gap-3 mt-0">
       {/* THANH ĐIỀU KHIỂN DÀNH CHO ADMIN */}
       {isAdmin && onMoveUp && onMoveDown && onOpenReorderModal && typeof sectionIndex === 'number' && typeof totalSections === 'number' && (
         <SectionOrderControls
@@ -244,7 +245,7 @@ export default function FlatMinimalistBooksSection({
       )}
 
       {/* TIÊU ĐỀ KHỐI VÀ NÚT CHUYỂN ĐỔI CHẾ ĐỘ (LƯỚI / DANH SÁCH) */}
-      <div className="flex items-center justify-between gap-2.5 px-0.5">
+      <div className={`${isAdmin ? 'flex' : 'hidden'} items-center justify-between gap-2.5 px-0.5`}>
         {isAdmin && isEditingTitle ? (
           <div className="flex items-center gap-1.5 flex-1 min-w-0">
             <input
@@ -344,33 +345,28 @@ export default function FlatMinimalistBooksSection({
       ) : layoutMode === 'grid' ? (
         /* =================== KIỂU 1: LƯỚI PHẲNG 2 CỘT (MINIMALIST FLAT GRID) =================== */
         /* Theo đúng mẫu ảnh 3 & ảnh 4: Ảnh phẳng bo góc nhẹ, Tiêu đề + Tác giả bên dưới, Nút 3D ở dưới cùng */
-        <div className="grid grid-cols-2 gap-3.5 sm:gap-4.5">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
           {visibleBooks.map((book, idx) => {
             const isBookHidden = book.is_visible === false;
             return (
               <div
                 key={book.id || idx}
-                className={`flex flex-col group relative transition-all ${
+                className={`flex flex-col group relative rounded-[18px] border border-slate-200/70 bg-white p-2.5 pb-3 shadow-[0_10px_28px_-20px_rgba(15,23,42,.45)] transition-all ${
                   isBookHidden ? 'opacity-60 ring-2 ring-dashed ring-amber-400 p-1 rounded-[14px]' : ''
                 }`}
               >
-                {/* ẢNH BÌA SÁCH PHẲNG (FLAT COVER 2D - KHÔNG DÙNG VIỀN KHUNG THÔ, BO GÓC NHẸ) */}
+                {/* Mọi ảnh tải lên đi qua ModernBookCover để luôn có gáy và mép sách cố định */}
                 <div
                   onClick={() => setSelectedBook(book)}
-                  className="w-full aspect-[3/4] rounded-[12px] overflow-hidden bg-slate-100 dark:bg-slate-800 shadow-sm hover:shadow-md transition-all cursor-pointer relative"
+                  className="w-full aspect-[3/4] cursor-pointer relative"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={book.cover_url || '/images/lessons/tong-quan-ve-cot-song.png'}
-                    alt={book.title}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                    loading="lazy"
+                  <ModernBookCover
+                    title={book.title}
+                    coverUrl={book.cover_url || '/images/lessons/tong-quan-ve-cot-song.png'}
+                    author={book.author || 'Tùng Dinh Dưỡng'}
+                    badgeText={book.badge_tag}
+                    index={idx}
                   />
-                  {book.badge_tag && (
-                    <span className="absolute top-2 left-2 px-1.5 py-0.5 rounded-[4px] bg-[#1E3A8A] text-[#FDE047] text-[8.5px] font-black uppercase tracking-wider shadow-xs">
-                      {book.badge_tag}
-                    </span>
-                  )}
                   {isBookHidden && isAdmin && (
                     <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-black/80 text-amber-300 text-[9px] font-bold">
                       Ẩn
@@ -379,35 +375,35 @@ export default function FlatMinimalistBooksSection({
                 </div>
 
                 {/* THÔNG TIN TIÊU ĐỀ & TÁC GIẢ BÊN DƯỚI (PHẲNG, KHÔNG CARD BAO NGOÀI) */}
-                <div className="flex flex-col pt-2 min-w-0">
+                <div className="flex flex-col pt-1 min-w-0">
                   <h3
                     onClick={() => setSelectedBook(book)}
-                    className="text-[13.5px] sm:text-[14.5px] font-bold text-ink leading-snug line-clamp-2 min-h-[36px] group-hover:text-[#1E3A8A] dark:group-hover:text-amber-300 transition-colors cursor-pointer"
+                    className="text-[13px] sm:text-[15px] font-bold text-center text-[#071735] leading-snug line-clamp-2 min-h-[36px] flex items-center justify-center cursor-pointer"
                   >
                     {book.title}
                   </h3>
-                  <p className="text-[11.5px] sm:text-[12px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5 font-medium">
+                  <p className={`${isAdmin ? 'block' : 'hidden'} text-[11.5px] sm:text-[12px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5 font-medium`}>
                     {book.author || 'Tùng Dinh Dưỡng'}
                     {book.category && ` · ${book.category}`}
                   </p>
                 </div>
 
                 {/* NÚT XEM THỬ 3D Ở DƯỚI CÙNG (THEO ĐÚNG YÊU CẦU: VẪN CÓ NÚT XEM THỬ 3D Ở DƯỚI) */}
-                <div className="mt-2.5 pt-0.5 flex flex-col gap-1.5">
+                <div className="mt-2 pt-0.5 flex flex-col gap-1.5">
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       setFlipbookPreviewBook(book);
                     }}
-                    className="animate-bubble-float relative w-full h-[34px] sm:h-[36px] rounded-xl bg-gradient-to-r from-[#FEF08A] via-[#FACC15] to-[#EAB308] hover:from-[#FFF59D] hover:to-[#F59E0B] text-[#1E293B] font-bold text-[11.5px] sm:text-[12px] shadow-[0_2px_10px_rgba(250,204,21,0.28)] flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] cursor-pointer border border-[#FDE047]"
+                    className="relative w-full h-[36px] sm:h-[40px] rounded-full bg-gradient-to-r from-[#FFE36C] to-[#FFC400] text-[#071735] font-black text-[11.5px] sm:text-[12.5px] shadow-[0_7px_18px_-10px_rgba(245,158,11,.85)] flex items-center justify-center gap-1.5 active:scale-[0.98] cursor-pointer border border-[#FFD52F]"
                     title="Xem thử 3D"
                   >
                     <BookOpen size={13} strokeWidth={2.2} className="shrink-0 text-[#1E293B]" />
                     <span className="tracking-wide">Xem thử 3D</span>
                   </button>
 
-                  <div className="flex items-center justify-center">
+                  <div className={`${isAdmin ? 'flex' : 'hidden'} items-center justify-center`}>
                     <span
                       onClick={() => setSelectedBook(book)}
                       className="text-[11px] sm:text-[11.5px] font-semibold text-slate-400 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white inline-flex items-center gap-0.5 cursor-pointer transition-colors"
@@ -485,23 +481,18 @@ export default function FlatMinimalistBooksSection({
                   isBookHidden ? 'opacity-60 ring-2 ring-dashed ring-amber-400' : ''
                 }`}
               >
-                {/* BÊN TRÁI: Bìa sách phẳng 2D chuẩn tỷ lệ 3:4 */}
+                {/* BÊN TRÁI: Cùng khung bìa sách 3D cố định như chế độ lưới */}
                 <div
                   onClick={() => setSelectedBook(book)}
-                  className="w-[102px] sm:w-[120px] aspect-[3/4] shrink-0 rounded-[10px] overflow-hidden bg-slate-200 dark:bg-slate-800 shadow-sm cursor-pointer relative"
+                  className="w-[102px] sm:w-[120px] aspect-[3/4] shrink-0 cursor-pointer relative"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={book.cover_url || '/images/lessons/tong-quan-ve-cot-song.png'}
-                    alt={book.title}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    loading="lazy"
+                  <ModernBookCover
+                    title={book.title}
+                    coverUrl={book.cover_url || '/images/lessons/tong-quan-ve-cot-song.png'}
+                    author={book.author || 'Tùng Dinh Dưỡng'}
+                    badgeText={book.badge_tag}
+                    index={idx}
                   />
-                  {book.badge_tag && (
-                    <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-[4px] bg-[#1E3A8A] text-[#FDE047] text-[8px] font-black uppercase tracking-wider shadow-xs">
-                      {book.badge_tag}
-                    </span>
-                  )}
                   {isBookHidden && isAdmin && (
                     <div className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/80 text-amber-300 text-[8.5px] font-bold">
                       Ẩn

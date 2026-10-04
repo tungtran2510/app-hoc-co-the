@@ -63,7 +63,8 @@ export default function ModernBookCover({
 
   return (
     <div
-      className={`relative aspect-[3/4] w-full select-none transition-transform duration-300 group-hover:-translate-y-1 ${className}`}
+      className={`relative aspect-[3/4] w-full select-none pl-[7%] pr-[3%] pb-[4%] transition-transform duration-300 group-hover:-translate-y-1 ${className}`}
+      style={{ perspective: '900px' }}
     >
       {/* THẺ TAG CỦA SÁCH: MÀU XANH NAVY CHỮ VÀNG, KÍCH THƯỚC BÉ TINH TẾ & DỊCH LÊN TRÊN */}
       {displayBadge && (
@@ -74,16 +75,32 @@ export default function ModernBookCover({
       )}
 
       {/* THÂN BÌA SÁCH 3D (ĐƯỢC BO GÓC & BẢO TOÀN HIỆU ỨNG GÁY SÁCH) */}
+      <div className="absolute bottom-[1%] left-[5%] right-[1%] h-[7%] rounded-[50%] bg-slate-950/25 blur-[7px]" />
+
       <div
-        className="w-full h-full rounded-r-[6px] rounded-l-[2px] overflow-hidden relative transition-all duration-300 group-hover:shadow-[0_0_24px_rgba(248,223,123,0.45),0_12px_28px_rgba(15,23,42,0.35)] group-active:shadow-[0_0_24px_rgba(248,223,123,0.45)] group-hover:ring-1 group-hover:ring-amber-300/60"
+        className="w-full h-full rounded-r-[7px] rounded-l-[2px] overflow-visible relative transition-all duration-300 group-hover:shadow-[0_0_24px_rgba(248,223,123,0.28)]"
         style={{
-          boxShadow:
-            '0 14px 28px -6px rgba(15, 23, 42, 0.22), 0 6px 10px -2px rgba(15, 23, 42, 0.1), inset -1px 0 2px rgba(255, 255, 255, 0.2)',
+          transform: 'rotateY(-3deg)',
+          transformOrigin: 'left center',
+          boxShadow: '10px 14px 22px -9px rgba(15, 23, 42, 0.38)',
         }}
       >
-      {/* 1. GÁY SÁCH 3D BÊN TRÁI (Spine Crease) */}
+      {/* Khối gáy nằm ngoài ảnh nên mọi ảnh tải lên đều tự thành một cuốn sách */}
       <div
-        className="pointer-events-none absolute inset-y-0 left-0 w-[14px] sm:w-[16px] z-20"
+        className="pointer-events-none absolute inset-y-[1px] -left-[7%] w-[8%] z-0 rounded-l-[4px] border-y border-l border-slate-900/20"
+        style={{
+          background: 'linear-gradient(to right, #0f2e62 0%, #184781 45%, #0b224d 100%)',
+          transform: 'skewY(-1.5deg)',
+          boxShadow: '-3px 5px 8px rgba(15,23,42,.18)',
+        }}
+      />
+      <div className="pointer-events-none absolute top-[1.5%] -right-[2.5%] bottom-[2.5%] w-[3%] z-0 rounded-r-[3px] border-r border-slate-300 bg-[repeating-linear-gradient(to_right,#fff_0px,#eef1f5_1px,#fff_2px)]" />
+      <div className="pointer-events-none absolute -bottom-[2.5%] left-[1%] right-[1.5%] h-[3%] z-0 rounded-b-[3px] border-b border-slate-300 bg-[repeating-linear-gradient(to_bottom,#fff_0px,#e5e7eb_1px,#fff_2px)]" />
+
+      <div className="absolute inset-0 z-10 overflow-hidden rounded-r-[7px] rounded-l-[2px] bg-white ring-1 ring-slate-900/10">
+      {/* 1. Nếp gấp gáy sách */}
+      <div
+        className="pointer-events-none absolute inset-y-0 left-0 w-[10%] z-20"
         style={{
           background:
             'linear-gradient(to right, rgba(0,0,0,0.38) 0%, rgba(255,255,255,0.2) 20%, rgba(0,0,0,0.12) 60%, transparent 100%)',
@@ -164,6 +181,7 @@ export default function ModernBookCover({
           </div>
         </div>
       )}
+      </div>
       </div>
     </div>
   );

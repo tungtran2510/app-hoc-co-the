@@ -432,7 +432,7 @@ export function AuthorBooksSection({
   if (books.length === 0 && !isAdmin) return null;
 
   return (
-    <section className="flex flex-col gap-3 mt-1">
+    <section className="flex flex-col gap-3 mt-1 rounded-[22px] bg-[#F7F8FC] px-0 py-1">
       {/* KHỐI NÚT ĐIỀU KHIỂN DÀNH CHO ADMIN - ĐẶT TRÊN ĐẦU KHỐI */}
       {isAdmin && typeof sectionIndex === 'number' && typeof totalSections === 'number' && onMoveUp && onMoveDown && onOpenReorderModal && (
         <SectionOrderControls
@@ -450,9 +450,9 @@ export function AuthorBooksSection({
       )}
 
       {/* Tiêu đề mục sách tác giả */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 text-center">
         <div className="flex items-center justify-between gap-2">
-          <h3 className="text-[18px] sm:text-[19px] font-extrabold text-ink leading-tight break-words line-clamp-2">
+          <h3 className="w-full text-[21px] sm:text-[25px] font-black tracking-tight text-[#071735] dark:text-white leading-tight break-words line-clamp-2">
             {profile.books_title || 'Sách & Tác phẩm đã làm'}
           </h3>
         </div>
@@ -465,27 +465,35 @@ export function AuthorBooksSection({
 
       {/* Danh sách các cuốn sách */}
       {books.length > 0 ? (
-        <div className="flex flex-col gap-3.5">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
           {books.map((book, idx) => {
             const hasVideo = Boolean(book.youtube_url);
             const isBookHidden = book.is_visible === false;
             if (isBookHidden && !isAdmin) return null;
 
             return (
+              <React.Fragment key={book.id}>
+              {idx === 1 && (
+                <div className="col-span-2 flex items-center justify-between pt-1">
+                  <h4 className="text-[19px] sm:text-[22px] font-black tracking-tight text-[#071735] dark:text-white">
+                    Các tác phẩm khác
+                  </h4>
+                </div>
+              )}
               <ScrollReveal
-                key={book.id}
                 animation="slide-left"
                 delay={idx * 140}
+                className={idx === 0 ? 'col-span-2' : ''}
               >
                 <div
-                  className={`p-3.5 sm:p-4 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-lg hover:shadow-blue-950/10 hover:border-amber-400/80 dark:hover:border-[#F8DF7B]/60 dark:hover:shadow-[0_12px_28px_rgba(248,223,123,0.15)] hover:-translate-y-1.5 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 flex flex-row gap-3 sm:gap-4.5 group ${
+                  className={`h-full bg-white text-slate-900 border border-slate-200/70 shadow-[0_10px_30px_-20px_rgba(15,23,42,.38)] transition-all duration-300 flex group ${idx === 0 ? 'flex-row gap-3 p-3 sm:gap-5 sm:p-5 rounded-[22px]' : 'flex-col gap-1.5 p-2.5 pb-3 rounded-[18px]'} ${
                     isBookHidden ? 'opacity-70 border-dashed border-amber-300' : ''
                   }`}
                 >
                   {/* BÊN TRÁI: Bìa sách to rõ chuẩn tỷ lệ 3:4 với ModernBookCover */}
                   <div
                     onClick={() => onSelectBook?.(book)}
-                    className="w-[116px] sm:w-[138px] aspect-[3/4] shrink-0 relative flex items-center justify-center cursor-pointer"
+                    className={`${idx === 0 ? 'w-[42%] max-w-[245px]' : 'w-full'} aspect-[3/4] shrink-0 relative flex items-center justify-center cursor-pointer`}
                   >
                     <ModernBookCover
                       title={book.title}
@@ -504,9 +512,9 @@ export function AuthorBooksSection({
                   </div>
 
                   {/* BÊN PHẢI: Tag videos, Tiêu đề, Khung Xem thử 3D màu vàng ở TRÊN, Chi tiết sách ở DƯỚI */}
-                  <div className="flex-1 flex flex-col justify-between min-w-0 py-0.5">
+                  <div className={`flex-1 flex flex-col justify-between min-w-0 ${idx === 0 ? 'py-1' : 'py-0'}`}>
                     <div className="flex flex-col gap-1.5">
-                      {hasVideo && (
+                      {hasVideo && idx === 0 && (
                         <div className="flex items-center gap-1.5">
                           <span className="flex items-center gap-1 px-2 py-0.5 rounded-[5px] bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/80 dark:text-red-300 dark:border-red-800/40 text-[10.5px] font-extrabold uppercase">
                             <Play size={10} className="fill-red-600 dark:fill-red-400" />
@@ -517,33 +525,70 @@ export function AuthorBooksSection({
 
                       <h4
                         onClick={() => onSelectBook?.(book)}
-                        className="text-[15.5px] sm:text-[16.5px] font-bold text-[#1D3985] dark:text-[#93C5FD] leading-snug line-clamp-2 break-normal group-hover:text-blue-700 dark:group-hover:text-amber-300 transition-colors cursor-pointer"
+                        className={`${idx === 0 ? 'text-[19px] sm:text-[28px] font-black text-left' : 'text-[13px] sm:text-[15px] font-bold text-center min-h-[36px] flex items-center justify-center'} text-[#071735] dark:text-[#93C5FD] leading-snug line-clamp-2 break-normal cursor-pointer`}
                       >
                         {book.title}
                       </h4>
-                      {book.description && (
-                        <p className="text-[12px] sm:text-[12.5px] text-slate-500 dark:text-slate-400 line-clamp-1 leading-normal font-normal">
+                      {book.description && idx === 0 && (
+                        <p className="text-[12px] sm:text-[15px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-normal font-normal">
                           {book.description}
+                        </p>
+                      )}
+                      {idx === 0 && (
+                        <p className="mt-1 text-[12px] sm:text-[14px] text-slate-500 dark:text-slate-400">
+                          Tác giả: <strong className="text-slate-800 dark:text-white">{profile.name || 'Tùng Dinh Dưỡng'}</strong>
                         </p>
                       )}
                     </div>
 
                     {/* CỤM HÀNH ĐỘNG: Xem thử 3D màu vàng sáng full bề ngang, Chi tiết sách ở DƯỚI */}
                     <div className="pt-2 flex flex-col gap-1.5 mt-auto">
+                      {idx === 0 ? (
+                        <div className="grid grid-cols-[.78fr_.88fr_1.45fr] overflow-hidden rounded-[14px] border border-amber-300 bg-white shadow-[0_7px_22px_-12px_rgba(245,158,11,.65)]">
+                          <a
+                            href={hasVideo ? book.youtube_url || '#' : '#'}
+                            target={hasVideo ? '_blank' : undefined}
+                            rel={hasVideo ? 'noopener noreferrer' : undefined}
+                            onClick={(e) => { if (!hasVideo) e.preventDefault(); e.stopPropagation(); }}
+                            className="flex min-h-[48px] flex-col items-center justify-center gap-0.5 border-r border-slate-200 text-[9px] sm:text-[11px] font-bold text-[#071735]"
+                            aria-disabled={!hasVideo}
+                          >
+                            <Play size={15} className="fill-red-600 text-red-600" />
+                            <span>Video</span>
+                          </a>
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); setPreviewBook(book); }}
+                            className="flex min-h-[48px] flex-col items-center justify-center gap-0.5 border-r border-slate-200 text-[9px] sm:text-[11px] font-bold text-[#071735]"
+                          >
+                            <Sparkles size={15} />
+                            <span>Xem 3D</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); setPreviewBook(book); }}
+                            className="flex min-h-[48px] items-center justify-center gap-1 bg-gradient-to-r from-[#FFE36C] to-[#FFC400] px-1 text-[10px] sm:text-[12px] font-black text-[#071735]"
+                          >
+                            <BookOpen size={16} strokeWidth={2.4} />
+                            <span>Xem thử 3D</span>
+                          </button>
+                        </div>
+                      ) : (
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           setPreviewBook(book);
                         }}
-                        className="animate-bubble-float relative w-full h-[36px] sm:h-[38px] rounded-xl bg-gradient-to-r from-[#FEF08A] via-[#FACC15] to-[#EAB308] hover:from-[#FFF59D] hover:to-[#F59E0B] text-[#1E293B] font-bold text-[12px] sm:text-[12.5px] shadow-[0_2px_12px_rgba(250,204,21,0.32)] flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] cursor-pointer border border-[#FDE047]"
+                        className="relative w-full h-[36px] sm:h-[40px] rounded-full bg-gradient-to-r from-[#FFE36C] to-[#FFC400] text-[#071735] font-black text-[11px] sm:text-[12.5px] shadow-[0_7px_18px_-10px_rgba(245,158,11,.85)] flex items-center justify-center gap-1.5 active:scale-[0.98] cursor-pointer border border-[#FFD52F]"
                         title="Xem thử 3D"
                       >
                         <BookOpen size={14} strokeWidth={2.2} className="shrink-0 text-[#1E293B]" />
                         <span className="tracking-wide">Xem thử 3D</span>
                       </button>
+                      )}
 
-                      <div className="flex items-center justify-center">
+                      <div className={`items-center justify-center ${idx === 0 ? 'flex' : 'hidden'}`}>
                         <span
                           onClick={() => onSelectBook?.(book)}
                           className="text-[11.5px] sm:text-[12px] font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white inline-flex items-center gap-0.5 cursor-pointer transition-colors"
@@ -631,6 +676,7 @@ export function AuthorBooksSection({
                   </div>
                 </div>
             </ScrollReveal>
+            </React.Fragment>
           );
           })}
         </div>
