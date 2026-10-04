@@ -35,6 +35,7 @@ export interface AuthorProfile {
   email?: string | null;
   facebook_url?: string | null;
   address?: string | null;
+  featured_variants_hidden?: string[];
 }
 
 export interface RecommendedBook {

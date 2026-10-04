@@ -452,6 +452,15 @@ export function AuthorBooksSection({
       ];
   const [previewBook, setPreviewBook] = useState<AuthorBook | null>(null);
   const [videoBook, setVideoBook] = useState<AuthorBook | null>(null);
+  const [hiddenVariants, setHiddenVariants] = useState<string[]>(profile.featured_variants_hidden || []);
+  const visibleVariants = (['medium', 'large'] as const).filter((v) => isAdmin || !hiddenVariants.includes(v));
+  const toggleVariant = async (v: string) => {
+    const next = hiddenVariants.includes(v) ? hiddenVariants.filter((x) => x !== v) : [...hiddenVariants, v];
+    setHiddenVariants(next);
+    if (isAdmin) {
+      await saveSettingsApi({ author_profile: { ...profile, featured_variants_hidden: next } });
+    }
+  };
   const [internalEditingBook, setInternalEditingBook] = useState<AuthorBook | null>(null);
 
   if (displayBooks.length === 0 && !isAdmin) return null;
@@ -506,13 +515,19 @@ export function AuthorBooksSection({
       {/* Danh sách các cuốn sách */}
       {displayBooks.length > 0 ? (
         <div className="grid grid-cols-2 gap-2 sm:gap-3">
-          {displayBooks.map((book, idx) => {
+          {displayBooks
+            .flatMap((book, idx) =>
+              idx === 0
+                ? visibleVariants.map((v) => ({ book, idx, variant: v as 'medium' | 'large' | null }))
+                : [{ book, idx, variant: null as 'medium' | 'large' | null }]
+            )
+            .map(({ book, idx, variant }) => {
             const hasVideo = Boolean(book.youtube_url);
             const isBookHidden = book.is_visible === false;
             if (isBookHidden && !isAdmin) return null;
 
             return (
-              <React.Fragment key={book.id}>
+              <React.Fragment key={`${book.id}-${variant || 'single'}`}>
               {idx === 1 && (
                 <div className="col-span-2 flex items-center justify-between pt-1">
                   <h4 className="text-[15px] sm:text-[18px] font-black tracking-tight text-[#071735] dark:text-white">
@@ -534,14 +549,14 @@ export function AuthorBooksSection({
                 className={idx === 0 ? 'col-span-2' : ''}
               >
                 <div
-                  className={`h-full bg-white text-slate-900 border border-slate-200/70 dark:bg-[#1A1236] dark:text-white dark:border-white/10 shadow-[0_10px_30px_-20px_rgba(15,23,42,.38)] transition-all duration-300 flex group ${idx === 0 ? 'flex-row gap-2.5 p-2.5 sm:gap-4 sm:p-4 rounded-[18px]' : 'flex-col gap-0.5 p-1.5 pb-2 rounded-[14px]'} ${
-                    isBookHidden ? 'opacity-70 border-dashed border-amber-300' : ''
+                  className={`h-full bg-white text-slate-900 border border-slate-200/70 dark:bg-[#1A1236] dark:text-white dark:border-white/10 shadow-[0_10px_30px_-20px_rgba(15,23,42,.38)] transition-all duration-300 flex group ${idx === 0 ? 'flex-row gap-1.5 p-3 sm:gap-3 sm:p-4 rounded-[18px]' : 'flex-col gap-0.5 p-1.5 pb-2 rounded-[14px]'} ${
+                    isBookHidden || (variant && hiddenVariants.includes(variant)) ? 'opacity-70 border-dashed border-amber-300' : ''
                   }`}
                 >
                   {/* BÊN TRÁI: Bìa sách to rõ chuẩn tỷ lệ 3:4 với ModernBookCover */}
                   <div
                     onClick={() => onSelectBook?.(book)}
-                    className={`${idx === 0 ? 'w-[35%] max-w-[205px]' : 'w-[84%] mx-auto'} aspect-[3/4] shrink-0 relative flex items-center justify-center cursor-pointer`}
+                    className={`${idx === 0 ? (variant === 'large' ? 'w-[52%] max-w-[280px]' : 'w-[42%] max-w-[230px]') : 'w-[80%] mx-auto'} aspect-[3/4] shrink-0 relative flex items-center justify-center cursor-pointer`}
                   >
                     <ModernBookCover
                       title={book.title}
@@ -564,7 +579,7 @@ export function AuthorBooksSection({
                     <div className="flex flex-col gap-1.5">
                       <h4
                         onClick={() => onSelectBook?.(book)}
-                        className={`${idx === 0 ? 'text-[17px] sm:text-[24px] font-black text-left' : 'w-full px-2 text-[10px] sm:text-[11.5px] font-bold text-center min-h-[25px] flex items-center justify-center [overflow-wrap:anywhere]'} text-[#071735] dark:text-[#93C5FD] leading-[1.15] line-clamp-2 break-normal cursor-pointer`}
+                        className={`${idx === 0 ? `${variant === 'large' ? 'text-[clamp(11px,3.1vw,15px)]' : 'text-[clamp(12px,3.8vw,17px)]'} sm:text-[24px] font-black text-left whitespace-nowrap truncate` : 'w-full px-2 text-[10px] sm:text-[11.5px] font-bold text-center min-h-[25px] flex items-center justify-center [overflow-wrap:anywhere] line-clamp-2 break-normal'} text-[#071735] dark:text-[#93C5FD] leading-[1.15] cursor-pointer`}
                       >
                         {book.title}
                       </h4>
@@ -617,7 +632,7 @@ export function AuthorBooksSection({
                           e.stopPropagation();
                           setPreviewBook(book);
                         }}
-                        className="relative mx-auto h-[26px] w-[calc(100%_-_12px)] sm:h-[30px] sm:w-[calc(100%_-_16px)] rounded-full bg-gradient-to-r from-[#FFE36C] to-[#FFC400] text-[#071735] font-black text-[9.5px] sm:text-[10.5px] shadow-[0_6px_15px_-10px_rgba(245,158,11,.8)] flex items-center justify-center gap-1 active:scale-[0.98] cursor-pointer border border-[#FFD52F]"
+                        className="relative mx-auto h-[26px] w-[calc(100%_-_28px)] sm:h-[30px] sm:w-[calc(100%_-_36px)] rounded-[10px] bg-gradient-to-r from-[#FFE36C] to-[#FFC400] text-[#071735] font-black text-[9.5px] sm:text-[10.5px] shadow-[0_6px_15px_-10px_rgba(245,158,11,.8)] flex items-center justify-center gap-1 active:scale-[0.98] cursor-pointer border border-[#FFD52F]"
                         title="Xem thử 3D"
                       >
                         <BookOpen size={13} strokeWidth={2.2} className="shrink-0 text-[#1E293B]" />
@@ -627,7 +642,25 @@ export function AuthorBooksSection({
 
                     </div>
 
-                  {isAdmin && (
+                  {isAdmin && variant && (
+                    <div
+                      className="mt-1.5 flex items-center justify-between gap-1.5 rounded-[8px] bg-amber-50 dark:bg-white/5 px-2 py-1"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <span className="text-[10px] font-extrabold text-amber-800 dark:text-amber-300">
+                        {variant === 'large' ? 'Bản 2 · Bìa lớn' : 'Bản 1 · Bìa vừa'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => toggleVariant(variant)}
+                        className="h-6 px-2 rounded-[6px] bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-[10.5px] font-bold flex items-center gap-1 cursor-pointer"
+                      >
+                        {hiddenVariants.includes(variant) ? <Eye size={11} /> : <EyeOff size={11} />}
+                        <span>{hiddenVariants.includes(variant) ? 'Hiện bản này' : 'Ẩn bản này'}</span>
+                      </button>
+                    </div>
+                  )}
+                  {isAdmin && (!variant || variant === visibleVariants[0]) && (
                     <div
                       className="mt-2 pt-1.5 border-t border-dashed border-[#2D5B94]/25 dark:border-slate-800 flex items-center justify-between gap-1.5"
                       onClick={(e) => e.stopPropagation()}
