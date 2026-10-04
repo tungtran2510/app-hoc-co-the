@@ -127,20 +127,20 @@ export const DEFAULT_AI_TRAINING: AiTrainingConfig = {
    - ĐỊNH HƯỚNG BÀI HỌC: Luôn định hướng người học mở đúng 1 - 2 bài học liên quan nhất trong hệ thống để xem video và hình ảnh chi tiết.`,
   documents: [
     {
-      id: 'doc-01-cotsong-doctorloan',
+      id: 'doc-01-cotsong-chuan',
       title: 'Cột Sống, Đĩa Đệm & Cơ Chế Bảo Vệ, Hỗ Trợ Điều Chỉnh Tư Thế',
       content: `Cột sống người gồm 33-34 đốt sống tạo thành 4 đường cong sinh lý tự nhiên (cổ, ngực, thắt lưng, cùng cụt). Đĩa đệm đóng vai trò giảm xóc sinh học với nhân nhầy ngậm nước và vòng sợi bao quanh, nhận dinh dưỡng qua cơ chế thẩm thấu khi vận động.
 Nguyên nhân cốt lõi gây đau mỏi, thoái hóa là sai lệch trục chịu lực, mất đường cong sinh lý do thói quen ngồi gù lưng, cúi đầu bấm điện thoại hoặc mang vác sai tư thế.
-Giải pháp bảo vệ cột sống gồm 3 phần: (1) Nâng cao nhận thức về tư thế sinh hoạt đúng; (2) Sử dụng công cụ hỗ trợ điều chỉnh tư thế DoctorLoan (đã được cấp sáng chế) để giải tỏa áp lực đĩa đệm khi ngồi, nằm, ngủ, lái xe; (3) Tập luyện phục hồi hệ cơ lõi và duy trì thói quen vận động khoa học.
+Giải pháp bảo vệ cột sống gồm 3 phần: (1) Nâng cao nhận thức về tư thế sinh hoạt đúng; (2) Duy trì tư thế nằm chuẩn, ngồi chuẩn để giải tỏa áp lực đĩa đệm khi làm việc và nghỉ ngơi; (3) Tập luyện phục hồi hệ cơ lõi và duy trì thói quen vận động khoa học.
 Phản ứng thích nghi: Cảm giác căng tức, mỏi cơ nhẹ trong 1-3 ngày đầu là hiện tượng bình thường khi cơ bắp co rút được kéo giãn và điều chỉnh lại. Nếu xuất hiện đau dữ dội hoặc tê yếu chi, cần dừng lại và kiểm tra y tế chuyên khoa.`,
       updated_at: '2026-10-02T00:00:00.000Z',
     },
     {
-      id: 'doc-02-nuoc-hydro-gems',
-      title: 'Nước Hydro Gems & Quản Trị Nguồn Nước Uống Cấp Tế Bào',
+      id: 'doc-02-nuoc-te-bao',
+      title: 'Khoa Học Nguồn Nước & Quản Trị Nước Uống Cấp Tế Bào',
       content: `Nước chiếm 55-70% trọng lượng cơ thể, là môi trường dung môi cho toàn bộ phản ứng sinh hóa, vận chuyển dưỡng chất và thanh lọc độc tố tế bào.
 Nguyên lý chăm sóc sức khỏe chủ động qua nguồn nước: Giúp mỗi gia đình tự đo lường, kiểm tra và quản trị chất lượng nước uống tại nhà bằng các công cụ đo trực quan (test pH, test chống oxy hóa ORP, độ tinh khiết TDS, kích thước phân tử nước).
-3 đặc tính khoa học của Nước Gems: (1) Tính kiềm tự nhiên: Giúp trung hòa lượng axit dư thừa sinh ra từ chuyển hóa và căng thẳng; (2) Giàu Hydrogen hòa tan: Hoạt chất chống oxy hóa mạnh giúp trung hòa gốc tự do và bảo vệ màng tế bào; (3) Cụm phân tử nước siêu nhỏ: Thẩm thấu sâu vào tế bào, hỗ trợ chuyển hóa và đào thải cặn bã hiệu quả. Nước là nền tảng môi trường sống của tế bào, không phải là thuốc.`,
+3 đặc tính khoa học của nguồn nước tốt: (1) Tính kiềm tự nhiên: Giúp trung hòa lượng axit dư thừa sinh ra từ chuyển hóa và căng thẳng; (2) Giàu Hydrogen hòa tan: Hoạt chất chống oxy hóa mạnh giúp trung hòa gốc tự do và bảo vệ màng tế bào; (3) Cụm phân tử nước siêu nhỏ: Thẩm thấu sâu vào tế bào, hỗ trợ chuyển hóa và đào thải cặn bã hiệu quả. Nước là nền tảng môi trường sống của tế bào, không phải là thuốc.`,
       updated_at: '2026-10-02T00:00:00.000Z',
     },
     {
@@ -193,8 +193,8 @@ Dấu hiệu cảnh báo đỏ (Red Flags) cần đi viện ngay: Đau nhói d�
     },
     {
       id: 'faq-04',
-      question: 'Nước Hydro Gems có điểm gì khác biệt so với nước thông thường?',
-      answer: 'Nước Gems có 3 đặc tính sinh học: tính kiềm tự nhiên bù khoáng, giàu hydrogen chống oxy hóa và cụm phân tử nước siêu nhỏ thẩm thấu nhanh. Bạn hãy mở bài học "Nước & Điện Giải" để xem chi tiết thí nghiệm đo lường.',
+      question: 'Uống nước như thế nào để đĩa đệm và sụn khớp không bị khô?',
+      answer: 'Đĩa đệm nhận nước và dưỡng chất qua cơ chế thẩm thấu qua mâm sụn khi cơ thể vận động đúng trục. Cần uống nước rải đều trong ngày, ưu tiên nước sạch giàu khoáng tự nhiên để duy trì áp lực thẩm thấu cho sụn khớp.',
     },
     {
       id: 'faq-05',

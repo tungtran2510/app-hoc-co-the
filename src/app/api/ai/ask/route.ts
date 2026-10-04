@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { rateLimit, getClientIp } from '../../../../lib/authServer';
 import { getSettings } from '../../../../lib/data';
-import { sampleTopics, samplePages } from '../../../../data/sample';
+import { sampleTopics, samplePages, sampleBlocks } from '../../../../data/sample';
 import { getSupabaseClient } from '../../../../lib/supabaseClient';
 import { retrieveKnowledge, formatKnowledgeForPrompt, KnowledgeExcerpt } from '../../../../lib/aiKnowledgeRetrieval';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
+interface VideoItemSummary {
+  index: number;
+  title: string;
+  description?: string;
+}
 
 interface LessonCatalogItem {
   topic_title: string;
@@ -16,6 +21,7 @@ interface LessonCatalogItem {
   page_slug: string;
   summary: string;
   content: string;
+  videos?: VideoItemSummary[];
 }
 
 let cachedCatalog: LessonCatalogItem[] | null = null;
@@ -31,6 +37,47 @@ function normalizeText(text: string): string {
     .replace(/[^a-z0-9\s]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+// Tìm video chuẩn xác nhất trong bài học tương ứng với câu hỏi của người học
+function findBestVideoIndex(
+  query: string,
+  videos?: VideoItemSummary[]
+): { video_index: number; video_title: string } {
+  if (!videos || videos.length === 0) {
+    return { video_index: 1, video_title: '' };
+  }
+  const normQ = normalizeText(query);
+  const qTokens = normQ.split(' ').filter((w) => w.length >= 2);
+
+  let bestIndex = 1;
+  let bestTitle = videos[0].title;
+  let bestScore = -1;
+
+  for (const v of videos) {
+    let score = 0;
+    const vNorm = normalizeText(`${v.title} ${v.description || ''}`);
+
+    // Khớp nguyên cụm từ khóa dài
+    if (normQ.length > 3 && vNorm.includes(normQ)) {
+      score += 15;
+    }
+
+    // Khớp từng từ đơn
+    for (const t of qTokens) {
+      if (vNorm.includes(t)) {
+        score += 2;
+      }
+    }
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestIndex = v.index;
+      bestTitle = v.title;
+    }
+  }
+
+  return { video_index: bestIndex, video_title: bestTitle };
 }
 
 // BỘ CÂU HỎI & TRẢ LỜI CHUẨN XÁC, NGẮN GỌN, ĐÚNG TRỌNG TÂM (PHẢN HỒI TỨC THÌ < 5ms)
@@ -57,24 +104,30 @@ const CURATED_QA = [
 • Cảnh báo y tế cần khám ngay: Nếu xuất hiện cảm giác đau nhói buốt lan nhanh xuống chân, tê mất cảm giác bàn chân hoặc rối loạn đại tiểu tiện.`,
     suggested_pages: [
       {
-        title: 'Đĩa đệm và cơ chế giảm xóc',
+        title: '02. Cơ chế hình thành thoát vị đĩa đệm 3D',
         topic_title: 'Cột Sống & Đĩa Đệm',
         topic_slug: 'cot-song',
         page_slug: 'dia-dem',
+        video_index: 2,
+        video_title: '02. Cơ chế hình thành thoát vị đĩa đệm 3D',
         reason: 'Hiểu rõ cấu trúc nhân nhầy và cơ chế thẩm thấu nuôi dưỡng đĩa đệm.',
       },
       {
-        title: 'Tư thế chuẩn & Vận động giải áp',
+        title: '03. Chuỗi bài tập giải nén cột sống cuối ngày (Vinmec)',
         topic_title: 'Cột Sống & Đĩa Đệm',
         topic_slug: 'cot-song',
         page_slug: 'tu-the-va-van-dong',
+        video_index: 3,
+        video_title: '03. Chuỗi bài tập giải nén cột sống cuối ngày (Vinmec)',
         reason: 'Hướng dẫn các nguyên tắc công thái học và bảo vệ cột sống an toàn.',
       },
       {
-        title: 'Các vấn đề thường gặp và cách phòng tránh',
+        title: '02. Thoát vị đĩa đệm nặng: Giải pháp điều trị (BV Tâm Anh)',
         topic_title: 'Cột Sống & Đĩa Đệm',
         topic_slug: 'cot-song',
         page_slug: 'cac-van-de-thuong-gap',
+        video_index: 2,
+        video_title: '02. Thoát vị đĩa đệm nặng: Giải pháp điều trị (BV Tâm Anh)',
         reason: 'Nhận diện các hội chứng đau cơ xương khớp và cách phòng ngừa thoái hóa.',
       },
     ],
@@ -106,18 +159,22 @@ const CURATED_QA = [
 • Lắng nghe cơ thể: Do thể trạng và cơ địa mỗi người khác nhau, không có một tư thế cố định áp dụng cho tất cả; hãy điều chỉnh tư thế sao cho cột sống được nâng đỡ thoải mái và tự nhiên nhất.`,
     suggested_pages: [
       {
-        title: 'Tư thế chuẩn & Vận động giải áp',
+        title: '01. Tư thế công thái học cho dân văn phòng (BV Tâm Anh)',
         topic_title: 'Cột Sống & Đĩa Đệm',
         topic_slug: 'cot-song',
         page_slug: 'tu-the-va-van-dong',
+        video_index: 1,
+        video_title: '01. Tư thế công thái học cho dân văn phòng (BV Tâm Anh)',
         reason: 'Hướng dẫn chi tiết nguyên tắc tư thế công thái học bảo vệ cột sống.',
       },
       {
-        title: 'Đĩa đệm và cơ chế giảm xóc',
+        title: '02. Nguyên tắc bốc vác & vận động an toàn (Vinmec)',
         topic_title: 'Cột Sống & Đĩa Đệm',
         topic_slug: 'cot-song',
-        page_slug: 'dia-dem',
-        reason: 'Hiểu cơ chế thẩm thấu dinh dưỡng và giảm tải áp lực đĩa đệm.',
+        page_slug: 'tu-the-va-van-dong',
+        video_index: 2,
+        video_title: '02. Nguyên tắc bốc vác & vận động an toàn (Vinmec)',
+        reason: 'Kỹ thuật bản lề háng Hip Hinge bảo vệ thắt lưng khi nâng đồ nặng.',
       },
     ],
     follow_up_questions: [
@@ -142,18 +199,22 @@ const CURATED_QA = [
 • Cần đi khám y tế ngay: Nếu xuất hiện cảm giác tê yếu chi lan nhanh, bàn chân khó nhấc hoặc rối loạn đại tiểu tiện.`,
     suggested_pages: [
       {
-        title: 'Các vấn đề thường gặp và cách phòng tránh',
+        title: '01. Thoái hóa cột sống: Dấu hiệu & Điều trị (BV Tâm Anh)',
         topic_title: 'Cột Sống & Đĩa Đệm',
         topic_slug: 'cot-song',
         page_slug: 'cac-van-de-thuong-gap',
-        reason: 'Nhận diện các hội chứng đau cơ xương khớp và biện pháp phòng ngừa.',
+        video_index: 1,
+        video_title: '01. Thoái hóa cột sống: Dấu hiệu & Điều trị (BV Tâm Anh)',
+        reason: 'Bác sĩ chuyên khoa giải thích tiến trình thoái hóa và đau mỏi cột sống.',
       },
       {
-        title: 'Thần kinh và tủy sống',
+        title: '02. Hội chứng chèn ép rễ thần kinh tọa 3D',
         topic_title: 'Cột Sống & Đĩa Đệm',
         topic_slug: 'cot-song',
         page_slug: 'than-kinh',
-        reason: 'Tìm hiểu đường dẫn truyền thần kinh và cơ chế chèn ép rễ.',
+        video_index: 2,
+        video_title: '02. Hội chứng chèn ép rễ thần kinh tọa 3D',
+        reason: 'Đường đi dây thần kinh tọa từ thắt lưng và phân biệt đau rễ thần kinh.',
       },
     ],
     follow_up_questions: [
@@ -178,18 +239,22 @@ const CURATED_QA = [
 • Chọn nguồn nước: Ưu tiên nước sạch, giàu khoáng và có tính kiềm tự nhiên để trung hòa axit dư thừa.`,
     suggested_pages: [
       {
-        title: 'Nguyên tắc uống nước',
-        topic_title: 'Nước',
+        title: '01. Uống nước đúng cách: Nhấp từng ngụm ở tư thế ngồi',
+        topic_title: 'Nước & Điện Giải',
         topic_slug: 'nuoc',
         page_slug: 'nguyen-tac-uong-nuoc',
-        reason: 'Quy tắc 4 đúng khi uống nước cho tế bào.',
+        video_index: 1,
+        video_title: '01. Uống nước đúng cách: Nhấp từng ngụm ở tư thế ngồi',
+        reason: 'Quy tắc 4 đúng khi uống nước cho tế bào và đĩa đệm.',
       },
       {
-        title: 'Vai trò của nước',
-        topic_title: 'Nước',
+        title: '02. Công thức tính lượng nước chuẩn theo cân nặng',
+        topic_title: 'Nước & Điện Giải',
         topic_slug: 'nuoc',
-        page_slug: 'vai-tro-cua-nuoc',
-        reason: 'Dung môi sinh hóa và cơ chế thẩm thấu nuôi đĩa đệm.',
+        page_slug: 'nguyen-tac-uong-nuoc',
+        video_index: 2,
+        video_title: '02. Công thức tính lượng nước chuẩn theo cân nặng',
+        reason: 'Công thức tính lượng nước chuẩn theo thể trạng.',
       },
     ],
     follow_up_questions: [
@@ -213,18 +278,22 @@ const CURATED_QA = [
 • Cần cắt giảm: Hạn chế đường tinh luyện, đồ ngọt, thực phẩm siêu chế biến, dầu chiên đi chiên lại và nước ngọt có gas.`,
     suggested_pages: [
       {
-        title: 'Dinh dưỡng kháng viêm',
-        topic_title: 'Dinh Dưỡng',
+        title: '01. Chế độ ăn kháng viêm: Giảm đau nhức mạn tính',
+        topic_title: 'Dinh Dưỡng Nền Tảng',
         topic_slug: 'dinh-duong',
         page_slug: 'dinh-duong-khang-viem',
+        video_index: 1,
+        video_title: '01. Chế độ ăn kháng viêm: Giảm đau nhức mạn tính',
         reason: 'Thực đơn và nhóm chất giúp kiểm soát phản ứng viêm khớp.',
       },
       {
-        title: 'Chất đạm (Protein)',
-        topic_title: 'Dinh Dưỡng',
+        title: '02. Bộ ba Canxi, Vitamin D3 & K2 dẫn truyền vào xương',
+        topic_title: 'Dinh Dưỡng Nền Tảng',
         topic_slug: 'dinh-duong',
-        page_slug: 'chat-dam-protein',
-        reason: 'Nguyên liệu cấu tạo cơ bắp và hệ thống dây chằng.',
+        page_slug: 'vitamin-khoang-chat',
+        video_index: 2,
+        video_title: '02. Bộ ba Canxi, Vitamin D3 & K2 dẫn truyền vào xương',
+        reason: 'Vi chất thiết yếu tăng mật độ xương và phục hồi khớp.',
       },
     ],
     follow_up_questions: [
@@ -247,17 +316,21 @@ const CURATED_QA = [
 • Cơ chế nuôi dưỡng: Đĩa đệm nhận dinh dưỡng qua cơ chế thẩm thấu khi vận động đúng trục sinh học tự nhiên.`,
     suggested_pages: [
       {
-        title: 'Tổng quan về cột sống',
+        title: '01. Cấu tạo & chức năng cột sống',
         topic_title: 'Cột Sống & Đĩa Đệm',
         topic_slug: 'cot-song',
         page_slug: 'tong-quan-ve-cot-song',
+        video_index: 1,
+        video_title: '01. Cấu tạo & chức năng cột sống',
         reason: 'Cấu trúc giải phẫu và 4 đường cong sinh lý.',
       },
       {
-        title: 'Đĩa đệm',
+        title: '01. Giải phẫu đĩa đệm: Vòng sợi & Nhân nhầy',
         topic_title: 'Cột Sống & Đĩa Đệm',
         topic_slug: 'cot-song',
         page_slug: 'dia-dem',
+        video_index: 1,
+        video_title: '01. Giải phẫu đĩa đệm: Vòng sợi & Nhân nhầy',
         reason: 'Cấu tạo nhân nhầy và cơ chế hấp thụ xung lực.',
       },
     ],
@@ -288,7 +361,8 @@ function rankCatalogPages(query: string, catalog: LessonCatalogItem[]): LessonCa
 
   const scored = catalog.map((c) => {
     let score = 0;
-    const text = normalizeText(`${c.page_title} ${c.topic_title} ${c.summary}`);
+    const videosText = (c.videos || []).map((v) => `${v.title} ${v.description || ''}`).join(' ');
+    const text = normalizeText(`${c.page_title} ${c.topic_title} ${c.summary} ${videosText}`);
 
     // Phân loại chủ đề theo từ khóa câu hỏi
     if (
@@ -313,12 +387,23 @@ function rankCatalogPages(query: string, catalog: LessonCatalogItem[]): LessonCa
       score += 15;
     }
 
-    if ((normQ.includes('da day') || normQ.includes('ruot') || normQ.includes('tieu hoa')) && c.topic_slug === 'tieu-hoa') {
+    if ((normQ.includes('da day') || normQ.includes('ruot') || normQ.includes('tieu hoa') || normQ.includes('enzym')) && c.topic_slug === 'tieu-hoa') {
       score += 15;
     }
 
     tokens.forEach((t) => {
       if (text.includes(t)) score += 2;
+    });
+
+    // Điểm thưởng cao nếu có video trong bài khớp trực tiếp từ khóa
+    (c.videos || []).forEach((v) => {
+      const vNorm = normalizeText(`${v.title} ${v.description || ''}`);
+      if (normQ.length > 3 && vNorm.includes(normQ)) {
+        score += 10;
+      }
+      tokens.forEach((t) => {
+        if (vNorm.includes(t)) score += 3;
+      });
     });
 
     return { c, score };
@@ -328,7 +413,7 @@ function rankCatalogPages(query: string, catalog: LessonCatalogItem[]): LessonCa
   return scored.slice(0, 2).map((s) => s.c);
 }
 
-// Xây dựng danh mục bài học siêu tốc (chỉ 2 query song song hoặc fallback 0ms tới sample data)
+// Xây dựng danh mục bài học siêu tốc kèm danh sách video từng bài
 async function getOrBuildLessonCatalog(): Promise<LessonCatalogItem[]> {
   if (cachedCatalog && cachedCatalog.length > 0 && cachedCatalogExpiry > Date.now()) {
     return cachedCatalog;
@@ -337,15 +422,32 @@ async function getOrBuildLessonCatalog(): Promise<LessonCatalogItem[]> {
   try {
     const supabase = getSupabaseClient();
     if (supabase) {
-      const [{ data: topics }, { data: pages }] = await Promise.all([
+      const [{ data: topics }, { data: pages }, { data: blocks }] = await Promise.all([
         supabase.from('topics').select('id, title, slug').order('sort_order'),
         supabase.from('pages').select('id, title, slug, summary, topic_id').order('sort_order'),
+        supabase.from('blocks').select('page_id, type, data').eq('type', 'videos'),
       ]);
 
       if (topics && pages && pages.length > 0) {
         const topicMap = new Map(topics.map((t) => [t.id, t]));
+        const videoBlockMap = new Map<string, VideoItemSummary[]>();
+
+        (blocks || []).forEach((b) => {
+          if (Array.isArray(b.data?.videos)) {
+            videoBlockMap.set(
+              b.page_id,
+              b.data.videos.map((v: any, idx: number) => ({
+                index: idx + 1,
+                title: v.title || `Video ${idx + 1}`,
+                description: v.description || '',
+              }))
+            );
+          }
+        });
+
         const catalog: LessonCatalogItem[] = pages.map((p) => {
           const t = topicMap.get(p.topic_id);
+          const vList = videoBlockMap.get(p.id) || [];
           return {
             topic_title: t?.title || 'Cột Sống & Đĩa Đệm',
             topic_slug: t?.slug || 'cot-song',
@@ -353,6 +455,7 @@ async function getOrBuildLessonCatalog(): Promise<LessonCatalogItem[]> {
             page_slug: p.slug,
             summary: p.summary || '',
             content: p.summary || '',
+            videos: vList,
           };
         });
 
@@ -366,8 +469,23 @@ async function getOrBuildLessonCatalog(): Promise<LessonCatalogItem[]> {
   }
 
   const topicMap = new Map(sampleTopics.map((t) => [t.id, t]));
+  const videoBlockMap = new Map<string, VideoItemSummary[]>();
+  sampleBlocks.forEach((b) => {
+    if (b.type === 'videos' && Array.isArray((b.data as any)?.videos)) {
+      videoBlockMap.set(
+        b.page_id,
+        (b.data as any).videos.map((v: any, idx: number) => ({
+          index: idx + 1,
+          title: v.title || `Video ${idx + 1}`,
+          description: v.description || '',
+        }))
+      );
+    }
+  });
+
   const catalog: LessonCatalogItem[] = samplePages.map((p) => {
     const t = topicMap.get(p.topic_id);
+    const vList = videoBlockMap.get(p.id) || [];
     return {
       topic_title: t?.title || 'Cột Sống & Đĩa Đệm',
       topic_slug: t?.slug || 'cot-song',
@@ -375,6 +493,7 @@ async function getOrBuildLessonCatalog(): Promise<LessonCatalogItem[]> {
       page_slug: p.slug,
       summary: p.summary || '',
       content: p.summary || '',
+      videos: vList,
     };
   });
 
@@ -390,13 +509,18 @@ function fastFallbackSearch(query: string, catalog: LessonCatalogItem[], _excerp
   return {
     answer:
       'Trợ lý AI đang bận nên chưa kịp trả lời câu hỏi này của bạn. Bạn bấm gửi lại sau ít giây giúp mình nhé. Trong lúc chờ, bạn có thể xem các bài học liên quan bên dưới.',
-    suggested_pages: selectedPages.map((s) => ({
-      title: s.page_title,
-      topic_title: s.topic_title,
-      topic_slug: s.topic_slug,
-      page_slug: s.page_slug,
-      reason: `Bài học liên quan: "${s.page_title}".`,
-    })),
+    suggested_pages: selectedPages.map((s) => {
+      const best = findBestVideoIndex(query, s.videos);
+      return {
+        title: best.video_title || s.page_title,
+        topic_title: s.topic_title,
+        topic_slug: s.topic_slug,
+        page_slug: s.page_slug,
+        video_index: best.video_index,
+        video_title: best.video_title,
+        reason: `Bài học liên quan: "${s.page_title}".`,
+      };
+    }),
     follow_up_questions: [] as string[],
     provider: 'fallback_busy',
   };
@@ -451,13 +575,18 @@ export async function POST(req: NextRequest) {
 
           return NextResponse.json({
             answer: matchedFaq.answer,
-            suggested_pages: selectedPages.map((s) => ({
-              title: s.page_title,
-              topic_title: s.topic_title,
-              topic_slug: s.topic_slug,
-              page_slug: s.page_slug,
-              reason: 'Tài liệu hướng dẫn trực tiếp từ chuyên gia.',
-            })),
+            suggested_pages: selectedPages.map((s) => {
+              const best = findBestVideoIndex(question, s.videos);
+              return {
+                title: best.video_title || s.page_title,
+                topic_title: s.topic_title,
+                topic_slug: s.topic_slug,
+                page_slug: s.page_slug,
+                video_index: best.video_index,
+                video_title: best.video_title,
+                reason: 'Tài liệu hướng dẫn trực tiếp từ chuyên gia.',
+              };
+            }),
             follow_up_questions: [
               'Tư thế sinh hoạt đúng cần chú ý gì?',
               'Có lưu ý gì trong sinh hoạt hàng ngày không?',
@@ -484,8 +613,14 @@ export async function POST(req: NextRequest) {
     const topCatalog = rankCatalogPages(question, catalog);
 
     const catalogText = topCatalog
-      .map((c, idx) => `[Bài ${idx + 1}] "${c.page_title}" (Chủ đề: ${c.topic_title}, slug: ${c.topic_slug}/${c.page_slug}): ${c.summary}`)
-      .join('\n');
+      .map((c, idx) => {
+        let text = `[Bài ${idx + 1}] "${c.page_title}" (Chủ đề: ${c.topic_title}, slug: ${c.topic_slug}/${c.page_slug}): ${c.summary}`;
+        if (c.videos && c.videos.length > 0) {
+          text += '\n  Danh sách video trong bài:\n' + c.videos.map((v) => `    * Video ${v.index}: "${v.title}"${v.description ? ` (${v.description})` : ''}`).join('\n');
+        }
+        return text;
+      })
+      .join('\n\n');
 
     // 4. HỆ THỐNG PROMPT TỐI ƯU: ĐÚNG TRỌNG TÂM, NGẮN GỌN, TUYỆT ĐỐI CẤM BÁN HÀNG DOCTORLOAN
     const systemPrompt = `Bạn là Trợ lý Sức Khỏe AI trong ứng dụng giáo dục y học "Học Cơ Thể" (Tủ Sách Y Khoa Qbiz Books của tác giả Tùng dinh dưỡng).
@@ -497,7 +632,7 @@ NGUYÊN TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ NGHIÊM NGẶT):
    - Chỉ dùng thông tin có trong TRÍCH ĐOẠN TÀI LIỆU bên dưới, giữ đúng thuật ngữ và con số của tác giả. KHÔNG bịa số liệu. Nếu tài liệu không nói đến điều được hỏi, hãy nói rõ "Phần này chưa có trong tài liệu của tác giả" rồi chỉ nêu nguyên tắc chung rất ngắn và dẫn sang bài học gần nhất.
    - Câu hỏi mơ hồ hoặc quá rộng (ví dụ "đau lưng", "mệt mỏi"): đừng liệt kê tràn lan. Trả lời 1 ý chính rồi hỏi lại đúng 1 câu làm rõ (đau ở vùng nào, bao lâu, kèm tê hay không).
    - Có thông tin về hội chứng đỏ (tê yếu chi lan nhanh, rối loạn đại tiểu tiện, sốt kèm đau dữ dội): khuyên đi khám chuyên khoa ngay, ngắn gọn.
-   - Câu gợi ý hỏi tiếp (follow_up_questions): 3 câu, mỗi câu 8 đến 14 từ, đi tiếp theo mạch bài giảng (hiểu cơ chế, nguyên nhân gốc, rồi cách chăm sóc), nói như người học thật sự sẽ hỏi.
+   - Câu gợi ý hỏi tiếp (follow_up_questions): 3 câu, mỗi câu 8 đến 14 từ, đi tiếp theo mạch bài giảng (hiểu cơ chế, nguyên nhân gốc, rồi cách chăm sóc), nói như người học thật sự sẽ hỏi. TUYỆT ĐỐI KHÔNG CHỨA BẤT KỲ TÊN THƯƠNG HIỆU, NHÃN HIỆU NÀO.
 
 2. NGUYÊN TẮC QUAN TRỌNG VỀ TƯ THẾ & VẬN ĐỘNG (TUYỆT ĐỐI TUÂN THỦ THEO TÁC GIẢ):
    - CẤM TIỂU TƯ VẤN NẰM/NGỒI CHI TIẾT:
@@ -511,19 +646,21 @@ NGUYÊN TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ NGHIÊM NGẶT):
      + CHỈ ĐƯỢC NÓI CHUNG theo nguyên tắc: "Duy trì tư thế nằm chuẩn, ngồi chuẩn để bảo vệ trục cột sống và độ cong sinh lý tự nhiên", "tránh duy trì tư thế tĩnh tại một chỗ quá lâu, nên đứng dậy đi lại nhẹ nhàng định kỳ", "vận động nhẹ nhàng phù hợp với thể trạng của bản thân".
    - LÝ DO CHUYÊN MÔN: Thể trạng, cơ địa và mức độ tổn thương của mỗi người là khác nhau, không ai giống ai nên không áp đặt một tư thế nằm ngồi hay bài tập cố định cho tất cả mọi người.
 
-3. TUYỆT ĐỐI CẤM KHÁC:
-   - CẤM TUYỆT ĐỐI nhắc đến thương hiệu DoctorLoan, ghế DoctorLoan hay bất kỳ sản phẩm bán hàng nào (trừ khi người dùng đích thân hỏi từ "DoctorLoan").
+3. TUYỆT ĐỐI CẤM THƯƠNG HIỆU, NHÃN HIỆU & SẢN PHẨM (ÁP DỤNG TRIỆT ĐỂ Ở CẢ CÂU TRẢ LỜI VÀ CÂU HỎI TIẾP THEO):
+   - CẤM TUYỆT ĐỐI NÊU TÊN BẤT KỲ THƯƠNG HIỆU, NHÃN HIỆU NÀO (DoctorLoan, Doctor Loan, Hydro Gems, Gems, hoặc bất kỳ thương hiệu, nhãn hiệu thương mại nào) trong câu trả lời cũng như trong câu hỏi gợi ý tiếp theo (follow_up_questions).
+   - CẤM TUYỆT ĐỐI nêu tên hoặc gợi ý câu hỏi về sản phẩm, hàng hóa, thiết bị, ghế, gối.
+   - CÂU HỎI TIẾP THEO (follow_up_questions): Phải 100% là câu hỏi y học thuần túy về cấu tạo giải phẫu, cơ chế sinh lý, nước, dinh dưỡng khoa học hoặc phòng ngừa tự nhiên. TUYỆT ĐỐI KHÔNG chứa tên bất kỳ thương hiệu, nhãn hiệu, sản phẩm, thiết bị, ghế, gối hay bài tập cụ thể nào.
    - CẤM chia kiểu máy móc: "TẦNG 1", "TẦNG 2", "TẦNG 3".
    - CẤM tự ý đưa công thức nước 0.04 hay cảnh báo cấp cứu/bệnh viện vào các câu hỏi sinh hoạt thông thường.
    - CẤM các từ: "chữa bệnh", "khám chữa bệnh", "điều trị dứt điểm", "bác sĩ".
    - CẤM các câu trần tình như "tôi không phải bác sĩ", "tác giả không phải bác sĩ".
-   - CÂU HỎI TIẾP THEO (follow_up_questions): Tuyệt đối KHÔNG gợi ý các câu hỏi về bài tập, tư thế nằm ngủ, cách nằm, gối hay ghế. Chỉ gợi ý câu hỏi về dinh dưỡng, nước, kiến thức giải phẫu, cơ chế bệnh học hoặc nguyên tắc tư thế chuẩn chung.
 
 4. KIẾN THỨC TỪ TÀI LIỆU CỦA TÁC GIẢ (ƯU TIÊN SỐ 1 - luôn tuân theo các nguyên tắc ở mục 2 và 3):
 ${authorGuidelines ? `Chỉ dẫn riêng của tác giả: ${authorGuidelines}\n\n` : ''}${knowledgeText || '(Không tìm thấy đoạn tài liệu khớp trực tiếp; hãy trả lời theo kiến thức giải phẫu - dinh dưỡng phổ thông, thận trọng, đúng nguyên tắc ở trên.)'}
 
-5. ĐỊNH HƯỚNG BÀI HỌC:
-   - Chọn đúng 1-2 bài học liên quan nhất trong danh mục dưới đây:
+5. ĐỊNH HƯỚNG BÀI HỌC VÀ CHỈ ĐỊNH ĐÚNG VIDEO (P0 - BẮT BUỘC):
+   - Chọn đúng 1-2 bài học liên quan nhất từ danh mục dưới đây.
+   - BẮT BUỘC CHỈ ĐỊNH ĐÚNG "video_index" (số thứ tự 1, 2, 3...) và "title" là tên video trả lời đúng nhất câu hỏi của người học, để khi người học bấm "Phát ngay" là mở đúng video đó và phát ngay, KHÔNG bắt người học phải tự đi tìm trong danh sách.
 ${catalogText}
 
 BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
@@ -531,10 +668,12 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
   "answer": "1 câu trả lời thẳng, 3-4 gạch đầu dòng ngắn nêu cơ chế/lý do từ tài liệu, 1 câu cuối dẫn sang bài học liên quan",
   "suggested_pages": [
     {
-      "title": "Tên bài học chính xác trong danh mục",
+      "title": "Tên video chính xác trong danh mục",
       "topic_title": "Tên chủ đề",
       "topic_slug": "slug_chu_de",
       "page_slug": "slug_bai_hoc",
+      "video_index": 1,
+      "video_title": "Tên video chính xác",
       "reason": "Lý do ngắn gọn 1 câu"
     }
   ],
@@ -801,11 +940,33 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
             if (topicSlug && pageSlug.startsWith(`${topicSlug}/`)) {
               pageSlug = pageSlug.slice(topicSlug.length + 1);
             }
+
+            const catItem = catalog.find((c) => c.topic_slug === topicSlug && c.page_slug === pageSlug)
+              || catalog.find((c) => c.page_slug === pageSlug);
+
+            let vIndex = typeof p.video_index === 'number' && p.video_index >= 1 ? p.video_index : null;
+            let vTitle = p.video_title || '';
+
+            if (catItem && catItem.videos && catItem.videos.length > 0) {
+              if (!vIndex || !vTitle) {
+                const best = findBestVideoIndex(question, catItem.videos);
+                vIndex = vIndex || best.video_index;
+                vTitle = vTitle || best.video_title;
+              } else {
+                const matchedV = catItem.videos.find((v) => v.index === vIndex);
+                if (matchedV) {
+                  vTitle = matchedV.title;
+                }
+              }
+            }
+
             return {
-              title: p.title || '',
-              topic_title: p.topic_title || '',
+              title: vTitle || p.title || '',
+              topic_title: p.topic_title || catItem?.topic_title || '',
               topic_slug: topicSlug,
               page_slug: pageSlug,
+              video_index: vIndex || 1,
+              video_title: vTitle || p.title || '',
               reason: p.reason || '',
             };
           })
@@ -813,8 +974,18 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
 
       const filteredFollowUps = Array.isArray(parsedJson.follow_up_questions)
         ? parsedJson.follow_up_questions.filter((q: string) => {
+            if (!q || typeof q !== 'string') return false;
             const lq = q.toLowerCase();
             if (
+              lq.includes('doctorloan') ||
+              lq.includes('doctor loan') ||
+              lq.includes('hydro gems') ||
+              lq.includes('gems') ||
+              lq.includes('thiết bị') ||
+              lq.includes('sản phẩm') ||
+              lq.includes('thương hiệu') ||
+              lq.includes('nhãn hiệu') ||
+              lq.includes('nhãn hàng') ||
               lq.includes('gối') ||
               lq.includes('ghế') ||
               lq.includes('bài tập') ||

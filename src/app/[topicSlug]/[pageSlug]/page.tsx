@@ -17,6 +17,11 @@ interface PageProps {
     topicSlug: string;
     pageSlug: string;
   };
+  searchParams?: {
+    v?: string;
+    autoplay?: string;
+    play?: string;
+  };
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -68,7 +73,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function ContentPage({ params }: PageProps) {
+export default async function ContentPage({ params, searchParams }: PageProps) {
   const { topicSlug, pageSlug } = params;
 
   const result = await getPageBySlug(topicSlug, pageSlug);
@@ -94,8 +99,14 @@ export default async function ContentPage({ params }: PageProps) {
       : null;
   const nextPageIndex = nextPage ? currentIdx + 2 : null;
 
-  // Mặc định phát video thứ 1 (Bài 01)
-  const defaultActiveVideoIndex = 0;
+  // Xác định video bắt đầu: ưu tiên param ?v=n
+  let defaultActiveVideoIndex = 0;
+  if (searchParams?.v) {
+    const parsed = parseInt(searchParams.v, 10);
+    if (!isNaN(parsed) && parsed >= 1) {
+      defaultActiveVideoIndex = parsed - 1;
+    }
+  }
 
   return (
     <ContentViewer

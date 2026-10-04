@@ -118,6 +118,8 @@ export default function VideosBlock({
 
   const searchParams = useSearchParams();
   const vParam = searchParams.get('v');
+  const autoplayParam = searchParams.get('autoplay') || searchParams.get('play');
+  const shouldAutoPlay = Boolean(vParam || autoplayParam === '1' || autoplayParam === 'true');
 
   // Xác định video bắt đầu: ưu tiên param ?v=n
   const initialIndex = (() => {
@@ -131,7 +133,7 @@ export default function VideosBlock({
   })();
 
   const [activeIndex, setActiveIndex] = useState(initialIndex);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(shouldAutoPlay);
   const [isEndedPlaylist, setIsEndedPlaylist] = useState(false);
   const [watchedList, setWatchedList] = useState<number[]>([]);
   const [localTab, setLocalTab] = useState<'syllabus' | 'summary' | 'resources'>('syllabus');
@@ -235,14 +237,20 @@ export default function VideosBlock({
     };
   }, [activeIndex, videoList]);
 
-  // Cuộn tới khối video nếu có param ?v= hoặc khôi phục scroll_y, đồng thời kích hoạt Auto-play
+  // Cuộn tới khối video nếu có param ?v= hoặc autoplay, đồng thời kích hoạt Auto-play
   useEffect(() => {
-    if (vParam) {
+    if (vParam || autoplayParam === '1' || autoplayParam === 'true') {
       setIsPlaying(true);
+      if (vParam) {
+        const parsed = parseInt(vParam, 10);
+        if (!isNaN(parsed) && parsed >= 1 && parsed <= videoList.length) {
+          setActiveIndex(parsed - 1);
+        }
+      }
       if (containerRef.current) {
         setTimeout(() => {
           containerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 300);
+        }, 200);
       }
     } else {
       // Nếu vào từ Xem tiếp có lưu vị trí cuộn

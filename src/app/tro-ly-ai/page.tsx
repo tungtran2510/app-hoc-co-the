@@ -16,6 +16,7 @@ import {
   HelpCircle,
   CheckCircle2,
   Sliders,
+  Play,
 } from 'lucide-react';
 import BottomNav from '../../components/BottomNav';
 import { checkAdminStatus } from '../../lib/adminAuth';
@@ -27,6 +28,8 @@ interface SuggestedPage {
   topic_title: string;
   topic_slug: string;
   page_slug: string;
+  video_index?: number;
+  video_title?: string;
   reason?: string;
 }
 
@@ -40,10 +43,10 @@ interface ChatMessage {
 }
 
 const DEFAULT_QUICK_PROMPTS = [
-  'Thoát vị đĩa đệm có tập xà đơn và đi bộ được không?',
-  'Ngồi máy tính nhiều bị đau mỏi cổ vai gáy, cách xử lý thế nào?',
+  'Tại sao ngồi nhiều hay bị đau lưng và mỏi cổ vai gáy?',
+  'Thoát vị đĩa đệm và trượt đốt sống thì nguyên tắc bảo tồn ra sao?',
   'Uống nước như thế nào để đĩa đệm và sụn khớp không bị khô?',
-  'Đau thắt lưng khi ngủ dậy: Nguyên nhân và cách khắc phục?',
+  'Tại sao hay bị đầy bụng khó tiêu sau bữa ăn?',
 ];
 
 // Hàm format text markdown đơn giản (bold, bullet) siêu gọn gàng
@@ -120,7 +123,24 @@ export default function AiAssistantPage() {
   const dynamicQuickPrompts = React.useMemo(() => {
     if (trainingConfig?.faqs && trainingConfig.faqs.length > 0) {
       const activeFaqs = trainingConfig.faqs
-        .filter((f) => f.question?.trim())
+        .filter((f) => {
+          if (!f.question?.trim()) return false;
+          const lq = f.question.toLowerCase();
+          // CẤM TUYỆT ĐỐI BẤT KỲ TÊN THƯƠNG HIỆU, NHÃN HIỆU, SẢN PHẨM NÀO
+          if (
+            lq.includes('doctorloan') ||
+            lq.includes('doctor loan') ||
+            lq.includes('gems') ||
+            lq.includes('hydro gems') ||
+            lq.includes('thiết bị') ||
+            lq.includes('gối') ||
+            lq.includes('ghế') ||
+            lq.includes('sản phẩm')
+          ) {
+            return false;
+          }
+          return true;
+        })
         .map((f) => f.question.trim());
       if (activeFaqs.length >= 3) {
         return activeFaqs.slice(0, 4);
@@ -232,12 +252,35 @@ export default function AiAssistantPage() {
         cleanAnswer = cleanAnswer.charAt(0).toUpperCase() + cleanAnswer.slice(1);
       }
 
+      const rawFollowUps: string[] = Array.isArray(data.follow_up_questions) ? data.follow_up_questions : [];
+      const cleanFollowUps = rawFollowUps.filter((fq: string) => {
+        if (!fq || typeof fq !== 'string') return false;
+        const lq = fq.toLowerCase();
+        return !(
+          lq.includes('doctorloan') ||
+          lq.includes('doctor loan') ||
+          lq.includes('hydro gems') ||
+          lq.includes('gems') ||
+          lq.includes('thiết bị') ||
+          lq.includes('sản phẩm') ||
+          lq.includes('thương hiệu') ||
+          lq.includes('nhãn hiệu') ||
+          lq.includes('gối') ||
+          lq.includes('ghế') ||
+          lq.includes('bài tập') ||
+          lq.includes('tập gì') ||
+          lq.includes('tập luyện') ||
+          lq.includes('nằm ngủ') ||
+          lq.includes('tư thế ngủ')
+        );
+      });
+
       const aiMsg: ChatMessage = {
         id: `ai-${Date.now()}`,
         role: 'assistant',
         text: cleanAnswer || data.answer,
         suggested_pages: data.suggested_pages || [],
-        follow_up_questions: data.follow_up_questions || [],
+        follow_up_questions: cleanFollowUps,
         timestamp: Date.now(),
       };
 
@@ -456,8 +499,10 @@ export default function AiAssistantPage() {
                           const cleanPageSlug = sp.page_slug
                               .replace(new RegExp(`^${sp.topic_slug}/`), '')
                               .replace(/^\//, '');
-                          const lessonUrl = `/${sp.topic_slug}/${cleanPageSlug}`;
+                          const vQuery = sp.video_index ? `v=${sp.video_index}&` : '';
+                          const lessonUrl = `/${sp.topic_slug}/${cleanPageSlug}?${vQuery}autoplay=1`;
                           const topicIcon = `/images/topics/${sp.topic_slug}.png`;
+                          const displayTitle = sp.video_title || sp.title;
 
                           return (
                             <Link
@@ -485,11 +530,18 @@ export default function AiAssistantPage() {
 
                               {/* Tiêu đề & Thông tin bài học (Font to rõ ràng) */}
                               <div className="flex-1 min-w-0">
-                                <div className="text-[10px] sm:text-[10.5px] font-black uppercase text-primary dark:text-[#F8DF7B] tracking-wider truncate">
-                                  {sp.topic_title}
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className="text-[10px] sm:text-[10.5px] font-black uppercase text-primary dark:text-[#F8DF7B] tracking-wider truncate max-w-[140px]">
+                                    {sp.topic_title}
+                                  </span>
+                                  {sp.video_index ? (
+                                    <span className="px-1.5 py-0.5 rounded-[5px] bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-[9.5px] font-black tracking-tight">
+                                      Video {sp.video_index < 10 ? `0${sp.video_index}` : sp.video_index}
+                                    </span>
+                                  ) : null}
                                 </div>
                                 <h4 className="text-[13.5px] sm:text-[14.5px] font-black text-slate-900 dark:text-white leading-snug truncate group-hover:text-primary dark:group-hover:text-[#F8DF7B] transition-colors mt-0.5">
-                                  {sp.title}
+                                  {displayTitle}
                                 </h4>
                                 {sp.reason && (
                                   <p className="text-[11.5px] text-slate-500 dark:text-purple-300/80 leading-tight truncate mt-0.5 font-medium">
@@ -500,8 +552,8 @@ export default function AiAssistantPage() {
 
                               {/* Nút hành động */}
                               <div className="shrink-0 flex items-center gap-1 text-[11px] sm:text-[11.5px] font-black text-primary bg-primary-soft group-hover:bg-primary group-hover:text-white dark:bg-purple-950/80 dark:text-[#F8DF7B] dark:group-hover:bg-[#F8DF7B] dark:group-hover:text-slate-900 px-2.5 py-1.5 rounded-[8px] border border-primary/25 dark:border-purple-800/50 transition-colors whitespace-nowrap shadow-2xs">
-                                <span>Học ngay</span>
-                                <ChevronRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
+                                <Play size={11} fill="currentColor" />
+                                <span>Phát ngay</span>
                               </div>
                             </Link>
                           );
@@ -511,27 +563,51 @@ export default function AiAssistantPage() {
                   )}
 
                   {/* CÂU HỎI GỢI Ý TIẾP THEO (FOLLOW UP) */}
-                  {!isUser && msg.follow_up_questions && msg.follow_up_questions.length > 0 && (
-                    <div className="w-full max-w-[94%] sm:max-w-[88%] flex flex-col gap-1 mt-0.5">
-                      <span className="text-[10.5px] font-bold text-muted px-0.5 flex items-center gap-1">
-                        <span>💡</span>
-                        <span>Gợi ý hỏi tiếp:</span>
-                      </span>
-                      <div className="flex flex-wrap gap-1">
-                        {msg.follow_up_questions.map((fq, fIdx) => (
-                          <button
-                            key={fIdx}
-                            type="button"
-                            onClick={() => handleSendMessage(fq)}
-                            className="px-2.5 py-1 rounded-full bg-white dark:bg-[#160D30] hover:bg-primary hover:text-white border border-primary/20 dark:border-purple-800/40 hover:border-primary text-[11px] font-bold text-ink-2 hover:text-white text-left transition-all cursor-pointer shadow-2xs active:scale-95 flex items-center gap-1 leading-tight group"
-                          >
-                            <span className="text-primary group-hover:text-white text-[10px]">💬</span>
-                            <span className="line-clamp-1">{fq}</span>
-                          </button>
-                        ))}
+                  {!isUser && msg.follow_up_questions && msg.follow_up_questions.length > 0 && (() => {
+                    const cleanList = msg.follow_up_questions.filter((fq) => {
+                      if (!fq || typeof fq !== 'string') return false;
+                      const lq = fq.toLowerCase();
+                      return !(
+                        lq.includes('doctorloan') ||
+                        lq.includes('doctor loan') ||
+                        lq.includes('hydro gems') ||
+                        lq.includes('gems') ||
+                        lq.includes('thiết bị') ||
+                        lq.includes('sản phẩm') ||
+                        lq.includes('thương hiệu') ||
+                        lq.includes('nhãn hiệu') ||
+                        lq.includes('gối') ||
+                        lq.includes('ghế') ||
+                        lq.includes('bài tập') ||
+                        lq.includes('tập gì') ||
+                        lq.includes('tập luyện') ||
+                        lq.includes('nằm ngủ') ||
+                        lq.includes('tư thế ngủ')
+                      );
+                    });
+                    if (cleanList.length === 0) return null;
+                    return (
+                      <div className="w-full max-w-[94%] sm:max-w-[88%] flex flex-col gap-1 mt-0.5">
+                        <span className="text-[10.5px] font-bold text-muted px-0.5 flex items-center gap-1">
+                          <span>💡</span>
+                          <span>Gợi ý hỏi tiếp:</span>
+                        </span>
+                        <div className="flex flex-wrap gap-1">
+                          {cleanList.map((fq, fIdx) => (
+                            <button
+                              key={fIdx}
+                              type="button"
+                              onClick={() => handleSendMessage(fq)}
+                              className="px-2.5 py-1 rounded-full bg-white dark:bg-[#160D30] hover:bg-primary hover:text-white border border-primary/20 dark:border-purple-800/40 hover:border-primary text-[11px] font-bold text-ink-2 hover:text-white text-left transition-all cursor-pointer shadow-2xs active:scale-95 flex items-center gap-1 leading-tight group"
+                            >
+                              <span className="text-primary group-hover:text-white text-[10px]">💬</span>
+                              <span className="line-clamp-1">{fq}</span>
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    );
+                  })()}
                 </div>
               );
             })}
