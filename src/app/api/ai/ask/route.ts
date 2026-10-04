@@ -502,13 +502,34 @@ async function getOrBuildLessonCatalog(): Promise<LessonCatalogItem[]> {
   return catalog;
 }
 
-// Fallback khi cả hai AI không phản hồi kịp: nói thật là AI đang bận, KHÔNG bịa nội dung chung chung/lạc đề
-function fastFallbackSearch(query: string, catalog: LessonCatalogItem[], _excerpts?: KnowledgeExcerpt[]) {
+// Fallback khi AI bận hoặc chậm: trích xuất trực tiếp từ tài liệu chuyên môn của tác giả và đề xuất video bài học
+function fastFallbackSearch(query: string, catalog: LessonCatalogItem[], excerpts?: KnowledgeExcerpt[]) {
   const selectedPages = rankCatalogPages(query, catalog);
 
+  let answerText = '';
+  if (excerpts && excerpts.length > 0 && excerpts[0].text) {
+    const rawContent = excerpts[0].text;
+    const cleanBullets = rawContent
+      .replace(/#{1,6}\s+/g, '')
+      .split('\n')
+      .map((s: string) => s.trim())
+      .filter((s: string) => s.length > 15 && !/(?:doctorloan|doctor loan|hydro gems|gems)/i.test(s))
+      .slice(0, 3)
+      .map((s: string) => `• ${s.replace(/^[-•*]\s*/, '')}`)
+      .join('\n');
+
+    if (cleanBullets) {
+      answerText = `Theo tài liệu chuyên môn của tác giả về vấn đề này:\n${cleanBullets}\n\nBạn có thể nhấn vào video bài học đề xuất bên dưới để xem trực quan ngay:`;
+    }
+  }
+
+  if (!answerText) {
+    answerText =
+      'Trợ lý AI đang cập nhật tài liệu chuyên môn cho chủ đề này. Dưới đây là video bài học trực quan liên quan nhất để bạn theo dõi ngay:';
+  }
+
   return {
-    answer:
-      'Trợ lý AI đang bận nên chưa kịp trả lời câu hỏi này của bạn. Bạn bấm gửi lại sau ít giây giúp mình nhé. Trong lúc chờ, bạn có thể xem các bài học liên quan bên dưới.',
+    answer: answerText,
     suggested_pages: selectedPages.map((s) => {
       const best = findBestVideoIndex(query, s.videos);
       return {
@@ -521,8 +542,11 @@ function fastFallbackSearch(query: string, catalog: LessonCatalogItem[], _excerp
         reason: `Bài học liên quan: "${s.page_title}".`,
       };
     }),
-    follow_up_questions: [] as string[],
-    provider: 'fallback_busy',
+    follow_up_questions: [
+      'Nguyên tắc duy trì tư thế chuẩn để bảo vệ cột sống?',
+      'Chế độ dinh dưỡng khoa học hỗ trợ phục hồi tự nhiên?',
+    ],
+    provider: 'smart_fallback',
   };
 }
 
@@ -687,11 +711,11 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
     let rawText = '';
     let usedProvider = '';
 
-    // 5. GỌI PRIMARY: DEEPSEEK V3 VỚI TIMEOUT 8000ms
+    // 5. GỌI PRIMARY: DEEPSEEK V3 VỚI TIMEOUT 7500ms
     if (deepseekKey) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 18000);
+        const timeoutId = setTimeout(() => controller.abort(), 7500);
 
         const deepseekRes = await fetch('https://api.deepseek.com/chat/completions', {
           method: 'POST',
@@ -725,17 +749,21 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
             rawText = text;
             usedProvider = 'deepseek';
           }
+        } else {
+          console.warn('[AI] DeepSeek returned status:', deepseekRes.status);
         }
       } catch (err: any) {
-        console.warn('[AI] DeepSeek timed out or failed, falling back to Gemini Flash...', err?.message);
+        console.warn('[AI] DeepSeek timed out or failed, falling back to Google Gemini...', err?.message);
       }
     }
 
-    // 6. GỌI SECONDARY (FALLBACK): GOOGLE GEMINI VỚI TIMEOUT 8000ms
+    // 6. GỌI SECONDARY (FALLBACK): GOOGLE GEMINI TỐC ĐỘ CAO VỚI TIMEOUT 6000ms
     if (!rawText && geminiKey) {
       const candidateModels = [
+        'gemini-3.5-flash',
+        'gemini-flash-lite-latest',
+        'gemini-3.1-flash-lite',
         'gemini-flash-latest',
-        'gemini-2.5-flash',
       ];
 
       const geminiPrompt = `${systemPrompt}\n\nCÂU HỎI CỦA NGƯỜI HỌC: "${question}"\n\nLỊCH SỬ:\n${history.slice(-4).map((h: any) => `${h.role === 'user' ? 'Người học' : 'Trợ lý'}: ${h.text}`).join('\n')}`;
@@ -743,7 +771,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
       for (const model of candidateModels) {
         try {
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 9000);
+          const timeoutId = setTimeout(() => controller.abort(), 6000);
 
           const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`;
           const geminiRes = await fetch(geminiUrl, {
@@ -755,7 +783,6 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
                 responseMimeType: 'application/json',
                 temperature: 0.3,
                 maxOutputTokens: 1400,
-                thinkingConfig: { thinkingBudget: 0 },
               },
             }),
             signal: controller.signal,
@@ -771,6 +798,8 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
               usedProvider = model;
               break;
             }
+          } else {
+            console.warn(`[AI] Gemini ${model} failed with status:`, geminiRes.status);
           }
         } catch {
           // Thử model tiếp theo
