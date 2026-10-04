@@ -150,13 +150,9 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
   );
 
   return (
-    <section className="flex flex-col gap-2 mt-1">
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="text-[15px] sm:text-[16.5px] font-black text-slate-900 dark:text-white uppercase tracking-tight truncate">
-          LỘ TRÌNH {visiblePages.length} BƯỚC · {visiblePages.length} BÀI HỌC
-        </h2>
-
-        {isAdmin && (
+    <section className="flex flex-col gap-2 mt-0">
+      {isAdmin && (
+        <div className="flex items-center justify-end gap-2">
           <button
             type="button"
             onClick={() => setIsCreating(true)}
@@ -165,16 +161,15 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
             <Plus size={14} strokeWidth={2.5} />
             <span>Thêm bài</span>
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {visiblePages.length > 0 ? (
         <>
           <p className="text-[12px] sm:text-[12.5px] text-slate-500 dark:text-white/70 font-medium leading-tight truncate -mt-0.5">
             Gợi ý: Nên xem lần lượt theo thứ tự từ 01 → 02 → 03.
           </p>
-
-          <div className="relative flex flex-col gap-2.5 mt-1">
+          <div className="relative flex flex-col gap-2.5 mt-0">
             {/* Đường kẻ dọc nối liền các bước lộ trình (như Ảnh mẫu 2) */}
             <div
               className="absolute left-[13.5px] top-5 bottom-5 w-[2px] bg-slate-200/90 dark:bg-purple-800/40 pointer-events-none z-0"

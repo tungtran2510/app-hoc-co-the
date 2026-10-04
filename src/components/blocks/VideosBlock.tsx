@@ -593,7 +593,7 @@ export default function VideosBlock({
       )}
 
       {/* 1. THANH TÙY CHỈNH TỐC ĐỘ PHÁT VIDEO CHUYÊN NGHIỆP (ĐẶT Ở TRÊN, SÁT DƯỚI KHUNG VIDEO THEO YÊU CẦU) */}
-      <div className="flex items-center justify-between gap-1.5 px-2.5 py-1 rounded-[11px] bg-slate-50 dark:bg-[#160D30]/80 border border-slate-200/80 dark:border-purple-900/40 text-[11px] font-bold">
+      <div className="grid w-full min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-2 overflow-hidden rounded-[11px] border border-slate-200/80 bg-slate-50 px-2 py-1 dark:border-purple-900/40 dark:bg-[#160D30]/80 text-[11px] font-bold">
         <button
           type="button"
           onClick={() => {
@@ -604,19 +604,19 @@ export default function VideosBlock({
               return isDetectedVertical ? 'horizontal' : 'vertical';
             });
           }}
-          className="flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full border border-blue-300 bg-blue-50 text-blue-900 dark:bg-purple-950/60 dark:border-purple-800/50 dark:text-blue-200 cursor-pointer whitespace-nowrap shrink-0"
+          className="flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border border-blue-300 bg-blue-50 px-2 py-1 text-[10px] font-bold text-blue-900 dark:border-purple-800/50 dark:bg-purple-950/60 dark:text-blue-200 cursor-pointer"
           title="Bấm để chuyển đổi giữa khung dọc và khung ngang"
         >
-          <span>{isVertical ? '↕ Dạng dọc' : '↔ Dạng ngang'}</span>
+          <span>{isVertical ? '↕ Dọc' : '↔ Ngang'}</span>
         </button>
-        <div className="flex items-center gap-1 shrink-0 overflow-x-auto">
-          <Gauge size={13} className="text-blue-700 dark:text-[#93C5FD] shrink-0" />
-          {[0.75, 1, 1.25, 1.5, 2].map((spd) => (
+        <div className="flex min-w-0 items-center justify-end gap-1 overflow-x-auto">
+          <Gauge size={12} className="shrink-0 text-blue-700 dark:text-[#93C5FD]" />
+          {[1, 1.1, 1.25, 1.5, 2].map((spd) => (
             <button
               key={spd}
               type="button"
               onClick={() => handleSetSpeed(spd)}
-              className={`px-2 py-0.5 rounded-[6px] text-[10.5px] font-extrabold transition-all cursor-pointer ${
+              className={`shrink-0 rounded-[6px] px-1.5 py-0.5 text-[10px] font-extrabold transition-all cursor-pointer ${
                 playbackRate === spd
                   ? 'bg-[#1E3A8A] text-white dark:bg-[#93C5FD] dark:text-[#160C2C] shadow-2xs font-black'
                   : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200/80 dark:bg-purple-950/60 dark:text-purple-200 dark:border-purple-800/40'
@@ -631,8 +631,8 @@ export default function VideosBlock({
 
       {/* 2. THANH TIẾN ĐỘ HỌC TẬP (GỌN GÀNG, SÁT DƯỚI TỐC ĐỘ PHÁT, BỎ KHOẢNG HỞ THỪA) */}
       <div className="flex flex-col gap-1 px-0.5">
-        <div className="flex items-center justify-between text-[12.5px] font-bold text-ink">
-          <span className="flex items-center gap-1.5 text-muted">
+        <div className="flex items-center justify-between gap-2 text-[11px] sm:text-[12px] font-bold text-ink">
+          <span className="flex shrink-0 items-center gap-1 whitespace-nowrap text-muted">
             <span>Tiến độ:</span>
             <strong className="text-blue-700 dark:text-[#93C5FD] font-black">
               {Math.min(100, Math.round(((videoList.filter((_, idx) => watchedList.includes(idx + 1)).length) / (videoList.length || 1)) * 100))}%
@@ -748,7 +748,7 @@ export default function VideosBlock({
             <div
               key={idx}
               onClick={() => handleSelectVideo(idx)}
-              className={`w-full flex items-center gap-2.5 p-2 sm:p-2.5 rounded-[12px] text-left transition-all duration-150 cursor-pointer group active:scale-[0.99] ${
+              className={`w-full flex items-center gap-2 p-1.5 sm:gap-2.5 sm:p-2 rounded-[11px] text-left transition-all duration-150 cursor-pointer group active:scale-[0.99] ${
                 isActive
                   ? 'bg-blue-50/60 dark:bg-gradient-to-br dark:from-[#24154B] dark:via-[#1B0F3B] dark:to-[#120829] border-[1.5px] border-blue-400 dark:border-blue-400/60 shadow-xs ring-1 ring-blue-400/20'
                   : 'bg-white dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-900/40 hover:border-slate-300 dark:hover:border-purple-600/50 shadow-2xs'
@@ -757,7 +757,7 @@ export default function VideosBlock({
               tabIndex={0}
             >
               {/* 1. KHUNG ẢNH THUMBNAIL THU GỌN: HUY HIỆU SỐ BÀI GÓC TRÊN-TRÁI + THỜI LƯỢNG GÓC DƯỚI-PHẢI */}
-              <div className="relative w-[80px] sm:w-[92px] aspect-video rounded-[8px] overflow-hidden bg-slate-100 dark:bg-[#0A0515] shrink-0 border border-slate-200/90 dark:border-purple-500/20 shadow-2xs">
+              <div className="relative w-[72px] sm:w-[88px] aspect-video rounded-[8px] overflow-hidden bg-slate-100 dark:bg-[#0A0515] shrink-0 border border-slate-200/90 dark:border-purple-500/20 shadow-2xs">
                 {thumbUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -807,7 +807,7 @@ export default function VideosBlock({
               {/* 2. TIÊU ĐỀ RỘNG RÃI TRẢI DÀI TRỌN VẸN CHIỀU NGANG */}
               <div className="flex flex-col gap-0.5 min-w-0 flex-1 justify-center">
                 <h4
-                  className={`text-[13px] sm:text-[14px] font-extrabold leading-snug line-clamp-2 transition-colors ${
+                  className={`text-[12px] sm:text-[13px] font-extrabold leading-snug line-clamp-2 transition-colors ${
                     isActive
                       ? 'text-slate-950 dark:text-blue-100 group-hover:text-blue-800'
                       : 'text-slate-900 dark:text-white group-hover:text-blue-700'
@@ -818,7 +818,7 @@ export default function VideosBlock({
                 </h4>
 
                 {vid.description && (
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1 font-normal">
+                  <p className="text-[10px] sm:text-[10.5px] text-slate-500 dark:text-slate-400 line-clamp-1 font-normal">
                     {vid.description}
                   </p>
                 )}

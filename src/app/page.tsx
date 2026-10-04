@@ -5,6 +5,7 @@ import HomeSectionsClient from '../components/HomeSectionsClient';
 import BottomNav from '../components/BottomNav';
 import QbizBooksOpeningSplash from '../components/QbizBooksOpeningSplash';
 import { Metadata } from 'next';
+import homeStyles from './home-page.module.css';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -24,7 +25,7 @@ export default async function HomePage() {
   ]);
 
   return (
-    <main className="flex-1 flex flex-col bg-[radial-gradient(ellipse_75%_22%_at_50%_0%,rgba(214,179,106,0.10),transparent_75%),linear-gradient(180deg,#FBFAF7_0%,#F6F7F9_48%,#FBFAF7_100%)] px-4 sm:px-5 pt-3 pb-28 gap-4 sm:gap-5">
+    <main className={`${homeStyles.homePage} flex-1 flex flex-col font-[var(--font-be-vietnam-pro)] bg-[radial-gradient(ellipse_75%_22%_at_50%_0%,rgba(214,179,106,0.10),transparent_75%),linear-gradient(180deg,#FBFAF7_0%,#F6F7F9_48%,#FBFAF7_100%)] dark:bg-none dark:bg-[#0C0817] px-4 sm:px-5 pt-3 pb-28 gap-4 sm:gap-5`}>
       {/* Hiệu ứng 3D mở sách Qbiz Books khi vào trang chủ */}
       <QbizBooksOpeningSplash />
 

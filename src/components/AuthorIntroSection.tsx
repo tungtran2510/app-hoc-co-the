@@ -15,7 +15,6 @@ import {
   Globe,
   Plus,
   ChevronRight,
-  ChevronLeft,
   ArrowUp,
   ArrowDown,
   Trash2,
@@ -27,8 +26,6 @@ import {
   X,
   MessageCircle,
   FileText,
-  ArrowLeft,
-  Search,
 } from 'lucide-react';
 import { AuthorProfile, AuthorBook, RecommendedBook } from '../lib/types';
 import { normalizeAuthorProfile } from '../lib/data';
@@ -484,26 +481,11 @@ export function AuthorBooksSection({
       )}
 
       {/* Tiêu đề mục sách tác giả */}
-      <div className="flex flex-col gap-1 text-center">
-        <div className="grid grid-cols-[30px_1fr_30px] items-center gap-1 px-0.5">
-          <button
-            type="button"
-            onClick={() => window.history.back()}
-            className="flex h-[30px] w-[30px] items-center justify-center rounded-full text-[#071735] transition-colors hover:bg-white dark:hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#071735] dark:text-white"
-            aria-label="Quay lại"
-          >
-            <ArrowLeft size={20} strokeWidth={2.6} />
-          </button>
-          <h3 className="text-[18px] sm:text-[22px] font-black tracking-tight text-[#071735] dark:text-white leading-tight break-words line-clamp-2">
+      <div className="flex flex-col gap-1">
+        <div className="px-0.5">
+          <h3 className="text-left text-[20px] sm:text-[24px] font-black tracking-tight text-[#071735] dark:text-white leading-tight break-words line-clamp-2">
             {profile.books_title || 'Sách & Tác phẩm đã làm'}
           </h3>
-          <a
-            href="/tim-kiem"
-            className="flex h-[30px] w-[30px] items-center justify-center rounded-full text-[#071735] transition-colors hover:bg-white dark:hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#071735] dark:text-white"
-            aria-label="Tìm kiếm"
-          >
-            <Search size={20} strokeWidth={2.6} />
-          </a>
         </div>
         {profile.books_subtitle && (
           <p className="text-[12px] sm:text-[12.5px] text-slate-500 dark:text-slate-400 leading-normal">
@@ -533,14 +515,6 @@ export function AuthorBooksSection({
                   <h4 className="text-[15px] sm:text-[18px] font-black tracking-tight text-[#071735] dark:text-white">
                     Các tác phẩm khác
                   </h4>
-                  <div className="flex items-center gap-1.5 text-[#071735] dark:text-white">
-                    <button type="button" className="flex h-7 w-7 items-center justify-center rounded-full bg-white dark:bg-[#241548] dark:border dark:border-white/15 shadow-sm" aria-label="Tác phẩm trước">
-                      <ChevronLeft size={16} strokeWidth={2.5} />
-                    </button>
-                    <button type="button" className="flex h-7 w-7 items-center justify-center rounded-full bg-white dark:bg-[#241548] dark:border dark:border-white/15 shadow-sm" aria-label="Tác phẩm tiếp theo">
-                      <ChevronRight size={16} strokeWidth={2.5} />
-                    </button>
-                  </div>
                 </div>
               )}
               <ScrollReveal
@@ -556,7 +530,7 @@ export function AuthorBooksSection({
                   {/* BÊN TRÁI: Bìa sách to rõ chuẩn tỷ lệ 3:4 với ModernBookCover */}
                   <div
                     onClick={() => onSelectBook?.(book)}
-                    className={`${idx === 0 ? (variant === 'large' ? 'w-[47%] max-w-[260px]' : 'w-[42%] max-w-[230px]') : 'w-[80%] mx-auto'} aspect-[3/4] shrink-0 relative flex items-center justify-center cursor-pointer`}
+                    className={`${idx === 0 ? (variant === 'large' ? 'w-[47%] max-w-[260px]' : 'w-[42%] max-w-[230px]') : 'w-[90%] mx-auto'} aspect-[3/4] shrink-0 relative flex items-center justify-center cursor-pointer`}
                   >
                     <ModernBookCover
                       title={book.title}
@@ -579,7 +553,7 @@ export function AuthorBooksSection({
                     <div className="flex flex-col gap-1.5">
                       <h4
                         onClick={() => onSelectBook?.(book)}
-                        className={`${idx === 0 ? `${variant === 'large' ? 'text-[clamp(11px,3.1vw,15px)]' : 'text-[clamp(12px,3.8vw,17px)]'} sm:text-[24px] font-black text-left whitespace-nowrap truncate` : 'w-full px-2 text-[10px] sm:text-[11.5px] font-bold text-center min-h-[25px] flex items-center justify-center [overflow-wrap:anywhere] line-clamp-2 break-normal'} text-[#071735] dark:text-[#93C5FD] leading-[1.15] cursor-pointer`}
+                        className={`${idx === 0 ? `${variant === 'large' ? 'text-[clamp(11px,3.1vw,15px)]' : 'text-[clamp(12px,3.8vw,17px)]'} sm:text-[24px] font-black text-left whitespace-nowrap truncate` : 'w-full px-1 text-[11px] sm:text-[12px] font-extrabold text-center min-h-[29px] flex items-center justify-center [overflow-wrap:anywhere] line-clamp-2 break-normal'} text-[#071735] dark:text-[#93C5FD] leading-[1.15] cursor-pointer`}
                       >
                         {book.title}
                       </h4>
@@ -632,10 +606,10 @@ export function AuthorBooksSection({
                           e.stopPropagation();
                           setPreviewBook(book);
                         }}
-                        className="relative mx-auto h-[25px] w-[calc(100%_-_36px)] sm:h-[29px] sm:w-[calc(100%_-_44px)] rounded-[9px] bg-gradient-to-r from-[#FFE36C] to-[#FFC400] text-[#071735] font-black text-[9.5px] sm:text-[10.5px] shadow-[0_6px_15px_-10px_rgba(245,158,11,.8)] flex items-center justify-center gap-1 active:scale-[0.98] cursor-pointer border border-[#FFD52F]"
+                        className="relative mx-auto h-[27px] w-[calc(100%_-_22px)] sm:h-[30px] sm:w-[calc(100%_-_28px)] rounded-[9px] bg-gradient-to-r from-[#2456A6] to-[#173D80] text-white dark:from-[#FFE36C] dark:to-[#FFC400] dark:text-[#071735] font-black text-[10px] sm:text-[11px] shadow-[0_6px_15px_-10px_rgba(30,64,130,.55)] dark:shadow-[0_6px_15px_-10px_rgba(245,158,11,.8)] flex items-center justify-center gap-1 active:scale-[0.98] cursor-pointer border border-[#254E8D] dark:border-[#FFD52F]"
                         title="Xem thử 3D"
                       >
-                        <BookOpen size={13} strokeWidth={2.2} className="shrink-0 text-[#1E293B]" />
+                        <BookOpen size={13} strokeWidth={2.2} className="shrink-0 text-white dark:text-[#1E293B]" />
                         <span className="tracking-[0.025em]">Xem thử 3D</span>
                       </button>
                       )}

@@ -5,52 +5,23 @@ import Link from 'next/link';
 import {
   ChevronLeft,
   Bookmark,
-  Trash2,
+  BookmarkCheck,
   ChevronRight,
   BookOpen,
   Smartphone,
   Sparkles,
   ArrowRight,
   ShieldCheck,
-  Compass,
   PlayCircle,
   ListVideo,
+  LayoutGrid,
+  List,
+  Rows3,
 } from 'lucide-react';
 import { getSavedPages, SavedPageInfo, toggleSavePage, getStoredXemTiep, XemTiepInfo } from '../../lib/learningProgress';
 import { getUserPhone, syncUserProgress, LEARNING_PROGRESS_EVENT } from '../../lib/userSync';
 import UserSyncModal from '../../components/UserSyncModal';
 import BottomNav from '../../components/BottomNav';
-
-const quickExploreTopics = [
-  {
-    slug: 'cot-song',
-    title: 'Cột sống & Đĩa đệm',
-    badge: 'SPINE & BONE',
-    icon: '/images/topics/cot-song.png',
-    count: '6 bài học',
-  },
-  {
-    slug: 'dinh-duong',
-    title: 'Dinh dưỡng nền tảng',
-    badge: 'NUTRITION',
-    icon: '/images/topics/dinh-duong.png',
-    count: '4 bài học',
-  },
-  {
-    slug: 'co-the-nguoi',
-    title: 'Cơ thể người 3D',
-    badge: 'ANATOMY 3D',
-    icon: '/images/topics/co-the-nguoi.png',
-    count: 'Tổng quan',
-  },
-  {
-    slug: 'tieu-hoa',
-    title: 'Hệ tiêu hóa',
-    badge: 'DIGESTIVE',
-    icon: '/images/topics/tieu-hoa.png',
-    count: 'Chuyên đề',
-  },
-];
 
 export default function SavedPages() {
   const [savedList, setSavedList] = useState<SavedPageInfo[]>([]);
@@ -58,6 +29,17 @@ export default function SavedPages() {
   const [showPhoneSync, setShowPhoneSync] = useState(false);
   const [userPhone, setUserPhone] = useState<string | null>(null);
   const [resume, setResume] = useState<XemTiepInfo | null>(null);
+  const [savedView, setSavedView] = useState<'list' | 'compact' | 'grid'>('list');
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem('qbiz_saved_view');
+    if (stored === 'list' || stored === 'compact' || stored === 'grid') setSavedView(stored);
+  }, []);
+
+  const changeSavedView = (view: 'list' | 'compact' | 'grid') => {
+    setSavedView(view);
+    window.localStorage.setItem('qbiz_saved_view', view);
+  };
 
   const formatPhone = (p: string) => {
     const clean = p.replace(/[^0-9]/g, '');
@@ -117,9 +99,9 @@ export default function SavedPages() {
   };
 
   return (
-    <main className="flex-1 flex flex-col px-4 sm:px-5 pt-3 pb-28 gap-5 max-w-lg mx-auto w-full">
+    <main className="flex-1 flex flex-col bg-[linear-gradient(180deg,#F8FAFD_0%,#F5F7FB_48%,#FBFCFE_100%)] dark:bg-none dark:bg-[#0C0817] px-4 sm:px-5 pt-1.5 pb-28 gap-3 max-w-2xl mx-auto w-full">
       {/* 1. Header chuẩn iOS */}
-      <header className="flex items-center justify-between h-[48px]">
+      <header className="flex items-center justify-between h-[42px]">
         <Link
           href="/"
           className="inline-flex items-center gap-1 text-primary dark:text-purple-300 text-[16px] font-extrabold pr-2 transition-opacity active:opacity-75"
@@ -150,13 +132,13 @@ export default function SavedPages() {
       </header>
 
       {/* 2. Tiêu đề trang trọng */}
-      <section className="flex flex-col gap-1.5 pt-1">
-        <h1 className="text-[24px] sm:text-[26px] font-black text-slate-900 dark:text-white leading-tight">
+      <section className="flex flex-col gap-1 pt-0">
+        <h1 className="text-[22px] sm:text-[27px] font-black tracking-tight text-slate-900 dark:text-white leading-tight">
           Đã lưu
         </h1>
-        <p className="text-[13px] sm:text-[13.5px] text-slate-600 dark:text-purple-200/80 leading-relaxed font-normal">
+        <p className="text-[13px] sm:text-[14px] text-slate-500 dark:text-purple-200/80 leading-relaxed font-normal">
           {savedList.length > 0
-            ? `${savedList.length} mục bạn đã lưu (bài học, video, sách, danh sách phát)`
+            ? 'Lưu bài học, video, sách và danh sách phát để xem lại.'
             : 'Giữ lâu vào bài học, video, sách hoặc danh sách phát để lưu lại xem sau'}
         </p>
       </section>
@@ -164,27 +146,33 @@ export default function SavedPages() {
       {/* 3. Đang xem dở (chuyển từ tab "Đang xem" cũ) */}
       {resume && resume.topic_slug && resume.page_slug && (
         <section className="flex flex-col gap-2">
-          <div className="flex items-center gap-1.5 text-slate-700 dark:text-purple-200 text-[12px] font-black uppercase tracking-wide">
-            <PlayCircle size={14} className="text-primary dark:text-[#F8DF7B]" />
-            <span>Đang xem dở</span>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 text-slate-800 dark:text-purple-100 text-[13px] font-black uppercase tracking-wide">
+              <PlayCircle size={17} className="text-blue-600 dark:text-[#F8DF7B]" />
+              <span>Đang học dở</span>
+            </div>
           </div>
-          <Link
-            href={`/${resume.topic_slug.replace('cot-song-that-lung', 'cot-song')}/${resume.page_slug}?v=${resume.video_index || 1}`}
-            className="p-3.5 rounded-[20px] bg-gradient-to-br from-primary-soft to-white dark:from-[#241548] dark:to-[#160D30] border border-primary/30 dark:border-purple-700/50 shadow-xs flex items-center gap-3 active:scale-[0.99] transition-all"
-          >
-            <div className="w-11 h-11 rounded-[14px] bg-primary text-white flex items-center justify-center shrink-0">
-              <PlayCircle size={22} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[10.5px] font-black uppercase tracking-wider text-primary dark:text-[#F8DF7B] truncate">
-                {resume.topic_title}
-              </p>
-              <p className="text-[15px] font-black text-slate-900 dark:text-white leading-snug line-clamp-2">
-                {resume.page_title}
-              </p>
-            </div>
-            <ArrowRight size={18} className="text-slate-500 dark:text-purple-300 shrink-0" />
-          </Link>
+          <div className="rounded-[20px] border border-blue-100 bg-white p-3 shadow-[0_12px_28px_-22px_rgba(37,99,235,.55)] dark:border-purple-700/50 dark:bg-[#160D30]">
+            <Link href={`/${resume.topic_slug.replace('cot-song-that-lung', 'cot-song')}/${resume.page_slug}?v=${resume.video_index || 1}`} className="grid grid-cols-[38%_1fr] items-center gap-3 active:opacity-90">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-[13px] bg-[#102D5C]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={resume.cover_url || '/images/lessons/tong-quan-ve-cot-song.png'} alt={resume.page_title} className="h-full w-full object-cover" />
+                <span className="absolute bottom-1.5 left-1.5 rounded-full bg-white/95 p-1 text-blue-700 shadow"><PlayCircle size={17} /></span>
+              </div>
+              <div className="min-w-0">
+                <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-[9px] font-black uppercase tracking-wide text-blue-800 dark:bg-blue-950/60 dark:text-blue-200"><PlayCircle size={11} /> Đang xem dở</span>
+                <p className="mt-1 text-[13px] font-black leading-snug text-slate-900 dark:text-white line-clamp-2">{resume.page_title}</p>
+                <p className="mt-0.5 text-[10.5px] text-slate-500 dark:text-slate-300 line-clamp-1">{resume.topic_title}{resume.video_title ? ` · ${resume.video_title}` : ''}</p>
+                <div className="mt-2 flex items-center gap-2">
+                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200 dark:bg-white/10"><div className="h-full rounded-full bg-blue-700" style={{ width: `${resume.video_total ? Math.min(100, Math.round((resume.video_index / resume.video_total) * 100)) : 0}%` }} /></div>
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-300">{resume.video_total ? Math.min(100, Math.round((resume.video_index / resume.video_total) * 100)) : 0}%</span>
+                </div>
+              </div>
+            </Link>
+            <Link href={`/${resume.topic_slug.replace('cot-song-that-lung', 'cot-song')}/${resume.page_slug}?v=${resume.video_index || 1}`} className="mt-2.5 flex h-10 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-r from-[#12366F] to-[#0B2A59] text-[12px] font-black text-white shadow-sm active:scale-[.99]">
+              <PlayCircle size={17} fill="currentColor" /> Tiếp tục học <ArrowRight size={15} />
+            </Link>
+          </div>
         </section>
       )}
 
@@ -215,7 +203,26 @@ export default function SavedPages() {
           </Link>
         </div>
       ) : (
-        <div className="flex flex-col gap-3">
+        <section className="flex flex-col gap-3">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="flex items-center gap-1.5 text-[12px] sm:text-[13px] font-extrabold uppercase tracking-wide text-slate-800 dark:text-purple-100">
+              <Bookmark size={15} className="fill-blue-600 text-blue-600" />
+              Đã lưu gần đây
+            </h2>
+            <div role="group" aria-label="Chế độ hiển thị mục đã lưu" className="flex items-center gap-0.5 rounded-xl border border-slate-200 bg-white/80 p-1 shadow-sm dark:border-purple-800/50 dark:bg-[#160D30]">
+              {([
+                { value: 'list', label: 'Danh sách', Icon: List },
+                { value: 'compact', label: 'Gọn', Icon: Rows3 },
+                { value: 'grid', label: 'Lưới', Icon: LayoutGrid },
+              ] as const).map(({ value, label, Icon }) => (
+                <button key={value} type="button" onClick={() => changeSavedView(value)} aria-label={label} aria-pressed={savedView === value} title={label}
+                  className={`flex h-8 w-8 items-center justify-center rounded-[9px] transition-colors ${savedView === value ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300' : 'text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5'}`}>
+                  <Icon size={16} strokeWidth={2.2} />
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className={savedView === 'grid' ? 'grid grid-cols-2 gap-2.5 sm:grid-cols-3' : 'flex flex-col gap-2.5'}>
           {savedList.map((item) => {
             const topicIcon = `/images/topics/${item.topic_slug}.png`;
 
@@ -225,29 +232,32 @@ export default function SavedPages() {
               return (
                 <div
                   key={item.page_id}
-                  className="p-3 rounded-[20px] bg-white dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-800/40 shadow-xs flex items-center gap-3"
+                  className={`relative flex min-w-0 items-center gap-2 rounded-[15px] border border-slate-200/80 bg-white shadow-[0_5px_16px_-16px_rgba(15,23,42,.5)] dark:border-purple-800/40 dark:bg-[#160D30] ${savedView === 'compact' ? 'p-2' : 'p-2.5'}`}
                 >
                   <Link
                     href={item.href || `/${item.topic_slug}/${item.page_slug}`}
-                    className="flex items-center gap-3 flex-1 min-w-0 active:scale-[0.99] transition-transform"
+                    className="flex min-w-0 flex-1 items-center gap-2 active:opacity-80 transition-opacity"
                   >
-                    <div className="relative w-[72px] shrink-0 aspect-video rounded-[10px] overflow-hidden bg-primary-soft border border-slate-200 dark:border-purple-800/50 flex items-center justify-center text-primary">
-                      {item.thumb ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={item.thumb} alt={item.page_title} className="w-full h-full object-cover" loading="lazy" />
-                      ) : (
-                        <KindIcon size={20} />
-                      )}
+                    <div className="flex shrink-0 flex-col items-center gap-1">
+                      <div className={`relative aspect-video overflow-hidden bg-primary-soft border border-slate-200 dark:border-purple-800/50 flex items-center justify-center text-primary ${savedView === 'compact' ? 'w-[54px] rounded-[9px]' : 'w-[62px] rounded-[10px]'}`}>
+                        {item.thumb ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={item.thumb} alt={item.page_title} className="h-full w-full object-cover" loading="lazy" />
+                        ) : (
+                          <KindIcon size={20} />
+                        )}
+                      </div>
+                      {item.kind === 'video' && <span className="inline-flex items-center gap-0.5 text-[8px] font-black uppercase tracking-wide text-blue-700 dark:text-blue-300"><KindIcon size={10} />Video</span>}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-primary dark:text-[#F8DF7B]">
+                    <div className="min-w-0 flex-1">
+                      {item.kind !== 'video' && <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-primary dark:text-[#F8DF7B]">
                         <KindIcon size={11} /> {kindLabel}
-                      </span>
-                      <h3 className="text-[14.5px] font-black text-slate-900 dark:text-white leading-snug line-clamp-2">
+                      </span>}
+                      <h3 className="text-[12px] font-bold text-slate-900 dark:text-white leading-snug line-clamp-2">
                         {item.page_title}
                       </h3>
                       {(item.subtitle || item.topic_title) && (
-                        <p className="text-[11.5px] text-slate-500 dark:text-purple-300/80 line-clamp-1">
+                        <p className="text-[10px] text-slate-500 dark:text-purple-300/80 line-clamp-1">
                           {item.subtitle || item.topic_title}
                         </p>
                       )}
@@ -256,12 +266,32 @@ export default function SavedPages() {
                   <button
                     type="button"
                     onClick={(e) => handleRemove(e, item)}
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors shrink-0 cursor-pointer"
+                    className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-[9px] bg-blue-50 text-blue-700 transition-colors hover:bg-red-50 hover:text-red-600 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-red-950/40"
                     aria-label="Bỏ lưu mục này"
                     title="Bỏ lưu"
                   >
-                    <Trash2 size={16} />
+                    <BookmarkCheck size={17} />
                   </button>
+                </div>
+              );
+            }
+
+            if (savedView !== 'grid') {
+              return (
+                <div key={item.page_id} className={`flex min-w-0 items-center gap-2.5 rounded-[15px] border border-slate-200/90 bg-white px-2.5 py-2 shadow-[0_5px_16px_-16px_rgba(15,23,42,.5)] dark:border-purple-800/40 dark:bg-[#160D30] ${savedView === 'compact' ? 'gap-2 px-2 py-1.5' : ''}`}>
+                  <Link href={`/${item.topic_slug}/${item.page_slug}`} className="flex min-w-0 flex-1 items-center gap-2.5 active:opacity-80">
+                    <div className={`relative flex shrink-0 items-center justify-center overflow-hidden rounded-[10px] border border-slate-200 bg-slate-50 p-0.5 dark:border-purple-800/50 dark:bg-purple-950/70 ${savedView === 'compact' ? 'h-10 w-10' : 'h-12 w-12'}`}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={topicIcon} alt={item.topic_title} className="h-full w-full object-contain" onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }} />
+                      <span className="absolute bottom-0 right-0 rounded-tl bg-primary px-1 text-[8px] font-black text-white">#{item.page_number}</span>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <span className="block truncate text-[9px] font-extrabold uppercase tracking-wide text-primary dark:text-[#F8DF7B]">{item.topic_title}</span>
+                      <h3 className="mt-0.5 line-clamp-2 text-[12.5px] font-bold leading-snug text-slate-900 dark:text-white">{item.page_title}</h3>
+                    </div>
+                    <ArrowRight size={16} className="shrink-0 text-slate-400" />
+                  </Link>
+                  <button type="button" onClick={(e) => handleRemove(e, item)} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] bg-blue-50 text-blue-700 hover:bg-red-50 hover:text-red-600 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-red-950/40" aria-label="Bỏ lưu bài học" title="Bỏ lưu"><BookmarkCheck size={16} /></button>
                 </div>
               );
             }
@@ -269,12 +299,13 @@ export default function SavedPages() {
             return (
               <div
                 key={item.page_id}
-                className="p-3.5 sm:p-4 rounded-[20px] bg-white dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-800/40 shadow-xs hover:shadow-md transition-all flex flex-col gap-3 group"
+                className="flex min-w-0 items-center gap-2 rounded-[15px] border border-slate-200/90 bg-white px-2.5 py-2 shadow-[0_5px_16px_-16px_rgba(15,23,42,.5)] transition-colors dark:border-purple-800/40 dark:bg-[#160D30] group"
               >
                 {/* Hàng trên: Logo chuyên đề + Tiêu đề + Nút xóa */}
-                <div className="flex items-start gap-3">
+                <div className="flex min-w-0 flex-1 items-start gap-2.5">
                   {/* Thumbnail Chuyên đề 3D */}
-                  <div className="relative w-12 h-12 rounded-[14px] bg-slate-50 dark:bg-purple-950/70 border border-slate-200 dark:border-purple-800/50 p-1 flex items-center justify-center shrink-0 shadow-2xs overflow-hidden">
+                  <div className="flex shrink-0 flex-col items-center gap-1">
+                    <div className="relative h-11 w-11 rounded-[10px] bg-slate-50 dark:bg-purple-950/70 border border-slate-200 dark:border-purple-800/50 p-0.5 flex items-center justify-center overflow-hidden">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={topicIcon}
@@ -294,87 +325,37 @@ export default function SavedPages() {
                     <span className="absolute bottom-0 right-0 px-1 py-0.2 rounded-tl-[6px] bg-primary text-white text-[8.5px] font-black">
                       #{item.page_number}
                     </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => handleRemove(e, item)}
+                      className="flex h-7 w-10 shrink-0 cursor-pointer items-center justify-center rounded-[8px] bg-blue-50 text-blue-700 transition-colors hover:bg-red-50 hover:text-red-600 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-red-950/40"
+                      aria-label="Bỏ lưu bài học"
+                      title="Bỏ lưu bài học này"
+                    >
+                      <BookmarkCheck size={15} />
+                    </button>
                   </div>
 
                   {/* Thông tin bài học */}
-                  <div className="flex-1 min-w-0 pt-0.5">
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
                       <span className="text-[10px] font-black uppercase text-primary dark:text-[#F8DF7B] tracking-wider truncate">
                         {item.topic_title}
                       </span>
-                      <span className="text-[9.5px] font-bold px-1.5 py-0.5 rounded-[5px] bg-emerald-50 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-300">
-                        Đã lưu
-                      </span>
                     </div>
 
-                    <h3 className="text-[15.5px] sm:text-[16.5px] font-black text-slate-900 dark:text-white leading-snug line-clamp-2 mt-0.5 group-hover:text-primary dark:group-hover:text-[#F8DF7B] transition-colors">
+                    <h3 className="break-words text-[12px] font-bold text-slate-900 dark:text-white leading-snug mt-0.5 group-hover:text-primary dark:group-hover:text-[#F8DF7B] transition-colors">
                       {item.page_title}
                     </h3>
                   </div>
-
-                  {/* Nút xóa khỏi danh sách đã lưu */}
-                  <button
-                    type="button"
-                    onClick={(e) => handleRemove(e, item)}
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors shrink-0 cursor-pointer"
-                    aria-label="Xóa bài học khỏi danh sách đã lưu"
-                    title="Bỏ lưu bài học này"
-                  >
-                    <Trash2 size={16} />
-                  </button>
                 </div>
-
-                {/* Hàng dưới: Nút mở bài học rõ ràng chuyên nghiệp */}
-                <Link
-                  href={`/${item.topic_slug}/${item.page_slug}`}
-                  className="w-full h-10 rounded-[12px] bg-slate-900 dark:bg-white/10 dark:border dark:border-white/15 hover:opacity-95 text-white font-bold text-[13px] flex items-center justify-center gap-1.5 active:scale-[0.99] transition-all cursor-pointer"
-                >
-                  <span>Mở học bài này</span>
-                  <ArrowRight size={14} />
-                </Link>
               </div>
             );
           })}
-        </div>
+          </div>
+        </section>
       )}
-
-      {/* 5. Khối Gợi ý Khám Phá Thêm Chuyên Đề (Xóa bỏ cảm giác trống trải) */}
-      <section className="flex flex-col gap-2.5 pt-2 border-t border-slate-200/70 dark:border-purple-800/30">
-        <div className="flex items-center gap-1.5 text-slate-700 dark:text-purple-200 text-[12px] font-black uppercase tracking-wide">
-          <Compass size={14} className="text-primary dark:text-[#F8DF7B]" />
-          <span>Gợi ý khám phá thêm chuyên đề:</span>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2.5">
-          {quickExploreTopics.map((topic) => (
-            <Link
-              key={topic.slug}
-              href={`/${topic.slug}`}
-              className="p-3 rounded-[16px] bg-white dark:bg-[#160D30] border border-slate-200/80 dark:border-purple-800/40 hover:border-primary/50 dark:hover:border-[#F8DF7B]/60 shadow-2xs hover:shadow-xs transition-all flex items-center gap-2.5 group cursor-pointer"
-            >
-              <div className="w-10 h-10 rounded-[11px] bg-slate-50 dark:bg-purple-950/70 p-1 flex items-center justify-center shrink-0 border border-slate-200/60 dark:border-purple-800/40 group-hover:scale-105 transition-transform overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={topic.icon}
-                  alt={topic.title}
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <div className="flex flex-col min-w-0">
-                <span className="text-[9px] font-extrabold uppercase text-slate-500 dark:text-purple-300/70 tracking-wider truncate">
-                  {topic.badge}
-                </span>
-                <span className="text-[12px] font-black text-slate-900 dark:text-white leading-tight truncate mt-0.5 group-hover:text-primary dark:group-hover:text-[#F8DF7B] transition-colors">
-                  {topic.title}
-                </span>
-                <span className="text-[10.5px] text-slate-500 dark:text-purple-300/70 font-medium">
-                  {topic.count}
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
 
       {/* 6. Thanh điều hướng dưới cùng */}
       <BottomNav />

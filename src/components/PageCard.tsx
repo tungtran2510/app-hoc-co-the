@@ -60,9 +60,9 @@ export default function PageCard({
       href={targetUrl}
       prefetch={true}
       onTouchStart={onActivate}
-      className={`page-card-container flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 bg-white dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] rounded-[14px] border transition-all active:scale-[0.99] shadow-xs group ${
+      className={`lesson-page-card flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 bg-white dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] rounded-[14px] border transition-all active:scale-[0.99] shadow-xs group ${
         isActive
-          ? 'is-active border-blue-400 dark:border-[#93C5FD]'
+          ? 'border-slate-200/80 dark:border-purple-500/25'
           : hasStarted && !isCompleted
           ? 'border-blue-300 dark:border-blue-400/50'
           : isCompleted

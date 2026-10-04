@@ -83,7 +83,7 @@ export default function TopicCard({
         <div className="topic-card-inner-glow absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent pointer-events-none opacity-0" />
 
         {/* 3. ẢNH GIẢI PHẪU 3D TRONG SUỐT BÊN PHẢI (TO HẲN, NỔI BẬT KHÔNG NỀN ĐEN) */}
-        <div className="absolute right-0.5 top-1 bottom-4 w-[54%] sm:w-[52%] flex items-center justify-center pointer-events-none overflow-visible select-none z-0">
+        <div className={`absolute right-0.5 top-1 bottom-4 flex items-center justify-center pointer-events-none overflow-visible select-none z-0 ${boldTitle ? 'w-[49%]' : 'w-[54%] sm:w-[52%]'}`}>
           {hasCoverImage ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -103,7 +103,7 @@ export default function TopicCard({
         </div>
 
         {/* 4. CỘT THÔNG TIN BÊN TRÁI: TIẾNG ANH PHỤ TRÊN CÙNG + TIÊU ĐỀ TIẾNG VIỆT TO RÕ ĐỒNG BỘ */}
-        <div className="relative z-10 flex flex-col gap-1 max-w-[60%] sm:max-w-[58%]">
+        <div className={`relative z-10 flex flex-col gap-1 ${boldTitle ? 'max-w-[65%]' : 'max-w-[60%] sm:max-w-[58%]'}`}>
           {/* Nhãn tiếng Anh phụ trên cùng (ngắn gọn, chuẩn nhãn bìa sách) */}
           <div className="flex items-center gap-1 text-[8.5px] sm:text-[9.5px] font-bold uppercase tracking-wider text-purple-200/90 leading-tight">
             <svg className="w-2.5 h-2.5 text-purple-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">

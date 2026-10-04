@@ -884,7 +884,7 @@ export default function ContentViewer({
             <button
               type="button"
               onClick={handleToggleCompleted}
-              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[11.5px] font-bold transition-all shadow-2xs cursor-pointer active:scale-95 shrink-0 ${
+              className={`inline-flex items-center gap-1 whitespace-nowrap px-2 py-0.5 rounded-full border text-[10px] sm:text-[11px] font-bold transition-all shadow-2xs cursor-pointer active:scale-95 shrink-0 ${
                 isCompleted
                   ? 'bg-emerald-50 text-emerald-800 border-emerald-500 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-500 animate-breathe-emerald'
                   : 'bg-white text-slate-700 border-slate-300 hover:border-emerald-500 hover:text-emerald-700 dark:bg-[#1E1342] dark:text-purple-200 dark:border-purple-800/60'
@@ -1028,7 +1028,7 @@ export default function ContentViewer({
   };
 
   return (
-    <main className="flex-1 flex flex-col px-5 pt-2 pb-16 sm:pb-20 gap-3 sm:gap-3.5">
+    <main className="flex-1 flex flex-col px-5 pt-0 pb-16 sm:pb-20 gap-1 sm:gap-2.5">
       {/* 1. ĐÃ BỎ THANH ĐEN ĐỈNH ĐẦU ĐỂ TIẾT KIỆM DIỆN TÍCH THEO YÊU CẦU CỦA ANH */}
 
       {/* 2. Thanh điều hướng trang: ‹ [Chủ đề] + [Mục lục] + [⋮] */}
@@ -1054,8 +1054,8 @@ export default function ContentViewer({
       />
 
       {/* 3. Phần đầu bài viết: Badge BÀI 01 / 04 + Tiêu đề lớn (Không lặp lại tên chủ đề) */}
-      <div className="flex flex-col gap-3 sm:gap-3.5" style={{ zoom: fontSizeMode === 'small' ? 0.9 : fontSizeMode === 'large' ? 1.15 : 1 } as React.CSSProperties}>
-      <section className="flex flex-col gap-1.5 mt-1">
+      <div className="flex flex-col gap-2 sm:gap-2.5" style={{ zoom: fontSizeMode === 'small' ? 0.9 : fontSizeMode === 'large' ? 1.15 : 1 } as React.CSSProperties}>
+      <section className="flex flex-col gap-1 mt-0">
         <div className="flex items-center justify-end gap-2 flex-wrap sm:flex-nowrap">
 
           <div className="flex items-center gap-2 shrink-0">
@@ -1088,11 +1088,11 @@ export default function ContentViewer({
             )}
           </div>
         </div>
-        <h1 className="text-[28px] sm:text-[30px] font-extrabold text-ink leading-[1.2]">
+        <h1 className="text-[21px] sm:text-[25px] font-extrabold text-ink leading-[1.16]">
           {currentPage.title}
         </h1>
         {currentPage.summary && (
-          <p className="text-[15px] text-muted font-normal leading-relaxed mt-0.5">
+          <p className="text-[12px] sm:text-[13px] text-muted font-normal leading-relaxed mt-0">
             {currentPage.summary}
           </p>
         )}

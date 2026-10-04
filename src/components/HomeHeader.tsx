@@ -300,7 +300,7 @@ export default function HomeHeader({
                 title="Bấm để đổi tên của bạn"
               >
                 <div className="flex items-center gap-1.5 animate-greeting-bounce">
-                  <span className="text-[17px] sm:text-[18px] font-black text-ink tracking-tight group-hover:text-amber-600 dark:group-hover:text-[#F8DF7B] transition-colors">
+                  <span className="text-[21px] sm:text-[23px] font-black text-ink tracking-tight leading-tight group-hover:text-amber-600 dark:group-hover:text-[#F8DF7B] transition-colors">
                     Hi, {userName || 'bạn'}!
                   </span>
                   {/* 1 biểu tượng duy nhất ngay cạnh tên: Chuông thông báo & Đồng bộ */}
@@ -319,11 +319,9 @@ export default function HomeHeader({
                 </div>
               </button>
             </div>
-            {appSubtitle && appSubtitle.trim() ? (
-              <span className="text-[11px] sm:text-[11.5px] text-muted font-medium">
-                {appSubtitle.trim()}
-              </span>
-            ) : null}
+            <span className="mt-0.5 text-[11.5px] sm:text-[12px] text-muted font-medium tracking-[0.005em]">
+              {appSubtitle?.trim() || 'Hiểu cơ thể, sống khỏe mỗi ngày'}
+            </span>
           </div>
 
           <div className="flex items-center gap-2">
