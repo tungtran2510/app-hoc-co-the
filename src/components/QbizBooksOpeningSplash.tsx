@@ -11,6 +11,38 @@ interface QbizBooksOpeningSplashProps {
 // Cờ theo dõi trong bộ nhớ phiên làm việc của tab để khi người dùng đang lướt bài học rồi ấn quay về Trang chủ không bị hiện lại liên tục
 let hasShownIntroInSession = false;
 
+// Đánh dấu đã xem intro vĩnh viễn trên mọi tầng lưu trữ (Cookie 1 năm, localStorage, sessionStorage, window, module)
+export function markIntroAsSeenPermanent() {
+  try {
+    if (typeof document !== 'undefined') {
+      document.cookie = 'qbiz_books_intro_seen=1; path=/; max-age=31536000; SameSite=Lax';
+    }
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('qbiz_books_intro_seen', '1');
+      localStorage.setItem('qbiz_books_intro_timestamp', Date.now().toString());
+    }
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem('qbiz_books_intro_seen', '1');
+    }
+    if (typeof window !== 'undefined') {
+      (window as any).__qbiz_books_intro_seen = true;
+    }
+    hasShownIntroInSession = true;
+  } catch {}
+}
+
+// Kiểm tra xem đã từng xem intro trên bất kỳ tầng lưu trữ nào chưa
+export function hasSeenIntroAnywhere(): boolean {
+  try {
+    if (hasShownIntroInSession) return true;
+    if (typeof window !== 'undefined' && (window as any).__qbiz_books_intro_seen) return true;
+    if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('qbiz_books_intro_seen') === '1') return true;
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('qbiz_books_intro_seen') === '1') return true;
+    if (typeof document !== 'undefined' && /(?:^|;\s*)qbiz_books_intro_seen=1/.test(document.cookie)) return true;
+  } catch {}
+  return false;
+}
+
 export default function QbizBooksOpeningSplash({
   onFinish,
   forceShow = false,
@@ -26,31 +58,27 @@ export default function QbizBooksOpeningSplash({
     try {
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('skip_intro') === '1') {
+        markIntroAsSeenPermanent();
         setIsVisible(false);
         return;
       }
 
       const force = urlParams.get('intro') === '1' || forceShow;
 
-      // 1. Kiểm tra cờ phiên trong sessionStorage (chỉ cho phép 1 lần khi mới bật app)
-      const seenInSession = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('qbiz_books_intro_seen') === '1';
-
-      // 2. Kiểm tra cờ đã từng xem trên thiết bị (localStorage)
-      const seenInLocal = typeof localStorage !== 'undefined' && localStorage.getItem('qbiz_books_intro_seen') === '1';
-
-      // 3. Kiểm tra xem người dùng có quay lại trang chủ từ các bài học nội bộ không
+      // 1. Kiểm tra xem người dùng có quay lại trang chủ từ các bài học nội bộ không
       const isInternalNav = typeof document !== 'undefined' && !!document.referrer && document.referrer.includes(window.location.host);
 
-      // Nếu không ép buộc xem lại và đã từng mở trong phiên/thiết bị hoặc quay lại từ bài học -> TUYỆT ĐỐI BỎ QUA
-      if (!force && (seenInSession || seenInLocal || hasShownIntroInSession || isInternalNav)) {
+      // 2. Nếu đã từng xem ở bất kỳ đâu (Cookie 1 năm, Local, Session, Window flag) HOẶC quay lại từ trang khác HOẶC không ép buộc:
+      // -> TUYỆT ĐỐI KHÔNG HIỂN THỊ, KHÓA CHẶT 100%
+      if (!force && (hasSeenIntroAnywhere() || isInternalNav)) {
+        markIntroAsSeenPermanent();
         setIsVisible(false);
         return;
       }
 
-      // Đánh dấu ngay lập tức vào cả sessionStorage và localStorage để khi lướt bài học rồi ấn quay về Trang chủ KHÔNG BAO GIỜ bị hiện lại
-      if (typeof sessionStorage !== 'undefined') sessionStorage.setItem('qbiz_books_intro_seen', '1');
-      if (typeof localStorage !== 'undefined') localStorage.setItem('qbiz_books_intro_seen', '1');
-      hasShownIntroInSession = true;
+      // Đánh dấu NGAY LẬP TỨC trên toàn bộ các tầng lưu trữ TRƯỚC KHI hiệu ứng chạy
+      // để bất kỳ thao tác nào sau đó (reload, chuyển tab, quay lại trang chủ) ĐỀU BỊ KHÓA LẠI
+      markIntroAsSeenPermanent();
       shouldShow = true;
       setIsVisible(true);
     } catch {
@@ -72,6 +100,7 @@ export default function QbizBooksOpeningSplash({
 
     // 3. Sau 3700ms: Đóng hoàn toàn
     const tFinish = setTimeout(() => {
+      markIntroAsSeenPermanent();
       setIsVisible(false);
       if (onFinish) onFinish();
     }, 3700);
@@ -96,6 +125,7 @@ export default function QbizBooksOpeningSplash({
       tOpen = setTimeout(() => setIsBookOpened(true), 650);
       tFade = setTimeout(() => setIsFadingOut(true), 3200);
       tFinish = setTimeout(() => {
+        markIntroAsSeenPermanent();
         setIsVisible(false);
         if (onFinish) onFinish();
       }, 3700);
@@ -111,11 +141,7 @@ export default function QbizBooksOpeningSplash({
   }, [onFinish]);
 
   const handleDismiss = () => {
-    try {
-      if (typeof sessionStorage !== 'undefined') sessionStorage.setItem('qbiz_books_intro_seen', '1');
-      if (typeof localStorage !== 'undefined') localStorage.setItem('qbiz_books_intro_seen', '1');
-    } catch {}
-    hasShownIntroInSession = true;
+    markIntroAsSeenPermanent();
     setIsFadingOut(true);
     setTimeout(() => {
       setIsVisible(false);

@@ -19,6 +19,17 @@ export default function PwaRegistrar() {
   useEffect(() => {
     // 1. Đăng ký Service Worker và ép cập nhật bản mới nhất
     if (typeof window !== 'undefined') {
+      // Nếu người dùng đang ở bất kỳ trang bài học hoặc chuyên đề nào (không phải trang chủ '/')
+      // thì lập tức khóa cờ intro để khi họ ấn 'Trang chủ' tuyệt đối không bao giờ bị hiện splash
+      if (window.location.pathname !== '/') {
+        try {
+          document.cookie = 'qbiz_books_intro_seen=1; path=/; max-age=31536000; SameSite=Lax';
+          localStorage.setItem('qbiz_books_intro_seen', '1');
+          sessionStorage.setItem('qbiz_books_intro_seen', '1');
+          (window as any).__qbiz_books_intro_seen = true;
+        } catch {}
+      }
+
       const syncThemeColor = () => {
         const stored = localStorage.getItem('giao_dien');
         const isDark = stored === 'dark' || (!stored && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
