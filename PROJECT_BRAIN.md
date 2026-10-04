@@ -71,7 +71,14 @@ Hệ thống hỗ trợ đầy đủ **10 khối nội dung chuẩn**:
 
 ---
 
-## 6. ĐỊNH HƯỚNG THƯƠNG MẠI HÓA TIẾP THEO
-- **Mô hình White-label (Bán cho đối tác theo tên miền riêng):**
-  - Cung cấp web riêng với logo, thương hiệu và nội dung độc lập cho từng khách hàng hoặc phòng khám.
+## 6. HỆ THỐNG ĐA CƠ SỞ SAAS & WHITE-LABEL WORKSPACES - ĐÃ HOÀN TẤT
+- **Mô hình Cơ sở / Khách hàng SaaS (`?ws=[slug]` hoặc Custom Domain):**
+  - Cung cấp web riêng với logo, thương hiệu, tài khoản Admin và nội dung độc lập cho từng bác sĩ / phòng khám / đối tác.
+  - Quản trị tập trung tại tab **"Cơ sở SaaS"** trong Cài đặt quản trị (chỉ Super Admin `0974248716` truy cập được).
+  - Tính năng cấp app tức thì:
+    + Tự động tạo slug định danh (vd: `bs-tuan` -> link `/?ws=bs-tuan`).
+    + Cấp tài khoản quản trị riêng (SĐT + Mật khẩu quản trị cho khách).
+    + Tùy chọn nhân bản/sao chép toàn bộ bộ khóa học mẫu hiện tại hoặc để trống cho khách tự soạn từ đầu.
+    + Bật/tắt khóa app khách hàng khi hết hạn dịch vụ hoặc tạm ngưng hợp đồng.
+    + Bảo vệ dữ liệu tuyệt đối: Dữ liệu phân tách theo `workspace_id`, không bao giờ lẫn lộn hay đè lên dữ liệu gốc `default`.
 
