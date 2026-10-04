@@ -34,6 +34,7 @@ interface HomeSectionsClientProps {
     pageCount: number;
   }[];
   topicsTitle?: string | null;
+  topicsDisplay?: 'card' | 'text' | 'logo' | 'large' | null;
   authorProfile?: AuthorProfile | null;
   recommendedBooksTitle?: string | null;
   recommendedBooksSubtitle?: string | null;
@@ -58,6 +59,7 @@ export default function HomeSectionsClient({
   initialHiddenSections,
   topicsWithCounts,
   topicsTitle,
+  topicsDisplay,
   authorProfile: initialAuthorProfile,
   recommendedBooksTitle,
   recommendedBooksSubtitle,
@@ -412,6 +414,7 @@ export default function HomeSectionsClient({
               <TopicListClient
                 initialTopics={topicsWithCounts}
                 initialTopicsTitle={topicsTitle}
+                initialDisplay={topicsDisplay}
                 sectionIndex={index}
                 totalSections={sectionsOrder.length}
                 isHidden={isHidden}

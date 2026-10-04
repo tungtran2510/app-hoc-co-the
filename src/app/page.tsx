@@ -43,6 +43,7 @@ export default async function HomePage() {
         initialHiddenSections={settings.hidden_home_sections}
         topicsWithCounts={topicsWithCounts}
         topicsTitle={settings.topics_title || 'Chuyên Đề Học'}
+        topicsDisplay={settings.topics_display}
         authorProfile={settings.author_profile}
         recommendedBooksTitle={settings.recommended_books_title}
         recommendedBooksSubtitle={settings.recommended_books_subtitle}

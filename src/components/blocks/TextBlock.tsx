@@ -133,24 +133,32 @@ export default function TextBlock({
 
   const style = getBlockStyle(displayStyle);
 
-  // Xác định cỡ chữ: ưu tiên cấu hình riêng của khối (fontSize), nếu không có thì theo fontSizeMode chung của trang
-  const resolvedTextSizeClass = (() => {
-    if (fontSize) {
-      if (fontSize === 'small' || fontSize === '14px') return 'text-[14px] sm:text-[15px] leading-[1.55]';
-      if (fontSize === 'normal' || fontSize === '16px') return 'text-[16px] sm:text-[17px] leading-[1.6]';
-      if (fontSize === 'large' || fontSize === '18px') return 'text-[18px] sm:text-[19px] leading-[1.65]';
-      if (fontSize === 'xlarge' || fontSize === '21px') return 'text-[21px] sm:text-[22px] leading-[1.7]';
-    }
-    return fontSizeMode === 'small'
-      ? 'text-[16px] leading-[1.5]'
-      : fontSizeMode === 'large'
-      ? 'text-[22px] leading-[1.65]'
-      : 'text-[19px] leading-[1.6]';
-  })();
+  // Xác định cỡ chữ: cỡ riêng của khối (nếu có) là cỡ gốc; cỡ chữ chung của trang (Nhỏ/Vừa/Lớn) luôn được cộng thêm lên trên,
+  // để nút chỉnh cỡ chữ của người học hoạt động với MỌI khối (kể cả khối đã được chỉnh cỡ riêng).
+  const pageFontDelta = fontSizeMode === 'small' ? -3 : fontSizeMode === 'large' ? 3 : 0;
+  const blockBaseFontPx =
+    fontSize === 'small' || fontSize === '14px'
+      ? 14
+      : fontSize === 'normal' || fontSize === '16px'
+      ? 16
+      : fontSize === 'large' || fontSize === '18px'
+      ? 18
+      : fontSize === 'xlarge' || fontSize === '21px'
+      ? 21
+      : 19;
+  const resolvedTextSizeClass =
+    blockBaseFontPx >= 21
+      ? 'leading-[1.7]'
+      : blockBaseFontPx >= 18
+      ? 'leading-[1.65]'
+      : blockBaseFontPx <= 14
+      ? 'leading-[1.55]'
+      : 'leading-[1.6]';
 
   const textSizeClass = resolvedTextSizeClass;
 
   const contentCustomStyle: React.CSSProperties = {
+    fontSize: `${blockBaseFontPx + pageFontDelta}px`,
     ...(textColor ? { color: textColor } : {}),
     ...(textAlign ? { textAlign } : {}),
     ...(fontSize && !['small', 'normal', 'large', 'xlarge', '14px', '16px', '18px', '21px'].includes(fontSize)

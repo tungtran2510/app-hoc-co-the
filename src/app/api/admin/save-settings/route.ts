@@ -50,6 +50,7 @@ export async function POST(req: NextRequest) {
       welcome_message: settings.welcome_message !== undefined ? settings.welcome_message : (existingBlockStyles.welcome_message ?? 'Hi vọng nền tảng học hiểu cơ thể và chăm sóc sức khỏe chủ động này sẽ giúp bạn hiểu sâu hơn về cơ thể mình, nuôi dưỡng hệ cơ xương khớp và sống khỏe mỗi ngày.'),
       welcome_video_url: settings.welcome_video_url !== undefined ? settings.welcome_video_url : (existingBlockStyles.welcome_video_url ?? null),
       home_custom_blocks: settings.home_custom_blocks !== undefined ? settings.home_custom_blocks : (existingBlockStyles.home_custom_blocks ?? {}),
+      topics_display: settings.topics_display !== undefined ? settings.topics_display : (existingBlockStyles.topics_display ?? 'card'),
     };
 
     const existingAuthorProfile = existing?.author_profile || {};

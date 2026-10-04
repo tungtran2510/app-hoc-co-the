@@ -101,6 +101,7 @@ export default function PwaRegistrar() {
         '/',
         '/tro-ly-ai',
         '/da-luu',
+        '/chuyen-de',
         '/tim-kiem',
         '/cot-song',
         '/cot-song/tong-quan-ve-cot-song',

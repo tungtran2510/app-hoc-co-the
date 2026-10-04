@@ -13,8 +13,9 @@ import {
   ArrowRight,
   ShieldCheck,
   Compass,
+  PlayCircle,
 } from 'lucide-react';
-import { getSavedPages, SavedPageInfo, toggleSavePage } from '../../lib/learningProgress';
+import { getSavedPages, SavedPageInfo, toggleSavePage, getStoredXemTiep, XemTiepInfo } from '../../lib/learningProgress';
 import { getUserPhone, syncUserProgress, LEARNING_PROGRESS_EVENT } from '../../lib/userSync';
 import UserSyncModal from '../../components/UserSyncModal';
 import BottomNav from '../../components/BottomNav';
@@ -55,6 +56,7 @@ export default function SavedPages() {
   const [isLoading, setIsLoading] = useState(true);
   const [showPhoneSync, setShowPhoneSync] = useState(false);
   const [userPhone, setUserPhone] = useState<string | null>(null);
+  const [resume, setResume] = useState<XemTiepInfo | null>(null);
 
   const formatPhone = (p: string) => {
     const clean = p.replace(/[^0-9]/g, '');
@@ -70,6 +72,11 @@ export default function SavedPages() {
       setSavedList(list);
     } catch {
       setSavedList([]);
+    }
+    try {
+      setResume(getStoredXemTiep());
+    } catch {
+      setResume(null);
     }
   };
 
@@ -152,6 +159,33 @@ export default function SavedPages() {
             : 'Đánh dấu các bài học quan trọng để mở xem lại bất cứ khi nào bạn cần'}
         </p>
       </section>
+
+      {/* 3. Đang xem dở (chuyển từ tab "Đang xem" cũ) */}
+      {resume && resume.topic_slug && resume.page_slug && (
+        <section className="flex flex-col gap-2">
+          <div className="flex items-center gap-1.5 text-slate-700 dark:text-purple-200 text-[12px] font-black uppercase tracking-wide">
+            <PlayCircle size={14} className="text-amber-600 dark:text-[#F8DF7B]" />
+            <span>Đang xem dở</span>
+          </div>
+          <Link
+            href={`/${resume.topic_slug.replace('cot-song-that-lung', 'cot-song')}/${resume.page_slug}?v=${resume.video_index || 1}`}
+            className="p-3.5 rounded-[20px] bg-gradient-to-br from-amber-50 to-white dark:from-[#241548] dark:to-[#160D30] border border-amber-300/70 dark:border-purple-700/50 shadow-xs flex items-center gap-3 active:scale-[0.99] transition-all"
+          >
+            <div className="w-11 h-11 rounded-[14px] bg-amber-400 text-slate-900 flex items-center justify-center shrink-0">
+              <PlayCircle size={22} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10.5px] font-black uppercase tracking-wider text-purple-700 dark:text-[#F8DF7B] truncate">
+                {resume.topic_title}
+              </p>
+              <p className="text-[15px] font-black text-slate-900 dark:text-white leading-snug line-clamp-2">
+                {resume.page_title}
+              </p>
+            </div>
+            <ArrowRight size={18} className="text-slate-500 dark:text-purple-300 shrink-0" />
+          </Link>
+        </section>
+      )}
 
       {/* 4. Danh sách bài học đã lưu (Giao diện thẻ Chuyên nghiệp) */}
       {isLoading ? (

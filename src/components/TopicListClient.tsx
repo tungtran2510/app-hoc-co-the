@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus, Edit2, ArrowUp, ArrowDown, Eye, EyeOff, Trash2, Check, X } from 'lucide-react';
-import TopicCard from './TopicCard';
+import TopicTile, { TopicsDisplayMode, TOPICS_DISPLAY_OPTIONS, topicsContainerClass } from './TopicTile';
 import { Topic } from '../lib/types';
 import { checkIsAdminClient } from '../lib/adminAuth';
 import { saveTopicApi, deleteTopicApi } from '../lib/apiAdmin';
@@ -25,6 +25,9 @@ interface TopicListClientProps {
   onMoveUp?: () => void;
   onMoveDown?: () => void;
   onOpenReorderModal?: () => void;
+  initialDisplay?: TopicsDisplayMode | null;
+  hideViewAll?: boolean;
+  enableSearch?: boolean;
 }
 
 export default function TopicListClient({
@@ -37,6 +40,9 @@ export default function TopicListClient({
   onMoveUp,
   onMoveDown,
   onOpenReorderModal,
+  initialDisplay,
+  hideViewAll = false,
+  enableSearch = false,
 }: TopicListClientProps) {
   const [topicsWithCounts, setTopicsWithCounts] = useState(initialTopics);
   const [topicsTitle, setTopicsTitle] = useState(
@@ -50,6 +56,8 @@ export default function TopicListClient({
   const [isAdmin, setIsAdmin] = useState(false);
   const [editingTopic, setEditingTopic] = useState<Topic | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [displayMode, setDisplayMode] = useState<TopicsDisplayMode>(initialDisplay || 'card');
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
     checkIsAdminClient().then((admin) => setIsAdmin(admin));
@@ -147,6 +155,16 @@ export default function TopicListClient({
     await saveSettingsApi({ topics_title: trimmed });
   };
 
+  const handleChangeDisplay = async (mode: TopicsDisplayMode) => {
+    const prev = displayMode;
+    setDisplayMode(mode);
+    const res = await saveSettingsApi({ topics_display: mode });
+    if (!res.success) {
+      alert(res.error || 'Chưa lưu được – chưa kết nối dữ liệu');
+      setDisplayMode(prev);
+    }
+  };
+
   return (
     <section className="flex flex-col gap-2 mt-1">
       {/* KHỐI NÚT ĐIỀU KHIỂN DÀNH CHO ADMIN - ĐẶT TRÊN ĐẦU KHỐI (FULL-WIDTH ADMIN BAR) */}
@@ -220,15 +238,17 @@ export default function TopicListClient({
         )}
 
         <div className="flex items-center gap-2 shrink-0">
-          <Link
-            href="/cot-song"
-            prefetch={true}
-            className="text-[13px] font-black uppercase tracking-wider text-[#1E3A8A] hover:text-[#172554] dark:text-[#F8DF7B] dark:hover:text-amber-200 flex items-center gap-0.5 cursor-pointer active:opacity-75 transition-colors"
-            title="Xem danh sách bài học chủ đề Cột sống"
-          >
-            <span>Xem tất cả</span>
-            <span className="text-[15px]">›</span>
-          </Link>
+          {!hideViewAll && (
+            <Link
+              href="/chuyen-de"
+              prefetch={true}
+              className="text-[13px] font-black uppercase tracking-wider text-[#1E3A8A] hover:text-[#172554] dark:text-[#F8DF7B] dark:hover:text-amber-200 flex items-center gap-0.5 cursor-pointer active:opacity-75 transition-colors"
+              title="Xem tất cả chuyên đề"
+            >
+              <span>Xem tất cả</span>
+              <span className="text-[15px]">›</span>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -239,10 +259,43 @@ export default function TopicListClient({
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 sm:gap-2.5 mt-1.5">
+      {/* Ô tìm chuyên đề (chỉ hiện ở trang Chuyên đề) */}
+      {enableSearch && (
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Tìm chuyên đề..."
+          className="w-full h-11 px-4 rounded-[14px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 text-[14px] text-ink focus:border-primary focus:outline-hidden"
+        />
+      )}
+
+      {/* Chọn kiểu hiển thị chuyên đề (chỉ quản trị viên thấy) */}
+      {isAdmin && (
+        <div className="flex items-center gap-1.5 flex-wrap p-1.5 rounded-[12px] bg-slate-100 dark:bg-white/5 border border-line">
+          <span className="text-[11px] font-extrabold uppercase text-muted px-1.5">Kiểu hiển thị</span>
+          {TOPICS_DISPLAY_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => handleChangeDisplay(opt.value)}
+              className={`h-7 px-2.5 rounded-[8px] text-[12px] font-bold cursor-pointer transition-colors ${
+                displayMode === opt.value
+                  ? 'bg-[#1E3A8A] text-amber-300 shadow-xs'
+                  : 'bg-white dark:bg-[#1E1342] text-slate-600 dark:text-purple-200 border border-line'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className={topicsContainerClass(displayMode)}>
         {topicsWithCounts.map(({ topic, pageCount }, index) => {
           // Người xem bình thường không thấy chủ đề bị ẩn
           if (!topic.is_visible && !isAdmin) return null;
+          if (query.trim() && !topic.title.toLowerCase().includes(query.trim().toLowerCase())) return null;
 
           return (
             <ScrollReveal
@@ -252,7 +305,8 @@ export default function TopicListClient({
               className="relative flex flex-col group"
             >
               <div className="relative">
-                <TopicCard
+                <TopicTile
+                  mode={displayMode}
                   topic={topic}
                   pageCount={pageCount}
                   isActive={activeTopicSlug === topic.slug}

@@ -139,7 +139,7 @@ export default function EditBlockModal({
     block.type === 'text' ? block.data.format || 'paragraph' : 'paragraph'
   );
   const [fontSize, setFontSize] = useState<string>(
-    block.type === 'text' ? block.data.font_size || 'normal' : 'normal'
+    block.type === 'text' ? block.data.font_size || '' : ''
   );
   const [textColor, setTextColor] = useState<string>(
     block.type === 'text' ? block.data.text_color || '' : ''
@@ -474,7 +474,7 @@ export default function EditBlockModal({
           html: cleanHtml,
           lines: lines.length > 0 ? lines : (isHtml ? ['Khối nội dung HTML'] : ['Nội dung mới']),
           format: textFormat,
-          font_size: fontSize,
+          font_size: fontSize || undefined,
           text_color: textColor.trim() || undefined,
           text_align: textAlign,
           images: finalAttachedImages.length > 0 ? finalAttachedImages : undefined,
@@ -943,13 +943,25 @@ export default function EditBlockModal({
                         <span>Cài đặt chữ & Màu sắc</span>
                       </span>
                       <span className="text-[11px] text-muted font-mono">
-                        {fontSize === 'small' ? '14px' : fontSize === 'large' ? '18px' : fontSize === 'xlarge' ? '21px' : '16px'} • {textColor || 'Tự động'}
+                        {fontSize === 'small' ? '14px' : fontSize === 'large' ? '18px' : fontSize === 'xlarge' ? '21px' : fontSize === 'normal' ? '16px' : 'Tự động'} • {textColor || 'Tự động'}
                       </span>
                     </div>
 
                     {/* Cỡ chữ */}
                     <div className="flex flex-col gap-1">
-                      <span className="text-[12px] font-bold text-muted">Cỡ chữ văn bản:</span>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[12px] font-bold text-muted">Cỡ chữ văn bản:</span>
+                        <button
+                          type="button"
+                          onClick={() => setFontSize('')}
+                          className={`h-6 px-2 rounded-[7px] text-[11px] font-bold cursor-pointer border ${
+                            fontSize === '' ? 'bg-primary text-white border-primary' : 'bg-white dark:bg-[#1C123D] border-line text-ink'
+                          }`}
+                          title="Theo cỡ chữ chung của trang (người học đổi được)"
+                        >
+                          Tự động
+                        </button>
+                      </div>
                       <div className="grid grid-cols-4 gap-1.5">
                         {FONT_SIZE_OPTIONS.map((opt) => {
                           const isSel = fontSize === opt.value;

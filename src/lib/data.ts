@@ -235,6 +235,7 @@ export async function getSettings(): Promise<Settings> {
             welcome_message: data.welcome_message || data.block_styles?.welcome_message || 'Hi vọng nền tảng học hiểu cơ thể và chăm sóc sức khỏe chủ động này sẽ giúp bạn hiểu sâu hơn về cơ thể mình, nuôi dưỡng hệ cơ xương khớp và sống khỏe mỗi ngày.',
             welcome_video_url: data.welcome_video_url || data.block_styles?.welcome_video_url || 'https://www.youtube.com/watch?v=c9kmCxFKHPY',
             home_custom_blocks: (data.block_styles?.home_custom_blocks && typeof data.block_styles.home_custom_blocks === 'object') ? data.block_styles.home_custom_blocks : {},
+            topics_display: ['card', 'text', 'logo', 'large'].includes(data.block_styles?.topics_display) ? data.block_styles.topics_display : 'card',
           } as Settings;
         }
       } catch {

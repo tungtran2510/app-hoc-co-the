@@ -95,6 +95,7 @@ export interface Settings {
   home_title?: string | null;
   search_placeholder?: string | null;
   topics_title?: string | null;
+  topics_display?: 'card' | 'text' | 'logo' | 'large' | null;
   recommended_books_title?: string | null;
   recommended_books_subtitle?: string | null;
   recommended_books?: RecommendedBook[];
