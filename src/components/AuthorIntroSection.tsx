@@ -534,14 +534,14 @@ export function AuthorBooksSection({
                 className={idx === 0 ? 'col-span-2' : ''}
               >
                 <div
-                  className={`h-full bg-white text-slate-900 border border-slate-200/70 dark:bg-[#1A1236] dark:text-white dark:border-white/10 shadow-[0_10px_30px_-20px_rgba(15,23,42,.38)] transition-all duration-300 flex group ${idx === 0 ? 'flex-row gap-2.5 p-2.5 sm:gap-4 sm:p-4 rounded-[18px]' : 'flex-col gap-0.5 p-1 pb-2 rounded-[14px]'} ${
+                  className={`h-full bg-white text-slate-900 border border-slate-200/70 dark:bg-[#1A1236] dark:text-white dark:border-white/10 shadow-[0_10px_30px_-20px_rgba(15,23,42,.38)] transition-all duration-300 flex group ${idx === 0 ? 'flex-row gap-2.5 p-2.5 sm:gap-4 sm:p-4 rounded-[18px]' : 'flex-col gap-0.5 p-1.5 pb-2 rounded-[14px]'} ${
                     isBookHidden ? 'opacity-70 border-dashed border-amber-300' : ''
                   }`}
                 >
                   {/* BÊN TRÁI: Bìa sách to rõ chuẩn tỷ lệ 3:4 với ModernBookCover */}
                   <div
                     onClick={() => onSelectBook?.(book)}
-                    className={`${idx === 0 ? 'w-[35%] max-w-[205px]' : 'w-[96%] mx-auto'} aspect-[3/4] shrink-0 relative flex items-center justify-center cursor-pointer`}
+                    className={`${idx === 0 ? 'w-[35%] max-w-[205px]' : 'w-[84%] mx-auto'} aspect-[3/4] shrink-0 relative flex items-center justify-center cursor-pointer`}
                   >
                     <ModernBookCover
                       title={book.title}
