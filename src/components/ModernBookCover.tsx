@@ -63,44 +63,43 @@ export default function ModernBookCover({
 
   return (
     <div
-      className={`relative aspect-[3/4] w-full select-none pl-[7%] pr-[3%] pb-[4%] transition-transform duration-300 group-hover:-translate-y-1 ${className}`}
-      style={{ perspective: '900px' }}
+      className={`relative aspect-[3/4] w-full select-none pl-[5%] pr-[2%] pb-[3%] transition-transform duration-300 group-hover:-translate-y-1 ${className}`}
+      style={{ perspective: '1100px' }}
     >
-      {/* THẺ TAG CỦA SÁCH: MÀU XANH NAVY CHỮ VÀNG, KÍCH THƯỚC BÉ TINH TẾ & DỊCH LÊN TRÊN */}
-      {displayBadge && (
-        <div className="absolute -top-2.5 -left-1 sm:-top-3 sm:-left-1.5 z-30 rounded-[4px] bg-[#1E3A8A] text-[#FDE047] font-bold text-[7px] sm:text-[7.5px] px-1.5 py-[1.5px] shadow-sm border border-amber-300/40 flex items-center gap-1 select-none pointer-events-none max-w-[92%] truncate">
-          <Sparkles size={7} className="text-[#FDE047] fill-[#FDE047] shrink-0" />
-          <span className="tracking-wider uppercase truncate">{displayBadge}</span>
-        </div>
-      )}
-
       {/* THÂN BÌA SÁCH 3D (ĐƯỢC BO GÓC & BẢO TOÀN HIỆU ỨNG GÁY SÁCH) */}
       <div className="absolute bottom-[1%] left-[5%] right-[1%] h-[7%] rounded-[50%] bg-slate-950/25 blur-[7px]" />
 
       <div
         className="w-full h-full rounded-r-[7px] rounded-l-[2px] overflow-visible relative transition-all duration-300 group-hover:shadow-[0_0_24px_rgba(248,223,123,0.28)]"
         style={{
-          transform: 'rotateY(-3deg)',
+          transform: 'rotateY(-2.5deg)',
           transformOrigin: 'left center',
-          boxShadow: '10px 14px 22px -9px rgba(15, 23, 42, 0.38)',
+          boxShadow: '8px 12px 20px -10px rgba(15, 23, 42, 0.38)',
         }}
       >
       {/* Khối gáy nằm ngoài ảnh nên mọi ảnh tải lên đều tự thành một cuốn sách */}
       <div
-        className="pointer-events-none absolute inset-y-[1px] -left-[7%] w-[8%] z-0 rounded-l-[4px] border-y border-l border-slate-900/20"
+        className="pointer-events-none absolute inset-y-[1px] -left-[5%] w-[6%] z-0 rounded-l-[3px] border-y border-l border-slate-900/20"
         style={{
           background: 'linear-gradient(to right, #0f2e62 0%, #184781 45%, #0b224d 100%)',
-          transform: 'skewY(-1.5deg)',
-          boxShadow: '-3px 5px 8px rgba(15,23,42,.18)',
+          transform: 'skewY(-0.5deg)',
+          boxShadow: '-2px 4px 7px rgba(15,23,42,.16)',
         }}
       />
-      <div className="pointer-events-none absolute top-[1.5%] -right-[2.5%] bottom-[2.5%] w-[3%] z-0 rounded-r-[3px] border-r border-slate-300 bg-[repeating-linear-gradient(to_right,#fff_0px,#eef1f5_1px,#fff_2px)]" />
+      {/* Tag nằm sát bên trong mép trên, vắt nhẹ từ gáy sang mặt bìa. */}
+      {displayBadge && (
+        <div className="pointer-events-none absolute top-0 -left-[4.2%] z-30 flex h-[10px] max-w-[78%] select-none items-center gap-[2px] truncate rounded-[2.5px] border border-[#E7C84C]/60 bg-[#173A79] px-[4px] text-[5.75px] font-extrabold uppercase leading-none tracking-[0.06em] text-[#FFE66A] shadow-[0_1px_4px_rgba(15,23,42,.22)] sm:h-[11px] sm:px-[4.5px] sm:text-[6.25px]">
+          <Sparkles size={5.5} strokeWidth={2.2} className="shrink-0 fill-[#FFE66A] text-[#FFE66A]" />
+          <span className="truncate">{displayBadge}</span>
+        </div>
+      )}
+      <div className="pointer-events-none absolute top-[1.5%] -right-[1.5%] bottom-[2.5%] w-[2%] z-0 rounded-r-[3px] border-r border-slate-300 bg-[repeating-linear-gradient(to_right,#fff_0px,#eef1f5_1px,#fff_2px)]" />
       <div className="pointer-events-none absolute -bottom-[2.5%] left-[1%] right-[1.5%] h-[3%] z-0 rounded-b-[3px] border-b border-slate-300 bg-[repeating-linear-gradient(to_bottom,#fff_0px,#e5e7eb_1px,#fff_2px)]" />
 
       <div className="absolute inset-0 z-10 overflow-hidden rounded-r-[7px] rounded-l-[2px] bg-white ring-1 ring-slate-900/10">
       {/* 1. Nếp gấp gáy sách */}
       <div
-        className="pointer-events-none absolute inset-y-0 left-0 w-[10%] z-20"
+        className="pointer-events-none absolute inset-y-0 left-0 w-[5%] z-20"
         style={{
           background:
             'linear-gradient(to right, rgba(0,0,0,0.38) 0%, rgba(255,255,255,0.2) 20%, rgba(0,0,0,0.12) 60%, transparent 100%)',

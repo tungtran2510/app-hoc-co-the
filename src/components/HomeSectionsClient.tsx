@@ -485,6 +485,7 @@ export default function HomeSectionsClient({
               {hiddenBanner}
               <AuthorBooksSection
                 profile={authorProfile}
+                supplementalBooks={flatBooks}
                 isAdmin={isAdmin}
                 isHidden={isHidden}
                 onToggleVisibility={() => handleToggleSectionVisibility('author_books')}
@@ -554,6 +555,9 @@ export default function HomeSectionsClient({
 
         // KHỐI MỚI: TỦ SÁCH TỐI GIẢN (PHONG CÁCH PHẲNG NHƯ MẪU NGƯỜI DÙNG YÊU CẦU)
         if (sectionKey === 'flat_books') {
+          if (!isAdmin && sectionsOrder.includes('author_books') && !hiddenSections.includes('author_books')) {
+            return null;
+          }
           return (
             <React.Fragment key="flat_books">
               {hiddenBanner}
