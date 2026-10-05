@@ -8,6 +8,54 @@ import {
 
 export const USER_PHONE_KEY = 'user_phone';
 export const LEARNING_PROGRESS_EVENT = 'learning_progress_updated';
+export type TopicDisplayScope = 'home' | 'page';
+
+export function getTopicDisplayPreferenceKey(scope: TopicDisplayScope, phone: string | null): string {
+  const cleanPhone = phone?.replace(/[^0-9]/g, '') || 'guest';
+  return `qbiz_topics_display:${scope}:${cleanPhone}`;
+}
+
+export async function getTopicDisplayPreferences(phone: string): Promise<{
+  success: boolean;
+  preferences?: UserProgressSyncData['display_preferences'];
+}> {
+  try {
+    const res = await fetch('/api/user/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, action: 'get_preferences' }),
+    });
+    const json = await res.json();
+    return res.ok && json.success
+      ? { success: true, preferences: json.preferences || {} }
+      : { success: false };
+  } catch {
+    return { success: false };
+  }
+}
+
+export async function saveTopicDisplayPreference(
+  phone: string,
+  scope: TopicDisplayScope,
+  mode: string
+): Promise<boolean> {
+  const preferenceKey = scope === 'page' ? 'topics_page_display' : 'home_topics_display';
+  try {
+    const res = await fetch('/api/user/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        phone,
+        action: 'save_preferences',
+        localData: { display_preferences: { [preferenceKey]: mode } },
+      }),
+    });
+    const json = await res.json();
+    return res.ok && Boolean(json.success);
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Lấy số điện thoại người dùng đã lưu
@@ -29,6 +77,7 @@ export function setUserPhone(phone: string): void {
   try {
     const clean = phone.replace(/[^0-9]/g, '');
     localStorage.setItem(USER_PHONE_KEY, clean);
+    window.dispatchEvent(new CustomEvent('user_phone_updated', { detail: { phone: clean } }));
   } catch {
     // Bỏ qua
   }
@@ -41,6 +90,7 @@ export function clearUserPhone(): void {
   if (typeof window === 'undefined') return;
   try {
     localStorage.removeItem(USER_PHONE_KEY);
+    window.dispatchEvent(new CustomEvent('user_phone_updated', { detail: { phone: null } }));
   } catch {
     // Bỏ qua
   }

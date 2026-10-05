@@ -310,6 +310,10 @@ export interface UserProgressSyncData {
     saved_at: number;
   }>;
   da_hoan_thanh?: string[];
+  display_preferences?: {
+    home_topics_display?: string;
+    topics_page_display?: string;
+  };
   updated_at?: string;
 }
 

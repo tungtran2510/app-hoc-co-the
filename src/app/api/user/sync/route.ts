@@ -16,6 +16,16 @@ function hashedSyncKey(cleanPhone: string): string {
   return 'user_sync:' + crypto.createHmac('sha256', pepper).update(cleanPhone).digest('hex').slice(0, 40);
 }
 
+const DISPLAY_MODES = new Set(['card', 'text', 'logo', 'large', 'catalog']);
+
+function normalizeDisplayPreferences(value: any): NonNullable<UserProgressSyncData['display_preferences']> {
+  const preferences: NonNullable<UserProgressSyncData['display_preferences']> = {};
+  if (!value || typeof value !== 'object') return preferences;
+  if (DISPLAY_MODES.has(value.home_topics_display)) preferences.home_topics_display = value.home_topics_display;
+  if (DISPLAY_MODES.has(value.topics_page_display)) preferences.topics_page_display = value.topics_page_display;
+  return preferences;
+}
+
 export async function POST(req: NextRequest) {
   try {
     // Chặn dò số điện thoại hàng loạt: tối đa 40 lần / 10 phút cho mỗi IP
@@ -71,8 +81,49 @@ export async function POST(req: NextRequest) {
     }
 
     const sourceRecord = record || legacyRecord;
-    const cloudData: UserProgressSyncData | null =
-      sourceRecord?.block_styles?.user_progress || sourceRecord?.block_styles || null;
+    const storedBlockStyles = sourceRecord?.block_styles || {};
+    const storedProgress = storedBlockStyles.user_progress || storedBlockStyles;
+    const displayPreferences = normalizeDisplayPreferences(
+      storedBlockStyles.display_preferences || storedProgress?.display_preferences
+    );
+    const cloudData: UserProgressSyncData = {
+      ...(storedProgress || {}),
+      phone: '',
+      display_preferences: displayPreferences,
+    };
+
+    if (action === 'get_preferences') {
+      return NextResponse.json({ success: true, preferences: displayPreferences });
+    }
+
+    if (action === 'save_preferences') {
+      const incoming = normalizeDisplayPreferences(localData?.display_preferences);
+      const nextPreferences = { ...displayPreferences, ...incoming };
+      const progressData: UserProgressSyncData = {
+        phone: '',
+        xem_tiep: cloudData.xem_tiep || null,
+        tien_do: cloudData.tien_do || {},
+        bai_da_luu: cloudData.bai_da_luu || [],
+        da_hoan_thanh: cloudData.da_hoan_thanh || [],
+        updated_at: new Date().toISOString(),
+      };
+      const { error: upsertErr } = await supabase.from('settings').upsert(
+        {
+          workspace_id: syncKey,
+          app_name: 'Học viên',
+          primary_color: '#0C0817',
+          access_mode: 'OPEN',
+          block_styles: { user_progress: progressData, display_preferences: nextPreferences },
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'workspace_id' }
+      );
+      if (upsertErr) {
+        return NextResponse.json({ error: upsertErr.message || 'Không lưu được cách hiển thị' }, { status: 500 });
+      }
+      if (legacyRecord) await supabase.from('settings').delete().eq('workspace_id', legacyKey);
+      return NextResponse.json({ success: true, preferences: nextPreferences });
+    }
 
     // 1. Chỉ lấy dữ liệu từ đám mây (GET)
     if (action === 'get') {
@@ -133,6 +184,7 @@ export async function POST(req: NextRequest) {
       tien_do: mergedTienDo,
       bai_da_luu: mergedBaiDaLuu,
       da_hoan_thanh: mergedDaHoanThanh,
+      display_preferences: displayPreferences,
       updated_at: new Date().toISOString(),
     };
 
@@ -143,7 +195,7 @@ export async function POST(req: NextRequest) {
         app_name: 'Học viên',
         primary_color: '#0C0817',
         access_mode: 'OPEN',
-        block_styles: { user_progress: mergedPayload },
+        block_styles: { user_progress: mergedPayload, display_preferences: displayPreferences },
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'workspace_id' }

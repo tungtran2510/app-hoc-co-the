@@ -13,6 +13,13 @@ import { saveSettingsApi } from '../lib/apiAdmin';
 import EditTopicModal from './admin/EditTopicModal';
 import SectionOrderControls from './admin/SectionOrderControls';
 import ScrollReveal from './ScrollReveal';
+import {
+  getTopicDisplayPreferenceKey,
+  getTopicDisplayPreferences,
+  getUserPhone,
+  saveTopicDisplayPreference,
+  TopicDisplayScope,
+} from '../lib/userSync';
 
 interface TopicListClientProps {
   initialTopics: {
@@ -74,6 +81,8 @@ export default function TopicListClient({
   );
   const [activeTopicSlug, setActiveTopicSlug] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdminResolved, setIsAdminResolved] = useState(false);
+  const [userPhoneRevision, setUserPhoneRevision] = useState(0);
   const [editingTopic, setEditingTopic] = useState<Topic | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [displayMode, setDisplayMode] = useState<TopicsDisplayMode>(initialDisplay || 'card');
@@ -108,7 +117,10 @@ export default function TopicListClient({
   }, [enableSearch, query]);
 
   useEffect(() => {
-    checkIsAdminClient().then((admin) => setIsAdmin(admin));
+    checkIsAdminClient().then((admin) => {
+      setIsAdmin(admin);
+      setIsAdminResolved(true);
+    });
     if (initialTopicsTitle && initialTopicsTitle !== 'Chọn chủ đề') {
       setTopicsTitle(initialTopicsTitle);
     } else {
@@ -125,13 +137,43 @@ export default function TopicListClient({
   }, [initialTopicsTitle]);
 
   useEffect(() => {
-    if (isAdmin) return;
-    const storageKey = settingsScope === 'page' ? 'qbiz_topics_page_display' : 'qbiz_home_topics_display';
-    const saved = window.localStorage.getItem(storageKey);
-    if (saved && TOPICS_DISPLAY_OPTIONS.some((opt) => opt.value === saved)) {
-      setDisplayMode(saved as TopicsDisplayMode);
+    const handleUserPhoneUpdated = () => setUserPhoneRevision((revision) => revision + 1);
+    window.addEventListener('user_phone_updated', handleUserPhoneUpdated);
+    return () => window.removeEventListener('user_phone_updated', handleUserPhoneUpdated);
+  }, []);
+
+  useEffect(() => {
+    if (!isAdminResolved || isAdmin) return;
+    setDisplayMode(initialDisplay || 'card');
+    const scope: TopicDisplayScope = settingsScope === 'page' ? 'page' : 'home';
+    const preferenceKey = scope === 'page' ? 'topics_page_display' : 'home_topics_display';
+    const phone = getUserPhone();
+    const storageKey = getTopicDisplayPreferenceKey(scope, phone);
+    const isSupportedMode = (value: string | null): value is TopicsDisplayMode =>
+      Boolean(value && TOPICS_DISPLAY_OPTIONS.some((opt) => opt.value === value));
+
+    try {
+      const saved = window.localStorage.getItem(storageKey);
+      if (isSupportedMode(saved)) setDisplayMode(saved);
+    } catch {
+      // Keep the admin-configured default if browser storage is unavailable.
     }
-  }, [settingsScope, isAdmin]);
+
+    if (!phone) return;
+    let active = true;
+    getTopicDisplayPreferences(phone).then(({ success, preferences }) => {
+      if (!active || !success) return;
+      const saved = preferences?.[preferenceKey];
+      if (typeof saved !== 'string' || !isSupportedMode(saved)) return;
+      setDisplayMode(saved);
+      try {
+        window.localStorage.setItem(storageKey, saved);
+      } catch {
+        // Cloud preference remains authoritative when local storage is unavailable.
+      }
+    });
+    return () => { active = false; };
+  }, [settingsScope, isAdmin, isAdminResolved, initialDisplay, userPhoneRevision]);
 
   const handleMove = async (index: number, direction: 'up' | 'down') => {
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
@@ -227,9 +269,22 @@ export default function TopicListClient({
   const handleChangeDisplay = async (mode: TopicsDisplayMode) => {
     const prev = displayMode;
     setDisplayMode(mode);
-    if (!isAdmin) {
-      const storageKey = settingsScope === 'page' ? 'qbiz_topics_page_display' : 'qbiz_home_topics_display';
-      window.localStorage.setItem(storageKey, mode);
+    const admin = isAdminResolved ? isAdmin : await checkIsAdminClient();
+    if (admin !== isAdmin) {
+      setIsAdmin(admin);
+      setIsAdminResolved(true);
+    }
+    if (!admin) {
+      const scope: TopicDisplayScope = settingsScope === 'page' ? 'page' : 'home';
+      const phone = getUserPhone();
+      try {
+        window.localStorage.setItem(getTopicDisplayPreferenceKey(scope, phone), mode);
+      } catch {
+        // Continue with a cloud save for signed-in users.
+      }
+      if (phone && !(await saveTopicDisplayPreference(phone, scope, mode))) {
+        alert('Đã đổi kiểu hiển thị trên thiết bị này nhưng chưa đồng bộ được với tài khoản. Vui lòng thử lại khi có kết nối.');
+      }
       return;
     }
     const field = settingsScope === 'page' ? 'topics_page_display' : 'home_topics_display';
@@ -345,13 +400,13 @@ export default function TopicListClient({
                 title="Chọn cách hiển thị chuyên đề"
                 aria-label="Chọn cách hiển thị chuyên đề"
                 aria-expanded={showDisplayMenu}
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-300/60 bg-slate-100/55 text-slate-400/75 transition-colors hover:bg-slate-200/70 hover:text-slate-500 active:scale-95"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-300/70 bg-slate-100/70 text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-700 active:scale-95 dark:border-white/15 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/15 dark:hover:text-white"
               >
                 <SlidersHorizontal size={16} strokeWidth={2} />
               </button>
               {showDisplayMenu && (
-                <div className="absolute right-0 top-10 z-30 w-44 rounded-[14px] border border-slate-200 bg-white p-1.5 shadow-lg">
-                  <span className="px-2 pt-1 text-[10.5px] font-extrabold uppercase text-muted">Chọn cách hiển thị</span>
+                <div className="absolute right-0 top-10 z-30 w-44 rounded-[14px] border border-slate-200 bg-white p-1.5 shadow-lg dark:border-white/15 dark:bg-[#1B1431]">
+                  <span className="px-2 pt-1 text-[10.5px] font-extrabold uppercase text-slate-500 dark:text-slate-300">Chọn cách hiển thị</span>
                   {displayOptions.map((opt) => (
                     <button
                       key={opt.value}
@@ -361,7 +416,7 @@ export default function TopicListClient({
                         setShowDisplayMenu(false);
                       }}
                       className={`block h-8 w-full rounded-[8px] px-2.5 text-left text-[12.5px] font-bold ${
-                        displayMode === opt.value ? 'bg-primary text-white' : 'text-slate-700 hover:bg-primary-soft'
+                        displayMode === opt.value ? 'bg-primary text-white' : 'text-slate-700 hover:bg-primary-soft dark:text-slate-200 dark:hover:bg-white/10'
                       }`}
                     >
                       {opt.label}
@@ -455,13 +510,13 @@ export default function TopicListClient({
                 onClick={() => setShowDisplayMenu((v) => !v)}
                 title="Kiểu hiển thị chuyên đề"
                 aria-label="Kiểu hiển thị chuyên đề"
-                className="w-11 h-11 rounded-[15px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 text-[#1E3A8A] flex items-center justify-center cursor-pointer active:scale-95 transition-transform shadow-2xs"
+                className="w-11 h-11 rounded-[15px] bg-white dark:bg-[#21183A] border border-slate-200 dark:border-white/15 text-[#1E3A8A] dark:text-slate-100 flex items-center justify-center cursor-pointer active:scale-95 transition-transform shadow-2xs"
               >
                 <SlidersHorizontal size={20} strokeWidth={2.4} />
               </button>
               {showDisplayMenu && (
                 <div className="absolute right-0 top-11 z-30 w-44 p-1.5 rounded-[14px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 shadow-lg flex flex-col gap-1">
-                  <span className="text-[10.5px] font-extrabold uppercase text-muted px-2 pt-1">Chọn bố cục</span>
+                  <span className="text-[10.5px] font-extrabold uppercase text-muted dark:text-slate-300 px-2 pt-1">Chọn bố cục</span>
                   {displayOptions.map((opt) => (
                     <button
                       key={opt.value}
@@ -470,8 +525,8 @@ export default function TopicListClient({
                         handleChangeDisplay(opt.value);
                         setShowDisplayMenu(false);
                       }}
-                      className={`h-8 px-2.5 rounded-[8px] text-left text-[12.5px] font-bold cursor-pointer ${
-                        displayMode === opt.value ? 'bg-primary text-white' : 'text-slate-700 hover:bg-primary-soft'
+                  className={`h-8 px-2.5 rounded-[8px] text-left text-[12.5px] font-bold cursor-pointer ${
+                        displayMode === opt.value ? 'bg-primary text-white' : 'text-slate-700 hover:bg-primary-soft dark:text-slate-200 dark:hover:bg-white/10'
                       }`}
                     >
                       {opt.label}
@@ -493,7 +548,7 @@ export default function TopicListClient({
       {/* Chọn kiểu hiển thị chuyên đề (chỉ quản trị viên thấy) */}
       {isAdmin && !enableSearch && (
         <div className="flex items-center gap-1.5 flex-wrap p-1.5 rounded-[12px] bg-slate-100 dark:bg-white/5 border border-line">
-          <span className="text-[11px] font-extrabold uppercase text-muted px-1.5">Kiểu hiển thị</span>
+          <span className="text-[11px] font-extrabold uppercase text-muted dark:text-slate-300 px-1.5">Kiểu hiển thị</span>
           {displayOptions.map((opt) => (
             <button
               key={opt.value}
@@ -502,7 +557,7 @@ export default function TopicListClient({
               className={`h-7 px-2.5 rounded-[8px] text-[12px] font-bold cursor-pointer transition-colors ${
                 displayMode === opt.value
                   ? 'bg-[#1E3A8A] text-amber-300 shadow-xs'
-                  : 'bg-white dark:bg-[#1E1342] text-slate-600 dark:text-purple-200 border border-line'
+                  : 'bg-white dark:bg-[#261B40] text-slate-700 dark:text-[#E6DCFA] border border-line'
               }`}
             >
               {opt.label}

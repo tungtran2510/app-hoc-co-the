@@ -229,14 +229,26 @@ export default function SavedPages() {
             if (item.kind && item.kind !== 'page') {
               const kindLabel = item.kind === 'video' ? 'Video' : item.kind === 'book' ? 'Sách' : 'Danh sách phát';
               const KindIcon = item.kind === 'video' ? PlayCircle : item.kind === 'book' ? BookOpen : ListVideo;
+              const isGridView = savedView === 'grid';
               return (
                 <div
                   key={item.page_id}
-                  className={`relative flex min-w-0 items-center gap-2 rounded-[15px] border border-slate-200/80 bg-white shadow-[0_5px_16px_-16px_rgba(15,23,42,.5)] dark:border-purple-800/40 dark:bg-[#160D30] ${savedView === 'compact' ? 'p-2' : 'p-2.5'}`}
+                  className={`relative flex min-w-0 items-center gap-2 rounded-[15px] border border-slate-200/80 bg-white shadow-[0_5px_16px_-16px_rgba(15,23,42,.5)] dark:border-purple-800/40 dark:bg-[#160D30] ${isGridView ? 'p-2 pt-9' : savedView === 'compact' ? 'p-2' : 'p-2.5'}`}
                 >
+                  {isGridView && (
+                    <button
+                      type="button"
+                      onClick={(e) => handleRemove(e, item)}
+                      className="absolute left-2 top-1.5 z-10 flex h-6 w-7 cursor-pointer items-center justify-center rounded-[8px] bg-blue-50 text-blue-700 transition-colors hover:bg-red-50 hover:text-red-600 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-red-950/40"
+                      aria-label="Bỏ lưu mục này"
+                      title="Bỏ lưu"
+                    >
+                      <BookmarkCheck size={14} />
+                    </button>
+                  )}
                   <Link
                     href={item.href || `/${item.topic_slug}/${item.page_slug}`}
-                    className="flex min-w-0 flex-1 items-center gap-2 active:opacity-80 transition-opacity"
+                    className={`flex min-w-0 flex-1 items-start gap-2 active:opacity-80 transition-opacity ${isGridView ? 'gap-2.5' : 'items-center'}`}
                   >
                     <div className="flex shrink-0 flex-col items-center gap-1">
                       <div className={`relative aspect-video overflow-hidden bg-primary-soft border border-slate-200 dark:border-purple-800/50 flex items-center justify-center text-primary ${savedView === 'compact' ? 'w-[54px] rounded-[9px]' : 'w-[62px] rounded-[10px]'}`}>
@@ -253,7 +265,7 @@ export default function SavedPages() {
                       {item.kind !== 'video' && <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-primary dark:text-[#F8DF7B]">
                         <KindIcon size={11} /> {kindLabel}
                       </span>}
-                      <h3 className="text-[12px] font-bold text-slate-900 dark:text-white leading-snug line-clamp-2">
+                      <h3 className={`break-words text-[12px] font-bold text-slate-900 dark:text-white leading-snug ${isGridView ? '' : 'line-clamp-2'}`}>
                         {item.page_title}
                       </h3>
                       {(item.subtitle || item.topic_title) && (
@@ -263,7 +275,7 @@ export default function SavedPages() {
                       )}
                     </div>
                   </Link>
-                  <button
+                  {!isGridView && <button
                     type="button"
                     onClick={(e) => handleRemove(e, item)}
                     className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-[9px] bg-blue-50 text-blue-700 transition-colors hover:bg-red-50 hover:text-red-600 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-red-950/40"
@@ -271,7 +283,7 @@ export default function SavedPages() {
                     title="Bỏ lưu"
                   >
                     <BookmarkCheck size={17} />
-                  </button>
+                  </button>}
                 </div>
               );
             }
@@ -299,7 +311,7 @@ export default function SavedPages() {
             return (
               <div
                 key={item.page_id}
-                className="flex min-w-0 items-center gap-2 rounded-[15px] border border-slate-200/90 bg-white px-2.5 py-2 shadow-[0_5px_16px_-16px_rgba(15,23,42,.5)] transition-colors dark:border-purple-800/40 dark:bg-[#160D30] group"
+                className="relative flex min-w-0 items-center gap-2 rounded-[15px] border border-slate-200/90 bg-white px-2.5 pb-2 pt-9 shadow-[0_5px_16px_-16px_rgba(15,23,42,.5)] transition-colors dark:border-purple-800/40 dark:bg-[#160D30] group"
               >
                 {/* Hàng trên: Logo chuyên đề + Tiêu đề + Nút xóa */}
                 <div className="flex min-w-0 flex-1 items-start gap-2.5">
@@ -326,16 +338,17 @@ export default function SavedPages() {
                       #{item.page_number}
                     </span>
                     </div>
-                    <button
-                      type="button"
-                      onClick={(e) => handleRemove(e, item)}
-                      className="flex h-7 w-10 shrink-0 cursor-pointer items-center justify-center rounded-[8px] bg-blue-50 text-blue-700 transition-colors hover:bg-red-50 hover:text-red-600 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-red-950/40"
-                      aria-label="Bỏ lưu bài học"
-                      title="Bỏ lưu bài học này"
-                    >
-                      <BookmarkCheck size={15} />
-                    </button>
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={(e) => handleRemove(e, item)}
+                    className="absolute left-2 top-2 z-10 flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-[9px] border border-blue-100 bg-white/95 text-blue-700 shadow-sm transition-colors hover:bg-red-50 hover:text-red-600 dark:border-blue-900/50 dark:bg-[#201743] dark:text-blue-300 dark:hover:bg-red-950/40"
+                    aria-label="Bỏ lưu bài học"
+                    title="Bỏ lưu bài học này"
+                  >
+                    <BookmarkCheck size={15} />
+                  </button>
 
                   {/* Thông tin bài học */}
                   <div className="min-w-0 flex-1">

@@ -481,14 +481,18 @@ export function AuthorBooksSection({
       )}
 
       {/* Tiêu đề mục sách tác giả */}
-      <div className="flex flex-col gap-1">
-        <div className="px-0.5">
-          <h3 className="text-left text-[20px] sm:text-[24px] font-black tracking-tight text-[#071735] dark:text-white leading-tight break-words line-clamp-2">
-            {profile.books_title || 'Sách & Tác phẩm đã làm'}
-          </h3>
+      <div className="flex flex-col gap-1.5 border-b border-slate-200/80 pb-3 dark:border-white/10">
+        <div className="flex items-center gap-2 px-0.5">
+          <span aria-hidden="true" className="h-8 w-[3px] shrink-0 rounded-full bg-gradient-to-b from-[#315F9E] to-[#D9B44A]" />
+          <div className="min-w-0">
+            <p className="mb-0.5 text-[9px] font-extrabold uppercase tracking-[0.16em] text-[#58708F] dark:text-blue-300">Thư viện tác phẩm</p>
+            <h3 className="break-words text-left text-[19px] font-extrabold leading-tight tracking-[-0.025em] text-[#102144] dark:text-white sm:text-[23px]">
+              {profile.books_title || 'Sách & Tác phẩm đã làm'}
+            </h3>
+          </div>
         </div>
         {profile.books_subtitle && (
-          <p className="text-[12px] sm:text-[12.5px] text-slate-500 dark:text-slate-400 leading-normal">
+          <p className="pl-[13px] text-[12px] leading-relaxed text-slate-500 dark:text-slate-400 sm:text-[12.5px]">
             {profile.books_subtitle}
           </p>
         )}
@@ -511,10 +515,12 @@ export function AuthorBooksSection({
             return (
               <React.Fragment key={`${book.id}-${variant || 'single'}`}>
               {idx === 1 && (
-                <div className="col-span-2 flex items-center justify-between pt-1">
-                  <h4 className="text-[15px] sm:text-[18px] font-black tracking-tight text-[#071735] dark:text-white">
+                <div className="col-span-2 flex items-center gap-2.5 border-t border-slate-200/80 pt-3 dark:border-white/10">
+                  <span aria-hidden="true" className="h-5 w-[3px] shrink-0 rounded-full bg-[#315F9E] dark:bg-blue-300" />
+                  <h4 className="shrink-0 text-[13px] font-bold tracking-tight text-[#29466F] dark:text-slate-100 sm:text-[15px]">
                     Các tác phẩm khác
                   </h4>
+                  <span aria-hidden="true" className="h-px flex-1 bg-slate-200/80 dark:bg-white/10" />
                 </div>
               )}
               <ScrollReveal
