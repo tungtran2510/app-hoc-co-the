@@ -4,6 +4,7 @@ import { getSettings } from '../../../../lib/data';
 import { sampleTopics, samplePages, sampleBlocks } from '../../../../data/sample';
 import { getSupabaseClient } from '../../../../lib/supabaseClient';
 import { retrieveKnowledge, formatKnowledgeForPrompt, KnowledgeExcerpt } from '../../../../lib/aiKnowledgeRetrieval';
+import { getMasterKnowledgeDocs } from '../../../../lib/aiKnowledgeServer';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -639,8 +640,12 @@ export async function POST(req: NextRequest) {
     const deepseekKey = process.env.DEEPSEEK_API_KEY;
     const geminiKey = process.env.GEMINI_API_KEY;
 
-    // 3b. TRUY XUẤT CÁC ĐOẠN TÀI LIỆU LIÊN QUAN TỪ KHO TÀI LIỆU TÁC GIẢ NẠP TRONG ADMIN
-    const excerpts = retrieveKnowledge(question, aiTraining?.documents);
+    // 3b. TRUY XUẤT CÁC ĐOẠN TÀI LIỆU LIÊN QUAN TỪ KHO TÀI LIỆU MASTER (< 1ms từ RAM)
+    const masterDocs = getMasterKnowledgeDocs();
+    const allDocs = (Array.isArray(aiTraining?.documents) && aiTraining.documents.length > 0)
+      ? [...masterDocs, ...aiTraining.documents]
+      : masterDocs;
+    const excerpts = retrieveKnowledge(question, allDocs);
     const knowledgeText = formatKnowledgeForPrompt(excerpts);
     const authorGuidelines = (aiTraining?.guidelines || '').trim();
 

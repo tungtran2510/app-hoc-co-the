@@ -29,12 +29,7 @@ export default function BottomNav() {
     event: React.MouseEvent<HTMLAnchorElement>,
     href: string
   ) => {
-    event.preventDefault();
     setOptimisticTarget(href);
-    // Keep the primary navigation reliable even when an outdated App Router
-    // client cache has a stale RSC payload. A document navigation fetches the
-    // current route and its matching server-rendered content together.
-    window.location.assign(href);
   };
 
   const isHome = activePath === '/';

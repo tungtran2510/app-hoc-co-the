@@ -52,6 +52,19 @@ export default function EditAiTrainingModal({
       setSuccessMsg('');
       if (normalized.documents && normalized.documents.length > 0) {
         setExpandedDocId(normalized.documents[0].id);
+      } else {
+        // Tải đầy đủ tài liệu phục vụ quản trị Admin theo yêu cầu
+        fetch('/api/ai/training?full=1')
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.success && Array.isArray(data.ai_training?.documents)) {
+              setDocuments(data.ai_training.documents);
+              if (data.ai_training.documents.length > 0) {
+                setExpandedDocId(data.ai_training.documents[0].id);
+              }
+            }
+          })
+          .catch(() => {});
       }
     }
   }, [isOpen, initialConfig]);

@@ -175,7 +175,7 @@ interface CacheEntry<T> {
   expiry: number;
 }
 const dataCache = new Map<string, CacheEntry<any>>();
-const CACHE_TTL_MS = 5 * 1000; // 5 giây để cập nhật tức thì khi Admin chỉnh sửa hoặc F5
+const CACHE_TTL_MS = 20 * 1000; // 20 giây tối ưu hiệu năng, tự động làm mới tức thì khi Admin bấm lưu
 
 export function clearDataCache(keyPrefix?: string): void {
   if (!keyPrefix) {
@@ -441,6 +441,51 @@ export async function getBlocksByPage(pageId: string, includeHidden = false): Pr
     return sampleBlocks
       .filter((b) => b.page_id === pageId && (includeHidden || b.is_visible))
       .sort((a, b) => a.sort_order - b.sort_order);
+  });
+}
+
+export async function getAllPages(includeHidden = false): Promise<Page[]> {
+  const cacheKey = `all_pages:${includeHidden}`;
+  return getCachedOrFetch(cacheKey, async () => {
+    const supabase = getSupabase();
+    if (supabase) {
+      try {
+        let query = supabase.from('pages').select('*');
+        if (!includeHidden) {
+          query = query.eq('is_visible', true).eq('status', 'published');
+        }
+        const { data } = await query.order('sort_order', { ascending: true });
+        if (data) return data as Page[];
+      } catch {
+        // fallback
+      }
+    }
+    return samplePages
+      .filter((p) => includeHidden || (p.is_visible && p.status === 'published'))
+      .sort((a, b) => a.sort_order - b.sort_order);
+  });
+}
+
+export async function getAllBlocks(includeHidden = false): Promise<Block[]> {
+  const cacheKey = `all_blocks:${includeHidden}`;
+  return getCachedOrFetch(cacheKey, async () => {
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      try {
+        let query = supabase.from('blocks').select('*');
+        if (!includeHidden) {
+          query = query.eq('is_visible', true);
+        }
+        const { data } = await query.order('sort_order', { ascending: true });
+        if (data && data.length > 0) return data.map(decodeBlockRow);
+      } catch {
+        // fallback
+      }
+    }
+    return sampleBlocks
+      .filter((b) => includeHidden || b.is_visible)
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .map(decodeBlockRow);
   });
 }
 

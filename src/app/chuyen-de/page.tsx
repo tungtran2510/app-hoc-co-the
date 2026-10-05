@@ -1,6 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
-import { getBlocksByPage, getPagesByTopic, getSettings, getTopicsWithCounts } from '../../lib/data';
+import { getAllBlocks, getAllPages, getSettings, getTopicsWithCounts } from '../../lib/data';
 import TopicListClient from '../../components/TopicListClient';
 import BottomNav from '../../components/BottomNav';
 import { Block } from '../../lib/types';
@@ -13,7 +13,12 @@ export const metadata: Metadata = {
 };
 
 export default async function AllTopicsPage() {
-  const [settings, topicsWithCounts] = await Promise.all([getSettings(), getTopicsWithCounts(true)]);
+  const [settings, topicsWithCounts, allPages, allBlocks] = await Promise.all([
+    getSettings(),
+    getTopicsWithCounts(true),
+    getAllPages(true),
+    getAllBlocks(true),
+  ]);
   const visibleTopics = topicsWithCounts.filter(({ topic }) => topic.is_visible);
   const topicFaqs: Array<{
     id: string; blockId: string; itemId: string; block: Extract<Block, { type: 'faq' }>;
@@ -21,11 +26,33 @@ export default async function AllTopicsPage() {
     learningAnswers: Array<{ id: string; text: string; topicId: string; topicTitle: string; destinationType?: 'video' | 'topic'; href?: string; videoTitle: string; thumbnailUrl?: string | null }>;
     videos: { title: string; thumbnailUrl?: string | null; href: string }[];
   }> = [];
-  const topicPageRecords: Array<{ topic: (typeof visibleTopics)[number]['topic']; page: Awaited<ReturnType<typeof getPagesByTopic>>[number]; blocks: Awaited<ReturnType<typeof getBlocksByPage>>; videos: { title: string; thumbnailUrl?: string | null; href: string }[] }> = [];
-  await Promise.all(visibleTopics.map(async ({ topic }) => {
-    const pages = await getPagesByTopic(topic.id, true);
-    await Promise.all(pages.map(async (page) => {
-      const blocks = await getBlocksByPage(page.id);
+  const topicPageRecords: Array<{ topic: (typeof visibleTopics)[number]['topic']; page: (typeof allPages)[number]; blocks: Block[]; videos: { title: string; thumbnailUrl?: string | null; href: string }[] }> = [];
+
+  // Nhóm blocks và pages theo id trong bộ nhớ RAM (0ms)
+  const blocksByPageMap = new Map<string, Block[]>();
+  for (const b of allBlocks) {
+    const list = blocksByPageMap.get(b.page_id);
+    if (list) {
+      list.push(b);
+    } else {
+      blocksByPageMap.set(b.page_id, [b]);
+    }
+  }
+
+  const pagesByTopicMap = new Map<string, typeof allPages>();
+  for (const p of allPages) {
+    const list = pagesByTopicMap.get(p.topic_id);
+    if (list) {
+      list.push(p);
+    } else {
+      pagesByTopicMap.set(p.topic_id, [p]);
+    }
+  }
+
+  for (const { topic } of visibleTopics) {
+    const pages = (pagesByTopicMap.get(topic.id) || []).sort((a, b) => a.sort_order - b.sort_order);
+    for (const page of pages) {
+      const blocks = blocksByPageMap.get(page.id) || [];
       let videoIndex = 0;
       const videos = blocks.flatMap((block) => block.type === 'videos' && Array.isArray(block.data?.videos)
         ? block.data.videos.map((video) => {
@@ -35,9 +62,8 @@ export default async function AllTopicsPage() {
           })
         : []);
       topicPageRecords.push({ topic, page, blocks, videos });
-    }));
-  }));
-  topicPageRecords.sort((a, b) => visibleTopics.findIndex(({ topic }) => topic.id === a.topic.id) - visibleTopics.findIndex(({ topic }) => topic.id === b.topic.id) || a.page.sort_order - b.page.sort_order);
+    }
+  }
   const faqVideoOptions = topicPageRecords.flatMap(({ topic, page, blocks }) => {
     let index = 0;
     return blocks.flatMap((block) => block.type === 'videos' && Array.isArray(block.data?.videos) ? block.data.videos.map((video) => {

@@ -98,44 +98,23 @@ export default function PwaRegistrar() {
 
     const alreadyInstalled = checkStandalone();
 
-    // 3. Tự động tải sẵn ngầm tất cả các trang & dữ liệu cốt lõi (Aggressive Idle Prefetching)
+    // 3. Tự động tải sẵn ngầm các trang cốt lõi một cách nhẹ nhàng (Gentle Prefetching)
     const runIdlePrefetch = () => {
-      const routesToPrefetch = [
-        '/',
-        '/tro-ly-ai',
-        '/da-luu',
-        '/chuyen-de',
-        '/tim-kiem',
-        '/cot-song',
-        '/cot-song/tong-quan-ve-cot-song',
-        '/cot-song/tu-the-va-van-dong',
-        '/dinh-duong',
-        '/co-the-nguoi',
-      ];
+      try {
+        if (sessionStorage.getItem('app_prefetched_v2')) return;
+        sessionStorage.setItem('app_prefetched_v2', '1');
+      } catch {}
 
-      routesToPrefetch.forEach((route) => {
-        // Tải cả file HTML lẫn RSC payload để khi bấm là mở ngay 0ms
+      const coreRoutes = ['/chuyen-de', '/da-luu', '/tro-ly-ai'];
+      coreRoutes.forEach((route) => {
         fetch(route, { priority: 'low' }).catch(() => {});
-        fetch(`${route}?_rsc=1`, { priority: 'low' }).catch(() => {});
       });
-
-      // Tải trước cấu hình trợ lý AI
-      fetch('/api/ai/training', { priority: 'low' })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data?.success && data.ai_training) {
-            try {
-              localStorage.setItem('app_ai_training_cache_v1', JSON.stringify(data.ai_training));
-            } catch {}
-          }
-        })
-        .catch(() => {});
     };
 
     if ('requestIdleCallback' in window) {
-      (window as any).requestIdleCallback(runIdlePrefetch, { timeout: 1200 });
+      (window as any).requestIdleCallback(runIdlePrefetch, { timeout: 3500 });
     } else {
-      setTimeout(runIdlePrefetch, 600);
+      setTimeout(runIdlePrefetch, 2500);
     }
 
     // 4. Bắt sự kiện cài đặt PWA
