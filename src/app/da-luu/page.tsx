@@ -232,8 +232,8 @@ export default function SavedPages() {
 
             if (savedView === 'grid') {
               return (
-                <article key={item.page_id} className={`grid min-w-0 grid-cols-1 gap-1.5 rounded-[15px] border border-slate-200/80 bg-white p-2.5 shadow-[0_5px_16px_-16px_rgba(15,23,42,.5)] dark:border-purple-800/40 dark:bg-[#160D30] ${savedList.length === 1 ? 'col-span-2 grid-cols-[112px_minmax(0,1fr)] sm:col-span-1 sm:grid-cols-1' : ''}`}>
-                  <div className={`flex h-7 min-w-0 items-center justify-between gap-2 ${savedList.length === 1 ? 'col-span-2 sm:col-span-1' : ''}`}>
+                <article key={item.page_id} className="flex min-w-0 flex-col gap-1.5 rounded-[15px] border border-slate-200/80 bg-white p-2.5 shadow-[0_5px_16px_-16px_rgba(15,23,42,.5)] dark:border-purple-800/40 dark:bg-[#160D30]">
+                  <div className="flex h-7 min-w-0 items-center justify-between gap-2">
                     <span className="inline-flex min-w-0 items-center gap-1 truncate text-[9px] font-black uppercase tracking-wide text-primary dark:text-blue-300">
                       <KindIcon size={12} className="shrink-0" />
                       <span className="truncate">{kindLabel}</span>
