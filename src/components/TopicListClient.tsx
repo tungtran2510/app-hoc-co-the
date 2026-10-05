@@ -16,7 +16,6 @@ import EditTopicModal from './admin/EditTopicModal';
 import EditBlockModal from './admin/EditBlockModal';
 import VideoLessonLink from './VideoLessonLink';
 import SectionOrderControls from './admin/SectionOrderControls';
-import ScrollReveal from './ScrollReveal';
 import {
   getTopicDisplayPreferenceKey,
   getTopicDisplayPreferences,
@@ -740,10 +739,8 @@ export default function TopicListClient({
           if (enableSearch && query.trim().length === 0 && featuredTopicIds.includes(topic.id)) return null;
 
           return (
-            <ScrollReveal
+            <div
               key={topic.id}
-              animation="bubble-pop"
-              delay={Math.min(index * 60, 480)}
               className="relative flex flex-col group"
             >
               <div className="relative">
@@ -834,7 +831,7 @@ export default function TopicListClient({
                   </div>
                 </div>
               )}
-            </ScrollReveal>
+            </div>
           );
         })}
       </div>
