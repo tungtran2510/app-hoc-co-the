@@ -279,13 +279,15 @@ export default function EditBlockModal({
   const [faqAdditionalVideoSearch, setFaqAdditionalVideoSearch] = useState<Record<string, string>>({});
   const [faqAdditionalVideoSearchActive, setFaqAdditionalVideoSearchActive] = useState<Record<string, boolean>>({});
   const [expandedFaqAnswers, setExpandedFaqAnswers] = useState<Record<string, boolean>>({});
+  const [expandedFaqItems, setExpandedFaqItems] = useState<Record<string, boolean>>({});
   const [faqAnswerLinkMode, setFaqAnswerLinkMode] = useState<Record<string, 'topic' | 'video'>>({});
 
   const handleAddFaqItem = () => {
+    const id = generateUuid();
     setFaqItems([
       ...faqItems,
       {
-        id: generateUuid(),
+        id,
         question: '',
         answer: '',
         is_visible: true,
@@ -293,6 +295,7 @@ export default function EditBlockModal({
         learning_answers: [],
       },
     ]);
+    setExpandedFaqItems((current) => ({ ...current, [id]: true }));
   };
 
   const handleUpdateFaqItem = (id: string, updates: Partial<{ question: string; answer: string; is_visible: boolean; image_url: string; resources: FaqResource[]; learning_answers: Array<{ id: string; text: string; target_topic_id?: string; target_page_id: string; target_video_index: number; video_links?: Array<{ id: string; target_topic_id: string; target_page_id: string; target_video_index: number }> }> }>) => {
@@ -2340,10 +2343,11 @@ export default function EditBlockModal({
                         key={item.id || idx}
                         className="p-2.5 rounded-[10px] bg-white dark:bg-[#1A0E35] border border-line flex flex-col gap-2"
                       >
-                        <div className="flex items-center justify-between pb-1.5 border-b border-line/60">
-                          <span className="text-[12px] font-bold text-ink">
-                            Câu {idx + 1}
-                          </span>
+                        <div className="flex items-center justify-between gap-1">
+                          <button type="button" onClick={() => setExpandedFaqItems((current) => ({ ...current, [item.id]: !current[item.id] }))} aria-expanded={!!expandedFaqItems[item.id]} aria-label={`${expandedFaqItems[item.id] ? 'Thu gọn' : 'Mở'} câu hỏi: ${item.question || `Câu hỏi mới ${idx + 1}`}`} className="flex min-w-0 flex-1 items-center gap-1.5 text-left text-[12px] font-bold text-ink">
+                            {expandedFaqItems[item.id] ? <ChevronUp size={15} className="shrink-0" /> : <ChevronDown size={15} className="shrink-0" />}
+                            <span className="truncate">{item.question || `Câu hỏi mới ${idx + 1}`}</span>
+                          </button>
                           <div className="flex items-center gap-1">
                             <button
                               type="button"
@@ -2383,15 +2387,14 @@ export default function EditBlockModal({
                           </div>
                         </div>
 
+                        {expandedFaqItems[item.id] && <>
                         <div className="flex flex-col gap-1">
-                          <label className="text-[11.5px] font-bold text-ink">
-                            Câu hỏi <span className="text-red-500">*</span>
-                          </label>
                           <input
                             type="text"
                             value={item.question}
                             onChange={(e) => handleUpdateFaqItem(item.id, { question: e.target.value })}
                             placeholder="Nhập câu hỏi…"
+                            aria-label={`Câu hỏi ${idx + 1}`}
                             className="w-full h-8.5 px-2.5 rounded-[8px] bg-surface border border-line text-[13px] font-bold text-ink focus:border-primary focus:outline-hidden"
                           />
                         </div>
@@ -2519,6 +2522,7 @@ export default function EditBlockModal({
                             </div>
                           ))}
                         </div>
+                        </>}
                         </>}
                       </div>
                     ))}
