@@ -28,6 +28,10 @@ const PRECACHE_SHELL_URLS = [
   '/spine_hero_clean.png',
 ];
 
+// Next App Router payloads (RSC) phải luôn khớp với HTML/JS đang chạy.
+// Cache RSC cũ theo từng request đã khiến một trang cũ có thể gắn lại modal
+// toàn màn hình và chặn thao tác sau khi người dùng chuyển tab.
+
 // Cài đặt SW & Tải sẵn Shell ngầm vào điện thoại
 self.addEventListener('install', (event) => {
   self.skipWaiting();
@@ -101,22 +105,22 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 3. Next.js App Router RSC Payloads (?_rsc=... hoặc header RSC=1)
-  // Chiến lược: STALE-WHILE-REVALIDATE -> Chuyển tab / vào bài học phản hồi ngay lập tức 0ms!
+  // 3. Next.js App Router RSC Payloads: luôn dùng mạng khi online để tránh
+  // ghép giao diện từ cache cũ với bundle mới. Cache chỉ là fallback offline.
   const isRSC = url.searchParams.has('_rsc') || request.headers.get('rsc') === '1' || request.headers.get('RSC') === '1';
   if (isRSC) {
     event.respondWith(
       caches.open(CACHE_NAME).then(async (cache) => {
         const cachedResponse = await cache.match(request);
-        const fetchPromise = fetch(request)
-          .then((networkResponse) => {
-            if (networkResponse.status === 200) {
-              cache.put(request, networkResponse.clone());
-            }
-            return networkResponse;
-          })
-          .catch(() => cachedResponse);
-        return cachedResponse || fetchPromise;
+        try {
+          const networkResponse = await fetch(request);
+          if (networkResponse.status === 200) {
+            cache.put(request, networkResponse.clone());
+          }
+          return networkResponse;
+        } catch {
+          return cachedResponse || new Response('Offline page data unavailable', { status: 503 });
+        }
       })
     );
     return;

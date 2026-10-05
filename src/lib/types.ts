@@ -183,6 +183,13 @@ export interface FileItem {
   size_bytes?: number;
 }
 
+export interface FaqResource {
+  title: string;
+  url: string;
+  kind?: 'video' | 'link';
+  thumbnail_url?: string;
+}
+
 export type Block =
   | {
       id: string;
@@ -265,10 +272,27 @@ export type Block =
       is_visible: boolean;
       data: {
         title?: string;
+        description?: string;
+        /** Separates topic-page FAQs from the independent all-topics FAQ collection. */
+        faq_surface?: 'topic' | 'overview';
+        scope?: 'topic' | 'video';
+        target_page_id?: string;
+        target_video_index?: number;
         items: Array<{
           id: string;
           question: string;
           answer: string;
+          is_visible?: boolean;
+          image_url?: string;
+          resources?: FaqResource[];
+          learning_answers?: Array<{
+            id: string;
+            text: string;
+            target_topic_id?: string;
+            target_page_id: string;
+            target_video_index: number;
+            video_links?: Array<{ id: string; target_topic_id: string; target_page_id: string; target_video_index: number }>;
+          }>;
         }>;
       };
     }

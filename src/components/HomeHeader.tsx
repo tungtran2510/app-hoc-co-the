@@ -590,7 +590,7 @@ export default function HomeHeader({
 
       {/* Modal Nhập tên khách hàng Chào mừng */}
       {showNameModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-20 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
           <div className="w-full max-w-sm rounded-[24px] bg-white dark:bg-[#180E32] border border-slate-200 dark:border-[#3A2268] p-5 shadow-2xl flex flex-col gap-3.5 animate-in zoom-in-95 duration-200">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-purple-900/50 flex items-center justify-center text-xl shrink-0">

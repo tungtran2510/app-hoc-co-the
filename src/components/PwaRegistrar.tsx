@@ -73,7 +73,10 @@ export default function PwaRegistrar() {
               if (installing) {
                 installing.addEventListener('statechange', () => {
                   if (installing.state === 'installed' && navigator.serviceWorker.controller) {
-                    window.location.reload();
+                    // Activate the new worker for the next navigation, but do
+                    // not reload in the middle of a user's current session.
+                    // Reloading while a route transition is in flight can pair
+                    // stale page state with a new bundle and leave overlays on top.
                   }
                 });
               }

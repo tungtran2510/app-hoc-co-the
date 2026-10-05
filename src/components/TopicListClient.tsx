@@ -1,16 +1,20 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { Plus, Edit2, ArrowUp, ArrowDown, Eye, EyeOff, Trash2, Check, X, BookOpen, LayoutGrid, Lightbulb, Search, SlidersHorizontal, Star, Flame, ChevronDown, CircleHelp, Play } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Plus, Edit2, ArrowUp, ArrowDown, Eye, EyeOff, Trash2, Check, X, BookOpen, LayoutGrid, Lightbulb, Search, SlidersHorizontal, Star, Flame, ChevronDown, CircleHelp, Play, Pencil } from 'lucide-react';
 import TopicTile, { TopicsDisplayMode, TOPICS_DISPLAY_OPTIONS, topicsContainerClass } from './TopicTile';
 import { DEFAULT_TOPIC_COVERS } from './TopicCard';
-import { Topic, TopicsGuide } from '../lib/types';
+import { Block, Topic, TopicsGuide } from '../lib/types';
+import { generateUuid } from '../lib/uuid';
 import TopicsGuideModal from './TopicsGuideModal';
 import { checkIsAdminClient } from '../lib/adminAuth';
-import { saveTopicApi, deleteTopicApi } from '../lib/apiAdmin';
+import { getAdminHeaders, saveBlockApi, saveTopicApi, deleteTopicApi } from '../lib/apiAdmin';
 import { saveSettingsApi } from '../lib/apiAdmin';
 import EditTopicModal from './admin/EditTopicModal';
+import EditBlockModal from './admin/EditBlockModal';
+import VideoLessonLink from './VideoLessonLink';
 import SectionOrderControls from './admin/SectionOrderControls';
 import ScrollReveal from './ScrollReveal';
 import {
@@ -42,13 +46,20 @@ interface TopicListClientProps {
   initialFeaturedTopicIds?: string[] | null;
   initialFaqs?: {
     id: string;
+    blockId: string;
+    itemId: string;
+    block: Extract<Block, { type: 'faq' }>;
     question: string;
     answer: string;
+    topicId: string;
     topicTitle: string;
     topicSlug: string;
     pageTitle: string;
+    learningAnswers: { id: string; text: string; topicId: string; topicTitle: string; destinationType?: 'video' | 'topic'; href?: string; videoTitle: string; thumbnailUrl?: string | null; linkedVideos?: Array<{ href: string; title: string; thumbnailUrl?: string | null }> }[];
     videos: { title: string; thumbnailUrl?: string | null; href: string }[];
   }[];
+  initialFaqVideos?: { key: string; page_id: string; page_title: string; page_slug: string; video_title: string; thumbnail_url?: string | null; index: number; topic_id: string; topic_title: string; topic_slug: string }[];
+  initialFaqTopics?: { id: string; title: string }[];
   settingsScope?: 'home' | 'page';
 }
 
@@ -69,8 +80,11 @@ export default function TopicListClient({
   initialGuide,
   initialFeaturedTopicIds = [],
   initialFaqs = [],
+  initialFaqVideos = [],
+  initialFaqTopics = [],
   settingsScope = 'home',
 }: TopicListClientProps) {
+  const router = useRouter();
   const [topicsWithCounts, setTopicsWithCounts] = useState(initialTopics);
   const [topicsTitle, setTopicsTitle] = useState(
     initialTopicsTitle && initialTopicsTitle !== 'Chọn chủ đề' ? initialTopicsTitle : 'Chuyên Đề Học'
@@ -94,6 +108,12 @@ export default function TopicListClient({
   const [showGuide, setShowGuide] = useState(false);
   const [showDisplayMenu, setShowDisplayMenu] = useState(false);
   const [featuredTopicIds, setFeaturedTopicIds] = useState<string[]>(initialFeaturedTopicIds || []);
+  const [topicFaqRows, setTopicFaqRows] = useState(initialFaqs);
+  const [selectedFaqTopic, setSelectedFaqTopic] = useState('all');
+  const [editingFaqBlock, setEditingFaqBlock] = useState<Extract<Block, { type: 'faq' }> | null>(null);
+  const [faqCategoryPickerOpen, setFaqCategoryPickerOpen] = useState(false);
+  const [faqCategoryPickerAction, setFaqCategoryPickerAction] = useState<'category' | 'question'>('category');
+  const [faqSaveError, setFaqSaveError] = useState('');
   const lessonFetchStarted = React.useRef(false);
   // Tìm cả tên bài học: chỉ tải dữ liệu tìm kiếm một lần khi người dùng bắt đầu gõ
   const [lessonIndex, setLessonIndex] = useState<
@@ -102,6 +122,59 @@ export default function TopicListClient({
   const displayOptions = enableSearch
     ? TOPICS_DISPLAY_OPTIONS.filter((opt) => ['card', 'logo', 'catalog'].includes(opt.value))
     : TOPICS_DISPLAY_OPTIONS;
+
+  useEffect(() => setTopicFaqRows(initialFaqs), [initialFaqs]);
+
+  const filteredFaqRows = useMemo(() => topicFaqRows.filter((faq) => selectedFaqTopic === 'all'
+    ? true
+    : faq.learningAnswers.length
+      ? faq.learningAnswers.some((answer) => answer.topicId === selectedFaqTopic)
+      : faq.topicId === selectedFaqTopic), [topicFaqRows, selectedFaqTopic]);
+
+  const faqTopicsWithContent = useMemo(() => initialFaqTopics.filter((topic) => topicFaqRows.some((faq) => faq.learningAnswers.length
+    ? faq.learningAnswers.some((answer) => answer.topicId === topic.id)
+    : faq.topicId === topic.id)), [initialFaqTopics, topicFaqRows]);
+
+  const handleAddFaqQuestion = async (topicId: string) => {
+    const topic = initialFaqTopics.find((item) => item.id === topicId);
+    if (!topic) return;
+    setFaqCategoryPickerOpen(false);
+    setSelectedFaqTopic(topicId);
+    setFaqSaveError('');
+    const existing = topicFaqRows.find((faq) => faq.topicId === topicId)?.block;
+    if (existing) {
+      setEditingFaqBlock({ ...existing, data: { ...existing.data, items: [...existing.data.items, { id: generateUuid(), question: '', answer: '', is_visible: true, learning_answers: [] }] } });
+      return;
+    }
+    try {
+      const response = await fetch(`/api/admin/topic-faqs?topicId=${encodeURIComponent(topicId)}`, { headers: getAdminHeaders(), cache: 'no-store' });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || 'Không tải được chuyên đề');
+      const page = result.pages?.[0];
+      if (!page) throw new Error('Chuyên đề này chưa có bài học để gắn câu hỏi.');
+      const block: Extract<Block, { type: 'faq' }> = {
+        id: generateUuid(), page_id: page.id, type: 'faq', display_style: 'accordion',
+        sort_order: (result.blocks || []).filter((item: { page_id: string }) => item.page_id === page.id).length + 1,
+        is_visible: true,
+        data: { title: `Vấn đề thường gặp · ${topic.title}`, faq_surface: 'overview', items: [{ id: generateUuid(), question: '', answer: '', is_visible: true, learning_answers: [] }] },
+      };
+      setEditingFaqBlock(block);
+    } catch (error) {
+      setFaqSaveError(error instanceof Error ? error.message : 'Không tạo được câu hỏi mới.');
+    }
+  };
+
+  const handleSaveFaqBlock = async (block: Block): Promise<boolean> => {
+    if (block.type !== 'faq') return false;
+    const result = await saveBlockApi(block);
+    if (!result.success) {
+      setFaqSaveError(result.error || 'Chưa lưu được phần vấn đề thường gặp.');
+      return false;
+    }
+    setFaqSaveError('');
+    router.refresh();
+    return true;
+  };
 
   useEffect(() => {
     if (!enableSearch || lessonFetchStarted.current || query.trim().length < 2) return;
@@ -745,7 +818,7 @@ export default function TopicListClient({
         })}
       </div>
 
-      {enableSearch && query.trim().length === 0 && initialFaqs.length > 0 && (
+      {enableSearch && query.trim().length === 0 && (initialFaqs.length > 0 || isAdmin) && (
         <section aria-labelledby="topic-faq-heading" className="mt-5 border-t border-slate-200/80 pt-5 dark:border-white/10">
           <div className="rounded-[22px] border border-[#D8E2F0] bg-gradient-to-b from-[#F5F8FD] to-[#EEF3FA] p-3 shadow-[0_10px_28px_-25px_rgba(24,52,103,.7)] dark:border-white/10 dark:from-[#191330] dark:to-[#130E25] sm:p-4">
             <header className="mb-3 flex items-center justify-between gap-3 px-0.5">
@@ -755,48 +828,43 @@ export default function TopicListClient({
                 </span>
                 <div className="min-w-0">
                   <h3 id="topic-faq-heading" className="text-[15px] font-black leading-tight text-[#102144] dark:text-white sm:text-[17px]">Vấn đề thường gặp</h3>
-                  <p className="mt-0.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">Giải đáp ngắn theo từng chuyên đề</p>
+                  <p className="mt-0.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">Chọn chủ đề để xem câu hỏi và hướng học phù hợp</p>
                 </div>
               </div>
-              <span className="shrink-0 rounded-full border border-[#DCE5F2] bg-white/80 px-2.5 py-1 text-[10px] font-bold text-slate-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">{initialFaqs.length} câu hỏi</span>
+              <span className="shrink-0 rounded-full border border-[#DCE5F2] bg-white/80 px-2.5 py-1 text-[10px] font-bold text-slate-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">{filteredFaqRows.length} câu hỏi</span>
             </header>
 
+            <div className="mb-2 flex flex-wrap items-center gap-1.5" aria-label="Lọc vấn đề theo chủ đề">
+              <button type="button" onClick={() => setSelectedFaqTopic('all')} aria-pressed={selectedFaqTopic === 'all'} className={`rounded-full border px-3 py-1.5 text-[10px] font-extrabold transition-colors ${selectedFaqTopic === 'all' ? 'border-[#214B91] bg-[#214B91] text-white' : 'border-[#DCE5F2] bg-white text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-200'}`}>Tất cả</button>
+              {faqTopicsWithContent.map((topic) => <button key={topic.id} type="button" onClick={() => setSelectedFaqTopic(topic.id)} aria-pressed={selectedFaqTopic === topic.id} className={`rounded-full border px-3 py-1.5 text-[10px] font-extrabold transition-colors ${selectedFaqTopic === topic.id ? 'border-[#214B91] bg-[#214B91] text-white' : 'border-[#DCE5F2] bg-white text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-200'}`}>{topic.title}</button>)}
+              {isAdmin && <button type="button" onClick={() => { setFaqCategoryPickerAction('category'); setFaqCategoryPickerOpen((open) => !open); }} className="inline-flex min-h-[30px] items-center gap-1 rounded-full border border-dashed border-[#214B91] px-3 py-1.5 text-[10px] font-extrabold text-[#214B91] dark:border-blue-300 dark:text-blue-200"><Plus size={12} />Thêm danh mục</button>}
+            </div>
+
+            {isAdmin && <div className="mb-2 flex justify-start"><button type="button" onClick={() => { if (selectedFaqTopic !== 'all') void handleAddFaqQuestion(selectedFaqTopic); else { setFaqCategoryPickerAction('question'); setFaqCategoryPickerOpen(true); } }} className="inline-flex min-h-8 items-center gap-1 rounded-[9px] bg-[#214B91] px-2.5 text-[10px] font-extrabold text-white"><Plus size={13} />Thêm câu hỏi</button></div>}
+
+            {isAdmin && faqCategoryPickerOpen && <div className="mb-3 rounded-[12px] border border-blue-200 bg-white p-2.5 dark:border-blue-400/20 dark:bg-[#191330]"><div className="mb-2 flex items-center justify-between gap-2"><p className="text-[11px] font-extrabold text-[#102144] dark:text-white">{faqCategoryPickerAction === 'category' ? 'Chọn chủ đề để thêm danh mục' : 'Chọn chủ đề cho câu hỏi mới'}</p><button type="button" onClick={() => setFaqCategoryPickerOpen(false)} aria-label="Đóng danh sách chủ đề" className="rounded p-1 text-slate-500"><X size={14} /></button></div><div className="flex max-h-36 flex-wrap gap-1.5 overflow-y-auto">{initialFaqTopics.filter((topic) => faqCategoryPickerAction === 'question' || !faqTopicsWithContent.some((present) => present.id === topic.id)).map((topic) => <button key={topic.id} type="button" onClick={() => void handleAddFaqQuestion(topic.id)} className="rounded-full border border-[#DCE5F2] bg-slate-50 px-2.5 py-1.5 text-[10px] font-bold text-slate-700 hover:border-[#214B91] hover:text-[#214B91] dark:border-white/10 dark:bg-white/5 dark:text-slate-200">{topic.title}</button>)}</div>{faqCategoryPickerAction === 'category' && <p className="mt-2 text-[9px] text-slate-500 dark:text-slate-400">Chọn chủ đề sẽ mở câu hỏi đầu tiên; danh mục sẽ hiện sau khi lưu.</p>}</div>}
+
+            {faqSaveError && <p role="alert" className="mb-2 rounded-lg bg-red-50 px-3 py-2 text-[11px] font-bold text-red-700 dark:bg-red-950/30 dark:text-red-200">{faqSaveError}</p>}
+
             <div className="flex flex-col gap-2">
-              {initialFaqs.map((faq) => (
-                <details key={faq.id} className="group overflow-hidden rounded-[15px] border border-slate-200/90 bg-white shadow-[0_3px_10px_-9px_rgba(15,23,42,.35)] dark:border-white/10 dark:bg-[#1B1630]">
-                  <summary className="flex min-h-[54px] cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-3 text-left [&::-webkit-details-marker]:hidden">
-                    <span className="min-w-0 flex-1">
-                      <span className="mb-1 block text-[9px] font-extrabold uppercase tracking-[.08em] text-[#315991] dark:text-blue-300">{faq.topicTitle}</span>
-                      <span className="block text-[12.5px] font-extrabold leading-snug text-slate-900 dark:text-slate-100 sm:text-[13px]">{faq.question}</span>
-                    </span>
-                    <ChevronDown size={17} className="shrink-0 text-slate-400 transition-transform group-open:rotate-180" />
-                  </summary>
-                  <div className="border-t border-slate-100 px-3.5 pb-3.5 pt-3 dark:border-white/10">
-                    <p className="mb-2 text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">{faq.pageTitle}</p>
-                    <p className="whitespace-pre-line text-[12px] leading-relaxed text-slate-600 dark:text-slate-300">{faq.answer}</p>
-                    <Link href={`/${faq.topicSlug}`} className="mt-3 inline-flex min-h-8 items-center gap-1 rounded-full border border-[#D7E3F3] bg-[#F5F8FD] px-3 text-[10.5px] font-extrabold text-[#234B8B] transition-colors hover:bg-[#EAF1FC] dark:border-white/10 dark:bg-white/5 dark:text-blue-200 dark:hover:bg-white/10">
-                      Mở chuyên đề <span aria-hidden="true">›</span>
-                    </Link>
-                    {faq.videos.length > 0 && (
-                      <div className="mt-3 border-t border-slate-100 pt-3 dark:border-white/10">
-                        <p className="mb-2 text-[9px] font-extrabold uppercase tracking-[.08em] text-slate-500 dark:text-slate-400">Video trong bài học</p>
-                        <div className="flex flex-col gap-1.5">
-                          {faq.videos.map((video) => (
-                            <Link key={`${faq.id}-${video.href}`} href={video.href} className="flex min-w-0 items-center gap-2.5 rounded-[11px] border border-slate-100 bg-slate-50/80 p-1.5 transition-colors hover:border-blue-200 hover:bg-blue-50/60 dark:border-white/10 dark:bg-white/[.035] dark:hover:border-blue-400/30">
-                              <span className="relative h-10 w-[58px] shrink-0 overflow-hidden rounded-[7px] bg-slate-200 dark:bg-slate-800">
-                                {video.thumbnailUrl && <img src={video.thumbnailUrl} alt="" className="h-full w-full object-cover" loading="lazy" />}
-                                <span className="absolute inset-0 flex items-center justify-center bg-black/20 text-white"><Play size={14} fill="currentColor" /></span>
-                              </span>
-                              <span className="min-w-0 flex-1 line-clamp-2 text-[11px] font-bold leading-snug text-slate-700 dark:text-slate-200">{video.title}</span>
-                              <span aria-hidden="true" className="shrink-0 text-[17px] text-[#315991] dark:text-blue-300">›</span>
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </details>
-              ))}
+              {filteredFaqRows.map((faq) => {
+                const answers = selectedFaqTopic === 'all' ? faq.learningAnswers : faq.learningAnswers.filter((answer) => answer.topicId === selectedFaqTopic);
+                const label = selectedFaqTopic === 'all' ? faq.topicTitle : initialFaqTopics.find((topic) => topic.id === selectedFaqTopic)?.title || faq.topicTitle;
+                return <div key={faq.id} className="flex items-start gap-1.5">
+                  <details className="group min-w-0 flex-1 overflow-hidden rounded-[15px] border border-slate-200/90 bg-white shadow-[0_3px_10px_-9px_rgba(15,23,42,.35)] dark:border-white/10 dark:bg-[#1B1630]">
+                    <summary className="flex min-h-[54px] cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-3 text-left [&::-webkit-details-marker]:hidden">
+                      <span className="min-w-0 flex-1"><span className="mb-1 block text-[9px] font-extrabold uppercase tracking-[.08em] text-[#315991] dark:text-blue-300">{label}</span><span className="block text-[12.5px] font-extrabold leading-snug text-slate-900 dark:text-slate-100 sm:text-[13px]">{faq.question}</span></span>
+                      <ChevronDown size={17} className="shrink-0 text-slate-400 transition-transform group-open:rotate-180" />
+                    </summary>
+                    <div className="border-t border-slate-100 px-3.5 pb-3.5 pt-3 dark:border-white/10">
+                      <p className="mb-2 text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">{faq.pageTitle}</p>
+                      {faq.answer && <p className="whitespace-pre-line text-[12px] leading-relaxed text-slate-600 dark:text-slate-300">{faq.answer}</p>}
+                      {answers.length > 0 && <div className="mt-2.5 flex flex-col gap-2">{answers.map((answer, index) => <div key={answer.id} className="rounded-[11px] bg-[#F1F6FD] p-2.5 dark:bg-blue-950/20"><span className="mb-1 block text-[9px] font-black uppercase tracking-wide text-[#315991] dark:text-blue-300">{answer.topicTitle} · Câu trả lời {index + 1}</span>{answer.text && <p className="mb-2 text-[11px] leading-relaxed text-slate-700 dark:text-slate-200">{answer.text}</p>}{answer.href && (answer.destinationType === 'topic' ? <Link href={answer.href} className="inline-flex min-h-8 items-center gap-1 rounded-full border border-[#D7E3F3] bg-white px-3 text-[10.5px] font-bold text-[#234B8B] dark:border-white/10 dark:bg-white/5 dark:text-blue-200">Xem chuyên đề <span aria-hidden="true">›</span></Link> : <VideoLessonLink href={answer.href} title={answer.videoTitle} thumbnailUrl={answer.thumbnailUrl} />)}{answer.linkedVideos?.map((video, videoIndex) => <VideoLessonLink key={`${answer.id}-video-${videoIndex}`} href={video.href} title={video.title} thumbnailUrl={video.thumbnailUrl} />)}</div>)}</div>}
+                    </div>
+                  </details>
+                  {isAdmin && <button type="button" onClick={() => { setFaqSaveError(''); setEditingFaqBlock(faq.block); }} title="Sửa vấn đề thường gặp này" aria-label={`Sửa: ${faq.question}`} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[11px] border border-blue-200 bg-white text-blue-700 shadow-sm dark:border-blue-300/15 dark:bg-[#1B1630] dark:text-blue-200"><Pencil size={15} /></button>}
+                </div>;
+              })}
             </div>
           </div>
         </section>
@@ -821,6 +889,7 @@ export default function TopicListClient({
           onSaved={handleSaved}
         />
       )}
+      {editingFaqBlock && <EditBlockModal isOpen onClose={() => setEditingFaqBlock(null)} block={editingFaqBlock} onSaveBlock={handleSaveFaqBlock} faqTopicOptions={initialFaqTopics} faqVideoOptions={initialFaqVideos.map((video) => ({ key: video.key, page_id: video.page_id, page_title: video.page_title, video_title: video.video_title, thumbnail_url: video.thumbnail_url, index: video.index, topic_id: video.topic_id, topic_title: video.topic_title }))} />}
 
       {/* Modal Thêm chủ đề mới */}
       {isCreating && (

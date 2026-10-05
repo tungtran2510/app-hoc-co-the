@@ -1,13 +1,17 @@
 'use client';
 
 import React, { useState } from 'react';
-import { HelpCircle, ChevronDown } from 'lucide-react';
+import { ArrowUpRight, HelpCircle, ChevronDown, Play } from 'lucide-react';
 import { FontSizeOption } from '../PageHeaderBar';
+import { FaqResource } from '../../lib/types';
 
 export interface FaqItem {
   id: string;
   question: string;
   answer: string;
+  is_visible?: boolean;
+  image_url?: string;
+  resources?: FaqResource[];
 }
 
 interface FaqBlockProps {
@@ -23,10 +27,11 @@ export default function FaqBlock({
   items = [],
   fontSizeMode = 'normal',
 }: FaqBlockProps) {
+  const visibleItems = items.filter((item) => item.is_visible !== false);
   // Mặc định mở câu hỏi đầu tiên
   const [openIds, setOpenIds] = useState<Record<string, boolean>>(() => {
-    if (items.length > 0 && items[0]?.id) {
-      return { [items[0].id]: true };
+    if (visibleItems.length > 0 && visibleItems[0]?.id) {
+      return { [visibleItems[0].id]: true };
     }
     return {};
   });
@@ -52,7 +57,7 @@ export default function FaqBlock({
       ? 'text-[16.5px]'
       : 'text-[15px]';
 
-  if (!items || items.length === 0) {
+  if (visibleItems.length === 0) {
     return null;
   }
 
@@ -73,7 +78,7 @@ export default function FaqBlock({
 
         {/* Danh sách accordion các câu hỏi */}
         <div className="flex flex-col gap-2">
-          {items.map((item, idx) => {
+          {visibleItems.map((item, idx) => {
             const isOpen = !!openIds[item.id];
             return (
               <div
@@ -122,6 +127,24 @@ export default function FaqBlock({
                       >
                         {item.answer}
                       </p>
+                      {item.image_url && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={item.image_url} alt="" loading="lazy" className="mt-3 max-h-72 w-full rounded-[12px] border border-slate-200 object-cover dark:border-white/10" />
+                      )}
+                      {item.resources && item.resources.length > 0 && (
+                        <div className="mt-3 flex flex-col gap-2">
+                          {item.resources.map((resource, resourceIndex) => (
+                            <a key={`${item.id}-resource-${resourceIndex}`} href={resource.url} target={/^https?:\/\//i.test(resource.url) ? '_blank' : undefined} rel={/^https?:\/\//i.test(resource.url) ? 'noreferrer' : undefined} className="flex min-w-0 items-center gap-2.5 rounded-[11px] border border-slate-200 bg-slate-50/80 p-2 text-slate-700 transition-colors hover:border-blue-300 hover:bg-blue-50 dark:border-white/10 dark:bg-white/[.035] dark:text-slate-200 dark:hover:border-blue-400/40 dark:hover:bg-blue-950/20">
+                              {resource.thumbnail_url ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img src={resource.thumbnail_url} alt="" loading="lazy" className="h-10 w-[58px] shrink-0 rounded-[7px] object-cover" />
+                              ) : <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-200">{resource.kind === 'video' ? <Play size={15} fill="currentColor" /> : <ArrowUpRight size={16} />}</span>}
+                              <span className="min-w-0 flex-1 line-clamp-2 text-[12px] font-bold leading-snug">{resource.title || resource.url}</span>
+                              <ArrowUpRight size={15} className="shrink-0 text-blue-600 dark:text-blue-300" />
+                            </a>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

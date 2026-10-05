@@ -174,18 +174,7 @@ export default function AddBlockDrawer({
         is_visible: true,
         data: {
           title: 'Hỏi - Đáp Thường Gặp (FAQ)',
-          items: [
-            {
-              id: generateUuid(),
-              question: 'Tại sao cần chăm sóc cột sống đúng cách mỗi ngày?',
-              answer: 'Cột sống là trụ cột nâng đỡ toàn bộ cơ thể và bảo vệ tủy sống. Duy trì tư thế đúng và vận động hợp lý giúp ngăn ngừa thoát vị đĩa đệm và thoái hóa sớm.',
-            },
-            {
-              id: generateUuid(),
-              question: 'Dấu hiệu nào cho thấy tôi nên đi khám chuyên khoa?',
-              answer: 'Khi có cơn đau lan xuống tay/chân, tê bì, yếu cơ hoặc đau kéo dài trên 1-2 tuần không thuyên giảm khi nghỉ ngơi.',
-            },
-          ],
+          items: [],
         },
       };
     } else if (type === 'books') {

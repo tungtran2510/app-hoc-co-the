@@ -25,6 +25,18 @@ export default function BottomNav() {
 
   const activePath = optimisticTarget ?? pathname;
 
+  const handleTabNavigate = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
+    event.preventDefault();
+    setOptimisticTarget(href);
+    // Keep the primary navigation reliable even when an outdated App Router
+    // client cache has a stale RSC payload. A document navigation fetches the
+    // current route and its matching server-rendered content together.
+    window.location.assign(href);
+  };
+
   const isHome = activePath === '/';
   const isSaved = activePath === '/da-luu';
   const isAi = activePath === '/tro-ly-ai';
@@ -47,7 +59,7 @@ export default function BottomNav() {
         <Link
           href="/"
           prefetch={true}
-          onClick={() => setOptimisticTarget('/')}
+          onClick={(event) => handleTabNavigate(event, '/')}
           className={`${baseItem} ${isHome ? activeText : idleText}`}
           aria-label="Tổng quan"
         >
@@ -59,7 +71,7 @@ export default function BottomNav() {
         <Link
           href="/chuyen-de"
           prefetch={true}
-          onClick={() => setOptimisticTarget('/chuyen-de')}
+          onClick={(event) => handleTabNavigate(event, '/chuyen-de')}
           className={`${baseItem} ${isTopics ? activeText : idleText}`}
           aria-label="Chuyên đề"
         >
@@ -71,7 +83,7 @@ export default function BottomNav() {
         <Link
           href="/da-luu"
           prefetch={true}
-          onClick={() => setOptimisticTarget('/da-luu')}
+          onClick={(event) => handleTabNavigate(event, '/da-luu')}
           className={`${baseItem} ${isSaved ? activeText : idleText}`}
           aria-label="Bài học đã lưu"
         >
@@ -83,7 +95,7 @@ export default function BottomNav() {
         <Link
           href="/tro-ly-ai"
           prefetch={true}
-          onClick={() => setOptimisticTarget('/tro-ly-ai')}
+          onClick={(event) => handleTabNavigate(event, '/tro-ly-ai')}
           className={`${baseItem} ${isAi ? activeText : idleText}`}
           aria-label="Hỏi đáp AI"
         >

@@ -26,7 +26,7 @@ import {
   HelpCircle,
   Crop,
 } from 'lucide-react';
-import { Block, Image as ImageType, FileItem, Video, RecommendedBook } from '../../lib/types';
+import { Block, Image as ImageType, FileItem, Video, RecommendedBook, FaqResource } from '../../lib/types';
 import EditSingleRecommendedBookModal from './EditSingleRecommendedBookModal';
 import { extractYouTubeId, fetchYouTubeMeta } from '../../lib/youtube';
 import { uploadImageFile, uploadPdfFile } from '../../lib/storageUpload';
@@ -95,7 +95,9 @@ interface EditBlockModalProps {
   isOpen: boolean;
   onClose: () => void;
   block: Block;
-  onSaveBlock: (updatedBlock: Block) => void;
+  onSaveBlock: (updatedBlock: Block) => void | boolean | Promise<void | boolean>;
+  faqTopicOptions?: Array<{ id: string; title: string }>;
+  faqVideoOptions?: Array<{ key: string; page_id: string; page_title: string; video_title: string; thumbnail_url?: string | null; index: number; topic_id: string; topic_title: string }>;
 }
 
 export default function EditBlockModal({
@@ -103,6 +105,8 @@ export default function EditBlockModal({
   onClose,
   block,
   onSaveBlock,
+  faqTopicOptions,
+  faqVideoOptions,
 }: EditBlockModalProps) {
   // State cho text block: Tiêu đề & Màu sắc
   const [blockTitle, setBlockTitle] = useState<string>(
@@ -256,25 +260,71 @@ export default function EditBlockModal({
   const [faqTitle, setFaqTitle] = useState(
     block.type === 'faq' ? block.data.title || 'Hỏi - Đáp Thường Gặp (FAQ)' : 'Hỏi - Đáp Thường Gặp (FAQ)'
   );
-  const [faqItems, setFaqItems] = useState<Array<{ id: string; question: string; answer: string }>>(
+  const [faqItems, setFaqItems] = useState<Array<{ id: string; question: string; answer: string; is_visible?: boolean; image_url?: string; resources?: FaqResource[]; learning_answers?: Array<{ id: string; text: string; target_topic_id?: string; target_page_id: string; target_video_index: number; video_links?: Array<{ id: string; target_topic_id: string; target_page_id: string; target_video_index: number }> }> }>>(
     block.type === 'faq' && Array.isArray(block.data.items)
-      ? block.data.items.map((it) => ({ ...it }))
+      ? block.data.items.map((it) => {
+          const learningAnswers = [...(it.learning_answers || [])];
+          const legacyAnswer = it.answer?.trim();
+          if (legacyAnswer) {
+            const firstEmptyAnswer = learningAnswers.findIndex((answer) => !answer.text?.trim());
+            if (firstEmptyAnswer >= 0) learningAnswers[firstEmptyAnswer] = { ...learningAnswers[firstEmptyAnswer], text: legacyAnswer };
+            else learningAnswers.unshift({ id: generateUuid(), text: legacyAnswer, target_page_id: '', target_video_index: 0 });
+          }
+          return { ...it, answer: '', learning_answers: learningAnswers };
+        })
       : []
   );
+  const [faqVideoSearch, setFaqVideoSearch] = useState<Record<string, string>>({});
+  const [faqVideoSearchActive, setFaqVideoSearchActive] = useState<Record<string, boolean>>({});
+  const [faqAdditionalVideoSearch, setFaqAdditionalVideoSearch] = useState<Record<string, string>>({});
+  const [faqAdditionalVideoSearchActive, setFaqAdditionalVideoSearchActive] = useState<Record<string, boolean>>({});
+  const [expandedFaqAnswers, setExpandedFaqAnswers] = useState<Record<string, boolean>>({});
+  const [faqAnswerLinkMode, setFaqAnswerLinkMode] = useState<Record<string, 'topic' | 'video'>>({});
 
   const handleAddFaqItem = () => {
     setFaqItems([
       ...faqItems,
       {
         id: generateUuid(),
-        question: 'Câu hỏi mới?',
-        answer: 'Nội dung giải thích chi tiết...',
+        question: '',
+        answer: '',
+        is_visible: true,
+        resources: [],
+        learning_answers: [],
       },
     ]);
   };
 
-  const handleUpdateFaqItem = (id: string, updates: Partial<{ question: string; answer: string }>) => {
+  const handleUpdateFaqItem = (id: string, updates: Partial<{ question: string; answer: string; is_visible: boolean; image_url: string; resources: FaqResource[]; learning_answers: Array<{ id: string; text: string; target_topic_id?: string; target_page_id: string; target_video_index: number; video_links?: Array<{ id: string; target_topic_id: string; target_page_id: string; target_video_index: number }> }> }>) => {
     setFaqItems(faqItems.map((item) => (item.id === id ? { ...item, ...updates } : item)));
+  };
+
+  const handleAddFaqResource = (item: (typeof faqItems)[number], kind: 'video' | 'link') => {
+    handleUpdateFaqItem(item.id, {
+      resources: [...(item.resources || []), { title: '', url: '', kind }],
+    });
+  };
+
+  const handleAddLearningAnswer = (item: (typeof faqItems)[number]) => {
+    const id = generateUuid();
+    handleUpdateFaqItem(item.id, { learning_answers: [...(item.learning_answers || []), { id, text: '', target_topic_id: '', target_page_id: '', target_video_index: 0 }] });
+    setExpandedFaqAnswers((current) => ({ ...current, [id]: true }));
+  };
+
+  const handleUpdateLearningAnswer = (item: (typeof faqItems)[number], answerId: string, updates: Partial<{ text: string; target_topic_id: string; target_page_id: string; target_video_index: number; video_links: Array<{ id: string; target_topic_id: string; target_page_id: string; target_video_index: number }> }>) => {
+    handleUpdateFaqItem(item.id, { learning_answers: (item.learning_answers || []).map((answer) => answer.id === answerId ? { ...answer, ...updates } : answer) });
+  };
+
+  const handleUpdateAdditionalVideo = (item: (typeof faqItems)[number], answer: (NonNullable<(typeof faqItems)[number]['learning_answers']>)[number], videoId: string, updates: Partial<{ target_topic_id: string; target_page_id: string; target_video_index: number }>) => {
+    handleUpdateLearningAnswer(item, answer.id, { video_links: (answer.video_links || []).map((video) => video.id === videoId ? { ...video, ...updates } : video) });
+  };
+
+  const handleMoveLearningAnswer = (item: (typeof faqItems)[number], index: number, direction: 'up' | 'down') => {
+    const answers = [...(item.learning_answers || [])];
+    const next = direction === 'up' ? index - 1 : index + 1;
+    if (next < 0 || next >= answers.length) return;
+    [answers[index], answers[next]] = [answers[next], answers[index]];
+    handleUpdateFaqItem(item.id, { learning_answers: answers });
   };
 
   const handleDeleteFaqItem = (id: string) => {
@@ -433,7 +483,7 @@ export default function EditBlockModal({
     setNewVidThumb('');
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (block.type === 'text') {
       const lines = textLines
         .split('\n')
@@ -482,7 +532,10 @@ export default function EditBlockModal({
           videos: finalAttachedVideos.length > 0 ? finalAttachedVideos : undefined,
         },
       };
-      onSaveBlock(updated);
+      const saved = await onSaveBlock(updated);
+      if (saved === false) return;
+      onClose();
+      return;
     } else if (block.type === 'images') {
       let finalImages = [...imageList];
       if (block.display_style === 'single') {
@@ -602,26 +655,30 @@ export default function EditBlockModal({
           id: it.id || generateUuid(),
           question: it.question.trim(),
           answer: it.answer.trim(),
+          is_visible: it.is_visible !== false,
+          learning_answers: (it.learning_answers || []).filter((answer) => answer.text.trim() || answer.target_topic_id || answer.target_page_id || answer.video_links?.some((video) => video.target_page_id)).map((answer) => ({ ...answer, text: answer.text.trim(), video_links: (answer.video_links || []).filter((video) => video.target_page_id) })),
+          image_url: it.image_url?.trim() || undefined,
+          resources: (it.resources || []).filter((resource) => resource.url.trim()).map((resource) => ({
+            ...resource,
+            title: resource.title.trim() || resource.url.trim(),
+            url: resource.url.trim(),
+            thumbnail_url: resource.thumbnail_url?.trim() || undefined,
+          })),
         }))
         .filter((it) => it.question.length > 0 || it.answer.length > 0);
 
       const updated: Block = {
         ...block,
         data: {
+          ...block.data,
           title: faqTitle.trim() || 'Hỏi - Đáp Thường Gặp (FAQ)',
-          items:
-            cleanItems.length > 0
-              ? cleanItems
-              : [
-                  {
-                    id: generateUuid(),
-                    question: 'Câu hỏi mới?',
-                    answer: 'Nội dung giải thích...',
-                  },
-                ],
+          items: cleanItems,
         },
       };
-      onSaveBlock(updated);
+      const saved = await onSaveBlock(updated);
+      if (saved === false) return;
+      onClose();
+      return;
     } else if (block.type === 'books') {
       const updated: Block = {
         ...block,
@@ -637,7 +694,7 @@ export default function EditBlockModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-xs p-0 sm:p-4">
-      <div className="w-full max-w-[480px] max-h-[92vh] bg-white dark:bg-[#160E2E] rounded-t-[28px] sm:rounded-[28px] flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-200 border dark:border-white/10">
+      <div className="h-[90dvh] max-h-[90dvh] w-full max-w-[480px] bg-white dark:bg-[#160E2E] rounded-t-[22px] sm:h-[90vh] sm:max-h-[90vh] sm:rounded-[28px] flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-200 border dark:border-white/10">
         {/* Header */}
         <div className="flex items-center justify-between p-4 px-5 border-b border-line">
           <h3 className="text-[19px] font-extrabold text-ink">
@@ -2232,32 +2289,32 @@ export default function EditBlockModal({
 
           {/* Form chỉnh sửa khối FAQ (Accordion) */}
           {block.type === 'faq' && (
-            <div className="flex flex-col gap-3.5">
+            <div className="flex flex-col gap-2.5">
               {/* Tiêu đề khối FAQ */}
-              <div className="p-3.5 rounded-[16px] bg-slate-50 dark:bg-white/5 border border-line flex flex-col gap-2">
-                <label className="text-[13px] font-black text-ink uppercase tracking-wide flex items-center gap-1.5">
-                  <HelpCircle size={15} className="text-purple-700 dark:text-purple-300" />
-                  <span>Tiêu đề khối Hỏi - Đáp</span>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[12px] font-bold text-ink flex items-center gap-1.5">
+                  <HelpCircle size={14} className="text-primary" />
+                  <span>Tiêu đề</span>
                 </label>
                 <input
                   type="text"
                   value={faqTitle}
                   onChange={(e) => setFaqTitle(e.target.value)}
                   placeholder="Ví dụ: Hỏi - Đáp Thường Gặp (FAQ)"
-                  className="w-full h-9.5 px-3 rounded-[10px] bg-white dark:bg-[#160E2E] border border-line text-[14px] font-bold text-ink focus:border-primary focus:outline-hidden"
+                    className="w-full h-9 px-2.5 rounded-[8px] bg-surface border border-line text-[13px] font-semibold text-ink focus:border-primary focus:outline-hidden"
                 />
               </div>
 
               {/* Danh sách các câu hỏi & trả lời */}
               <div className="flex flex-col gap-2.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-[13px] font-black text-ink uppercase tracking-wide">
-                    Danh sách câu hỏi & trả lời ({faqItems.length})
+                  <span className="text-[13px] font-bold text-ink">
+                    Câu hỏi ({faqItems.length})
                   </span>
                   <button
                     type="button"
                     onClick={handleAddFaqItem}
-                    className="flex items-center gap-1 h-7.5 px-2.5 rounded-[8px] bg-primary text-white text-[12px] font-bold hover:bg-primary-hover cursor-pointer shadow-2xs"
+                    className="flex items-center gap-1 h-8 px-2.5 rounded-[8px] bg-primary text-white text-[12px] font-bold hover:bg-primary-hover cursor-pointer"
                   >
                     <Plus size={13} strokeWidth={2.5} />
                     <span>Thêm câu hỏi</span>
@@ -2273,21 +2330,30 @@ export default function EditBlockModal({
                       onClick={handleAddFaqItem}
                       className="text-[12px] font-bold text-primary hover:underline cursor-pointer"
                     >
-                      + Nhấn vào đây để thêm câu hỏi đầu tiên
+                      + Thêm câu hỏi đầu tiên
                     </button>
                   </div>
                 ) : (
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-2">
                     {faqItems.map((item, idx) => (
                       <div
                         key={item.id || idx}
-                        className="p-3 sm:p-3.5 rounded-[16px] bg-white dark:bg-[#1A0E35] border border-line shadow-xs flex flex-col gap-2.5"
+                        className="p-2.5 rounded-[10px] bg-white dark:bg-[#1A0E35] border border-line flex flex-col gap-2"
                       >
                         <div className="flex items-center justify-between pb-1.5 border-b border-line/60">
-                          <span className="text-[11px] font-extrabold text-purple-800 dark:text-purple-300 bg-purple-100 dark:bg-purple-950 px-2 py-0.5 rounded-full">
-                            Câu hỏi #{idx + 1}
+                          <span className="text-[12px] font-bold text-ink">
+                            Câu {idx + 1}
                           </span>
                           <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => handleUpdateFaqItem(item.id, { is_visible: item.is_visible === false })}
+                              className="flex h-7 items-center gap-1 rounded-[7px] px-1.5 text-[10px] font-semibold text-muted hover:bg-surface-2 hover:text-ink"
+                              title={item.is_visible === false ? 'Hiện câu hỏi' : 'Ẩn câu hỏi'}
+                            >
+                              {item.is_visible === false ? <Eye size={13} /> : <EyeOff size={13} />}
+                              {item.is_visible === false ? 'Ẩn' : 'Hiện'}
+                            </button>
                             <button
                               type="button"
                               disabled={idx === 0}
@@ -2325,23 +2391,135 @@ export default function EditBlockModal({
                             type="text"
                             value={item.question}
                             onChange={(e) => handleUpdateFaqItem(item.id, { question: e.target.value })}
-                            placeholder="Ví dụ: Tại sao cần duy trì tư thế đúng khi làm việc?"
+                            placeholder="Nhập câu hỏi…"
                             className="w-full h-8.5 px-2.5 rounded-[8px] bg-surface border border-line text-[13px] font-bold text-ink focus:border-primary focus:outline-hidden"
                           />
                         </div>
 
-                        <div className="flex flex-col gap-1">
-                          <label className="text-[11.5px] font-bold text-ink">
-                            Câu trả lời giải thích <span className="text-red-500">*</span>
-                          </label>
+                          {!faqVideoOptions && <div className="flex flex-col gap-1">
+                            <label className="text-[11.5px] font-bold text-ink">
+                            Câu trả lời <span className="text-red-500">*</span>
+                            </label>
                           <textarea
                             rows={3}
                             value={item.answer}
                             onChange={(e) => handleUpdateFaqItem(item.id, { answer: e.target.value })}
-                            placeholder="Nhập nội dung giải đáp khoa học, rõ ràng và dễ hiểu..."
+                            placeholder="Nhập câu trả lời ngắn gọn…"
                             className="w-full p-2.5 rounded-[8px] bg-surface border border-line text-[12.5px] text-ink leading-relaxed focus:border-primary focus:outline-hidden resize-none"
                           />
+                          </div>}
+
+                        {faqVideoOptions ? <div className="flex flex-col gap-2 border-t border-line pt-2">
+                          <div className="flex items-center justify-between gap-2"><p className="text-[12px] font-bold text-ink">Câu trả lời ({(item.learning_answers || []).length})</p><button type="button" onClick={() => handleAddLearningAnswer(item)} className="shrink-0 rounded-[7px] px-2 py-1.5 text-[11px] font-bold text-primary hover:bg-primary-soft">+ Thêm câu trả lời</button></div>
+                          {(item.learning_answers || []).map((answer, answerIndex) => {
+                            const selectedVideo = faqVideoOptions.find((video) => video.page_id === answer.target_page_id && video.index === answer.target_video_index);
+                            const selectedTopic = faqTopicOptions?.find((topic) => topic.id === answer.target_topic_id);
+                            const query = faqVideoSearch[answer.id] ?? (selectedVideo ? `${selectedVideo.topic_title} · ${selectedVideo.page_title} · ${selectedVideo.video_title}` : '');
+                            const matches = query.trim() ? faqVideoOptions.filter((video) => `${video.topic_title} ${video.page_title} ${video.video_title}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())).slice(0, 8) : [];
+                            const isExpanded = !!expandedFaqAnswers[answer.id];
+                            const linkMode = faqAnswerLinkMode[answer.id] || (answer.target_page_id ? 'video' : answer.target_topic_id ? 'topic' : '');
+                            const preview = answer.text.trim() || (selectedVideo ? selectedVideo.video_title : selectedTopic ? `Mở chuyên đề: ${selectedTopic.title}` : 'Chạm để viết câu trả lời');
+                            return <div key={answer.id} className="overflow-hidden rounded-[9px] border border-line bg-surface">
+                              <div className="flex min-h-10 items-center gap-1 px-2">
+                                <button type="button" onClick={() => setExpandedFaqAnswers((current) => ({ ...current, [answer.id]: !current[answer.id] }))} aria-expanded={isExpanded} className="flex min-w-0 flex-1 items-center justify-between gap-2 py-2 text-left">
+                                  <span className="min-w-0"><span className="block text-[11px] font-bold text-ink">Câu trả lời {answerIndex + 1}</span>{!isExpanded && <span className="block truncate text-[10px] text-muted">{preview}</span>}</span>
+                                  <ChevronDown size={15} className={`shrink-0 text-muted transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                                </button>
+                                <button type="button" disabled={answerIndex === 0} onClick={() => handleMoveLearningAnswer(item, answerIndex, 'up')} title="Lên" className="px-1 text-[10px] text-muted disabled:opacity-30">↑</button>
+                                <button type="button" disabled={answerIndex === (item.learning_answers || []).length - 1} onClick={() => handleMoveLearningAnswer(item, answerIndex, 'down')} title="Xuống" className="px-1 text-[10px] text-muted disabled:opacity-30">↓</button>
+                                <button type="button" onClick={() => handleUpdateFaqItem(item.id, { learning_answers: (item.learning_answers || []).filter((entry) => entry.id !== answer.id) })} className="px-1 text-[10px] font-semibold text-red-600">Xóa</button>
+                              </div>
+                              {isExpanded && <div className="flex flex-col gap-2 border-t border-line p-2">
+                                <textarea rows={2} value={answer.text} onChange={(event) => handleUpdateLearningAnswer(item, answer.id, { text: event.target.value })} placeholder="Viết câu trả lời…" className="w-full resize-y rounded-[7px] border border-line bg-white p-2 text-[12px] text-ink dark:bg-[#160E2E]" />
+                                <div className="flex gap-1.5">
+                                  <button type="button" onClick={() => { setFaqAnswerLinkMode((current) => ({ ...current, [answer.id]: 'topic' })); handleUpdateLearningAnswer(item, answer.id, { target_topic_id: answer.target_topic_id || faqTopicOptions?.[0]?.id || '', target_page_id: '', target_video_index: 0 }); setFaqVideoSearchActive((current) => ({ ...current, [answer.id]: false })); }} className={`h-8 flex-1 rounded-[7px] border px-2 text-[10px] font-bold ${linkMode === 'topic' ? 'border-primary bg-primary-soft text-primary' : 'border-line bg-white text-muted dark:bg-[#160E2E]'}`}>Chọn chuyên đề</button>
+                                  <button type="button" onClick={() => { setFaqAnswerLinkMode((current) => ({ ...current, [answer.id]: 'video' })); handleUpdateLearningAnswer(item, answer.id, { target_topic_id: '', target_page_id: '', target_video_index: 0 }); setFaqVideoSearch((current) => ({ ...current, [answer.id]: '' })); setFaqVideoSearchActive((current) => ({ ...current, [answer.id]: true })); }} className={`h-8 flex-1 rounded-[7px] border px-2 text-[10px] font-bold ${linkMode === 'video' ? 'border-primary bg-primary-soft text-primary' : 'border-line bg-white text-muted dark:bg-[#160E2E]'}`}>Thêm video</button>
+                                </div>
+                                {linkMode === 'topic' && <select value={answer.target_topic_id || faqTopicOptions?.[0]?.id || ''} onChange={(event) => handleUpdateLearningAnswer(item, answer.id, { target_topic_id: event.target.value, target_page_id: '', target_video_index: 0 })} aria-label={`Chuyên đề của câu trả lời ${answerIndex + 1}`} className="h-9 w-full rounded-[7px] border border-line bg-white px-2 text-[12px] text-ink dark:bg-[#160E2E]">{faqTopicOptions?.map((topic) => <option key={topic.id} value={topic.id}>{topic.title}</option>)}</select>}
+                                {linkMode === 'video' && <div className="flex flex-col gap-2">
+                                  <div className="flex gap-1.5"><input type="search" value={query} onFocus={() => setFaqVideoSearchActive((current) => ({ ...current, [answer.id]: true }))} onChange={(event) => { setFaqVideoSearch((current) => ({ ...current, [answer.id]: event.target.value })); setFaqVideoSearchActive((current) => ({ ...current, [answer.id]: true })); }} placeholder="Tìm video bài học…" aria-label={`Tìm video ${answerIndex + 1}`} className="h-9 min-w-0 flex-1 rounded-[7px] border border-line bg-white px-2 text-[11px] text-ink dark:bg-[#160E2E]" />{selectedVideo && <button type="button" onClick={() => { handleUpdateLearningAnswer(item, answer.id, { target_topic_id: '', target_page_id: '', target_video_index: 0 }); setFaqVideoSearch((current) => ({ ...current, [answer.id]: '' })); }} className="rounded-[7px] border border-line px-2 text-[10px] font-bold text-red-600">Xóa</button>}</div>
+                                  {faqVideoSearchActive[answer.id] && query.trim() && <div className="max-h-48 overflow-y-auto rounded-[8px] border border-line bg-white p-1 shadow-sm dark:bg-[#1A0E35]">{matches.length > 0 ? matches.map((video) => <button key={video.key} type="button" onClick={() => { handleUpdateLearningAnswer(item, answer.id, { target_topic_id: video.topic_id, target_page_id: video.page_id, target_video_index: video.index }); setFaqVideoSearch((current) => ({ ...current, [answer.id]: `${video.topic_title} · ${video.page_title} · ${video.video_title}` })); setFaqVideoSearchActive((current) => ({ ...current, [answer.id]: false })); }} className="flex w-full items-center gap-2 rounded-[6px] p-1.5 text-left hover:bg-blue-50 dark:hover:bg-white/10">{video.thumbnail_url ? <img src={video.thumbnail_url} alt="" className="h-11 w-[68px] shrink-0 rounded-[5px] object-cover" /> : <span className="flex h-11 w-[68px] shrink-0 items-center justify-center rounded-[5px] bg-red-600 text-white"><VideoIcon size={17} /></span>}<span className="min-w-0"><span className="block truncate text-[9px] font-bold text-red-600">{video.topic_title} · {video.page_title}</span><span className="block line-clamp-2 text-[10px] font-semibold text-ink">{video.video_title}</span></span></button>) : <p className="px-2 py-2 text-[11px] text-muted">Không tìm thấy video.</p>}</div>}
+                                  {selectedVideo && <div className="flex min-w-0 items-center gap-2 rounded-[8px] border border-line bg-white p-1.5 dark:bg-[#160E2E]">{selectedVideo.thumbnail_url ? <img src={selectedVideo.thumbnail_url} alt="" className="h-10 w-[62px] shrink-0 rounded-[5px] object-cover" /> : <span className="flex h-10 w-[62px] shrink-0 items-center justify-center rounded-[5px] bg-red-600 text-white"><VideoIcon size={17} /></span>}<span className="min-w-0"><span className="block truncate text-[9px] font-bold text-red-600">{selectedVideo.topic_title} · {selectedVideo.page_title}</span><span className="block line-clamp-2 text-[10px] font-semibold text-ink">{selectedVideo.video_title}</span></span></div>}
+                                  {!!answer.video_links?.length && <div className="flex flex-col gap-1.5">{answer.video_links.map((linkedVideo, linkedIndex) => {
+                                    const linkedOption = faqVideoOptions.find((video) => video.page_id === linkedVideo.target_page_id && video.index === linkedVideo.target_video_index);
+                                    const linkedQuery = faqAdditionalVideoSearch[linkedVideo.id] ?? (linkedOption ? `${linkedOption.topic_title} · ${linkedOption.page_title} · ${linkedOption.video_title}` : '');
+                                    const linkedMatches = linkedQuery.trim() ? faqVideoOptions.filter((video) => `${video.topic_title} ${video.page_title} ${video.video_title}`.toLocaleLowerCase().includes(linkedQuery.trim().toLocaleLowerCase())).slice(0, 8) : [];
+                                    return <div key={linkedVideo.id} className="rounded-[8px] border border-line bg-white p-1.5 dark:bg-[#160E2E]">{linkedOption && !faqAdditionalVideoSearchActive[linkedVideo.id] ? <div className="flex items-center gap-2">{linkedOption.thumbnail_url ? <img src={linkedOption.thumbnail_url} alt="" className="h-10 w-[62px] shrink-0 rounded-[5px] object-cover" /> : <span className="flex h-10 w-[62px] items-center justify-center rounded-[5px] bg-red-600 text-white"><VideoIcon size={17} /></span>}<span className="min-w-0 flex-1"><span className="block truncate text-[9px] font-bold text-red-600">{linkedOption.topic_title} · {linkedOption.page_title}</span><span className="block line-clamp-2 text-[10px] font-semibold text-ink">{linkedOption.video_title}</span></span><button type="button" onClick={() => handleUpdateLearningAnswer(item, answer.id, { video_links: (answer.video_links || []).filter((entry) => entry.id !== linkedVideo.id) })} className="px-1 text-[10px] font-bold text-red-600">Xóa</button></div> : <><input type="search" value={linkedQuery} onFocus={() => setFaqAdditionalVideoSearchActive((current) => ({ ...current, [linkedVideo.id]: true }))} onChange={(event) => { setFaqAdditionalVideoSearch((current) => ({ ...current, [linkedVideo.id]: event.target.value })); setFaqAdditionalVideoSearchActive((current) => ({ ...current, [linkedVideo.id]: true })); }} placeholder={`Tìm video tiếp theo ${linkedIndex + 1}…`} className="h-9 w-full rounded-[7px] border border-line bg-white px-2 text-[11px] text-ink dark:bg-[#160E2E]" />{faqAdditionalVideoSearchActive[linkedVideo.id] && linkedQuery.trim() && <div className="mt-1 max-h-40 overflow-y-auto">{linkedMatches.map((video) => <button key={video.key} type="button" onClick={() => { handleUpdateAdditionalVideo(item, answer, linkedVideo.id, { target_topic_id: video.topic_id, target_page_id: video.page_id, target_video_index: video.index }); setFaqAdditionalVideoSearch((current) => ({ ...current, [linkedVideo.id]: '' })); setFaqAdditionalVideoSearchActive((current) => ({ ...current, [linkedVideo.id]: false })); }} className="flex w-full items-center gap-2 rounded-[6px] p-1.5 text-left hover:bg-blue-50 dark:hover:bg-white/10">{video.thumbnail_url ? <img src={video.thumbnail_url} alt="" className="h-11 w-[68px] shrink-0 rounded-[5px] object-cover" /> : <span className="flex h-11 w-[68px] shrink-0 items-center justify-center rounded-[5px] bg-red-600 text-white"><VideoIcon size={17} /></span>}<span className="min-w-0"><span className="block truncate text-[9px] font-bold text-red-600">{video.topic_title} · {video.page_title}</span><span className="block line-clamp-2 text-[10px] font-semibold text-ink">{video.video_title}</span></span></button>)}</div>}</>}</div>;
+                                  })}</div>}
+                                  <button type="button" onClick={() => { const id = generateUuid(); handleUpdateLearningAnswer(item, answer.id, { video_links: [...(answer.video_links || []), { id, target_topic_id: '', target_page_id: '', target_video_index: 0 }] }); setFaqAdditionalVideoSearchActive((current) => ({ ...current, [id]: true })); }} className="self-start rounded-[7px] border border-dashed border-primary/40 px-2.5 py-1.5 text-[10px] font-bold text-primary"><Plus size={12} className="mr-1 inline" />Thêm video tiếp theo</button>
+                                </div>}
+                              </div>}
+                            </div>;
+                          })}
+                        </div> : <>
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[11.5px] font-bold text-ink">Ảnh minh họa (không bắt buộc)</label>
+                          <div className="flex gap-1.5">
+                            <input
+                              type="url"
+                              value={item.image_url || ''}
+                              onChange={(e) => handleUpdateFaqItem(item.id, { image_url: e.target.value })}
+                              placeholder="Dán đường dẫn ảnh"
+                              className="h-8.5 min-w-0 flex-1 rounded-[8px] border border-line bg-surface px-2.5 text-[12px] text-ink focus:border-primary focus:outline-hidden"
+                            />
+                            <label className="flex h-8.5 shrink-0 cursor-pointer items-center gap-1 rounded-[8px] bg-primary-soft px-2 text-[10px] font-bold text-primary">
+                              <Upload size={12} />{isUploadingMedia ? 'Đang tải' : 'Tải ảnh'}
+                              <input type="file" accept="image/*" className="hidden" disabled={isUploadingMedia} onChange={async (event) => {
+                                const file = event.target.files?.[0];
+                                if (!file) return;
+                                try {
+                                  setIsUploadingMedia(true);
+                                  const result = await uploadImageFile(file);
+                                  handleUpdateFaqItem(item.id, { image_url: result.url });
+                                } catch (error: any) {
+                                  alert(error.message || 'Tải ảnh chưa thành công');
+                                } finally {
+                                  setIsUploadingMedia(false);
+                                  event.target.value = '';
+                                }
+                              }} />
+                            </label>
+                          </div>
                         </div>
+
+                        <div className="flex flex-col gap-2 rounded-[11px] border border-line/70 bg-slate-50/70 p-2.5 dark:bg-white/[.025]">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <label className="text-[11.5px] font-bold text-ink">Video hoặc liên kết gợi ý</label>
+                            <div className="flex gap-1.5">
+                              <button type="button" onClick={() => handleAddFaqResource(item, 'video')} className="rounded-[7px] bg-blue-50 px-2 py-1 text-[10px] font-bold text-blue-700 dark:bg-blue-950/50 dark:text-blue-200">+ Video</button>
+                              <button type="button" onClick={() => handleAddFaqResource(item, 'link')} className="rounded-[7px] bg-slate-200 px-2 py-1 text-[10px] font-bold text-slate-700 dark:bg-white/10 dark:text-slate-200">+ Liên kết</button>
+                            </div>
+                          </div>
+                          {(item.resources || []).map((resource, resourceIndex) => (
+                            <div key={`${item.id}-resource-${resourceIndex}`} className="grid grid-cols-[1fr_auto] gap-1.5">
+                              <div className="flex min-w-0 flex-col gap-1.5">
+                                <input
+                                  type="text"
+                                  value={resource.title}
+                                  onChange={(e) => handleUpdateFaqItem(item.id, { resources: (item.resources || []).map((entry, index) => index === resourceIndex ? { ...entry, title: e.target.value } : entry) })}
+                                  placeholder={resource.kind === 'video' ? 'Tên video' : 'Tên liên kết'}
+                                  className="h-8 w-full rounded-[7px] border border-line bg-surface px-2 text-[11px] text-ink focus:border-primary focus:outline-hidden"
+                                />
+                                <input
+                                  type="url"
+                                  value={resource.url}
+                                  onChange={(e) => handleUpdateFaqItem(item.id, { resources: (item.resources || []).map((entry, index) => index === resourceIndex ? { ...entry, url: e.target.value } : entry) })}
+                                  placeholder="Link bài học / video / website"
+                                  className="h-8 w-full rounded-[7px] border border-line bg-surface px-2 text-[11px] text-ink focus:border-primary focus:outline-hidden"
+                                />
+                                {resource.kind === 'video' && <input
+                                  type="url"
+                                  value={resource.thumbnail_url || ''}
+                                  onChange={(e) => handleUpdateFaqItem(item.id, { resources: (item.resources || []).map((entry, index) => index === resourceIndex ? { ...entry, thumbnail_url: e.target.value } : entry) })}
+                                  placeholder="Link ảnh thumbnail (nếu có)"
+                                  className="h-8 w-full rounded-[7px] border border-line bg-surface px-2 text-[11px] text-ink focus:border-primary focus:outline-hidden"
+                                />}
+                              </div>
+                              <button type="button" onClick={() => handleUpdateFaqItem(item.id, { resources: (item.resources || []).filter((_, index) => index !== resourceIndex) })} className="flex h-8 w-8 items-center justify-center self-start rounded-[7px] bg-red-50 text-red-600 dark:bg-red-950/30 dark:text-red-300" aria-label="Xóa liên kết">×</button>
+                            </div>
+                          ))}
+                        </div>
+                        </>}
                       </div>
                     ))}
                   </div>

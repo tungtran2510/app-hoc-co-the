@@ -32,6 +32,13 @@ const SYNONYM_MAP: [RegExp, string][] = [
   [/hoat chat sinh hoc|phytonutrient/g, 'hoat chat sinh hoc polyphenol flavonoid carotenoid allicin curcumin'],
   [/cat tui mat|sau cat tui mat/g, 'cat tui mat sau cat tui mat dich mat muoi mat phan mo'],
   [/thoat vi dia dem|thoat vi/g, 'thoat vi dia dem l4 l5 chen ep re than kinh toa'],
+  [/omega\s*3|dau ca/g, 'omega 3 epa dha rtg totox dau ca tieu chi cham diem'],
+  [/nhin an 16\s*8|16\s*8|intermittent fasting/g, 'nhin an gian doan 16 8 khung gio mau thuc don'],
+  [/tu thuc bao|autophagy/g, 'tu thuc bao autophagy cong tac phac do 4 tuan tai tao te bao'],
+  [/lam sach ruot|thai doc ruot/g, 'lam sach duong ruot 4 tuan chat xo hoa tan men vi sinh'],
+  [/kem|zinc/g, 'khoang chat kem thieu kem giam vi giac sinh ly metallothionein'],
+  [/canxi|calcium/g, 'khoang chất canxi loang xuong osteocalcin magie d3 k2'],
+  [/sat|iron/g, 'khoang chat sat thieu mau nhuoc sac vi chat tao mau hemoglobin'],
 ];
 
 interface Chunk {

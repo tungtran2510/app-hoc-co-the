@@ -99,8 +99,22 @@ export default function AiAssistantPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showTrainingModal, setShowTrainingModal] = useState(false);
   const [trainingConfig, setTrainingConfig] = useState<AiTrainingConfig | null>(null);
+  const [loadingStep, setLoadingStep] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    let timer: any;
+    if (isLoading) {
+      setLoadingStep(0);
+      timer = setTimeout(() => {
+        setLoadingStep(1);
+      }, 2200);
+    } else {
+      setLoadingStep(0);
+    }
+    return () => clearTimeout(timer);
+  }, [isLoading]);
 
   const fetchTrainingConfig = () => {
     fetch('/api/ai/training')
@@ -614,9 +628,13 @@ export default function AiAssistantPage() {
 
             {/* TRẠNG THÁI ĐANG TRẢ LỜI */}
             {isLoading && (
-              <div className="flex items-center gap-2 max-w-[85%] p-2 px-3 rounded-[12px] bg-white dark:bg-[#160D30] border border-primary/20 dark:border-purple-800/40 shadow-2xs text-[12px] text-muted animate-in fade-in duration-200">
-                <Loader2 size={13} className="animate-spin text-primary shrink-0" />
-                <span className="truncate">Trợ lý Sức Khỏe đang tra cứu bài học...</span>
+              <div className="flex items-start sm:items-center gap-2.5 max-w-[92%] p-2.5 px-3.5 rounded-[14px] bg-white dark:bg-[#160D30] border border-primary/25 dark:border-purple-800/50 shadow-xs text-[12px] sm:text-[12.5px] text-ink-2 dark:text-purple-200 animate-in fade-in duration-200 leading-snug">
+                <Loader2 size={15} className="animate-spin text-primary shrink-0 mt-0.5 sm:mt-0" />
+                <span className="font-medium">
+                  {loadingStep === 0
+                    ? '🔍 Trợ lý AI đang tra cứu kho tài liệu y khoa chuyên sâu...'
+                    : '⏳ Câu hỏi chuyên sâu, vui lòng chờ trong giây lát để AI tổng hợp giải pháp y khoa và bài học chuẩn xác nhất...'}
+                </span>
               </div>
             )}
 

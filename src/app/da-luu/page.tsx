@@ -230,6 +230,26 @@ export default function SavedPages() {
               const kindLabel = item.kind === 'video' ? 'Video' : item.kind === 'book' ? 'Sách' : 'Danh sách phát';
               const KindIcon = item.kind === 'video' ? PlayCircle : item.kind === 'book' ? BookOpen : ListVideo;
               const isGridView = savedView === 'grid';
+              if (isGridView) {
+                return (
+                  <div key={item.page_id} className="flex min-w-0 flex-col gap-1.5 rounded-[15px] border border-slate-200/80 bg-white p-2 shadow-[0_5px_16px_-16px_rgba(15,23,42,.5)] dark:border-purple-800/40 dark:bg-[#160D30]">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <Link href={item.href || `/${item.topic_slug}/${item.page_slug}`} className="relative aspect-video min-w-0 flex-1 overflow-hidden rounded-[9px] border border-slate-200 bg-primary-soft dark:border-purple-800/50">
+                        {item.thumb ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={item.thumb} alt={item.page_title} className="h-full w-full object-cover" loading="lazy" />
+                        ) : <span className="flex h-full w-full items-center justify-center text-primary dark:text-[#F8DF7B]"><KindIcon size={19} /></span>}
+                      </Link>
+                      <button type="button" onClick={(e) => handleRemove(e, item)} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] bg-blue-50 text-blue-700 hover:bg-red-50 hover:text-red-600 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-red-950/40" aria-label="Bỏ lưu mục này" title="Bỏ lưu"><BookmarkCheck size={16} /></button>
+                    </div>
+                    <Link href={item.href || `/${item.topic_slug}/${item.page_slug}`} className="min-w-0 active:opacity-80">
+                      <span className="mb-0.5 inline-flex items-center gap-1 text-[8px] font-black uppercase tracking-wide text-primary dark:text-blue-300"><KindIcon size={10} />{kindLabel}</span>
+                      <h3 className="line-clamp-1 break-all text-[11px] font-extrabold leading-snug text-slate-900 dark:text-white">{item.page_title}</h3>
+                      <p className="line-clamp-1 break-all text-[9px] leading-snug text-slate-500 dark:text-purple-300/80">{item.subtitle || item.topic_title || ' '}</p>
+                    </Link>
+                  </div>
+                );
+              }
               return (
                 <div
                   key={item.page_id}
@@ -311,13 +331,10 @@ export default function SavedPages() {
             return (
               <div
                 key={item.page_id}
-                className="relative flex min-w-0 items-center gap-2 rounded-[15px] border border-slate-200/90 bg-white px-2.5 pb-2 pt-9 shadow-[0_5px_16px_-16px_rgba(15,23,42,.5)] transition-colors dark:border-purple-800/40 dark:bg-[#160D30] group"
+                className="flex min-w-0 flex-col gap-1.5 rounded-[15px] border border-slate-200/90 bg-white p-2 shadow-[0_5px_16px_-16px_rgba(15,23,42,.5)] transition-colors dark:border-purple-800/40 dark:bg-[#160D30] group"
               >
-                {/* Hàng trên: Logo chuyên đề + Tiêu đề + Nút xóa */}
-                <div className="flex min-w-0 flex-1 items-start gap-2.5">
-                  {/* Thumbnail Chuyên đề 3D */}
-                  <div className="flex shrink-0 flex-col items-center gap-1">
-                    <div className="relative h-11 w-11 rounded-[10px] bg-slate-50 dark:bg-purple-950/70 border border-slate-200 dark:border-purple-800/50 p-0.5 flex items-center justify-center overflow-hidden">
+                <div className="flex min-w-0 items-center gap-2">
+                  <Link href={`/${item.topic_slug}/${item.page_slug}`} className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-[10px] border border-slate-200 bg-slate-50 p-0.5 dark:border-purple-800/50 dark:bg-purple-950/70">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={topicIcon}
@@ -333,36 +350,25 @@ export default function SavedPages() {
                       <BookOpen size={18} />
                     </div>
 
-                    {/* Số bài */}
                     <span className="absolute bottom-0 right-0 px-1 py-0.2 rounded-tl-[6px] bg-primary text-white text-[8.5px] font-black">
                       #{item.page_number}
                     </span>
-                    </div>
-                  </div>
-
+                  </Link>
                   <button
                     type="button"
                     onClick={(e) => handleRemove(e, item)}
-                    className="absolute left-2 top-2 z-10 flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-[9px] border border-blue-100 bg-white/95 text-blue-700 shadow-sm transition-colors hover:bg-red-50 hover:text-red-600 dark:border-blue-900/50 dark:bg-[#201743] dark:text-blue-300 dark:hover:bg-red-950/40"
+                    className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-[9px] bg-blue-50 text-blue-700 transition-colors hover:bg-red-50 hover:text-red-600 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-red-950/40"
                     aria-label="Bỏ lưu bài học"
                     title="Bỏ lưu bài học này"
                   >
                     <BookmarkCheck size={15} />
                   </button>
-
-                  {/* Thông tin bài học */}
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] font-black uppercase text-primary dark:text-[#F8DF7B] tracking-wider truncate">
-                        {item.topic_title}
-                      </span>
-                    </div>
-
-                    <h3 className="break-words text-[12px] font-bold text-slate-900 dark:text-white leading-snug mt-0.5 group-hover:text-primary dark:group-hover:text-[#F8DF7B] transition-colors">
-                      {item.page_title}
-                    </h3>
-                  </div>
                 </div>
+                <Link href={`/${item.topic_slug}/${item.page_slug}`} className="min-w-0 active:opacity-80">
+                  <span className="block truncate text-[8px] font-extrabold uppercase tracking-wide text-primary dark:text-[#F8DF7B]">{item.topic_title}</span>
+                  <h3 className="line-clamp-1 break-all text-[11px] font-extrabold leading-snug text-slate-900 transition-colors group-hover:text-primary dark:text-white dark:group-hover:text-[#F8DF7B]">{item.page_title}</h3>
+                  <p className="line-clamp-1 break-all text-[9px] leading-snug text-slate-500 dark:text-purple-300/80">{item.topic_title}</p>
+                </Link>
               </div>
             );
           })}
