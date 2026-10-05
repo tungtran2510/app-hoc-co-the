@@ -51,6 +51,8 @@ interface TopicListClientProps {
     block: Extract<Block, { type: 'faq' }>;
     question: string;
     answer: string;
+    faqCategoryId: string;
+    faqCategoryTitle: string;
     topicId: string;
     topicTitle: string;
     topicSlug: string;
@@ -109,10 +111,11 @@ export default function TopicListClient({
   const [showDisplayMenu, setShowDisplayMenu] = useState(false);
   const [featuredTopicIds, setFeaturedTopicIds] = useState<string[]>(initialFeaturedTopicIds || []);
   const [topicFaqRows, setTopicFaqRows] = useState(initialFaqs);
-  const [selectedFaqTopic, setSelectedFaqTopic] = useState('all');
+  const [selectedFaqCategory, setSelectedFaqCategory] = useState('all');
   const [editingFaqBlock, setEditingFaqBlock] = useState<Extract<Block, { type: 'faq' }> | null>(null);
   const [faqCategoryPickerOpen, setFaqCategoryPickerOpen] = useState(false);
   const [faqCategoryPickerAction, setFaqCategoryPickerAction] = useState<'category' | 'question'>('category');
+  const [newFaqCategoryName, setNewFaqCategoryName] = useState('');
   const [faqSaveError, setFaqSaveError] = useState('');
   const lessonFetchStarted = React.useRef(false);
   // Tìm cả tên bài học: chỉ tải dữ liệu tìm kiếm một lần khi người dùng bắt đầu gõ
@@ -125,39 +128,57 @@ export default function TopicListClient({
 
   useEffect(() => setTopicFaqRows(initialFaqs), [initialFaqs]);
 
-  const filteredFaqRows = useMemo(() => topicFaqRows.filter((faq) => selectedFaqTopic === 'all'
+  const filteredFaqRows = useMemo(() => topicFaqRows.filter((faq) => selectedFaqCategory === 'all'
     ? true
-    : faq.learningAnswers.length
-      ? faq.learningAnswers.some((answer) => answer.topicId === selectedFaqTopic)
-      : faq.topicId === selectedFaqTopic), [topicFaqRows, selectedFaqTopic]);
+    : faq.faqCategoryId === selectedFaqCategory), [topicFaqRows, selectedFaqCategory]);
 
-  const faqTopicsWithContent = useMemo(() => initialFaqTopics.filter((topic) => topicFaqRows.some((faq) => faq.learningAnswers.length
-    ? faq.learningAnswers.some((answer) => answer.topicId === topic.id)
-    : faq.topicId === topic.id)), [initialFaqTopics, topicFaqRows]);
+  const faqCategories = useMemo(() => Array.from(new Map(topicFaqRows.map((faq) => [faq.faqCategoryId, faq.faqCategoryTitle])).entries()).map(([id, title]) => ({ id, title })), [topicFaqRows]);
 
-  const handleAddFaqQuestion = async (topicId: string) => {
-    const topic = initialFaqTopics.find((item) => item.id === topicId);
-    if (!topic) return;
+  const handleAddFaqQuestion = async (categoryId: string) => {
+    const category = faqCategories.find((item) => item.id === categoryId);
+    if (!category) return;
     setFaqCategoryPickerOpen(false);
-    setSelectedFaqTopic(topicId);
+    setSelectedFaqCategory(categoryId);
     setFaqSaveError('');
-    const existing = topicFaqRows.find((faq) => faq.topicId === topicId)?.block;
+    const existing = topicFaqRows.find((faq) => faq.faqCategoryId === categoryId)?.block;
     if (existing) {
       setEditingFaqBlock({ ...existing, data: { ...existing.data, items: [...existing.data.items, { id: generateUuid(), question: '', answer: '', is_visible: true, learning_answers: [] }] } });
       return;
     }
+  };
+
+  const handleCreateFaqCategory = async () => {
+    const title = newFaqCategoryName.trim();
+    if (!title) return;
+    const duplicate = faqCategories.find((category) => category.title.toLocaleLowerCase() === title.toLocaleLowerCase());
+    if (duplicate) {
+      setNewFaqCategoryName('');
+      setFaqCategoryPickerOpen(false);
+      await handleAddFaqQuestion(duplicate.id);
+      return;
+    }
+    const categoryId = generateUuid();
+    const storageTopic = initialFaqTopics[0];
+    if (!storageTopic) {
+      setFaqSaveError('Chưa có bài học để lưu danh mục.');
+      return;
+    }
+    setFaqSaveError('');
     try {
-      const response = await fetch(`/api/admin/topic-faqs?topicId=${encodeURIComponent(topicId)}`, { headers: getAdminHeaders(), cache: 'no-store' });
+      const response = await fetch(`/api/admin/topic-faqs?topicId=${encodeURIComponent(storageTopic.id)}`, { headers: getAdminHeaders(), cache: 'no-store' });
       const result = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(result.error || 'Không tải được chuyên đề');
+      if (!response.ok) throw new Error(result.error || 'Không tải được dữ liệu để tạo danh mục');
       const page = result.pages?.[0];
-      if (!page) throw new Error('Chuyên đề này chưa có bài học để gắn câu hỏi.');
+      if (!page) throw new Error('Chưa có bài học để lưu danh mục.');
       const block: Extract<Block, { type: 'faq' }> = {
         id: generateUuid(), page_id: page.id, type: 'faq', display_style: 'accordion',
         sort_order: (result.blocks || []).filter((item: { page_id: string }) => item.page_id === page.id).length + 1,
         is_visible: true,
-        data: { title: `Vấn đề thường gặp · ${topic.title}`, faq_surface: 'overview', items: [{ id: generateUuid(), question: '', answer: '', is_visible: true, learning_answers: [] }] },
+        data: { title: `Vấn đề thường gặp · ${title}`, faq_surface: 'overview', faq_category_id: categoryId, faq_category_title: title, items: [{ id: generateUuid(), question: '', answer: '', is_visible: true, learning_answers: [] }] },
       };
+      setSelectedFaqCategory(categoryId);
+      setFaqCategoryPickerOpen(false);
+      setNewFaqCategoryName('');
       setEditingFaqBlock(block);
     } catch (error) {
       setFaqSaveError(error instanceof Error ? error.message : 'Không tạo được câu hỏi mới.');
@@ -835,21 +856,21 @@ export default function TopicListClient({
             </header>
 
             <div className="mb-2 flex flex-wrap items-center gap-1.5" aria-label="Lọc vấn đề theo chủ đề">
-              <button type="button" onClick={() => setSelectedFaqTopic('all')} aria-pressed={selectedFaqTopic === 'all'} className={`rounded-full border px-3 py-1.5 text-[10px] font-extrabold transition-colors ${selectedFaqTopic === 'all' ? 'border-[#214B91] bg-[#214B91] text-white' : 'border-[#DCE5F2] bg-white text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-200'}`}>Tất cả</button>
-              {faqTopicsWithContent.map((topic) => <button key={topic.id} type="button" onClick={() => setSelectedFaqTopic(topic.id)} aria-pressed={selectedFaqTopic === topic.id} className={`rounded-full border px-3 py-1.5 text-[10px] font-extrabold transition-colors ${selectedFaqTopic === topic.id ? 'border-[#214B91] bg-[#214B91] text-white' : 'border-[#DCE5F2] bg-white text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-200'}`}>{topic.title}</button>)}
+              <button type="button" onClick={() => setSelectedFaqCategory('all')} aria-pressed={selectedFaqCategory === 'all'} className={`rounded-full border px-3 py-1.5 text-[10px] font-extrabold transition-colors ${selectedFaqCategory === 'all' ? 'border-[#214B91] bg-[#214B91] text-white' : 'border-[#DCE5F2] bg-white text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-200'}`}>Tất cả</button>
+              {faqCategories.map((category) => <button key={category.id} type="button" onClick={() => setSelectedFaqCategory(category.id)} aria-pressed={selectedFaqCategory === category.id} className={`rounded-full border px-3 py-1.5 text-[10px] font-extrabold transition-colors ${selectedFaqCategory === category.id ? 'border-[#214B91] bg-[#214B91] text-white' : 'border-[#DCE5F2] bg-white text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-200'}`}>{category.title}</button>)}
               {isAdmin && <button type="button" onClick={() => { setFaqCategoryPickerAction('category'); setFaqCategoryPickerOpen((open) => !open); }} className="inline-flex min-h-[30px] items-center gap-1 rounded-full border border-dashed border-[#214B91] px-3 py-1.5 text-[10px] font-extrabold text-[#214B91] dark:border-blue-300 dark:text-blue-200"><Plus size={12} />Thêm danh mục</button>}
             </div>
 
-            {isAdmin && <div className="mb-2 flex justify-start"><button type="button" onClick={() => { if (selectedFaqTopic !== 'all') void handleAddFaqQuestion(selectedFaqTopic); else { setFaqCategoryPickerAction('question'); setFaqCategoryPickerOpen(true); } }} className="inline-flex min-h-8 items-center gap-1 rounded-[9px] bg-[#214B91] px-2.5 text-[10px] font-extrabold text-white"><Plus size={13} />Thêm câu hỏi</button></div>}
+            {isAdmin && <div className="mb-2 flex justify-start"><button type="button" onClick={() => { if (selectedFaqCategory !== 'all') void handleAddFaqQuestion(selectedFaqCategory); else { setFaqCategoryPickerAction('question'); setFaqCategoryPickerOpen(true); } }} className="inline-flex min-h-8 items-center gap-1 rounded-[9px] bg-[#214B91] px-2.5 text-[10px] font-extrabold text-white"><Plus size={13} />Thêm câu hỏi</button></div>}
 
-            {isAdmin && faqCategoryPickerOpen && <div className="mb-3 rounded-[12px] border border-blue-200 bg-white p-2.5 dark:border-blue-400/20 dark:bg-[#191330]"><div className="mb-2 flex items-center justify-between gap-2"><p className="text-[11px] font-extrabold text-[#102144] dark:text-white">{faqCategoryPickerAction === 'category' ? 'Chọn chủ đề để thêm danh mục' : 'Chọn chủ đề cho câu hỏi mới'}</p><button type="button" onClick={() => setFaqCategoryPickerOpen(false)} aria-label="Đóng danh sách chủ đề" className="rounded p-1 text-slate-500"><X size={14} /></button></div><div className="flex max-h-36 flex-wrap gap-1.5 overflow-y-auto">{initialFaqTopics.filter((topic) => faqCategoryPickerAction === 'question' || !faqTopicsWithContent.some((present) => present.id === topic.id)).map((topic) => <button key={topic.id} type="button" onClick={() => void handleAddFaqQuestion(topic.id)} className="rounded-full border border-[#DCE5F2] bg-slate-50 px-2.5 py-1.5 text-[10px] font-bold text-slate-700 hover:border-[#214B91] hover:text-[#214B91] dark:border-white/10 dark:bg-white/5 dark:text-slate-200">{topic.title}</button>)}</div>{faqCategoryPickerAction === 'category' && <p className="mt-2 text-[9px] text-slate-500 dark:text-slate-400">Chọn chủ đề sẽ mở câu hỏi đầu tiên; danh mục sẽ hiện sau khi lưu.</p>}</div>}
+            {isAdmin && faqCategoryPickerOpen && <div className="mb-3 rounded-[12px] border border-blue-200 bg-white p-2.5 dark:border-blue-400/20 dark:bg-[#191330]"><div className="mb-2 flex items-center justify-between gap-2"><p className="text-[11px] font-extrabold text-[#102144] dark:text-white">{faqCategoryPickerAction === 'category' ? 'Tên danh mục mới' : 'Chọn danh mục cho câu hỏi mới'}</p><button type="button" onClick={() => setFaqCategoryPickerOpen(false)} aria-label="Đóng" className="rounded p-1 text-slate-500"><X size={14} /></button></div>{faqCategoryPickerAction === 'category' ? <form onSubmit={(event) => { event.preventDefault(); void handleCreateFaqCategory(); }} className="flex gap-2"><input autoFocus value={newFaqCategoryName} onChange={(event) => setNewFaqCategoryName(event.target.value)} placeholder="Nhập tên danh mục bạn muốn…" aria-label="Tên danh mục mới" className="h-9 min-w-0 flex-1 rounded-[8px] border border-[#DCE5F2] bg-white px-2.5 text-[11px] text-slate-800 outline-none focus:border-[#214B91] dark:border-white/10 dark:bg-white/5 dark:text-white" /><button type="submit" disabled={!newFaqCategoryName.trim()} className="inline-flex h-9 shrink-0 items-center gap-1 rounded-[8px] bg-[#214B91] px-2.5 text-[10px] font-extrabold text-white disabled:opacity-40"><Plus size={13} />Tạo danh mục</button></form> : <div className="flex max-h-36 flex-wrap gap-1.5 overflow-y-auto">{faqCategories.map((category) => <button key={category.id} type="button" onClick={() => void handleAddFaqQuestion(category.id)} className="rounded-full border border-[#DCE5F2] bg-slate-50 px-2.5 py-1.5 text-[10px] font-bold text-slate-700 hover:border-[#214B91] hover:text-[#214B91] dark:border-white/10 dark:bg-white/5 dark:text-slate-200">{category.title}</button>)}{faqCategories.length === 0 && <p className="text-[10px] text-slate-500">Chưa có danh mục. Hãy thêm danh mục trước.</p>}</div>}</div>}
 
             {faqSaveError && <p role="alert" className="mb-2 rounded-lg bg-red-50 px-3 py-2 text-[11px] font-bold text-red-700 dark:bg-red-950/30 dark:text-red-200">{faqSaveError}</p>}
 
             <div className="flex flex-col gap-2">
               {filteredFaqRows.map((faq) => {
-                const answers = selectedFaqTopic === 'all' ? faq.learningAnswers : faq.learningAnswers.filter((answer) => answer.topicId === selectedFaqTopic);
-                const label = selectedFaqTopic === 'all' ? faq.topicTitle : initialFaqTopics.find((topic) => topic.id === selectedFaqTopic)?.title || faq.topicTitle;
+                const answers = faq.learningAnswers;
+                const label = faq.faqCategoryTitle;
                 return <div key={faq.id} className="flex items-start gap-1.5">
                   <details className="group min-w-0 flex-1 overflow-hidden rounded-[15px] border border-slate-200/90 bg-white shadow-[0_3px_10px_-9px_rgba(15,23,42,.35)] dark:border-white/10 dark:bg-[#1B1630]">
                     <summary className="flex min-h-[54px] cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-3 text-left [&::-webkit-details-marker]:hidden">

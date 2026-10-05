@@ -17,7 +17,7 @@ export default async function AllTopicsPage() {
   const visibleTopics = topicsWithCounts.filter(({ topic }) => topic.is_visible);
   const topicFaqs: Array<{
     id: string; blockId: string; itemId: string; block: Extract<Block, { type: 'faq' }>;
-    question: string; answer: string; topicId: string; topicTitle: string; topicSlug: string; pageTitle: string;
+    question: string; answer: string; topicId: string; topicTitle: string; faqCategoryId: string; faqCategoryTitle: string; topicSlug: string; pageTitle: string;
     learningAnswers: Array<{ id: string; text: string; topicId: string; topicTitle: string; destinationType?: 'video' | 'topic'; href?: string; videoTitle: string; thumbnailUrl?: string | null }>;
     videos: { title: string; thumbnailUrl?: string | null; href: string }[];
   }> = [];
@@ -62,11 +62,13 @@ export default async function AllTopicsPage() {
           });
           return [{ id: answer.id, text: answer.text, topicId: targetTopicId, topicTitle: category.topic.title, destinationType: video ? 'video' as const : answer.target_topic_id ? 'topic' as const : undefined, href: video ? `/${video.topic_slug}/${video.page_slug}?v=${video.index}` : answer.target_topic_id ? `/${targetTopic.slug}` : undefined, videoTitle: video?.video_title || (answer.target_topic_id ? `Mở chuyên đề ${targetTopic.title}` : ''), thumbnailUrl: video?.thumbnail_url, linkedVideos }];
         });
-        topicFaqs.push({
-          id: `${page.id}-${block.id}-${item.id}`, blockId: block.id, itemId: item.id, block,
-          question: item.question, answer: item.answer, topicId: topic.id, topicTitle: topic.title,
-          topicSlug: topic.slug, pageTitle: page.title, learningAnswers, videos,
-        });
+          topicFaqs.push({
+            id: `${page.id}-${block.id}-${item.id}`, blockId: block.id, itemId: item.id, block,
+            question: item.question, answer: item.answer, topicId: topic.id, topicTitle: topic.title,
+            faqCategoryId: block.data.faq_category_id || topic.id,
+            faqCategoryTitle: block.data.faq_category_title || topic.title,
+            topicSlug: topic.slug, pageTitle: page.title, learningAnswers, videos,
+          });
       }
     }
   }

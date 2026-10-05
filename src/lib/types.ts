@@ -275,6 +275,8 @@ export type Block =
         description?: string;
         /** Separates topic-page FAQs from the independent all-topics FAQ collection. */
         faq_surface?: 'topic' | 'overview';
+        faq_category_id?: string;
+        faq_category_title?: string;
         scope?: 'topic' | 'video';
         target_page_id?: string;
         target_video_index?: number;
