@@ -579,7 +579,7 @@ export async function POST(req: NextRequest) {
     // Lấy catalog bài học siêu nhanh
     const [catalog, settings] = await Promise.all([
       getOrBuildLessonCatalog(),
-      getSettings(),
+      getSettings(true),
     ]);
 
     const aiTraining = settings?.ai_training;

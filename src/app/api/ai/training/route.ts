@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const settings = await getSettings();
+    const settings = await getSettings(true);
     return NextResponse.json({
       success: true,
       ai_training: settings.ai_training || null,

@@ -199,8 +199,9 @@ async function getCachedOrFetch<T>(key: string, fetcher: () => Promise<T>, ttlMs
   return data;
 }
 
-export async function getSettings(): Promise<Settings> {
-  return getCachedOrFetch('settings', async () => {
+export async function getSettings(includeAiTraining = false): Promise<Settings> {
+  const cacheKey = includeAiTraining ? 'settings:full' : 'settings:light';
+  return getCachedOrFetch(cacheKey, async () => {
     const supabase = getSupabase();
     if (supabase) {
       try {
@@ -214,42 +215,51 @@ export async function getSettings(): Promise<Settings> {
           const finalHotline = data.hotline || authProfile.phone || DEFAULT_AUTHOR_PROFILE.phone;
           const finalZaloUrl = data.zalo_url || authProfile.zalo_url || DEFAULT_AUTHOR_PROFILE.zalo_url;
 
+          // Loại bỏ trường nặng ai_training khỏi block_styles nếu không cần thiết để giảm tải >67KB payload
+          const sanitizedBlockStyles = (data.block_styles && typeof data.block_styles === 'object')
+            ? { ...data.block_styles }
+            : {};
+          if (!includeAiTraining && 'ai_training' in sanitizedBlockStyles) {
+            delete sanitizedBlockStyles.ai_training;
+          }
+
           return {
             ...data,
+            block_styles: sanitizedBlockStyles,
             app_name: data.app_name || 'Qbiz Books',
             primary_color: data.primary_color || '#0C0817',
             hotline: finalHotline,
             zalo_url: finalZaloUrl,
-            app_subtitle: data.app_subtitle !== undefined ? data.app_subtitle : (data.block_styles?.app_subtitle !== undefined ? data.block_styles.app_subtitle : null),
-            brand_tagline: data.brand_tagline !== undefined ? data.brand_tagline : (data.block_styles?.brand_tagline !== undefined ? data.block_styles.brand_tagline : 'EMPOWERING MEDICAL KNOWLEDGE'),
+            app_subtitle: data.app_subtitle !== undefined ? data.app_subtitle : (sanitizedBlockStyles.app_subtitle !== undefined ? sanitizedBlockStyles.app_subtitle : null),
+            brand_tagline: data.brand_tagline !== undefined ? data.brand_tagline : (sanitizedBlockStyles.brand_tagline !== undefined ? sanitizedBlockStyles.brand_tagline : 'EMPOWERING MEDICAL KNOWLEDGE'),
             author_profile: {
               ...authProfile,
               phone: finalHotline,
               zalo_url: finalZaloUrl,
             },
-            home_greeting: data.home_greeting || data.block_styles?.home_greeting || 'Xin chào!',
-            home_title: data.home_title || data.block_styles?.home_title || 'Hôm nay mình học gì?',
-            search_placeholder: data.search_placeholder || data.block_styles?.search_placeholder || 'Tìm bài, ví dụ: đĩa đệm',
-            topics_title: data.topics_title || data.block_styles?.topics_title || 'Chuyên Đề Học',
-            home_topics_display: data.block_styles?.home_topics_display || data.block_styles?.topics_display || 'card',
-            topics_page_display: data.block_styles?.topics_page_display || data.block_styles?.topics_display || 'card',
-            featured_topic_ids: Array.isArray(data.block_styles?.featured_topic_ids) ? data.block_styles.featured_topic_ids : [],
-            recommended_books_title: data.recommended_books_title || data.block_styles?.recommended_books_title || 'Tài Liệu Y Khoa',
-            recommended_books_subtitle: data.recommended_books_subtitle || data.block_styles?.recommended_books_subtitle || 'Tài liệu tham khảo chuyên sâu giúp bạn hiểu và chăm sóc cơ thể mỗi ngày',
-            recommended_books: normalizeRecommendedBooks(data.recommended_books || data.block_styles?.recommended_books),
-            recommended_books_layout: data.recommended_books_layout || data.block_styles?.recommended_books_layout || 'grid',
-            flat_books_title: data.flat_books_title || data.block_styles?.flat_books_title || 'Tủ Sách Tối Giản',
-            flat_books: normalizeRecommendedBooks(data.flat_books || data.block_styles?.flat_books || DEFAULT_RECOMMENDED_BOOKS),
-            home_sections_order: normalizeHomeSectionsOrder(data.home_sections_order || data.block_styles?.home_sections_order),
-            hidden_home_sections: normalizeHiddenHomeSections(data.hidden_home_sections || data.block_styles?.hidden_home_sections),
-            ai_training: normalizeAiTraining(data.ai_training || data.block_styles?.ai_training),
-            welcome_title: data.welcome_title || data.block_styles?.welcome_title || 'Chào mừng bạn đến với Qbiz Books',
-            welcome_message: data.welcome_message || data.block_styles?.welcome_message || 'Hi vọng nền tảng học hiểu cơ thể và chăm sóc sức khỏe chủ động này sẽ giúp bạn hiểu sâu hơn về cơ thể mình, nuôi dưỡng hệ cơ xương khớp và sống khỏe mỗi ngày.',
-            welcome_video_url: data.welcome_video_url || data.block_styles?.welcome_video_url || 'https://www.youtube.com/watch?v=c9kmCxFKHPY',
-            home_custom_blocks: (data.block_styles?.home_custom_blocks && typeof data.block_styles.home_custom_blocks === 'object') ? data.block_styles.home_custom_blocks : {},
-            topics_display: ['card', 'text', 'logo', 'large'].includes(data.block_styles?.topics_display) ? data.block_styles.topics_display : 'card',
-            topics_description: data.block_styles?.topics_description || 'Hệ thống chuyên đề & bài học giải phẫu cơ thể',
-            topics_guide: (data.block_styles?.topics_guide && typeof data.block_styles.topics_guide === 'object') ? data.block_styles.topics_guide : null,
+            home_greeting: data.home_greeting || sanitizedBlockStyles.home_greeting || 'Xin chào!',
+            home_title: data.home_title || sanitizedBlockStyles.home_title || 'Hôm nay mình học gì?',
+            search_placeholder: data.search_placeholder || sanitizedBlockStyles.search_placeholder || 'Tìm bài, ví dụ: đĩa đệm',
+            topics_title: data.topics_title || sanitizedBlockStyles.topics_title || 'Chuyên Đề Học',
+            home_topics_display: sanitizedBlockStyles.home_topics_display || sanitizedBlockStyles.topics_display || 'card',
+            topics_page_display: sanitizedBlockStyles.topics_page_display || sanitizedBlockStyles.topics_display || 'card',
+            featured_topic_ids: Array.isArray(sanitizedBlockStyles.featured_topic_ids) ? sanitizedBlockStyles.featured_topic_ids : [],
+            recommended_books_title: data.recommended_books_title || sanitizedBlockStyles.recommended_books_title || 'Tài Liệu Y Khoa',
+            recommended_books_subtitle: data.recommended_books_subtitle || sanitizedBlockStyles.recommended_books_subtitle || 'Tài liệu tham khảo chuyên sâu giúp bạn hiểu và chăm sóc cơ thể mỗi ngày',
+            recommended_books: normalizeRecommendedBooks(data.recommended_books || sanitizedBlockStyles.recommended_books),
+            recommended_books_layout: data.recommended_books_layout || sanitizedBlockStyles.recommended_books_layout || 'grid',
+            flat_books_title: data.flat_books_title || sanitizedBlockStyles.flat_books_title || 'Tủ Sách Tối Giản',
+            flat_books: normalizeRecommendedBooks(data.flat_books || sanitizedBlockStyles.flat_books || DEFAULT_RECOMMENDED_BOOKS),
+            home_sections_order: normalizeHomeSectionsOrder(data.home_sections_order || sanitizedBlockStyles.home_sections_order),
+            hidden_home_sections: normalizeHiddenHomeSections(data.hidden_home_sections || sanitizedBlockStyles.hidden_home_sections),
+            ai_training: includeAiTraining ? normalizeAiTraining(data.ai_training || data.block_styles?.ai_training) : DEFAULT_AI_TRAINING,
+            welcome_title: data.welcome_title || sanitizedBlockStyles.welcome_title || 'Chào mừng bạn đến với Qbiz Books',
+            welcome_message: data.welcome_message || sanitizedBlockStyles.welcome_message || 'Hi vọng nền tảng học hiểu cơ thể và chăm sóc sức khỏe chủ động này sẽ giúp bạn hiểu sâu hơn về cơ thể mình, nuôi dưỡng hệ cơ xương khớp và sống khỏe mỗi ngày.',
+            welcome_video_url: data.welcome_video_url || sanitizedBlockStyles.welcome_video_url || 'https://www.youtube.com/watch?v=c9kmCxFKHPY',
+            home_custom_blocks: (sanitizedBlockStyles.home_custom_blocks && typeof sanitizedBlockStyles.home_custom_blocks === 'object') ? sanitizedBlockStyles.home_custom_blocks : {},
+            topics_display: ['card', 'text', 'logo', 'large'].includes(sanitizedBlockStyles.topics_display) ? sanitizedBlockStyles.topics_display : 'card',
+            topics_description: sanitizedBlockStyles.topics_description || 'Hệ thống chuyên đề & bài học giải phẫu cơ thể',
+            topics_guide: (sanitizedBlockStyles.topics_guide && typeof sanitizedBlockStyles.topics_guide === 'object') ? sanitizedBlockStyles.topics_guide : null,
           } as Settings;
         }
       } catch {

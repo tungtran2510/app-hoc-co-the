@@ -4,6 +4,9 @@ node_modules
 .env
 .env*.local
 .vercel
+screenshots/
+.playwright-cli/
+.next-visual-review/
 
 # Temporary scratch and QA test files
 scratch/
