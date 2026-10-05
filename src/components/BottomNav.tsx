@@ -29,9 +29,11 @@ export default function BottomNav() {
     event: React.MouseEvent<HTMLAnchorElement>,
     href: string
   ) => {
-    event.preventDefault();
+    if (pathname === href) {
+      event.preventDefault();
+      return;
+    }
     setOptimisticTarget(href);
-    window.location.assign(href);
   };
 
   const isHome = activePath === '/';

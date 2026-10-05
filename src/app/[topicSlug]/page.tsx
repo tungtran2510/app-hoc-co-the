@@ -1,6 +1,6 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
-import { getTopicBySlug, getPagesByTopic, getBlocksByPage, getSettings } from '../../lib/data';
+import { getTopicBySlug, getPagesByTopic, getBlocksByPages, getSettings } from '../../lib/data';
 import TopicHeaderNav from '../../components/TopicHeaderNav';
 import TopicLearningExperience from '../../components/TopicLearningExperience';
 import BottomNav from '../../components/BottomNav';
@@ -24,8 +24,9 @@ export default async function TopicPage({ params }: TopicPageProps) {
   if (!topic) notFound();
 
   const pages = await getPagesByTopic(topic.id, true);
-  const pagesWithDetails = await Promise.all(pages.map(async (page, index) => {
-    const blocks = await getBlocksByPage(page.id);
+  const blocksByPage = await getBlocksByPages(pages.map((p) => p.id), false);
+  const pagesWithDetails = pages.map((page, index) => {
+    const blocks = blocksByPage[page.id] || [];
     let videoCount = 0;
     const pageVideos: Array<{ video: import('../../lib/types').Video; index: number; pageSlug: string }> = [];
     for (const block of blocks) {
@@ -50,7 +51,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
       }];
     });
     return { page, orderNumber: index + 1, videoCount, pageVideos, faqGroups };
-  }));
+  });
 
   const totalVideos = pagesWithDetails.reduce((sum, item) => sum + item.videoCount, 0);
   const topicVideos = pagesWithDetails.flatMap(({ page, pageVideos }) => pageVideos.map((entry) => ({ ...entry, pageId: page.id })));

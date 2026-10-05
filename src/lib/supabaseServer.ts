@@ -20,7 +20,7 @@ export function getSupabaseServer(): SupabaseClient | null {
         fetch: (input, init = {}) =>
           fetch(input, {
             ...init,
-            cache: 'no-store',
+            next: { revalidate: 60 },
           }),
       },
     });

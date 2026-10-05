@@ -504,14 +504,14 @@ export default function HomeHeader({
                 </button>
               </>
             ) : (
-              <a
+              <Link
                 href="/dang-nhap"
                 onClick={() => setShowMenu(false)}
                 className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-ink dark:hover:bg-surface-2 cursor-pointer"
               >
                 <User size={16} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
                 <span>Đăng nhập quản trị</span>
-              </a>
+              </Link>
             )}
           </div>
         )}
