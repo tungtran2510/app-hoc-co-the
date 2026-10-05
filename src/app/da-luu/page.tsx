@@ -232,7 +232,7 @@ export default function SavedPages() {
 
             if (savedView === 'grid') {
               return (
-                <article key={item.page_id} className="flex min-w-0 flex-col gap-2 rounded-[15px] border border-slate-200/80 bg-white p-2.5 shadow-[0_5px_16px_-16px_rgba(15,23,42,.5)] dark:border-purple-800/40 dark:bg-[#160D30]">
+                <article key={item.page_id} className="flex min-w-0 flex-col gap-1.5 rounded-[15px] border border-slate-200/80 bg-white p-2.5 shadow-[0_5px_16px_-16px_rgba(15,23,42,.5)] dark:border-purple-800/40 dark:bg-[#160D30]">
                   <div className="flex h-7 min-w-0 items-center justify-between gap-2">
                     <span className="inline-flex min-w-0 items-center gap-1 truncate text-[9px] font-black uppercase tracking-wide text-primary dark:text-blue-300">
                       <KindIcon size={12} className="shrink-0" />
@@ -240,14 +240,14 @@ export default function SavedPages() {
                     </span>
                     <button type="button" onClick={(e) => handleRemove(e, item)} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[9px] bg-blue-50 text-blue-700 hover:bg-red-50 hover:text-red-600 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-red-950/40" aria-label="Bỏ lưu mục này" title="Bỏ lưu"><BookmarkCheck size={15} /></button>
                   </div>
-                  <Link href={itemHref} className="relative block aspect-video w-full overflow-hidden rounded-[10px] border border-slate-200 bg-slate-50 dark:border-purple-800/50 dark:bg-purple-950/70">
+                  <Link href={itemHref} className="relative block aspect-video w-full max-w-[112px] overflow-hidden rounded-[10px] border border-slate-200 bg-slate-50 dark:border-purple-800/50 dark:bg-purple-950/70">
                     {item.thumb ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={item.thumb} alt={item.page_title} className="h-full w-full object-cover" loading="lazy" />
                     ) : isLesson ? (
                       <>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={topicIcon} alt={item.topic_title} className="h-full w-full object-contain p-3" loading="lazy" onError={(e) => { const image = e.target as HTMLElement; image.style.display = 'none'; const fallback = image.nextElementSibling as HTMLElement | null; if (fallback) fallback.style.display = 'flex'; }} />
+                        <img src={topicIcon} alt={item.topic_title} className="h-full w-full object-contain p-1" loading="lazy" onError={(e) => { const image = e.target as HTMLElement; image.style.display = 'none'; const fallback = image.nextElementSibling as HTMLElement | null; if (fallback) fallback.style.display = 'flex'; }} />
                         <span className="absolute inset-0 hidden items-center justify-center text-primary dark:text-[#F8DF7B]"><BookOpen size={22} /></span>
                       </>
                     ) : (

@@ -158,16 +158,6 @@ export default function HomeHeader({
       const savedName = localStorage.getItem('app_user_display_name');
       if (savedName && savedName.trim()) {
         setUserName(savedName.trim());
-      } else {
-        const prompted = sessionStorage.getItem('app_user_name_prompted');
-        if (!prompted) {
-          const timer = setTimeout(() => {
-            setNameInput('');
-            setShowNameModal(true);
-            sessionStorage.setItem('app_user_name_prompted', 'true');
-          }, 800);
-          return () => clearTimeout(timer);
-        }
       }
     } catch {}
   }, []);
