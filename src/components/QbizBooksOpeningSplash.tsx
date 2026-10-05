@@ -83,27 +83,34 @@ export default function QbizBooksOpeningSplash({
 
     if (!shouldShow) return;
 
-    // 1. Sau 650ms: Bìa sách 3D mở ra
+    // 1. Sau 400ms: Bìa sách 3D mở ra
     const tOpen = setTimeout(() => {
       setIsBookOpened(true);
-    }, 650);
+    }, 400);
 
-    // 2. Sau 3200ms: Bắt đầu tan biến dần vào trang chủ
+    // 2. Sau 1800ms: Bắt đầu tan biến dần vào trang chủ
     const tFade = setTimeout(() => {
       setIsFadingOut(true);
-    }, 3200);
+    }, 1800);
 
-    // 3. Sau 3700ms: Đóng hoàn toàn
+    // 3. Sau 2200ms: Đóng hoàn toàn
     const tFinish = setTimeout(() => {
       markIntroAsSeenPermanent();
       setIsVisible(false);
       if (onFinish) onFinish();
-    }, 3700);
+    }, 2200);
+
+    // Bảo hiểm an toàn tuyệt đối: Luôn tắt sau 2500ms để không bao giờ chắn màn hình
+    const tSafety = setTimeout(() => {
+      markIntroAsSeenPermanent();
+      setIsVisible(false);
+    }, 2500);
 
     return () => {
       clearTimeout(tOpen);
       clearTimeout(tFade);
       clearTimeout(tFinish);
+      clearTimeout(tSafety);
     };
   }, [forceShow, onFinish]);
 
@@ -117,13 +124,13 @@ export default function QbizBooksOpeningSplash({
       setIsVisible(true);
       setIsBookOpened(false);
       setIsFadingOut(false);
-      tOpen = setTimeout(() => setIsBookOpened(true), 650);
-      tFade = setTimeout(() => setIsFadingOut(true), 3200);
+      tOpen = setTimeout(() => setIsBookOpened(true), 400);
+      tFade = setTimeout(() => setIsFadingOut(true), 1800);
       tFinish = setTimeout(() => {
         markIntroAsSeenPermanent();
         setIsVisible(false);
         if (onFinish) onFinish();
-      }, 3700);
+      }, 2200);
     };
 
     window.addEventListener('replay_qbiz_books_intro', handleReplay);
@@ -141,7 +148,7 @@ export default function QbizBooksOpeningSplash({
     setTimeout(() => {
       setIsVisible(false);
       if (onFinish) onFinish();
-    }, 300);
+    }, 250);
   };
 
   if (!isVisible) return null;
@@ -149,7 +156,8 @@ export default function QbizBooksOpeningSplash({
   return (
     <div
       id="qbiz-books-3d-splash"
-      className={`fixed inset-0 z-[99999] flex flex-col items-center justify-center select-none overflow-hidden transition-all duration-500 ${
+      onClick={handleDismiss}
+      className={`fixed inset-0 z-[99999] flex flex-col items-center justify-center select-none overflow-hidden transition-all duration-500 cursor-pointer ${
         isFadingOut ? 'opacity-0 scale-105 pointer-events-none' : 'opacity-100 scale-100'
       }`}
       style={{
