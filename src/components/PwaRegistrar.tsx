@@ -192,7 +192,7 @@ export default function PwaRegistrar() {
         <aside
           role="region"
           aria-label="Thông báo cài đặt ứng dụng"
-          className="fixed top-2.5 left-1/2 -translate-x-1/2 z-[70] w-[94%] max-w-[460px] md:max-w-[780px] p-2.5 rounded-[18px] bg-white/95 dark:bg-[#1C123D]/95 text-slate-900 dark:text-white border border-slate-300/80 dark:border-purple-400/50 shadow-[0_10px_35px_rgba(0,0,0,0.28)] backdrop-blur-md animate-in slide-in-from-top-4 duration-300 flex items-center justify-between gap-2.5"
+          className="fixed bottom-22 left-1/2 -translate-x-1/2 z-25 w-[94%] max-w-[460px] md:max-w-[780px] p-2.5 rounded-[18px] bg-white/95 dark:bg-[#1C123D]/95 text-slate-900 dark:text-white border border-slate-300/80 dark:border-purple-400/50 shadow-[0_10px_35px_rgba(0,0,0,0.28)] backdrop-blur-md animate-in slide-in-from-bottom-4 duration-300 flex items-center justify-between gap-2.5"
         >
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
             <div className="w-10 h-10 rounded-[12px] overflow-hidden shrink-0 shadow-xs border border-slate-200 dark:border-purple-400/40 p-0.5 bg-white dark:bg-[#120A2B]">
@@ -236,7 +236,7 @@ export default function PwaRegistrar() {
         <button
           type="button"
           onClick={handleInstallClick}
-          className="fixed bottom-20 right-3.5 z-40 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 dark:from-[#F8DF7B] dark:to-amber-400 text-slate-950 text-[11.5px] font-black shadow-lg hover:scale-105 active:scale-95 transition-all cursor-pointer border border-white/20"
+          className="fixed bottom-24 right-3.5 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 dark:from-[#F8DF7B] dark:to-amber-400 text-slate-950 text-[11.5px] font-black shadow-lg hover:scale-105 active:scale-95 transition-all cursor-pointer border border-white/20"
           title="Cài app ra màn hình"
         >
           <Smartphone size={13} strokeWidth={2.5} />
