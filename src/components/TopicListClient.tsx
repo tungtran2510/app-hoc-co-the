@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Plus, Edit2, ArrowUp, ArrowDown, Eye, EyeOff, Trash2, Check, X, BookOpen, LayoutGrid, Lightbulb, Search, SlidersHorizontal, Star, Flame } from 'lucide-react';
+import { Plus, Edit2, ArrowUp, ArrowDown, Eye, EyeOff, Trash2, Check, X, BookOpen, LayoutGrid, Lightbulb, Search, SlidersHorizontal, Star, Flame, ChevronDown, CircleHelp, Play } from 'lucide-react';
 import TopicTile, { TopicsDisplayMode, TOPICS_DISPLAY_OPTIONS, topicsContainerClass } from './TopicTile';
 import { DEFAULT_TOPIC_COVERS } from './TopicCard';
 import { Topic, TopicsGuide } from '../lib/types';
@@ -33,6 +33,15 @@ interface TopicListClientProps {
   initialDescription?: string | null;
   initialGuide?: TopicsGuide | null;
   initialFeaturedTopicIds?: string[] | null;
+  initialFaqs?: {
+    id: string;
+    question: string;
+    answer: string;
+    topicTitle: string;
+    topicSlug: string;
+    pageTitle: string;
+    videos: { title: string; thumbnailUrl?: string | null; href: string }[];
+  }[];
   settingsScope?: 'home' | 'page';
 }
 
@@ -52,6 +61,7 @@ export default function TopicListClient({
   initialDescription,
   initialGuide,
   initialFeaturedTopicIds = [],
+  initialFaqs = [],
   settingsScope = 'home',
 }: TopicListClientProps) {
   const [topicsWithCounts, setTopicsWithCounts] = useState(initialTopics);
@@ -679,6 +689,63 @@ export default function TopicListClient({
           );
         })}
       </div>
+
+      {enableSearch && query.trim().length === 0 && initialFaqs.length > 0 && (
+        <section aria-labelledby="topic-faq-heading" className="mt-5 border-t border-slate-200/80 pt-5 dark:border-white/10">
+          <div className="rounded-[22px] border border-[#D8E2F0] bg-gradient-to-b from-[#F5F8FD] to-[#EEF3FA] p-3 shadow-[0_10px_28px_-25px_rgba(24,52,103,.7)] dark:border-white/10 dark:from-[#191330] dark:to-[#130E25] sm:p-4">
+            <header className="mb-3 flex items-center justify-between gap-3 px-0.5">
+              <div className="flex min-w-0 items-center gap-2.5">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-[#E1EBFA] text-[#214B91] dark:bg-blue-400/10 dark:text-blue-200">
+                  <CircleHelp size={19} />
+                </span>
+                <div className="min-w-0">
+                  <h3 id="topic-faq-heading" className="text-[15px] font-black leading-tight text-[#102144] dark:text-white sm:text-[17px]">Vấn đề thường gặp</h3>
+                  <p className="mt-0.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">Giải đáp ngắn theo từng chuyên đề</p>
+                </div>
+              </div>
+              <span className="shrink-0 rounded-full border border-[#DCE5F2] bg-white/80 px-2.5 py-1 text-[10px] font-bold text-slate-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">{initialFaqs.length} câu hỏi</span>
+            </header>
+
+            <div className="flex flex-col gap-2">
+              {initialFaqs.map((faq) => (
+                <details key={faq.id} className="group overflow-hidden rounded-[15px] border border-slate-200/90 bg-white shadow-[0_3px_10px_-9px_rgba(15,23,42,.35)] dark:border-white/10 dark:bg-[#1B1630]">
+                  <summary className="flex min-h-[54px] cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-3 text-left [&::-webkit-details-marker]:hidden">
+                    <span className="min-w-0 flex-1">
+                      <span className="mb-1 block text-[9px] font-extrabold uppercase tracking-[.08em] text-[#315991] dark:text-blue-300">{faq.topicTitle}</span>
+                      <span className="block text-[12.5px] font-extrabold leading-snug text-slate-900 dark:text-slate-100 sm:text-[13px]">{faq.question}</span>
+                    </span>
+                    <ChevronDown size={17} className="shrink-0 text-slate-400 transition-transform group-open:rotate-180" />
+                  </summary>
+                  <div className="border-t border-slate-100 px-3.5 pb-3.5 pt-3 dark:border-white/10">
+                    <p className="mb-2 text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">{faq.pageTitle}</p>
+                    <p className="whitespace-pre-line text-[12px] leading-relaxed text-slate-600 dark:text-slate-300">{faq.answer}</p>
+                    <Link href={`/${faq.topicSlug}`} className="mt-3 inline-flex min-h-8 items-center gap-1 rounded-full border border-[#D7E3F3] bg-[#F5F8FD] px-3 text-[10.5px] font-extrabold text-[#234B8B] transition-colors hover:bg-[#EAF1FC] dark:border-white/10 dark:bg-white/5 dark:text-blue-200 dark:hover:bg-white/10">
+                      Mở chuyên đề <span aria-hidden="true">›</span>
+                    </Link>
+                    {faq.videos.length > 0 && (
+                      <div className="mt-3 border-t border-slate-100 pt-3 dark:border-white/10">
+                        <p className="mb-2 text-[9px] font-extrabold uppercase tracking-[.08em] text-slate-500 dark:text-slate-400">Video trong bài học</p>
+                        <div className="flex flex-col gap-1.5">
+                          {faq.videos.map((video) => (
+                            <Link key={`${faq.id}-${video.href}`} href={video.href} className="flex min-w-0 items-center gap-2.5 rounded-[11px] border border-slate-100 bg-slate-50/80 p-1.5 transition-colors hover:border-blue-200 hover:bg-blue-50/60 dark:border-white/10 dark:bg-white/[.035] dark:hover:border-blue-400/30">
+                              <span className="relative h-10 w-[58px] shrink-0 overflow-hidden rounded-[7px] bg-slate-200 dark:bg-slate-800">
+                                {video.thumbnailUrl && <img src={video.thumbnailUrl} alt="" className="h-full w-full object-cover" loading="lazy" />}
+                                <span className="absolute inset-0 flex items-center justify-center bg-black/20 text-white"><Play size={14} fill="currentColor" /></span>
+                              </span>
+                              <span className="min-w-0 flex-1 line-clamp-2 text-[11px] font-bold leading-snug text-slate-700 dark:text-slate-200">{video.title}</span>
+                              <span aria-hidden="true" className="shrink-0 text-[17px] text-[#315991] dark:text-blue-300">›</span>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {!enableSearch && !hideViewAll && (
         <Link
