@@ -25,10 +25,20 @@ const STOPWORDS = new Set(
   ).split(' ')
 );
 
+const SYNONYM_MAP: [RegExp, string][] = [
+  [/dai trang kich thich|viem dai trang|ruot kich thich|ibs/g, 'dai trang kich thich ruot kich thich ibs truc nao ruot'],
+  [/magie|magnesium/g, 'magie magnesium vi khoang do an giau magie rau ngot hat bi'],
+  [/vitamin b|vitamin nhom b/g, 'vitamin b thiamin riboflavin niacin pyridoxine folate b1 b6 b12 gao lut'],
+  [/hoat chat sinh hoc|phytonutrient/g, 'hoat chat sinh hoc polyphenol flavonoid carotenoid allicin curcumin'],
+  [/cat tui mat|sau cat tui mat/g, 'cat tui mat sau cat tui mat dich mat muoi mat phan mo'],
+  [/thoat vi dia dem|thoat vi/g, 'thoat vi dia dem l4 l5 chen ep re than kinh toa'],
+];
+
 interface Chunk {
   doc: string;
   text: string;
   norm: string;
+  headingNorm: string;
 }
 
 const CHUNK_TARGET = 1100;
@@ -52,9 +62,15 @@ function splitIntoChunks(doc: AiKnowledgeDoc): Chunk[] {
     const body = buf.trim();
     buf = '';
     if (body.length <= 40) return;
-    // Giữ tiêu đề mục trong mỗi đoạn để không mất ngữ cảnh và truy xuất đúng mục
-    const text = heading && !body.startsWith(heading) ? `${heading}\n${body}` : body;
-    chunks.push({ doc: title, text, norm: normalizeVi(text) });
+    // Giữ tiêu đề mục trong mỗi đoạn và loại bỏ số thứ tự thừa (ví dụ "4. ")
+    const cleanHeading = heading.replace(/^\d+[\.\)]\s*/, '').trim();
+    const text = cleanHeading && !body.startsWith(cleanHeading) ? `[${cleanHeading}]\n${body}` : body;
+    chunks.push({
+      doc: title,
+      text,
+      norm: normalizeVi(text),
+      headingNorm: normalizeVi(cleanHeading),
+    });
   };
 
   for (const line of lines) {
@@ -96,7 +112,14 @@ export function retrieveKnowledge(
   const maxChars = opts.maxChars ?? 6500;
   if (!Array.isArray(docs) || docs.length === 0) return [];
 
-  const qTokens = normalizeVi(question)
+  let expandedNorm = normalizeVi(question);
+  for (const [pattern, replacement] of SYNONYM_MAP) {
+    if (pattern.test(expandedNorm)) {
+      expandedNorm += ' ' + replacement;
+    }
+  }
+
+  const qTokens = expandedNorm
     .split(' ')
     .filter((t) => t.length >= 2 && !STOPWORDS.has(t));
   if (qTokens.length === 0) return [];
@@ -129,7 +152,18 @@ export function retrieveKnowledge(
       }
     }
     for (const b of bigrams) if (padded.includes(` ${b} `)) score += 3;
-    if (normalizeVi(c.doc).split(' ').some((w) => qTokens.includes(w))) score += 1.5;
+
+    // Ưu tiên cao nếu tiêu đề mục (heading) khớp trực tiếp
+    if (c.headingNorm) {
+      for (const t of qTokens) {
+        if (c.headingNorm.includes(t)) score += 4;
+      }
+      for (const b of bigrams) {
+        if (c.headingNorm.includes(b)) score += 6;
+      }
+    }
+
+    if (normalizeVi(c.doc).split(' ').some((w) => qTokens.includes(w))) score += 2;
     if (score > 0) scored.push({ doc: c.doc, text: c.text, score });
   }
 
@@ -150,5 +184,5 @@ export function retrieveKnowledge(
 
 export function formatKnowledgeForPrompt(excerpts: KnowledgeExcerpt[]): string {
   if (excerpts.length === 0) return '';
-  return excerpts.map((e, i) => `[Trích đoạn ${i + 1} - ${e.doc}]\n${e.text}`).join('\n\n');
+  return excerpts.map((e, i) => `[Tài liệu tham khảo ${i + 1} - ${e.doc}]\n${e.text}`).join('\n\n');
 }

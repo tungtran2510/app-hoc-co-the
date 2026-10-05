@@ -72,19 +72,19 @@ function renderFormattedText(text: string) {
 
     if (isBullet) {
       return (
-        <div key={idx} className="flex items-start gap-1.5 my-0.5 text-ink text-[13px] leading-snug">
-          <span className="text-primary font-black shrink-0 mt-0.5 text-[10px]">•</span>
+        <div key={idx} className="flex items-start gap-1.5 my-0.5 text-ink text-[13.5px] leading-relaxed">
+          <span className="text-primary font-black shrink-0 mt-1 text-[10px]">•</span>
           <span className="flex-1 min-w-0">{renderedParts}</span>
         </div>
       );
     }
 
     if (!line.trim()) {
-      return <div key={idx} className="h-1" />;
+      return <div key={idx} className="h-1.5" />;
     }
 
     return (
-      <p key={idx} className="text-ink text-[13px] leading-snug my-0.5">
+      <p key={idx} className="text-ink text-[13.5px] leading-relaxed my-0.5">
         {renderedParts}
       </p>
     );

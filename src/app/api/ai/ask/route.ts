@@ -509,23 +509,38 @@ function fastFallbackSearch(query: string, catalog: LessonCatalogItem[], excerpt
   let answerText = '';
   if (excerpts && excerpts.length > 0 && excerpts[0].text) {
     const rawContent = excerpts[0].text;
-    const cleanBullets = rawContent
-      .replace(/#{1,6}\s+/g, '')
+    const lines = rawContent
       .split('\n')
       .map((s: string) => s.trim())
-      .filter((s: string) => s.length > 15 && !/(?:doctorloan|doctor loan|hydro gems|gems)/i.test(s))
+      .filter((s: string) => {
+        if (s.length < 20) return false;
+        if (/^#{1,6}\s+/.test(s)) return false;
+        if (/^\|.*\|$/.test(s)) return false;
+        if (/^(?:bài\s+\d+|chương\s+\d+|phần\s+\d+|mục\s+\d+)/i.test(s)) return false;
+        if (/(?:doctorloan|doctor loan|hydro gems|gems)/i.test(s)) return false;
+        return true;
+      });
+
+    const cleanBullets = lines
       .slice(0, 3)
-      .map((s: string) => `• ${s.replace(/^[-•*]\s*/, '')}`)
-      .join('\n');
+      .map((s: string) => {
+        const clean = s
+          .replace(/^[-•*]\s*/, '')
+          .replace(/^\d+[\.\)]\s*/, '')
+          .replace(/^[IVXLCDM]+[\.\)]\s*/i, '')
+          .trim();
+        return `• ${clean}`;
+      })
+      .join('\n\n');
 
     if (cleanBullets) {
-      answerText = `Theo tài liệu chuyên môn của tác giả về vấn đề này:\n${cleanBullets}\n\nBạn có thể nhấn vào video bài học đề xuất bên dưới để xem trực quan ngay:`;
+      answerText = `Dưới đây là các lưu ý khoa học quan trọng nhất về vấn đề này:\n\n${cleanBullets}\n\nBạn có thể nhấn vào video bài học đề xuất bên dưới để xem phân tích chi tiết:`;
     }
   }
 
   if (!answerText) {
     answerText =
-      'Trợ lý AI đang cập nhật tài liệu chuyên môn cho chủ đề này. Dưới đây là video bài học trực quan liên quan nhất để bạn theo dõi ngay:';
+      'Dưới đây là các video bài học trực quan liên quan nhất để bạn theo dõi và nắm rõ nguyên tắc khoa học ngay:';
   }
 
   return {
@@ -646,15 +661,25 @@ export async function POST(req: NextRequest) {
       })
       .join('\n\n');
 
-    // 4. HỆ THỐNG PROMPT TỐI ƯU: ĐÚNG TRỌNG TÂM, NGẮN GỌN, TUYỆT ĐỐI CẤM BÁN HÀNG DOCTORLOAN
+    // 4. HỆ THỐNG PROMPT TỐI ƯU: ĐÚNG TRỌNG TÂM, CÓ ĐIỂM NHẤN, BỐ CỤC THÔNG THOÁNG, KHÔNG THƯƠNG HIỆU
     const systemPrompt = `Bạn là Trợ lý Sức Khỏe AI trong ứng dụng giáo dục y học "Học Cơ Thể" (Tủ Sách Y Khoa Qbiz Books của tác giả Tùng dinh dưỡng).
 
 NGUYÊN TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ NGHIÊM NGẶT):
-1. ĐÚNG TRỌNG TÂM, GỌN, CHÍNH XÁC (P0):
-   - Trả lời đúng vấn đề người học hỏi, không lan man, không văn sáo rỗng, không lặp lại câu hỏi.
-   - Cấu trúc cố định: (a) 1 câu trả lời thẳng vào câu hỏi; (b) 3 đến 4 gạch đầu dòng, mỗi gạch 1 ý ngắn nêu CƠ CHẾ hoặc LÝ DO lấy từ tài liệu; (c) 1 câu cuối dẫn người học sang đúng bài học để xem sâu hơn. Tổng khoảng 80 đến 130 từ.
-   - Chỉ dùng thông tin có trong TRÍCH ĐOẠN TÀI LIỆU bên dưới, giữ đúng thuật ngữ và con số của tác giả. KHÔNG bịa số liệu. Nếu tài liệu không nói đến điều được hỏi, hãy nói rõ "Phần này chưa có trong tài liệu của tác giả" rồi chỉ nêu nguyên tắc chung rất ngắn và dẫn sang bài học gần nhất.
-   - Câu hỏi mơ hồ hoặc quá rộng (ví dụ "đau lưng", "mệt mỏi"): đừng liệt kê tràn lan. Trả lời 1 ý chính rồi hỏi lại đúng 1 câu làm rõ (đau ở vùng nào, bao lâu, kèm tê hay không).
+1. ĐÚNG TRỌNG TÂM, CÓ ĐIỂM NHẤN, BỐ CỤC THÔNG THOÁNG (P0):
+   - Trả lời thẳng vào câu hỏi, không lan man, không lặp lại câu hỏi, không dùng từ ngữ sáo rỗng.
+   - BẮT BUỘC IN ĐẬM TỪ KHÓA BẰNG DẤU ** (VD: **từ khóa**):
+     + BẮT BUỘC in đậm tên các loại thực phẩm, nhóm thực phẩm cụ thể (VD: **hạt bí đỏ**, **hạt mè đen**, **rau ngót**, **cải bó xôi**, **chuối**, **gạo lứt**, **yến mạch**, **các loại đậu**...).
+     + BẮT BUỘC in đậm các khoáng chất, vitamin, hoạt chất sinh học (VD: **Magie**, **Vitamin B1**, **Vitamin B6**, **Vitamin B12**, **chất xơ hòa tan**, **Flavonoid**, **Polyphenol**...).
+     + BẮT BUỘC in đậm các cơ chế và hành động cốt lõi (VD: **chia nhỏ bữa ăn**, **nhai kỹ**, **giảm chất béo bão hòa**, **bổ sung men vi sinh Probiotics**...).
+   - BỐ CỤC XUỐNG DÒNG RÕ RÀNG, DỄ ĐỌC TRÊN ĐIỆN THOẠI:
+     + 1-2 câu trả lời trực diện mở đầu.
+     + Tiếp theo là 3 đến 4 gạch đầu dòng (bắt đầu bằng dấu • ), mỗi gạch đầu dòng nêu rõ 1 ý hoặc 1 nhóm thực phẩm/hành động cụ thể.
+     + 1 câu cuối dẫn dắt người học sang video bài học liên quan nhất bên dưới.
+   - TUYỆT ĐỐI KHÔNG TRÍCH DẪN SỐ THỨ TỰ ĐỀ MỤC NGỚ NGẨN:
+     + Tuyệt đối KHÔNG trích các tiêu đề mục sách, số thứ tự chương như "3. CÂN BẰNG NĂNG LƯỢNG", "4. HỘI CHỨNG SAU CẮT TÚI MẬT", "Mục 2.1". Phải diễn đạt tự nhiên thành kiến thức chia sẻ.
+   - TUYỆT ĐỐI KHÔNG DÙNG CÂU PHÒNG THỦ:
+     + Tuyệt đối KHÔNG nói: "Phần này chưa có trong tài liệu của tác giả...", "Tài liệu của tác giả chưa đề cập...". Hãy trả lời dựa trên kiến thức giải phẫu - dinh dưỡng khoa học chính xác, khách quan.
+   - Câu hỏi mơ hồ hoặc quá rộng (ví dụ "đau lưng", "mệt mỏi"): Đừng liệt kê tràn lan. Trả lời 1 ý chính rồi hỏi lại đúng 1 câu làm rõ (đau ở vùng nào, bao lâu, kèm tê hay không).
    - Có thông tin về hội chứng đỏ (tê yếu chi lan nhanh, rối loạn đại tiểu tiện, sốt kèm đau dữ dội): khuyên đi khám chuyên khoa ngay, ngắn gọn.
    - Câu gợi ý hỏi tiếp (follow_up_questions): 3 câu, mỗi câu 8 đến 14 từ, đi tiếp theo mạch bài giảng (hiểu cơ chế, nguyên nhân gốc, rồi cách chăm sóc), nói như người học thật sự sẽ hỏi. TUYỆT ĐỐI KHÔNG CHỨA BẤT KỲ TÊN THƯƠNG HIỆU, NHÃN HIỆU NÀO.
 
@@ -689,7 +714,7 @@ ${catalogText}
 
 BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
 {
-  "answer": "1 câu trả lời thẳng, 3-4 gạch đầu dòng ngắn nêu cơ chế/lý do từ tài liệu, 1 câu cuối dẫn sang bài học liên quan",
+  "answer": "1-2 câu trả lời thẳng có in đậm, 3-4 gạch đầu dòng bắt đầu bằng • có in đậm từ khóa quan trọng, 1 câu cuối dẫn sang bài học liên quan",
   "suggested_pages": [
     {
       "title": "Tên video chính xác trong danh mục",
@@ -711,11 +736,60 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
     let rawText = '';
     let usedProvider = '';
 
-    // 5. GỌI PRIMARY: DEEPSEEK V3 VỚI TIMEOUT 7500ms
-    if (deepseekKey) {
+    // 5. GỌI PRIMARY: GOOGLE GEMINI TỐC ĐỘ CAO (PHẢN HỒI ~1-1.5s)
+    if (geminiKey) {
+      const candidateModels = [
+        'gemini-flash-lite-latest',
+        'gemini-3.5-flash',
+        'gemini-flash-latest',
+      ];
+
+      const geminiPrompt = `${systemPrompt}\n\nCÂU HỎI CỦA NGƯỜI HỌC: "${question}"\n\nLỊCH SỬ:\n${history.slice(-4).map((h: any) => `${h.role === 'user' ? 'Người học' : 'Trợ lý'}: ${h.text}`).join('\n')}`;
+
+      for (const model of candidateModels) {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 3800);
+
+          const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`;
+          const geminiRes = await fetch(geminiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: geminiPrompt }] }],
+              generationConfig: {
+                responseMimeType: 'application/json',
+                temperature: 0.3,
+                maxOutputTokens: 1400,
+              },
+            }),
+            signal: controller.signal,
+          });
+
+          clearTimeout(timeoutId);
+
+          if (geminiRes.ok) {
+            const geminiData = await geminiRes.json();
+            const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (text) {
+              rawText = text;
+              usedProvider = model;
+              break;
+            }
+          } else {
+            console.warn(`[AI] Gemini ${model} failed with status:`, geminiRes.status);
+          }
+        } catch (err: any) {
+          console.warn(`[AI] Gemini ${model} attempt timed out or failed:`, err?.message);
+        }
+      }
+    }
+
+    // 6. GỌI SECONDARY (FALLBACK): DEEPSEEK V3 VỚI TIMEOUT 4500ms
+    if (!rawText && deepseekKey) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 7500);
+        const timeoutId = setTimeout(() => controller.abort(), 4500);
 
         const deepseekRes = await fetch('https://api.deepseek.com/chat/completions', {
           method: 'POST',
@@ -753,57 +827,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
           console.warn('[AI] DeepSeek returned status:', deepseekRes.status);
         }
       } catch (err: any) {
-        console.warn('[AI] DeepSeek timed out or failed, falling back to Google Gemini...', err?.message);
-      }
-    }
-
-    // 6. GỌI SECONDARY (FALLBACK): GOOGLE GEMINI TỐC ĐỘ CAO VỚI TIMEOUT 6000ms
-    if (!rawText && geminiKey) {
-      const candidateModels = [
-        'gemini-3.5-flash',
-        'gemini-flash-lite-latest',
-        'gemini-3.1-flash-lite',
-        'gemini-flash-latest',
-      ];
-
-      const geminiPrompt = `${systemPrompt}\n\nCÂU HỎI CỦA NGƯỜI HỌC: "${question}"\n\nLỊCH SỬ:\n${history.slice(-4).map((h: any) => `${h.role === 'user' ? 'Người học' : 'Trợ lý'}: ${h.text}`).join('\n')}`;
-
-      for (const model of candidateModels) {
-        try {
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 6000);
-
-          const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`;
-          const geminiRes = await fetch(geminiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: geminiPrompt }] }],
-              generationConfig: {
-                responseMimeType: 'application/json',
-                temperature: 0.3,
-                maxOutputTokens: 1400,
-              },
-            }),
-            signal: controller.signal,
-          });
-
-          clearTimeout(timeoutId);
-
-          if (geminiRes.ok) {
-            const geminiData = await geminiRes.json();
-            const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (text) {
-              rawText = text;
-              usedProvider = model;
-              break;
-            }
-          } else {
-            console.warn(`[AI] Gemini ${model} failed with status:`, geminiRes.status);
-          }
-        } catch {
-          // Thử model tiếp theo
-        }
+        console.warn('[AI] DeepSeek timed out or failed:', err?.message);
       }
     }
 
@@ -902,7 +926,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
 
       // LOẠI BỎ TRIỆT ĐỂ VIỆC TIỂU TƯ VẤN: NẰM CỤ THỂ, NGỒI CỤ THỂ, GỐI, GHẾ, BÀI TẬP CỤ THỂ
       const isAskingPillows = /gối/i.test(question);
-      cleanAnswer = cleanAnswer
+      const cleanedLines = cleanAnswer
         .split('\n')
         .map((line) => {
           let l = line;
@@ -955,8 +979,22 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON:
 
           return l;
         })
-        .filter((l) => l.trim().length > 0)
-        .join('\n');
+        .filter((l) => l.trim().length > 0);
+
+      // Định dạng khoảng cách dòng thông thoáng và khử số thứ tự mục sách thừa
+      const spacedLines: string[] = [];
+      for (let i = 0; i < cleanedLines.length; i++) {
+        let l = cleanedLines[i].trim();
+        // Khử số thứ tự mục sách nếu LLM lỡ sinh ra: "• 3. CÂN BẰNG..." -> "• Cân bằng..."
+        l = l.replace(/^([•\-\*]\s*)\d+[\.\)]\s*/, '$1');
+        l = l.replace(/^\d+[\.\)]\s+/, '• ');
+        spacedLines.push(l);
+        // Chèn dòng trống sau mỗi ý để giao diện thông thoáng, dễ đọc trên điện thoại
+        if (i < cleanedLines.length - 1) {
+          spacedLines.push('');
+        }
+      }
+      cleanAnswer = spacedLines.join('\n').trim();
 
       if (cleanAnswer.length > 0) {
         cleanAnswer = cleanAnswer.charAt(0).toUpperCase() + cleanAnswer.slice(1);

@@ -22,6 +22,13 @@ Cùng một lượng thực phẩm, nếu thay đổi trình tự đưa vào mi�
 - **Thực hành:** Đi bộ nhẹ nhàng 10–15 phút sau bữa ăn 15–30 phút giúp kéo đường huyết từ máu thẳng vào cơ bắp, dập tắt đỉnh Spikes Insulin.
 
 ## 4. HỒ SƠ DƯỠNG CHẤT TRONG THỰC PHẨM BẢN ĐỊA VIỆT NAM
-- **Rau muống, Rau ngót, Rau đắng:** Giàu Vitamin C, Beta-carotene, Magie và xơ hòa tan.
-- **Rau gia vị (Tía tía, Kinh giới, Hành, Hẹ, Gừng, Nghệ):** Giàu Poliphenol, Flavonoid, Essential oils có tính kháng sinh thực vật mạnh, tiêu diệt vi khuẩn có hại ruột.
-- **Đậu phụ, Đậu nành bản địa:** Giàu Isoflavone, đạm thực vật chất lượng cao.
+- **Thực phẩm bản địa giàu Magie (Mg):**
+  + **Hạt & Đậu:** Hạt bí đỏ, hạt mè đen, hạt điều, đậu nành, đậu phụ, đậu đen. Đây là nhóm giàu Magie tự nhiên hàng đầu, hỗ trợ thư giãn thần kinh và co cơ.
+  + **Rau lá xanh đậm:** Rau ngót, rau đắng, rau muống, rau dền đỏ. Diệp lục tố (Chlorophyll) trong rau xanh có lõi trung tâm chính là nguyên tử Magie.
+  + **Quả & Tinh bột:** Chuối chín, bơ, khoai lang, yến mạch nguyên cám.
+- **Thực phẩm bản địa giàu Vitamin nhóm B (B1, B2, B3, B6, B9, B12):**
+  + **Ngũ cốc & Hạt:** Gạo lứt, cám gạo, yến mạch, các loại đậu (đậu xanh, đậu đen, đậu đỏ) giàu Vitamin B1 (Thiamine), B3 (Niacin) và B6.
+  + **Đạm động vật & Trứng:** Trứng gà ta, cá sông, thịt gia cầm nạc, gan động vật cung cấp dồi dào Vitamin B2, B5 và B12 tự nhiên (duy trì bao myelin thần kinh và tạo máu).
+  + **Rau củ & Nấm:** Rau ngót, rau cải xanh, nấm rơm, nấm hương giàu Vitamin B9 (Folate tự nhiên).
+- **Rau gia vị kháng sinh thực vật (Hành, hẹ, tía tô, kinh giới, gừng, nghệ):**
+  + Giàu Polyphenol, Flavonoid, Curcumin, Allicin và tinh dầu kháng khuẩn tự nhiên, dập tắt ổ viêm đường tiêu hóa.

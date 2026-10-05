@@ -70,6 +70,15 @@ Chất dinh dưỡng vi lượng không sinh năng lượng trực tiếp nhưng
 - **I-ốt ($I^-$)**: Nguyên liệu tổng hợp hormone tuyến giáp (Thyroxine - T4, Triiodothyronine - T3) điều hòa tốc độ chuyển hóa cơ bản.
 - **Selen ($Se$)**: Thành phần của enzym Glutathione Peroxidase chống tổn thương oxy hóa tế bào.
 
+### 2.4. Hoạt chất Sinh học (Bioactive Compounds / Phytonutrients)
+- **Định nghĩa:** Là các hợp chất tự nhiên có hoạt tính sinh học cao trong thực vật và thực phẩm tự nhiên, tuy không sinh calo trực tiếp nhưng tham gia bảo vệ tế bào và điều hòa hàng ngàn phản ứng sống.
+- **Các nhóm hoạt chất sinh học điển hình:**
+  + **Polyphenol & Flavonoid** (trong rau củ đa sắc, trà xanh, quả mọng): Trung hòa gốc tự do, bảo vệ màng lipid tế bào khỏi tổn thương oxy hóa.
+  + **Carotenoid (Beta-carotene, Lycopene, Lutein)** (trong gấc, cà rốt, bí đỏ): Bảo vệ niêm mạc, tế bào mắt và hệ miễn dịch.
+  + **Isoflavone** (trong đậu nành, đậu phụ): Phytoestrogen thực vật hỗ trợ chuyển hóa xương và nội tiết.
+  + **Curcumin** (nghệ) & **Allicin** (tỏi, hẹ): Kháng viêm tự nhiên mạnh mẽ, kích hoạt enzym bảo vệ gan.
+- **Cơ chế tác động:** Kích hoạt hệ thống phòng thủ chống oxy hóa nội sinh, điều hòa enzym chuyển hóa và dập tắt các phản ứng viêm âm thầm.
+
 ---
 
 ## 3. CÂN BẰNG NĂNG LƯỢNG VÀ NGUYÊN TẮC DINH DƯỠNG SINH LÝ
