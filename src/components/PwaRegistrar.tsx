@@ -98,6 +98,46 @@ export default function PwaRegistrar() {
 
     const alreadyInstalled = checkStandalone();
 
+    // 3. Tự động tải sẵn ngầm tất cả các trang & dữ liệu cốt lõi (Aggressive Idle Prefetching)
+    const runIdlePrefetch = () => {
+      const routesToPrefetch = [
+        '/',
+        '/tro-ly-ai',
+        '/da-luu',
+        '/chuyen-de',
+        '/tim-kiem',
+        '/cot-song',
+        '/cot-song/tong-quan-ve-cot-song',
+        '/cot-song/tu-the-va-van-dong',
+        '/dinh-duong',
+        '/co-the-nguoi',
+      ];
+
+      routesToPrefetch.forEach((route) => {
+        // Tải cả file HTML lẫn RSC payload để khi bấm là mở ngay 0ms
+        fetch(route, { priority: 'low' }).catch(() => {});
+        fetch(`${route}?_rsc=1`, { priority: 'low' }).catch(() => {});
+      });
+
+      // Tải trước cấu hình trợ lý AI
+      fetch('/api/ai/training', { priority: 'low' })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data?.success && data.ai_training) {
+            try {
+              localStorage.setItem('app_ai_training_cache_v1', JSON.stringify(data.ai_training));
+            } catch {}
+          }
+        })
+        .catch(() => {});
+    };
+
+    if ('requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(runIdlePrefetch, { timeout: 1200 });
+    } else {
+      setTimeout(runIdlePrefetch, 600);
+    }
+
     // 4. Bắt sự kiện cài đặt PWA
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();

@@ -125,8 +125,6 @@ export async function POST(req: NextRequest) {
     try {
       const { clearDataCache } = await import('../../../../lib/data');
       clearDataCache();
-      const { invalidatePublicContentCache } = await import('../../../../lib/cachedData');
-      invalidatePublicContentCache();
     } catch {
       // Bỏ qua
     }

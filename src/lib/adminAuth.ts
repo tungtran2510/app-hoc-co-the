@@ -14,15 +14,6 @@ export interface AdminStatus {
   } | null;
 }
 
-// Several visible sections ask for the same status during initial hydration.
-// Share the in-flight request and keep its result briefly to avoid a burst of
-// identical /api/admin/me calls (which also probes Supabase).
-let adminStatusCache: { token: string; expiresAt: number; promise: Promise<AdminStatus> } | null = null;
-
-function invalidateAdminStatusCache() {
-  adminStatusCache = null;
-}
-
 export function isSuperAdmin(user?: { role?: string; phone?: string } | null): boolean {
   if (!user) return false;
   return user.role === 'super_admin' || user.phone === '0974248716';
@@ -46,19 +37,8 @@ export function getAdminTokenClient(): string {
 
 export async function checkAdminStatus(): Promise<AdminStatus> {
   if (typeof window === 'undefined') return { isAdmin: false, supabaseOk: false, user: null };
-  const token = getAdminTokenClient();
-  const now = Date.now();
-  if (adminStatusCache && adminStatusCache.token === token && adminStatusCache.expiresAt > now) {
-    return adminStatusCache.promise;
-  }
-
-  const promise = fetchAdminStatus(token);
-  adminStatusCache = { token, expiresAt: now + 5000, promise };
-  return promise;
-}
-
-async function fetchAdminStatus(token: string): Promise<AdminStatus> {
   try {
+    const token = getAdminTokenClient();
     const headers: Record<string, string> = {};
     if (token) {
       headers['x-admin-token'] = token;
@@ -98,7 +78,6 @@ export async function loginAdmin(
     const data = await res.json().catch(() => ({}));
     if (data.token && typeof window !== 'undefined') {
       localStorage.setItem('app_admin_token', data.token);
-      invalidateAdminStatusCache();
     }
     if (data.user && typeof window !== 'undefined') {
       localStorage.setItem('app_user_phone', data.user.phone || '');
@@ -113,17 +92,16 @@ export async function loginAdmin(
 export async function logoutAdmin(): Promise<void> {
   try {
     if (typeof window !== 'undefined') {
-      invalidateAdminStatusCache();
-      const token = getAdminTokenClient();
       localStorage.removeItem('app_admin_token');
       localStorage.removeItem('app_user_phone');
       localStorage.removeItem('app_user_display_name');
-      const headers: Record<string, string> = {};
-      if (token) {
-        headers['x-admin-token'] = token;
-      }
-      await fetch('/api/admin/logout', { method: 'POST', headers });
     }
+    const token = getAdminTokenClient();
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['x-admin-token'] = token;
+    }
+    await fetch('/api/admin/logout', { method: 'POST', headers });
   } catch {
     // Bỏ qua lỗi mạng
   }
@@ -135,3 +113,4 @@ export function setAdminClient(status: boolean) {
     logoutAdmin();
   }
 }
+

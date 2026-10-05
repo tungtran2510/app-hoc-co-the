@@ -336,29 +336,6 @@ export async function getPagesByTopic(topicId: string, includeHidden = false): P
   });
 }
 
-/** Load pages for several topics in one request instead of an N+1 fan-out. */
-export async function getPagesByTopics(topicIds: string[], includeHidden = false): Promise<Page[]> {
-  const ids = Array.from(new Set(topicIds)).sort();
-  if (ids.length === 0) return [];
-  const cacheKey = `pages_by_topics:${ids.join(',')}:${includeHidden}`;
-  return getCachedOrFetch(cacheKey, async () => {
-    const supabase = getSupabase();
-    if (supabase) {
-      try {
-        let query = supabase.from('pages').select('*').in('topic_id', ids);
-        if (!includeHidden) query = query.eq('is_visible', true).eq('status', 'published');
-        const { data } = await query.order('sort_order', { ascending: true });
-        if (data) return data as Page[];
-      } catch {
-        // fallback
-      }
-    }
-    return samplePages
-      .filter((page) => ids.includes(page.topic_id) && (includeHidden || (page.is_visible && page.status === 'published')))
-      .sort((a, b) => a.sort_order - b.sort_order);
-  });
-}
-
 /**
  * Tối ưu hóa siêu tốc cho Trang chủ: Lấy toàn bộ chủ đề kèm số lượng bài học chỉ trong 1 lần truy vấn
  */
@@ -448,7 +425,7 @@ export function decodeBlockRow(row: any): Block {
 export async function getBlocksByPage(pageId: string, includeHidden = false): Promise<Block[]> {
   const cacheKey = `blocks_by_page:${pageId}:${includeHidden}`;
   return getCachedOrFetch(cacheKey, async () => {
-    const supabase = getSupabase();
+    const supabase = getSupabaseClient();
     if (supabase) {
       try {
         let query = supabase.from('blocks').select('*').eq('page_id', pageId);
@@ -463,36 +440,6 @@ export async function getBlocksByPage(pageId: string, includeHidden = false): Pr
     }
     return sampleBlocks
       .filter((b) => b.page_id === pageId && (includeHidden || b.is_visible))
-      .sort((a, b) => a.sort_order - b.sort_order);
-  });
-}
-
-/** Fetch just lesson videos and FAQ blocks for many pages in one database request. */
-export async function getLearningBlocksByPages(pageIds: string[], includeHidden = false): Promise<Block[]> {
-  const ids = Array.from(new Set(pageIds)).sort();
-  if (ids.length === 0) return [];
-  const cacheKey = `learning_blocks_by_pages:${ids.join(',')}:${includeHidden}`;
-  return getCachedOrFetch(cacheKey, async () => {
-    const supabase = getSupabase();
-    if (supabase) {
-      try {
-        let query = supabase.from('blocks')
-          .select('id,page_id,type,display_style,data,sort_order,is_visible')
-          .in('page_id', ids)
-          .in('type', ['text', 'videos']);
-        if (!includeHidden) query = query.eq('is_visible', true);
-        const { data } = await query.order('sort_order', { ascending: true });
-        if (data) {
-          return data.map(decodeBlockRow).filter((block) =>
-            block.type === 'videos' || block.type === 'faq'
-          );
-        }
-      } catch {
-        // fallback
-      }
-    }
-    return sampleBlocks
-      .filter((block) => ids.includes(block.page_id) && (includeHidden || block.is_visible) && (block.type === 'videos' || block.type === 'faq'))
       .sort((a, b) => a.sort_order - b.sort_order);
   });
 }

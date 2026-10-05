@@ -1,6 +1,6 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
-import { getCachedLearningBlocksByPages, getCachedPagesByTopic, getCachedSettings, getCachedTopicBySlug } from '../../lib/cachedData';
+import { getTopicBySlug, getPagesByTopic, getBlocksByPage, getSettings } from '../../lib/data';
 import TopicHeaderNav from '../../components/TopicHeaderNav';
 import TopicLearningExperience from '../../components/TopicLearningExperience';
 import BottomNav from '../../components/BottomNav';
@@ -11,7 +11,7 @@ interface TopicPageProps { params: { topicSlug: string } }
 export const revalidate = 60;
 
 export async function generateMetadata({ params }: TopicPageProps): Promise<Metadata> {
-  const [topic, settings] = await Promise.all([getCachedTopicBySlug(params.topicSlug), getCachedSettings()]);
+  const [topic, settings] = await Promise.all([getTopicBySlug(params.topicSlug), getSettings()]);
   if (!topic) return { title: 'Không tìm thấy chủ đề' };
   return {
     title: `${topic.title} · ${settings?.app_name || 'Học Cơ Thể'}`,
@@ -20,19 +20,12 @@ export async function generateMetadata({ params }: TopicPageProps): Promise<Meta
 }
 
 export default async function TopicPage({ params }: TopicPageProps) {
-  const topic = await getCachedTopicBySlug(params.topicSlug);
+  const topic = await getTopicBySlug(params.topicSlug);
   if (!topic) notFound();
 
-  const pages = await getCachedPagesByTopic(topic.id, true);
-  const learningBlocks = await getCachedLearningBlocksByPages(pages.map((page) => page.id));
-  const blocksByPage = new Map<string, typeof learningBlocks>();
-  for (const block of learningBlocks) {
-    const pageBlocks = blocksByPage.get(block.page_id) || [];
-    pageBlocks.push(block);
-    blocksByPage.set(block.page_id, pageBlocks);
-  }
-  const pagesWithDetails = pages.map((page, index) => {
-    const blocks = blocksByPage.get(page.id) || [];
+  const pages = await getPagesByTopic(topic.id, true);
+  const pagesWithDetails = await Promise.all(pages.map(async (page, index) => {
+    const blocks = await getBlocksByPage(page.id);
     let videoCount = 0;
     const pageVideos: Array<{ video: import('../../lib/types').Video; index: number; pageSlug: string }> = [];
     for (const block of blocks) {
@@ -57,7 +50,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
       }];
     });
     return { page, orderNumber: index + 1, videoCount, pageVideos, faqGroups };
-  });
+  }));
 
   const totalVideos = pagesWithDetails.reduce((sum, item) => sum + item.videoCount, 0);
   const topicVideos = pagesWithDetails.flatMap(({ page, pageVideos }) => pageVideos.map((entry) => ({ ...entry, pageId: page.id })));

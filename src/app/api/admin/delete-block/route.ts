@@ -1,5 +1,4 @@
 import { revalidatePath } from 'next/cache';
-import { invalidatePublicContentCache } from '../../../../lib/cachedData';
 import { NextRequest, NextResponse } from 'next/server';
 import { checkIsAdminRequest, getAdminUserFromRequest } from '../../../../lib/authServer';
 import { getSupabaseServer } from '../../../../lib/supabaseServer';
@@ -59,7 +58,6 @@ export async function POST(req: NextRequest) {
     try {
       const { clearDataCache } = await import('../../../../lib/data');
       clearDataCache();
-      invalidatePublicContentCache();
       revalidatePath('/', 'layout');
     } catch {
       // Bỏ qua

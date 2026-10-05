@@ -1,17 +1,47 @@
 'use client';
 
-import React from 'react';
-import { usePathname } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { Home, LayoutGrid, Bookmark, Sparkles } from 'lucide-react';
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [optimisticTarget, setOptimisticTarget] = useState<string | null>(null);
 
-  const isHome = pathname === '/';
-  const isSaved = pathname === '/da-luu';
-  const isAi = pathname === '/tro-ly-ai';
+  // Khi router thật sự cập nhật pathname, hoàn tất và xóa optimistic state
+  useEffect(() => {
+    setOptimisticTarget(null);
+  }, [pathname]);
+
+  // Làm nóng bộ nhớ đệm trước (prefetch) trên cả 4 tab chính để khi chạm là mở ngay
+  useEffect(() => {
+    router.prefetch('/');
+    router.prefetch('/chuyen-de');
+    router.prefetch('/da-luu');
+    router.prefetch('/tro-ly-ai');
+  }, [router]);
+
+  const activePath = optimisticTarget ?? pathname;
+
+  const handleTabNavigate = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
+    event.preventDefault();
+    setOptimisticTarget(href);
+    // Keep the primary navigation reliable even when an outdated App Router
+    // client cache has a stale RSC payload. A document navigation fetches the
+    // current route and its matching server-rendered content together.
+    window.location.assign(href);
+  };
+
+  const isHome = activePath === '/';
+  const isSaved = activePath === '/da-luu';
+  const isAi = activePath === '/tro-ly-ai';
   // Tab "Chuyên đề" sáng khi đang ở trang tất cả chuyên đề, trong một chuyên đề hoặc trong một bài học
-  const isTopics = !isHome && !isAi && !isSaved && !pathname.startsWith('/dang-nhap') && !pathname.startsWith('/tim-kiem');
+  const isTopics = !isHome && !isAi && !isSaved && !activePath.startsWith('/dang-nhap') && !activePath.startsWith('/tim-kiem');
 
   const baseItem =
     'flex flex-col items-center justify-center gap-1 transition-all duration-100 active:scale-90 active:opacity-70 min-h-[48px] cursor-pointer';
@@ -26,38 +56,46 @@ export default function BottomNav() {
     >
       <div className="w-full max-w-[480px] md:max-w-[820px] lg:max-w-[820px] h-[80px] pb-2 grid grid-cols-4 select-none bg-white dark:bg-[#100922] transition-all">
         {/* 1. Tổng quan */}
-        <a
+        <Link
           href="/"
+          prefetch={true}
+          onClick={(event) => handleTabNavigate(event, '/')}
           className={`${baseItem} ${isHome ? activeText : idleText}`}
           aria-label="Tổng quan"
         >
           <Home size={22} strokeWidth={isHome ? 2.5 : 2} />
           <span className="text-[11px] sm:text-[12px] leading-tight">Tổng quan</span>
-        </a>
+        </Link>
 
         {/* 2. Chuyên đề */}
-        <a
+        <Link
           href="/chuyen-de"
+          prefetch={true}
+          onClick={(event) => handleTabNavigate(event, '/chuyen-de')}
           className={`${baseItem} ${isTopics ? activeText : idleText}`}
           aria-label="Chuyên đề"
         >
           <LayoutGrid size={22} strokeWidth={isTopics ? 2.5 : 2} />
           <span className="text-[11px] sm:text-[12px] leading-tight">Chuyên đề</span>
-        </a>
+        </Link>
 
         {/* 3. Đã lưu */}
-        <a
+        <Link
           href="/da-luu"
+          prefetch={true}
+          onClick={(event) => handleTabNavigate(event, '/da-luu')}
           className={`${baseItem} ${isSaved ? activeText : idleText}`}
           aria-label="Bài học đã lưu"
         >
           <Bookmark size={22} strokeWidth={isSaved ? 2.5 : 2} className={isSaved ? 'fill-[#1E3A8A] dark:fill-[#F8DF7B]' : ''} />
           <span className="text-[11px] sm:text-[12px] leading-tight">Đã lưu</span>
-        </a>
+        </Link>
 
         {/* 4. Hỏi đáp AI */}
-        <a
+        <Link
           href="/tro-ly-ai"
+          prefetch={true}
+          onClick={(event) => handleTabNavigate(event, '/tro-ly-ai')}
           className={`${baseItem} ${isAi ? activeText : idleText}`}
           aria-label="Hỏi đáp AI"
         >
@@ -66,7 +104,7 @@ export default function BottomNav() {
             <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#1E3A8A] dark:bg-[#F8DF7B] animate-pulse" />
           </div>
           <span className="text-[11px] sm:text-[12px] leading-tight">Hỏi đáp AI</span>
-        </a>
+        </Link>
       </div>
     </nav>
   );

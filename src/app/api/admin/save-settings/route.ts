@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
-import { invalidatePublicContentCache } from '../../../../lib/cachedData';
 import { checkIsAdminRequest } from '../../../../lib/authServer';
 import { getSupabaseServer } from '../../../../lib/supabaseServer';
 import { clearDataCache } from '../../../../lib/data';
@@ -103,7 +102,6 @@ export async function POST(req: NextRequest) {
     // Xóa bộ nhớ đệm và kích hoạt revalidate các trang
     try {
       clearDataCache();
-      invalidatePublicContentCache();
       revalidatePath('/');
       revalidatePath('/', 'layout');
       revalidatePath('/chuyen-de');

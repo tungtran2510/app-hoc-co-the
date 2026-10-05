@@ -1,12 +1,22 @@
 // Service Worker PWA Chuyên Nghiệp Cho Qbiz Books
-// Cache app shell và static assets nhẹ; không tải đồng loạt các trang khi cài app.
-// Nội dung chữ được lấy khi mở trang và cache bởi Next/server; video chỉ tải khi người dùng mở.
+// Lưu sẵn toàn bộ chức năng, giao diện, shell, tabs và bài học cốt lõi trên điện thoại
+// Đạt tốc độ phản hồi tức thì (< 1ms) khi người dùng chuyển đổi các mục hoặc vào bài học
+// TUÂN THỦ CHỈ THỊ: Chỉ tải từ mạng khi người dùng ấn vào tài liệu sách / video dung lượng lớn
 
-const CACHE_NAME = 'qbiz-books-shell-v28';
-const STATIC_ASSETS_CACHE = 'qbiz-books-static-v28';
+const CACHE_NAME = 'qbiz-books-shell-v27';
+const STATIC_ASSETS_CACHE = 'qbiz-books-static-v27';
 
-// Danh sách tài nguyên shell nhẹ cần tải sẵn vào bộ nhớ điện thoại
+// Danh sách tài nguyên Shell và các trang cốt lõi cần tải sẵn vào bộ nhớ điện thoại
 const PRECACHE_SHELL_URLS = [
+  '/',
+  '/tro-ly-ai',
+  '/da-luu',
+  '/tim-kiem',
+  '/cot-song',
+  '/cot-song/tong-quan-ve-cot-song',
+  '/cot-song/tu-the-va-van-dong',
+  '/dinh-duong',
+  '/co-the-nguoi',
   '/favicon.ico',
   '/apple-icon.png',
   '/app_logo.png',
@@ -22,7 +32,7 @@ const PRECACHE_SHELL_URLS = [
 // Cache RSC cũ theo từng request đã khiến một trang cũ có thể gắn lại modal
 // toàn màn hình và chặn thao tác sau khi người dùng chuyển tab.
 
-// Cài SW bằng các asset nhẹ; tải trang/nội dung theo đợt sau khi giao diện đã mở.
+// Cài đặt SW & Tải sẵn Shell ngầm vào điện thoại
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(

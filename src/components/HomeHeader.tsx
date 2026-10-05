@@ -328,7 +328,7 @@ export default function HomeHeader({
             {/* Kính lúp tìm kiếm */}
             <Link
               href="/tim-kiem"
-              prefetch={false}
+              prefetch={true}
               className="w-9 h-9 rounded-full bg-white dark:bg-[#1E1342] hover:bg-slate-100 dark:hover:bg-[#281855] border border-slate-200 dark:border-purple-800/40 flex items-center justify-center text-[#1E3A8A] dark:text-purple-200 transition-colors shadow-2xs"
               title="Tìm kiếm bài học"
               aria-label="Tìm kiếm"
