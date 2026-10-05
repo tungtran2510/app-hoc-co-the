@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   BookOpen,
   User,
@@ -67,6 +68,12 @@ export default function HomeHeader({
   const [userName, setUserName] = useState<string>('bạn');
   const [showNameModal, setShowNameModal] = useState(false);
   const [nameInput, setNameInput] = useState('');
+  const router = useRouter();
+
+  useEffect(() => {
+    router.prefetch('/dang-nhap');
+    router.prefetch('/tro-ly-ai');
+  }, [router]);
 
   useEffect(() => {
     try {
@@ -483,14 +490,17 @@ export default function HomeHeader({
                 )}
 
 
-                <Link
-                  href="/tro-ly-ai"
-                  onClick={() => setShowMenu(false)}
-                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-white dark:hover:bg-[#25154D] cursor-pointer"
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowMenu(false);
+                    router.push('/tro-ly-ai');
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-white dark:hover:bg-[#25154D] cursor-pointer"
                 >
                   <Sparkles size={16} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
                   <span>Huấn luyện Trợ lý AI</span>
-                </Link>
+                </button>
 
                 <div className="border-t border-slate-200 dark:border-line my-1" />
 
@@ -504,14 +514,17 @@ export default function HomeHeader({
                 </button>
               </>
             ) : (
-              <Link
-                href="/dang-nhap"
-                onClick={() => setShowMenu(false)}
-                className="flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-ink dark:hover:bg-surface-2 cursor-pointer"
+              <button
+                type="button"
+                onClick={() => {
+                  setShowMenu(false);
+                  router.push('/dang-nhap');
+                }}
+                className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-ink dark:hover:bg-surface-2 cursor-pointer"
               >
                 <User size={16} className="text-[#1E3A8A] dark:text-[#F8DF7B]" />
                 <span>Đăng nhập quản trị</span>
-              </Link>
+              </button>
             )}
           </div>
         )}
