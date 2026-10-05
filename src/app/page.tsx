@@ -1,16 +1,15 @@
 import React from 'react';
-import { getSettings, getTopicsWithCounts } from '../lib/data';
+import { getCachedSettings, getCachedTopicsWithCounts } from '../lib/cachedData';
 import HomeHeader from '../components/HomeHeader';
 import HomeSectionsClient from '../components/HomeSectionsClient';
 import BottomNav from '../components/BottomNav';
-import QbizBooksOpeningSplash from '../components/QbizBooksOpeningSplash';
 import { Metadata } from 'next';
 import homeStyles from './home-page.module.css';
 
 export const revalidate = 30;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getSettings();
+  const settings = await getCachedSettings();
   return {
     title: `${settings?.app_name || 'Qbiz Books'} · Tủ Sách Y Khoa & Khám Phá Cơ Thể`,
     description: 'Ứng dụng học hiểu kiến thức về cơ thể và chăm sóc sức khỏe chủ động',
@@ -19,15 +18,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function HomePage() {
   const [settings, topicsWithCounts] = await Promise.all([
-    getSettings(),
-    getTopicsWithCounts(true),
+    getCachedSettings(),
+    getCachedTopicsWithCounts(true),
   ]);
 
   return (
     <main className={`${homeStyles.homePage} flex-1 flex flex-col font-[var(--font-be-vietnam-pro)] bg-[radial-gradient(ellipse_75%_22%_at_50%_0%,rgba(214,179,106,0.10),transparent_75%),linear-gradient(180deg,#FBFAF7_0%,#F6F7F9_48%,#FBFAF7_100%)] dark:bg-none dark:bg-[#0C0817] px-4 sm:px-5 pt-3 pb-28 gap-4 sm:gap-5`}>
-      {/* Hiệu ứng 3D mở sách Qbiz Books khi vào trang chủ */}
-      <QbizBooksOpeningSplash />
-
       {/* 1. Header chuẩn iPhone: Lời chào Dr. Tùng + Tìm kiếm + Avatar + Brand Card phong cách MEDICA LEARN */}
       <HomeHeader
         initialAppName={settings.app_name}

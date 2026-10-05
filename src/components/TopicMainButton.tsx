@@ -32,7 +32,7 @@ export default function TopicMainButton({ topic, firstPage }: TopicMainButtonPro
     return (
       <Link
         href={`/${topic.slug}/${continueInfo.page_slug}?v=${continueInfo.video_index || 1}`}
-        prefetch={true}
+        prefetch={false}
         className="flex items-center justify-between px-4 h-[44px] min-h-[44px] w-full rounded-[13px] bg-[#1E3A8A] hover:bg-[#172554] text-white font-bold text-[14px] sm:text-[15px] transition-all active:scale-[0.99] shadow-[0_4px_14px_rgba(30,58,138,0.25)]"
       >
         <span className="truncate pr-2">
@@ -46,7 +46,7 @@ export default function TopicMainButton({ topic, firstPage }: TopicMainButtonPro
   return (
     <Link
       href={`/${topic.slug}/${firstPage.slug}`}
-      prefetch={true}
+      prefetch={false}
       className="flex items-center justify-between px-4 h-[44px] min-h-[44px] w-full rounded-[13px] bg-[#1E3A8A] hover:bg-[#172554] text-white font-bold text-[14px] sm:text-[15px] transition-all active:scale-[0.99] shadow-[0_4px_14px_rgba(30,58,138,0.25)]"
     >
       <span className="truncate pr-2">

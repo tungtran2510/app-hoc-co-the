@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Be_Vietnam_Pro, Lora, Inter } from 'next/font/google';
 import './globals.css';
+import './reduced-motion.css';
 import PwaRegistrar from '../components/PwaRegistrar';
 
 const beVietnamPro = Be_Vietnam_Pro({

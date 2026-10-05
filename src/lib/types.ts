@@ -275,6 +275,8 @@ export type Block =
         description?: string;
         /** Separates topic-page FAQs from the independent all-topics FAQ collection. */
         faq_surface?: 'topic' | 'overview';
+        /** Links a detached overview copy to its legacy source for migration deduplication only. */
+        faq_legacy_source_id?: string;
         faq_category_id?: string;
         faq_category_title?: string;
         scope?: 'topic' | 'video';

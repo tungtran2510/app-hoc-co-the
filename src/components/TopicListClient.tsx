@@ -2,18 +2,16 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { Plus, Edit2, ArrowUp, ArrowDown, Eye, EyeOff, Trash2, Check, X, BookOpen, LayoutGrid, Lightbulb, Search, SlidersHorizontal, Star, Flame, ChevronDown, CircleHelp, Play, Pencil } from 'lucide-react';
 import TopicTile, { TopicsDisplayMode, TOPICS_DISPLAY_OPTIONS, topicsContainerClass } from './TopicTile';
 import { DEFAULT_TOPIC_COVERS } from './TopicCard';
 import { Block, Topic, TopicsGuide } from '../lib/types';
 import { generateUuid } from '../lib/uuid';
-import TopicsGuideModal from './TopicsGuideModal';
 import { checkIsAdminClient } from '../lib/adminAuth';
 import { getAdminHeaders, saveBlockApi, saveTopicApi, deleteTopicApi } from '../lib/apiAdmin';
 import { saveSettingsApi } from '../lib/apiAdmin';
-import EditTopicModal from './admin/EditTopicModal';
-import EditBlockModal from './admin/EditBlockModal';
 import VideoLessonLink from './VideoLessonLink';
 import SectionOrderControls from './admin/SectionOrderControls';
 import ScrollReveal from './ScrollReveal';
@@ -24,6 +22,12 @@ import {
   saveTopicDisplayPreference,
   TopicDisplayScope,
 } from '../lib/userSync';
+
+// Admin editors and the guide are infrequent overlays. Keep their JS out of
+// the critical bundle needed to render and navigate the public topic tabs.
+const TopicsGuideModal = dynamic(() => import('./TopicsGuideModal'), { ssr: false });
+const EditTopicModal = dynamic(() => import('./admin/EditTopicModal'), { ssr: false });
+const EditBlockModal = dynamic(() => import('./admin/EditBlockModal'), { ssr: false });
 
 interface TopicListClientProps {
   initialTopics: {
@@ -62,6 +66,7 @@ interface TopicListClientProps {
   }[];
   initialFaqVideos?: { key: string; page_id: string; page_title: string; page_slug: string; video_title: string; thumbnail_url?: string | null; index: number; topic_id: string; topic_title: string; topic_slug: string }[];
   initialFaqTopics?: { id: string; title: string }[];
+  initialFaqStoragePageId?: string;
   settingsScope?: 'home' | 'page';
 }
 
@@ -84,6 +89,7 @@ export default function TopicListClient({
   initialFaqs = [],
   initialFaqVideos = [],
   initialFaqTopics = [],
+  initialFaqStoragePageId,
   settingsScope = 'home',
 }: TopicListClientProps) {
   const router = useRouter();
@@ -158,21 +164,15 @@ export default function TopicListClient({
       return;
     }
     const categoryId = generateUuid();
-    const storageTopic = initialFaqTopics[0];
-    if (!storageTopic) {
+    if (!initialFaqStoragePageId) {
       setFaqSaveError('Chưa có bài học để lưu danh mục.');
       return;
     }
     setFaqSaveError('');
     try {
-      const response = await fetch(`/api/admin/topic-faqs?topicId=${encodeURIComponent(storageTopic.id)}`, { headers: getAdminHeaders(), cache: 'no-store' });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(result.error || 'Không tải được dữ liệu để tạo danh mục');
-      const page = result.pages?.[0];
-      if (!page) throw new Error('Chưa có bài học để lưu danh mục.');
       const block: Extract<Block, { type: 'faq' }> = {
-        id: generateUuid(), page_id: page.id, type: 'faq', display_style: 'accordion',
-        sort_order: (result.blocks || []).filter((item: { page_id: string }) => item.page_id === page.id).length + 1,
+        id: generateUuid(), page_id: initialFaqStoragePageId, type: 'faq', display_style: 'accordion',
+        sort_order: 1_000_000,
         is_visible: true,
         data: { title: `Vấn đề thường gặp · ${title}`, faq_surface: 'overview', faq_category_id: categoryId, faq_category_title: title, items: [{ id: generateUuid(), question: '', answer: '', is_visible: true, learning_answers: [] }] },
       };
@@ -478,7 +478,7 @@ export default function TopicListClient({
           {!hideViewAll && enableSearch && (
             <Link
               href="/chuyen-de"
-              prefetch={true}
+              prefetch={false}
               className="text-[13px] font-black uppercase tracking-wider text-[#1E3A8A] hover:text-[#172554] dark:text-[#F8DF7B] dark:hover:text-amber-200 flex items-center gap-0.5 cursor-pointer active:opacity-75 transition-colors"
               title="Xem tất cả chuyên đề"
             >
@@ -673,6 +673,7 @@ export default function TopicListClient({
               <Link
                 key={p.id}
                 href={`/${p.topic_slug}/${p.slug}`}
+                prefetch={false}
                 className="flex items-center gap-2 px-3 py-2 rounded-[12px] bg-white border border-slate-200/80 active:scale-[0.99] transition-transform"
               >
                 <div className="flex-1 min-w-0">
@@ -702,7 +703,7 @@ export default function TopicListClient({
             <div role="region" aria-label="Chuyên đề nổi bật, vuốt ngang để xem thêm" tabIndex={0} className="-mx-4 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:gap-3 sm:px-0">
               {featured.map(({ topic, pageCount }) => (
                 <div key={`featured-${topic.id}`} className="relative w-fit max-w-[86vw] shrink-0 snap-start">
-                  <Link href={`/${topic.slug}`} className="relative flex min-h-[82px] w-fit min-w-[190px] max-w-full items-center gap-2 rounded-[17px] border border-slate-200/80 bg-white p-2.5 pr-7 shadow-[0_10px_28px_-22px_rgba(15,23,42,.65)] active:scale-[0.98] transition-transform">
+                  <Link href={`/${topic.slug}`} prefetch={false} className="relative flex min-h-[82px] w-fit min-w-[190px] max-w-full items-center gap-2 rounded-[17px] border border-slate-200/80 bg-white p-2.5 pr-7 shadow-[0_10px_28px_-22px_rgba(15,23,42,.65)] active:scale-[0.98] transition-transform">
                     <div className="h-[58px] w-[58px] shrink-0 overflow-hidden rounded-[13px] bg-[#170B3D]">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={topic.cover_url || DEFAULT_TOPIC_COVERS[topic.slug] || ''} alt={topic.title} className="h-full w-full object-cover" loading="lazy" />
@@ -880,7 +881,7 @@ export default function TopicListClient({
                     <div className="border-t border-slate-100 px-3.5 pb-3.5 pt-3 dark:border-white/10">
                       <p className="mb-2 text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">{faq.pageTitle}</p>
                       {faq.answer && <p className="whitespace-pre-line text-[12px] leading-relaxed text-slate-600 dark:text-slate-300">{faq.answer}</p>}
-                      {answers.length > 0 && <div className="mt-2.5 flex flex-col gap-2">{answers.map((answer, index) => <div key={answer.id} className="rounded-[11px] bg-[#F1F6FD] p-2.5 dark:bg-blue-950/20"><span className="mb-1 block text-[9px] font-black uppercase tracking-wide text-[#315991] dark:text-blue-300">{answer.topicTitle} · Câu trả lời {index + 1}</span>{answer.text && <p className="mb-2 text-[11px] leading-relaxed text-slate-700 dark:text-slate-200">{answer.text}</p>}{answer.href && (answer.destinationType === 'topic' ? <Link href={answer.href} className="inline-flex min-h-8 items-center gap-1 rounded-full border border-[#D7E3F3] bg-white px-3 text-[10.5px] font-bold text-[#234B8B] dark:border-white/10 dark:bg-white/5 dark:text-blue-200">Xem chuyên đề <span aria-hidden="true">›</span></Link> : <VideoLessonLink href={answer.href} title={answer.videoTitle} thumbnailUrl={answer.thumbnailUrl} />)}{answer.linkedVideos?.map((video, videoIndex) => <VideoLessonLink key={`${answer.id}-video-${videoIndex}`} href={video.href} title={video.title} thumbnailUrl={video.thumbnailUrl} />)}</div>)}</div>}
+                      {answers.length > 0 && <div className="mt-2.5 flex flex-col gap-2">{answers.map((answer, index) => <div key={answer.id} className="rounded-[11px] bg-[#F1F6FD] p-2.5 dark:bg-blue-950/20"><span className="mb-1 block text-[9px] font-black uppercase tracking-wide text-[#315991] dark:text-blue-300">{answer.topicTitle} · Câu trả lời {index + 1}</span>{answer.text && <p className="mb-2 text-[11px] leading-relaxed text-slate-700 dark:text-slate-200">{answer.text}</p>}{answer.href && (answer.destinationType === 'topic' ? <Link href={answer.href} prefetch={false} className="inline-flex min-h-8 items-center gap-1 rounded-full border border-[#D7E3F3] bg-white px-3 text-[10.5px] font-bold text-[#234B8B] dark:border-white/10 dark:bg-white/5 dark:text-blue-200">Xem chuyên đề <span aria-hidden="true">›</span></Link> : <VideoLessonLink href={answer.href} title={answer.videoTitle} thumbnailUrl={answer.thumbnailUrl} />)}{answer.linkedVideos?.map((video, videoIndex) => <VideoLessonLink key={`${answer.id}-video-${videoIndex}`} href={video.href} title={video.title} thumbnailUrl={video.thumbnailUrl} />)}</div>)}</div>}
                     </div>
                   </details>
                   {isAdmin && <button type="button" onClick={() => { setFaqSaveError(''); setEditingFaqBlock(faq.block); }} title="Sửa vấn đề thường gặp này" aria-label={`Sửa: ${faq.question}`} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[11px] border border-blue-200 bg-white text-blue-700 shadow-sm dark:border-blue-300/15 dark:bg-[#1B1630] dark:text-blue-200"><Pencil size={15} /></button>}
@@ -894,7 +895,7 @@ export default function TopicListClient({
       {!enableSearch && !hideViewAll && (
         <Link
           href="/chuyen-de"
-          prefetch={true}
+          prefetch={false}
           className="mt-1 inline-flex min-h-9 items-center justify-center gap-1 self-center rounded-full px-4 text-[12px] font-bold text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary"
           title="Xem tất cả chuyên đề"
         >

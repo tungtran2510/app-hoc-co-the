@@ -2,12 +2,12 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import {
-  getPageBySlug,
-  getBlocksByPage,
-  getPagesByTopic,
-  getSettings,
-  getAllPageSlugMap,
-} from '../../../lib/data';
+  getCachedAllPageSlugMap,
+  getCachedBlocksByPage,
+  getCachedPageBySlug,
+  getCachedPagesByTopic,
+  getCachedSettings,
+} from '../../../lib/cachedData';
 import ContentViewer from '../../../components/ContentViewer';
 
 export const revalidate = 60;
@@ -27,8 +27,8 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { topicSlug, pageSlug } = params;
   const [result, settings] = await Promise.all([
-    getPageBySlug(topicSlug, pageSlug),
-    getSettings(),
+    getCachedPageBySlug(topicSlug, pageSlug),
+    getCachedSettings(),
   ]);
 
   if (!result) {
@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const { page, topic } = result;
-  const blocks = await getBlocksByPage(page.id);
+  const blocks = await getCachedBlocksByPage(page.id);
 
   let imageUrl = page.cover_url || topic.cover_url || '';
   if (!imageUrl) {
@@ -76,16 +76,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function ContentPage({ params, searchParams }: PageProps) {
   const { topicSlug, pageSlug } = params;
 
-  const result = await getPageBySlug(topicSlug, pageSlug);
+  const result = await getCachedPageBySlug(topicSlug, pageSlug);
   if (!result) {
     notFound();
   }
 
   const { topic, page, pageIndex, totalPages } = result;
   const [blocks, allPages, pageSlugMap] = await Promise.all([
-    getBlocksByPage(page.id),
-    getPagesByTopic(topic.id),
-    getAllPageSlugMap(),
+    getCachedBlocksByPage(page.id),
+    getCachedPagesByTopic(topic.id),
+    getCachedAllPageSlugMap(),
   ]);
 
   // Tìm trang trước và trang kế tiếp trong cùng chủ đề

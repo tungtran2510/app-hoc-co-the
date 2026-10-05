@@ -26,6 +26,11 @@ export default function ScrollReveal({
       return;
     }
 
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setIsVisible(true);
+      return;
+    }
+
     const currentEl = elementRef.current;
     if (!currentEl) return;
 

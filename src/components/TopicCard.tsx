@@ -57,7 +57,7 @@ export default function TopicCard({
   return (
     <Link
       href={`/${topic.slug}`}
-      prefetch={true}
+      prefetch={false}
       onTouchStart={onActivate}
       className={`topic-card-container group relative flex flex-col cursor-pointer select-none transition-all duration-300 ${
         isActive ? 'is-active' : ''
