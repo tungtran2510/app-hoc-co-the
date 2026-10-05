@@ -267,7 +267,7 @@ export default function RecommendedBooksSection({
               <ScrollReveal
                 key={book.id || idx}
                 animation="book-cascade"
-                delay={idx * 120}
+                delay={Math.min(idx * 30, 90)}
               >
                 <div
                   className={`p-3.5 sm:p-4 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-lg hover:shadow-blue-900/10 hover:border-[#1E3A8A]/50 dark:hover:border-[#F8DF7B]/60 dark:hover:shadow-[0_12px_28px_rgba(248,223,123,0.15)] hover:-translate-y-1.5 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 flex flex-row gap-3 sm:gap-4.5 group relative ${
@@ -411,7 +411,7 @@ export default function RecommendedBooksSection({
               <ScrollReveal
                 key={book.id || idx}
                 animation="book-cascade"
-                delay={idx * 120}
+                delay={Math.min(idx * 30, 90)}
               >
                 <div
                   onClick={() => setSelectedBook(book)}

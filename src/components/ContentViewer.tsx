@@ -766,7 +766,7 @@ export default function ContentViewer({
       <div
         key={block.id}
         id={`block-${block.id}`}
-        className={`relative transition-all ${
+        className={`relative transition-all cv-auto-large ${
           isAdmin
             ? 'p-2.5 rounded-[22px] border-2 border-dashed border-[#2D5B94]/30 dark:border-purple-500/40 bg-white/40 dark:bg-[#160E2E]/40'
             : ''

@@ -55,8 +55,9 @@ export default function TopicCard({
     .replace(' - ', '\n');
 
   return (
-    <a
+    <Link
       href={`/${topic.slug}`}
+      prefetch={true}
       onTouchStart={onActivate}
       className={`topic-card-container group relative flex flex-col cursor-pointer select-none transition-all duration-300 ${
         isActive ? 'is-active' : ''
@@ -88,6 +89,7 @@ export default function TopicCard({
             <img
               src={coverUrl!}
               alt={topic.title}
+              decoding="async"
               className={`topic-card-img w-full h-full max-h-[120px] sm:max-h-[132px] object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.55)] ${
                 topic.slug === 'cot-song' ? 'scale-115' : ''
               }`}
@@ -124,6 +126,6 @@ export default function TopicCard({
           </span>
         </div>
       </div>
-    </a>
+    </Link>
   );
 }

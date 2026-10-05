@@ -494,7 +494,7 @@ export default function HomeHeader({
                   type="button"
                   onClick={() => {
                     setShowMenu(false);
-                    window.location.assign('/tro-ly-ai');
+                    router.push('/tro-ly-ai');
                   }}
                   className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-white dark:hover:bg-[#25154D] cursor-pointer"
                 >
@@ -518,7 +518,7 @@ export default function HomeHeader({
                 type="button"
                 onClick={() => {
                   setShowMenu(false);
-                  window.location.assign('/dang-nhap');
+                  router.push('/dang-nhap');
                 }}
                 className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-left text-[14px] font-bold text-slate-800 hover:bg-slate-100 dark:text-ink dark:hover:bg-surface-2 cursor-pointer"
               >

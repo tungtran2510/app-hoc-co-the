@@ -744,3 +744,17 @@ html .font-extrabold { font-weight: 600; }
 
 /* Tiêu đề thẻ chuyên đề ở TRANG CHỦ: đậm rõ hơn (ghi đè quy tắc h3 = 600 ở trên) */
 html .topic-card-title-bold { font-weight: 800 !important; letter-spacing: 0.005em !important; text-shadow: 0 1px 2px rgba(0,0,0,0.45); }
+
+
+/* ============================================================================
+   TỐI ƯU HÓA RENDER VÀ CUỘN (CONTENT-VISIBILITY & GPU ACCELERATION)
+   ============================================================================ */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 160px;
+}
+
+.cv-auto-large {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 320px;
+}
