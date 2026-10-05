@@ -29,18 +29,11 @@ export default function BottomNav() {
     event: React.MouseEvent<HTMLAnchorElement>,
     href: string
   ) => {
-    event.preventDefault();
     if (pathname === href) {
+      event.preventDefault();
       return;
     }
     setOptimisticTarget(href);
-    if (typeof document !== 'undefined' && 'startViewTransition' in document) {
-      (document as unknown as { startViewTransition: (cb: () => void) => void }).startViewTransition(() => {
-        router.push(href);
-      });
-    } else {
-      router.push(href);
-    }
   };
 
   const isHome = activePath === '/';
@@ -62,54 +55,46 @@ export default function BottomNav() {
     >
       <div className="w-full max-w-[480px] md:max-w-[820px] lg:max-w-[820px] h-[80px] pb-2 grid grid-cols-4 select-none bg-white dark:bg-[#100922] transition-all">
         {/* 1. Tổng quan */}
-        <Link
+        <a
           href="/"
-          prefetch={true}
           onClick={(event) => handleTabNavigate(event, '/')}
-          onTouchStart={() => router.prefetch('/')}
-          onMouseEnter={() => router.prefetch('/')}
+          onTouchStart={() => setOptimisticTarget('/')}
           className={`${baseItem} ${isHome ? activeText : idleText}`}
           aria-label="Tổng quan"
         >
           <Home size={22} strokeWidth={isHome ? 2.5 : 2} />
           <span className="text-[11px] sm:text-[12px] leading-tight">Tổng quan</span>
-        </Link>
+        </a>
 
         {/* 2. Chuyên đề */}
-        <Link
+        <a
           href="/chuyen-de"
-          prefetch={true}
           onClick={(event) => handleTabNavigate(event, '/chuyen-de')}
-          onTouchStart={() => router.prefetch('/chuyen-de')}
-          onMouseEnter={() => router.prefetch('/chuyen-de')}
+          onTouchStart={() => setOptimisticTarget('/chuyen-de')}
           className={`${baseItem} ${isTopics ? activeText : idleText}`}
           aria-label="Chuyên đề"
         >
           <LayoutGrid size={22} strokeWidth={isTopics ? 2.5 : 2} />
           <span className="text-[11px] sm:text-[12px] leading-tight">Chuyên đề</span>
-        </Link>
+        </a>
 
         {/* 3. Đã lưu */}
-        <Link
+        <a
           href="/da-luu"
-          prefetch={true}
           onClick={(event) => handleTabNavigate(event, '/da-luu')}
-          onTouchStart={() => router.prefetch('/da-luu')}
-          onMouseEnter={() => router.prefetch('/da-luu')}
+          onTouchStart={() => setOptimisticTarget('/da-luu')}
           className={`${baseItem} ${isSaved ? activeText : idleText}`}
           aria-label="Bài học đã lưu"
         >
           <Bookmark size={22} strokeWidth={isSaved ? 2.5 : 2} className={isSaved ? 'fill-[#1E3A8A] dark:fill-[#F8DF7B]' : ''} />
           <span className="text-[11px] sm:text-[12px] leading-tight">Đã lưu</span>
-        </Link>
+        </a>
 
         {/* 4. Hỏi đáp AI */}
-        <Link
+        <a
           href="/tro-ly-ai"
-          prefetch={true}
           onClick={(event) => handleTabNavigate(event, '/tro-ly-ai')}
-          onTouchStart={() => router.prefetch('/tro-ly-ai')}
-          onMouseEnter={() => router.prefetch('/tro-ly-ai')}
+          onTouchStart={() => setOptimisticTarget('/tro-ly-ai')}
           className={`${baseItem} ${isAi ? activeText : idleText}`}
           aria-label="Hỏi đáp AI"
         >
@@ -118,7 +103,7 @@ export default function BottomNav() {
             <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#1E3A8A] dark:bg-[#F8DF7B] animate-pulse" />
           </div>
           <span className="text-[11px] sm:text-[12px] leading-tight">Hỏi đáp AI</span>
-        </Link>
+        </a>
       </div>
     </nav>
   );

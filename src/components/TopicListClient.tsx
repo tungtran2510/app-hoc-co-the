@@ -701,7 +701,7 @@ export default function TopicListClient({
             <div role="region" aria-label="Chuyên đề nổi bật, vuốt ngang để xem thêm" tabIndex={0} className="-mx-4 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:gap-3 sm:px-0">
               {featured.map(({ topic, pageCount }) => (
                 <div key={`featured-${topic.id}`} className="relative w-fit max-w-[86vw] shrink-0 snap-start">
-                  <Link href={`/${topic.slug}`} prefetch={true} className="relative flex min-h-[82px] w-fit min-w-[190px] max-w-full items-center gap-2 rounded-[17px] border border-slate-200/80 bg-white p-2.5 pr-7 shadow-[0_10px_28px_-22px_rgba(15,23,42,.65)] active:scale-[0.98] transition-transform">
+                  <a href={`/${topic.slug}`} className="relative flex min-h-[82px] w-fit min-w-[190px] max-w-full items-center gap-2 rounded-[17px] border border-slate-200/80 bg-white p-2.5 pr-7 shadow-[0_10px_28px_-22px_rgba(15,23,42,.65)] active:scale-[0.98] transition-transform">
                     <div className="h-[58px] w-[58px] shrink-0 overflow-hidden rounded-[13px] bg-[#170B3D]">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={topic.cover_url || DEFAULT_TOPIC_COVERS[topic.slug] || ''} alt={topic.title} className="h-full w-full object-cover" loading="lazy" decoding="async" />
@@ -711,7 +711,7 @@ export default function TopicListClient({
                       <p className="mt-1 flex items-center gap-1 whitespace-nowrap text-[10px] font-semibold text-slate-500"><BookOpen size={11} />{pageCount > 0 ? `${pageCount} bài học` : 'Sắp ra mắt'}</p>
                     </div>
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[18px] text-[#2D5B94]">›</span>
-                  </Link>
+                  </a>
                   {isAdmin && (
                     <button type="button" onClick={() => handleToggleFeatured(topic.id)} className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-amber-400 text-[#071735] shadow" title="Bỏ nổi bật">
                       <Star size={12} className="fill-current" />
