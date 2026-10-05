@@ -247,8 +247,8 @@ export default function SavedPages() {
                     ) : isLesson ? (
                       <>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={topicIcon} alt={item.topic_title} className="h-full w-full object-contain p-3" loading="lazy" onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }} />
-                        <span className="absolute inset-0 -z-0 flex items-center justify-center text-primary dark:text-[#F8DF7B]"><BookOpen size={22} /></span>
+                        <img src={topicIcon} alt={item.topic_title} className="h-full w-full object-contain p-3" loading="lazy" onError={(e) => { const image = e.target as HTMLElement; image.style.display = 'none'; const fallback = image.nextElementSibling as HTMLElement | null; if (fallback) fallback.style.display = 'flex'; }} />
+                        <span className="absolute inset-0 hidden items-center justify-center text-primary dark:text-[#F8DF7B]"><BookOpen size={22} /></span>
                       </>
                     ) : (
                       <span className="flex h-full w-full items-center justify-center text-primary dark:text-[#F8DF7B]"><KindIcon size={24} /></span>
