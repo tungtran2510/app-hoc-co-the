@@ -1,6 +1,6 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
-import { getTopicBySlug, getPagesByTopic, getBlocksByPages, getSettings } from '../../lib/data';
+import { getTopics, getTopicBySlug, getPagesByTopic, getBlocksByPages, getSettings } from '../../lib/data';
 import TopicHeaderNav from '../../components/TopicHeaderNav';
 import TopicLearningExperience from '../../components/TopicLearningExperience';
 import BottomNav from '../../components/BottomNav';
@@ -9,6 +9,11 @@ import { Metadata } from 'next';
 interface TopicPageProps { params: { topicSlug: string } }
 
 export const revalidate = 60;
+
+export async function generateStaticParams() {
+  const topics = await getTopics();
+  return topics.map((t) => ({ topicSlug: t.slug }));
+}
 
 export async function generateMetadata({ params }: TopicPageProps): Promise<Metadata> {
   const [topic, settings] = await Promise.all([getTopicBySlug(params.topicSlug), getSettings()]);
