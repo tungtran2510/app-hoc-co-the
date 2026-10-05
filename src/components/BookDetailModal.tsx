@@ -20,7 +20,8 @@ import {
 } from 'lucide-react';
 import { extractYouTubeId } from '../lib/youtube';
 import ModernBookCover from './ModernBookCover';
-import FlipbookViewer from './FlipbookViewer';
+import dynamic from 'next/dynamic';
+const FlipbookViewer = dynamic(() => import('./FlipbookViewer'), { ssr: false });
 import YouTubeEmbed from './YouTubeEmbed';
 
 export interface UnifiedBookItem {

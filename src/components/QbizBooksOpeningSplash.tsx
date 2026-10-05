@@ -12,11 +12,14 @@ interface QbizBooksOpeningSplashProps {
 let hasShownIntroInSession = false;
 
 // Đánh dấu đã chiếu intro trong LẦN MỞ APP HIỆN TẠI (sessionStorage + window + module).
-// Không lưu vĩnh viễn: mỗi lần mở app mới thì hiệu ứng chiếu lại đúng 1 lần.
+// Đánh dấu đã chiếu intro trong LẦN MỞ APP HIỆN TẠI (sessionStorage + localStorage + window + module).
 export function markIntroAsSeenPermanent() {
   try {
     if (typeof sessionStorage !== 'undefined') {
       sessionStorage.setItem('qbiz_books_intro_seen', '1');
+    }
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('qbiz_books_intro_seen', String(Date.now()));
     }
     if (typeof window !== 'undefined') {
       (window as any).__qbiz_books_intro_seen = true;
@@ -31,6 +34,15 @@ export function hasSeenIntroAnywhere(): boolean {
     if (hasShownIntroInSession) return true;
     if (typeof window !== 'undefined' && (window as any).__qbiz_books_intro_seen) return true;
     if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('qbiz_books_intro_seen') === '1') return true;
+    if (typeof localStorage !== 'undefined') {
+      const seenTime = localStorage.getItem('qbiz_books_intro_seen');
+      if (seenTime) {
+        const elapsed = Date.now() - parseInt(seenTime, 10);
+        if (!isNaN(elapsed) && elapsed < 24 * 60 * 60 * 1000) {
+          return true;
+        }
+      }
+    }
   } catch {}
   return false;
 }
@@ -83,28 +95,28 @@ export default function QbizBooksOpeningSplash({
 
     if (!shouldShow) return;
 
-    // 1. Sau 400ms: Bìa sách 3D mở ra
+    // 1. Sau 120ms: Bìa sách 3D mở ra dứt khoát
     const tOpen = setTimeout(() => {
       setIsBookOpened(true);
-    }, 400);
+    }, 120);
 
-    // 2. Sau 1800ms: Bắt đầu tan biến dần vào trang chủ
+    // 2. Sau 700ms: Bắt đầu tan biến dần vào trang chủ
     const tFade = setTimeout(() => {
       setIsFadingOut(true);
-    }, 1800);
+    }, 700);
 
-    // 3. Sau 2200ms: Đóng hoàn toàn
+    // 3. Sau 950ms: Đóng hoàn toàn
     const tFinish = setTimeout(() => {
       markIntroAsSeenPermanent();
       setIsVisible(false);
       if (onFinish) onFinish();
-    }, 2200);
+    }, 950);
 
-    // Bảo hiểm an toàn tuyệt đối: Luôn tắt sau 2500ms để không bao giờ chắn màn hình
+    // Bảo hiểm an toàn tuyệt đối: Luôn tắt sau 1100ms để không bao giờ chắn màn hình
     const tSafety = setTimeout(() => {
       markIntroAsSeenPermanent();
       setIsVisible(false);
-    }, 2500);
+    }, 1100);
 
     return () => {
       clearTimeout(tOpen);
@@ -124,13 +136,13 @@ export default function QbizBooksOpeningSplash({
       setIsVisible(true);
       setIsBookOpened(false);
       setIsFadingOut(false);
-      tOpen = setTimeout(() => setIsBookOpened(true), 400);
-      tFade = setTimeout(() => setIsFadingOut(true), 1800);
+      tOpen = setTimeout(() => setIsBookOpened(true), 120);
+      tFade = setTimeout(() => setIsFadingOut(true), 700);
       tFinish = setTimeout(() => {
         markIntroAsSeenPermanent();
         setIsVisible(false);
         if (onFinish) onFinish();
-      }, 2200);
+      }, 950);
     };
 
     window.addEventListener('replay_qbiz_books_intro', handleReplay);
@@ -157,7 +169,7 @@ export default function QbizBooksOpeningSplash({
     <div
       id="qbiz-books-3d-splash"
       onClick={handleDismiss}
-      className={`fixed inset-0 z-[99999] flex flex-col items-center justify-center select-none overflow-hidden transition-all duration-500 cursor-pointer ${
+      className={`fixed inset-0 z-[99999] flex flex-col items-center justify-center select-none overflow-hidden transition-all duration-300 cursor-pointer ${
         isFadingOut ? 'opacity-0 scale-105 pointer-events-none' : 'opacity-100 scale-100'
       }`}
       style={{
@@ -215,7 +227,7 @@ export default function QbizBooksOpeningSplash({
       >
         {/* Bóng đổ thực tế dưới sàn */}
         <div
-          className="absolute -bottom-6 w-[280px] h-[35px] rounded-[100%] bg-black/80 blur-xl transition-all duration-1000 pointer-events-none"
+          className="absolute -bottom-6 w-[280px] h-[35px] rounded-[100%] bg-black/80 blur-xl transition-all duration-500 pointer-events-none"
           style={{
             transform: isBookOpened
               ? 'scaleX(1.2) scaleY(1.3) translateY(8px) opacity-70'
@@ -225,7 +237,7 @@ export default function QbizBooksOpeningSplash({
 
         {/* Ánh sáng vàng rực từ trong lòng sách tỏa ra khi mở */}
         <div
-          className="absolute inset-0 rounded-[20px] bg-gradient-to-r from-amber-500/0 via-amber-400/35 to-yellow-300/0 blur-2xl pointer-events-none transition-all duration-1000"
+          className="absolute inset-0 rounded-[20px] bg-gradient-to-r from-amber-500/0 via-amber-400/35 to-yellow-300/0 blur-2xl pointer-events-none transition-all duration-500"
           style={{
             opacity: isBookOpened ? 1 : 0,
             transform: isBookOpened ? 'scale(1.2) translateY(-10px)' : 'scale(0.8)',
@@ -234,7 +246,7 @@ export default function QbizBooksOpeningSplash({
 
         {/* KHUNG THÂN CUỐN SÁCH 3D */}
         <div
-          className="relative w-[260px] h-[370px] sm:w-[280px] sm:h-[400px] transition-transform duration-1000 ease-out"
+          className="relative w-[260px] h-[370px] sm:w-[280px] sm:h-[400px] transition-transform duration-500 ease-out"
           style={{
             transformStyle: 'preserve-3d',
             transform: isBookOpened
@@ -364,7 +376,7 @@ export default function QbizBooksOpeningSplash({
               if (!isBookOpened) setIsBookOpened(true);
               else handleDismiss();
             }}
-            className="absolute inset-0 rounded-r-[12px] rounded-l-[4px] cursor-pointer origin-left transition-transform duration-1000 ease-out"
+            className="absolute inset-0 rounded-r-[12px] rounded-l-[4px] cursor-pointer origin-left transition-transform duration-500 ease-out"
             style={{
               transformStyle: 'preserve-3d',
               zIndex: isBookOpened ? 5 : 40,

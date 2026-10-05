@@ -18,7 +18,8 @@ import {
 import { RecommendedBook } from '../lib/types';
 import { checkIsAdminClient } from '../lib/adminAuth';
 import SectionOrderControls from './admin/SectionOrderControls';
-import FlipbookViewer from './FlipbookViewer';
+import dynamic from 'next/dynamic';
+const FlipbookViewer = dynamic(() => import('./FlipbookViewer'), { ssr: false });
 import BookDetailModal from './BookDetailModal';
 import EditSingleRecommendedBookModal from './admin/EditSingleRecommendedBookModal';
 import ModernBookCover from './ModernBookCover';

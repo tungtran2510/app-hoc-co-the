@@ -434,24 +434,25 @@ html.gray ::-webkit-scrollbar-thumb {
 /* 5. Hiệu ứng Vệt Sáng Quét Qua (Shimmer Sweep) cho nút Xem Tiếp chuyên nghiệp */
 @keyframes shimmer-sweep {
   0% {
-    transform: translateX(-160%) skewX(-20deg);
+    transform: translate3d(-160%, 0, 0) skewX(-20deg);
     opacity: 0;
   }
   15% {
     opacity: 0.75;
   }
   30% {
-    transform: translateX(260%) skewX(-20deg);
+    transform: translate3d(260%, 0, 0) skewX(-20deg);
     opacity: 0;
   }
   100% {
-    transform: translateX(260%) skewX(-20deg);
+    transform: translate3d(260%, 0, 0) skewX(-20deg);
     opacity: 0;
   }
 }
 
 .animate-shimmer-sweep {
   animation: shimmer-sweep 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform;
 }
 
 /* 6. Hiệu ứng Hào Quang Nhịp Thở Sáng (Pulse Glow) chuẩn Y Khoa */
@@ -488,24 +489,25 @@ html.dark .animate-pulse-glow {
 /* 7. Hiệu ứng Flash lấp lánh trên thẻ tag bìa sách (Flash Shimmer Tag) */
 @keyframes badge-flash-sweep {
   0% {
-    transform: translateX(-120%) skewX(-20deg);
+    transform: translate3d(-120%, 0, 0) skewX(-20deg);
     opacity: 0;
   }
   15% {
     opacity: 0.95;
   }
   35% {
-    transform: translateX(240%) skewX(-20deg);
+    transform: translate3d(240%, 0, 0) skewX(-20deg);
     opacity: 0;
   }
   100% {
-    transform: translateX(240%) skewX(-20deg);
+    transform: translate3d(240%, 0, 0) skewX(-20deg);
     opacity: 0;
   }
 }
 
 .animate-flash-sweep {
   animation: badge-flash-sweep 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform;
 }
 
 /* ============================================================================
@@ -514,11 +516,11 @@ html.dark .animate-pulse-glow {
    ============================================================================ */
 @keyframes bubble-float {
   0%, 100% {
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
     box-shadow: 0 2px 8px rgba(234, 179, 8, 0.22), 0 1px 2px rgba(0, 0, 0, 0.04);
   }
   50% {
-    transform: translateY(-2px);
+    transform: translate3d(0, -2px, 0);
     box-shadow: 0 6px 16px rgba(250, 204, 21, 0.38), 0 2px 4px rgba(0, 0, 0, 0.06);
   }
 }
@@ -535,12 +537,12 @@ html.dark .animate-pulse-glow {
   0%, 100% {
     border-color: rgba(203, 213, 225, 0.85);
     box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
   }
   50% {
     border-color: rgba(245, 158, 11, 0.5);
     box-shadow: 0 6px 20px rgba(30, 58, 138, 0.1), 0 0 16px rgba(245, 158, 11, 0.15);
-    transform: translateY(-1.5px);
+    transform: translate3d(0, -1.5px, 0);
   }
 }
 
@@ -548,17 +550,18 @@ html.dark .animate-pulse-glow {
   0%, 100% {
     border-color: rgba(255, 255, 255, 0.16);
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
   }
   50% {
     border-color: rgba(248, 223, 123, 0.65);
     box-shadow: 0 8px 28px rgba(109, 40, 217, 0.35), 0 0 18px rgba(248, 223, 123, 0.28);
-    transform: translateY(-1.5px);
+    transform: translate3d(0, -1.5px, 0);
   }
 }
 
 .animate-bio-breathing {
   animation: bio-breathing-light 3.8s ease-in-out infinite;
+  will-change: transform, box-shadow, border-color;
   transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
@@ -591,6 +594,7 @@ html.dark .animate-bio-breathing {
   display: inline-block;
   transform-origin: center center;
   animation: medica-heartbeat 3.8s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+  will-change: transform;
 }
 
 /* ============================================================================
@@ -732,7 +736,7 @@ html.dark .animate-bio-breathing {
 
 
 
-/* Gi?m d? d?m ti�u d? cho d? nh�n, d?ng b? Be Vietnam Pro */
+/* Gi?m d? d?m ti�u d? cho d? nh�n, d?ng b? Be Vietnam Pro */
 html h1, html h2, html h3, html h4, html h5, html h6 { font-weight: 600 !important; letter-spacing: -0.01em; }
 html .font-black { font-weight: 700; }
 html .font-extrabold { font-weight: 600; }

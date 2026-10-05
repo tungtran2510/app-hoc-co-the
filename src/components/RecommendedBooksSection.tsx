@@ -25,7 +25,8 @@ import SectionOrderControls from './admin/SectionOrderControls';
 import ModernBookCover from './ModernBookCover';
 import BookDetailModal, { UnifiedBookItem } from './BookDetailModal';
 import ScrollReveal from './ScrollReveal';
-import FlipbookViewer from './FlipbookViewer';
+import dynamic from 'next/dynamic';
+const FlipbookViewer = dynamic(() => import('./FlipbookViewer'), { ssr: false });
 
 interface RecommendedBooksSectionProps {
   initialTitle?: string | null;
