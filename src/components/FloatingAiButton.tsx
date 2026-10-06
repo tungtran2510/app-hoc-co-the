@@ -50,7 +50,7 @@ export default function FloatingAiButton() {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (typeof parsed.x === 'number' && typeof parsed.y === 'number') {
-          const clampedX = Math.max(12, Math.min(parsed.x, window.innerWidth - 108));
+          const clampedX = Math.max(12, Math.min(parsed.x, window.innerWidth - 88));
           const clampedY = Math.max(50, Math.min(parsed.y, window.innerHeight - 90));
           setPos({ x: clampedX, y: clampedY });
           return;
@@ -59,8 +59,8 @@ export default function FloatingAiButton() {
     } catch {}
 
     // Vị trí mặc định: Góc dưới bên phải (nổi ngay sát trên Tab Tìm kiếm của BottomNav)
-    const defaultX = Math.max(12, window.innerWidth - 108);
-    const defaultY = Math.max(50, window.innerHeight - 110);
+    const defaultX = Math.max(12, window.innerWidth - 88);
+    const defaultY = Math.max(50, window.innerHeight - 105);
     setPos({ x: defaultX, y: defaultY });
   }, []);
 
@@ -69,7 +69,7 @@ export default function FloatingAiButton() {
     const handleResize = () => {
       setPos((prev) => {
         if (!prev) return prev;
-        const clampedX = Math.max(12, Math.min(prev.x, window.innerWidth - 108));
+        const clampedX = Math.max(12, Math.min(prev.x, window.innerWidth - 88));
         const clampedY = Math.max(50, Math.min(prev.y, window.innerHeight - 90));
         return { x: clampedX, y: clampedY };
       });
@@ -82,8 +82,8 @@ export default function FloatingAiButton() {
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0 && e.pointerType === 'mouse') return;
 
-    const currentX = pos ? pos.x : Math.max(12, window.innerWidth - 96);
-    const currentY = pos ? pos.y : Math.max(50, window.innerHeight - 110);
+    const currentX = pos ? pos.x : Math.max(12, window.innerWidth - 88);
+    const currentY = pos ? pos.y : Math.max(50, window.innerHeight - 105);
 
     dragInfoRef.current = {
       startX: e.clientX,
@@ -241,26 +241,26 @@ export default function FloatingAiButton() {
         />
       )}
 
-      {/* Thẻ nút Link tới /tro-ly-ai siêu tốc, kích thước vừa vặn dễ bấm, viền sắc nét nổi bật trên cả nền sáng và tối */}
+      {/* Thẻ nút Link tới /tro-ly-ai siêu tốc, kích thước nhỏ gọn thanh lịch, viền xanh navy nhạt tinh tế, giảm trong suốt */}
       <a
         href="/tro-ly-ai"
         onClick={handleLinkClick}
-        className={`relative flex items-center gap-2 px-[18px] py-[9px] rounded-full backdrop-blur-md transition-all shadow-md ${
+        className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full backdrop-blur-md transition-all shadow-sm ${
           isUnlocked || isDragging
-            ? 'bg-black/85 dark:bg-[#160D30]/95 border-2 border-[#FDE047] text-[#FDE047] shadow-[0_0_22px_rgba(250,204,21,0.65)] ring-2 ring-[#FDE047]/50'
-            : 'bg-white dark:bg-[#160D30] hover:bg-white/95 dark:hover:bg-[#1D1140] border-2 border-rose-600 dark:border-amber-400 text-slate-900 dark:text-[#F8DF7B] shadow-[0_4px_16px_rgba(225,29,72,0.3)] dark:shadow-[0_4px_16px_rgba(250,204,21,0.35)]'
+            ? 'bg-black/90 dark:bg-[#160D30]/95 border-2 border-[#FDE047] text-[#FDE047] shadow-[0_0_18px_rgba(250,204,21,0.65)] ring-2 ring-[#FDE047]/50'
+            : 'bg-white/95 dark:bg-[#160D30]/95 hover:bg-white dark:hover:bg-[#1D1140] border-[1.5px] border-[#1E3A8A]/40 dark:border-blue-400/40 text-[#1E3A8A] dark:text-[#F8DF7B] shadow-[0_2px_10px_rgba(30,58,138,0.12)] dark:shadow-[0_2px_10px_rgba(0,0,0,0.35)]'
         }`}
       >
         <Sparkles
-          size={16}
-          strokeWidth={2.4}
+          size={14}
+          strokeWidth={2.2}
           className={`${
             isUnlocked || isDragging
               ? 'text-[#FDE047] animate-spin'
-              : 'text-rose-500 dark:text-[#F8DF7B] fill-rose-400/40 dark:fill-amber-300/40 animate-pulse'
+              : 'text-[#1E3A8A] dark:text-[#F8DF7B] fill-[#1E3A8A]/20 dark:fill-amber-300/30 animate-pulse'
           }`}
         />
-        <span className="text-[13.5px] font-black tracking-tight whitespace-nowrap">
+        <span className="text-[12px] font-extrabold tracking-tight whitespace-nowrap">
           {isUnlocked ? 'Thả đặt' : 'Hỏi AI'}
         </span>
       </a>
