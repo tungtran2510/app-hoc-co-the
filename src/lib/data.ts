@@ -14,6 +14,7 @@ import {
   Block,
   ContinueInfo,
   AuthorProfile,
+  AuthorBook,
   RecommendedBook,
   AiTrainingConfig,
 } from './types';
@@ -64,10 +65,44 @@ export function normalizeRecommendedBooks(raw?: any): RecommendedBook[] {
   }));
 }
 
-export function normalizeAuthorProfile(raw?: any): AuthorProfile {
+export function normalizeAuthorProfile(raw?: any, supplementalFlatBooks?: any[]): AuthorProfile {
   if (!raw || typeof raw !== 'object' || Object.keys(raw).length === 0) {
     return { ...DEFAULT_AUTHOR_PROFILE };
   }
+
+  const baseBooks: AuthorBook[] = Array.isArray(raw.books)
+    ? raw.books.map((b: any) => ({
+        ...b,
+        gallery_images: Array.isArray(b.gallery_images) ? b.gallery_images.filter(Boolean) : [],
+        flipbook_pages: Array.isArray(b.flipbook_pages) ? b.flipbook_pages.filter(Boolean) : [],
+        is_visible: b.is_visible !== undefined ? Boolean(b.is_visible) : true,
+      }))
+    : [...DEFAULT_AUTHOR_PROFILE.books];
+
+  if (Array.isArray(supplementalFlatBooks) && supplementalFlatBooks.length > 0) {
+    const existingTitles = new Set(baseBooks.map((b) => b.title?.trim().toLowerCase()));
+    for (const item of supplementalFlatBooks) {
+      const t = item?.title?.trim();
+      if (!t || t.toLowerCase() === 'tài liệu mới') continue;
+      if (existingTitles.has(t.toLowerCase())) continue;
+      existingTitles.add(t.toLowerCase());
+      baseBooks.push({
+        id: item.id || `book-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        title: t,
+        cover_url: item.cover_url || null,
+        description: item.description || '',
+        year: item.year || item.badge_tag?.match(/\b20\d{2}\b/)?.[0] || '2025',
+        youtube_url: item.youtube_url || null,
+        gallery_images: Array.isArray(item.gallery_images) ? item.gallery_images.filter(Boolean) : [],
+        flipbook_pages: Array.isArray(item.flipbook_pages) ? item.flipbook_pages.filter(Boolean) : [],
+        file_url: item.file_url || null,
+        file_name: item.file_name || null,
+        pdf_url: item.pdf_url || null,
+        is_visible: item.is_visible !== undefined ? Boolean(item.is_visible) : true,
+      });
+    }
+  }
+
   return {
     ...DEFAULT_AUTHOR_PROFILE,
     ...raw,
@@ -80,14 +115,7 @@ export function normalizeAuthorProfile(raw?: any): AuthorProfile {
     books_subtitle: raw.books_subtitle !== undefined && raw.books_subtitle !== null ? raw.books_subtitle : '',
     contact_title: raw.contact_title !== undefined && raw.contact_title !== null ? raw.contact_title : 'Thông tin liên hệ & Kết nối',
     contact_subtitle: raw.contact_subtitle !== undefined && raw.contact_subtitle !== null ? raw.contact_subtitle : 'Kết nối trực tiếp cùng chuyên gia / tác giả',
-    books: Array.isArray(raw.books)
-      ? raw.books.map((b: any) => ({
-          ...b,
-          gallery_images: Array.isArray(b.gallery_images) ? b.gallery_images.filter(Boolean) : [],
-          flipbook_pages: Array.isArray(b.flipbook_pages) ? b.flipbook_pages.filter(Boolean) : [],
-          is_visible: b.is_visible !== undefined ? Boolean(b.is_visible) : true,
-        }))
-      : DEFAULT_AUTHOR_PROFILE.books,
+    books: baseBooks,
     phone: raw.phone !== undefined && raw.phone !== null ? raw.phone : DEFAULT_AUTHOR_PROFILE.phone,
     zalo_url: raw.zalo_url !== undefined && raw.zalo_url !== null ? raw.zalo_url : DEFAULT_AUTHOR_PROFILE.zalo_url,
     email: raw.email !== undefined && raw.email !== null ? raw.email : DEFAULT_AUTHOR_PROFILE.email,
@@ -222,7 +250,8 @@ export async function getSettings(includeAiTraining = false): Promise<Settings> 
           .eq('workspace_id', 'default')
           .single();
         if (data) {
-          const authProfile = normalizeAuthorProfile(data.author_profile);
+          const rawFlatBooks = data.flat_books || (data.block_styles && typeof data.block_styles === 'object' ? data.block_styles.flat_books : null);
+          const authProfile = normalizeAuthorProfile(data.author_profile, rawFlatBooks);
           const finalHotline = data.hotline || authProfile.phone || DEFAULT_AUTHOR_PROFILE.phone;
           const finalZaloUrl = data.zalo_url || authProfile.zalo_url || DEFAULT_AUTHOR_PROFILE.zalo_url;
 

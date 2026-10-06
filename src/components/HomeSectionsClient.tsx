@@ -98,7 +98,7 @@ export default function HomeSectionsClient({
   );
 
   const [authorProfile, setAuthorProfile] = useState<AuthorProfile>(() =>
-    normalizeAuthorProfile(initialAuthorProfile)
+    normalizeAuthorProfile(initialAuthorProfile, flatBooks)
   );
 
   const [appName, setAppName] = useState(initialAppName || 'Học Cơ Thể');
@@ -216,9 +216,9 @@ export default function HomeSectionsClient({
 
   useEffect(() => {
     if (initialAuthorProfile) {
-      setAuthorProfile(normalizeAuthorProfile(initialAuthorProfile));
+      setAuthorProfile(normalizeAuthorProfile(initialAuthorProfile, flatBooks));
     }
-  }, [initialAuthorProfile]);
+  }, [initialAuthorProfile, flatBooks]);
 
   useEffect(() => {
     if (initialAppName) setAppName(initialAppName);
@@ -625,7 +625,6 @@ export default function HomeSectionsClient({
               {hiddenBanner}
               <AuthorBooksSection
                 profile={authorProfile}
-                supplementalBooks={flatBooks}
                 isAdmin={isAdmin}
                 isHidden={isHidden}
                 isCollapsed={isSectionCollapsed('author_books')}

@@ -108,25 +108,11 @@ export default function ContentViewer({
   const [supabaseOk, setSupabaseOk] = useState(false);
   const [currentPage, setCurrentPage] = useState<Page>(page);
   const [pageStatus, setPageStatus] = useState<'draft' | 'published'>(page.status);
-  // Khởi tạo và chuẩn hóa danh sách khối (bao gồm khối sách lật 3D vào luồng thống nhất)
+  // Khởi tạo và chuẩn hóa danh sách khối (loại bỏ khối sách ảo/flipbook tự sinh theo yêu cầu người dùng)
   const initializeBlocks = (rawBlocks: Block[]): Block[] => {
-    let list = [...rawBlocks];
-    const hasFlipbook = list.some((b) => b.display_style === 'flipbook');
-    if (!hasFlipbook) {
-      const videoIdx = list.findIndex((b) => b.type === 'videos');
-      const insertIdx = videoIdx >= 0 ? videoIdx + 1 : Math.min(1, list.length);
-      const flipbookId = isValidUuid(page.id) ? 'f' + page.id.slice(1) : generateUuid();
-      const flipbookBlock: Block = {
-        id: flipbookId,
-        page_id: page.id,
-        type: 'files',
-        display_style: 'flipbook',
-        sort_order: insertIdx + 1,
-        is_visible: true,
-        data: { files: [] },
-      };
-      list.splice(insertIdx, 0, flipbookBlock);
-    }
+    let list = rawBlocks.filter(
+      (b) => b.display_style !== 'flipbook' && b.type !== 'books' && b.display_style !== 'books'
+    );
     list.sort((a, b) => a.sort_order - b.sort_order);
     return list.map((b, idx) => ({ ...b, sort_order: idx + 1 }));
   };
@@ -519,11 +505,8 @@ export default function ContentViewer({
     const textStyleCounts: Record<string, number> = {};
 
     return blockList
-      .filter((b) => b.is_visible)
+      .filter((b) => b.is_visible && b.display_style !== 'flipbook' && b.type !== 'books' && b.display_style !== 'books')
       .map((block) => {
-        if (block.display_style === 'flipbook') {
-          return { id: block.id, label: 'Đọc sách lật 3D Atlas Y Khoa' };
-        }
 
         if (block.type === 'videos') {
           const firstVid = block.data?.videos?.[0];
@@ -706,67 +689,9 @@ export default function ContentViewer({
   ) => {
     if (!isAdmin && !block.is_visible) return null;
 
-    // Nếu là khối sách lật 3D
-    if (block.display_style === 'flipbook') {
-      const coverUrl = block.type === 'files' ? block.data.cover_url : undefined;
-      const flipbookTitle = block.type === 'files' ? block.data.title : undefined;
-      return (
-        <div key={block.id} id={`block-${block.id}`}>
-          <FlipbookViewer
-            topicTitle={topic.title}
-            pageTitle={currentPage.title}
-            title={flipbookTitle}
-            coverUrl={coverUrl}
-            blockMode
-            pdfUrl={
-              block.type === 'files'
-                ? (block.data.files || []).find((f) => /\.pdf(\?|$)/i.test(f.url || ''))?.url ||
-                  (block.data.files || [])[0]?.url
-                : undefined
-            }
-            onUpdateCover={(newCoverUrl: string) => {
-              const updated = blockList.map((b) => {
-                if (b.id === block.id && b.type === 'files') {
-                  return {
-                    ...b,
-                    data: {
-                      ...b.data,
-                      cover_url: newCoverUrl,
-                    },
-                  };
-                }
-                return b;
-              });
-              setBlockList(updated);
-              triggerSaveBlocks(updated);
-            }}
-            onUpdateTitle={(newTitle: string) => {
-              const updated = blockList.map((b) => {
-                if (b.id === block.id && b.type === 'files') {
-                  return {
-                    ...b,
-                    data: {
-                      ...b.data,
-                      title: newTitle,
-                    },
-                  };
-                }
-                return b;
-              });
-              setBlockList(updated);
-              triggerSaveBlocks(updated);
-            }}
-            onOpenEditBlockModal={() => setEditingBlock(block)}
-            isAdmin={isAdmin}
-            isHidden={!block.is_visible}
-            onToggleVisibility={() => handleToggleVisibility(block.id)}
-            onMoveUp={() => handleMoveBlockUp(idx)}
-            onMoveDown={() => handleMoveBlockDown(idx)}
-            isFirst={idx === 0}
-            isLast={idx === blockList.length - 1}
-          />
-        </div>
-      );
+    // Loại bỏ khối sách/flipbook khỏi bài học (kiến thức đã có trong phần Tóm tắt, tránh vướng víu)
+    if (block.display_style === 'flipbook' || block.type === 'books' || block.display_style === 'books') {
+      return null;
     }
 
     const blockTitle = getBlockTitle(block);

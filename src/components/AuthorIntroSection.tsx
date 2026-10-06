@@ -473,25 +473,7 @@ export function AuthorBooksSection({
   onDeleteBook,
 }: AuthorBooksSectionProps) {
   const books = profile.books || [];
-  const displayBooks: AuthorBook[] = isAdmin
-    ? books
-    : [
-        ...books,
-        ...supplementalBooks.map((book) => ({
-          id: `supplemental-${book.id}`,
-          title: book.title,
-          cover_url: book.cover_url,
-          description: book.description,
-          year: book.badge_tag?.match(/\b20\d{2}\b/)?.[0],
-          youtube_url: book.youtube_url,
-          gallery_images: book.gallery_images,
-          flipbook_pages: book.flipbook_pages,
-          file_url: book.file_url,
-          file_name: book.file_name,
-          pdf_url: book.pdf_url,
-          is_visible: book.is_visible,
-        })),
-      ];
+  const displayBooks: AuthorBook[] = books.filter((b) => isAdmin || b.is_visible !== false);
   const [previewBook, setPreviewBook] = useState<AuthorBook | null>(null);
   const [videoBook, setVideoBook] = useState<AuthorBook | null>(null);
   const [hiddenVariants, setHiddenVariants] = useState<string[]>(profile.featured_variants_hidden || []);
