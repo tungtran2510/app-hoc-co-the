@@ -202,12 +202,14 @@ export default function FloatingAiButton() {
     window.addEventListener('pointercancel', handlePointerUp);
   };
 
-  const handleLinkClick = (e: React.MouseEvent) => {
+  const handleButtonClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (justMovedRef.current || isUnlockedRef.current || isDraggingRef.current) {
-      e.preventDefault();
       return;
     }
     playTapSound();
+    window.location.href = '/tro-ly-ai';
   };
 
   if (isHiddenPage) return null;
@@ -215,12 +217,21 @@ export default function FloatingAiButton() {
   return (
     <aside
       onPointerDown={handlePointerDown}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }}
       style={{
         transform: 'translateZ(0)',
         left: pos ? `${pos.x}px` : 'auto',
         right: pos ? 'auto' : '16px',
         top: pos ? `${pos.y}px` : 'auto',
         bottom: pos ? 'auto' : '74px',
+        WebkitTouchCallout: 'none',
+        WebkitUserSelect: 'none',
+        userSelect: 'none',
+        touchAction: 'none',
         transition: isDragging
           ? 'none'
           : 'box-shadow 0.2s ease, transform 0.2s ease',
@@ -241,11 +252,21 @@ export default function FloatingAiButton() {
         />
       )}
 
-      {/* Thẻ nút Link tới /tro-ly-ai siêu tốc, kích thước nhỏ gọn thanh lịch, viền xanh navy nhạt tinh tế, giảm trong suốt */}
-      <a
-        href="/tro-ly-ai"
-        onClick={handleLinkClick}
-        className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full backdrop-blur-md transition-all shadow-sm ${
+      {/* Nút bấm button không dùng thẻ a để trình duyệt di động tuyệt đối không bật menu sao chép link khi nhấn giữ */}
+      <button
+        type="button"
+        onClick={handleButtonClick}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }}
+        style={{
+          WebkitTouchCallout: 'none',
+          WebkitUserSelect: 'none',
+          userSelect: 'none',
+        }}
+        className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full backdrop-blur-md transition-all shadow-sm select-none ${
           isUnlocked || isDragging
             ? 'bg-black/90 dark:bg-[#160D30]/95 border-2 border-[#FDE047] text-[#FDE047] shadow-[0_0_18px_rgba(250,204,21,0.65)] ring-2 ring-[#FDE047]/50'
             : 'bg-white/95 dark:bg-[#160D30]/95 hover:bg-white dark:hover:bg-[#1D1140] border-[1.5px] border-[#1E3A8A]/40 dark:border-blue-400/40 text-[#1E3A8A] dark:text-[#F8DF7B] shadow-[0_2px_10px_rgba(30,58,138,0.12)] dark:shadow-[0_2px_10px_rgba(0,0,0,0.35)]'
@@ -263,7 +284,7 @@ export default function FloatingAiButton() {
         <span className="text-[12px] font-extrabold tracking-tight whitespace-nowrap">
           {isUnlocked ? 'Thả đặt' : 'Hỏi AI'}
         </span>
-      </a>
+      </button>
 
       {/* Gợi ý nhỏ khi đang giữ gần đủ 2.5 giây */}
       {isHolding && (

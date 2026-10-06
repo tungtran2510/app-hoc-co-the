@@ -190,7 +190,7 @@ const ARTIFACT_DIR = 'C:\\Users\\Admin\\.gemini\\antigravity\\brain\\23366f77-38
   // Tap AI Button -> Navigate to /tro-ly-ai
   console.log('   Testing Tap on Floating AI Button -> /tro-ly-ai...');
   const tAiStart = Date.now();
-  const aiLink = page.locator('aside[aria-label*="Hỏi Trợ lý AI"] a').first();
+  const aiLink = page.locator('aside[aria-label*="Hỏi Trợ lý AI"] button, aside[aria-label*="Hỏi Trợ lý AI"] a').first();
   await aiLink.click();
   await page.waitForURL('**/tro-ly-ai', { timeout: 10000 });
   const aiTransitionMs = Date.now() - tAiStart;
