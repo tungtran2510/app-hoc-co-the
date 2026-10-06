@@ -41,10 +41,10 @@ const ARTIFACT_DIR = 'C:\\Users\\Admin\\.gemini\\antigravity\\brain\\23366f77-38
   const targetBase = process.env.TEST_URL || 'https://app-hoc-co-the.vercel.app';
   console.log(`\n1. Navigating to ${targetBase} (Mobile Viewport: 390x844)...`);
   const t0 = Date.now();
-  await page.goto(targetBase, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.goto(targetBase, { waitUntil: 'networkidle', timeout: 30000 });
   const initialLoadTime = Date.now() - t0;
   console.log(`   Initial DOM loaded in: ${initialLoadTime}ms. URL: ${page.url()}`);
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(1000);
 
   // -------------------------------------------------------------
   // TEST 1: TOPIC CARD ACTIVE GOLDEN TOUCH EFFECT & HOVER
@@ -190,9 +190,10 @@ const ARTIFACT_DIR = 'C:\\Users\\Admin\\.gemini\\antigravity\\brain\\23366f77-38
   // Tap AI Button -> Navigate to /tro-ly-ai
   console.log('   Testing Tap on Floating AI Button -> /tro-ly-ai...');
   const tAiStart = Date.now();
-  const aiLink = page.locator('aside[aria-label*="Hỏi Trợ lý AI"] button, aside[aria-label*="Hỏi Trợ lý AI"] a').first();
-  await aiLink.click();
-  await page.waitForFunction(() => window.location.pathname.startsWith('/tro-ly-ai'), null, { timeout: 10000 });
+  await Promise.all([
+    page.waitForURL('**/tro-ly-ai*', { timeout: 10000 }),
+    aiLink.click()
+  ]);
   const aiTransitionMs = Date.now() - tAiStart;
   console.log(`   ⚡ TRANSITION TIME (Tap AI Button -> /tro-ly-ai): ${aiTransitionMs}ms!`);
 

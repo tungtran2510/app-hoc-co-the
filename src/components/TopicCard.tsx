@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import TopicIcon from './TopicIcon';
 import { Topic } from '../lib/types';
-import { playTapSound } from '../lib/audioFeedback';
 
 export const DEFAULT_TOPIC_COVERS: Record<string, string> = {
   'cot-song': '/images/topics/cot-song.png',
@@ -44,6 +44,7 @@ export default function TopicCard({
   onActivate,
   boldTitle = false,
 }: TopicCardProps) {
+  const router = useRouter();
   const [imgError, setImgError] = useState(false);
   const isAvailable = pageCount > 0;
   const coverUrl = topic.cover_url || DEFAULT_TOPIC_COVERS[topic.slug] || null;
@@ -73,6 +74,13 @@ export default function TopicCard({
       }}
       onClick={() => {
         onActivate?.();
+        try {
+          router.push(`/${topic.slug}`);
+        } catch {
+          if (typeof window !== 'undefined') {
+            window.location.href = `/${topic.slug}`;
+          }
+        }
       }}
       className={`topic-card-container group relative flex flex-col cursor-pointer select-none transition-transform duration-100 active:scale-[0.98] [&.is-active]:scale-[0.98] ${
         isActive ? 'is-active' : ''
