@@ -173,6 +173,25 @@ export default function ContentViewer({
     }
   }, [page.id, initialBlocks, page.status, page]);
 
+  // Lưu thông tin bài học đang xem để Trợ lý AI (nút nổi & trang trợ lý) bám đuổi ngữ cảnh bài học
+  useEffect(() => {
+    try {
+      if (topic && currentPage) {
+        const lessonContext = {
+          topic_slug: topic.slug,
+          topic_title: topic.title,
+          page_slug: currentPage.slug,
+          page_title: currentPage.title,
+          page_summary: currentPage.summary || '',
+        };
+        sessionStorage.setItem('qbiz_current_lesson', JSON.stringify(lessonContext));
+        window.dispatchEvent(new CustomEvent('qbiz_current_lesson_changed', { detail: lessonContext }));
+      }
+    } catch {
+      // Bỏ qua lỗi truy cập client storage
+    }
+  }, [topic?.slug, topic?.title, currentPage?.slug, currentPage?.title, currentPage?.summary]);
+
   const [saveErrorMsg, setSaveErrorMsg] = useState('');
   const [shareNoticeMsg, setShareNoticeMsg] = useState('');
   const [isSaved, setIsSaved] = useState(false);

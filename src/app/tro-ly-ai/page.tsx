@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   ArrowLeft,
   Sparkles,
@@ -52,6 +52,64 @@ const DEFAULT_QUICK_PROMPTS = [
   'Tại sao hay bị đầy bụng khó tiêu sau bữa ăn?',
 ];
 
+// GỢI Ý CÂU HỎI THỰC TẾ BÁM ĐUỔI THEO TỪNG CHUYÊN ĐỀ Y KHOA (ĐÚNG TRỌNG TÂM)
+const TOPIC_QUICK_PROMPTS: Record<string, string[]> = {
+  'cot-song': [
+    'Cấu tạo đĩa đệm và cơ chế gây đau thắt lưng, thoái hóa?',
+    'Nguyên tắc tư thế nằm, ngồi chuẩn để bảo vệ cột sống?',
+    'Thoát vị đĩa đệm và trượt đốt sống cần chú ý điều gì?',
+    'Cong vẹo cột sống ảnh hưởng thế nào đến nội tạng và tuần hoàn?',
+  ],
+  'nuoc': [
+    '4 thời điểm vàng uống nước để hấp thu tối đa cho cơ thể?',
+    'Nước nội bào và ngoại bào khác nhau thế nào, tại sao cần bù khoáng?',
+    'Uống nước sai lầm gây gánh nặng gì cho thận và tế bào?',
+    'Cách tính lượng nước uống chuẩn theo cân nặng hàng ngày?',
+  ],
+  'tieu-hoa': [
+    'Trục ruột - não và vai trò của 100 nghìn tỷ vi khuẩn đường ruột?',
+    'Nguyên nhân gây trào ngược dạ dày, đầy hơi khó tiêu sau ăn?',
+    'Thời gian tiêu hóa thức ăn qua dạ dày và ruột non là bao lâu?',
+    'Chế độ ăn như thế nào để phục hồi niêm mạc ruột tự nhiên?',
+  ],
+  'he-tieu-hoa': [
+    'Trục ruột - não và vai trò của 100 nghìn tỷ vi khuẩn đường ruột?',
+    'Nguyên nhân gây trào ngược dạ dày, đầy hơi khó tiêu sau ăn?',
+    'Thời gian tiêu hóa thức ăn qua dạ dày và ruột non là bao lâu?',
+    'Chế độ ăn như thế nào để phục hồi niêm mạc ruột tự nhiên?',
+  ],
+  'noi-tiet-chuyen-hoa': [
+    'Cơ chế đề kháng Insulin dẫn đến tiểu đường tuýp 2?',
+    'Tại sao mỡ nội tạng lại nguy hiểm hơn mỡ dưới da?',
+    'Nhịp sinh học ăn uống giúp tối ưu chuyển hóa năng lượng ATP?',
+    'Dấu hiệu rối loạn chuyển hóa đường huyết sớm cần nhận biết?',
+  ],
+  'gan-mat-tuy': [
+    'Cơ chế giải độc 2 pha (Phase 1 & Phase 2) của gan là gì?',
+    'Dịch mật giữ vai trò gì trong việc nhũ hóa chất béo và tiêu hóa?',
+    'Làm sao để bảo vệ tuyến tụy không bị quá tải đường và cồn?',
+    'Thực phẩm tự nhiên hỗ trợ phục hồi và hạ men gan hiệu quả?',
+  ],
+  'mien-dich': [
+    'Tại sao 70% hệ miễn dịch của cơ thể lại nằm ở đường ruột?',
+    'Bạch cầu và cơ chế tiêu diệt vi khuẩn, virus xâm nhập?',
+    'Những yếu tố hàng đầu làm suy giảm kháng thể tự nhiên?',
+    'Dinh dưỡng và giấc ngủ giúp tăng cường miễn dịch ra sao?',
+  ],
+  'dinh-duong': [
+    'Cân đối tỷ lệ đạm, chất béo tốt và tinh bột theo nhu cầu cơ thể?',
+    'Dinh dưỡng học tế bào và chu trình tạo năng lượng ATP?',
+    'Nhận diện các bẫy dinh dưỡng công nghiệp và đường ẩn?',
+    'Các vi chất và vitamin thiết yếu cơ thể không tự tổng hợp được?',
+  ],
+  'co-the-nguoi': [
+    'Tổng quan 11 hệ cơ quan phối hợp nhịp nhàng trong cơ thể người?',
+    'Tuần hoàn máu và vai trò cung cấp oxy nuôi dưỡng tế bào não?',
+    'Cân bằng nội môi (Homeostasis) là gì và tầm quan trọng?',
+    'Cơ chế tự phục hồi và tái tạo tế bào tự nhiên của cơ thể?',
+  ],
+};
+
 // Hàm format text markdown đơn giản (bold, bullet) siêu gọn gàng
 function renderFormattedText(text: string) {
   const lines = text.split('\n');
@@ -94,8 +152,61 @@ function renderFormattedText(text: string) {
   });
 }
 
-export default function AiAssistantPage() {
+function AiAssistantContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const topicParam = searchParams.get('topic');
+  const pageParam = searchParams.get('page');
+  const topicTitleParam = searchParams.get('topicTitle');
+  const pageTitleParam = searchParams.get('pageTitle');
+  const qParam = searchParams.get('q');
+
+  const [activeLesson, setActiveLesson] = useState<{
+    topic_slug: string;
+    topic_title: string;
+    page_slug?: string;
+    page_title?: string;
+    page_summary?: string;
+  } | null>(null);
+
+  // Đọc ngữ cảnh bài học từ URL Params hoặc sessionStorage để AI bám đuổi
+  useEffect(() => {
+    if (topicParam) {
+      const defaultTopicTitles: Record<string, string> = {
+        'cot-song': 'Cột Sống',
+        'nuoc': 'Nước & Điện Giải',
+        'tieu-hoa': 'Hệ Tiêu Hóa',
+        'he-tieu-hoa': 'Hệ Tiêu Hóa',
+        'noi-tiet-chuyen-hoa': 'Nội Tiết & Chuyển Hóa',
+        'gan-mat-tuy': 'Gan - Mật - Tụy',
+        'mien-dich': 'Hệ Miễn Dịch',
+        'dinh-duong': 'Dinh Dưỡng Nền Tảng',
+        'co-the-nguoi': 'Cơ Thể Người Toàn Diện',
+      };
+      const ctx = {
+        topic_slug: topicParam,
+        topic_title: topicTitleParam || defaultTopicTitles[topicParam] || topicParam,
+        page_slug: pageParam || undefined,
+        page_title: pageTitleParam || undefined,
+      };
+      setActiveLesson(ctx);
+      try {
+        sessionStorage.setItem('qbiz_current_lesson', JSON.stringify(ctx));
+      } catch {}
+      return;
+    }
+
+    try {
+      const raw = sessionStorage.getItem('qbiz_current_lesson');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.topic_slug) {
+          setActiveLesson(parsed);
+        }
+      }
+    } catch {}
+  }, [topicParam, pageParam, topicTitleParam, pageTitleParam]);
+
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -276,6 +387,21 @@ export default function AiAssistantPage() {
   }, []);
 
   const dynamicQuickPrompts = React.useMemo(() => {
+    // 1. Ưu tiên các câu hỏi gợi ý bám sát theo bài học & chuyên đề hiện tại
+    if (activeLesson?.page_title) {
+      const topicList = (activeLesson.topic_slug && TOPIC_QUICK_PROMPTS[activeLesson.topic_slug]) || DEFAULT_QUICK_PROMPTS;
+      return [
+        `Giải thích chi tiết hơn về bài học: ${activeLesson.page_title}`,
+        `Những sai lầm thường gặp nhất liên quan đến ${activeLesson.page_title.toLowerCase()}?`,
+        topicList[0] || 'Cơ chế hoạt động và nguyên tắc bảo vệ tự nhiên?',
+        topicList[1] || 'Thói quen và chế độ sinh hoạt nào tốt nhất cho phần này?',
+      ];
+    }
+
+    if (activeLesson?.topic_slug && TOPIC_QUICK_PROMPTS[activeLesson.topic_slug]) {
+      return TOPIC_QUICK_PROMPTS[activeLesson.topic_slug];
+    }
+
     if (trainingConfig?.faqs && trainingConfig.faqs.length > 0) {
       const activeFaqs = trainingConfig.faqs
         .filter((f) => {
@@ -306,7 +432,7 @@ export default function AiAssistantPage() {
       }
     }
     return DEFAULT_QUICK_PROMPTS;
-  }, [trainingConfig]);
+  }, [activeLesson?.page_title, activeLesson?.topic_slug, trainingConfig]);
 
   // Load lịch sử chat từ localStorage
   useEffect(() => {
@@ -392,6 +518,13 @@ export default function AiAssistantPage() {
         body: JSON.stringify({
           question: textToSend,
           history: historyPayload,
+          context: activeLesson ? {
+            topic_slug: activeLesson.topic_slug,
+            topic_title: activeLesson.topic_title,
+            page_slug: activeLesson.page_slug,
+            page_title: activeLesson.page_title,
+            page_summary: activeLesson.page_summary,
+          } : undefined,
         }),
       });
 
@@ -455,6 +588,15 @@ export default function AiAssistantPage() {
       setIsLoading(false);
     }
   };
+
+  // Tự động gửi câu hỏi khi được điều hướng từ bài học video có tham số q
+  const autoSentRef = useRef(false);
+  useEffect(() => {
+    if (qParam && !autoSentRef.current && !isLoading) {
+      autoSentRef.current = true;
+      handleSendMessage(qParam);
+    }
+  }, [qParam, isLoading]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -523,6 +665,57 @@ export default function AiAssistantPage() {
         </div>
       </header>
 
+      {/* THANH BÁM ĐUỔI NGỮ CẢNH BÀI HỌC (STICKY DƯỚI HEADER) */}
+      {activeLesson && (activeLesson.page_title || activeLesson.topic_title) && (
+        <div className="sticky top-[53px] sm:top-[57px] z-19 bg-gradient-to-r from-blue-50 via-indigo-50/80 to-purple-50 dark:from-purple-950/90 dark:to-indigo-950/70 border-b border-blue-200/80 dark:border-purple-800/60 px-3.5 sm:px-4 py-2 flex items-center justify-between gap-2 shadow-2xs backdrop-blur-md">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="w-6 h-6 rounded-full bg-blue-600 dark:bg-purple-600 text-white flex items-center justify-center shrink-0 text-[11px] shadow-2xs font-black animate-pulse">
+              🎯
+            </span>
+            <div className="flex flex-col min-w-0">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[10px] font-black uppercase text-blue-700 dark:text-[#F8DF7B] tracking-wider">
+                  Đang bám sát bài học
+                </span>
+                {activeLesson.topic_title && (
+                  <span className="px-1.5 py-0.2 rounded-full bg-blue-100 dark:bg-purple-900/60 text-blue-800 dark:text-purple-200 text-[9.5px] font-extrabold truncate max-w-[130px]">
+                    {activeLesson.topic_title}
+                  </span>
+                )}
+              </div>
+              <span className="text-[12.5px] font-black text-slate-900 dark:text-white truncate">
+                {activeLesson.page_title || activeLesson.topic_title}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1.5 shrink-0">
+            {activeLesson.topic_slug && activeLesson.page_slug && (
+              <Link
+                href={`/${activeLesson.topic_slug}/${activeLesson.page_slug}`}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-[8px] bg-white dark:bg-[#1E1342] hover:bg-blue-50 dark:hover:bg-purple-900/60 text-blue-700 dark:text-[#F8DF7B] border border-blue-200 dark:border-purple-800/60 text-[11px] font-extrabold shadow-2xs transition-all active:scale-95 whitespace-nowrap"
+              >
+                <span>‹ Về bài học</span>
+              </Link>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                setActiveLesson(null);
+                try {
+                  sessionStorage.removeItem('qbiz_current_lesson');
+                } catch {}
+              }}
+              className="w-6 h-6 rounded-full bg-slate-200/80 dark:bg-purple-900/50 hover:bg-slate-300 dark:hover:bg-purple-800 text-slate-600 dark:text-purple-300 flex items-center justify-center text-[11px] font-bold transition-colors cursor-pointer"
+              title="Thoát bám đuổi để hỏi tự do toàn bộ chủ đề"
+              aria-label="Thoát bám đuổi bài học"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* 2. KHUNG NỘI DUNG TIN NHẮN */}
       <main className="flex-1 flex flex-col px-3.5 sm:px-4 pt-2.5 pb-36 max-w-[640px] w-full mx-auto gap-3">
         {/* BANNER QUẢN TRỊ VIÊN: HUẤN LUYỆN KIẾN THỨC AI (SIÊU GỌN 1 DÒNG) */}
@@ -550,34 +743,77 @@ export default function AiAssistantPage() {
         {/* MÀN HÌNH CHÀO MỪNG NẾU CHƯA CÓ TIN NHẮN */}
         {messages.length === 0 ? (
           <div className="flex flex-col gap-3.5 pt-1 animate-in fade-in duration-300">
-            {/* Thẻ giới thiệu Trợ lý */}
-            <div className="p-3.5 sm:p-4 rounded-[18px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 shadow-xs flex flex-col gap-2">
-              <div className="flex items-center gap-2.5">
-                {/* Logo Trợ lý AI y khoa chuyên nghiệp viền hoàng kim phát sáng nhẹ */}
-                <div className="relative w-10 h-10 rounded-[12px] bg-gradient-to-br from-[#3B1262] via-[#5B21B6] to-[#7C3AED] text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-950/30 ring-2 ring-amber-400/50">
-                  <Sparkles size={20} className="text-amber-300 drop-shadow-xs" />
-                  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-white dark:ring-[#160D30]" />
+            {/* Thẻ chào đón BÁM ĐUỔI THEO BÀI HỌC hoặc Thẻ mặc định */}
+            {activeLesson && (activeLesson.page_title || activeLesson.topic_title) ? (
+              <div className="p-3.5 sm:p-4 rounded-[18px] bg-gradient-to-br from-blue-50/90 via-indigo-50/80 to-purple-50/90 dark:from-[#1A103C] dark:via-[#160D30] dark:to-[#220F45] border border-blue-200 dark:border-purple-800/60 shadow-xs flex flex-col gap-2.5">
+                <div className="flex items-center gap-2.5">
+                  <div className="relative w-10 h-10 rounded-[12px] bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center shrink-0 shadow-md ring-2 ring-blue-400/50">
+                    <Sparkles size={20} className="text-amber-300 drop-shadow-xs" />
+                    <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-white dark:ring-[#160D30]" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[10px] font-black uppercase text-blue-700 dark:text-[#F8DF7B] tracking-wider">
+                        Trợ lý bám sát bài học
+                      </span>
+                      {activeLesson.topic_title && (
+                        <span className="px-1.5 py-0.2 rounded-full bg-blue-100 dark:bg-purple-900/60 text-blue-800 dark:text-purple-200 text-[9.5px] font-extrabold truncate">
+                          {activeLesson.topic_title}
+                        </span>
+                      )}
+                    </div>
+                    <h2 className="text-[14.5px] sm:text-[15.5px] font-extrabold text-slate-900 dark:text-white leading-snug">
+                      {activeLesson.page_title || activeLesson.topic_title}
+                    </h2>
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <h2 className="text-[14.5px] sm:text-[15.5px] font-extrabold text-slate-900 dark:text-white leading-snug">
-                    Trợ lý Sức Khỏe AI đồng hành 24/7
-                  </h2>
-                  <p className="text-[11.5px] text-slate-500 dark:text-purple-300/70 truncate">
-                    Hỏi đáp giải phẫu, cơ xương khớp & vận động khoa học
+
+                <div className="pt-2 border-t border-blue-200/60 dark:border-purple-800/40 text-[12.5px] text-slate-700 dark:text-purple-100/90 leading-relaxed flex flex-col gap-1.5">
+                  <p>
+                    👋 Chào bạn! Bạn đang học bài <strong className="text-blue-900 dark:text-amber-300">{activeLesson.page_title || activeLesson.topic_title}</strong> thuộc chuyên đề <strong className="text-blue-900 dark:text-amber-300">{activeLesson.topic_title}</strong>.
+                  </p>
+                  <p className="text-[13px] font-bold text-blue-800 dark:text-[#F8DF7B]">
+                    👉 Bạn có câu hỏi gì về phần {activeLesson.page_title ? activeLesson.page_title.toLowerCase() : activeLesson.topic_title.toLowerCase()} này không?
+                  </p>
+                  <p className="text-[11.5px] text-slate-500 dark:text-purple-300/70 italic">
+                    (Mình sẽ tập trung giải đáp chuyên sâu và chính xác nhất cho bài này, đồng thời bạn vẫn có thể hỏi rộng bất kỳ chủ đề sức khỏe nào khác nhé!)
                   </p>
                 </div>
               </div>
+            ) : (
+              <div className="p-3.5 sm:p-4 rounded-[18px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 shadow-xs flex flex-col gap-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="relative w-10 h-10 rounded-[12px] bg-gradient-to-br from-[#3B1262] via-[#5B21B6] to-[#7C3AED] text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-950/30 ring-2 ring-amber-400/50">
+                    <Sparkles size={20} className="text-amber-300 drop-shadow-xs" />
+                    <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-white dark:ring-[#160D30]" />
+                  </div>
+                  <div className="min-w-0">
+                    <h2 className="text-[14.5px] sm:text-[15.5px] font-extrabold text-slate-900 dark:text-white leading-snug">
+                      Trợ lý Sức Khỏe AI đồng hành 24/7
+                    </h2>
+                    <p className="text-[11.5px] text-slate-500 dark:text-purple-300/70 truncate">
+                      Hỏi đáp giải phẫu, cơ xương khớp & vận động khoa học
+                    </p>
+                  </div>
+                </div>
 
-              <p className="text-[12.5px] text-slate-600 dark:text-purple-100/90 leading-snug pt-1 border-t border-slate-100 dark:border-purple-800/30">
-                Tra cứu nhanh cấu trúc cơ thể, thói quen sinh hoạt đúng, bài tập an toàn hoặc tìm bài học trong ứng dụng!
-              </p>
-            </div>
+                <p className="text-[12.5px] text-slate-600 dark:text-purple-100/90 leading-snug pt-1 border-t border-slate-100 dark:border-purple-800/30">
+                  Tra cứu nhanh cấu trúc cơ thể, thói quen sinh hoạt đúng, bài tập an toàn hoặc tìm bài học trong ứng dụng!
+                </p>
+              </div>
+            )}
 
             {/* Gợi ý câu hỏi thực tế bám sát tài liệu & đời sống */}
             <div className="flex flex-col gap-1.5">
               <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-purple-300/70 px-1 flex items-center gap-1.5">
                 <Sparkles size={12} className="text-amber-500" />
-                <span>Câu hỏi gợi ý (chạm để hỏi ngay):</span>
+                <span>
+                  {activeLesson?.page_title
+                    ? `Câu hỏi trọng tâm về "${activeLesson.page_title}":`
+                    : activeLesson?.topic_title
+                    ? `Câu hỏi trọng tâm về ${activeLesson.topic_title}:`
+                    : 'Câu hỏi gợi ý (chạm để hỏi ngay):'}
+                </span>
               </span>
 
               <div className="flex flex-col gap-1.5">
@@ -825,7 +1061,15 @@ export default function AiAssistantPage() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={isListening ? "Đang nghe bạn nói liên tục..." : "Hỏi về cơ thể, thói quen đúng, bài tập..."}
+              placeholder={
+                isListening
+                  ? "Đang nghe bạn nói liên tục..."
+                  : activeLesson?.page_title
+                  ? `Hỏi về ${activeLesson.page_title} (hoặc hỏi rộng tự do)...`
+                  : activeLesson?.topic_title
+                  ? `Hỏi về ${activeLesson.topic_title} (hoặc hỏi rộng tự do)...`
+                  : "Hỏi về cơ thể, thói quen đúng, bài tập..."
+              }
               disabled={isLoading}
               className={`w-full h-10 sm:h-11 pl-3.5 pr-9 rounded-[14px] bg-surface dark:bg-[#160D30] border ${
                 isListening
@@ -909,5 +1153,22 @@ export default function AiAssistantPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function AiAssistantPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-bg flex items-center justify-center">
+          <div className="flex items-center gap-2 text-ink-2 font-bold text-[14px]">
+            <Loader2 size={20} className="animate-spin text-primary" />
+            <span>Đang tải Trợ lý AI...</span>
+          </div>
+        </div>
+      }
+    >
+      <AiAssistantContent />
+    </Suspense>
   );
 }

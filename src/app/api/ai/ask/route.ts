@@ -355,13 +355,24 @@ function findCuratedMatch(query: string) {
   return null;
 }
 
-// Xếp hạng bài học thông minh theo từ khóa chuyên môn (tránh gợi ý sai chủ đề)
-function rankCatalogPages(query: string, catalog: LessonCatalogItem[]): LessonCatalogItem[] {
+// Xếp hạng bài học thông minh theo từ khóa chuyên môn và bối cảnh bài học hiện tại
+function rankCatalogPages(
+  query: string,
+  catalog: LessonCatalogItem[],
+  context?: { topic_slug?: string; page_slug?: string }
+): LessonCatalogItem[] {
   const normQ = normalizeText(query);
   const tokens = normQ.split(/\s+/).filter((w) => w.length >= 2);
 
   const scored = catalog.map((c) => {
     let score = 0;
+    // Điểm thưởng bối cảnh nếu người học đang mở bài học hoặc chuyên đề này
+    if (context?.page_slug && c.page_slug === context.page_slug) {
+      score += 25;
+    } else if (context?.topic_slug && c.topic_slug === context.topic_slug) {
+      score += 12;
+    }
+
     const videosText = (c.videos || []).map((v) => `${v.title} ${v.description || ''}`).join(' ');
     const text = normalizeText(`${c.page_title} ${c.topic_title} ${c.summary} ${videosText}`);
 
@@ -504,8 +515,13 @@ async function getOrBuildLessonCatalog(): Promise<LessonCatalogItem[]> {
 }
 
 // Fallback khi AI bận hoặc chậm: trích xuất trực tiếp từ tài liệu chuyên môn của tác giả và đề xuất video bài học
-function fastFallbackSearch(query: string, catalog: LessonCatalogItem[], excerpts?: KnowledgeExcerpt[]) {
-  const selectedPages = rankCatalogPages(query, catalog);
+function fastFallbackSearch(
+  query: string,
+  catalog: LessonCatalogItem[],
+  excerpts?: KnowledgeExcerpt[],
+  context?: { topic_slug?: string; page_slug?: string }
+) {
+  const selectedPages = rankCatalogPages(query, catalog, context);
 
   let answerText = '';
   if (excerpts && excerpts.length > 0 && excerpts[0].text) {
@@ -574,6 +590,13 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const question = (body.question || '').trim();
     const history = Array.isArray(body.history) ? body.history : [];
+    const context = (body.context && typeof body.context === 'object') ? (body.context as {
+      topic_slug?: string;
+      topic_title?: string;
+      page_slug?: string;
+      page_title?: string;
+      page_summary?: string;
+    }) : undefined;
 
     if (!question) {
       return NextResponse.json({ error: 'Vui lòng nhập câu hỏi.' }, { status: 400 });
@@ -611,7 +634,7 @@ export async function POST(req: NextRequest) {
       if (matchedFaq && matchedFaq.answer) {
         // Nếu người dùng KHÔNG hỏi DoctorLoan nhưng FAQ chứa DoctorLoan, bỏ qua để AI sinh nội dung chuẩn
         if (isAskingDoctorLoan || !/doctor\s*loan/i.test(matchedFaq.answer)) {
-          const selectedPages = rankCatalogPages(question, catalog);
+          const selectedPages = rankCatalogPages(question, catalog, context);
 
           return NextResponse.json({
             answer: matchedFaq.answer,
@@ -650,11 +673,11 @@ export async function POST(req: NextRequest) {
     const authorGuidelines = (aiTraining?.guidelines || '').trim();
 
     if (!deepseekKey && !geminiKey) {
-      return NextResponse.json(fastFallbackSearch(question, catalog, excerpts));
+      return NextResponse.json(fastFallbackSearch(question, catalog, excerpts, context));
     }
 
-    // 3. LỌC 2-3 BÀI HỌC LIÊN QUAN NHẤT TỪ CATALOG BẰNG THUẬT TOÁN ĐIỂM CHỦ ĐỀ
-    const topCatalog = rankCatalogPages(question, catalog);
+    // 3. LỌC 2-3 BÀI HỌC LIÊN QUAN NHẤT TỪ CATALOG BẰNG THUẬT TOÁN ĐIỂM CHỦ ĐỀ VÀ BỐI CẢNH
+    const topCatalog = rankCatalogPages(question, catalog, context);
 
     const catalogText = topCatalog
       .map((c, idx) => {
@@ -666,8 +689,21 @@ export async function POST(req: NextRequest) {
       })
       .join('\n\n');
 
+    const lessonContextSection = (context?.page_title || context?.topic_title)
+      ? `
+BỐI CẢNH BÀI HỌC NGƯỜI HỌC ĐANG THEO DÕI (BÁM ĐUỔI TRỌNG TÂM):
+- Bài học: "${context.page_title || 'Bài học'}" (Chuyên đề: "${context.topic_title || ''}").
+${context.page_summary ? `- Tóm tắt bài học: "${context.page_summary}"\n` : ''}
+- NGUYÊN TẮC BÁM ĐUỔI TRỌNG TÂM VÀ MỞ RỘNG (P0):
+  + Nếu câu hỏi của người học liên quan đến bài học này hoặc chuyên đề "${context.topic_title || ''}": Hãy tập trung chuyên sâu, giải thích cơ chế giải phẫu, sinh lý và hướng dẫn ứng dụng gắn liền với bài học này.
+  + Nếu người học hỏi rộng hơn (về các vấn đề sức khỏe khác, các cơ quan khác, hoặc thắc mắc tổng quát): BẮT BUỘC PHẢI TRẢ LỜI ĐẦY ĐỦ, CHUẨN XÁC, THẤU ĐÁO CHO CÂU HỎI ĐÓ, sau đó khéo léo kết nối với nguyên tắc tự phục hồi và sức khỏe toàn diện.
+  + Trong "suggested_pages": Ưu tiên đề xuất video từ bài học "${context.page_title || ''}" nếu liên quan.
+`
+      : '';
+
     // 4. HỆ THỐNG PROMPT TỐI ƯU: ĐÚNG TRỌNG TÂM, CÓ ĐIỂM NHẤN, BỐ CỤC THÔNG THOÁNG, KHÔNG THƯƠNG HIỆU
     const systemPrompt = `Bạn là Trợ lý Sức Khỏe AI trong ứng dụng giáo dục y học "Học Cơ Thể" (Tủ Sách Y Khoa Qbiz Books của tác giả Tùng dinh dưỡng).
+${lessonContextSection}
 
 NGUYÊN TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ NGHIÊM NGẶT):
 1. ĐÚNG TRỌNG TÂM, CÓ ĐIỂM NHẤN, BỐ CỤC THÔNG THOÁNG (P0):

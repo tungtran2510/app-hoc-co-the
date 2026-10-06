@@ -885,7 +885,7 @@ export default function VideosBlock({
 
         {/* Nút Hỏi trợ lý AI về bài học này (Đặt ngay dưới danh sách các bài học video theo yêu cầu) */}
         <Link
-          href={`/tro-ly-ai?q=Giải thích chi tiết hơn về bài học: ${encodeURIComponent(pageTitle || '')}`}
+          href={`/tro-ly-ai?topic=${encodeURIComponent(topicSlug || '')}&page=${encodeURIComponent(pageSlug || '')}&topicTitle=${encodeURIComponent(topicTitle || '')}&pageTitle=${encodeURIComponent(pageTitle || '')}&q=${encodeURIComponent(`Giải thích chi tiết hơn về bài học: ${pageTitle || ''}`)}`}
           className="flex items-center justify-between p-3.5 rounded-[16px] bg-gradient-to-r from-blue-50/90 to-indigo-50/80 dark:from-purple-950/60 dark:to-indigo-950/40 border border-blue-200 dark:border-purple-800/60 text-ink hover:border-blue-500 transition-all shadow-2xs group mt-2"
         >
           <div className="flex items-center gap-2.5">
