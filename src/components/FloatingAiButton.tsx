@@ -51,6 +51,8 @@ export default function FloatingAiButton() {
     page_title?: string;
   } | null>(null);
 
+  const hasLessonContext = !!(activeLesson && (activeLesson.page_title || activeLesson.topic_title));
+
   useEffect(() => {
     const updateContext = () => {
       try {
@@ -92,45 +94,48 @@ export default function FloatingAiButton() {
 
   // Đọc tọa độ từ localStorage hoặc đặt mặc định ở góc dưới bên phải (ngay trên Tab Tìm kiếm ở BottomNav)
   useEffect(() => {
+    const btnWidth = hasLessonContext ? 128 : 88;
     try {
       const saved = localStorage.getItem('qbiz_floating_ai_pos');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (typeof parsed.x === 'number' && typeof parsed.y === 'number') {
-          const clampedX = Math.max(12, Math.min(parsed.x, window.innerWidth - 88));
-          const clampedY = Math.max(50, Math.min(parsed.y, window.innerHeight - 90));
+          const clampedX = Math.max(12, Math.min(parsed.x, window.innerWidth - btnWidth - 12));
+          const clampedY = Math.max(50, Math.min(parsed.y, window.innerHeight - 125));
           setPos({ x: clampedX, y: clampedY });
           return;
         }
       }
     } catch {}
 
-    // Vị trí mặc định: Góc dưới bên phải (nổi ngay sát trên Tab Tìm kiếm của BottomNav)
-    const defaultX = Math.max(12, window.innerWidth - 88);
-    const defaultY = Math.max(50, window.innerHeight - 105);
+    // Vị trí mặc định: Góc dưới bên phải (nổi ngay sát trên Tab Tìm kiếm của BottomNav, không che pagination)
+    const defaultX = Math.max(12, window.innerWidth - btnWidth - 14);
+    const defaultY = Math.max(50, window.innerHeight - 130);
     setPos({ x: defaultX, y: defaultY });
-  }, []);
+  }, [hasLessonContext]);
 
   // Đảm bảo không bị lọt khỏi màn hình khi xoay điện thoại hoặc thay đổi kích thước
   useEffect(() => {
     const handleResize = () => {
+      const btnWidth = hasLessonContext ? 128 : 88;
       setPos((prev) => {
         if (!prev) return prev;
-        const clampedX = Math.max(12, Math.min(prev.x, window.innerWidth - 88));
-        const clampedY = Math.max(50, Math.min(prev.y, window.innerHeight - 90));
+        const clampedX = Math.max(12, Math.min(prev.x, window.innerWidth - btnWidth - 12));
+        const clampedY = Math.max(50, Math.min(prev.y, window.innerHeight - 125));
         return { x: clampedX, y: clampedY };
       });
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [hasLessonContext]);
 
   // Xử lý sự kiện nhấn chạm
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0 && e.pointerType === 'mouse') return;
 
-    const currentX = pos ? pos.x : Math.max(12, window.innerWidth - 88);
-    const currentY = pos ? pos.y : Math.max(50, window.innerHeight - 105);
+    const btnWidth = hasLessonContext ? 128 : 88;
+    const currentX = pos ? pos.x : Math.max(12, window.innerWidth - btnWidth - 14);
+    const currentY = pos ? pos.y : Math.max(50, window.innerHeight - 130);
 
     dragInfoRef.current = {
       startX: e.clientX,
@@ -197,10 +202,11 @@ export default function FloatingAiButton() {
 
       // Khi ĐÃ mở khóa (sau 2.5s) => Cho phép kéo nút tự do
       dragInfoRef.current.moved = true;
+      const btnWidth = hasLessonContext ? 128 : 88;
       const minX = 12;
-      const maxX = window.innerWidth - 96;
+      const maxX = window.innerWidth - btnWidth - 12;
       const minY = 50;
-      const maxY = window.innerHeight - 90; // Không che BottomNav
+      const maxY = window.innerHeight - 120; // Không che BottomNav và thanh phân trang
 
       latestX = Math.max(minX, Math.min(dragInfoRef.current.elemX + dx, maxX));
       latestY = Math.max(minY, Math.min(dragInfoRef.current.elemY + dy, maxY));
@@ -271,8 +277,6 @@ export default function FloatingAiButton() {
   };
 
   if (isHiddenPage) return null;
-
-  const hasLessonContext = !!(activeLesson && (activeLesson.page_title || activeLesson.topic_title));
 
   return (
     <aside
