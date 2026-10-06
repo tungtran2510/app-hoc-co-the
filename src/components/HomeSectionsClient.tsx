@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Edit2, EyeOff, Plus } from 'lucide-react';
+import { Edit2, EyeOff, Plus, ChevronDown, ChevronUp, Layers } from 'lucide-react';
 import { Topic, AuthorProfile, RecommendedBook, AuthorBook, CustomHtmlBlockData } from '../lib/types';
 import { checkIsAdminClient } from '../lib/adminAuth';
 import { saveSettingsApi } from '../lib/apiAdmin';
@@ -129,6 +129,40 @@ export default function HomeSectionsClient({
   const [authorModalTab, setAuthorModalTab] = useState<'author' | 'books' | 'contact' | 'extra'>('author');
   const [selectedAuthorBook, setSelectedAuthorBook] = useState<AuthorBook | null>(null);
   const [editingSingleAuthorBook, setEditingSingleAuthorBook] = useState<AuthorBook | null>(null);
+
+  const [collapsedSections, setCollapsedSections] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('admin_collapsed_sections');
+        if (saved) return JSON.parse(saved);
+      } catch {}
+    }
+    return [];
+  });
+
+  const handleToggleCollapseSection = (key: string) => {
+    setCollapsedSections((prev) => {
+      const next = prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key];
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('admin_collapsed_sections', JSON.stringify(next));
+        } catch {}
+      }
+      return next;
+    });
+  };
+
+  const handleToggleCollapseAll = () => {
+    const allKeys = [...sectionsOrder];
+    const isAllCollapsed = allKeys.length > 0 && allKeys.every((k) => collapsedSections.includes(k));
+    const next = isAllCollapsed ? [] : allKeys;
+    setCollapsedSections(next);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('admin_collapsed_sections', JSON.stringify(next));
+      } catch {}
+    }
+  };
 
   const handleSaveSingleAuthorBook = async (updatedBook: AuthorBook) => {
     const books = authorProfile.books || [];
@@ -290,6 +324,49 @@ export default function HomeSectionsClient({
 
   return (
     <>
+      {/* THANH ĐIỀU HƯỚNG TỔNG QUAN DÀNH CHO ADMIN: BỐ CỤC & THU GỌN TOÀN BỘ */}
+      {isAdmin && (
+        <div className="w-full flex items-center justify-between px-3 py-1.5 mb-2 rounded-[14px] bg-slate-900/90 dark:bg-[#1A103C]/95 border border-slate-300/30 dark:border-purple-700/60 shadow-xs backdrop-blur-xs text-white gap-2">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <Layers size={13} className="text-amber-400 shrink-0" strokeWidth={2.5} />
+            <span className="text-[11px] font-black uppercase tracking-wider text-slate-200 dark:text-purple-200 truncate">
+              Bố cục trang chủ ({sectionsOrder.length} khối)
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              onClick={handleToggleCollapseAll}
+              className="flex items-center gap-1 h-6.5 px-2 rounded-[6px] bg-white/10 hover:bg-white/20 text-slate-200 dark:text-purple-200 text-[10.5px] font-extrabold uppercase tracking-wide cursor-pointer transition-transform active:scale-95"
+              title="Thu gọn hoặc mở rộng toàn bộ các khối trên trang chủ"
+            >
+              {sectionsOrder.length > 0 && sectionsOrder.every((k) => collapsedSections.includes(k)) ? (
+                <>
+                  <ChevronDown size={12} strokeWidth={2.6} />
+                  <span>Mở rộng tất cả</span>
+                </>
+              ) : (
+                <>
+                  <ChevronUp size={12} strokeWidth={2.6} />
+                  <span>Thu gọn tất cả</span>
+                </>
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowReorderModal(true)}
+              className="flex items-center gap-1 h-6.5 px-2 rounded-[6px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[10.5px] uppercase tracking-wide cursor-pointer transition-transform active:scale-95 shadow-xs"
+              title="Sắp xếp thứ tự các khối"
+            >
+              <Layers size={11} strokeWidth={2.5} />
+              <span className="hidden sm:inline">Sắp xếp</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {sectionsOrder.map((sectionKey, index) => {
         const isHidden = hiddenSections.includes(sectionKey);
 
@@ -323,6 +400,8 @@ export default function HomeSectionsClient({
                 data={customBlocks[sectionKey] || {}}
                 isAdmin={isAdmin}
                 isHidden={isHidden}
+                isCollapsed={collapsedSections.includes(sectionKey)}
+                onToggleCollapse={() => handleToggleCollapseSection(sectionKey)}
                 sectionIndex={index}
                 totalSections={sectionsOrder.length}
                 onToggleVisibility={() => handleToggleSectionVisibility(sectionKey)}
@@ -337,6 +416,7 @@ export default function HomeSectionsClient({
 
         // KHỐI 1: THƯƠNG HIỆU (BRAND CARD)
         if (sectionKey === 'brand_card') {
+          const isBrandCollapsed = collapsedSections.includes('brand_card');
           return (
             <section key="brand_card" className="flex flex-col gap-1.5 mt-0.5">
               {hiddenBanner}
@@ -346,6 +426,8 @@ export default function HomeSectionsClient({
                   sectionIndex={index}
                   totalSections={sectionsOrder.length}
                   isHidden={isHidden}
+                  isCollapsed={isBrandCollapsed}
+                  onToggleCollapse={() => handleToggleCollapseSection('brand_card')}
                   onToggleVisibility={() => handleToggleSectionVisibility('brand_card')}
                   onMoveUp={() => handleMoveSection(index, 'up')}
                   onMoveDown={() => handleMoveSection(index, 'down')}
@@ -355,57 +437,59 @@ export default function HomeSectionsClient({
                 />
               )}
 
-              {/* DÒNG BRAND CARD NỔI BẬT ("MEDICA LEARN" STYLE) - HIỆU ỨNG NHỊP THỞ SINH HỌC & NHỊP TIM MEDICA */}
-              <div
-                onClick={() => setShowWelcomeModal(true)}
-                className={`w-full rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs animate-bio-breathing hover:shadow-lg hover:shadow-blue-950/10 hover:border-amber-400/80 dark:hover:border-amber-400/70 dark:hover:shadow-[0_10px_28px_rgba(245,158,11,0.15)] hover:-translate-y-1 active:scale-[0.99] transition-all duration-300 dark:bg-gradient-to-br dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0B132B] dark:border-white/15 dark:text-white p-3 sm:p-3.5 flex items-center justify-between gap-3 cursor-pointer group ${
-                  isHidden ? 'opacity-80 ring-2 ring-dashed ring-amber-500/40' : ''
-                }`}
-                title="Bấm để xem lời ngỏ chào mừng & video giới thiệu"
-              >
-                {/* Logo app 3D bên trái */}
-                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[14px] overflow-hidden border border-amber-400/50 dark:border-amber-400/70 shadow-md shrink-0 bg-[#0C152B] p-0.5">
-                  <img
-                    src={logoUrl || '/app_logo.png'}
-                    alt="Logo Qbiz Books"
-                    className="w-full h-full object-cover rounded-[11px]"
-                  />
-                </div>
-
-                {/* Khối chữ thương hiệu ở giữa */}
-                <div className="flex flex-col flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-slate-900 dark:text-white uppercase">
-                      {appName ? appName.split(' ')[0] : 'QBIZ'}
-                    </span>
-                    <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-amber-600 dark:text-amber-400 uppercase">
-                      {appName && appName.includes(' ') ? appName.split(' ').slice(1).join(' ') : 'BOOKS'}
-                    </span>
-                    {isAdmin && <Edit2 size={12} className="text-slate-400 dark:text-slate-400 opacity-60" />}
+              {/* DÒNG BRAND CARD NỔI BẬT ("MEDICA LEARN" STYLE) */}
+              {isAdmin && isBrandCollapsed ? null : (
+                <div
+                  onClick={() => setShowWelcomeModal(true)}
+                  className={`w-full rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs animate-bio-breathing hover:shadow-lg hover:shadow-blue-950/10 hover:border-amber-400/80 dark:hover:border-amber-400/70 dark:hover:shadow-[0_10px_28px_rgba(245,158,11,0.15)] hover:-translate-y-1 active:scale-[0.99] transition-all duration-300 dark:bg-gradient-to-br dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0B132B] dark:border-white/15 dark:text-white p-3 sm:p-3.5 flex items-center justify-between gap-3 cursor-pointer group ${
+                    isHidden ? 'opacity-80 ring-2 ring-dashed ring-amber-500/40' : ''
+                  }`}
+                  title="Bấm để xem lời ngỏ chào mừng & video giới thiệu"
+                >
+                  {/* Logo app 3D bên trái */}
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[14px] overflow-hidden border border-amber-400/50 dark:border-amber-400/70 shadow-md shrink-0 bg-[#0C152B] p-0.5">
+                    <img
+                      src={logoUrl || '/app_logo.png'}
+                      alt="Logo Qbiz Books"
+                      className="w-full h-full object-cover rounded-[11px]"
+                    />
                   </div>
-                  {brandTagline && brandTagline.trim() ? (
-                    <span className="text-[9.5px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-400 mt-0.5 truncate">
-                      {brandTagline.trim()}
-                    </span>
-                  ) : null}
-                  {appSubtitle && appSubtitle.trim() ? (
-                    <span className="text-[10.5px] sm:text-[11px] text-slate-600 dark:text-slate-200 font-medium line-clamp-1">
-                      {appSubtitle.trim()}
-                    </span>
-                  ) : null}
-                </div>
 
-                {/* Huy hiệu Vàng Kim bên phải - Icon quả tim đập nhịp y khoa */}
-                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[15px] bg-gradient-to-br from-amber-50 via-slate-50 to-amber-100/60 border border-amber-300/80 dark:bg-none dark:bg-[#0B132B] dark:border-amber-400 p-[2px] shadow-md shrink-0 flex items-center justify-center relative overflow-hidden">
-                  <div className="flex flex-col items-center justify-center text-amber-600 dark:text-amber-300">
-                    <svg className="w-5 h-5 text-amber-600 dark:text-amber-300 drop-shadow-xs dark:drop-shadow-[0_1px_3px_rgba(245,158,11,0.8)] animate-medica-heartbeat" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" fill="currentColor" fillOpacity="0.25" />
-                      <path d="M3.5 12h3l2-3 3 6 2-3h7" stroke="currentColor" strokeWidth="1.8" />
-                    </svg>
-                    <span className="text-[7px] font-black tracking-widest text-amber-700 dark:text-amber-200 uppercase mt-0.5">MEDICA</span>
+                  {/* Khối chữ thương hiệu ở giữa */}
+                  <div className="flex flex-col flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-slate-900 dark:text-white uppercase">
+                        {appName ? appName.split(' ')[0] : 'QBIZ'}
+                      </span>
+                      <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-amber-600 dark:text-amber-400 uppercase">
+                        {appName && appName.includes(' ') ? appName.split(' ').slice(1).join(' ') : 'BOOKS'}
+                      </span>
+                      {isAdmin && <Edit2 size={12} className="text-slate-400 dark:text-slate-400 opacity-60" />}
+                    </div>
+                    {brandTagline && brandTagline.trim() ? (
+                      <span className="text-[9.5px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-400 mt-0.5 truncate">
+                        {brandTagline.trim()}
+                      </span>
+                    ) : null}
+                    {appSubtitle && appSubtitle.trim() ? (
+                      <span className="text-[10.5px] sm:text-[11px] text-slate-600 dark:text-slate-200 font-medium line-clamp-1">
+                        {appSubtitle.trim()}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  {/* Huy hiệu Vàng Kim bên phải - Icon quả tim đập nhịp y khoa */}
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[15px] bg-gradient-to-br from-amber-50 via-slate-50 to-amber-100/60 border border-amber-300/80 dark:bg-none dark:bg-[#0B132B] dark:border-amber-400 p-[2px] shadow-md shrink-0 flex items-center justify-center relative overflow-hidden">
+                    <div className="flex flex-col items-center justify-center text-amber-600 dark:text-amber-300">
+                      <svg className="w-5 h-5 text-amber-600 dark:text-amber-300 drop-shadow-xs dark:drop-shadow-[0_1px_3px_rgba(245,158,11,0.8)] animate-medica-heartbeat" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" fill="currentColor" fillOpacity="0.25" />
+                        <path d="M3.5 12h3l2-3 3 6 2-3h7" stroke="currentColor" strokeWidth="1.8" />
+                      </svg>
+                      <span className="text-[7px] font-black tracking-widest text-amber-700 dark:text-amber-200 uppercase mt-0.5">MEDICA</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </section>
           );
         }
@@ -425,6 +509,8 @@ export default function HomeSectionsClient({
                 sectionIndex={index}
                 totalSections={sectionsOrder.length}
                 isHidden={isHidden}
+                isCollapsed={collapsedSections.includes('topics')}
+                onToggleCollapse={() => handleToggleCollapseSection('topics')}
                 onToggleVisibility={() => handleToggleSectionVisibility('topics')}
                 onMoveUp={() => handleMoveSection(index, 'up')}
                 onMoveDown={() => handleMoveSection(index, 'down')}
@@ -436,6 +522,7 @@ export default function HomeSectionsClient({
 
         // KHỐI 3: HOẠT ĐỘNG GẦN ĐÂY (RECENT ACTIVITY)
         if (sectionKey === 'recent_activity') {
+          const isRecentCollapsed = collapsedSections.includes('recent_activity');
           return (
             <section key="recent_activity" className="flex flex-col gap-1.5 mt-2">
               {hiddenBanner}
@@ -445,23 +532,29 @@ export default function HomeSectionsClient({
                   sectionIndex={index}
                   totalSections={sectionsOrder.length}
                   isHidden={isHidden}
+                  isCollapsed={isRecentCollapsed}
+                  onToggleCollapse={() => handleToggleCollapseSection('recent_activity')}
                   onToggleVisibility={() => handleToggleSectionVisibility('recent_activity')}
                   onMoveUp={() => handleMoveSection(index, 'up')}
                   onMoveDown={() => handleMoveSection(index, 'down')}
                   onOpenReorderModal={() => setShowReorderModal(true)}
                 />
               )}
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <h3 className="text-[17.5px] sm:text-[18.5px] font-black text-ink tracking-tight whitespace-nowrap">
-                    Hoạt động gần đây
-                  </h3>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-700 bg-amber-100/80 border border-amber-300/60 dark:text-[#F8DF7B] dark:bg-[#2E1B58] dark:border-0 px-2 py-0.5 rounded-full shrink-0">
-                    Đang học dở
-                  </span>
-                </div>
-              </div>
-              <HomeContinueSection />
+              {isAdmin && isRecentCollapsed ? null : (
+                <>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <h3 className="text-[17.5px] sm:text-[18.5px] font-black text-ink tracking-tight whitespace-nowrap">
+                        Hoạt động gần đây
+                      </h3>
+                      <span className="text-[10px] font-black uppercase tracking-wider text-amber-700 bg-amber-100/80 border border-amber-300/60 dark:text-[#F8DF7B] dark:bg-[#2E1B58] dark:border-0 px-2 py-0.5 rounded-full shrink-0">
+                        Đang học dở
+                      </span>
+                    </div>
+                  </div>
+                  <HomeContinueSection />
+                </>
+              )}
             </section>
           );
         }
@@ -475,6 +568,8 @@ export default function HomeSectionsClient({
                 profile={authorProfile}
                 isAdmin={isAdmin}
                 isHidden={isHidden}
+                isCollapsed={collapsedSections.includes('author_profile')}
+                onToggleCollapse={() => handleToggleCollapseSection('author_profile')}
                 onToggleVisibility={() => handleToggleSectionVisibility('author_profile')}
                 sectionIndex={index}
                 totalSections={sectionsOrder.length}
@@ -498,6 +593,8 @@ export default function HomeSectionsClient({
                 supplementalBooks={flatBooks}
                 isAdmin={isAdmin}
                 isHidden={isHidden}
+                isCollapsed={collapsedSections.includes('author_books')}
+                onToggleCollapse={() => handleToggleCollapseSection('author_books')}
                 onToggleVisibility={() => handleToggleSectionVisibility('author_books')}
                 sectionIndex={index}
                 totalSections={sectionsOrder.length}
@@ -527,6 +624,8 @@ export default function HomeSectionsClient({
                 profile={authorProfile}
                 isAdmin={isAdmin}
                 isHidden={isHidden}
+                isCollapsed={collapsedSections.includes('author_philosophy')}
+                onToggleCollapse={() => handleToggleCollapseSection('author_philosophy')}
                 onToggleVisibility={() => handleToggleSectionVisibility('author_philosophy')}
                 sectionIndex={index}
                 totalSections={sectionsOrder.length}
@@ -552,6 +651,8 @@ export default function HomeSectionsClient({
                 sectionIndex={index}
                 totalSections={sectionsOrder.length}
                 isHidden={isHidden}
+                isCollapsed={collapsedSections.includes('recommended_books')}
+                onToggleCollapse={() => handleToggleCollapseSection('recommended_books')}
                 onToggleVisibility={() => handleToggleSectionVisibility('recommended_books')}
                 onMoveUp={() => handleMoveSection(index, 'up')}
                 onMoveDown={() => handleMoveSection(index, 'down')}
@@ -577,6 +678,8 @@ export default function HomeSectionsClient({
                 sectionIndex={index}
                 totalSections={sectionsOrder.length}
                 isHidden={isHidden}
+                isCollapsed={collapsedSections.includes('flat_books')}
+                onToggleCollapse={() => handleToggleCollapseSection('flat_books')}
                 onToggleVisibility={() => handleToggleSectionVisibility('flat_books')}
                 onMoveUp={() => handleMoveSection(index, 'up')}
                 onMoveDown={() => handleMoveSection(index, 'down')}
@@ -597,6 +700,8 @@ export default function HomeSectionsClient({
                 profile={authorProfile}
                 isAdmin={isAdmin}
                 isHidden={isHidden}
+                isCollapsed={collapsedSections.includes('author_contact')}
+                onToggleCollapse={() => handleToggleCollapseSection('author_contact')}
                 onToggleVisibility={() => handleToggleSectionVisibility('author_contact')}
                 sectionIndex={index}
                 totalSections={sectionsOrder.length}

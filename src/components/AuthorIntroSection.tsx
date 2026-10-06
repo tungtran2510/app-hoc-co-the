@@ -46,6 +46,8 @@ export interface AuthorSectionBaseProps {
   profile: AuthorProfile;
   isAdmin?: boolean;
   isHidden?: boolean;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
   onToggleVisibility?: () => void;
   sectionIndex?: number;
   totalSections?: number;
@@ -66,9 +68,11 @@ export interface AuthorProfileSectionProps extends AuthorSectionBaseProps {
 export interface AuthorBioDetailModalProps {
   profile: AuthorProfile;
   onClose: () => void;
+  isAdmin?: boolean;
+  onEdit?: () => void;
 }
 
-export function AuthorBioDetailModal({ profile, onClose }: AuthorBioDetailModalProps) {
+export function AuthorBioDetailModal({ profile, onClose, isAdmin, onEdit }: AuthorBioDetailModalProps) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -89,22 +93,39 @@ export function AuthorBioDetailModal({ profile, onClose }: AuthorBioDetailModalP
         className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white dark:bg-[#181132] rounded-2xl shadow-2xl border border-slate-200 dark:border-white/15 p-5 sm:p-6 flex flex-col gap-4 text-slate-900 dark:text-white"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Nút đóng modal */}
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors cursor-pointer"
-          title="Đóng"
-        >
-          <X size={18} />
-        </button>
+        {/* Header Modal với nút Sửa riêng cho Admin và nút Đóng */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+            <ShieldCheck size={16} className="text-amber-600 dark:text-amber-400" />
+            <span className="text-[11.5px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">
+              Hồ sơ chuyên gia
+            </span>
+          </div>
 
-        {/* Tiêu đề Modal */}
-        <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-          <ShieldCheck size={16} className="text-amber-600 dark:text-amber-400" />
-          <span className="text-[11.5px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">
-            Hồ sơ chuyên gia
-          </span>
+          <div className="flex items-center gap-1.5">
+            {isAdmin && onEdit && (
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onEdit();
+                }}
+                className="flex items-center gap-1 h-7 px-2.5 rounded-[7px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[11px] tracking-wide uppercase transition-transform active:scale-95 shadow-xs cursor-pointer"
+                title="Chỉnh sửa chi tiết hồ sơ chuyên gia"
+              >
+                <Edit2 size={11} strokeWidth={2.8} />
+                <span>Sửa hồ sơ</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors cursor-pointer"
+              title="Đóng"
+            >
+              <X size={18} />
+            </button>
+          </div>
         </div>
 
         {/* Khối chuyên gia header */}
@@ -206,12 +227,25 @@ export function AuthorBioDetailModal({ profile, onClose }: AuthorBioDetailModalP
           </div>
         </div>
 
-        {/* Nút đóng */}
-        <div className="pt-2 flex justify-end">
+        {/* Nút hành động cuối modal */}
+        <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100 dark:border-white/10">
+          {isAdmin && onEdit && (
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                onEdit();
+              }}
+              className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 h-10 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[12.5px] shadow-sm cursor-pointer transition-transform active:scale-95"
+            >
+              <Edit2 size={13} strokeWidth={2.8} />
+              <span>Chỉnh sửa thông tin hồ sơ</span>
+            </button>
+          )}
           <button
             type="button"
             onClick={onClose}
-            className="w-full sm:w-auto px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/15 text-slate-700 dark:text-slate-200 text-[12.5px] font-semibold transition-colors cursor-pointer text-center"
+            className={`${isAdmin && onEdit ? 'px-4' : 'w-full sm:w-auto px-4'} h-10 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/15 text-slate-700 dark:text-slate-200 text-[12.5px] font-semibold transition-colors cursor-pointer text-center`}
           >
             Đóng
           </button>
@@ -228,6 +262,8 @@ export function AuthorProfileSection({
   profile,
   isAdmin = false,
   isHidden = false,
+  isCollapsed = false,
+  onToggleCollapse,
   onToggleVisibility,
   sectionIndex,
   totalSections,
@@ -253,6 +289,8 @@ export function AuthorProfileSection({
           sectionIndex={sectionIndex}
           totalSections={totalSections}
           isHidden={isHidden}
+          isCollapsed={isCollapsed}
+          onToggleCollapse={onToggleCollapse}
           onToggleVisibility={onToggleVisibility}
           onMoveUp={onMoveUp}
           onMoveDown={onMoveDown}
@@ -263,7 +301,8 @@ export function AuthorProfileSection({
       )}
 
       {/* THẺ MASTER SINGLE CARD (ĐÚNG 1 KHUNG DUY NHẤT, NỀN TRẮNG SẠCH ĐỒNG BỘ APP) */}
-      <ScrollReveal animation="slide-left" delay={40}>
+      {isAdmin && isCollapsed ? null : (
+        <ScrollReveal animation="slide-left" delay={40}>
         <div className="relative p-4 sm:p-5 rounded-[16px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-sm dark:bg-gradient-to-br dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0B132B] dark:border-white/15 dark:text-white overflow-hidden flex flex-col gap-3">
           {/* Họa tiết trang trí viền cao cấp góc phải */}
           <div className="absolute top-0 right-0 w-32 h-32 opacity-10 dark:opacity-20 pointer-events-none bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-200 dark:from-blue-400 via-transparent to-transparent" />
@@ -386,12 +425,15 @@ export function AuthorProfileSection({
           )}
         </div>
       </ScrollReveal>
+      )}
 
       {/* Modal chi tiết hồ sơ chuyên gia */}
       {showBioModal && (
         <AuthorBioDetailModal
           profile={profile}
+          isAdmin={isAdmin}
           onClose={() => setShowBioModal(false)}
+          onEdit={onEdit}
         />
       )}
     </section>
@@ -415,6 +457,8 @@ export function AuthorBooksSection({
   supplementalBooks = [],
   isAdmin = false,
   isHidden = false,
+  isCollapsed = false,
+  onToggleCollapse,
   onToggleVisibility,
   sectionIndex,
   totalSections,
@@ -472,17 +516,22 @@ export function AuthorBooksSection({
           sectionIndex={sectionIndex}
           totalSections={totalSections}
           isHidden={isHidden}
+          isCollapsed={isCollapsed}
+          onToggleCollapse={onToggleCollapse}
           onToggleVisibility={onToggleVisibility}
           onMoveUp={onMoveUp}
           onMoveDown={onMoveDown}
           onOpenReorderModal={onOpenReorderModal}
           onEdit={onEdit}
-          editLabel="Cài đặt khối sách"
+          editLabel="Sửa khối sách"
         />
       )}
 
-      {/* Tiêu đề mục sách tác giả */}
-      <div className="flex flex-col gap-1.5 border-b border-slate-200/80 pb-3 dark:border-white/10">
+      {/* Khi Admin thu gọn khối này, ẩn danh sách sách bên dưới */}
+      {isAdmin && isCollapsed ? null : (
+        <>
+          {/* Tiêu đề mục sách tác giả */}
+          <div className="flex flex-col gap-1.5 border-b border-slate-200/80 pb-3 dark:border-white/10">
         <div className="flex items-center gap-2 px-0.5">
           <span aria-hidden="true" className="h-8 w-[3px] shrink-0 rounded-full bg-gradient-to-b from-[#315F9E] to-[#D9B44A]" />
           <div className="min-w-0">
@@ -772,6 +821,8 @@ export function AuthorBooksSection({
           </div>
         </div>
       )}
+        </>
+      )}
 
       <FlipbookViewer
         mode="modal-only"
@@ -807,6 +858,8 @@ export function AuthorPhilosophySection({
   profile,
   isAdmin = false,
   isHidden = false,
+  isCollapsed = false,
+  onToggleCollapse,
   onToggleVisibility,
   sectionIndex,
   totalSections,
@@ -826,6 +879,8 @@ export function AuthorPhilosophySection({
           sectionIndex={sectionIndex}
           totalSections={totalSections}
           isHidden={isHidden}
+          isCollapsed={isCollapsed}
+          onToggleCollapse={onToggleCollapse}
           onToggleVisibility={onToggleVisibility}
           onMoveUp={onMoveUp}
           onMoveDown={onMoveDown}
@@ -835,22 +890,24 @@ export function AuthorPhilosophySection({
         />
       )}
 
-      <ScrollReveal animation="slide-right" delay={40}>
-        <div className="p-4 sm:p-5 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-sm dark:bg-gradient-to-br dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0B132B] dark:border-white/15 dark:text-white flex flex-col gap-2">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
-            <div className="flex items-center gap-1.5 text-amber-600 dark:text-[#F8DF7B]">
-              <Sparkles size={16} strokeWidth={2.5} />
-              <h4 className="text-[13.5px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-[#F8DF7B]">
-                {profile.extra_title || 'Triết lý phụng sự'}
-              </h4>
+      {isAdmin && isCollapsed ? null : (
+        <ScrollReveal animation="slide-right" delay={40}>
+          <div className="p-4 sm:p-5 rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs hover:shadow-sm dark:bg-gradient-to-br dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0B132B] dark:border-white/15 dark:text-white flex flex-col gap-2">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+              <div className="flex items-center gap-1.5 text-amber-600 dark:text-[#F8DF7B]">
+                <Sparkles size={16} strokeWidth={2.5} />
+                <h4 className="text-[13.5px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-[#F8DF7B]">
+                  {profile.extra_title || 'Triết lý phụng sự'}
+                </h4>
+              </div>
             </div>
-          </div>
 
-          <p className="text-[14px] sm:text-[15px] font-medium text-slate-700 dark:text-slate-200 leading-relaxed pt-1 italic">
-            &ldquo;{profile.extra_content || 'Bấm sửa để thêm thông điệp triết lý phụng sự...'}&rdquo;
-          </p>
-        </div>
-      </ScrollReveal>
+            <p className="text-[14px] sm:text-[15px] font-medium text-slate-700 dark:text-slate-200 leading-relaxed pt-1 italic">
+              &ldquo;{profile.extra_content || 'Bấm sửa để thêm thông điệp triết lý phụng sự...'}&rdquo;
+            </p>
+          </div>
+        </ScrollReveal>
+      )}
     </section>
   );
 }
@@ -862,6 +919,8 @@ export function AuthorContactSection({
   profile,
   isAdmin = false,
   isHidden = false,
+  isCollapsed = false,
+  onToggleCollapse,
   onToggleVisibility,
   sectionIndex,
   totalSections,
@@ -890,6 +949,8 @@ export function AuthorContactSection({
           sectionIndex={sectionIndex}
           totalSections={totalSections}
           isHidden={isHidden}
+          isCollapsed={isCollapsed}
+          onToggleCollapse={onToggleCollapse}
           onToggleVisibility={onToggleVisibility}
           onMoveUp={onMoveUp}
           onMoveDown={onMoveDown}
@@ -899,7 +960,8 @@ export function AuthorContactSection({
         />
       )}
 
-      <ScrollReveal animation="slide-right" delay={40}>
+      {isAdmin && isCollapsed ? null : (
+        <ScrollReveal animation="slide-right" delay={40}>
         <div className="p-4 sm:p-5 rounded-[16px] bg-white text-slate-900 border border-slate-200 shadow-sm dark:bg-[#111827] dark:border-white/15 dark:text-white flex flex-col gap-3.5">
           <div className="flex items-center gap-2.5 min-w-0 pb-3 border-b border-slate-200 dark:border-white/10">
             <div className="w-8 h-8 rounded-[10px] bg-slate-100 text-slate-800 dark:bg-white/10 dark:text-white flex items-center justify-center shrink-0">
@@ -983,6 +1045,7 @@ export function AuthorContactSection({
           )}
         </div>
       </ScrollReveal>
+      )}
     </section>
   );
 }

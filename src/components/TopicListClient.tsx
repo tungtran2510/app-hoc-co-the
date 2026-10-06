@@ -34,6 +34,8 @@ interface TopicListClientProps {
   sectionIndex?: number;
   totalSections?: number;
   isHidden?: boolean;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
   onToggleVisibility?: () => void;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
@@ -71,6 +73,8 @@ export default function TopicListClient({
   sectionIndex,
   totalSections,
   isHidden,
+  isCollapsed = false,
+  onToggleCollapse,
   onToggleVisibility,
   onMoveUp,
   onMoveDown,
@@ -412,6 +416,8 @@ export default function TopicListClient({
           sectionIndex={sectionIndex}
           totalSections={totalSections}
           isHidden={isHidden}
+          isCollapsed={isCollapsed}
+          onToggleCollapse={onToggleCollapse}
           onToggleVisibility={onToggleVisibility}
           onMoveUp={onMoveUp}
           onMoveDown={onMoveDown}
@@ -421,8 +427,11 @@ export default function TopicListClient({
         />
       )}
 
-      {/* Hàng 1: Tiêu đề chuyên đề học + Xem tất cả */}
-      <div className="flex items-center justify-between gap-2">
+      {/* Khi Admin chọn thu gọn khối này, ẩn danh sách bên dưới */}
+      {isAdmin && isCollapsed ? null : (
+        <>
+          {/* Hàng 1: Tiêu đề chuyên đề học + Xem tất cả */}
+          <div className="flex items-center justify-between gap-2">
         {isAdmin && isEditingTitle ? (
           <div className="flex items-center gap-1.5 flex-1 min-w-0">
             <input
@@ -773,62 +782,77 @@ export default function TopicListClient({
                 </div>
               )}
 
-              {/* Thanh công cụ quản trị trên mỗi thẻ chuyên đề */}
+              {/* Thanh công cụ quản trị trên mỗi thẻ chuyên đề (Tối ưu 100% cho điện thoại & mọi kích thước) */}
               {isAdmin && (
-                <div className="flex items-center justify-between mt-1 px-1.5 py-1 rounded-[10px] bg-slate-900/80 dark:bg-[#1A103C]/95 border border-slate-300/30 dark:border-purple-700/60 text-white text-[11.5px] font-bold shadow-2xs backdrop-blur-xs">
-                  <button
-                    type="button"
-                    onClick={() => setEditingTopic(topic)}
-                    className="flex items-center gap-1 h-6 px-2 rounded-[6px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[10.5px] uppercase tracking-wide cursor-pointer transition-transform active:scale-95 shadow-2xs"
-                    title="Sửa chủ đề"
-                  >
-                    <Edit2 size={10} strokeWidth={2.5} />
-                    <span>Sửa</span>
-                  </button>
+                <div className="mt-1 p-1 rounded-[10px] bg-slate-900/90 dark:bg-[#1A103C]/95 border border-slate-300/30 dark:border-purple-700/60 text-white shadow-2xs backdrop-blur-xs flex flex-col gap-1">
+                  {/* Hàng 1: Nút Sửa chính + Nổi bật ⭐ + Ẩn/Hiện 👁 */}
+                  <div className="flex items-center gap-1 justify-between">
+                    <button
+                      type="button"
+                      onClick={() => setEditingTopic(topic)}
+                      className="flex-1 flex items-center justify-center gap-1 h-6 px-1.5 rounded-[6px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[10px] uppercase tracking-wide cursor-pointer transition-transform active:scale-95 shadow-2xs min-w-0"
+                      title="Chỉnh sửa chủ đề này"
+                    >
+                      <Edit2 size={10} strokeWidth={2.8} className="shrink-0" />
+                      <span className="truncate">Sửa</span>
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={() => handleToggleFeatured(topic.id)}
-                    className={`w-6 h-6 rounded-[6px] flex items-center justify-center cursor-pointer active:scale-90 ${featuredTopicIds.includes(topic.id) ? 'bg-amber-400 text-slate-950' : 'text-slate-300 hover:text-amber-300 hover:bg-white/15'}`}
-                    title={featuredTopicIds.includes(topic.id) ? 'Bỏ nổi bật' : 'Đặt làm nổi bật'}
-                  >
-                    <Star size={12} strokeWidth={2.2} className={featuredTopicIds.includes(topic.id) ? 'fill-current' : ''} />
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => handleToggleFeatured(topic.id)}
+                      className={`w-6 h-6 rounded-[6px] flex items-center justify-center shrink-0 cursor-pointer active:scale-90 transition-colors ${
+                        featuredTopicIds.includes(topic.id)
+                          ? 'bg-amber-400 text-slate-950 shadow-2xs'
+                          : 'text-slate-300 hover:text-amber-300 hover:bg-white/15'
+                      }`}
+                      title={featuredTopicIds.includes(topic.id) ? 'Bỏ nổi bật' : 'Đặt làm nổi bật (ưu tiên)'}
+                    >
+                      <Star size={11} strokeWidth={2.4} className={featuredTopicIds.includes(topic.id) ? 'fill-current' : ''} />
+                    </button>
 
-                  <div className="flex items-center gap-0.5">
+                    <button
+                      type="button"
+                      onClick={() => handleToggleVisible(index)}
+                      className={`w-6 h-6 rounded-[6px] flex items-center justify-center shrink-0 cursor-pointer active:scale-90 transition-colors ${
+                        topic.is_visible
+                          ? 'text-slate-300 hover:text-white hover:bg-white/15'
+                          : 'bg-amber-500/20 text-amber-300 border border-amber-400/40'
+                      }`}
+                      title={topic.is_visible ? 'Đang hiện – Bấm để ẩn' : 'Đang ẩn – Bấm để hiện'}
+                    >
+                      {topic.is_visible ? <Eye size={11} strokeWidth={2.2} /> : <EyeOff size={11} strokeWidth={2.5} className="text-amber-400" />}
+                    </button>
+                  </div>
+
+                  {/* Hàng 2: Di chuyển Lên ↑ + Xuống ↓ + Xóa 🗑 */}
+                  <div className="flex items-center gap-1 pt-0.5 border-t border-white/10">
                     <button
                       type="button"
                       disabled={index === 0}
                       onClick={() => handleMove(index, 'up')}
-                      className="w-6 h-6 rounded-[6px] flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/15 disabled:opacity-20 cursor-pointer active:scale-90"
+                      className="flex-1 h-5.5 rounded-[5px] flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/15 disabled:opacity-20 cursor-pointer active:scale-90 transition-all bg-white/5"
                       title="Chuyển lên"
                     >
-                      <ArrowUp size={12} strokeWidth={2.5} />
+                      <ArrowUp size={11} strokeWidth={2.6} />
                     </button>
+
                     <button
                       type="button"
                       disabled={index === topicsWithCounts.length - 1}
                       onClick={() => handleMove(index, 'down')}
-                      className="w-6 h-6 rounded-[6px] flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/15 disabled:opacity-20 cursor-pointer active:scale-90"
+                      className="flex-1 h-5.5 rounded-[5px] flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/15 disabled:opacity-20 cursor-pointer active:scale-90 transition-all bg-white/5"
                       title="Chuyển xuống"
                     >
-                      <ArrowDown size={12} strokeWidth={2.5} />
+                      <ArrowDown size={11} strokeWidth={2.6} />
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => handleToggleVisible(index)}
-                      className="w-6 h-6 rounded-[6px] flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/15 cursor-pointer active:scale-90"
-                      title={topic.is_visible ? 'Ẩn chủ đề' : 'Hiện chủ đề'}
-                    >
-                      {topic.is_visible ? <Eye size={12} strokeWidth={2.2} /> : <EyeOff size={12} strokeWidth={2.5} className="text-amber-400" />}
-                    </button>
+
                     <button
                       type="button"
                       onClick={() => handleDelete(topic.id, topic.title)}
-                      className="w-6 h-6 rounded-[6px] flex items-center justify-center text-red-400 hover:text-white hover:bg-red-500/80 cursor-pointer active:scale-90"
+                      className="w-6 h-5.5 rounded-[5px] flex items-center justify-center text-red-400 hover:text-white hover:bg-red-500/80 cursor-pointer active:scale-90 transition-all shrink-0 bg-red-950/30"
                       title="Xóa chủ đề"
                     >
-                      <Trash2 size={12} strokeWidth={2.2} />
+                      <Trash2 size={11} strokeWidth={2.4} />
                     </button>
                   </div>
                 </div>
@@ -900,6 +924,8 @@ export default function TopicListClient({
           Xem tất cả chuyên đề <span aria-hidden="true">›</span>
         </Link>
       )}
+        </>
+      )}
 
       {/* Modal Sửa chủ đề */}
       {editingTopic && (
@@ -907,6 +933,7 @@ export default function TopicListClient({
           topic={editingTopic}
           onClose={() => setEditingTopic(null)}
           onSaved={handleSaved}
+          onDelete={handleDelete}
         />
       )}
       {editingFaqBlock && <EditBlockModal isOpen onClose={() => setEditingFaqBlock(null)} block={editingFaqBlock} onSaveBlock={handleSaveFaqBlock} faqTopicOptions={initialFaqTopics} faqVideoOptions={initialFaqVideos.map((video) => ({ key: video.key, page_id: video.page_id, page_title: video.page_title, video_title: video.video_title, thumbnail_url: video.thumbnail_url, index: video.index, topic_id: video.topic_id, topic_title: video.topic_title }))} />}

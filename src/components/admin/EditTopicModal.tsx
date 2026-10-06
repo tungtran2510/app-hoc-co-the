@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Save, Upload, Image as ImageIcon, Crop } from 'lucide-react';
+import { X, Save, Upload, Image as ImageIcon, Crop, Trash2, Eye, EyeOff } from 'lucide-react';
 import { Topic } from '../../lib/types';
 import { generateSlug } from '../../lib/slug';
 import { uploadImageFile } from '../../lib/storageUpload';
@@ -37,6 +37,7 @@ interface EditTopicModalProps {
   nextSortOrder?: number;
   onClose: () => void;
   onSaved: (topic: Topic) => void;
+  onDelete?: (id: string, title: string) => void;
 }
 
 export default function EditTopicModal({
@@ -44,6 +45,7 @@ export default function EditTopicModal({
   nextSortOrder = 1,
   onClose,
   onSaved,
+  onDelete,
 }: EditTopicModalProps) {
   const isCreating = !topic;
 
@@ -55,6 +57,7 @@ export default function EditTopicModal({
   const [colorFg, setColorFg] = useState(topic?.color_fg || '#2D5B94');
   const [icon, setIcon] = useState(topic?.icon || 'body');
   const [coverUrl, setCoverUrl] = useState(topic?.cover_url || '');
+  const [isVisible, setIsVisible] = useState<boolean>(topic?.is_visible !== false);
 
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -111,7 +114,7 @@ export default function EditTopicModal({
         color_bg: colorBg,
         color_fg: colorFg,
         sort_order: topic?.sort_order ?? nextSortOrder,
-        is_visible: topic?.is_visible ?? true,
+        is_visible: isVisible,
       };
 
       const res = await saveTopicApi(payload);
@@ -342,26 +345,76 @@ export default function EditTopicModal({
               </label>
             </div>
           </div>
+
+          {/* Trạng thái hiển thị (Bật/Ẩn) */}
+          <div className="flex items-center justify-between p-3.5 rounded-[14px] bg-slate-50 dark:bg-purple-950/20 border border-slate-200 dark:border-purple-800/30">
+            <div className="flex items-center gap-2.5">
+              <div className={`w-8 h-8 rounded-[9px] flex items-center justify-center shrink-0 ${isVisible ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'}`}>
+                {isVisible ? <Eye size={16} strokeWidth={2.4} /> : <EyeOff size={16} strokeWidth={2.4} />}
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[13.5px] font-bold text-slate-800 dark:text-white">
+                  Trạng thái hiển thị
+                </span>
+                <span className="text-[11.5px] text-slate-500 dark:text-slate-400">
+                  {isVisible ? 'Công khai – Học viên có thể thấy' : 'Đang ẩn – Chỉ quản trị viên nhìn thấy'}
+                </span>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsVisible(!isVisible)}
+              className={`w-12 h-6.5 rounded-full transition-colors relative cursor-pointer ${
+                isVisible ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-white/20'
+              }`}
+              title={isVisible ? 'Bấm để ẩn chuyên đề' : 'Bấm để hiển thị công khai'}
+            >
+              <div
+                className={`w-5 h-5 rounded-full bg-white shadow-xs transition-transform absolute top-0.5 ${
+                  isVisible ? 'left-6' : 'left-0.5'
+                }`}
+              />
+            </button>
+          </div>
         </div>
 
         {/* Footer */}
-        <div className="p-3.5 px-5 border-t border-line flex items-center justify-end gap-2.5 bg-surface">
-          <button
-            type="button"
-            onClick={onClose}
-            className="h-[44px] px-4 rounded-[12px] bg-surface-2 text-ink font-bold text-[14px] cursor-pointer"
-          >
-            Hủy
-          </button>
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={isSaving || isUploading}
-            className="flex items-center justify-center gap-1.5 h-[44px] px-5 rounded-[12px] bg-primary text-white font-extrabold text-[14px] shadow-sm cursor-pointer disabled:opacity-60"
-          >
-            <Save size={16} />
-            <span>{isSaving ? 'Đang lưu...' : 'Lưu chủ đề'}</span>
-          </button>
+        <div className="p-3.5 px-5 border-t border-line flex items-center justify-between gap-2.5 bg-surface">
+          {topic && onDelete ? (
+            <button
+              type="button"
+              onClick={() => {
+                if (confirm(`Bạn có chắc chắn muốn xóa chủ đề "${topic.title}"?`)) {
+                  onDelete(topic.id, topic.title);
+                  onClose();
+                }
+              }}
+              className="flex items-center gap-1.5 h-[42px] px-3.5 rounded-[12px] bg-red-50 hover:bg-red-100 text-red-600 font-bold text-[13px] cursor-pointer transition-colors border border-red-200"
+              title="Xóa chủ đề này khỏi hệ thống"
+            >
+              <Trash2 size={15} />
+              <span>Xóa chủ đề</span>
+            </button>
+          ) : <div />}
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="h-[42px] px-4 rounded-[12px] bg-surface-2 text-ink font-bold text-[14px] cursor-pointer"
+            >
+              Hủy
+            </button>
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={isSaving || isUploading}
+              className="flex items-center justify-center gap-1.5 h-[42px] px-5 rounded-[12px] bg-primary text-white font-extrabold text-[14px] shadow-sm cursor-pointer disabled:opacity-60"
+            >
+              <Save size={16} />
+              <span>{isSaving ? 'Đang lưu...' : 'Lưu chủ đề'}</span>
+            </button>
+          </div>
         </div>
       </div>
 

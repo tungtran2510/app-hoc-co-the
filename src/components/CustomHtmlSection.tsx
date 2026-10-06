@@ -177,6 +177,8 @@ interface SectionProps {
   data: CustomHtmlBlockData;
   isAdmin: boolean;
   isHidden: boolean;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
   sectionIndex: number;
   totalSections: number;
   onToggleVisibility: () => void;
@@ -186,17 +188,32 @@ interface SectionProps {
   onEdit: () => void;
 }
 
-export default function CustomHtmlSection({ data, isAdmin, isHidden, sectionIndex, totalSections, onToggleVisibility, onMoveUp, onMoveDown, onOpenReorderModal, onEdit }: SectionProps) {
+export default function CustomHtmlSection({
+  data,
+  isAdmin,
+  isHidden,
+  isCollapsed = false,
+  onToggleCollapse,
+  sectionIndex,
+  totalSections,
+  onToggleVisibility,
+  onMoveUp,
+  onMoveDown,
+  onOpenReorderModal,
+  onEdit,
+}: SectionProps) {
   const empty = !data.title && !data.html && !data.text && !(data.images && data.images.length);
   if (empty && !isAdmin) return null;
   return (
     <section className="flex flex-col gap-2 mt-1">
       {isAdmin && (
         <SectionOrderControls
-          sectionTitle="KHỐI TÙY BIẾN"
+          sectionTitle={data.title || "KHỐI TÙY BIẾN"}
           sectionIndex={sectionIndex}
           totalSections={totalSections}
           isHidden={isHidden}
+          isCollapsed={isCollapsed}
+          onToggleCollapse={onToggleCollapse}
           onToggleVisibility={onToggleVisibility}
           onMoveUp={onMoveUp}
           onMoveDown={onMoveDown}
@@ -205,12 +222,14 @@ export default function CustomHtmlSection({ data, isAdmin, isHidden, sectionInde
           editLabel="Sửa khối"
         />
       )}
-      {empty ? (
-        <div className="p-4 rounded-[14px] border border-dashed border-slate-400 dark:border-white/30 text-[14px] text-slate-600 dark:text-slate-300">
-          Khối tùy biến đang trống – bấm "Sửa khối" để thêm ảnh, văn bản hoặc HTML.
-        </div>
-      ) : (
-        <CustomHtmlContent data={data} />
+      {isAdmin && isCollapsed ? null : (
+        empty ? (
+          <div className="p-4 rounded-[14px] border border-dashed border-slate-400 dark:border-white/30 text-[14px] text-slate-600 dark:text-slate-300">
+            Khối tùy biến đang trống – bấm "Sửa khối" để thêm ảnh, văn bản hoặc HTML.
+          </div>
+        ) : (
+          <CustomHtmlContent data={data} />
+        )
       )}
     </section>
   );

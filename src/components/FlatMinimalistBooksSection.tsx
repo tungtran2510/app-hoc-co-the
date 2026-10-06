@@ -100,6 +100,8 @@ interface FlatMinimalistBooksSectionProps {
   sectionIndex?: number;
   totalSections?: number;
   isHidden?: boolean;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
   onToggleVisibility?: () => void;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
@@ -114,6 +116,8 @@ export default function FlatMinimalistBooksSection({
   sectionIndex,
   totalSections,
   isHidden = false,
+  isCollapsed = false,
+  onToggleCollapse,
   onToggleVisibility,
   onMoveUp,
   onMoveDown,
@@ -233,6 +237,8 @@ export default function FlatMinimalistBooksSection({
           sectionIndex={sectionIndex}
           totalSections={totalSections}
           isHidden={isHidden}
+          isCollapsed={isCollapsed}
+          onToggleCollapse={onToggleCollapse}
           onToggleVisibility={onToggleVisibility}
           onMoveUp={onMoveUp}
           onMoveDown={onMoveDown}
@@ -241,12 +247,15 @@ export default function FlatMinimalistBooksSection({
             setTitleDraft(title);
             setIsEditingTitle(true);
           }}
-          editLabel="Đổi tiêu đề"
+          editLabel="Sửa khối sách"
         />
       )}
 
-      {/* TIÊU ĐỀ KHỐI VÀ NÚT CHUYỂN ĐỔI CHẾ ĐỘ (LƯỚI / DANH SÁCH) */}
-      <div className={`${isAdmin ? 'flex' : 'hidden'} items-center justify-between gap-2.5 px-0.5`}>
+      {/* Khi Admin thu gọn khối này, ẩn nội dung bên dưới */}
+      {isAdmin && isCollapsed ? null : (
+        <>
+          {/* TIÊU ĐỀ KHỐI VÀ NÚT CHUYỂN ĐỔI CHẾ ĐỘ (LƯỚI / DANH SÁCH) */}
+          <div className={`${isAdmin ? 'flex' : 'hidden'} items-center justify-between gap-2.5 px-0.5`}>
         {isAdmin && isEditingTitle ? (
           <div className="flex items-center gap-1.5 flex-1 min-w-0">
             <input
@@ -611,6 +620,8 @@ export default function FlatMinimalistBooksSection({
             );
           })}
         </div>
+      )}
+        </>
       )}
 
       {/* MODAL CHI TIẾT SÁCH TOÀN DIỆN */}

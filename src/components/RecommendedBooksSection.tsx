@@ -36,6 +36,8 @@ interface RecommendedBooksSectionProps {
   sectionIndex?: number;
   totalSections?: number;
   isHidden?: boolean;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
   onToggleVisibility?: () => void;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
@@ -52,6 +54,8 @@ export default function RecommendedBooksSection({
   sectionIndex,
   totalSections,
   isHidden = false,
+  isCollapsed = false,
+  onToggleCollapse,
   onToggleVisibility,
   onMoveUp,
   onMoveDown,
@@ -187,17 +191,22 @@ export default function RecommendedBooksSection({
           sectionIndex={sectionIndex}
           totalSections={totalSections}
           isHidden={isHidden}
+          isCollapsed={isCollapsed}
+          onToggleCollapse={onToggleCollapse}
           onToggleVisibility={onToggleVisibility}
           onMoveUp={onMoveUp}
           onMoveDown={onMoveDown}
           onOpenReorderModal={onOpenReorderModal}
           onEdit={() => setShowEditModal(true)}
-          editLabel="Cài đặt khối sách"
+          editLabel="Sửa khối sách"
         />
       )}
 
-      {/* TIÊU ĐỀ MỤC & NHÓM NÚT CHUYỂN CHẾ ĐỘ XEM (BỎ BADGE SỐ TÀI LIỆU, TỰ ĐỘNG XUỐNG DÒNG KHÔNG ĐÈ NÚT) */}
-      <div className="flex flex-col gap-1.5">
+      {/* Khi Admin thu gọn khối này, ẩn danh sách sách bên dưới */}
+      {isAdmin && isCollapsed ? null : (
+        <>
+          {/* TIÊU ĐỀ MỤC & NHÓM NÚT CHUYỂN CHẾ ĐỘ XEM (BỎ BADGE SỐ TÀI LIỆU, TỰ ĐỘNG XUỐNG DÒNG KHÔNG ĐÈ NÚT) */}
+          <div className="flex flex-col gap-1.5">
         {/* Hàng 1: Tiêu đề bên trái (tự co giãn / xuống dòng), Nút chuyển đổi Lưới / Danh sách bên phải */}
         <div className="flex items-center justify-between gap-2.5">
           <h2 className="text-[18px] sm:text-[19px] font-extrabold text-ink leading-tight break-words line-clamp-2 flex-1 min-w-0">
@@ -529,6 +538,8 @@ export default function RecommendedBooksSection({
             );
           })}
         </div>
+      )}
+        </>
       )}
 
       {/* MODAL CHI TIẾT SÁCH TOÀN DIỆN (VIDEO YOUTUBE + BỘ SƯU TẬP ẢNH BÊN TRONG CÓ PHÓNG TO) */}
