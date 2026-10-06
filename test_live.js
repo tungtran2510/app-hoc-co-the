@@ -106,7 +106,7 @@ const ARTIFACT_DIR = 'C:\\Users\\Admin\\.gemini\\antigravity\\brain\\23366f77-38
   console.log('\n3. Testing Real Tap Transition: Home -> /cot-song...');
   const startTopicNav = Date.now();
   await cardCotSong.click();
-  await page.waitForURL('**/cot-song', { timeout: 10000 });
+  await page.waitForFunction(() => window.location.pathname.startsWith('/cot-song'), null, { timeout: 10000 });
   await page.waitForSelector('.lesson-page-card, h1, h2', { timeout: 5000 });
   const topicTransitionMs = Date.now() - startTopicNav;
   console.log(`   ⚡ TRANSITION TIME (Home -> Topic): ${topicTransitionMs}ms!`);
@@ -126,7 +126,7 @@ const ARTIFACT_DIR = 'C:\\Users\\Admin\\.gemini\\antigravity\\brain\\23366f77-38
   
   const startLessonNav = Date.now();
   await firstLessonCard.click();
-  await page.waitForURL(`**${lessonHref}`, { timeout: 10000 });
+  await page.waitForFunction((href) => window.location.pathname === href, lessonHref, { timeout: 10000 });
   await page.waitForSelector('header, article, h1', { timeout: 5000 });
   const lessonTransitionMs = Date.now() - startLessonNav;
   console.log(`   ⚡ TRANSITION TIME (Topic -> Lesson): ${lessonTransitionMs}ms!`);
@@ -139,7 +139,7 @@ const ARTIFACT_DIR = 'C:\\Users\\Admin\\.gemini\\antigravity\\brain\\23366f77-38
   const breadcrumbHome = page.locator('header a[href="/"]').first();
   const startBackHome = Date.now();
   await breadcrumbHome.click();
-  await page.waitForURL(targetBase + '/', { timeout: 10000 });
+  await page.waitForFunction(() => window.location.pathname === '/', null, { timeout: 10000 });
   const backHomeMs = Date.now() - startBackHome;
   console.log(`   ⚡ TRANSITION TIME (Lesson -> Home Breadcrumb): ${backHomeMs}ms!`);
 
@@ -198,7 +198,7 @@ const ARTIFACT_DIR = 'C:\\Users\\Admin\\.gemini\\antigravity\\brain\\23366f77-38
 
   // Navigate back to home for BottomNav tabs test
   await page.goto(targetBase, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(300);
+  await page.waitForTimeout(1000);
 
   // -------------------------------------------------------------
   // TEST 6: BOTTOM NAV TABS SPEED BENCHMARK
@@ -209,7 +209,7 @@ const ARTIFACT_DIR = 'C:\\Users\\Admin\\.gemini\\antigravity\\brain\\23366f77-38
     const tStart = Date.now();
     const tabLocator = page.locator(`nav[aria-label="Điều hướng chính"] a[href="${href}"]`).first();
     await tabLocator.click();
-    await page.waitForURL(`**${href === '/' ? targetBase + '/' : href}`, { timeout: 10000 });
+    await page.waitForFunction((h) => window.location.pathname === h, href, { timeout: 10000 });
     const tabMs = Date.now() - tStart;
     console.log(`   - Tab "${name}" (${href}): ${tabMs}ms`);
     return tabMs;

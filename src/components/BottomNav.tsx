@@ -38,7 +38,10 @@ export default function BottomNav() {
       if (typeof window !== 'undefined') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
+      return;
     }
+    e.preventDefault();
+    router.push(href);
   };
 
   return (

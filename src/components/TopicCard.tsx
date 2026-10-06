@@ -72,7 +72,6 @@ export default function TopicCard({
         e.currentTarget.classList.remove('is-active');
       }}
       onClick={() => {
-        playTapSound();
         onActivate?.();
       }}
       className={`topic-card-container group relative flex flex-col cursor-pointer select-none transition-transform duration-100 active:scale-[0.98] [&.is-active]:scale-[0.98] ${
