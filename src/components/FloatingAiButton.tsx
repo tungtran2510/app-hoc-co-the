@@ -203,7 +203,7 @@ export default function FloatingAiButton() {
   };
 
   const handleLinkClick = (e: React.MouseEvent) => {
-    if (justMovedRef.current || isUnlockedRef.current || isDraggingRef.current || dragInfoRef.current.moved) {
+    if (justMovedRef.current || isUnlockedRef.current || isDraggingRef.current) {
       e.preventDefault();
       return;
     }
