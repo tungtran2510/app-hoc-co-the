@@ -18,9 +18,34 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: TopicPageProps): Promise<Metadata> {
   const [topic, settings] = await Promise.all([getTopicBySlug(params.topicSlug), getSettings()]);
   if (!topic) return { title: 'Không tìm thấy chủ đề' };
+  const title = `${topic.title} · ${settings?.app_name || 'Học Cơ Thể'}`;
+  const description = topic.description || `Khám phá kiến thức chuyên sâu về ${topic.title}`;
+  const ogImage = topic.cover_url || topic.icon || '/spine_hero_clean.png';
+
   return {
-    title: `${topic.title} · ${settings?.app_name || 'Học Cơ Thể'}`,
-    description: topic.description || `Khám phá kiến thức ${topic.title}`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      locale: 'vi_VN',
+      siteName: settings?.app_name || 'Qbiz Books',
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: topic.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImage],
+    },
   };
 }
 

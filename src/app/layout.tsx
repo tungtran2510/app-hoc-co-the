@@ -25,6 +25,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://app-hoc-co-the.vercel.app'),
   title: 'Qbiz Books · Tủ Sách Y Khoa & Khám Phá Cơ Thể',
   description: 'Ứng dụng học hiểu kiến thức về cơ thể theo lộ trình tương tác',
   manifest: '/manifest.webmanifest',
@@ -42,6 +43,27 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: 'default',
     title: 'Qbiz Books',
+  },
+  openGraph: {
+    title: 'Qbiz Books · Tủ Sách Y Khoa & Khám Phá Cơ Thể',
+    description: 'Ứng dụng học hiểu kiến thức về cơ thể theo lộ trình tương tác',
+    type: 'website',
+    locale: 'vi_VN',
+    siteName: 'Qbiz Books',
+    images: [
+      {
+        url: '/spine_hero_clean.png',
+        width: 1200,
+        height: 630,
+        alt: 'Qbiz Books - Tủ Sách Y Khoa & Khám Phá Cơ Thể',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Qbiz Books · Tủ Sách Y Khoa & Khám Phá Cơ Thể',
+    description: 'Ứng dụng học hiểu kiến thức về cơ thể theo lộ trình tương tác',
+    images: ['/spine_hero_clean.png'],
   },
 };
 

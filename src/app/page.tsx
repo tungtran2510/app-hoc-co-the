@@ -11,9 +11,34 @@ export const revalidate = 30;
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
+  const title = `${settings?.app_name || 'Qbiz Books'} · Tủ Sách Y Khoa & Khám Phá Cơ Thể`;
+  const description = 'Ứng dụng học hiểu kiến thức về cơ thể và chăm sóc sức khỏe chủ động';
+  const ogImage = settings?.logo_url || '/spine_hero_clean.png';
+
   return {
-    title: `${settings?.app_name || 'Qbiz Books'} · Tủ Sách Y Khoa & Khám Phá Cơ Thể`,
-    description: 'Ứng dụng học hiểu kiến thức về cơ thể và chăm sóc sức khỏe chủ động',
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      locale: 'vi_VN',
+      siteName: settings?.app_name || 'Qbiz Books',
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImage],
+    },
   };
 }
 

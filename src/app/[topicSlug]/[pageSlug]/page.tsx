@@ -56,19 +56,31 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = `${page.title} · ${settings.app_name}`;
   const description = page.summary || `${topic.title} - Kiến thức cấu trúc cơ thể và sức khỏe`;
 
+  const ogImage = imageUrl || '/spine_hero_clean.png';
+
   return {
     title,
     description,
     openGraph: {
       title,
       description,
-      images: imageUrl ? [{ url: imageUrl }] : undefined,
+      type: 'article',
+      locale: 'vi_VN',
+      siteName: settings.app_name,
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: page.title,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: imageUrl ? [imageUrl] : undefined,
+      images: [ogImage],
     },
   };
 }
