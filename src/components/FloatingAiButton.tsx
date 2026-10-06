@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Sparkles } from 'lucide-react';
 import { playTapSound } from '../lib/audioFeedback';
 
 export default function FloatingAiButton() {
   const pathname = usePathname();
+  const router = useRouter();
 
   // Không hiển thị trên trang Trợ lý AI và trang Đăng nhập
   const isHiddenPage = pathname === '/tro-ly-ai' || pathname?.startsWith('/dang-nhap');
@@ -34,6 +35,13 @@ export default function FloatingAiButton() {
 
   const justMovedRef = useRef(false);
 
+  // Pre-warm trang trợ lý AI để khi bấm chuyển trang tức thì <50ms
+  useEffect(() => {
+    try {
+      router.prefetch('/tro-ly-ai');
+    } catch {}
+  }, [router]);
+
   // Đọc tọa độ từ localStorage hoặc đặt mặc định ở góc dưới bên phải (ngay trên Tab Tìm kiếm ở BottomNav)
   useEffect(() => {
     try {
@@ -41,8 +49,8 @@ export default function FloatingAiButton() {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (typeof parsed.x === 'number' && typeof parsed.y === 'number') {
-          const clampedX = Math.max(12, Math.min(parsed.x, window.innerWidth - 82));
-          const clampedY = Math.max(50, Math.min(parsed.y, window.innerHeight - 82));
+          const clampedX = Math.max(12, Math.min(parsed.x, window.innerWidth - 96));
+          const clampedY = Math.max(50, Math.min(parsed.y, window.innerHeight - 90));
           setPos({ x: clampedX, y: clampedY });
           return;
         }
@@ -50,9 +58,8 @@ export default function FloatingAiButton() {
     } catch {}
 
     // Vị trí mặc định: Góc dưới bên phải (nổi ngay sát trên Tab Tìm kiếm của BottomNav)
-    // BottomNav cao ~62px -> Đặt y cách đáy 74px (window.innerHeight - 105), x cách lề phải 16px (window.innerWidth - 82)
-    const defaultX = Math.max(12, window.innerWidth - 82);
-    const defaultY = Math.max(50, window.innerHeight - 105);
+    const defaultX = Math.max(12, window.innerWidth - 96);
+    const defaultY = Math.max(50, window.innerHeight - 110);
     setPos({ x: defaultX, y: defaultY });
   }, []);
 
@@ -61,8 +68,8 @@ export default function FloatingAiButton() {
     const handleResize = () => {
       setPos((prev) => {
         if (!prev) return prev;
-        const clampedX = Math.max(12, Math.min(prev.x, window.innerWidth - 82));
-        const clampedY = Math.max(50, Math.min(prev.y, window.innerHeight - 82));
+        const clampedX = Math.max(12, Math.min(prev.x, window.innerWidth - 96));
+        const clampedY = Math.max(50, Math.min(prev.y, window.innerHeight - 90));
         return { x: clampedX, y: clampedY };
       });
     };
@@ -74,8 +81,8 @@ export default function FloatingAiButton() {
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0 && e.pointerType === 'mouse') return;
 
-    const currentX = pos ? pos.x : Math.max(12, window.innerWidth - 82);
-    const currentY = pos ? pos.y : Math.max(50, window.innerHeight - 105);
+    const currentX = pos ? pos.x : Math.max(12, window.innerWidth - 96);
+    const currentY = pos ? pos.y : Math.max(50, window.innerHeight - 110);
 
     dragInfoRef.current = {
       startX: e.clientX,
@@ -143,9 +150,9 @@ export default function FloatingAiButton() {
       // Khi ĐÃ mở khóa (sau 2.5s) => Cho phép kéo nút tự do
       dragInfoRef.current.moved = true;
       const minX = 12;
-      const maxX = window.innerWidth - 82;
+      const maxX = window.innerWidth - 96;
       const minY = 50;
-      const maxY = window.innerHeight - 82; // Không che BottomNav
+      const maxY = window.innerHeight - 90; // Không che BottomNav
 
       latestX = Math.max(minX, Math.min(dragInfoRef.current.elemX + dx, maxX));
       latestY = Math.max(minY, Math.min(dragInfoRef.current.elemY + dy, maxY));
@@ -188,10 +195,10 @@ export default function FloatingAiButton() {
         return;
       }
 
-      // Nếu bấm nhanh dưới 2.5s (không hủy do cuộn, không kéo thả) => Chuyển đến trang Trợ lý AI
+      // Nếu bấm nhanh dưới 2.5s (không hủy do cuộn, không kéo thả) => Chuyển đến trang Trợ lý AI siêu tốc
       if (!cancelledByScrollRef.current && !hasMoved && !justMovedRef.current) {
         playTapSound();
-        window.location.href = '/tro-ly-ai';
+        router.push('/tro-ly-ai');
       }
     };
 
@@ -231,24 +238,24 @@ export default function FloatingAiButton() {
         />
       )}
 
-      {/* Thẻ nút dạng viên thuốc siêu gọn, trong suốt kính mờ theo đúng yêu cầu */}
+      {/* Thẻ nút dạng viên thuốc cao cấp, kích thước vừa vặn dễ bấm, viền sắc nét nổi bật trên cả nền sáng và tối */}
       <div
-        className={`relative flex items-center gap-1 px-2.5 py-1 rounded-full backdrop-blur-md transition-all shadow-sm ${
+        className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-md transition-all shadow-md ${
           isUnlocked || isDragging
-            ? 'bg-black/60 dark:bg-[#160D30]/80 border-2 border-[#FDE047] text-[#FDE047] shadow-[0_0_18px_rgba(250,204,21,0.5)]'
-            : 'bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/45 border border-white/40 dark:border-white/15 text-[#1E3A8A] dark:text-[#F8DF7B]'
+            ? 'bg-black/85 dark:bg-[#160D30]/95 border-2 border-[#FDE047] text-[#FDE047] shadow-[0_0_22px_rgba(250,204,21,0.65)] ring-2 ring-[#FDE047]/50'
+            : 'bg-white/95 dark:bg-[#160D30]/90 hover:bg-white dark:hover:bg-[#1D1140] border-1.5 border-rose-500/75 dark:border-amber-400/75 ring-1 ring-rose-400/30 dark:ring-amber-400/30 text-slate-800 dark:text-[#F8DF7B] shadow-[0_3px_12px_rgba(225,29,72,0.18)] dark:shadow-[0_3px_12px_rgba(250,204,21,0.22)]'
         }`}
       >
         <Sparkles
-          size={12.5}
+          size={14}
           strokeWidth={2.4}
           className={`${
             isUnlocked || isDragging
               ? 'text-[#FDE047] animate-spin'
-              : 'text-amber-500 dark:text-[#F8DF7B] fill-amber-400/40 dark:fill-amber-300/40 animate-pulse'
+              : 'text-rose-500 dark:text-[#F8DF7B] fill-rose-400/40 dark:fill-amber-300/40 animate-pulse'
           }`}
         />
-        <span className="text-[11.5px] font-black tracking-tight whitespace-nowrap">
+        <span className="text-[12.5px] font-black tracking-tight whitespace-nowrap">
           {isUnlocked ? 'Thả đặt' : 'Hỏi AI'}
         </span>
       </div>

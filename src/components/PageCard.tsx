@@ -57,8 +57,9 @@ export default function PageCard({
     : `/${topic.slug}/${page.slug}`;
 
   return (
-    <a
+    <Link
       href={targetUrl}
+      prefetch={true}
       onPointerDown={(e) => {
         e.currentTarget.classList.add('is-active');
       }}
@@ -159,6 +160,6 @@ export default function PageCard({
           )}
         </div>
       </div>
-    </a>
+    </Link>
   );
 }

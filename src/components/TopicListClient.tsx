@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Plus, Edit2, ArrowUp, ArrowDown, Eye, EyeOff, Trash2, Check, X, BookOpen, LayoutGrid, Lightbulb, Search, SlidersHorizontal, Star, Flame, ChevronDown, CircleHelp, Play, Pencil } from 'lucide-react';
 import TopicTile, { TopicsDisplayMode, TOPICS_DISPLAY_OPTIONS, topicsContainerClass } from './TopicTile';
@@ -476,15 +477,16 @@ export default function TopicListClient({
 
         <div className="flex items-center gap-2 shrink-0">
           {!hideViewAll && enableSearch && (
-            <a
+            <Link
               href="/chuyen-de"
+              prefetch={true}
               onClick={() => playTapSound()}
               className="text-[13px] font-black uppercase tracking-wider text-[#1E3A8A] hover:text-[#172554] dark:text-[#F8DF7B] dark:hover:text-amber-200 flex items-center gap-0.5 cursor-pointer active:opacity-75 transition-colors"
               title="Xem tất cả chuyên đề"
             >
               <span>Xem tất cả</span>
               <span className="text-[15px]">›</span>
-            </a>
+            </Link>
           )}
           {!enableSearch && (
             <div className="relative">
@@ -888,14 +890,15 @@ export default function TopicListClient({
       )}
 
       {!enableSearch && !hideViewAll && (
-        <a
+        <Link
           href="/chuyen-de"
+          prefetch={true}
           onClick={() => playTapSound()}
           className="mt-1 inline-flex min-h-9 items-center justify-center gap-1 self-center rounded-full px-4 text-[12px] font-bold text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary"
           title="Xem tất cả chuyên đề"
         >
           Xem tất cả chuyên đề <span aria-hidden="true">›</span>
-        </a>
+        </Link>
       )}
 
       {/* Modal Sửa chủ đề */}
