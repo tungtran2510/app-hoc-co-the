@@ -208,8 +208,10 @@ const ARTIFACT_DIR = 'C:\\Users\\Admin\\.gemini\\antigravity\\brain\\23366f77-38
   const testTab = async (name, href) => {
     const tStart = Date.now();
     const tabLocator = page.locator(`nav[aria-label="Điều hướng chính"] a[href="${href}"]`).first();
-    await tabLocator.click();
-    await page.waitForFunction((h) => window.location.pathname === h, href, { timeout: 10000 });
+    await Promise.all([
+      page.waitForURL(`**${href === '/' ? '' : href}*`, { timeout: 10000 }),
+      tabLocator.click()
+    ]);
     const tabMs = Date.now() - tStart;
     console.log(`   - Tab "${name}" (${href}): ${tabMs}ms`);
     return tabMs;

@@ -41,7 +41,9 @@ export default function BottomNav() {
       return;
     }
     e.preventDefault();
-    router.push(href);
+    if (typeof window !== 'undefined') {
+      window.location.href = href;
+    }
   };
 
   return (
