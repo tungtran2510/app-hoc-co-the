@@ -18,8 +18,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Thiếu đường dẫn tệp filePath' }, { status: 400 });
     }
 
-    // Tạo signed upload URL từ bucket 'media'
-    const { data, error } = await supabase.storage.from('media').createSignedUploadUrl(filePath);
+    // Tạo signed upload URL từ bucket 'media' với quyền ghi đè (upsert: true)
+    const { data, error } = await supabase.storage.from('media').createSignedUploadUrl(filePath, { upsert: true });
 
     if (error || !data) {
       // Nếu createSignedUploadUrl lỗi hoặc chưa hỗ trợ, trả về lỗi chi tiết

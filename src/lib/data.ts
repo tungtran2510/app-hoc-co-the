@@ -142,21 +142,13 @@ export function normalizeHomeSectionsOrder(raw?: any): string[] {
     unique.unshift('brand_card');
   }
 
-  // Tự động đảm bảo topics luôn hiện diện và nằm ngay sau brand_card
+  // Tự động đảm bảo topics luôn hiện diện nếu dữ liệu cũ chưa có (không can thiệp nếu người dùng đã tự xếp vị trí)
   if (!unique.includes('topics')) {
     const brandIdx = unique.indexOf('brand_card');
     if (brandIdx !== -1) {
       unique.splice(brandIdx + 1, 0, 'topics');
     } else {
       unique.unshift('topics');
-    }
-  } else {
-    // Đưa topics lên đúng vị trí ngay sau brand_card
-    const brandIdx = unique.indexOf('brand_card');
-    const topicsIdx = unique.indexOf('topics');
-    if (brandIdx !== -1 && topicsIdx !== brandIdx + 1) {
-      unique.splice(topicsIdx, 1);
-      unique.splice(brandIdx + 1, 0, 'topics');
     }
   }
 
@@ -269,8 +261,8 @@ export async function getSettings(includeAiTraining = false): Promise<Settings> 
             recommended_books_layout: data.recommended_books_layout || sanitizedBlockStyles.recommended_books_layout || 'grid',
             flat_books_title: data.flat_books_title || sanitizedBlockStyles.flat_books_title || 'Tủ Sách Tối Giản',
             flat_books: normalizeRecommendedBooks(data.flat_books || sanitizedBlockStyles.flat_books || DEFAULT_RECOMMENDED_BOOKS),
-            home_sections_order: normalizeHomeSectionsOrder(data.home_sections_order || sanitizedBlockStyles.home_sections_order),
-            hidden_home_sections: normalizeHiddenHomeSections(data.hidden_home_sections || sanitizedBlockStyles.hidden_home_sections),
+            home_sections_order: normalizeHomeSectionsOrder(sanitizedBlockStyles.home_sections_order || data.home_sections_order),
+            hidden_home_sections: normalizeHiddenHomeSections(sanitizedBlockStyles.hidden_home_sections || data.hidden_home_sections),
             ai_training: includeAiTraining ? normalizeAiTraining(data.ai_training || data.block_styles?.ai_training) : DEFAULT_AI_TRAINING,
             welcome_title: data.welcome_title || sanitizedBlockStyles.welcome_title || 'Chào mừng bạn đến với Qbiz Books',
             welcome_message: data.welcome_message || sanitizedBlockStyles.welcome_message || 'Hi vọng nền tảng học hiểu cơ thể và chăm sóc sức khỏe chủ động này sẽ giúp bạn hiểu sâu hơn về cơ thể mình, nuôi dưỡng hệ cơ xương khớp và sống khỏe mỗi ngày.',

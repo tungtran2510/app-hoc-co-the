@@ -1,5 +1,5 @@
 import { Block, Page } from './types';
-import { saveBlockApi, savePageApi, saveSettingsApi } from './apiAdmin';
+import { saveBlockApi, savePageApi, saveSettingsApi, getAdminHeaders } from './apiAdmin';
 
 export interface AppCustomSettings {
   app_name: string;
@@ -29,13 +29,29 @@ export function getStoredBlocks(_pageId: string, fallbackBlocks: Block[]): Block
 }
 
 /**
- * Lưu danh sách khối: gọi trực tiếp API Supabase, KHÔNG lưu tạm trên localStorage
+ * Lưu danh sách khối: gọi API Supabase hàng loạt (batch save) cực nhanh, nguyên khối
  */
 export async function saveStoredBlocks(_pageId: string, blocks: Block[]): Promise<boolean> {
-  // Gọi API ghi đồng thời các khối vào Supabase qua Promise.all
   try {
-    const results = await Promise.all(blocks.map((block) => saveBlockApi(block)));
-    return results.every((res) => res.success);
+    const res = await fetch('/api/admin/save-block', {
+      method: 'POST',
+      headers: getAdminHeaders(),
+      body: JSON.stringify({ blocks }),
+    });
+
+    if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (typeof window !== 'undefined' && 'serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_PAGE_CACHE' });
+      }
+      return Boolean(data.success);
+    }
+
+    // Dự phòng lưu tuần tự nếu cần
+    for (const block of blocks) {
+      await saveBlockApi(block);
+    }
+    return true;
   } catch {
     return false;
   }

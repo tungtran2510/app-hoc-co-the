@@ -17,7 +17,94 @@ export async function POST(req: NextRequest) {
 
 
   try {
-    const { block } = await req.json();
+    const body = await req.json();
+
+    // 1. HỖ TRỢ LƯU HÀNG LOẠT (BATCH SAVE): Cực kỳ ổn định và nhanh khi đổi thứ tự hoặc sắp xếp lại khối
+    if (Array.isArray(body.blocks)) {
+      const blocks = body.blocks;
+      if (blocks.length === 0) {
+        return NextResponse.json({ success: true, count: 0 });
+      }
+
+      const firstPageId = blocks[0]?.page_id;
+      if (!firstPageId) {
+        return NextResponse.json({ error: 'Thiếu page_id trong danh sách khối' }, { status: 400 });
+      }
+
+      let resolvedPageId = String(firstPageId).trim();
+      if (!isValidUuid(resolvedPageId)) {
+        const { data: pageData } = await supabase.from('pages').select('id').or(`id.eq.${resolvedPageId},slug.eq.${resolvedPageId}`).maybeSingle();
+        if (!pageData) {
+          return NextResponse.json({ error: `Không tìm thấy trang tương ứng (${resolvedPageId})` }, { status: 400 });
+        }
+        resolvedPageId = pageData.id;
+      }
+
+      // Kiểm tra quyền hạn nếu tài khoản là Giảng viên (instructor)
+      if (user.role === 'instructor') {
+        const allowed = user.allowed_topic_ids || [];
+        if (!allowed.includes('*')) {
+          const { data: pageRow } = await supabase.from('pages').select('topic_id').eq('id', resolvedPageId).single();
+          if (!pageRow) {
+            return NextResponse.json({ error: 'Không tìm thấy trang của bài học này' }, { status: 404 });
+          }
+          const tId = pageRow.topic_id;
+          let isAllowed = allowed.includes(tId) || allowed.includes(String(tId));
+          if (!isAllowed) {
+            const { data: topicRow } = await supabase.from('topics').select('slug').eq('id', tId).maybeSingle();
+            if (topicRow && allowed.includes(topicRow.slug)) {
+              isAllowed = true;
+            }
+          }
+          if (!isAllowed) {
+            return NextResponse.json({ error: 'Bạn không có quyền chỉnh sửa chủ đề này' }, { status: 403 });
+          }
+        }
+      }
+
+      const payloads = blocks.map((b: any, idx: number) => {
+        const inputBlockId = b.id ? String(b.id).trim() : '';
+        const finalBlockId = isValidUuid(inputBlockId) ? inputBlockId : generateUuid();
+        const isFaq = b.type === 'faq';
+        const isBooks = b.type === 'books';
+        return {
+          id: finalBlockId,
+          workspace_id: b.workspace_id || 'default',
+          page_id: resolvedPageId,
+          type: isFaq || isBooks ? 'text' : b.type,
+          display_style: isFaq ? 'faq' : isBooks ? 'books' : b.display_style,
+          data: isFaq
+            ? { ...(b.data || {}), __kind: 'faq', __style: b.display_style || 'accordion' }
+            : isBooks
+            ? { ...(b.data || {}), __kind: 'books', __style: b.display_style || 'list' }
+            : b.data || {},
+          sort_order: typeof b.sort_order === 'number' ? b.sort_order : idx + 1,
+          is_visible: b.is_visible ?? true,
+          updated_at: new Date().toISOString(),
+        };
+      });
+
+      const { error: upsertErr } = await supabase
+        .from('blocks')
+        .upsert(payloads, { onConflict: 'id' });
+
+      if (upsertErr) {
+        console.error('[Save Blocks Batch Error]', upsertErr);
+        return NextResponse.json({ error: upsertErr.message || 'Chưa lưu được – chưa kết nối dữ liệu' }, { status: 500 });
+      }
+
+      try {
+        const { clearDataCache } = await import('../../../../lib/data');
+        clearDataCache();
+        revalidatePath('/', 'layout');
+      } catch {
+        // Bỏ qua
+      }
+
+      return NextResponse.json({ success: true, count: payloads.length });
+    }
+
+    const { block } = body;
     if (!block || typeof block !== 'object' || !block.page_id) {
       return NextResponse.json({ error: 'Dữ liệu khối không hợp lệ (thiếu page_id)' }, { status: 400 });
     }

@@ -3,8 +3,17 @@
 // Đạt tốc độ phản hồi tức thì (< 1ms) khi người dùng chuyển đổi các mục hoặc vào bài học
 // TUÂN THỦ CHỈ THỊ: Chỉ tải từ mạng khi người dùng ấn vào tài liệu sách / video dung lượng lớn
 
-const CACHE_NAME = 'qbiz-books-shell-v36';
-const STATIC_ASSETS_CACHE = 'qbiz-books-static-v36';
+const CACHE_NAME = 'qbiz-books-shell-v37';
+const STATIC_ASSETS_CACHE = 'qbiz-books-static-v37';
+
+// Lắng nghe lệnh xóa cache từ Admin Client khi có thay đổi nội dung/vị trí
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'CLEAR_PAGE_CACHE') {
+    caches.delete(CACHE_NAME).then(() => {
+      console.log('[SW] HTML cache cleared on admin update');
+    });
+  }
+});
 
 // Danh sách tài nguyên Shell và các trang cốt lõi cần tải sẵn vào bộ nhớ điện thoại
 const PRECACHE_SHELL_URLS = [
@@ -164,30 +173,41 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 5. Với các trang điều hướng HTML (Chuyển trang Trang chủ, Đang xem, Đã lưu, Trợ lý AI, Chuyên đề):
-  // Chiến lược: CACHE FIRST / STALE-WHILE-REVALIDATE
-  // Nếu có sẵn trong Cache Shell điện thoại: Trả về NGAY TỨC THÌ (<15ms)
-  // Đồng thời fetch ngầm để cập nhật cache mới nhất cho lần sau
+  // 5. Với các trang điều hướng HTML (Trang chủ, Chuyên đề, Bài học, Đã lưu, Trợ lý AI, Quản trị):
+  // Chiến lược: NETWORK FIRST WITH TIMEOUT FALLBACK
+  // Luôn nạp mới từ mạng để phản ánh tức thì các thay đổi của Admin (vị trí khối, tài liệu, chữ vừa sửa).
+  // Nếu mất mạng hoặc mạng chậm quá 2 giây: Fallback mượt mà về Shell Cache có sẵn trên điện thoại.
   if (request.mode === 'navigate') {
+    // Nếu vào trang quản trị hoặc đăng nhập: Luôn trực tiếp từ mạng
+    if (url.pathname.startsWith('/admin') || url.pathname.startsWith('/dang-nhap')) {
+      event.respondWith(fetch(request).catch(() => caches.match(request) || caches.match('/')));
+      return;
+    }
+
     event.respondWith(
-      caches.open(CACHE_NAME).then(async (cache) => {
-        const cached = await cache.match(request);
-        const networkFetch = fetch(request)
-          .then((networkResponse) => {
+      (async () => {
+        try {
+          const networkPromise = fetch(request).then((networkResponse) => {
             if (networkResponse && networkResponse.status === 200) {
-              cache.put(request, networkResponse.clone());
+              const clone = networkResponse.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
             }
             return networkResponse;
-          })
-          .catch(() => cached || caches.match('/'));
+          });
 
-        if (cached) {
-          event.waitUntil(networkFetch);
-          return cached;
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Network timeout')), 2200)
+          );
+
+          return await Promise.race([networkPromise, timeoutPromise]);
+        } catch {
+          const cached = await caches.match(request);
+          if (cached) return cached;
+          const fallback = await caches.match('/');
+          if (fallback) return fallback;
+          return new Response('Trang ngoại tuyến hiện chưa có sẵn', { status: 503 });
         }
-
-        return networkFetch;
-      })
+      })()
     );
     return;
   }

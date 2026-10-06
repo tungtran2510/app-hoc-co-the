@@ -13,6 +13,12 @@ export function getAdminHeaders(): Record<string, string> {
   return headers;
 }
 
+export function invalidateClientHtmlCache(): void {
+  if (typeof window !== 'undefined' && 'serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_PAGE_CACHE' });
+  }
+}
+
 export async function saveBlockApi(block: Block): Promise<{ success: boolean; error?: string; block?: Block }> {
   try {
     const res = await fetch('/api/admin/save-block', {
@@ -24,6 +30,7 @@ export async function saveBlockApi(block: Block): Promise<{ success: boolean; er
     if (!res.ok) {
       return { success: false, error: data.error || 'Chưa lưu được khối, thử lại' };
     }
+    invalidateClientHtmlCache();
     return { success: true, block: data.block };
   } catch (err: any) {
     return { success: false, error: err.message || 'Lỗi mạng, chưa lưu được khối' };
@@ -41,6 +48,7 @@ export async function deleteBlockApi(blockId: string): Promise<{ success: boolea
       const err = await res.json().catch(() => ({}));
       return { success: false, error: err.error || 'Chưa xóa được khối, thử lại' };
     }
+    invalidateClientHtmlCache();
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || 'Lỗi mạng, chưa xóa được khối' };
@@ -58,6 +66,7 @@ export async function savePageApi(page: Partial<Page> & { id?: string }): Promis
     if (!res.ok) {
       return { success: false, error: data.error || 'Chưa lưu được trang, thử lại' };
     }
+    invalidateClientHtmlCache();
     return { success: true, page: data.page };
   } catch (err: any) {
     return { success: false, error: err.message || 'Lỗi mạng, chưa lưu được trang' };
@@ -75,6 +84,7 @@ export async function deletePageApi(pageId: string): Promise<{ success: boolean;
       const err = await res.json().catch(() => ({}));
       return { success: false, error: err.error || 'Chưa xóa được trang, thử lại' };
     }
+    invalidateClientHtmlCache();
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || 'Lỗi mạng, chưa xóa được trang' };
@@ -92,6 +102,7 @@ export async function saveTopicApi(topic: Partial<Topic> & { id?: string }): Pro
     if (!res.ok) {
       return { success: false, error: data.error || 'Chưa lưu được chủ đề, thử lại' };
     }
+    invalidateClientHtmlCache();
     return { success: true, topic: data.topic };
   } catch (err: any) {
     return { success: false, error: err.message || 'Lỗi mạng, chưa lưu được chủ đề' };
@@ -109,6 +120,7 @@ export async function deleteTopicApi(topicId: string): Promise<{ success: boolea
       const err = await res.json().catch(() => ({}));
       return { success: false, error: err.error || 'Chưa xóa được chủ đề, thử lại' };
     }
+    invalidateClientHtmlCache();
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || 'Lỗi mạng, chưa xóa được chủ đề' };
@@ -128,6 +140,7 @@ export async function saveSettingsApi(
     if (!res.ok) {
       return { success: false, error: data.error || 'Chưa lưu được cài đặt, thử lại' };
     }
+    invalidateClientHtmlCache();
     return { success: true, settings: data.settings };
   } catch (err: any) {
     return { success: false, error: err.message || 'Lỗi mạng, chưa lưu được cài đặt' };
