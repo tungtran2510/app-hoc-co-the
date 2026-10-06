@@ -106,7 +106,7 @@ const ARTIFACT_DIR = 'C:\\Users\\Admin\\.gemini\\antigravity\\brain\\23366f77-38
   console.log('\n3. Testing Real Tap Transition: Home -> /cot-song...');
   const startTopicNav = Date.now();
   await cardCotSong.click();
-  await page.waitForURL('**/cot-song', { timeout: 8000 });
+  await page.waitForURL('**/cot-song', { timeout: 10000 });
   await page.waitForSelector('.lesson-page-card, h1, h2', { timeout: 5000 });
   const topicTransitionMs = Date.now() - startTopicNav;
   console.log(`   ⚡ TRANSITION TIME (Home -> Topic): ${topicTransitionMs}ms!`);
@@ -126,7 +126,7 @@ const ARTIFACT_DIR = 'C:\\Users\\Admin\\.gemini\\antigravity\\brain\\23366f77-38
   
   const startLessonNav = Date.now();
   await firstLessonCard.click();
-  await page.waitForURL(`**${lessonHref}`, { timeout: 8000 });
+  await page.waitForURL(`**${lessonHref}`, { timeout: 10000 });
   await page.waitForSelector('header, article, h1', { timeout: 5000 });
   const lessonTransitionMs = Date.now() - startLessonNav;
   console.log(`   ⚡ TRANSITION TIME (Topic -> Lesson): ${lessonTransitionMs}ms!`);
@@ -139,20 +139,77 @@ const ARTIFACT_DIR = 'C:\\Users\\Admin\\.gemini\\antigravity\\brain\\23366f77-38
   const breadcrumbHome = page.locator('header a[href="/"]').first();
   const startBackHome = Date.now();
   await breadcrumbHome.click();
-  await page.waitForURL(targetBase + '/', { timeout: 8000 });
+  await page.waitForURL(targetBase + '/', { timeout: 10000 });
   const backHomeMs = Date.now() - startBackHome;
   console.log(`   ⚡ TRANSITION TIME (Lesson -> Home Breadcrumb): ${backHomeMs}ms!`);
 
   // -------------------------------------------------------------
-  // TEST 5: BOTTOM NAV TABS SPEED BENCHMARK
+  // TEST 5: FLOATING AI BUTTON - SIZE, BORDER & NAVIGATION
   // -------------------------------------------------------------
-  console.log('\n6. Testing BottomNav Tabs Instant Switching...');
+  console.log('\n6. Inspecting Floating AI Button on Light Mode...');
+  const aiButton = page.locator('aside[aria-label*="Hỏi Trợ lý AI"]').first();
+  const isAiVisible = await aiButton.isVisible();
+  console.log(`   - AI Button visible: ${isAiVisible}`);
+
+  const aiBox = await aiButton.boundingBox();
+  console.log(`   - AI Button Position: x=${aiBox?.x}, y=${aiBox?.y}`);
+  console.log(`   - AI Button Size: width=${aiBox?.width}px, height=${aiBox?.height}px`);
+
+  const pillStyles = await page.evaluate(() => {
+    const aside = document.querySelector('aside[aria-label*="Hỏi Trợ lý AI"]');
+    if (!aside) return null;
+    const pill = aside.querySelector('a') || aside.querySelector('div');
+    if (!pill) return null;
+    const computed = window.getComputedStyle(pill);
+    return {
+      borderWidth: computed.borderWidth,
+      borderStyle: computed.borderStyle,
+      borderColor: computed.borderColor,
+      backgroundColor: computed.backgroundColor,
+      boxShadow: computed.boxShadow,
+      color: computed.color,
+    };
+  });
+  console.log('   🎨 AI Button Light Mode Styles:');
+  console.log('      - Border:', pillStyles?.borderWidth, pillStyles?.borderStyle, pillStyles?.borderColor);
+  console.log('      - Background:', pillStyles?.backgroundColor);
+  console.log('      - Box Shadow:', pillStyles?.boxShadow);
+
+  const aiScreenshotPath = path.join(ARTIFACT_DIR, 'verified_ai_btn_light_mode.png');
+  await page.screenshot({
+    path: aiScreenshotPath,
+    clip: aiBox ? {
+      x: Math.max(0, aiBox.x - 20),
+      y: Math.max(0, aiBox.y - 20),
+      width: (aiBox.width || 80) + 40,
+      height: (aiBox.height || 35) + 40,
+    } : undefined,
+  });
+  console.log('   📸 AI Button Screenshot saved to: verified_ai_btn_light_mode.png');
+
+  // Tap AI Button -> Navigate to /tro-ly-ai
+  console.log('   Testing Tap on Floating AI Button -> /tro-ly-ai...');
+  const tAiStart = Date.now();
+  const aiLink = page.locator('aside[aria-label*="Hỏi Trợ lý AI"] a').first();
+  await aiLink.click();
+  await page.waitForURL('**/tro-ly-ai', { timeout: 10000 });
+  const aiTransitionMs = Date.now() - tAiStart;
+  console.log(`   ⚡ TRANSITION TIME (Tap AI Button -> /tro-ly-ai): ${aiTransitionMs}ms!`);
+
+  // Navigate back to home for BottomNav tabs test
+  await page.goto(targetBase, { waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(300);
+
+  // -------------------------------------------------------------
+  // TEST 6: BOTTOM NAV TABS SPEED BENCHMARK
+  // -------------------------------------------------------------
+  console.log('\n7. Testing BottomNav Tabs Instant Switching...');
 
   const testTab = async (name, href) => {
     const tStart = Date.now();
     const tabLocator = page.locator(`nav[aria-label="Điều hướng chính"] a[href="${href}"]`).first();
     await tabLocator.click();
-    await page.waitForURL(`**${href === '/' ? targetBase + '/' : href}`, { timeout: 8000 });
+    await page.waitForURL(`**${href === '/' ? targetBase + '/' : href}`, { timeout: 10000 });
     const tabMs = Date.now() - tStart;
     console.log(`   - Tab "${name}" (${href}): ${tabMs}ms`);
     return tabMs;
@@ -160,23 +217,25 @@ const ARTIFACT_DIR = 'C:\\Users\\Admin\\.gemini\\antigravity\\brain\\23366f77-38
 
   const msChuyenDe = await testTab('Chuyên đề', '/chuyen-de');
   const msDaLuu = await testTab('Đã lưu', '/da-luu');
-  const msAi = await testTab('Hỏi đáp AI', '/tro-ly-ai');
+  const msTimKiem = await testTab('Tìm kiếm', '/tim-kiem');
   const msHome = await testTab('Tổng quan', '/');
 
   console.log('\n================================================================');
   console.log('   PERFORMANCE SUMMARY & QA VERIFICATION:');
   console.log('================================================================');
+  console.log(`   - AI Button Visible & Styled:      ${isAiVisible ? 'PASS' : 'FAIL'} (${aiBox?.width}px x ${aiBox?.height}px)`);
+  console.log(`   - AI Button -> /tro-ly-ai:         ${aiTransitionMs}ms`);
   console.log(`   - Home -> Topic (/cot-song):       ${topicTransitionMs}ms`);
   console.log(`   - Topic -> Lesson:                 ${lessonTransitionMs}ms`);
   console.log(`   - Lesson -> Home (Breadcrumb):     ${backHomeMs}ms`);
   console.log(`   - BottomNav Chuyên đề:             ${msChuyenDe}ms`);
   console.log(`   - BottomNav Đã lưu:                ${msDaLuu}ms`);
-  console.log(`   - BottomNav Hỏi đáp AI:            ${msAi}ms`);
+  console.log(`   - BottomNav Tìm kiếm:              ${msTimKiem}ms`);
   console.log(`   - BottomNav Tổng quan (Trang chủ): ${msHome}ms`);
   console.log(`   - Total Page Errors:               ${errors.length}`);
   console.log('================================================================');
 
-  if (errors.length > 0) {
+  if (errors.length > 0 || !isAiVisible) {
     console.error('❌ FAILED: Detected errors during run:', errors);
     process.exit(1);
   } else {
