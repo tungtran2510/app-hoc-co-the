@@ -59,7 +59,6 @@ export default function PageCard({
     <Link
       href={targetUrl}
       prefetch={true}
-      onTouchStart={onActivate}
       className={`lesson-page-card flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 bg-white dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] rounded-[14px] border transition-all active:scale-[0.99] shadow-xs group ${
         isActive
           ? 'border-slate-200/80 dark:border-purple-500/25'

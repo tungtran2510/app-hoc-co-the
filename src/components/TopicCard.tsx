@@ -55,9 +55,9 @@ export default function TopicCard({
     .replace(' - ', '\n');
 
   return (
-    <a
+    <Link
       href={`/${topic.slug}`}
-      onTouchStart={onActivate}
+      prefetch={true}
       className={`topic-card-container group relative flex flex-col cursor-pointer select-none transition-all duration-300 ${
         isActive ? 'is-active' : ''
       }`}
@@ -125,6 +125,6 @@ export default function TopicCard({
           </span>
         </div>
       </div>
-    </a>
+    </Link>
   );
 }
