@@ -21,7 +21,10 @@ function GalleryImageItem({
   idx: number;
   onClick: () => void;
 }) {
-  const { dimensions } = useImageAspectRatio(img.thumb_url || img.url);
+  const resolvedUrl = (img.thumb_url || img.url)?.includes('images.unsplash.com')
+    ? '/spine_hero_clean.png'
+    : (img.thumb_url || img.url);
+  const { dimensions } = useImageAspectRatio(resolvedUrl);
   const aspectClass = dimensions?.aspectClass || 'aspect-square';
 
   return (
@@ -38,7 +41,7 @@ function GalleryImageItem({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={img.thumb_url || img.url}
+          src={resolvedUrl}
           alt={img.alt || img.caption || `Hình ${idx + 1}`}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
           loading="lazy"
@@ -68,7 +71,8 @@ function SingleImageItem({
   img: ImageType;
   onClick: () => void;
 }) {
-  const { dimensions } = useImageAspectRatio(img.url);
+  const resolvedUrl = img.url?.includes('images.unsplash.com') ? '/spine_hero_clean.png' : img.url;
+  const { dimensions } = useImageAspectRatio(resolvedUrl);
   const aspectClass = dimensions ? (dimensions.orientation === 'portrait' ? 'max-h-[500px]' : 'max-h-[420px]') : 'max-h-[400px]';
 
   return (
@@ -84,7 +88,7 @@ function SingleImageItem({
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={img.url}
+        src={resolvedUrl}
         alt={img.alt || img.caption || 'Hình ảnh'}
         className={`w-full h-auto object-contain ${aspectClass} group-hover:opacity-95 transition-opacity`}
         loading="lazy"
@@ -117,13 +121,19 @@ export default function ImagesBlock({
     return null;
   }
 
+  const sanitizedImages = images.map((im) => ({
+    ...im,
+    url: im.url?.includes('images.unsplash.com') ? '/spine_hero_clean.png' : im.url,
+    thumb_url: im.thumb_url?.includes('images.unsplash.com') ? '/spine_hero_clean.png' : im.thumb_url,
+  }));
+
   const handleOpenLightbox = (index: number) => {
     setSelectedIndex(index);
     setLightboxOpen(true);
   };
 
   if (displayStyle === 'single') {
-    const img = images[0];
+    const img = sanitizedImages[0];
     return (
       <div id={blockId} className="w-full flex flex-col gap-2 scroll-mt-20">
         <SingleImageItem img={img} onClick={() => handleOpenLightbox(0)} />
@@ -135,7 +145,7 @@ export default function ImagesBlock({
 
         <Lightbox
           isOpen={lightboxOpen}
-          images={images}
+          images={sanitizedImages}
           initialIndex={selectedIndex}
           onClose={() => setLightboxOpen(false)}
         />
