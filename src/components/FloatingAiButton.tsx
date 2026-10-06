@@ -197,8 +197,7 @@ export default function FloatingAiButton() {
 
       // Nếu bấm nhanh dưới 2.5s (không hủy do cuộn, không kéo thả) => Chuyển đến trang Trợ lý AI siêu tốc
       if (!cancelledByScrollRef.current && !hasMoved && !justMovedRef.current) {
-        playTapSound();
-        router.push('/tro-ly-ai');
+        navigateToAi();
       }
     };
 
@@ -207,10 +206,29 @@ export default function FloatingAiButton() {
     window.addEventListener('pointercancel', handlePointerUp);
   };
 
+  const navigateToAi = () => {
+    if (justMovedRef.current) return;
+    justMovedRef.current = true;
+    setTimeout(() => {
+      justMovedRef.current = false;
+    }, 500);
+    playTapSound();
+    router.push('/tro-ly-ai');
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (cancelledByScrollRef.current || isUnlockedRef.current || isDraggingRef.current || dragInfoRef.current.moved) {
+      e.preventDefault();
+      return;
+    }
+    navigateToAi();
+  };
+
   if (isHiddenPage) return null;
 
   return (
     <aside
+      onClick={handleClick}
       onPointerDown={handlePointerDown}
       style={{
         transform: 'translateZ(0)',
@@ -240,10 +258,10 @@ export default function FloatingAiButton() {
 
       {/* Thẻ nút dạng viên thuốc cao cấp, kích thước vừa vặn dễ bấm, viền sắc nét nổi bật trên cả nền sáng và tối */}
       <div
-        className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-md transition-all shadow-md ${
+        className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full backdrop-blur-md transition-all shadow-md ${
           isUnlocked || isDragging
             ? 'bg-black/85 dark:bg-[#160D30]/95 border-2 border-[#FDE047] text-[#FDE047] shadow-[0_0_22px_rgba(250,204,21,0.65)] ring-2 ring-[#FDE047]/50'
-            : 'bg-white/95 dark:bg-[#160D30]/90 hover:bg-white dark:hover:bg-[#1D1140] border-1.5 border-rose-500/75 dark:border-amber-400/75 ring-1 ring-rose-400/30 dark:ring-amber-400/30 text-slate-800 dark:text-[#F8DF7B] shadow-[0_3px_12px_rgba(225,29,72,0.18)] dark:shadow-[0_3px_12px_rgba(250,204,21,0.22)]'
+            : 'bg-white dark:bg-[#160D30] hover:bg-white/95 dark:hover:bg-[#1D1140] border-2 border-rose-500/90 dark:border-amber-400 text-slate-900 dark:text-[#F8DF7B] shadow-[0_3px_12px_rgba(225,29,72,0.25)] dark:shadow-[0_3px_12px_rgba(250,204,21,0.3)]'
         }`}
       >
         <Sparkles
