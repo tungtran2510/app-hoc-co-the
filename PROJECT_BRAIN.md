@@ -96,6 +96,12 @@ Hệ thống hỗ trợ đầy đủ **10 khối nội dung chuẩn**:
   - Nút gợi ý bài học đổi thành **"Phát ngay"** kèm icon Play nổi bật.
   - URL điều hướng gắn trực tiếp tham số: `/[topicSlug]/[pageSlug]?v=[index]&autoplay=1`.
   - Khung xem video (`VideosBlock.tsx`) tự động kích hoạt `isPlaying = true`, vượt qua màn hình thumbnail, tự động cuộn đến video và phát ngay lập tức mà người học không phải bấm thêm lần nào.
+- **Cơ chế bám đuổi bài học thông minh (Lesson-Anchored Context Tracking):**
+  - **Theo dõi ngữ cảnh liên tục:** Khi học viên đang xem bất kỳ bài học nào, `ContentViewer.tsx` tự động lưu ngữ cảnh vào `sessionStorage` (`qbiz_current_lesson`) và phát sự kiện `qbiz_current_lesson_changed` gồm `topic_slug`, `topic_title`, `page_slug`, `page_title`, `page_summary`.
+  - **Nút AI nổi bám đuổi (FloatingAiButton):** Tự động đổi nhãn từ "Hỏi AI" thành **"Hỏi bài này"** kèm chấm xanh nhấp nháy; khi nhấn sẽ tự động chuyển tiếp toàn bộ tham số ngữ cảnh (`?topic=...&page=...&topicTitle=...&pageTitle=...`) sang Trợ lý AI; tọa độ nổi tính toán an toàn (`z-50`), không bị che khuất bởi thanh phân trang hay thanh đáy BottomNav.
+  - **Thanh bám sát bài học cố định (Context Bar):** Trên trang `/tro-ly-ai`, thanh bám sát ghim ngay dưới Header hiển thị huy hiệu chuyên đề và tiêu đề bài học đang nghiên cứu (`🎯 ĐANG BÁM SÁT BÀI HỌC`), kèm nút quay lại bài học (`‹ Về bài học`) và nút thoát chế độ bám đuổi (`✕`).
+  - **Thẻ chào đón & Gợi ý trọng tâm:** AI chủ động mở lời: *"👋 Chào bạn! Bạn đang học bài [Tên bài học] thuộc chuyên đề [Tên chuyên đề]. 👉 Bạn có câu hỏi gì về phần [tên bài học] này không?"*; bộ 4 câu hỏi gợi ý tự động sinh bám sát chính xác bài học và chuyên đề; đồng thời vẫn mở rộng giải đáp mọi câu hỏi sức khỏe rộng mà người học đưa ra.
+  - **Tự động gửi câu hỏi từ khối Video:** Thẻ "Hỏi Trợ lý sức khỏe về bài này" dưới danh sách video tự động đính kèm tham số `q=...` và context, kích hoạt gửi ngay lập tức khi mở trang AI.
 - **Quy tắc kiểm duyệt thương hiệu tuyệt đối (Strict Zero-Brand Rule):**
   - Toàn bộ tên thương hiệu (DoctorLoan, Hydro Gems, Gems, các thiết bị thương mại) bị loại bỏ 100% khỏi câu trả lời, câu hỏi gợi ý và cơ sở tri thức huấn luyện AI.
 
