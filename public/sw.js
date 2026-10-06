@@ -3,8 +3,8 @@
 // Đạt tốc độ phản hồi tức thì (< 1ms) khi người dùng chuyển đổi các mục hoặc vào bài học
 // TUÂN THỦ CHỈ THỊ: Chỉ tải từ mạng khi người dùng ấn vào tài liệu sách / video dung lượng lớn
 
-const CACHE_NAME = 'qbiz-books-shell-v35';
-const STATIC_ASSETS_CACHE = 'qbiz-books-static-v35';
+const CACHE_NAME = 'qbiz-books-shell-v36';
+const STATIC_ASSETS_CACHE = 'qbiz-books-static-v36';
 
 // Danh sách tài nguyên Shell và các trang cốt lõi cần tải sẵn vào bộ nhớ điện thoại
 const PRECACHE_SHELL_URLS = [
@@ -165,22 +165,29 @@ self.addEventListener('fetch', (event) => {
   }
 
   // 5. Với các trang điều hướng HTML (Chuyển trang Trang chủ, Đang xem, Đã lưu, Trợ lý AI, Chuyên đề):
-  // Chiến lược: NETWORK FIRST (Luôn lấy bản mới nhất khi online, offline mới lấy từ cache ngầm)
+  // Chiến lược: CACHE FIRST / STALE-WHILE-REVALIDATE
+  // Nếu có sẵn trong Cache Shell điện thoại: Trả về NGAY TỨC THÌ (<15ms)
+  // Đồng thời fetch ngầm để cập nhật cache mới nhất cho lần sau
   if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(request)
-        .then((networkResponse) => {
-          if (networkResponse.status === 200) {
-            const clone = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-          }
-          return networkResponse;
-        })
-        .catch(async () => {
-          const cache = await caches.open(CACHE_NAME);
-          const cached = await cache.match(request);
-          return cached || caches.match('/');
-        })
+      caches.open(CACHE_NAME).then(async (cache) => {
+        const cached = await cache.match(request);
+        const networkFetch = fetch(request)
+          .then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
+              cache.put(request, networkResponse.clone());
+            }
+            return networkResponse;
+          })
+          .catch(() => cached || caches.match('/'));
+
+        if (cached) {
+          event.waitUntil(networkFetch);
+          return cached;
+        }
+
+        return networkFetch;
+      })
     );
     return;
   }

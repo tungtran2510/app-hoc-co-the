@@ -50,7 +50,7 @@ export default function FloatingAiButton() {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (typeof parsed.x === 'number' && typeof parsed.y === 'number') {
-          const clampedX = Math.max(12, Math.min(parsed.x, window.innerWidth - 96));
+          const clampedX = Math.max(12, Math.min(parsed.x, window.innerWidth - 108));
           const clampedY = Math.max(50, Math.min(parsed.y, window.innerHeight - 90));
           setPos({ x: clampedX, y: clampedY });
           return;
@@ -59,7 +59,7 @@ export default function FloatingAiButton() {
     } catch {}
 
     // Vị trí mặc định: Góc dưới bên phải (nổi ngay sát trên Tab Tìm kiếm của BottomNav)
-    const defaultX = Math.max(12, window.innerWidth - 96);
+    const defaultX = Math.max(12, window.innerWidth - 108);
     const defaultY = Math.max(50, window.innerHeight - 110);
     setPos({ x: defaultX, y: defaultY });
   }, []);
@@ -69,7 +69,7 @@ export default function FloatingAiButton() {
     const handleResize = () => {
       setPos((prev) => {
         if (!prev) return prev;
-        const clampedX = Math.max(12, Math.min(prev.x, window.innerWidth - 96));
+        const clampedX = Math.max(12, Math.min(prev.x, window.innerWidth - 108));
         const clampedY = Math.max(50, Math.min(prev.y, window.innerHeight - 90));
         return { x: clampedX, y: clampedY };
       });
@@ -245,14 +245,14 @@ export default function FloatingAiButton() {
       <a
         href="/tro-ly-ai"
         onClick={handleLinkClick}
-        className={`relative flex items-center gap-1.5 px-4 py-2 rounded-full backdrop-blur-md transition-all shadow-md ${
+        className={`relative flex items-center gap-2 px-[18px] py-[9px] rounded-full backdrop-blur-md transition-all shadow-md ${
           isUnlocked || isDragging
             ? 'bg-black/85 dark:bg-[#160D30]/95 border-2 border-[#FDE047] text-[#FDE047] shadow-[0_0_22px_rgba(250,204,21,0.65)] ring-2 ring-[#FDE047]/50'
-            : 'bg-white dark:bg-[#160D30] hover:bg-white/95 dark:hover:bg-[#1D1140] border-2 border-rose-600 dark:border-amber-400 text-slate-900 dark:text-[#F8DF7B] shadow-[0_3px_12px_rgba(225,29,72,0.25)] dark:shadow-[0_3px_12px_rgba(250,204,21,0.3)]'
+            : 'bg-white dark:bg-[#160D30] hover:bg-white/95 dark:hover:bg-[#1D1140] border-2 border-rose-600 dark:border-amber-400 text-slate-900 dark:text-[#F8DF7B] shadow-[0_4px_16px_rgba(225,29,72,0.3)] dark:shadow-[0_4px_16px_rgba(250,204,21,0.35)]'
         }`}
       >
         <Sparkles
-          size={15}
+          size={16}
           strokeWidth={2.4}
           className={`${
             isUnlocked || isDragging
@@ -260,7 +260,7 @@ export default function FloatingAiButton() {
               : 'text-rose-500 dark:text-[#F8DF7B] fill-rose-400/40 dark:fill-amber-300/40 animate-pulse'
           }`}
         />
-        <span className="text-[13px] font-black tracking-tight whitespace-nowrap">
+        <span className="text-[13.5px] font-black tracking-tight whitespace-nowrap">
           {isUnlocked ? 'Thả đặt' : 'Hỏi AI'}
         </span>
       </a>
