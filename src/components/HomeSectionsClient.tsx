@@ -139,8 +139,26 @@ export default function HomeSectionsClient({
     }
     return [];
   });
+  const [expandedHiddenSections, setExpandedHiddenSections] = useState<string[]>([]);
+
+  // Kiểm tra một khối có đang ở trạng thái thu gọn hay không
+  // QUY TẮC: Khối bị ẩn (isHidden) thì TỰ ĐỘNG THU GỌN LẠI (trừ khi admin chủ động bấm "Mở rộng" để xem)
+  const isSectionCollapsed = (key: string) => {
+    const isHidden = hiddenSections.includes(key);
+    if (isHidden) {
+      return !expandedHiddenSections.includes(key);
+    }
+    return collapsedSections.includes(key);
+  };
 
   const handleToggleCollapseSection = (key: string) => {
+    const isHidden = hiddenSections.includes(key);
+    if (isHidden) {
+      setExpandedHiddenSections((prev) =>
+        prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+      );
+      return;
+    }
     setCollapsedSections((prev) => {
       const next = prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key];
       if (typeof window !== 'undefined') {
@@ -154,13 +172,25 @@ export default function HomeSectionsClient({
 
   const handleToggleCollapseAll = () => {
     const allKeys = [...sectionsOrder];
-    const isAllCollapsed = allKeys.length > 0 && allKeys.every((k) => collapsedSections.includes(k));
-    const next = isAllCollapsed ? [] : allKeys;
-    setCollapsedSections(next);
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem('admin_collapsed_sections', JSON.stringify(next));
-      } catch {}
+    const isAllCollapsed = allKeys.length > 0 && allKeys.every((k) => isSectionCollapsed(k));
+    if (isAllCollapsed) {
+      // Đang thu gọn hết -> Mở rộng tất cả
+      setCollapsedSections([]);
+      setExpandedHiddenSections(allKeys.filter((k) => hiddenSections.includes(k)));
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('admin_collapsed_sections', JSON.stringify([]));
+        } catch {}
+      }
+    } else {
+      // Thu gọn tất cả
+      setCollapsedSections(allKeys);
+      setExpandedHiddenSections([]);
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('admin_collapsed_sections', JSON.stringify(allKeys));
+        } catch {}
+      }
     }
   };
 
@@ -213,6 +243,11 @@ export default function HomeSectionsClient({
       : [...hiddenSections, sectionKey];
 
     setHiddenSections(nextHidden);
+
+    // Khi mà ẩn thì tự động thu gọn lại (xóa khỏi danh sách mở rộng riêng)
+    if (!isCurrentlyHidden) {
+      setExpandedHiddenSections((prev) => prev.filter((k) => k !== sectionKey));
+    }
 
     const res = await saveSettingsApi({
       hidden_home_sections: nextHidden,
@@ -341,7 +376,7 @@ export default function HomeSectionsClient({
               className="flex items-center gap-1 h-6.5 px-2 rounded-[6px] bg-white/10 hover:bg-white/20 text-slate-200 dark:text-purple-200 text-[10.5px] font-extrabold uppercase tracking-wide cursor-pointer transition-transform active:scale-95"
               title="Thu gọn hoặc mở rộng toàn bộ các khối trên trang chủ"
             >
-              {sectionsOrder.length > 0 && sectionsOrder.every((k) => collapsedSections.includes(k)) ? (
+              {sectionsOrder.length > 0 && sectionsOrder.every((k) => isSectionCollapsed(k)) ? (
                 <>
                   <ChevronDown size={12} strokeWidth={2.6} />
                   <span>Mở rộng tất cả</span>
@@ -400,7 +435,7 @@ export default function HomeSectionsClient({
                 data={customBlocks[sectionKey] || {}}
                 isAdmin={isAdmin}
                 isHidden={isHidden}
-                isCollapsed={collapsedSections.includes(sectionKey)}
+                isCollapsed={isSectionCollapsed(sectionKey)}
                 onToggleCollapse={() => handleToggleCollapseSection(sectionKey)}
                 sectionIndex={index}
                 totalSections={sectionsOrder.length}
@@ -416,7 +451,7 @@ export default function HomeSectionsClient({
 
         // KHỐI 1: THƯƠNG HIỆU (BRAND CARD)
         if (sectionKey === 'brand_card') {
-          const isBrandCollapsed = collapsedSections.includes('brand_card');
+          const isBrandCollapsed = isSectionCollapsed('brand_card');
           return (
             <section key="brand_card" className="flex flex-col gap-1.5 mt-0.5">
               {hiddenBanner}
@@ -509,7 +544,7 @@ export default function HomeSectionsClient({
                 sectionIndex={index}
                 totalSections={sectionsOrder.length}
                 isHidden={isHidden}
-                isCollapsed={collapsedSections.includes('topics')}
+                isCollapsed={isSectionCollapsed('topics')}
                 onToggleCollapse={() => handleToggleCollapseSection('topics')}
                 onToggleVisibility={() => handleToggleSectionVisibility('topics')}
                 onMoveUp={() => handleMoveSection(index, 'up')}
@@ -522,7 +557,7 @@ export default function HomeSectionsClient({
 
         // KHỐI 3: HOẠT ĐỘNG GẦN ĐÂY (RECENT ACTIVITY)
         if (sectionKey === 'recent_activity') {
-          const isRecentCollapsed = collapsedSections.includes('recent_activity');
+          const isRecentCollapsed = isSectionCollapsed('recent_activity');
           return (
             <section key="recent_activity" className="flex flex-col gap-1.5 mt-2">
               {hiddenBanner}
@@ -568,7 +603,7 @@ export default function HomeSectionsClient({
                 profile={authorProfile}
                 isAdmin={isAdmin}
                 isHidden={isHidden}
-                isCollapsed={collapsedSections.includes('author_profile')}
+                isCollapsed={isSectionCollapsed('author_profile')}
                 onToggleCollapse={() => handleToggleCollapseSection('author_profile')}
                 onToggleVisibility={() => handleToggleSectionVisibility('author_profile')}
                 sectionIndex={index}
@@ -593,7 +628,7 @@ export default function HomeSectionsClient({
                 supplementalBooks={flatBooks}
                 isAdmin={isAdmin}
                 isHidden={isHidden}
-                isCollapsed={collapsedSections.includes('author_books')}
+                isCollapsed={isSectionCollapsed('author_books')}
                 onToggleCollapse={() => handleToggleCollapseSection('author_books')}
                 onToggleVisibility={() => handleToggleSectionVisibility('author_books')}
                 sectionIndex={index}
@@ -624,7 +659,7 @@ export default function HomeSectionsClient({
                 profile={authorProfile}
                 isAdmin={isAdmin}
                 isHidden={isHidden}
-                isCollapsed={collapsedSections.includes('author_philosophy')}
+                isCollapsed={isSectionCollapsed('author_philosophy')}
                 onToggleCollapse={() => handleToggleCollapseSection('author_philosophy')}
                 onToggleVisibility={() => handleToggleSectionVisibility('author_philosophy')}
                 sectionIndex={index}
@@ -651,7 +686,7 @@ export default function HomeSectionsClient({
                 sectionIndex={index}
                 totalSections={sectionsOrder.length}
                 isHidden={isHidden}
-                isCollapsed={collapsedSections.includes('recommended_books')}
+                isCollapsed={isSectionCollapsed('recommended_books')}
                 onToggleCollapse={() => handleToggleCollapseSection('recommended_books')}
                 onToggleVisibility={() => handleToggleSectionVisibility('recommended_books')}
                 onMoveUp={() => handleMoveSection(index, 'up')}
@@ -678,7 +713,7 @@ export default function HomeSectionsClient({
                 sectionIndex={index}
                 totalSections={sectionsOrder.length}
                 isHidden={isHidden}
-                isCollapsed={collapsedSections.includes('flat_books')}
+                isCollapsed={isSectionCollapsed('flat_books')}
                 onToggleCollapse={() => handleToggleCollapseSection('flat_books')}
                 onToggleVisibility={() => handleToggleSectionVisibility('flat_books')}
                 onMoveUp={() => handleMoveSection(index, 'up')}
@@ -700,7 +735,7 @@ export default function HomeSectionsClient({
                 profile={authorProfile}
                 isAdmin={isAdmin}
                 isHidden={isHidden}
-                isCollapsed={collapsedSections.includes('author_contact')}
+                isCollapsed={isSectionCollapsed('author_contact')}
                 onToggleCollapse={() => handleToggleCollapseSection('author_contact')}
                 onToggleVisibility={() => handleToggleSectionVisibility('author_contact')}
                 sectionIndex={index}

@@ -139,7 +139,7 @@ export default function SectionOrderControls({
       className={`w-full flex items-center justify-between py-1 px-2 sm:px-2.5 rounded-[12px] bg-slate-900/85 dark:bg-[#1A103C]/95 border border-slate-300/30 dark:border-purple-700/60 shadow-xs backdrop-blur-xs mb-1.5 gap-1.5 sm:gap-2 ${className}`}
       title={`Thanh quản trị: ${sectionTitle || 'Khối nội dung'}`}
     >
-      {/* Bên trái: Tên khối & Trạng thái (được ưu tiên co giãn rộng nhất có thể) */}
+      {/* Bên trái: Tên khối & Nút Thu gọn / Mở rộng (thay thế nút Ẩn trùng lặp) */}
       <div className="flex items-center gap-1.5 min-w-0 flex-1">
         <span
           className="text-[11px] font-black text-slate-200 dark:text-purple-200 uppercase tracking-wider truncate"
@@ -147,19 +147,38 @@ export default function SectionOrderControls({
         >
           {sectionTitle || 'KHỐI NỘI DUNG'}
         </span>
-        {isHidden && (
-          <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-amber-500/25 text-amber-300 border border-amber-400/40 shrink-0">
-            Ẩn
-          </span>
-        )}
-        {isCollapsed && (
-          <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-purple-500/30 text-purple-200 border border-purple-400/40 shrink-0">
-            Thu gọn
-          </span>
+
+        {/* Nút Thu gọn / Mở rộng khung: Ấn vào thì gọn toàn bộ khung lại, ấn lại thì mở rộng ra */}
+        {onToggleCollapse && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleCollapse();
+            }}
+            className={`inline-flex items-center gap-1 h-6 px-1.5 rounded-[6px] text-[10.5px] font-black uppercase tracking-wide cursor-pointer transition-transform active:scale-95 shrink-0 ${
+              isCollapsed
+                ? 'bg-purple-600/80 text-amber-300 border border-purple-400/60 shadow-xs'
+                : 'bg-white/10 text-slate-200 dark:text-purple-200 hover:bg-white/20 border border-white/15'
+            }`}
+            title={isCollapsed ? 'Khối đang thu gọn – Bấm để mở rộng toàn bộ khung' : 'Bấm để thu gọn toàn bộ khung này'}
+          >
+            {isCollapsed ? (
+              <>
+                <ChevronDown size={11} strokeWidth={2.8} />
+                <span className={isCompact ? 'hidden' : 'inline'}>Mở rộng</span>
+              </>
+            ) : (
+              <>
+                <ChevronUp size={11} strokeWidth={2.8} />
+                <span className={isCompact ? 'hidden' : 'inline'}>Thu gọn</span>
+              </>
+            )}
+          </button>
         )}
       </div>
 
-      {/* Bên phải: Nút Sửa trực tiếp + Thu gọn/Mở rộng + Lên, Xuống, Ẩn, Đổi thứ tự + Siêu gọn */}
+      {/* Bên phải: Nút Sửa trực tiếp + Ẩn/Hiện + Lên, Xuống, Đổi thứ tự + Siêu gọn */}
       <div className="flex items-center gap-1 shrink-0">
         {onEdit && (
           <button
@@ -180,25 +199,6 @@ export default function SectionOrderControls({
                 <span className="sm:hidden">Sửa</span>
               </>
             )}
-          </button>
-        )}
-
-        {/* Nút Thu gọn / Mở rộng khối */}
-        {onToggleCollapse && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleCollapse();
-            }}
-            className={`w-7 h-7 rounded-[7px] flex items-center justify-center transition-all cursor-pointer active:scale-95 ${
-              isCollapsed
-                ? 'bg-purple-600/70 text-amber-300 font-black border border-purple-400/50 shadow-xs'
-                : 'text-slate-300 dark:text-purple-300 hover:text-white hover:bg-white/15'
-            }`}
-            title={isCollapsed ? 'Khối đang thu gọn – Bấm để mở rộng' : 'Khối đang mở – Bấm để thu gọn'}
-          >
-            {isCollapsed ? <ChevronDown size={14} strokeWidth={2.6} /> : <ChevronUp size={14} strokeWidth={2.6} />}
           </button>
         )}
 
