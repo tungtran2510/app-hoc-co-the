@@ -56,9 +56,7 @@ export default function TopicCard({
     .replace(' - ', '\n');
 
   return (
-    <Link
-      href={`/${topic.slug}`}
-      prefetch={true}
+    <a href={`/${topic.slug}`}
       onTouchStart={(e) => {
         e.currentTarget.classList.add('is-active');
       }}
@@ -142,6 +140,6 @@ export default function TopicCard({
           </span>
         </div>
       </div>
-    </Link>
+    </a>
   );
 }

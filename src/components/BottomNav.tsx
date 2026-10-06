@@ -50,52 +50,44 @@ export default function BottomNav() {
     >
       <div className="w-full max-w-[480px] md:max-w-[820px] lg:max-w-[820px] h-[80px] pb-2 grid grid-cols-4 select-none bg-white dark:bg-[#100922] transition-all">
         {/* 1. Tổng quan */}
-        <Link
-          href="/"
-          prefetch={true}
+        <a href="/"
           onClick={(e) => handleTabClick(e, '/')}
           className={`${baseItem} ${isHome ? activeText : idleText}`}
           aria-label="Tổng quan"
         >
           <Home size={22} strokeWidth={isHome ? 2.5 : 2} />
           <span className="text-[11px] sm:text-[12px] leading-tight">Tổng quan</span>
-        </Link>
+        </a>
 
         {/* 2. Chuyên đề */}
-        <Link
-          href="/chuyen-de"
-          prefetch={true}
+        <a href="/chuyen-de"
           onClick={(e) => handleTabClick(e, '/chuyen-de')}
           className={`${baseItem} ${isTopics ? activeText : idleText}`}
           aria-label="Chuyên đề"
         >
           <LayoutGrid size={22} strokeWidth={isTopics ? 2.5 : 2} />
           <span className="text-[11px] sm:text-[12px] leading-tight">Chuyên đề</span>
-        </Link>
+        </a>
 
         {/* 3. Đã lưu */}
-        <Link
-          href="/da-luu"
-          prefetch={true}
+        <a href="/da-luu"
           onClick={(e) => handleTabClick(e, '/da-luu')}
           className={`${baseItem} ${isSaved ? activeText : idleText}`}
           aria-label="Bài học đã lưu"
         >
           <Bookmark size={22} strokeWidth={isSaved ? 2.5 : 2} className={isSaved ? 'fill-[#1E3A8A] dark:fill-[#F8DF7B]' : ''} />
           <span className="text-[11px] sm:text-[12px] leading-tight">Đã lưu</span>
-        </Link>
+        </a>
 
         {/* 4. Tìm kiếm */}
-        <Link
-          href="/tim-kiem"
-          prefetch={true}
+        <a href="/tim-kiem"
           onClick={(e) => handleTabClick(e, '/tim-kiem')}
           className={`${baseItem} ${isSearch ? activeText : idleText}`}
           aria-label="Tìm kiếm"
         >
           <Search size={22} strokeWidth={isSearch ? 2.5 : 2} />
           <span className="text-[11px] sm:text-[12px] leading-tight">Tìm kiếm</span>
-        </Link>
+        </a>
       </div>
     </nav>
   );

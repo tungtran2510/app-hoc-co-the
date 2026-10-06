@@ -242,18 +242,17 @@ export default function FloatingAiButton() {
       )}
 
       {/* Thẻ nút Link tới /tro-ly-ai siêu tốc, kích thước vừa vặn dễ bấm, viền sắc nét nổi bật trên cả nền sáng và tối */}
-      <Link
+      <a
         href="/tro-ly-ai"
-        prefetch={true}
         onClick={handleLinkClick}
-        className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full backdrop-blur-md transition-all shadow-md ${
+        className={`relative flex items-center gap-1.5 px-4 py-2 rounded-full backdrop-blur-md transition-all shadow-md ${
           isUnlocked || isDragging
             ? 'bg-black/85 dark:bg-[#160D30]/95 border-2 border-[#FDE047] text-[#FDE047] shadow-[0_0_22px_rgba(250,204,21,0.65)] ring-2 ring-[#FDE047]/50'
-            : 'bg-white dark:bg-[#160D30] hover:bg-white/95 dark:hover:bg-[#1D1140] border-2 border-rose-500/90 dark:border-amber-400 text-slate-900 dark:text-[#F8DF7B] shadow-[0_3px_12px_rgba(225,29,72,0.25)] dark:shadow-[0_3px_12px_rgba(250,204,21,0.3)]'
+            : 'bg-white dark:bg-[#160D30] hover:bg-white/95 dark:hover:bg-[#1D1140] border-2 border-rose-600 dark:border-amber-400 text-slate-900 dark:text-[#F8DF7B] shadow-[0_3px_12px_rgba(225,29,72,0.25)] dark:shadow-[0_3px_12px_rgba(250,204,21,0.3)]'
         }`}
       >
         <Sparkles
-          size={14}
+          size={15}
           strokeWidth={2.4}
           className={`${
             isUnlocked || isDragging
@@ -261,10 +260,10 @@ export default function FloatingAiButton() {
               : 'text-rose-500 dark:text-[#F8DF7B] fill-rose-400/40 dark:fill-amber-300/40 animate-pulse'
           }`}
         />
-        <span className="text-[12.5px] font-black tracking-tight whitespace-nowrap">
+        <span className="text-[13px] font-black tracking-tight whitespace-nowrap">
           {isUnlocked ? 'Thả đặt' : 'Hỏi AI'}
         </span>
-      </Link>
+      </a>
 
       {/* Gợi ý nhỏ khi đang giữ gần đủ 2.5 giây */}
       {isHolding && (

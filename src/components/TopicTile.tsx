@@ -51,9 +51,7 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
 
   if (mode === 'text') {
     return (
-      <Link
-        href={`/${topic.slug}`}
-        prefetch={true}
+      <a href={`/${topic.slug}`}
         onPointerDown={(e) => {
           e.currentTarget.classList.add('is-active');
         }}
@@ -81,15 +79,13 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
           <p className="text-[12px] text-slate-500 dark:text-purple-300/80 font-medium mt-0.5">{countText}</p>
         </div>
         <ChevronRight size={18} className="text-slate-400 dark:text-purple-300 shrink-0" />
-      </Link>
+      </a>
     );
   }
 
   if (mode === 'logo') {
     return (
-      <Link
-        href={`/${topic.slug}`}
-        prefetch={true}
+      <a href={`/${topic.slug}`}
         onPointerDown={(e) => {
           e.currentTarget.classList.add('is-active');
         }}
@@ -125,15 +121,13 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
           <p className="mt-1 flex items-center gap-1 text-[11px] text-slate-500 dark:text-purple-300/80 font-semibold"><BookOpen size={13} />{countText}</p>
         </div>
         <ChevronRight size={18} className="text-slate-400 dark:text-purple-300 shrink-0" />
-      </Link>
+      </a>
     );
   }
 
   if (mode === 'large') {
     return (
-      <Link
-        href={`/${topic.slug}`}
-        prefetch={true}
+      <a href={`/${topic.slug}`}
         onPointerDown={(e) => {
           e.currentTarget.classList.add('is-active');
         }}
@@ -176,15 +170,13 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
           </span>
           <ChevronRight size={20} className="text-white/80" />
         </div>
-      </Link>
+      </a>
     );
   }
 
   if (mode === 'catalog') {
     return (
-      <Link
-        href={`/${topic.slug}`}
-        prefetch={true}
+      <a href={`/${topic.slug}`}
         onPointerDown={(e) => {
           e.currentTarget.classList.add('is-active');
         }}
@@ -219,7 +211,7 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
           <p className="text-[11px] sm:text-[12px] font-black leading-[1.15] text-[#071735] line-clamp-2 min-h-[25px]">{topic.title}</p>
           <p className="mt-1 text-[9.5px] font-semibold text-slate-500">{countText}</p>
         </div>
-      </Link>
+      </a>
     );
   }
 

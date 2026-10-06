@@ -3,20 +3,26 @@
 // Đạt tốc độ phản hồi tức thì (< 1ms) khi người dùng chuyển đổi các mục hoặc vào bài học
 // TUÂN THỦ CHỈ THỊ: Chỉ tải từ mạng khi người dùng ấn vào tài liệu sách / video dung lượng lớn
 
-const CACHE_NAME = 'qbiz-books-shell-v34';
-const STATIC_ASSETS_CACHE = 'qbiz-books-static-v34';
+const CACHE_NAME = 'qbiz-books-shell-v35';
+const STATIC_ASSETS_CACHE = 'qbiz-books-static-v35';
 
 // Danh sách tài nguyên Shell và các trang cốt lõi cần tải sẵn vào bộ nhớ điện thoại
 const PRECACHE_SHELL_URLS = [
   '/',
-  '/tro-ly-ai',
+  '/chuyen-de',
   '/da-luu',
   '/tim-kiem',
+  '/tro-ly-ai',
   '/cot-song',
   '/cot-song/tong-quan-ve-cot-song',
   '/cot-song/tu-the-va-van-dong',
   '/dinh-duong',
+  '/nuoc',
+  '/tieu-hoa',
   '/co-the-nguoi',
+  '/noi-tiet-chuyen-hoa',
+  '/gan-mat-tuy',
+  '/mien-dich',
   '/favicon.ico',
   '/apple-icon.png',
   '/app_logo.png',

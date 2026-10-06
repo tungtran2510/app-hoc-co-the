@@ -87,6 +87,13 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+                <link rel="prefetch" href="/chuyen-de" />
+        <link rel="prefetch" href="/da-luu" />
+        <link rel="prefetch" href="/tim-kiem" />
+        <link rel="prefetch" href="/tro-ly-ai" />
+        <link rel="prefetch" href="/cot-song" />
+        <link rel="prefetch" href="/dinh-duong" />
+        <link rel="prefetch" href="/co-the-nguoi" />
         <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png?v=22" />
         <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png?v=22" />
