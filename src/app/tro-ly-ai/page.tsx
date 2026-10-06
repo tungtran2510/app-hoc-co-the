@@ -208,6 +208,8 @@ function AiAssistantContent() {
   }, [topicParam, pageParam, topicTitleParam, pageTitleParam]);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [historyMessages, setHistoryMessages] = useState<ChatMessage[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -386,62 +388,98 @@ function AiAssistantContent() {
     });
   }, []);
 
-  const dynamicQuickPrompts = React.useMemo(() => {
-    // 1. Ưu tiên các câu hỏi gợi ý bám sát theo bài học & chuyên đề hiện tại
+  interface PromptOption {
+    icon: string;
+    title: string;
+    fullQuery: string;
+  }
+
+  // GỢI Ý CÂU HỎI TRỌNG TÂM TRÊN ĐỈNH ĐẦU (ĐÚNG YÊU CẦU: GỌN GÀNG, BÀI HỌC RÚT RA, SAI LẦM, ỨNG DỤNG)
+  const topSuggestedPrompts = React.useMemo<PromptOption[]>(() => {
     if (activeLesson?.page_title) {
-      const topicList = (activeLesson.topic_slug && TOPIC_QUICK_PROMPTS[activeLesson.topic_slug]) || DEFAULT_QUICK_PROMPTS;
+      const pTitle = activeLesson.page_title;
       return [
-        `Giải thích chi tiết hơn về bài học: ${activeLesson.page_title}`,
-        `Những sai lầm thường gặp nhất liên quan đến ${activeLesson.page_title.toLowerCase()}?`,
-        topicList[0] || 'Cơ chế hoạt động và nguyên tắc bảo vệ tự nhiên?',
-        topicList[1] || 'Thói quen và chế độ sinh hoạt nào tốt nhất cho phần này?',
+        {
+          icon: '💡',
+          title: `Bài học rút ra từ bài này là gì?`,
+          fullQuery: `Bài học rút ra từ bài học "${pTitle}" là gì? Tóm tắt thật ngắn gọn các điểm cốt lõi nhất.`,
+        },
+        {
+          icon: '🎯',
+          title: `Ý nghĩa cốt lõi của ${pTitle.toLowerCase()}?`,
+          fullQuery: `Ý nghĩa cốt lõi và cơ chế hoạt động của ${pTitle.toLowerCase()} đối với cơ thể là gì?`,
+        },
+        {
+          icon: '⚠️',
+          title: `Sai lầm cần tránh liên quan đến bài này?`,
+          fullQuery: `Những sai lầm phổ biến nhất trong sinh hoạt cần tránh liên quan đến ${pTitle.toLowerCase()}?`,
+        },
+        {
+          icon: '🌿',
+          title: `Ứng dụng vào thực tế hàng ngày ra sao?`,
+          fullQuery: `Cách ứng dụng kiến thức bài "${pTitle}" vào thói quen sinh hoạt và chăm sóc sức khỏe hàng ngày?`,
+        },
       ];
     }
 
-    if (activeLesson?.topic_slug && TOPIC_QUICK_PROMPTS[activeLesson.topic_slug]) {
-      return TOPIC_QUICK_PROMPTS[activeLesson.topic_slug];
+    if (activeLesson?.topic_title) {
+      const tTitle = activeLesson.topic_title;
+      return [
+        {
+          icon: '💡',
+          title: `Bài học rút ra từ chuyên đề ${tTitle}?`,
+          fullQuery: `Bài học và nguyên tắc quan trọng nhất rút ra từ chuyên đề ${tTitle} là gì?`,
+        },
+        {
+          icon: '🎯',
+          title: `Cơ chế cốt lõi của ${tTitle.toLowerCase()}?`,
+          fullQuery: `Cơ chế sinh lý học cốt lõi của ${tTitle.toLowerCase()} đối với sức khỏe cơ thể?`,
+        },
+        {
+          icon: '⚠️',
+          title: `Những sai lầm hay gặp nhất?`,
+          fullQuery: `Những sai lầm phổ biến nhất gây tổn hại đến ${tTitle.toLowerCase()} và cách phòng tránh?`,
+        },
+        {
+          icon: '🌿',
+          title: `Thói quen chăm sóc đúng hàng ngày?`,
+          fullQuery: `Chế độ ăn uống và thói quen sinh hoạt tốt nhất cho ${tTitle.toLowerCase()}?`,
+        },
+      ];
     }
 
-    if (trainingConfig?.faqs && trainingConfig.faqs.length > 0) {
-      const activeFaqs = trainingConfig.faqs
-        .filter((f) => {
-          if (!f.question?.trim()) return false;
-          const lq = f.question.toLowerCase();
-          // CẤM TUYỆT ĐỐI BẤT KỲ TÊN THƯƠNG HIỆU, NHÃN HIỆU, SẢN PHẨM NÀO
-          if (
-            lq.includes('doctorloan') ||
-            lq.includes('doctor loan') ||
-            lq.includes('gems') ||
-            lq.includes('hydro gems') ||
-            lq.includes('thiết bị') ||
-            lq.includes('gối') ||
-            lq.includes('ghế') ||
-            lq.includes('sản phẩm')
-          ) {
-            return false;
-          }
-          return true;
-        })
-        .map((f) => f.question.trim());
-      if (activeFaqs.length >= 3) {
-        return activeFaqs.slice(0, 4);
-      }
-      if (activeFaqs.length > 0) {
-        const remaining = DEFAULT_QUICK_PROMPTS.filter((q) => !activeFaqs.includes(q));
-        return [...activeFaqs, ...remaining].slice(0, 4);
-      }
-    }
-    return DEFAULT_QUICK_PROMPTS;
-  }, [activeLesson?.page_title, activeLesson?.topic_slug, trainingConfig]);
+    return [
+      {
+        icon: '💡',
+        title: 'Tư thế nằm, ngồi chuẩn cho cột sống?',
+        fullQuery: 'Nguyên tắc tư thế nằm, ngồi chuẩn để bảo vệ đĩa đệm và cột sống?',
+      },
+      {
+        icon: '💧',
+        title: '4 thời điểm vàng uống nước trong ngày?',
+        fullQuery: '4 thời điểm vàng uống nước để hấp thu tối đa cho cơ thể?',
+      },
+      {
+        icon: '🌿',
+        title: 'Trục ruột - não và hệ vi sinh đường ruột?',
+        fullQuery: 'Trục ruột - não và vai trò của 100 nghìn tỷ vi khuẩn đường ruột?',
+      },
+      {
+        icon: '🔥',
+        title: 'Cơ chế kháng Insulin & mỡ nội tạng?',
+        fullQuery: 'Cơ chế đề kháng Insulin dẫn đến tiểu đường và cách giảm mỡ nội tạng?',
+      },
+    ];
+  }, [activeLesson?.page_title, activeLesson?.topic_title]);
 
-  // Load lịch sử chat từ localStorage
+  // Load lịch sử chat từ localStorage vào historyMessages (giữ màn hình mở đầu sạch sẽ, thoáng đãng)
   useEffect(() => {
     try {
       const saved = localStorage.getItem('ai_assistant_chat_v1');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const sanitized = parsed.map((m: any) => {
+          const sanitized: ChatMessage[] = parsed.map((m: any) => {
             if (m.role === 'assistant' && typeof m.text === 'string') {
               let cleaned = m.text
                 .replace(/(?:tác giả\s+)?(?:tùng\s+)?(?:dinh dưỡng\s+)?(?:không phải|chưa phải)(?:\s+là)?\s+bác sĩ[.,;:\-—–]?\s*/gi, '')
@@ -458,7 +496,7 @@ function AiAssistantContent() {
             }
             return m;
           });
-          setMessages(sanitized);
+          setHistoryMessages(sanitized);
         }
       }
     } catch {
@@ -469,21 +507,33 @@ function AiAssistantContent() {
   // Tự động cuộn xuống cuối khi có tin nhắn mới
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isLoading]);
+  }, [messages, isLoading, showHistory]);
 
-  const saveMessages = (newMessages: ChatMessage[]) => {
-    setMessages(newMessages);
-    try {
-      localStorage.setItem('ai_assistant_chat_v1', JSON.stringify(newMessages));
-    } catch {
-      // ignore
-    }
+  const saveMessages = (newSessionMessages: ChatMessage[]) => {
+    setMessages(newSessionMessages);
+    setHistoryMessages((prev) => {
+      const merged = [...prev];
+      for (const sm of newSessionMessages) {
+        if (!merged.some((m) => m.id === sm.id)) {
+          merged.push(sm);
+        }
+      }
+      try {
+        localStorage.setItem('ai_assistant_chat_v1', JSON.stringify(merged));
+      } catch {}
+      return merged;
+    });
   };
 
   const handleClearChat = () => {
-    if (messages.length === 0) return;
+    if (messages.length === 0 && historyMessages.length === 0) return;
     if (confirm('Bạn có muốn làm mới cuộc trò chuyện với Trợ lý AI?')) {
-      saveMessages([]);
+      setMessages([]);
+      setHistoryMessages([]);
+      setShowHistory(false);
+      try {
+        localStorage.removeItem('ai_assistant_chat_v1');
+      } catch {}
     }
   };
 
@@ -507,7 +557,7 @@ function AiAssistantContent() {
     setIsLoading(true);
 
     try {
-      const historyPayload = updatedMessages.slice(-6).map((m) => ({
+      const historyPayload = [...historyMessages, ...messages, userMsg].slice(-6).map((m) => ({
         role: m.role,
         text: m.text,
       }));
@@ -589,18 +639,188 @@ function AiAssistantContent() {
     }
   };
 
-  // Tự động gửi câu hỏi khi được điều hướng từ bài học video có tham số q
-  const autoSentRef = useRef(false);
+  // Xử lý nạp sẵn câu hỏi nếu có tham số q (nhưng không tự động gửi để tránh màn hình bị ngợp chữ)
   useEffect(() => {
-    if (qParam && !autoSentRef.current && !isLoading) {
-      autoSentRef.current = true;
-      handleSendMessage(qParam);
+    if (qParam && !input) {
+      setInput(qParam);
     }
-  }, [qParam, isLoading]);
+  }, [qParam]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     handleSendMessage();
+  };
+
+  // Hàm render danh sách tin nhắn chat đẹp mắt, chuyên nghiệp
+  const renderMessageList = (msgList: ChatMessage[]) => {
+    return msgList.map((msg) => {
+      const isUser = msg.role === 'user';
+      return (
+        <div
+          key={msg.id}
+          className={`flex flex-col gap-1.5 ${
+            isUser ? 'items-end' : 'items-start'
+          } animate-in fade-in duration-200`}
+        >
+          {/* Bong bóng tin nhắn */}
+          <div
+            className={`max-w-[94%] sm:max-w-[88%] shadow-2xs transition-all ${
+              isUser
+                ? 'px-3.5 py-2 rounded-[16px] rounded-br-[4px] bg-gradient-to-r from-purple-800 to-indigo-900 text-white text-[13.5px] font-medium leading-snug'
+                : 'p-3 sm:p-3.5 rounded-[16px] rounded-tl-[4px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 text-slate-900 dark:text-white'
+            }`}
+          >
+            {isUser ? (
+              <p className="whitespace-pre-wrap">{msg.text}</p>
+            ) : (
+              <div>
+                {/* Mini Header AI */}
+                <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-100 dark:border-purple-800/30 text-[11px] font-extrabold text-primary dark:text-[#F8DF7B]">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-4.5 h-4.5 rounded-[5px] bg-gradient-to-br from-purple-700 to-indigo-800 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                      <Sparkles size={10} className="text-amber-300" />
+                    </span>
+                    <span className="tracking-wide uppercase text-[10.5px]">Trợ lý Sức Khỏe AI</span>
+                  </div>
+                  <span className="text-[10px] text-slate-500 dark:text-purple-300/70 font-semibold">Tài liệu tác giả</span>
+                </div>
+
+                {/* Nội dung trả lời */}
+                <div>{renderFormattedText(msg.text)}</div>
+
+                {/* Dòng lưu ý y khoa siêu ngắn gọn, khuất tầm nhìn, đúng 1-2 dòng */}
+                <div className="mt-1.5 pt-1 border-t border-slate-100/60 dark:border-purple-800/20 flex items-center gap-1 text-[9.5px] sm:text-[10px] text-slate-400/80 dark:text-purple-300/50 italic">
+                  <span className="shrink-0 not-italic text-[9px] opacity-70">⚕️</span>
+                  <span className="line-clamp-2 leading-tight">
+                    * Thông tin tham khảo, không thay thế chẩn đoán y khoa.
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* THẺ BÀI HỌC GỢI Ý ĐI KÈM CỦA AI */}
+          {!isUser && msg.suggested_pages && msg.suggested_pages.length > 0 && (
+            <div className="w-full max-w-[96%] sm:max-w-[90%] flex flex-col gap-1.5 mt-1">
+              <div className="flex items-center gap-1.5 px-0.5 text-[11px] font-black text-primary dark:text-[#F8DF7B] uppercase tracking-wider">
+                <BookOpen size={13} strokeWidth={2.5} />
+                <span>Bài học đề xuất nên xem:</span>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                {msg.suggested_pages.map((sp, sIdx) => {
+                  const cleanPageSlug = sp.page_slug
+                      .replace(new RegExp(`^${sp.topic_slug}/`), '')
+                      .replace(/^\//, '');
+                  const vQuery = sp.video_index ? `v=${sp.video_index}&` : '';
+                  const lessonUrl = `/${sp.topic_slug}/${cleanPageSlug}?${vQuery}autoplay=1`;
+                  const topicIcon = `/images/topics/${sp.topic_slug}.png`;
+                  const displayTitle = sp.video_title || sp.title;
+
+                  return (
+                    <Link
+                      key={sIdx}
+                      href={lessonUrl}
+                      className="group flex items-center gap-3 p-2.5 rounded-[15px] bg-white hover:bg-primary-soft dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-800/40 hover:border-primary/50 dark:hover:border-[#F8DF7B]/60 shadow-xs hover:shadow-md transition-all cursor-pointer"
+                    >
+                      <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-[11px] bg-slate-50 dark:bg-purple-950/70 border border-slate-200 dark:border-purple-800/50 p-1 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform overflow-hidden">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={topicIcon}
+                          alt={sp.topic_title}
+                          className="w-full h-full object-contain"
+                          onError={(e) => {
+                            (e.target as HTMLElement).style.display = 'none';
+                            const fallback = (e.target as HTMLElement).nextElementSibling as HTMLElement;
+                            if (fallback) fallback.style.display = 'flex';
+                          }}
+                        />
+                        <div className="hidden w-full h-full items-center justify-center text-primary dark:text-[#F8DF7B]">
+                          <BookOpen size={16} />
+                        </div>
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[10px] sm:text-[10.5px] font-black uppercase text-primary dark:text-[#F8DF7B] tracking-wider truncate max-w-[140px]">
+                            {sp.topic_title}
+                          </span>
+                          {sp.video_index ? (
+                            <span className="px-1.5 py-0.5 rounded-[5px] bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-[9.5px] font-black tracking-tight">
+                              Video {sp.video_index < 10 ? `0${sp.video_index}` : sp.video_index}
+                            </span>
+                          ) : null}
+                        </div>
+                        <h4 className="text-[13.5px] sm:text-[14.5px] font-black text-slate-900 dark:text-white leading-snug truncate group-hover:text-primary dark:group-hover:text-[#F8DF7B] transition-colors mt-0.5">
+                          {displayTitle}
+                        </h4>
+                        {sp.reason && (
+                          <p className="text-[11.5px] text-slate-500 dark:text-purple-300/80 leading-tight truncate mt-0.5 font-medium">
+                            {sp.reason}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="shrink-0 flex items-center gap-1 text-[11px] sm:text-[11.5px] font-black text-primary bg-primary-soft group-hover:bg-primary group-hover:text-white dark:bg-purple-950/80 dark:text-[#F8DF7B] dark:group-hover:bg-[#F8DF7B] dark:group-hover:text-slate-900 px-2.5 py-1.5 rounded-[8px] border border-primary/25 dark:border-purple-800/50 transition-colors whitespace-nowrap shadow-2xs">
+                        <Play size={11} fill="currentColor" />
+                        <span>Phát ngay</span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* CÂU HỎI GỢI Ý TIẾP THEO (FOLLOW UP) */}
+          {!isUser && msg.follow_up_questions && msg.follow_up_questions.length > 0 && (() => {
+            const cleanList = msg.follow_up_questions.filter((fq) => {
+              if (!fq || typeof fq !== 'string') return false;
+              const lq = fq.toLowerCase();
+              return !(
+                lq.includes('doctorloan') ||
+                lq.includes('doctor loan') ||
+                lq.includes('hydro gems') ||
+                lq.includes('gems') ||
+                lq.includes('thiết bị') ||
+                lq.includes('sản phẩm') ||
+                lq.includes('thương hiệu') ||
+                lq.includes('nhãn hiệu') ||
+                lq.includes('gối') ||
+                lq.includes('ghế') ||
+                lq.includes('bài tập') ||
+                lq.includes('tập gì') ||
+                lq.includes('tập luyện') ||
+                lq.includes('nằm ngủ') ||
+                lq.includes('tư thế ngủ')
+              );
+            });
+            if (cleanList.length === 0) return null;
+            return (
+              <div className="w-full max-w-[94%] sm:max-w-[88%] flex flex-col gap-1 mt-0.5">
+                <span className="text-[10.5px] font-bold text-muted px-0.5 flex items-center gap-1">
+                  <span>💡</span>
+                  <span>Gợi ý hỏi tiếp:</span>
+                </span>
+                <div className="flex flex-wrap gap-1">
+                  {cleanList.map((fq, fIdx) => (
+                    <button
+                      key={fIdx}
+                      type="button"
+                      onClick={() => handleSendMessage(fq)}
+                      className="px-2.5 py-1 rounded-full bg-white dark:bg-[#160D30] hover:bg-primary hover:text-white border border-primary/20 dark:border-purple-800/40 hover:border-primary text-[11px] font-bold text-ink-2 hover:text-white text-left transition-all cursor-pointer shadow-2xs active:scale-95 flex items-center gap-1 leading-tight group"
+                    >
+                      <span className="text-primary group-hover:text-white text-[10px]">💬</span>
+                      <span className="line-clamp-1">{fq}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      );
+    });
   };
 
   return (
@@ -651,7 +871,7 @@ function AiAssistantContent() {
             </button>
           )}
 
-          {messages.length > 0 && (
+          {(messages.length > 0 || historyMessages.length > 0) && (
             <button
               type="button"
               onClick={handleClearChat}
@@ -717,7 +937,7 @@ function AiAssistantContent() {
       )}
 
       {/* 2. KHUNG NỘI DUNG TIN NHẮN */}
-      <main className="flex-1 flex flex-col px-3.5 sm:px-4 pt-2.5 pb-36 max-w-[640px] w-full mx-auto gap-3">
+      <main className="flex-1 flex flex-col px-3.5 sm:px-4 pt-2.5 pb-36 max-w-[640px] w-full mx-auto gap-2.5">
         {/* BANNER QUẢN TRỊ VIÊN: HUẤN LUYỆN KIẾN THỨC AI (SIÊU GỌN 1 DÒNG) */}
         {isAdmin && (
           <div className="px-3 py-1.5 rounded-[12px] bg-primary-soft/80 border border-primary/25 flex items-center justify-between gap-2 shadow-2xs">
@@ -740,287 +960,92 @@ function AiAssistantContent() {
           </div>
         )}
 
-        {/* MÀN HÌNH CHÀO MỪNG NẾU CHƯA CÓ TIN NHẮN */}
-        {messages.length === 0 ? (
-          <div className="flex flex-col gap-3.5 pt-1 animate-in fade-in duration-300">
-            {/* Thẻ chào đón BÁM ĐUỔI THEO BÀI HỌC hoặc Thẻ mặc định */}
-            {activeLesson && (activeLesson.page_title || activeLesson.topic_title) ? (
-              <div className="p-3.5 sm:p-4 rounded-[18px] bg-gradient-to-br from-blue-50/90 via-indigo-50/80 to-purple-50/90 dark:from-[#1A103C] dark:via-[#160D30] dark:to-[#220F45] border border-blue-200 dark:border-purple-800/60 shadow-xs flex flex-col gap-2.5">
-                <div className="flex items-center gap-2.5">
-                  <div className="relative w-10 h-10 rounded-[12px] bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center shrink-0 shadow-md ring-2 ring-blue-400/50">
-                    <Sparkles size={20} className="text-amber-300 drop-shadow-xs" />
-                    <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-white dark:ring-[#160D30]" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-[10px] font-black uppercase text-blue-700 dark:text-[#F8DF7B] tracking-wider">
-                        Trợ lý bám sát bài học
-                      </span>
-                      {activeLesson.topic_title && (
-                        <span className="px-1.5 py-0.2 rounded-full bg-blue-100 dark:bg-purple-900/60 text-blue-800 dark:text-purple-200 text-[9.5px] font-extrabold truncate">
-                          {activeLesson.topic_title}
-                        </span>
-                      )}
-                    </div>
-                    <h2 className="text-[14.5px] sm:text-[15.5px] font-extrabold text-slate-900 dark:text-white leading-snug">
-                      {activeLesson.page_title || activeLesson.topic_title}
-                    </h2>
-                  </div>
-                </div>
+        {/* GỢI Ý CÂU HỎI TRÊN ĐỈNH ĐẦU (GỌN GÀNG, ĐẸP MẮT THEO ĐÚNG YÊU CẦU) */}
+        <div className="flex flex-col gap-1.5 pt-0.5">
+          <div className="flex items-center justify-between px-1">
+            <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-purple-300/80 flex items-center gap-1.5">
+              <Sparkles size={12} className="text-amber-500" />
+              <span>Gợi ý câu hỏi:</span>
+            </span>
 
-                <div className="pt-2 border-t border-blue-200/60 dark:border-purple-800/40 text-[12.5px] text-slate-700 dark:text-purple-100/90 leading-relaxed flex flex-col gap-1.5">
-                  <p>
-                    👋 Chào bạn! Bạn đang học bài <strong className="text-blue-900 dark:text-amber-300">{activeLesson.page_title || activeLesson.topic_title}</strong> thuộc chuyên đề <strong className="text-blue-900 dark:text-amber-300">{activeLesson.topic_title}</strong>.
-                  </p>
-                  <p className="text-[13px] font-bold text-blue-800 dark:text-[#F8DF7B]">
-                    👉 Bạn có câu hỏi gì về phần {activeLesson.page_title ? activeLesson.page_title.toLowerCase() : activeLesson.topic_title.toLowerCase()} này không?
-                  </p>
-                  <p className="text-[11.5px] text-slate-500 dark:text-purple-300/70 italic">
-                    (Mình sẽ tập trung giải đáp chuyên sâu và chính xác nhất cho bài này, đồng thời bạn vẫn có thể hỏi rộng bất kỳ chủ đề sức khỏe nào khác nhé!)
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div className="p-3.5 sm:p-4 rounded-[18px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 shadow-xs flex flex-col gap-2">
-                <div className="flex items-center gap-2.5">
-                  <div className="relative w-10 h-10 rounded-[12px] bg-gradient-to-br from-[#3B1262] via-[#5B21B6] to-[#7C3AED] text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-950/30 ring-2 ring-amber-400/50">
-                    <Sparkles size={20} className="text-amber-300 drop-shadow-xs" />
-                    <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-white dark:ring-[#160D30]" />
-                  </div>
-                  <div className="min-w-0">
-                    <h2 className="text-[14.5px] sm:text-[15.5px] font-extrabold text-slate-900 dark:text-white leading-snug">
-                      Trợ lý Sức Khỏe AI đồng hành 24/7
-                    </h2>
-                    <p className="text-[11.5px] text-slate-500 dark:text-purple-300/70 truncate">
-                      Hỏi đáp giải phẫu, cơ xương khớp & vận động khoa học
-                    </p>
-                  </div>
-                </div>
-
-                <p className="text-[12.5px] text-slate-600 dark:text-purple-100/90 leading-snug pt-1 border-t border-slate-100 dark:border-purple-800/30">
-                  Tra cứu nhanh cấu trúc cơ thể, thói quen sinh hoạt đúng, bài tập an toàn hoặc tìm bài học trong ứng dụng!
-                </p>
-              </div>
+            {/* Nút xem lịch sử trò chuyện cũ nếu có */}
+            {historyMessages.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowHistory(!showHistory)}
+                className="inline-flex items-center gap-1 text-[11px] font-bold text-primary dark:text-[#F8DF7B] hover:underline cursor-pointer active:scale-95 transition-all"
+              >
+                <span>{showHistory ? 'Ẩn lịch sử cũ ▴' : `Lịch sử cũ (${historyMessages.length}) ▾`}</span>
+              </button>
             )}
+          </div>
 
-            {/* Gợi ý câu hỏi thực tế bám sát tài liệu & đời sống */}
-            <div className="flex flex-col gap-1.5">
-              <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-purple-300/70 px-1 flex items-center gap-1.5">
-                <Sparkles size={12} className="text-amber-500" />
-                <span>
-                  {activeLesson?.page_title
-                    ? `Câu hỏi trọng tâm về "${activeLesson.page_title}":`
-                    : activeLesson?.topic_title
-                    ? `Câu hỏi trọng tâm về ${activeLesson.topic_title}:`
-                    : 'Câu hỏi gợi ý (chạm để hỏi ngay):'}
-                </span>
-              </span>
+          {/* 4 thẻ gợi ý câu hỏi gọn gàng trên đỉnh đầu */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+            {topSuggestedPrompts.map((prompt, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => handleSendMessage(prompt.fullQuery)}
+                className="text-left px-3 py-2 rounded-[12px] bg-white dark:bg-[#160D30] hover:bg-blue-50/80 dark:hover:bg-purple-900/40 border border-slate-200/90 dark:border-purple-800/40 hover:border-blue-400/60 dark:hover:border-purple-500/50 shadow-2xs transition-all cursor-pointer group flex items-center justify-between gap-2 active:scale-[0.99]"
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-[13px] shrink-0">{prompt.icon}</span>
+                  <span className="text-[12px] sm:text-[12.5px] font-bold text-slate-700 dark:text-purple-100 group-hover:text-blue-700 dark:group-hover:text-[#F8DF7B] truncate">
+                    {prompt.title}
+                  </span>
+                </div>
+                <ChevronRight size={13} className="text-slate-400 group-hover:text-blue-600 dark:group-hover:text-[#F8DF7B] shrink-0 transition-transform group-hover:translate-x-0.5" />
+              </button>
+            ))}
+          </div>
+        </div>
 
-              <div className="flex flex-col gap-1.5">
-                {dynamicQuickPrompts.map((prompt, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => handleSendMessage(prompt)}
-                    className="text-left px-3.5 py-2.5 rounded-[13px] bg-white dark:bg-[#160D30] hover:bg-purple-50/70 dark:hover:bg-purple-900/40 border border-slate-200/90 dark:border-purple-800/40 hover:border-purple-500/50 text-[12.5px] font-bold text-slate-800 dark:text-white leading-snug transition-all cursor-pointer shadow-2xs group flex items-center justify-between gap-2 active:scale-[0.99]"
-                  >
-                    <span className="line-clamp-2 flex-1 min-w-0">{prompt}</span>
-                    <ChevronRight size={14} className="text-slate-400 group-hover:text-purple-700 dark:group-hover:text-[#F8DF7B] shrink-0 transition-transform group-hover:translate-x-0.5" />
-                  </button>
-                ))}
-              </div>
+        {/* LỊCH SỬ TIN NHẮN CŨ (KHI ĐƯỢC BẬT MỞ) */}
+        {showHistory && historyMessages.length > 0 && (
+          <div className="flex flex-col gap-2.5 pt-2 pb-2 border-b border-dashed border-slate-200 dark:border-purple-800/40">
+            <div className="text-center text-[10.5px] font-black uppercase tracking-wider text-slate-400 dark:text-purple-400 py-1">
+              📜 Lịch sử các cuộc trò chuyện trước ({historyMessages.length} tin nhắn)
+            </div>
+            {renderMessageList(historyMessages)}
+            <div className="text-center text-[10.5px] font-black uppercase tracking-wider text-slate-400 dark:text-purple-400 py-1">
+              --- Cuộc trò chuyện hiện tại ---
             </div>
           </div>
-        ) : (
-          /* DANH SÁCH TIN NHẮN ĐÃ TRAO ĐỔI */
-          <div className="flex flex-col gap-3">
-            {messages.map((msg) => {
-              const isUser = msg.role === 'user';
-              return (
-                <div
-                  key={msg.id}
-                  className={`flex flex-col gap-1.5 ${
-                    isUser ? 'items-end' : 'items-start'
-                  } animate-in fade-in duration-200`}
-                >
-                  {/* Bong bóng tin nhắn */}
-                  <div
-                    className={`max-w-[94%] sm:max-w-[88%] shadow-2xs transition-all ${
-                      isUser
-                        ? 'px-3.5 py-2 rounded-[16px] rounded-br-[4px] bg-gradient-to-r from-purple-800 to-indigo-900 text-white text-[13.5px] font-medium leading-snug'
-                        : 'p-3 sm:p-3.5 rounded-[16px] rounded-tl-[4px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 text-slate-900 dark:text-white'
-                    }`}
-                  >
-                    {isUser ? (
-                      <p className="whitespace-pre-wrap">{msg.text}</p>
-                    ) : (
-                      <div>
-                        {/* Mini Header AI */}
-                        <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-100 dark:border-purple-800/30 text-[11px] font-extrabold text-primary dark:text-[#F8DF7B]">
-                          <div className="flex items-center gap-1.5">
-                            <span className="w-4.5 h-4.5 rounded-[5px] bg-gradient-to-br from-purple-700 to-indigo-800 text-white flex items-center justify-center shrink-0 shadow-2xs">
-                              <Sparkles size={10} className="text-amber-300" />
-                            </span>
-                            <span className="tracking-wide uppercase text-[10.5px]">Trợ lý Sức Khỏe AI</span>
-                          </div>
-                          <span className="text-[10px] text-slate-500 dark:text-purple-300/70 font-semibold">Tài liệu tác giả</span>
-                        </div>
+        )}
 
-                        {/* Nội dung trả lời */}
-                        <div>{renderFormattedText(msg.text)}</div>
+        {/* TIN NHẮN PHIÊN HIỆN TẠI HOẶC MÀN HÌNH TRẮNG THOÁNG ĐÃNG */}
+        {messages.length > 0 ? (
+          <div className="flex flex-col gap-3 pt-1">
+            {renderMessageList(messages)}
+          </div>
+        ) : !showHistory ? (
+          /* MÀN HÌNH GẦN NHƯ TRẮNG, THOÁNG ĐÃNG, RỘNG RÃI THEO ĐÚNG YÊU CẦU CỦA NGƯỜI DÙNG */
+          <div className="flex-1 flex flex-col items-center justify-center min-h-[380px] text-center px-4 py-8 select-none pointer-events-none">
+            <div className="w-12 h-12 rounded-full bg-slate-100/80 dark:bg-purple-950/40 border border-slate-200/60 dark:border-purple-800/30 flex items-center justify-center text-slate-400 dark:text-purple-300 mb-2.5 opacity-60">
+              <Bot size={22} />
+            </div>
+            <p className="text-[13px] text-slate-400 dark:text-purple-300/70 font-medium max-w-[280px]">
+              {activeLesson?.page_title
+                ? `Chọn câu hỏi gợi ý phía trên hoặc gõ câu hỏi bất kỳ về "${activeLesson.page_title}" bên dưới`
+                : 'Sẵn sàng giải đáp mọi thắc mắc sức khỏe & giải phẫu của bạn'}
+            </p>
+          </div>
+        ) : null}
 
-                        {/* Dòng lưu ý y khoa siêu ngắn gọn, khuất tầm nhìn, đúng 1-2 dòng */}
-                        <div className="mt-1.5 pt-1 border-t border-slate-100/60 dark:border-purple-800/20 flex items-center gap-1 text-[9.5px] sm:text-[10px] text-slate-400/80 dark:text-purple-300/50 italic">
-                          <span className="shrink-0 not-italic text-[9px] opacity-70">⚕️</span>
-                          <span className="line-clamp-2 leading-tight">
-                            * Thông tin tham khảo, không thay thế chẩn đoán y khoa.
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* THẺ BÀI HỌC GỢI Ý ĐI KÈM CỦA AI (CÓ ĐỦ LOGO CHUYÊN ĐỀ & FONT RÕ RÀNG) */}
-                  {!isUser && msg.suggested_pages && msg.suggested_pages.length > 0 && (
-                    <div className="w-full max-w-[96%] sm:max-w-[90%] flex flex-col gap-1.5 mt-1">
-                      <div className="flex items-center gap-1.5 px-0.5 text-[11px] font-black text-primary dark:text-[#F8DF7B] uppercase tracking-wider">
-                        <BookOpen size={13} strokeWidth={2.5} />
-                        <span>Bài học đề xuất nên xem:</span>
-                      </div>
-
-                      <div className="flex flex-col gap-2">
-                        {msg.suggested_pages.map((sp, sIdx) => {
-                          const cleanPageSlug = sp.page_slug
-                              .replace(new RegExp(`^${sp.topic_slug}/`), '')
-                              .replace(/^\//, '');
-                          const vQuery = sp.video_index ? `v=${sp.video_index}&` : '';
-                          const lessonUrl = `/${sp.topic_slug}/${cleanPageSlug}?${vQuery}autoplay=1`;
-                          const topicIcon = `/images/topics/${sp.topic_slug}.png`;
-                          const displayTitle = sp.video_title || sp.title;
-
-                          return (
-                            <Link
-                              key={sIdx}
-                              href={lessonUrl}
-                              className="group flex items-center gap-3 p-2.5 rounded-[15px] bg-white hover:bg-primary-soft dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-800/40 hover:border-primary/50 dark:hover:border-[#F8DF7B]/60 shadow-xs hover:shadow-md transition-all cursor-pointer"
-                            >
-                              {/* Logo Chuyên đề 3D đầy đủ */}
-                              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-[11px] bg-slate-50 dark:bg-purple-950/70 border border-slate-200 dark:border-purple-800/50 p-1 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform overflow-hidden">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                  src={topicIcon}
-                                  alt={sp.topic_title}
-                                  className="w-full h-full object-contain"
-                                  onError={(e) => {
-                                    (e.target as HTMLElement).style.display = 'none';
-                                    const fallback = (e.target as HTMLElement).nextElementSibling as HTMLElement;
-                                    if (fallback) fallback.style.display = 'flex';
-                                  }}
-                                />
-                                <div className="hidden w-full h-full items-center justify-center text-primary dark:text-[#F8DF7B]">
-                                  <BookOpen size={16} />
-                                </div>
-                              </div>
-
-                              {/* Tiêu đề & Thông tin bài học (Font to rõ ràng) */}
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-1.5 flex-wrap">
-                                  <span className="text-[10px] sm:text-[10.5px] font-black uppercase text-primary dark:text-[#F8DF7B] tracking-wider truncate max-w-[140px]">
-                                    {sp.topic_title}
-                                  </span>
-                                  {sp.video_index ? (
-                                    <span className="px-1.5 py-0.5 rounded-[5px] bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-[9.5px] font-black tracking-tight">
-                                      Video {sp.video_index < 10 ? `0${sp.video_index}` : sp.video_index}
-                                    </span>
-                                  ) : null}
-                                </div>
-                                <h4 className="text-[13.5px] sm:text-[14.5px] font-black text-slate-900 dark:text-white leading-snug truncate group-hover:text-primary dark:group-hover:text-[#F8DF7B] transition-colors mt-0.5">
-                                  {displayTitle}
-                                </h4>
-                                {sp.reason && (
-                                  <p className="text-[11.5px] text-slate-500 dark:text-purple-300/80 leading-tight truncate mt-0.5 font-medium">
-                                    {sp.reason}
-                                  </p>
-                                )}
-                              </div>
-
-                              {/* Nút hành động */}
-                              <div className="shrink-0 flex items-center gap-1 text-[11px] sm:text-[11.5px] font-black text-primary bg-primary-soft group-hover:bg-primary group-hover:text-white dark:bg-purple-950/80 dark:text-[#F8DF7B] dark:group-hover:bg-[#F8DF7B] dark:group-hover:text-slate-900 px-2.5 py-1.5 rounded-[8px] border border-primary/25 dark:border-purple-800/50 transition-colors whitespace-nowrap shadow-2xs">
-                                <Play size={11} fill="currentColor" />
-                                <span>Phát ngay</span>
-                              </div>
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* CÂU HỎI GỢI Ý TIẾP THEO (FOLLOW UP) */}
-                  {!isUser && msg.follow_up_questions && msg.follow_up_questions.length > 0 && (() => {
-                    const cleanList = msg.follow_up_questions.filter((fq) => {
-                      if (!fq || typeof fq !== 'string') return false;
-                      const lq = fq.toLowerCase();
-                      return !(
-                        lq.includes('doctorloan') ||
-                        lq.includes('doctor loan') ||
-                        lq.includes('hydro gems') ||
-                        lq.includes('gems') ||
-                        lq.includes('thiết bị') ||
-                        lq.includes('sản phẩm') ||
-                        lq.includes('thương hiệu') ||
-                        lq.includes('nhãn hiệu') ||
-                        lq.includes('gối') ||
-                        lq.includes('ghế') ||
-                        lq.includes('bài tập') ||
-                        lq.includes('tập gì') ||
-                        lq.includes('tập luyện') ||
-                        lq.includes('nằm ngủ') ||
-                        lq.includes('tư thế ngủ')
-                      );
-                    });
-                    if (cleanList.length === 0) return null;
-                    return (
-                      <div className="w-full max-w-[94%] sm:max-w-[88%] flex flex-col gap-1 mt-0.5">
-                        <span className="text-[10.5px] font-bold text-muted px-0.5 flex items-center gap-1">
-                          <span>💡</span>
-                          <span>Gợi ý hỏi tiếp:</span>
-                        </span>
-                        <div className="flex flex-wrap gap-1">
-                          {cleanList.map((fq, fIdx) => (
-                            <button
-                              key={fIdx}
-                              type="button"
-                              onClick={() => handleSendMessage(fq)}
-                              className="px-2.5 py-1 rounded-full bg-white dark:bg-[#160D30] hover:bg-primary hover:text-white border border-primary/20 dark:border-purple-800/40 hover:border-primary text-[11px] font-bold text-ink-2 hover:text-white text-left transition-all cursor-pointer shadow-2xs active:scale-95 flex items-center gap-1 leading-tight group"
-                            >
-                              <span className="text-primary group-hover:text-white text-[10px]">💬</span>
-                              <span className="line-clamp-1">{fq}</span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </div>
-              );
-            })}
-
-            {/* TRẠNG THÁI ĐANG TRẢ LỜI */}
-            {isLoading && (
-              <div className="flex items-start sm:items-center gap-2.5 max-w-[92%] p-2.5 px-3.5 rounded-[14px] bg-white dark:bg-[#160D30] border border-primary/25 dark:border-purple-800/50 shadow-xs text-[12px] sm:text-[12.5px] text-ink-2 dark:text-purple-200 animate-in fade-in duration-200 leading-snug">
-                <Loader2 size={15} className="animate-spin text-primary shrink-0 mt-0.5 sm:mt-0" />
-                <span className="font-medium">
-                  {loadingStep === 0
-                    ? '🔍 Trợ lý AI đang tra cứu kho tài liệu y khoa chuyên sâu...'
-                    : '⏳ Câu hỏi chuyên sâu, vui lòng chờ trong giây lát để AI tổng hợp giải pháp y khoa và bài học chuẩn xác nhất...'}
-                </span>
-              </div>
-            )}
-
-            <div ref={messagesEndRef} />
+        {/* TRẠNG THÁI ĐANG TRẢ LỜI */}
+        {isLoading && (
+          <div className="flex items-start sm:items-center gap-2.5 max-w-[92%] p-2.5 px-3.5 rounded-[14px] bg-white dark:bg-[#160D30] border border-primary/25 dark:border-purple-800/50 shadow-xs text-[12px] sm:text-[12.5px] text-ink-2 dark:text-purple-200 animate-in fade-in duration-200 leading-snug">
+            <Loader2 size={15} className="animate-spin text-primary shrink-0 mt-0.5 sm:mt-0" />
+            <span className="font-medium">
+              {loadingStep === 0
+                ? '🔍 Trợ lý AI đang tra cứu kho tài liệu y khoa chuyên sâu...'
+                : '⏳ Câu hỏi chuyên sâu, vui lòng chờ trong giây lát để AI tổng hợp giải pháp y khoa chuẩn xác nhất...'}
+            </span>
           </div>
         )}
+
+        <div ref={messagesEndRef} />
       </main>
 
       {/* 3. THANH NHẬP CÂU HỎI Ở ĐÁY MÀN HÌNH (CỐ ĐỊNH TRÊN BOTTOM NAV) */}
