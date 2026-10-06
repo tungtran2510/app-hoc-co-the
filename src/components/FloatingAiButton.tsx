@@ -16,6 +16,10 @@ export default function FloatingAiButton() {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
+  const isUnlockedRef = useRef(false);
+  const isDraggingRef = useRef(false);
+  const cancelledByScrollRef = useRef(false);
+
   const holdTimerRef = useRef<any>(null);
   const holdProgressTimerRef = useRef<any>(null);
   const [holdProgress, setHoldProgress] = useState(0);
@@ -80,6 +84,10 @@ export default function FloatingAiButton() {
       moved: false,
     };
 
+    cancelledByScrollRef.current = false;
+    isUnlockedRef.current = false;
+    isDraggingRef.current = false;
+
     setIsHolding(true);
     setHoldProgress(0);
 
@@ -98,6 +106,8 @@ export default function FloatingAiButton() {
       clearInterval(holdProgressTimerRef.current);
       setHoldProgress(100);
       setIsHolding(false);
+      isUnlockedRef.current = true;
+      isDraggingRef.current = true;
       setIsUnlocked(true);
       setIsDragging(true);
 
@@ -117,27 +127,29 @@ export default function FloatingAiButton() {
       const dx = moveEvt.clientX - dragInfoRef.current.startX;
       const dy = moveEvt.clientY - dragInfoRef.current.startY;
 
-      // Nếu di chuyển tay > 12px trước khi đủ 2.5s => Hủy đếm giữ để cho phép cuộn trang bình thường
-      if (!dragInfoRef.current.moved && Math.hypot(dx, dy) > 12) {
-        dragInfoRef.current.moved = true;
-        clearTimeout(holdTimerRef.current);
-        clearInterval(holdProgressTimerRef.current);
-        setIsHolding(false);
-        setHoldProgress(0);
+      // Nếu chưa đủ 2.5s (chưa mở khóa) mà người dùng di chuyển > 10px => Hủy đếm giữ (cho phép cuộn trang)
+      if (!isUnlockedRef.current) {
+        if (Math.hypot(dx, dy) > 10) {
+          cancelledByScrollRef.current = true;
+          clearTimeout(holdTimerRef.current);
+          clearInterval(holdProgressTimerRef.current);
+          setIsHolding(false);
+          setHoldProgress(0);
+        }
+        return;
       }
 
-      // Khi đã được mở khóa (sau 2.5s) => Cho phép kéo nút tự do
-      if (dragInfoRef.current.moved && isUnlocked) {
-        const minX = 12;
-        const maxX = window.innerWidth - 105;
-        const minY = 50;
-        const maxY = window.innerHeight - 90; // Không che BottomNav
+      // Khi ĐÃ mở khóa (sau 2.5s) => Cho phép kéo nút tự do
+      dragInfoRef.current.moved = true;
+      const minX = 12;
+      const maxX = window.innerWidth - 105;
+      const minY = 50;
+      const maxY = window.innerHeight - 90; // Không che BottomNav
 
-        latestX = Math.max(minX, Math.min(dragInfoRef.current.elemX + dx, maxX));
-        latestY = Math.max(minY, Math.min(dragInfoRef.current.elemY + dy, maxY));
+      latestX = Math.max(minX, Math.min(dragInfoRef.current.elemX + dx, maxX));
+      latestY = Math.max(minY, Math.min(dragInfoRef.current.elemY + dy, maxY));
 
-        setPos({ x: latestX, y: latestY });
-      }
+      setPos({ x: latestX, y: latestY });
     };
 
     const handlePointerUp = () => {
@@ -150,28 +162,33 @@ export default function FloatingAiButton() {
       setIsHolding(false);
       setHoldProgress(0);
 
-      // Nếu đã ở trạng thái kéo thả di chuyển: lưu vị trí và không mở link
-      if (isUnlocked && dragInfoRef.current.moved) {
-        setIsDragging(false);
-        setIsUnlocked(false);
+      const wasUnlocked = isUnlockedRef.current;
+      const hasMoved = dragInfoRef.current.moved;
+
+      isUnlockedRef.current = false;
+      isDraggingRef.current = false;
+      setIsUnlocked(false);
+      setIsDragging(false);
+
+      // Nếu đã ở trạng thái mở khóa kéo thả: lưu vị trí và không mở link
+      if (wasUnlocked) {
         justMovedRef.current = true;
         setTimeout(() => {
           justMovedRef.current = false;
-        }, 200);
+        }, 300);
 
-        const finalPos = { x: latestX, y: latestY };
-        setPos(finalPos);
-        try {
-          localStorage.setItem('qbiz_floating_ai_pos', JSON.stringify(finalPos));
-        } catch {}
+        if (hasMoved) {
+          const finalPos = { x: latestX, y: latestY };
+          setPos(finalPos);
+          try {
+            localStorage.setItem('qbiz_floating_ai_pos', JSON.stringify(finalPos));
+          } catch {}
+        }
         return;
       }
 
-      setIsDragging(false);
-      setIsUnlocked(false);
-
-      // Nếu chưa di chuyển và bấm dưới 2.5s => Chuyển đến trang Trợ lý AI
-      if (!dragInfoRef.current.moved && !justMovedRef.current) {
+      // Nếu bấm nhanh dưới 2.5s (không hủy do cuộn, không kéo thả) => Chuyển đến trang Trợ lý AI
+      if (!cancelledByScrollRef.current && !hasMoved && !justMovedRef.current) {
         playTapSound();
         window.location.href = '/tro-ly-ai';
       }
