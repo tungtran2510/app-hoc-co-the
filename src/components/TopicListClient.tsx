@@ -99,7 +99,9 @@ export default function TopicListClient({
   const [userPhoneRevision, setUserPhoneRevision] = useState(0);
   const [editingTopic, setEditingTopic] = useState<Topic | null>(null);
   const [isCreating, setIsCreating] = useState(false);
-  const [displayMode, setDisplayMode] = useState<TopicsDisplayMode>(initialDisplay || 'card');
+  const [displayMode, setDisplayMode] = useState<TopicsDisplayMode>(
+    initialDisplay || (enableSearch || settingsScope === 'page' ? 'catalog' : 'card')
+  );
   const [query, setQuery] = useState('');
   const [topicsDesc, setTopicsDesc] = useState(initialDescription || 'Hệ thống chuyên đề & bài học giải phẫu cơ thể');
   const [descDraft, setDescDraft] = useState(topicsDesc);
@@ -236,7 +238,7 @@ export default function TopicListClient({
 
   useEffect(() => {
     if (!isAdminResolved || isAdmin) return;
-    setDisplayMode(initialDisplay || 'card');
+    setDisplayMode(initialDisplay || (enableSearch || settingsScope === 'page' ? 'catalog' : 'card'));
     const scope: TopicDisplayScope = settingsScope === 'page' ? 'page' : 'home';
     const preferenceKey = scope === 'page' ? 'topics_page_display' : 'home_topics_display';
     const phone = getUserPhone();

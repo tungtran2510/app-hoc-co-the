@@ -261,7 +261,7 @@ export async function getSettings(includeAiTraining = false): Promise<Settings> 
             search_placeholder: data.search_placeholder || sanitizedBlockStyles.search_placeholder || 'Tìm bài, ví dụ: đĩa đệm',
             topics_title: data.topics_title || sanitizedBlockStyles.topics_title || 'Chuyên Đề Học',
             home_topics_display: sanitizedBlockStyles.home_topics_display || sanitizedBlockStyles.topics_display || 'card',
-            topics_page_display: sanitizedBlockStyles.topics_page_display || sanitizedBlockStyles.topics_display || 'card',
+            topics_page_display: sanitizedBlockStyles.topics_page_display || 'catalog',
             featured_topic_ids: Array.isArray(sanitizedBlockStyles.featured_topic_ids) ? sanitizedBlockStyles.featured_topic_ids : [],
             recommended_books_title: data.recommended_books_title || sanitizedBlockStyles.recommended_books_title || 'Tài Liệu Y Khoa',
             recommended_books_subtitle: data.recommended_books_subtitle || sanitizedBlockStyles.recommended_books_subtitle || 'Tài liệu tham khảo chuyên sâu giúp bạn hiểu và chăm sóc cơ thể mỗi ngày',
