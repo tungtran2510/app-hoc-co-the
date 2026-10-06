@@ -218,12 +218,12 @@ const TOPIC_DOCUMENTS: Record<string, MedicalDocument[]> = {
     },
   ],
 
-  // 2. CHUYÊN ĐỀ DINH DƯỠNG & NƯỚC ĐIỆN GIẢI
-  'dinh-duong': [
+  // 2. CHUYÊN ĐỀ NƯỚC & ĐIỆN GIẢI
+  'nuoc': [
     {
-      id: 'doc-dinh-duong-1',
+      id: 'doc-nuoc-1',
       title: 'Sổ Tay Thực Hành: Nước, Cân Bằng Điện Giải & Độ pH Tế Bào',
-      badge: 'TÀI LIỆU Y KHOA',
+      badge: 'PDF Y KHOA',
       badgeColor: 'bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-950/80 dark:text-blue-300 dark:border-blue-800',
       description: 'Hệ thống hóa toàn diện về nước nội bào, ngoại bào, 4 thời điểm vàng uống nước và cân bằng điện giải Natri/Kali.',
       format: 'PDF Giáo Trình & TXT',
@@ -260,7 +260,7 @@ const TOPIC_DOCUMENTS: Record<string, MedicalDocument[]> = {
               'Ly 3 (Trước khi tắm): Ổn định huyết áp, phòng tránh sốc nhiệt.',
               'Ly 4 (Trước khi đi ngủ 30 phút): Giảm nguy cơ nhồi máu cơ tim do cô đặc máu đêm.',
             ],
-            notes: 'Mỗi ngày nên duy trì 0.4 lít nước trên mỗi 10kg trọng lượng cơ thể (ví dụ 60kg cần khoảng 2.4 lít).',
+            notes: 'Mỗi ngày nên duy trì 0.04 lít nước trên mỗi kg trọng lượng cơ thể (ví dụ 60kg cần khoảng 2.4 lít).',
           },
         ],
         clinicalAdvice: [
@@ -270,7 +270,73 @@ const TOPIC_DOCUMENTS: Record<string, MedicalDocument[]> = {
       },
     },
     {
-      id: 'doc-dinh-duong-2',
+      id: 'doc-nuoc-2',
+      title: 'Cẩm Nang Tra Cứu: Khoáng Chất & Điện Giải Thiết Yếu',
+      badge: 'FILE WORD DOCX',
+      badgeColor: 'bg-indigo-100 text-indigo-900 border-indigo-300 dark:bg-indigo-950/80 dark:text-indigo-300 dark:border-indigo-800',
+      description: 'Phân tích cơ chế áp suất thẩm thấu tế bào, vai trò bơm Natri-Kali và bổ sung vi khoáng ion kiềm thiết yếu.',
+      format: 'File Word (.docx)',
+      fileType: 'docx',
+      pages: 8,
+      size: 'File DOCX 24 KB',
+      source: 'Viện Dinh Dưỡng Sinh Học',
+      fileUrl: '/documents/cam_nang_khoang_chat_dien_giai.docx',
+      content: {
+        overview: 'Cân bằng điện giải giữ vai trò quyết định dẫn truyền xung động thần kinh, co bóp cơ tim và cân bằng toan kiềm máu.',
+        sections: [
+          {
+            heading: '1. Vai trò của Natri, Kali, Canxi và Magie',
+            paragraphs: [
+              'Bơm Natri-Kali (Na+/K+-ATPase) tiêu tốn tới 20-40% tổng năng lượng ATP của tế bào để duy trì điện thế màng lúc nghỉ.',
+              'Mất cân bằng điện giải khi đổ mồ hôi nhiều hoặc sốt có thể dẫn đến chuột rút, hoa mắt và rối loạn nhịp tim.',
+            ],
+            bullets: [
+              'Natri: Giữ áp lực thẩm thấu ngoại bào, điều hòa huyết áp.',
+              'Kali: Cân bằng nhịp đập cơ tim, giảm co thắt cơ bắp.',
+              'Magie: Đồng yếu tố cho hơn 300 enzyme chuyển hóa năng lượng.',
+            ],
+          },
+        ],
+        clinicalAdvice: [
+          'Khi chơi thể thao hoặc làm việc ngoài trời nắng, bổ sung nước có pha một lượng nhỏ khoáng chất hoặc nước dừa tươi.',
+        ],
+      },
+    },
+    {
+      id: 'doc-nuoc-3',
+      title: 'Ebook Y Khoa: Uống Nước Đúng Cách & Cân Bằng Nội Môi',
+      badge: 'EBOOK EPUB',
+      badgeColor: 'bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-800',
+      description: 'Cẩm nang thực hành tính lượng nước hàng ngày theo thể trạng, nhận biết sớm 5 cấp độ mất nước và giải pháp phục hồi.',
+      format: 'Ebook EPUB',
+      fileType: 'epub',
+      pages: 16,
+      size: 'Ebook EPUB 22 KB',
+      source: 'Tủ Sách Y Khoa Qbiz Books',
+      fileUrl: '/documents/ebook_nuoc_va_can_bang_noi_moi.epub',
+      content: {
+        overview: 'Nước là khởi nguồn của mọi chuyển hóa sinh học. Uống nước khoa học giúp làm chậm quá trình lão hóa tế bào.',
+        sections: [
+          {
+            heading: '1. 5 Cấp độ cảnh báo mất nước',
+            paragraphs: [
+              'Cấp 1: Cảm giác khát nhẹ, khô môi (mất 1-2% nước).',
+              'Cấp 2: Nước tiểu vàng sẫm, đau đầu nhẹ, mệt mỏi buổi chiều (mất 3-4% nước).',
+              'Cấp 3: Giảm độ đàn hồi của da, chuột rút, tim đập nhanh (mất 5-8% nước).',
+            ],
+          },
+        ],
+        clinicalAdvice: [
+          'Theo dõi màu sắc nước tiểu mỗi sáng: Màu vàng rơm nhạt là dấu hiệu cơ thể ngậm đủ nước.',
+        ],
+      },
+    },
+  ],
+
+  // 3. CHUYÊN ĐỀ DINH DƯỠNG NỀN TẢNG
+  'dinh-duong': [
+    {
+      id: 'doc-dinh-duong-1',
       title: 'Cẩm Nang Dinh Dưỡng Nền Tảng & Chuyển Hóa Năng Lượng',
       badge: 'FILE WORD DOCX',
       badgeColor: 'bg-indigo-100 text-indigo-900 border-indigo-300 dark:bg-indigo-950/80 dark:text-indigo-300 dark:border-indigo-800',
@@ -278,7 +344,7 @@ const TOPIC_DOCUMENTS: Record<string, MedicalDocument[]> = {
       format: 'File Word (.docx)',
       fileType: 'docx',
       pages: 8,
-      size: 'File DOCX 25 KB · Đọc trực tiếp',
+      size: 'File DOCX 25 KB',
       source: 'Viện Dinh Dưỡng Sinh Học',
       fileUrl: '/documents/cam_nang_dinh_duong_nen_tang.docx',
       txtUrl: '/documents/cam_nang_dinh_duong_nen_tang.txt',
@@ -310,17 +376,17 @@ const TOPIC_DOCUMENTS: Record<string, MedicalDocument[]> = {
       },
     },
     {
-      id: 'doc-dinh-duong-3',
-      title: 'Ebook: Bảng Tra Cứu 45 Chỉ Số Cơ Thể & Dinh Dưỡng Tế Bào',
-      badge: 'EBOOK EPUB',
-      badgeColor: 'bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-800',
-      description: 'Sách điện tử định dạng EPUB tra cứu 45 chỉ số cơ thể từ máy đo sinh học và giải pháp dinh dưỡng phục hồi.',
-      format: 'Ebook EPUB & PDF',
-      fileType: 'epub',
-      pages: 20,
-      size: 'Ebook EPUB 32 KB · PDF 531 KB',
+      id: 'doc-dinh-duong-2',
+      title: 'Bảng Tra Cứu Lâm Sàng: 45 Chỉ Số Cơ Thể & Nhu Cầu Vi Chất',
+      badge: 'PDF CHUẨN A4',
+      badgeColor: 'bg-rose-100 text-rose-900 border-rose-300 dark:bg-rose-950/80 dark:text-rose-300 dark:border-rose-800',
+      description: 'Bảng định mức nhu cầu dinh dưỡng hàng ngày (RDA) và cách đọc 45 chỉ số cơ thể từ máy đo sinh học.',
+      format: 'PDF Giáo Trình Chuẩn',
+      fileType: 'pdf',
+      pages: 14,
+      size: 'PDF 531 KB',
       source: 'Tủ Sách Y Khoa Qbiz Books',
-      fileUrl: '/documents/ebook_giai_phau_va_dinh_duong.epub',
+      fileUrl: '/documents/bang_tra_cuu_dinh_duong_45_chi_so.pdf',
       pdfUrl: '/documents/bang_tra_cuu_dinh_duong_45_chi_so.pdf',
       content: {
         overview: 'Bảng phân tích chuyên sâu các chỉ số: tỷ lệ mỡ dưới da, mỡ nội tạng, khối lượng cơ, mật độ khoáng xương và tỷ lệ nước toàn thân.',
@@ -344,9 +410,73 @@ const TOPIC_DOCUMENTS: Record<string, MedicalDocument[]> = {
         ],
       },
     },
+    {
+      id: 'doc-dinh-duong-3',
+      title: 'Ebook: Giải Phẫu Sinh Học & Dinh Dưỡng Tế Bào',
+      badge: 'EBOOK EPUB',
+      badgeColor: 'bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-800',
+      description: 'Sách điện tử EPUB ứng dụng giải phẫu vào dinh dưỡng sinh học và phục hồi chức năng tự nhiên.',
+      format: 'Ebook EPUB',
+      fileType: 'epub',
+      pages: 18,
+      size: '32 KB (Định dạng EPUB)',
+      source: 'Tủ Sách Y Khoa Qbiz Books',
+      fileUrl: '/documents/ebook_giai_phau_va_dinh_duong.epub',
+      content: {
+        overview: 'Cầu nối giữa kiến thức dinh dưỡng kinh viện và ứng dụng thực tiễn trong lối sống, tập luyện và dinh dưỡng hàng ngày.',
+        sections: [
+          {
+            heading: '1. Dinh dưỡng cho tái tạo tế bào',
+            paragraphs: [
+              'Tế bào ruột thay mới sau mỗi 3-5 ngày, tế bào da sau 28 ngày, và tế bào xương sau mỗi 7-10 năm. Nguyên liệu ta nạp vào quyết định chất lượng tế bào mới.',
+            ],
+          },
+        ],
+        clinicalAdvice: [
+          'Ưu tiên thực phẩm tươi sống, nguyên bản, hạn chế chế biến chiên xào nhiệt độ cao.',
+        ],
+      },
+    },
   ],
 
-  // 3. CHUYÊN ĐỀ HỆ TIÊU HÓA
+  // 4. CHUYÊN ĐỀ HỆ TIÊU HÓA (Hỗ trợ cả slug 'tieu-hoa' và 'he-tieu-hoa')
+  'tieu-hoa': [
+    {
+      id: 'doc-tieu-hoa-1',
+      title: 'Cẩm Nang Hệ Tiêu Hóa & Hệ Vi Sinh Đường Ruột (Microbiome)',
+      badge: 'FILE WORD DOCX',
+      badgeColor: 'bg-indigo-100 text-indigo-900 border-indigo-300 dark:bg-indigo-950/80 dark:text-indigo-300 dark:border-indigo-800',
+      description: 'Hệ thống hóa cấu trúc dạ dày, ruột non, ruột già và vai trò của 100 nghìn tỷ lợi khuẩn đường ruột.',
+      format: 'File Word (.docx) & PDF',
+      fileType: 'docx',
+      pages: 12,
+      size: 'DOCX 28 KB · PDF 531 KB',
+      source: 'Khoa Tiêu Hóa Lâm Sàng',
+      fileUrl: '/documents/cam_nang_he_tieu_hoa_va_vi_sinh.docx',
+      pdfUrl: '/documents/cam_nang_he_tieu_hoa_va_vi_sinh.pdf',
+      content: {
+        overview: 'Hệ tiêu hóa là nơi tiếp nhận, tiêu hóa và hấp thụ hơn 95% dưỡng chất, đồng thời là nơi cư trú của hơn 70% tế bào miễn dịch toàn thân.',
+        sections: [
+          {
+            heading: '1. Trục Não - Ruột (Gut-Brain Axis)',
+            paragraphs: [
+              'Đường ruột sản sinh tới 90% lượng Serotonin (hormone điều hòa tâm trạng). Khi đường ruột viêm nhiễm, tâm trạng sẽ dễ cáu gắt, lo âu và mất ngủ.',
+            ],
+          },
+          {
+            heading: '2. Bảo vệ lớp nhầy niêm mạc dạ dày',
+            paragraphs: [
+              'Axit dạ dày HCl pH 1.5 - 2.0 có tác dụng diệt khuẩn và hoạt hóa pepsin. Khi lớp chất nhầy bảo vệ bị bào mòn bởi stress, thuốc giảm đau NSAID hoặc vi khuẩn HP, nguy cơ viêm loét tăng cao.',
+            ],
+          },
+        ],
+        clinicalAdvice: [
+          'Bổ sung men vi sinh (Probiotics) và thức ăn cho lợi khuẩn (Prebiotics từ chuối, măng tây, yến mạch).',
+          'Ăn chậm, nhai kỹ để giảm gánh nặng co bóp cơ học cho dạ dày.',
+        ],
+      },
+    },
+  ],
   'he-tieu-hoa': [
     {
       id: 'doc-tieu-hoa-1',
@@ -385,7 +515,103 @@ const TOPIC_DOCUMENTS: Record<string, MedicalDocument[]> = {
     },
   ],
 
-  // 4. CHUYÊN ĐỀ CƠ THỂ NGƯỜI TOÀN DIỆN
+  // 5. CHUYÊN ĐỀ NỘI TIẾT - CHUYỂN HÓA
+  'noi-tiet-chuyen-hoa': [
+    {
+      id: 'doc-noi-tiet-1',
+      title: 'Cẩm Nang Hệ Nội Tiết & Cơ Chế Điều Hòa Đường Huyết (Insulin, Tuyến Giáp)',
+      badge: 'FILE WORD DOCX',
+      badgeColor: 'bg-indigo-100 text-indigo-900 border-indigo-300 dark:bg-indigo-950/80 dark:text-indigo-300 dark:border-indigo-800',
+      description: 'Tổng quan các tuyến nội tiết chính: Tuyến yên, tuyến giáp, tuyến thượng thận và cơ chế kháng insulin.',
+      format: 'File Word (.docx) & PDF',
+      fileType: 'docx',
+      pages: 10,
+      size: 'DOCX 26 KB · PDF 531 KB',
+      source: 'Tủ Sách Y Khoa Qbiz Books',
+      fileUrl: '/documents/cam_nang_noi_tiet_va_chuyen_hoa.docx',
+      pdfUrl: '/documents/cam_nang_noi_tiet_va_chuyen_hoa.pdf',
+      content: {
+        overview: 'Hệ nội tiết kiểm soát quá trình chuyển hóa, tăng trưởng và cảm xúc thông qua mạng lưới hormone điều hòa tinh vi.',
+        sections: [
+          {
+            heading: '1. Kháng Insulin và rối loạn chuyển hóa',
+            paragraphs: [
+              'Khi cơ thể liên tục nạp đường nhanh và đồ ngọt, tuyến tụy phải tiết quá nhiều insulin khiến tế bào chai sạn và giảm nhạy cảm.',
+            ],
+          },
+        ],
+        clinicalAdvice: [
+          'Hạn chế đồ uống có ga, bánh ngọt; ưu tiên thực phẩm có chỉ số đường huyết GI thấp.',
+        ],
+      },
+    },
+  ],
+
+  // 6. CHUYÊN ĐỀ GAN - MẬT - TỤY
+  'gan-mat-tuy': [
+    {
+      id: 'doc-gan-mat-1',
+      title: 'Cẩm Nang Chức Năng Gan – Mật – Tụy & Cơ Chế Thải Độc Sinh Học',
+      badge: 'FILE WORD DOCX',
+      badgeColor: 'bg-indigo-100 text-indigo-900 border-indigo-300 dark:bg-indigo-950/80 dark:text-indigo-300 dark:border-indigo-800',
+      description: 'Hơn 500 chức năng sống còn của gan, 2 pha thải độc Cytochrome P450 và bảo vệ tế bào gan.',
+      format: 'File Word (.docx) & PDF',
+      fileType: 'docx',
+      pages: 10,
+      size: 'DOCX 26 KB · PDF 531 KB',
+      source: 'Tủ Sách Y Khoa Qbiz Books',
+      fileUrl: '/documents/cam_nang_gan_mat_tuy.docx',
+      pdfUrl: '/documents/cam_nang_gan_mat_tuy.pdf',
+      content: {
+        overview: 'Gan là nhà máy hóa chất kỳ diệu của cơ thể, chịu trách nhiệm chuyển hóa mỡ, khử độc máu và dự trữ glycogen.',
+        sections: [
+          {
+            heading: '1. Cơ chế thải độc Pha 1 và Pha 2 của gan',
+            paragraphs: [
+              'Pha 1 oxy hóa độc tố tạo thành chất trung gian, Pha 2 liên hợp với Glutathione và các acid amin để đào thải ra ngoài qua mật và thận.',
+            ],
+          },
+        ],
+        clinicalAdvice: [
+          'Ngủ trước 23h để tạo điều kiện cho gan tái tạo tế bào và thải độc tối ưu.',
+        ],
+      },
+    },
+  ],
+
+  // 7. CHUYÊN ĐỀ HỆ MIỄN DỊCH
+  'mien-dich': [
+    {
+      id: 'doc-mien-dich-1',
+      title: 'Cẩm Nang Hệ Miễn Dịch & Tế Bào Bạch Cầu (Đề Kháng Tự Nhiên)',
+      badge: 'FILE WORD DOCX',
+      badgeColor: 'bg-indigo-100 text-indigo-900 border-indigo-300 dark:bg-indigo-950/80 dark:text-indigo-300 dark:border-indigo-800',
+      description: 'Hàng rào bảo vệ tự nhiên, miễn dịch bẩm sinh, miễn dịch thích ứng và các vi chất tăng cường đề kháng.',
+      format: 'File Word (.docx) & PDF',
+      fileType: 'docx',
+      pages: 10,
+      size: 'DOCX 26 KB · PDF 531 KB',
+      source: 'Tủ Sách Y Khoa Qbiz Books',
+      fileUrl: '/documents/cam_nang_he_mien_dich.docx',
+      pdfUrl: '/documents/cam_nang_he_mien_dich.pdf',
+      content: {
+        overview: 'Hệ miễn dịch là đội quân tinh nhuệ bảo vệ cơ thể 24/7 trước vi khuẩn, virus và các tế bào đột biến.',
+        sections: [
+          {
+            heading: '1. Miễn dịch bẩm sinh và miễn dịch dịch thể',
+            paragraphs: [
+              'Bạch cầu đa nhân trung tính, đại thực bào và tế bào NK (Natural Killer) tiêu diệt mầm bệnh lạ ngay trong những giờ đầu tiên.',
+            ],
+          },
+        ],
+        clinicalAdvice: [
+          'Duy trì vận động thể chất điều độ và bổ sung đủ Kẽm, Vitamin C, Vitamin D3.',
+        ],
+      },
+    },
+  ],
+
+  // 8. CHUYÊN ĐỀ CƠ THỂ NGƯỜI TOÀN DIỆN
   'co-the-nguoi': [
     {
       id: 'doc-co-the-1',
@@ -946,6 +1172,36 @@ export default function MedicalDocumentsTab({
               {/* TAB 1: BẢN ĐỌC CHUẨN Y KHOA TRỰC TIẾP (KHÔNG BAO GIỜ BỊ LỖI TRẮNG) */}
               {readerTab === 'read' && (
                 <div className="space-y-4 max-w-[720px] mx-auto">
+                  {/* Thanh nút mở trực tiếp file gốc cho mọi loại file */}
+                  <div className="flex items-center justify-between p-3 sm:p-3.5 rounded-[16px] bg-gradient-to-r from-blue-50 to-indigo-50/80 dark:from-purple-950/60 dark:to-indigo-950/40 border border-blue-200 dark:border-purple-800/60 gap-2 flex-wrap">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse shrink-0" />
+                      <span className="text-[12.5px] sm:text-[13px] font-black text-blue-950 dark:text-blue-200 truncate">
+                        Tệp thực tế: {selectedDoc.format} ({selectedDoc.size})
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenNativeFile(selectedDoc)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] bg-[#1E3A8A] hover:bg-[#172554] text-white font-bold text-[12px] shadow-xs cursor-pointer active:scale-95"
+                        title="Mở xem file trực tiếp toàn màn hình trên trình duyệt"
+                      >
+                        <ExternalLink size={13} />
+                        <span>Mở toàn màn hình</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDownload(selectedDoc)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[12px] shadow-xs cursor-pointer active:scale-95"
+                        title="Tải tệp này về thiết bị"
+                      >
+                        <Download size={13} />
+                        <span>Tải file</span>
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Khối Tổng quan */}
                   <div className="p-4 rounded-[18px] bg-amber-50/80 dark:bg-purple-950/40 border border-amber-200 dark:border-purple-800/40 shadow-xs">
                     <span className="text-[12px] font-black text-amber-800 dark:text-purple-300 uppercase tracking-wide block mb-1.5">

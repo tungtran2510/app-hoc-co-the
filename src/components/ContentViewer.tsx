@@ -30,6 +30,7 @@ import { generateUuid, isValidUuid } from '../lib/uuid';
 import PageHeaderBar, { TocItem, FontSizeOption, ThemeModeOption } from './PageHeaderBar';
 import BlockRenderer from './BlockRenderer';
 import TextBlock from './blocks/TextBlock';
+import ComparisonBlock from './blocks/ComparisonBlock';
 import EditBlockModal from './admin/EditBlockModal';
 import VideoManagerModal from './admin/VideoManagerModal';
 import AddBlockDrawer from './admin/AddBlockDrawer';
@@ -410,10 +411,10 @@ export default function ContentViewer({
   };
 
   // Di chuyển khối tóm tắt lên trong tab Tóm tắt cốt lõi
-  const handleMoveTextBlockUp = (bId: string) => {
-    const textIdx = textBlocks.findIndex((b) => b.id === bId);
-    if (textIdx <= 0) return;
-    const prevBlock = textBlocks[textIdx - 1];
+  const handleMoveSummaryBlockUp = (bId: string) => {
+    const sIdx = summaryBlocks.findIndex((b) => b.id === bId);
+    if (sIdx <= 0) return;
+    const prevBlock = summaryBlocks[sIdx - 1];
     const currIdx = blockList.findIndex((b) => b.id === bId);
     const prevIdx = blockList.findIndex((b) => b.id === prevBlock.id);
     if (currIdx === -1 || prevIdx === -1) return;
@@ -428,10 +429,10 @@ export default function ContentViewer({
   };
 
   // Di chuyển khối tóm tắt xuống trong tab Tóm tắt cốt lõi
-  const handleMoveTextBlockDown = (bId: string) => {
-    const textIdx = textBlocks.findIndex((b) => b.id === bId);
-    if (textIdx === -1 || textIdx >= textBlocks.length - 1) return;
-    const nextBlock = textBlocks[textIdx + 1];
+  const handleMoveSummaryBlockDown = (bId: string) => {
+    const sIdx = summaryBlocks.findIndex((b) => b.id === bId);
+    if (sIdx === -1 || sIdx >= summaryBlocks.length - 1) return;
+    const nextBlock = summaryBlocks[sIdx + 1];
     const currIdx = blockList.findIndex((b) => b.id === bId);
     const nextIdx = blockList.findIndex((b) => b.id === nextBlock.id);
     if (currIdx === -1 || nextIdx === -1) return;
@@ -662,9 +663,10 @@ export default function ContentViewer({
 
   const isHtmlTextBlock = (b: Block) =>
     b.type === 'text' && ((b.data as any)?.mode === 'html' || b.display_style === 'html');
-  const textBlocks = blockList.filter(
-    (b): b is Extract<Block, { type: 'text' }> => b.type === 'text' && !isHtmlTextBlock(b)
+  const summaryBlocks = blockList.filter(
+    (b) => (b.type === 'text' && !isHtmlTextBlock(b)) || b.type === 'comparison'
   );
+  const textBlocks = summaryBlocks;
   const filesBlocks = blockList.filter((b) => b.type === 'files');
   const customFiles: FileItem[] = filesBlocks.flatMap((b) => (b.type === 'files' ? b.data.files : []));
   const relatedLinksBlock = blockList.find((b) => b.type === 'links' && b.display_style === 'related');
@@ -711,7 +713,9 @@ export default function ContentViewer({
       return 'TÀI LIỆU Y KHOA';
     }
     if (block.type === 'comparison') {
-      return 'SO SÁNH 2 CỘT';
+      const left = block.data.left_title || 'Uống nước sai lầm';
+      const right = block.data.right_title || 'Uống nước khoa học';
+      return `SO SÁNH: ${left.toUpperCase()} ↔ ${right.toUpperCase()}`;
     }
     if (block.type === 'links') {
       return block.display_style === 'related' ? 'BÀI LIÊN QUAN' : 'LIÊN KẾT NGOÀI';
@@ -731,11 +735,26 @@ export default function ContentViewer({
     }
 
     // Nếu bài học đã có khối Video (đã tích hợp sẵn 3 tab: Giáo trình, Tóm tắt cốt lõi, Tài liệu):
-    // Các khối tóm tắt văn bản (Điểm cần nhớ, Ý nghĩa, Ghi chú, v.v.) đã nằm trọn vẹn trong tab Tóm tắt cốt lõi,
-    // và các tệp tài liệu đã nằm trong tab Tài liệu.
-    // Tuyệt đối không render lặp lại ở bên ngoài để tránh nhân đôi nội dung dưới danh sách bài học.
     if (videoBlock) {
+      // Khi đang xem tab 'Tài liệu' (resources):
+      // Tuyệt đối không hiển thị bất kỳ khối nào bên dưới VideosBlock.
+      // Đúng nguyên tắc của người dùng: "Tài liệu chỉ là nơi chứa tài liệu còn tất cả những thứ không liên quan đến tài liệu xóa hết"
+      if (activeTab === 'resources' && block.id !== videoBlock.id) {
+        return null;
+      }
+
+      // Khi đang xem tab 'Tóm tắt cốt lõi' (summary):
+      // Tất cả nội dung tóm tắt (văn bản, bảng so sánh...) đã nằm trọn vẹn trong tab summaryContent của VideosBlock
+      if (activeTab === 'summary' && block.id !== videoBlock.id) {
+        return null;
+      }
+
+      // Khi đang xem tab 'Giáo trình' (syllabus):
+      // Khối tóm tắt văn bản, bảng so sánh và tệp tài liệu đã nằm trong tab riêng, không hiển thị lặp lại bên dưới video
       if (block.type === 'text' && !isHtmlTextBlock(block)) {
+        return null;
+      }
+      if (block.type === 'comparison') {
         return null;
       }
       if (block.type === 'files') {
@@ -940,7 +959,7 @@ export default function ContentViewer({
                             {/* Nút Di chuyển lên ▲ */}
                             <button
                               type="button"
-                              onClick={() => handleMoveTextBlockUp(b.id)}
+                              onClick={() => handleMoveSummaryBlockUp(b.id)}
                               disabled={textIdx === 0}
                               className="w-7 h-7 rounded-[8px] bg-white dark:bg-[#1C123D] border border-line flex items-center justify-center text-ink disabled:opacity-30 shadow-2xs cursor-pointer"
                               title="Di chuyển lên"
@@ -951,7 +970,7 @@ export default function ContentViewer({
                             {/* Nút Di chuyển xuống ▼ */}
                             <button
                               type="button"
-                              onClick={() => handleMoveTextBlockDown(b.id)}
+                              onClick={() => handleMoveSummaryBlockDown(b.id)}
                               disabled={textIdx === textBlocks.filter((x) => isAdmin || x.is_visible).length - 1}
                               className="w-7 h-7 rounded-[8px] bg-white dark:bg-[#1C123D] border border-line flex items-center justify-center text-ink disabled:opacity-30 shadow-2xs cursor-pointer"
                               title="Di chuyển xuống"
@@ -982,23 +1001,33 @@ export default function ContentViewer({
                         </div>
                       )}
 
-                      <TextBlock
-                        blockId={`block-${b.id}`}
-                        displayStyle={b.display_style}
-                        title={b.data.title}
-                        titleColor={b.data.title_color}
-                        mode={b.data.mode}
-                        html={b.data.html}
-                        lines={b.data.lines}
-                        format={b.data.format}
-                        fontSizeMode={fontSizeMode}
-                        fontSize={b.data.font_size}
-                        textColor={b.data.text_color}
-                        textAlign={b.data.text_align}
-                        images={b.data.images}
-                        files={b.data.files}
-                        videos={b.data.videos}
-                      />
+                      {b.type === 'comparison' ? (
+                        <ComparisonBlock
+                          blockId={`block-${b.id}`}
+                          leftTitle={b.data.left_title}
+                          leftLines={b.data.left_lines}
+                          rightTitle={b.data.right_title}
+                          rightLines={b.data.right_lines}
+                        />
+                      ) : b.type === 'text' ? (
+                        <TextBlock
+                          blockId={`block-${b.id}`}
+                          displayStyle={b.display_style}
+                          title={b.data.title}
+                          titleColor={b.data.title_color}
+                          mode={b.data.mode}
+                          html={b.data.html}
+                          lines={b.data.lines}
+                          format={b.data.format}
+                          fontSizeMode={fontSizeMode}
+                          fontSize={b.data.font_size}
+                          textColor={b.data.text_color}
+                          textAlign={b.data.text_align}
+                          images={b.data.images}
+                          files={b.data.files}
+                          videos={b.data.videos}
+                        />
+                      ) : null}
                     </div>
                   ))}
 

@@ -882,6 +882,27 @@ export default function VideosBlock({
             )}
           </div>
         )}
+
+        {/* Nút Hỏi trợ lý AI về bài học này (Đặt ngay dưới danh sách các bài học video theo yêu cầu) */}
+        <Link
+          href={`/tro-ly-ai?q=Giải thích chi tiết hơn về bài học: ${encodeURIComponent(pageTitle || '')}`}
+          className="flex items-center justify-between p-3.5 rounded-[16px] bg-gradient-to-r from-blue-50/90 to-indigo-50/80 dark:from-purple-950/60 dark:to-indigo-950/40 border border-blue-200 dark:border-purple-800/60 text-ink hover:border-blue-500 transition-all shadow-2xs group mt-2"
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-full bg-blue-700 dark:bg-purple-600 text-white flex items-center justify-center shadow-xs">
+              <Sparkles size={18} />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[13.5px] sm:text-[14px] font-black text-blue-900 dark:text-blue-200">
+                Hỏi Trợ lý sức khỏe về bài này
+              </span>
+              <span className="text-[11.5px] sm:text-[12px] text-slate-500 dark:text-purple-300 font-medium">
+                Giải đáp thắc mắc chuyên sâu 24/7
+              </span>
+            </div>
+          </div>
+          <ArrowRight size={18} className="text-blue-700 dark:text-blue-300 group-hover:translate-x-1 transition-transform" />
+        </Link>
       </div>
 
       <div className={currentTab === 'summary' ? 'flex flex-col gap-3 py-1 animate-in fade-in duration-100' : 'hidden'}>
@@ -892,26 +913,6 @@ export default function VideosBlock({
 
       <div className={currentTab === 'resources' ? 'flex flex-col gap-3 py-1 animate-in fade-in duration-100' : 'hidden'}>
         {resourcesContent}
-        {/* Nút Hỏi trợ lý AI */}
-        <Link
-          href={`/tro-ly-ai?q=Giải thích chi tiết hơn về bài học: ${encodeURIComponent(pageTitle || '')}`}
-          className="flex items-center justify-between p-3.5 rounded-[16px] bg-gradient-to-r from-primary-soft to-surface-2 border border-primary/25 text-ink hover:border-primary transition-all shadow-2xs group mt-1"
-        >
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center shadow-xs">
-              <Sparkles size={18} />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[14px] font-extrabold text-primary">
-                Hỏi Trợ lý sức khỏe về bài này
-              </span>
-              <span className="text-[12px] text-muted font-normal">
-                Giải đáp thắc mắc chuyên sâu 24/7
-              </span>
-            </div>
-          </div>
-          <ArrowRight size={18} className="text-primary group-hover:translate-x-1 transition-transform" />
-        </Link>
       </div>
 
       {/* MODAL SỬA TỪNG VIDEO TRỰC QUAN (ẤN VÀO ĐÂU SỬA ĐẤY) */}
