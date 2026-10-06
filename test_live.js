@@ -38,7 +38,7 @@ const ARTIFACT_DIR = 'C:\\Users\\Admin\\.gemini\\antigravity\\brain\\23366f77-38
     }
   });
 
-  const targetBase = process.env.TEST_URL || 'https://app-hoc-co-the.vercel.app';
+  const targetBase = process.env.TEST_URL || 'http://localhost:3008';
   console.log(`\n1. Navigating to ${targetBase} (Mobile Viewport: 390x844)...`);
   const t0 = Date.now();
   await page.goto(targetBase, { waitUntil: 'networkidle', timeout: 30000 });
@@ -158,7 +158,7 @@ const ARTIFACT_DIR = 'C:\\Users\\Admin\\.gemini\\antigravity\\brain\\23366f77-38
   const pillStyles = await page.evaluate(() => {
     const aside = document.querySelector('aside[aria-label*="Hỏi Trợ lý AI"]');
     if (!aside) return null;
-    const pill = aside.querySelector('a') || aside.querySelector('div');
+    const pill = aside.querySelector('button') || aside.querySelector('a') || aside.querySelector('div');
     if (!pill) return null;
     const computed = window.getComputedStyle(pill);
     return {
@@ -190,9 +190,10 @@ const ARTIFACT_DIR = 'C:\\Users\\Admin\\.gemini\\antigravity\\brain\\23366f77-38
   // Tap AI Button -> Navigate to /tro-ly-ai
   console.log('   Testing Tap on Floating AI Button -> /tro-ly-ai...');
   const tAiStart = Date.now();
+  const aiBtn = aiButton.locator('button').first();
   await Promise.all([
     page.waitForURL('**/tro-ly-ai*', { timeout: 10000 }),
-    aiLink.click()
+    aiBtn.click()
   ]);
   const aiTransitionMs = Date.now() - tAiStart;
   console.log(`   ⚡ TRANSITION TIME (Tap AI Button -> /tro-ly-ai): ${aiTransitionMs}ms!`);

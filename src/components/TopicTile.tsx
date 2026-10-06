@@ -50,14 +50,11 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
   const hasCover = Boolean(coverUrl) && !imgError;
   const countText = pageCount > 0 ? `${pageCount} bài học` : 'Sắp ra mắt';
 
-  const handleNav = () => {
+  const handleNav = (e?: React.MouseEvent) => {
     onActivate?.();
-    try {
-      router.push(`/${topic.slug}`);
-    } catch {
-      if (typeof window !== 'undefined') {
-        window.location.href = `/${topic.slug}`;
-      }
+    e?.preventDefault();
+    if (typeof window !== 'undefined') {
+      window.location.href = `/${topic.slug}`;
     }
   };
 
@@ -66,18 +63,6 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
       <Link
         href={`/${topic.slug}`}
         prefetch={true}
-        onPointerDown={(e) => {
-          e.currentTarget.classList.add('is-active');
-        }}
-        onTouchStart={(e) => {
-          e.currentTarget.classList.add('is-active');
-        }}
-        onTouchMove={(e) => {
-          e.currentTarget.classList.remove('is-active');
-        }}
-        onTouchCancel={(e) => {
-          e.currentTarget.classList.remove('is-active');
-        }}
         onClick={handleNav}
         className={`flex items-center justify-between gap-3 px-4 py-3.5 rounded-[14px] bg-white dark:bg-[#160D30] border shadow-2xs active:scale-[0.99] transition-all [&.is-active]:border-[#FDE047] [&.is-active]:ring-2 [&.is-active]:ring-[#FDE047] [&.is-active]:shadow-[0_0_20px_rgba(250,204,21,0.6)] ${
           isActive
@@ -99,18 +84,6 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
       <Link
         href={`/${topic.slug}`}
         prefetch={true}
-        onPointerDown={(e) => {
-          e.currentTarget.classList.add('is-active');
-        }}
-        onTouchStart={(e) => {
-          e.currentTarget.classList.add('is-active');
-        }}
-        onTouchMove={(e) => {
-          e.currentTarget.classList.remove('is-active');
-        }}
-        onTouchCancel={(e) => {
-          e.currentTarget.classList.remove('is-active');
-        }}
         onClick={handleNav}
         className={`flex min-h-[84px] sm:min-h-[94px] items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-[17px] sm:rounded-[20px] bg-white dark:bg-[#160D30] border shadow-[0_9px_28px_-22px_rgba(15,23,42,.65)] active:scale-[0.99] transition-all [&.is-active]:border-[#FDE047] [&.is-active]:ring-2 [&.is-active]:ring-[#FDE047] [&.is-active]:shadow-[0_0_20px_rgba(250,204,21,0.6)] ${
           isActive
@@ -140,18 +113,6 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
       <Link
         href={`/${topic.slug}`}
         prefetch={true}
-        onPointerDown={(e) => {
-          e.currentTarget.classList.add('is-active');
-        }}
-        onTouchStart={(e) => {
-          e.currentTarget.classList.add('is-active');
-        }}
-        onTouchMove={(e) => {
-          e.currentTarget.classList.remove('is-active');
-        }}
-        onTouchCancel={(e) => {
-          e.currentTarget.classList.remove('is-active');
-        }}
         onClick={handleNav}
         className={`relative flex flex-col justify-between min-h-[190px] sm:min-h-[210px] p-4 rounded-[20px] bg-gradient-to-br from-[#231652] via-[#1A0E3F] to-[#100629] border text-white overflow-hidden shadow-[0_10px_26px_-12px_rgba(0,0,0,0.55)] active:scale-[0.99] transition-all [&.is-active]:border-[#FDE047] [&.is-active]:ring-2 [&.is-active]:ring-[#FDE047] [&.is-active]:shadow-[0_0_25px_rgba(250,204,21,0.7)] ${
           isActive
@@ -188,18 +149,6 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
       <Link
         href={`/${topic.slug}`}
         prefetch={true}
-        onPointerDown={(e) => {
-          e.currentTarget.classList.add('is-active');
-        }}
-        onTouchStart={(e) => {
-          e.currentTarget.classList.add('is-active');
-        }}
-        onTouchMove={(e) => {
-          e.currentTarget.classList.remove('is-active');
-        }}
-        onTouchCancel={(e) => {
-          e.currentTarget.classList.remove('is-active');
-        }}
         onClick={handleNav}
         className={`group/catalog block w-full min-w-0 rounded-[16px] border bg-white p-2 shadow-[0_8px_24px_-20px_rgba(15,23,42,.55)] active:scale-[0.98] transition-all [&.is-active]:border-[#FDE047] [&.is-active]:ring-2 [&.is-active]:ring-[#FDE047] [&.is-active]:shadow-[0_0_20px_rgba(250,204,21,0.6)] ${
           isActive

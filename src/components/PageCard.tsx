@@ -2,7 +2,6 @@ import React from 'react';
 import Link from 'next/link';
 import { ChevronRight, BookOpen } from 'lucide-react';
 import { Page, Topic } from '../lib/types';
-import { playTapSound } from '../lib/audioFeedback';
 
 interface PageCardProps {
   page: Page;
@@ -59,21 +58,12 @@ export default function PageCard({
   return (
     <a
       href={targetUrl}
-      onPointerDown={(e) => {
-        e.currentTarget.classList.add('is-active');
-      }}
-      onTouchStart={(e) => {
-        e.currentTarget.classList.add('is-active');
-      }}
-      onTouchMove={(e) => {
-        e.currentTarget.classList.remove('is-active');
-      }}
-      onTouchCancel={(e) => {
-        e.currentTarget.classList.remove('is-active');
-      }}
-      onClick={() => {
-        playTapSound();
+      onClick={(e) => {
         onActivate?.();
+        e.preventDefault();
+        if (typeof window !== 'undefined') {
+          window.location.href = targetUrl;
+        }
       }}
       className={`lesson-page-card flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 bg-white dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] rounded-[14px] border transition-all active:scale-[0.99] shadow-xs group [&.is-active]:border-[#FDE047] [&.is-active]:ring-2 [&.is-active]:ring-[#FDE047] [&.is-active]:shadow-[0_0_20px_rgba(250,204,21,0.6)] ${
         isActive

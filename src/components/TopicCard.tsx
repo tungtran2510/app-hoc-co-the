@@ -60,26 +60,11 @@ export default function TopicCard({
     <Link
       href={`/${topic.slug}`}
       prefetch={true}
-      onTouchStart={(e) => {
-        e.currentTarget.classList.add('is-active');
-      }}
-      onPointerDown={(e) => {
-        e.currentTarget.classList.add('is-active');
-      }}
-      onTouchMove={(e) => {
-        e.currentTarget.classList.remove('is-active');
-      }}
-      onTouchCancel={(e) => {
-        e.currentTarget.classList.remove('is-active');
-      }}
-      onClick={() => {
+      onClick={(e) => {
         onActivate?.();
-        try {
-          router.push(`/${topic.slug}`);
-        } catch {
-          if (typeof window !== 'undefined') {
-            window.location.href = `/${topic.slug}`;
-          }
+        e.preventDefault();
+        if (typeof window !== 'undefined') {
+          window.location.href = `/${topic.slug}`;
         }
       }}
       className={`topic-card-container group relative flex flex-col cursor-pointer select-none transition-transform duration-100 active:scale-[0.98] [&.is-active]:scale-[0.98] ${
