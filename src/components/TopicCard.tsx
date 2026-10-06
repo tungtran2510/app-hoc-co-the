@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+import Link from 'next/link';
 import TopicIcon from './TopicIcon';
 import { Topic } from '../lib/types';
 import { playTapSound } from '../lib/audioFeedback';
@@ -44,38 +44,31 @@ export default function TopicCard({
   onActivate,
   boldTitle = false,
 }: TopicCardProps) {
-  const router = useRouter();
   const [imgError, setImgError] = useState(false);
   const isAvailable = pageCount > 0;
   const coverUrl = topic.cover_url || DEFAULT_TOPIC_COVERS[topic.slug] || null;
   const hasCoverImage = Boolean(coverUrl) && !imgError;
   const mindMapSubtitle = TOPIC_MIND_MAP_SUBTITLES[topic.slug] || 'ANATOMY';
 
-  // Tải trước đường dẫn trong nền để khi bấm chuyển trang tức thì dưới 50ms
-  useEffect(() => {
-    router.prefetch(`/${topic.slug}`);
-  }, [router, topic.slug]);
-
   // Định dạng tiêu đề hiển thị đồng bộ, ngắt dòng tự nhiên không bị cắt dấu
   const displayTitle = topic.title
     .replace(' – ', '\n')
     .replace(' - ', '\n');
 
-  const handleNavigate = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    playTapSound();
-    e.currentTarget.classList.add('is-active');
-    onActivate?.();
-    router.push(`/${topic.slug}`);
-  };
-
   return (
-    <a
+    <Link
       href={`/${topic.slug}`}
+      prefetch={true}
       onPointerDown={(e) => {
         e.currentTarget.classList.add('is-active');
       }}
-      onClick={handleNavigate}
+      onTouchStart={(e) => {
+        e.currentTarget.classList.add('is-active');
+      }}
+      onClick={() => {
+        playTapSound();
+        onActivate?.();
+      }}
       className={`topic-card-container group relative flex flex-col cursor-pointer select-none transition-transform duration-100 active:scale-[0.98] [&.is-active]:scale-[0.98] ${
         isActive ? 'is-active' : ''
       }`}
@@ -143,6 +136,6 @@ export default function TopicCard({
           </span>
         </div>
       </div>
-    </a>
+    </Link>
   );
 }

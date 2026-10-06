@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { ChevronLeft, Settings, Share2, X, Copy, Check } from 'lucide-react';
 import QRCode from 'qrcode';
 import { checkAdminStatus, isSuperAdmin } from '../lib/adminAuth';
@@ -14,7 +14,6 @@ interface TopicHeaderNavProps {
 }
 
 export default function TopicHeaderNav({ topicTitle, topicSlug }: TopicHeaderNavProps) {
-  const router = useRouter();
   const [isAdmin, setIsAdmin] = useState(false);
   const [isSuper, setIsSuper] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -87,19 +86,16 @@ export default function TopicHeaderNav({ topicTitle, topicSlug }: TopicHeaderNav
   return (
     <>
       <nav aria-label="Đường dẫn quay lại" className="flex items-center justify-between">
-        <a
+        <Link
           href="/"
-          onClick={(e) => {
-            e.preventDefault();
-            playTapSound();
-            router.push('/');
-          }}
+          prefetch={true}
+          onClick={playTapSound}
           className="inline-flex items-center gap-1 h-[48px] min-h-[48px] text-[#1E3A8A] hover:text-[#172554] dark:text-[#F8DF7B] text-[17px] font-extrabold transition-opacity active:opacity-75 cursor-pointer"
           aria-label="Quay lại Trang chủ"
         >
           <ChevronLeft size={24} strokeWidth={2.5} />
           <span>Trang chủ</span>
-        </a>
+        </Link>
 
         <div className="flex items-center gap-2">
           {/* Nút Chia sẻ chuyên đề (đúng vị trí góc trên phải) */}
