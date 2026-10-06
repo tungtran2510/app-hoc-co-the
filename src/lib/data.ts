@@ -116,7 +116,8 @@ export function isCustomHomeSectionKey(key: string): boolean {
 export function normalizeHiddenHomeSections(raw?: any): string[] {
   if (!Array.isArray(raw)) return [];
   const validSet = new Set(DEFAULT_HOME_SECTIONS_ORDER);
-  return raw.filter((key): key is string => typeof key === 'string' && (validSet.has(key) || isCustomHomeSectionKey(key)));
+  // Khối chuyên đề ('topics') là khối học tập cốt lõi của ứng dụng, luôn luôn hiển thị trên Trang chủ
+  return raw.filter((key): key is string => typeof key === 'string' && key !== 'topics' && (validSet.has(key) || isCustomHomeSectionKey(key)));
 }
 
 export function normalizeHomeSectionsOrder(raw?: any): string[] {
@@ -139,6 +140,24 @@ export function normalizeHomeSectionsOrder(raw?: any): string[] {
   // Tự động bổ sung brand_card lên đầu nếu dữ liệu cũ chưa có
   if (!unique.includes('brand_card')) {
     unique.unshift('brand_card');
+  }
+
+  // Tự động đảm bảo topics luôn hiện diện và nằm ngay sau brand_card
+  if (!unique.includes('topics')) {
+    const brandIdx = unique.indexOf('brand_card');
+    if (brandIdx !== -1) {
+      unique.splice(brandIdx + 1, 0, 'topics');
+    } else {
+      unique.unshift('topics');
+    }
+  } else {
+    // Đưa topics lên đúng vị trí ngay sau brand_card
+    const brandIdx = unique.indexOf('brand_card');
+    const topicsIdx = unique.indexOf('topics');
+    if (brandIdx !== -1 && topicsIdx !== brandIdx + 1) {
+      unique.splice(topicsIdx, 1);
+      unique.splice(brandIdx + 1, 0, 'topics');
+    }
   }
 
   // Tự động bổ sung recent_activity ngay sau topics nếu dữ liệu cũ chưa có
