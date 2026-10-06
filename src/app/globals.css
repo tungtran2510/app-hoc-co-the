@@ -606,24 +606,24 @@ html.dark .animate-bio-breathing {
 }
 
 .topic-card-glow {
-  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.12s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, box-shadow, border-color;
 }
 
 .topic-card-spine {
-  transition: all 0.28s ease;
+  transition: all 0.1s ease;
 }
 
 .topic-card-inner-glow {
-  transition: all 0.35s ease;
+  transition: all 0.12s ease;
 }
 
 .topic-card-badge {
-  transition: all 0.25s ease;
+  transition: all 0.1s ease;
 }
 
 .topic-card-img {
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.12s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* KHI ACTIVE (HỖ TRỢ CẢ CHẠM TRỰC TIẾP :active, FOCUS VÀ REACT STATE .is-active CHO MỌI THIẾT BỊ) */
@@ -631,14 +631,14 @@ html.dark .animate-bio-breathing {
 .topic-card-container:active .topic-card-glow,
 .topic-card-container:focus-visible .topic-card-glow {
   border-top-color: #FDE047 !important;
-  border-right-color: rgba(253, 224, 71, 0.9) !important;
+  border-right-color: rgba(253, 224, 71, 0.95) !important;
   border-left-color: #EAB308 !important;
   box-shadow: 
-    0 0 0 2px #FDE047,
-    0 0 32px rgba(250, 204, 21, 0.85),
+    0 0 0 2.5px #FDE047,
+    0 0 36px rgba(250, 204, 21, 0.95),
     0 12px 38px rgba(168, 85, 247, 0.65),
     inset 0 0 18px rgba(255, 255, 255, 0.35) !important;
-  transform: translateY(-3.5px) scale(1.025);
+  transform: translateY(-2px) scale(0.985);
 }
 
 .topic-card-container.is-active .topic-card-spine,

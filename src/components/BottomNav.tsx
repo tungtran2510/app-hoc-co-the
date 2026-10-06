@@ -1,12 +1,20 @@
 'use client';
 
-import React from 'react';
-import { usePathname } from 'next/navigation';
+import React, { useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { Home, LayoutGrid, Bookmark, Sparkles } from 'lucide-react';
 import { playTapSound } from '../lib/audioFeedback';
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    router.prefetch('/');
+    router.prefetch('/chuyen-de');
+    router.prefetch('/da-luu');
+    router.prefetch('/tro-ly-ai');
+  }, [router]);
 
   const isHome = pathname === '/';
   const isSaved = pathname === '/da-luu';
@@ -20,13 +28,15 @@ export default function BottomNav() {
   const idleText = 'text-slate-600 dark:text-purple-300/80 font-bold hover:text-[#172554] dark:hover:text-purple-200';
 
   const handleTabClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
     playTapSound();
     if (pathname === href) {
-      e.preventDefault();
       if (typeof window !== 'undefined') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
+      return;
     }
+    router.push(href);
   };
 
   return (

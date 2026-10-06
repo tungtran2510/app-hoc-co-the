@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { usePathname } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { ChevronLeft, Home, ListOrdered, MoreVertical, X, Lock, Check, Settings as SettingsIcon, Share2, Bookmark, Sun, Moon, Eye, Smartphone, Volume2, VolumeX } from 'lucide-react';
 import { isSoundEnabled, setSoundEnabled, playTapSound } from '../lib/audioFeedback';
 
@@ -49,9 +49,15 @@ export default function PageHeaderBar({
   onSelectTocItem,
 }: PageHeaderBarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [showToc, setShowToc] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   const [soundActive, setSoundActive] = useState(true);
+
+  useEffect(() => {
+    router.prefetch('/');
+    if (topicSlug) router.prefetch(`/${topicSlug}`);
+  }, [router, topicSlug]);
 
   React.useEffect(() => {
     setSoundActive(isSoundEnabled());
@@ -219,8 +225,12 @@ export default function PageHeaderBar({
         <div className="flex items-center gap-1.5 min-w-0">
           <a
             href="/"
-            onClick={playTapSound}
-            className="w-10 h-10 rounded-full bg-surface-2 hover:bg-surface-3 flex items-center justify-center text-ink hover:text-primary transition-colors shadow-2xs shrink-0"
+            onClick={(e) => {
+              e.preventDefault();
+              playTapSound();
+              router.push('/');
+            }}
+            className="w-10 h-10 rounded-full bg-surface-2 hover:bg-surface-3 flex items-center justify-center text-ink hover:text-primary transition-colors shadow-2xs shrink-0 cursor-pointer"
             title="Về Trang chủ"
             aria-label="Về Trang chủ"
           >
@@ -231,8 +241,12 @@ export default function PageHeaderBar({
 
           <a
             href={`/${topicSlug}`}
-            onClick={playTapSound}
-            className="flex items-center gap-1 text-[#1E3A8A] hover:text-[#172554] dark:text-purple-300 text-[16px] sm:text-[17px] font-extrabold min-h-[44px] transition-colors truncate"
+            onClick={(e) => {
+              e.preventDefault();
+              playTapSound();
+              router.push(`/${topicSlug}`);
+            }}
+            className="flex items-center gap-1 text-[#1E3A8A] hover:text-[#172554] dark:text-purple-300 text-[16px] sm:text-[17px] font-extrabold min-h-[44px] transition-colors truncate cursor-pointer"
             aria-label={`Về chủ đề ${topicTitle}`}
             title={`Về chủ đề ${topicTitle}`}
           >

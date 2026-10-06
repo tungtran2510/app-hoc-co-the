@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { ChevronRight, BookOpen } from 'lucide-react';
 import { Page, Topic } from '../lib/types';
 import { playTapSound } from '../lib/audioFeedback';
@@ -26,6 +27,7 @@ export default function PageCard({
   isActive = false,
   onActivate,
 }: PageCardProps) {
+  const router = useRouter();
   const formattedOrder = String(orderNumber).padStart(2, '0');
 
   const count = typeof videoCount === 'number' ? videoCount : 0;
@@ -55,18 +57,25 @@ export default function PageCard({
     ? `/${topic.slug}/${page.slug}?v=${lastVideo}`
     : `/${topic.slug}/${page.slug}`;
 
+  useEffect(() => {
+    router.prefetch(targetUrl);
+  }, [router, targetUrl]);
+
+  const handleNavigate = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    playTapSound();
+    e.currentTarget.classList.add('is-active');
+    onActivate?.();
+    router.push(targetUrl);
+  };
+
   return (
     <a
       href={targetUrl}
       onPointerDown={(e) => {
         e.currentTarget.classList.add('is-active');
-        onActivate?.();
       }}
-      onClick={(e) => {
-        playTapSound();
-        e.currentTarget.classList.add('is-active');
-        onActivate?.();
-      }}
+      onClick={handleNavigate}
       className={`lesson-page-card flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 bg-white dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] rounded-[14px] border transition-all active:scale-[0.99] shadow-xs group [&.is-active]:border-[#FDE047] [&.is-active]:ring-2 [&.is-active]:ring-[#FDE047] [&.is-active]:shadow-[0_0_20px_rgba(250,204,21,0.6)] ${
         isActive
           ? 'border-[#FDE047] ring-2 ring-[#FDE047] shadow-[0_0_20px_rgba(250,204,21,0.6)]'

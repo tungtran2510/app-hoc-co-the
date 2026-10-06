@@ -94,7 +94,6 @@ export default function TopicListClient({
   const [titleDraft, setTitleDraft] = useState(
     initialTopicsTitle && initialTopicsTitle !== 'Chọn chủ đề' ? initialTopicsTitle : 'Chuyên Đề Học'
   );
-  const [activeTopicSlug, setActiveTopicSlug] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAdminResolved, setIsAdminResolved] = useState(false);
   const [userPhoneRevision, setUserPhoneRevision] = useState(0);
@@ -749,8 +748,6 @@ export default function TopicListClient({
                   mode={displayMode}
                   topic={topic}
                   pageCount={pageCount}
-                  isActive={activeTopicSlug === topic.slug}
-                  onActivate={() => setActiveTopicSlug(topic.slug)}
                   boldTitle={!enableSearch}
                 />
 

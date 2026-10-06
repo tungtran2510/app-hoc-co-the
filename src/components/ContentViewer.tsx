@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   ArrowRight,
   ArrowLeft,
@@ -93,6 +94,14 @@ export default function ContentViewer({
   defaultActiveVideoIndex = 0,
   pageSlugMap,
 }: ContentViewerProps) {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (prevPage) router.prefetch(`/${topic.slug}/${prevPage.slug}`);
+    if (nextPage) router.prefetch(`/${topic.slug}/${nextPage.slug}`);
+    router.prefetch(`/${topic.slug}`);
+  }, [router, topic.slug, prevPage, nextPage]);
+
   const [fontSizeMode, setFontSizeMode] = useState<FontSizeOption>('normal');
   const [isAdmin, setIsAdmin] = useState(false);
   const [supabaseOk, setSupabaseOk] = useState(false);
@@ -1193,8 +1202,12 @@ export default function ContentViewer({
             {prevPage ? (
               <a
                 href={`/${topic.slug}/${prevPage.slug}`}
-                onClick={playTapSound}
-                className="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-[10px] bg-slate-100 dark:bg-[#1E1438] border border-slate-300/90 dark:border-purple-700/60 hover:bg-slate-200 dark:hover:bg-[#281A4E] text-slate-800 dark:text-white transition-all shadow-xs group active:scale-[0.98] h-[36px] overflow-hidden"
+                onClick={(e) => {
+                  e.preventDefault();
+                  playTapSound();
+                  router.push(`/${topic.slug}/${prevPage.slug}`);
+                }}
+                className="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-[10px] bg-slate-100 dark:bg-[#1E1438] border border-slate-300/90 dark:border-purple-700/60 hover:bg-slate-200 dark:hover:bg-[#281A4E] text-slate-800 dark:text-white transition-all shadow-xs group active:scale-[0.98] h-[36px] overflow-hidden cursor-pointer"
               >
                 <ArrowLeft size={13} strokeWidth={2.5} className="shrink-0 text-slate-500 dark:text-purple-300 group-hover:-translate-x-0.5 transition-transform" />
                 <span className="text-[11.5px] sm:text-[12px] font-bold truncate">
@@ -1204,8 +1217,12 @@ export default function ContentViewer({
             ) : (
               <a
                 href={`/${topic.slug}`}
-                onClick={playTapSound}
-                className="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-[10px] bg-slate-100 dark:bg-[#1E1438] border border-slate-300/90 dark:border-purple-700/60 hover:bg-slate-200 dark:hover:bg-[#281A4E] text-slate-800 dark:text-white transition-all shadow-xs group active:scale-[0.98] h-[36px] overflow-hidden"
+                onClick={(e) => {
+                  e.preventDefault();
+                  playTapSound();
+                  router.push(`/${topic.slug}`);
+                }}
+                className="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-[10px] bg-slate-100 dark:bg-[#1E1438] border border-slate-300/90 dark:border-purple-700/60 hover:bg-slate-200 dark:hover:bg-[#281A4E] text-slate-800 dark:text-white transition-all shadow-xs group active:scale-[0.98] h-[36px] overflow-hidden cursor-pointer"
               >
                 <ArrowLeft size={13} strokeWidth={2.5} className="shrink-0 text-slate-500 dark:text-purple-300 group-hover:-translate-x-0.5 transition-transform" />
                 <span className="text-[11.5px] sm:text-[12px] font-bold truncate">
@@ -1218,8 +1235,12 @@ export default function ContentViewer({
             {nextPage ? (
               <a
                 href={`/${topic.slug}/${nextPage.slug}`}
-                onClick={playTapSound}
-                className="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-[10px] bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white font-black shadow-sm shadow-blue-600/20 border border-blue-300/50 hover:brightness-105 transition-all group active:scale-[0.98] h-[36px] overflow-hidden"
+                onClick={(e) => {
+                  e.preventDefault();
+                  playTapSound();
+                  router.push(`/${topic.slug}/${nextPage.slug}`);
+                }}
+                className="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-[10px] bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white font-black shadow-sm shadow-blue-600/20 border border-blue-300/50 hover:brightness-105 transition-all group active:scale-[0.98] h-[36px] overflow-hidden cursor-pointer"
               >
                 <span className="text-[11.5px] sm:text-[12px] font-black text-white truncate">
                   Bài {String(nextPageIndex).padStart(2, '0')}: {nextPage.title}
@@ -1229,8 +1250,12 @@ export default function ContentViewer({
             ) : (
               <a
                 href={`/${topic.slug}`}
-                onClick={playTapSound}
-                className="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-[10px] bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white shadow-sm shadow-emerald-500/20 border border-emerald-400/40 hover:brightness-105 transition-all group active:scale-[0.98] h-[36px] overflow-hidden"
+                onClick={(e) => {
+                  e.preventDefault();
+                  playTapSound();
+                  router.push(`/${topic.slug}`);
+                }}
+                className="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-[10px] bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white shadow-sm shadow-emerald-500/20 border border-emerald-400/40 hover:brightness-105 transition-all group active:scale-[0.98] h-[36px] overflow-hidden cursor-pointer"
               >
                 <span className="text-[11.5px] sm:text-[12px] font-bold text-white truncate">
                   Hoàn thành bài

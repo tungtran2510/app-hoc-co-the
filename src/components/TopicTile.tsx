@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { BookOpen, ChevronRight } from 'lucide-react';
 import TopicCard, { DEFAULT_TOPIC_COVERS, TOPIC_MIND_MAP_SUBTITLES } from './TopicCard';
 import TopicIcon from './TopicIcon';
@@ -43,10 +44,23 @@ interface TopicTileProps {
 }
 
 export default function TopicTile({ mode, topic, pageCount, isActive, onActivate, boldTitle }: TopicTileProps) {
+  const router = useRouter();
   const [imgError, setImgError] = useState(false);
   const coverUrl = topic.cover_url || DEFAULT_TOPIC_COVERS[topic.slug] || null;
   const hasCover = Boolean(coverUrl) && !imgError;
   const countText = pageCount > 0 ? `${pageCount} bài học` : 'Sắp ra mắt';
+
+  useEffect(() => {
+    router.prefetch(`/${topic.slug}`);
+  }, [router, topic.slug]);
+
+  const handleNavigate = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    playTapSound();
+    e.currentTarget.classList.add('is-active');
+    onActivate?.();
+    router.push(`/${topic.slug}`);
+  };
 
   if (mode === 'text') {
     return (
@@ -54,13 +68,8 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
         href={`/${topic.slug}`}
         onPointerDown={(e) => {
           e.currentTarget.classList.add('is-active');
-          onActivate?.();
         }}
-        onClick={(e) => {
-          playTapSound();
-          e.currentTarget.classList.add('is-active');
-          onActivate?.();
-        }}
+        onClick={handleNavigate}
         className={`flex items-center justify-between gap-3 px-4 py-3.5 rounded-[14px] bg-white dark:bg-[#160D30] border shadow-2xs active:scale-[0.99] transition-all [&.is-active]:border-[#FDE047] [&.is-active]:ring-2 [&.is-active]:ring-[#FDE047] [&.is-active]:shadow-[0_0_20px_rgba(250,204,21,0.6)] ${
           isActive
             ? 'border-[#FDE047] ring-2 ring-[#FDE047] shadow-[0_0_20px_rgba(250,204,21,0.6)]'
@@ -82,13 +91,8 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
         href={`/${topic.slug}`}
         onPointerDown={(e) => {
           e.currentTarget.classList.add('is-active');
-          onActivate?.();
         }}
-        onClick={(e) => {
-          playTapSound();
-          e.currentTarget.classList.add('is-active');
-          onActivate?.();
-        }}
+        onClick={handleNavigate}
         className={`flex min-h-[84px] sm:min-h-[94px] items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-[17px] sm:rounded-[20px] bg-white dark:bg-[#160D30] border shadow-[0_9px_28px_-22px_rgba(15,23,42,.65)] active:scale-[0.99] transition-all [&.is-active]:border-[#FDE047] [&.is-active]:ring-2 [&.is-active]:ring-[#FDE047] [&.is-active]:shadow-[0_0_20px_rgba(250,204,21,0.6)] ${
           isActive
             ? 'border-[#FDE047] ring-2 ring-[#FDE047] shadow-[0_0_20px_rgba(250,204,21,0.6)]'
@@ -118,13 +122,8 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
         href={`/${topic.slug}`}
         onPointerDown={(e) => {
           e.currentTarget.classList.add('is-active');
-          onActivate?.();
         }}
-        onClick={(e) => {
-          playTapSound();
-          e.currentTarget.classList.add('is-active');
-          onActivate?.();
-        }}
+        onClick={handleNavigate}
         className={`relative flex flex-col justify-between min-h-[190px] sm:min-h-[210px] p-4 rounded-[20px] bg-gradient-to-br from-[#231652] via-[#1A0E3F] to-[#100629] border text-white overflow-hidden shadow-[0_10px_26px_-12px_rgba(0,0,0,0.55)] active:scale-[0.99] transition-all [&.is-active]:border-[#FDE047] [&.is-active]:ring-2 [&.is-active]:ring-[#FDE047] [&.is-active]:shadow-[0_0_25px_rgba(250,204,21,0.7)] ${
           isActive
             ? 'border-[#FDE047] ring-2 ring-[#FDE047] shadow-[0_0_25px_rgba(250,204,21,0.7)]'
@@ -161,13 +160,8 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
         href={`/${topic.slug}`}
         onPointerDown={(e) => {
           e.currentTarget.classList.add('is-active');
-          onActivate?.();
         }}
-        onClick={(e) => {
-          playTapSound();
-          e.currentTarget.classList.add('is-active');
-          onActivate?.();
-        }}
+        onClick={handleNavigate}
         className={`group/catalog block w-full min-w-0 rounded-[16px] border bg-white p-2 shadow-[0_8px_24px_-20px_rgba(15,23,42,.55)] active:scale-[0.98] transition-all [&.is-active]:border-[#FDE047] [&.is-active]:ring-2 [&.is-active]:ring-[#FDE047] [&.is-active]:shadow-[0_0_20px_rgba(250,204,21,0.6)] ${
           isActive
             ? 'border-[#FDE047] ring-2 ring-[#FDE047] shadow-[0_0_20px_rgba(250,204,21,0.6)]'
