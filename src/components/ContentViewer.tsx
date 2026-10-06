@@ -409,6 +409,42 @@ export default function ContentViewer({
     triggerSaveBlocks(reindexed);
   };
 
+  // Di chuyển khối tóm tắt lên trong tab Tóm tắt cốt lõi
+  const handleMoveTextBlockUp = (bId: string) => {
+    const textIdx = textBlocks.findIndex((b) => b.id === bId);
+    if (textIdx <= 0) return;
+    const prevBlock = textBlocks[textIdx - 1];
+    const currIdx = blockList.findIndex((b) => b.id === bId);
+    const prevIdx = blockList.findIndex((b) => b.id === prevBlock.id);
+    if (currIdx === -1 || prevIdx === -1) return;
+    playTapSound();
+    const updated = [...blockList];
+    const temp = updated[currIdx];
+    updated[currIdx] = updated[prevIdx];
+    updated[prevIdx] = temp;
+    const reindexed = updated.map((b, idx) => ({ ...b, sort_order: idx + 1 }));
+    setBlockList(reindexed);
+    triggerSaveBlocks(reindexed);
+  };
+
+  // Di chuyển khối tóm tắt xuống trong tab Tóm tắt cốt lõi
+  const handleMoveTextBlockDown = (bId: string) => {
+    const textIdx = textBlocks.findIndex((b) => b.id === bId);
+    if (textIdx === -1 || textIdx >= textBlocks.length - 1) return;
+    const nextBlock = textBlocks[textIdx + 1];
+    const currIdx = blockList.findIndex((b) => b.id === bId);
+    const nextIdx = blockList.findIndex((b) => b.id === nextBlock.id);
+    if (currIdx === -1 || nextIdx === -1) return;
+    playTapSound();
+    const updated = [...blockList];
+    const temp = updated[currIdx];
+    updated[currIdx] = updated[nextIdx];
+    updated[nextIdx] = temp;
+    const reindexed = updated.map((b, idx) => ({ ...b, sort_order: idx + 1 }));
+    setBlockList(reindexed);
+    triggerSaveBlocks(reindexed);
+  };
+
   // Xóa khối
   const handleDeleteBlock = async (blockId: string) => {
     if (!confirm('Bạn có chắc chắn muốn xóa khối nội dung này?')) return;
@@ -694,6 +730,19 @@ export default function ContentViewer({
       return null;
     }
 
+    // Nếu bài học đã có khối Video (đã tích hợp sẵn 3 tab: Giáo trình, Tóm tắt cốt lõi, Tài liệu):
+    // Các khối tóm tắt văn bản (Điểm cần nhớ, Ý nghĩa, Ghi chú, v.v.) đã nằm trọn vẹn trong tab Tóm tắt cốt lõi,
+    // và các tệp tài liệu đã nằm trong tab Tài liệu.
+    // Tuyệt đối không render lặp lại ở bên ngoài để tránh nhân đôi nội dung dưới danh sách bài học.
+    if (videoBlock) {
+      if (block.type === 'text' && !isHtmlTextBlock(block)) {
+        return null;
+      }
+      if (block.type === 'files') {
+        return null;
+      }
+    }
+
     const blockTitle = getBlockTitle(block);
 
     return (
@@ -860,7 +909,7 @@ export default function ContentViewer({
               <div className="flex flex-col gap-3 py-1">
                 {textBlocks
                   .filter((b) => isAdmin || b.is_visible)
-                  .map((b) => (
+                  .map((b, textIdx) => (
                     <div
                       key={b.id}
                       id={`block-${b.id}`}
@@ -886,6 +935,28 @@ export default function ContentViewer({
                             >
                               <Edit2 size={12} className="text-primary" />
                               <span>Sửa</span>
+                            </button>
+
+                            {/* Nút Di chuyển lên ▲ */}
+                            <button
+                              type="button"
+                              onClick={() => handleMoveTextBlockUp(b.id)}
+                              disabled={textIdx === 0}
+                              className="w-7 h-7 rounded-[8px] bg-white dark:bg-[#1C123D] border border-line flex items-center justify-center text-ink disabled:opacity-30 shadow-2xs cursor-pointer"
+                              title="Di chuyển lên"
+                            >
+                              <ChevronUp size={13} />
+                            </button>
+
+                            {/* Nút Di chuyển xuống ▼ */}
+                            <button
+                              type="button"
+                              onClick={() => handleMoveTextBlockDown(b.id)}
+                              disabled={textIdx === textBlocks.filter((x) => isAdmin || x.is_visible).length - 1}
+                              className="w-7 h-7 rounded-[8px] bg-white dark:bg-[#1C123D] border border-line flex items-center justify-center text-ink disabled:opacity-30 shadow-2xs cursor-pointer"
+                              title="Di chuyển xuống"
+                            >
+                              <ChevronDown size={13} />
                             </button>
 
                             {/* Nút Ẩn/Hiện */}
