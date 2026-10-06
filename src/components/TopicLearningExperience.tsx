@@ -11,6 +11,7 @@ import { deleteBlockApi, getAdminHeaders, saveBlockApi } from '../lib/apiAdmin';
 import { generateUuid } from '../lib/uuid';
 import EditBlockModal from './admin/EditBlockModal';
 import VideoLessonLink from './VideoLessonLink';
+import { playTapSound } from '../lib/audioFeedback';
 
 interface TopicPageItem { page: Page; orderNumber: number; videoCount: number }
 interface TopicFaqVideo { video: Video; index: number; pageSlug: string; pageId?: string; pageTitle?: string }
@@ -204,9 +205,9 @@ export default function TopicLearningExperience({
             <div className="flex items-center justify-between gap-2 text-[10px] font-bold text-slate-600 dark:text-slate-300"><span className="inline-flex items-center gap-1"><BarChart3 size={12} />Tiến độ</span><span>{completedIds.filter((id) => visiblePages.some(({ page }) => page.id === id)).length}/{visiblePages.length}</span></div>
             <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-200 dark:bg-black/30"><div className="h-full rounded-full bg-gradient-to-r from-[#F5B923] to-[#F6D86F] transition-[width]" style={{ width: `${progress}%` }} /></div>
           </div>
-          <Link href={actionHref} className="flex min-h-[40px] shrink-0 items-center justify-center gap-1.5 rounded-[12px] bg-gradient-to-r from-[#204DA4] to-[#173B85] px-2.5 text-[11px] font-black text-white shadow-[0_6px_14px_-10px_rgba(30,58,138,.7)] active:scale-[.98] sm:px-4 sm:text-[13px]">
+          <a href={actionHref} onClick={playTapSound} className="flex min-h-[40px] shrink-0 items-center justify-center gap-1.5 rounded-[12px] bg-gradient-to-r from-[#204DA4] to-[#173B85] px-2.5 text-[11px] font-black text-white shadow-[0_6px_14px_-10px_rgba(30,58,138,.7)] active:scale-[.98] sm:px-4 sm:text-[13px] cursor-pointer">
             <Play size={15} fill="currentColor" />{continuePage ? 'Tiếp tục học' : 'Bắt đầu học'}<ArrowRight size={15} />
-          </Link>
+          </a>
         </div>
       </section>
 

@@ -86,16 +86,15 @@ export default function TopicHeaderNav({ topicTitle, topicSlug }: TopicHeaderNav
   return (
     <>
       <nav aria-label="Đường dẫn quay lại" className="flex items-center justify-between">
-        <Link
+        <a
           href="/"
-          prefetch={true}
           onClick={playTapSound}
           className="inline-flex items-center gap-1 h-[48px] min-h-[48px] text-[#1E3A8A] hover:text-[#172554] dark:text-[#F8DF7B] text-[17px] font-extrabold transition-opacity active:opacity-75 cursor-pointer"
           aria-label="Quay lại Trang chủ"
         >
           <ChevronLeft size={24} strokeWidth={2.5} />
           <span>Trang chủ</span>
-        </Link>
+        </a>
 
         <div className="flex items-center gap-2">
           {/* Nút Chia sẻ chuyên đề (đúng vị trí góc trên phải) */}

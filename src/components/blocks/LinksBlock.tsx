@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ChevronRight, ExternalLink } from 'lucide-react';
+import { playTapSound } from '../../lib/audioFeedback';
 
 interface LinkItem {
   page_id?: string;
@@ -171,10 +172,11 @@ export default function LinksBlock({
               `/images/topics/${topicSlug || 'cot-song'}.png`;
 
             return (
-              <Link
+              <a
                 key={idx}
                 href={href}
-                className="flex items-center justify-between gap-3 min-h-[64px] px-3.5 py-2.5 bg-white dark:bg-[#160E2E] rounded-[16px] border-[1.5px] border-line dark:border-purple-900/40 hover:border-primary/50 dark:hover:border-purple-500/50 transition-all active:scale-[0.99] shadow-xs group"
+                onClick={playTapSound}
+                className="flex items-center justify-between gap-3 min-h-[64px] px-3.5 py-2.5 bg-white dark:bg-[#160E2E] rounded-[16px] border-[1.5px] border-line dark:border-purple-900/40 hover:border-primary/50 dark:hover:border-purple-500/50 transition-all active:scale-[0.99] shadow-xs group cursor-pointer"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   {/* Thumbnail ảnh đại diện sắc nét của từng bài học */}
@@ -194,7 +196,7 @@ export default function LinksBlock({
                   </span>
                 </div>
                 <ChevronRight size={20} className="text-muted dark:text-purple-400 group-hover:text-primary dark:group-hover:text-[#F8DF7B] group-hover:translate-x-0.5 transition-all shrink-0" />
-              </Link>
+              </a>
             );
           })}
         </div>
