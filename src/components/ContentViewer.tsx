@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import {
   ArrowRight,
   ArrowLeft,
@@ -1192,9 +1191,8 @@ export default function ContentViewer({
           <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
             {/* Nút Khung chữ nhật Bài trước / Quay lại - 1 dòng siêu gọn */}
             {prevPage ? (
-              <Link
+              <a
                 href={`/${topic.slug}/${prevPage.slug}`}
-                prefetch={true}
                 onClick={playTapSound}
                 className="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-[10px] bg-slate-100 dark:bg-[#1E1438] border border-slate-300/90 dark:border-purple-700/60 hover:bg-slate-200 dark:hover:bg-[#281A4E] text-slate-800 dark:text-white transition-all shadow-xs group active:scale-[0.98] h-[36px] overflow-hidden"
               >
@@ -1202,11 +1200,10 @@ export default function ContentViewer({
                 <span className="text-[11.5px] sm:text-[12px] font-bold truncate">
                   Bài {String(prevPageIndex).padStart(2, '0')}: {prevPage.title}
                 </span>
-              </Link>
+              </a>
             ) : (
-              <Link
+              <a
                 href={`/${topic.slug}`}
-                prefetch={true}
                 onClick={playTapSound}
                 className="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-[10px] bg-slate-100 dark:bg-[#1E1438] border border-slate-300/90 dark:border-purple-700/60 hover:bg-slate-200 dark:hover:bg-[#281A4E] text-slate-800 dark:text-white transition-all shadow-xs group active:scale-[0.98] h-[36px] overflow-hidden"
               >
@@ -1214,14 +1211,13 @@ export default function ContentViewer({
                 <span className="text-[11.5px] sm:text-[12px] font-bold truncate">
                   Về danh sách
                 </span>
-              </Link>
+              </a>
             )}
 
             {/* Nút Khung chữ nhật Bài tiếp theo - 1 dòng siêu gọn */}
             {nextPage ? (
-              <Link
+              <a
                 href={`/${topic.slug}/${nextPage.slug}`}
-                prefetch={true}
                 onClick={playTapSound}
                 className="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-[10px] bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white font-black shadow-sm shadow-blue-600/20 border border-blue-300/50 hover:brightness-105 transition-all group active:scale-[0.98] h-[36px] overflow-hidden"
               >
@@ -1229,11 +1225,10 @@ export default function ContentViewer({
                   Bài {String(nextPageIndex).padStart(2, '0')}: {nextPage.title}
                 </span>
                 <ArrowRight size={13} strokeWidth={2.5} className="shrink-0 text-white group-hover:translate-x-0.5 transition-transform" />
-              </Link>
+              </a>
             ) : (
-              <Link
+              <a
                 href={`/${topic.slug}`}
-                prefetch={true}
                 onClick={playTapSound}
                 className="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-[10px] bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white shadow-sm shadow-emerald-500/20 border border-emerald-400/40 hover:brightness-105 transition-all group active:scale-[0.98] h-[36px] overflow-hidden"
               >
@@ -1241,7 +1236,7 @@ export default function ContentViewer({
                   Hoàn thành bài
                 </span>
                 <CheckCircle2 size={14} strokeWidth={2.5} className="shrink-0 text-white" />
-              </Link>
+              </a>
             )}
           </div>
         </div>

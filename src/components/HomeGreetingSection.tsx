@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { Search, Edit2, Sparkles } from 'lucide-react';
 import { playTapSound } from '../lib/audioFeedback';
 import { checkIsAdminClient } from '../lib/adminAuth';
@@ -90,9 +89,8 @@ export default function HomeGreetingSection({
             />
           </div>
 
-          <Link
+          <a
             href="/tro-ly-ai"
-            prefetch={true}
             onClick={playTapSound}
             className="shrink-0 flex items-center gap-1 px-3.5 py-2 rounded-full bg-primary-soft dark:bg-purple-950/80 hover:bg-purple-100 dark:hover:bg-purple-900 text-primary dark:text-[#F8DF7B] text-[13px] font-extrabold border border-primary/25/60 dark:border-purple-800/40 shadow-2xs transition-all active:scale-95 whitespace-nowrap cursor-pointer"
             aria-label="Hỏi Trợ lý AI"
@@ -100,7 +98,7 @@ export default function HomeGreetingSection({
             <Sparkles size={14} className="text-amber-500" />
             <span>Hỏi AI</span>
             <span>→</span>
-          </Link>
+          </a>
         </div>
 
         {isAdmin && (
@@ -109,14 +107,13 @@ export default function HomeGreetingSection({
               <Sparkles size={12} className="text-amber-600 dark:text-amber-400" />
               <span>Trợ lý AI sẵn sàng</span>
             </span>
-            <Link
+            <a
               href="/tro-ly-ai"
-              prefetch={true}
               onClick={playTapSound}
               className="flex items-center gap-1 text-[11.5px] font-bold text-amber-600 hover:underline cursor-pointer dark:text-amber-400"
             >
               <span>Huấn luyện & Nạp tài liệu AI →</span>
-            </Link>
+            </a>
           </div>
         )}
       </section>

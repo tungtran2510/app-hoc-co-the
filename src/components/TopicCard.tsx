@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import TopicIcon from './TopicIcon';
 import { Topic } from '../lib/types';
 import { playTapSound } from '../lib/audioFeedback';
@@ -56,14 +55,15 @@ export default function TopicCard({
     .replace(' - ', '\n');
 
   return (
-    <Link
+    <a
       href={`/${topic.slug}`}
-      prefetch={true}
-      onPointerDown={() => {
+      onPointerDown={(e) => {
+        e.currentTarget.classList.add('is-active');
         onActivate?.();
       }}
-      onClick={() => {
+      onClick={(e) => {
         playTapSound();
+        e.currentTarget.classList.add('is-active');
         onActivate?.();
       }}
       className={`topic-card-container group relative flex flex-col cursor-pointer select-none transition-all duration-300 ${
@@ -133,6 +133,6 @@ export default function TopicCard({
           </span>
         </div>
       </div>
-    </Link>
+    </a>
   );
 }

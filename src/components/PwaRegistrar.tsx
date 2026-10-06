@@ -98,23 +98,35 @@ export default function PwaRegistrar() {
 
     const alreadyInstalled = checkStandalone();
 
-    // 3. Tự động tải sẵn ngầm các trang cốt lõi một cách nhẹ nhàng (Gentle Prefetching)
+    // 3. Tự động tải sẵn ngầm các trang cốt lõi & chuyên đề (Prefetching siêu tốc 0ms)
     const runIdlePrefetch = () => {
       try {
-        if (sessionStorage.getItem('app_prefetched_v2')) return;
-        sessionStorage.setItem('app_prefetched_v2', '1');
+        if (sessionStorage.getItem('app_prefetched_v3')) return;
+        sessionStorage.setItem('app_prefetched_v3', '1');
       } catch {}
 
-      const coreRoutes = ['/chuyen-de', '/da-luu', '/tro-ly-ai'];
+      const coreRoutes = [
+        '/chuyen-de',
+        '/da-luu',
+        '/tro-ly-ai',
+        '/cot-song',
+        '/dinh-duong',
+        '/nuoc',
+        '/tieu-hoa',
+        '/co-the-nguoi',
+        '/noi-tiet-chuyen-hoa',
+        '/gan-mat-tuy',
+        '/mien-dich',
+      ];
       coreRoutes.forEach((route) => {
         fetch(route, { priority: 'low' }).catch(() => {});
       });
     };
 
     if ('requestIdleCallback' in window) {
-      (window as any).requestIdleCallback(runIdlePrefetch, { timeout: 3500 });
+      (window as any).requestIdleCallback(runIdlePrefetch, { timeout: 1500 });
     } else {
-      setTimeout(runIdlePrefetch, 2500);
+      setTimeout(runIdlePrefetch, 1200);
     }
 
     // 4. Bắt sự kiện cài đặt PWA

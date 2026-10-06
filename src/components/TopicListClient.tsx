@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Plus, Edit2, ArrowUp, ArrowDown, Eye, EyeOff, Trash2, Check, X, BookOpen, LayoutGrid, Lightbulb, Search, SlidersHorizontal, Star, Flame, ChevronDown, CircleHelp, Play, Pencil } from 'lucide-react';
 import TopicTile, { TopicsDisplayMode, TOPICS_DISPLAY_OPTIONS, topicsContainerClass } from './TopicTile';
@@ -476,16 +475,15 @@ export default function TopicListClient({
 
         <div className="flex items-center gap-2 shrink-0">
           {!hideViewAll && enableSearch && (
-            <Link
+            <a
               href="/chuyen-de"
-              prefetch={true}
               onClick={() => playTapSound()}
               className="text-[13px] font-black uppercase tracking-wider text-[#1E3A8A] hover:text-[#172554] dark:text-[#F8DF7B] dark:hover:text-amber-200 flex items-center gap-0.5 cursor-pointer active:opacity-75 transition-colors"
               title="Xem tất cả chuyên đề"
             >
               <span>Xem tất cả</span>
               <span className="text-[15px]">›</span>
-            </Link>
+            </a>
           )}
           {!enableSearch && (
             <div className="relative">
@@ -671,10 +669,9 @@ export default function TopicListClient({
           <div className="flex flex-col gap-1.5 p-2.5 rounded-[16px] bg-primary-soft/60 border border-primary/15">
             <span className="text-[11px] font-extrabold uppercase tracking-wide text-primary px-1">Bài học phù hợp</span>
             {hits.map((p) => (
-              <Link
+              <a
                 key={p.id}
                 href={`/${p.topic_slug}/${p.slug}`}
-                prefetch={true}
                 onClick={() => playTapSound()}
                 className="flex items-center gap-2 px-3 py-2 rounded-[12px] bg-white border border-slate-200/80 active:scale-[0.99] transition-transform"
               >
@@ -685,7 +682,7 @@ export default function TopicListClient({
                   </p>
                 </div>
                 <span className="text-primary text-[16px] shrink-0">›</span>
-              </Link>
+              </a>
             ))}
           </div>
         );
@@ -705,7 +702,7 @@ export default function TopicListClient({
             <div role="region" aria-label="Chuyên đề nổi bật, vuốt ngang để xem thêm" tabIndex={0} className="-mx-4 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:gap-3 sm:px-0">
               {featured.map(({ topic, pageCount }) => (
                 <div key={`featured-${topic.id}`} className="relative w-fit max-w-[86vw] shrink-0 snap-start">
-                  <Link href={`/${topic.slug}`} prefetch={true} onClick={() => playTapSound()} className="relative flex min-h-[82px] w-fit min-w-[190px] max-w-full items-center gap-2 rounded-[17px] border border-slate-200/80 bg-white p-2.5 pr-7 shadow-[0_10px_28px_-22px_rgba(15,23,42,.65)] active:scale-[0.98] transition-transform">
+                  <a href={`/${topic.slug}`} onClick={() => playTapSound()} className="relative flex min-h-[82px] w-fit min-w-[190px] max-w-full items-center gap-2 rounded-[17px] border border-slate-200/80 bg-white p-2.5 pr-7 shadow-[0_10px_28px_-22px_rgba(15,23,42,.65)] active:scale-[0.98] transition-transform">
                     <div className="h-[58px] w-[58px] shrink-0 overflow-hidden rounded-[13px] bg-[#170B3D]">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={topic.cover_url || DEFAULT_TOPIC_COVERS[topic.slug] || ''} alt={topic.title} className="h-full w-full object-cover" loading="lazy" decoding="async" />
@@ -715,7 +712,7 @@ export default function TopicListClient({
                       <p className="mt-1 flex items-center gap-1 whitespace-nowrap text-[10px] font-semibold text-slate-500"><BookOpen size={11} />{pageCount > 0 ? `${pageCount} bài học` : 'Sắp ra mắt'}</p>
                     </div>
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[18px] text-[#2D5B94]">›</span>
-                  </Link>
+                  </a>
                   {isAdmin && (
                     <button type="button" onClick={() => handleToggleFeatured(topic.id)} className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-amber-400 text-[#071735] shadow" title="Bỏ nổi bật">
                       <Star size={12} className="fill-current" />
@@ -892,15 +889,14 @@ export default function TopicListClient({
       )}
 
       {!enableSearch && !hideViewAll && (
-        <Link
+        <a
           href="/chuyen-de"
-          prefetch={true}
           onClick={() => playTapSound()}
           className="mt-1 inline-flex min-h-9 items-center justify-center gap-1 self-center rounded-full px-4 text-[12px] font-bold text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary"
           title="Xem tất cả chuyên đề"
         >
           Xem tất cả chuyên đề <span aria-hidden="true">›</span>
-        </Link>
+        </a>
       )}
 
       {/* Modal Sửa chủ đề */}
