@@ -790,7 +790,7 @@ export default function TopicListClient({
                     <button
                       type="button"
                       onClick={() => setEditingTopic(topic)}
-                      className="flex-1 flex items-center justify-center gap-1 h-6 px-1.5 rounded-[6px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[10px] uppercase tracking-wide cursor-pointer transition-transform active:scale-95 shadow-2xs min-w-0"
+                      className="flex-1 flex items-center justify-center gap-0.5 h-6 px-1 rounded-[6px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[10.5px] uppercase cursor-pointer transition-transform active:scale-95 shadow-2xs min-w-0"
                       title="Chỉnh sửa chủ đề này"
                     >
                       <Edit2 size={10} strokeWidth={2.8} className="shrink-0" />
