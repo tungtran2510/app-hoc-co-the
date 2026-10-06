@@ -34,24 +34,25 @@ export default function FloatingAiButton() {
 
   const justMovedRef = useRef(false);
 
-  // Đọc tọa độ từ localStorage hoặc đặt mặc định ở góc trên bên phải (theo đúng ảnh khoanh đỏ)
+  // Đọc tọa độ từ localStorage hoặc đặt mặc định ở góc dưới bên phải (ngay trên Tab Tìm kiếm ở BottomNav)
   useEffect(() => {
     try {
       const saved = localStorage.getItem('qbiz_floating_ai_pos');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (typeof parsed.x === 'number' && typeof parsed.y === 'number') {
-          const clampedX = Math.max(12, Math.min(parsed.x, window.innerWidth - 110));
-          const clampedY = Math.max(50, Math.min(parsed.y, window.innerHeight - 100));
+          const clampedX = Math.max(12, Math.min(parsed.x, window.innerWidth - 82));
+          const clampedY = Math.max(50, Math.min(parsed.y, window.innerHeight - 82));
           setPos({ x: clampedX, y: clampedY });
           return;
         }
       }
     } catch {}
 
-    // Vị trí mặc định: góc trên bên phải (cách lề phải 16px, cách đỉnh 70px như ảnh khoanh đỏ)
-    const defaultX = Math.max(12, window.innerWidth - 115);
-    const defaultY = 70;
+    // Vị trí mặc định: Góc dưới bên phải (nổi ngay sát trên Tab Tìm kiếm của BottomNav)
+    // BottomNav cao ~62px -> Đặt y cách đáy 74px (window.innerHeight - 105), x cách lề phải 16px (window.innerWidth - 82)
+    const defaultX = Math.max(12, window.innerWidth - 82);
+    const defaultY = Math.max(50, window.innerHeight - 105);
     setPos({ x: defaultX, y: defaultY });
   }, []);
 
@@ -60,8 +61,8 @@ export default function FloatingAiButton() {
     const handleResize = () => {
       setPos((prev) => {
         if (!prev) return prev;
-        const clampedX = Math.max(12, Math.min(prev.x, window.innerWidth - 110));
-        const clampedY = Math.max(50, Math.min(prev.y, window.innerHeight - 100));
+        const clampedX = Math.max(12, Math.min(prev.x, window.innerWidth - 82));
+        const clampedY = Math.max(50, Math.min(prev.y, window.innerHeight - 82));
         return { x: clampedX, y: clampedY };
       });
     };
@@ -73,8 +74,8 @@ export default function FloatingAiButton() {
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0 && e.pointerType === 'mouse') return;
 
-    const currentX = pos ? pos.x : Math.max(12, window.innerWidth - 115);
-    const currentY = pos ? pos.y : 70;
+    const currentX = pos ? pos.x : Math.max(12, window.innerWidth - 82);
+    const currentY = pos ? pos.y : Math.max(50, window.innerHeight - 105);
 
     dragInfoRef.current = {
       startX: e.clientX,
@@ -142,9 +143,9 @@ export default function FloatingAiButton() {
       // Khi ĐÃ mở khóa (sau 2.5s) => Cho phép kéo nút tự do
       dragInfoRef.current.moved = true;
       const minX = 12;
-      const maxX = window.innerWidth - 105;
+      const maxX = window.innerWidth - 82;
       const minY = 50;
-      const maxY = window.innerHeight - 90; // Không che BottomNav
+      const maxY = window.innerHeight - 82; // Không che BottomNav
 
       latestX = Math.max(minX, Math.min(dragInfoRef.current.elemX + dx, maxX));
       latestY = Math.max(minY, Math.min(dragInfoRef.current.elemY + dy, maxY));
@@ -208,7 +209,8 @@ export default function FloatingAiButton() {
         transform: 'translateZ(0)',
         left: pos ? `${pos.x}px` : 'auto',
         right: pos ? 'auto' : '16px',
-        top: pos ? `${pos.y}px` : '70px',
+        top: pos ? `${pos.y}px` : 'auto',
+        bottom: pos ? 'auto' : '74px',
         transition: isDragging
           ? 'none'
           : 'box-shadow 0.2s ease, transform 0.2s ease',
@@ -229,29 +231,26 @@ export default function FloatingAiButton() {
         />
       )}
 
-      {/* Thẻ nút dạng viên thuốc (Pill) bán mờ kính theo tông sáng/tối chuẩn hình khoanh đỏ */}
+      {/* Thẻ nút dạng viên thuốc siêu gọn, trong suốt kính mờ theo đúng yêu cầu */}
       <div
-        className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full backdrop-blur-md transition-colors ${
+        className={`relative flex items-center gap-1 px-2.5 py-1 rounded-full backdrop-blur-md transition-all shadow-sm ${
           isUnlocked || isDragging
-            ? 'bg-black/85 dark:bg-[#160D30]/95 border-2 border-[#FDE047] text-[#FDE047]'
-            : 'bg-white/80 dark:bg-black/60 border border-slate-300/80 dark:border-white/20 text-[#1E3A8A] dark:text-[#F8DF7B] shadow-[0_4px_16px_rgba(0,0,0,0.15)] dark:shadow-[0_6px_20px_rgba(0,0,0,0.5)]'
+            ? 'bg-black/60 dark:bg-[#160D30]/80 border-2 border-[#FDE047] text-[#FDE047] shadow-[0_0_18px_rgba(250,204,21,0.5)]'
+            : 'bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/45 border border-white/40 dark:border-white/15 text-[#1E3A8A] dark:text-[#F8DF7B]'
         }`}
       >
         <Sparkles
-          size={14}
-          strokeWidth={2.3}
+          size={12.5}
+          strokeWidth={2.4}
           className={`${
             isUnlocked || isDragging
               ? 'text-[#FDE047] animate-spin'
-              : 'text-[#1E3A8A] dark:text-[#F8DF7B] fill-current animate-pulse'
+              : 'text-amber-500 dark:text-[#F8DF7B] fill-amber-400/40 dark:fill-amber-300/40 animate-pulse'
           }`}
         />
-        <span className="text-[12.5px] font-black tracking-tight whitespace-nowrap">
-          {isUnlocked ? 'Thả để đặt' : 'Hỏi AI'}
+        <span className="text-[11.5px] font-black tracking-tight whitespace-nowrap">
+          {isUnlocked ? 'Thả đặt' : 'Hỏi AI'}
         </span>
-
-        {/* Chấm tròn nhỏ hiển thị trạng thái sẵn sàng */}
-        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse ml-0.5" />
       </div>
 
       {/* Gợi ý nhỏ khi đang giữ gần đủ 2.5 giây */}
