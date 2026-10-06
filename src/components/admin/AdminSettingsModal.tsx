@@ -6,6 +6,8 @@ import {
   Settings,
   Save,
   Download,
+  Upload,
+  RotateCcw,
   LogOut,
   Sliders,
   Key,
@@ -17,7 +19,7 @@ import {
   AppCustomSettings,
 } from '../../lib/storage';
 import { logoutAdmin, isSuperAdmin, checkAdminStatus } from '../../lib/adminAuth';
-import { saveSettingsApi, changePasswordApi, getAdminHeaders } from '../../lib/apiAdmin';
+import { saveSettingsApi, changePasswordApi, getAdminHeaders, restoreBackupApi } from '../../lib/apiAdmin';
 import InstructorManagerSection from './InstructorManagerSection';
 import WorkspaceManagerSection from './WorkspaceManagerSection';
 
@@ -52,6 +54,13 @@ export default function AdminSettingsModal({
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
+
+  // Phục hồi bản sao lưu
+  const [isRestoring, setIsRestoring] = useState(false);
+  const [restoreError, setRestoreError] = useState('');
+  const [restoreSuccess, setRestoreSuccess] = useState('');
+  const [pendingRestoreData, setPendingRestoreData] = useState<any>(null);
+  const restoreFileInputRef = React.useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -153,6 +162,54 @@ export default function AdminSettingsModal({
       alert(err.message || 'Lỗi khi sao lưu dữ liệu.');
     } finally {
       setIsExporting(false);
+    }
+  };
+
+  const handleSelectBackupFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRestoreError('');
+    setRestoreSuccess('');
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const content = event.target?.result as string;
+        const parsed = JSON.parse(content);
+        const backupData = parsed.backupData || parsed;
+        if (!backupData || !Array.isArray(backupData.topics) || !Array.isArray(backupData.pages) || !Array.isArray(backupData.blocks)) {
+          setRestoreError('File không hợp lệ: Thiếu danh sách topics, pages hoặc blocks chuẩn.');
+          return;
+        }
+        setPendingRestoreData(backupData);
+      } catch (err: any) {
+        setRestoreError('Lỗi đọc file JSON: ' + (err.message || 'File hỏng hoặc không đúng định dạng.'));
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
+  const handleConfirmRestore = async () => {
+    if (!pendingRestoreData) return;
+    try {
+      setIsRestoring(true);
+      setRestoreError('');
+      setRestoreSuccess('');
+      const res = await restoreBackupApi(pendingRestoreData);
+      if (!res.success) {
+        setRestoreError(res.error || 'Phục hồi dữ liệu thất bại.');
+        return;
+      }
+      setRestoreSuccess(`Phục hồi thành công: ${res.restored?.topics || 0} chuyên đề, ${res.restored?.pages || 0} bài học, ${res.restored?.blocks || 0} khối nội dung!`);
+      setPendingRestoreData(null);
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+    } catch (err: any) {
+      setRestoreError(err.message || 'Lỗi mạng khi phục hồi.');
+    } finally {
+      setIsRestoring(false);
     }
   };
 
@@ -407,6 +464,94 @@ export default function AdminSettingsModal({
                   <span>{isExporting ? 'Đang xuất tệp...' : 'Tải file sao lưu (JSON)'}</span>
                 </button>
               </div>
+
+              {/* Phục hồi dữ liệu từ bản sao lưu */}
+              {isSuper && (
+                <div className="flex flex-col gap-2.5 p-3.5 rounded-[16px] bg-amber-500/5 dark:bg-amber-950/20 border border-amber-300/60 dark:border-amber-700/50">
+                  <div className="flex items-center gap-2">
+                    <RotateCcw size={16} className="text-amber-600 dark:text-amber-400" />
+                    <span className="text-[14px] font-bold text-ink">
+                      Phục hồi dữ liệu từ bản sao lưu
+                    </span>
+                  </div>
+                  <p className="text-[13px] text-muted leading-relaxed">
+                    Tải file JSON đã sao lưu lên để khôi phục toàn bộ chủ đề, bài học, khối nội dung và cài đặt vào CSDL Supabase.
+                  </p>
+
+                  {restoreError && (
+                    <div className="p-2.5 rounded-[10px] bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-[13px] font-bold">
+                      {restoreError}
+                    </div>
+                  )}
+
+                  {restoreSuccess && (
+                    <div className="p-2.5 rounded-[10px] bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-[13px] font-bold">
+                      {restoreSuccess}
+                    </div>
+                  )}
+
+                  {/* Input chọn file ẩn */}
+                  <input
+                    ref={restoreFileInputRef}
+                    type="file"
+                    accept=".json,application/json"
+                    className="hidden"
+                    onChange={handleSelectBackupFile}
+                  />
+
+                  {pendingRestoreData ? (
+                    <div className="flex flex-col gap-2 p-3 rounded-[12px] bg-white dark:bg-[#1A1235] border border-amber-400/80 shadow-xs">
+                      <span className="text-[13px] font-bold text-amber-900 dark:text-amber-300">
+                        Xác nhận dữ liệu cần phục hồi:
+                      </span>
+                      <ul className="text-[12px] text-slate-700 dark:text-slate-300 space-y-0.5 list-disc pl-4 font-medium">
+                        <li>Thời điểm xuất file: <strong>{new Date(pendingRestoreData.exported_at || Date.now()).toLocaleString('vi-VN')}</strong></li>
+                        <li>Chuyên đề: <strong>{pendingRestoreData.topics?.length || 0}</strong></li>
+                        <li>Bài học: <strong>{pendingRestoreData.pages?.length || 0}</strong></li>
+                        <li>Khối nội dung: <strong>{pendingRestoreData.blocks?.length || 0}</strong></li>
+                      </ul>
+                      <div className="flex items-center gap-2 mt-1">
+                        <button
+                          type="button"
+                          onClick={handleConfirmRestore}
+                          disabled={isRestoring}
+                          className="flex-1 flex items-center justify-center gap-1.5 h-10 rounded-[10px] bg-amber-600 hover:bg-amber-700 text-white font-bold text-[13.5px] cursor-pointer shadow-xs disabled:opacity-50"
+                        >
+                          {isRestoring ? (
+                            <>
+                              <Loader2 size={15} className="animate-spin" />
+                              <span>Đang ghi vào CSDL...</span>
+                            </>
+                          ) : (
+                            <>
+                              <RotateCcw size={15} />
+                              <span>Tiến hành phục hồi ngay</span>
+                            </>
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPendingRestoreData(null)}
+                          disabled={isRestoring}
+                          className="px-3 h-10 rounded-[10px] bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-slate-300 font-bold text-[13px] cursor-pointer hover:bg-slate-300"
+                        >
+                          Hủy
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => restoreFileInputRef.current?.click()}
+                      disabled={isRestoring}
+                      className="flex items-center justify-center gap-1.5 h-11 rounded-[12px] bg-white dark:bg-white/5 border border-amber-400 text-amber-800 dark:text-amber-300 font-bold text-[14px] shadow-xs cursor-pointer hover:bg-amber-50 dark:hover:bg-amber-950/30"
+                    >
+                      <Upload size={16} />
+                      <span>Chọn file sao lưu (JSON) để phục hồi</span>
+                    </button>
+                  )}
+                </div>
+              )}
 
               {/* Đổi mật khẩu Admin */}
               <div className="flex flex-col gap-3 p-4 rounded-[16px] bg-surface-2 border border-line">

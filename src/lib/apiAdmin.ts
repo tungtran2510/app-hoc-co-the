@@ -235,6 +235,21 @@ export async function saveWorkspaceApi(
   } catch (err: any) {
     return { success: false, error: err.message || 'Lỗi mạng khi cập nhật cơ sở' };
   }
+}export async function restoreBackupApi(
+  backupData: any
+): Promise<{ success: boolean; restored?: any; error?: string }> {
+  try {
+    const res = await fetch('/api/admin/sao-luu', {
+      method: 'POST',
+      headers: getAdminHeaders(),
+      body: JSON.stringify({ backupData }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      return { success: false, error: data.error || 'Phục hồi thất bại' };
+    }
+    return { success: true, restored: data.restored };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Lỗi mạng khi phục hồi dữ liệu' };
+  }
 }
-
-
