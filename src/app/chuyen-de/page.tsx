@@ -5,7 +5,7 @@ import TopicListClient from '../../components/TopicListClient';
 import BottomNav from '../../components/BottomNav';
 import { Block } from '../../lib/types';
 
-export const revalidate = 30;
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: 'Chuyên đề · Tất cả bài học',

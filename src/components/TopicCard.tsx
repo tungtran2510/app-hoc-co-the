@@ -56,13 +56,20 @@ export default function TopicCard({
     .replace(' - ', '\n');
 
   return (
-    <a
+    <Link
       href={`/${topic.slug}`}
+      prefetch={true}
       onTouchStart={(e) => {
         e.currentTarget.classList.add('is-active');
       }}
       onPointerDown={(e) => {
         e.currentTarget.classList.add('is-active');
+      }}
+      onTouchMove={(e) => {
+        e.currentTarget.classList.remove('is-active');
+      }}
+      onTouchCancel={(e) => {
+        e.currentTarget.classList.remove('is-active');
       }}
       onClick={() => {
         playTapSound();
@@ -135,6 +142,6 @@ export default function TopicCard({
           </span>
         </div>
       </div>
-    </a>
+    </Link>
   );
 }

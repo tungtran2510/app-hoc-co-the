@@ -194,7 +194,7 @@ interface CacheEntry<T> {
   expiry: number;
 }
 const dataCache = new Map<string, CacheEntry<any>>();
-const CACHE_TTL_MS = 60 * 1000; // 60 giây tối ưu hiệu năng, tự động làm mới tức thì khi Admin bấm lưu
+const CACHE_TTL_MS = 10 * 60 * 1000; // 10 phút tối ưu hiệu năng, tự động làm mới tức thì khi Admin bấm lưu
 
 export function clearDataCache(keyPrefix?: string): void {
   if (!keyPrefix) {
@@ -479,7 +479,7 @@ export async function getBlocksByPages(pageIds: string[], includeHidden = false)
 
     if (supabase) {
       try {
-        let query = supabase.from('blocks').select('*').in('page_id', pageIds);
+        let query = supabase.from('blocks').select('id, page_id, type, data, is_visible, sort_order').in('page_id', pageIds);
         if (!includeHidden) {
           query = query.eq('is_visible', true);
         }
@@ -544,7 +544,7 @@ export async function getAllBlocks(includeHidden = false): Promise<Block[]> {
     const supabase = getSupabase();
     if (supabase) {
       try {
-        let query = supabase.from('blocks').select('*');
+        let query = supabase.from('blocks').select('id, page_id, type, data, is_visible, sort_order');
         if (!includeHidden) {
           query = query.eq('is_visible', true);
         }

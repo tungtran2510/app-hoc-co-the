@@ -7,10 +7,23 @@ import {
   getPagesByTopic,
   getSettings,
   getAllPageSlugMap,
+  getTopics,
 } from '../../../lib/data';
 import ContentViewer from '../../../components/ContentViewer';
 
-export const revalidate = 60;
+export const revalidate = 300;
+
+export async function generateStaticParams() {
+  const topics = await getTopics();
+  const allParams: { topicSlug: string; pageSlug: string }[] = [];
+  for (const topic of topics) {
+    const pages = await getPagesByTopic(topic.id);
+    for (const page of pages) {
+      allParams.push({ topicSlug: topic.slug, pageSlug: page.slug });
+    }
+  }
+  return allParams;
+}
 
 interface PageProps {
   params: {

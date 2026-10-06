@@ -57,13 +57,20 @@ export default function PageCard({
     : `/${topic.slug}/${page.slug}`;
 
   return (
-    <a
+    <Link
       href={targetUrl}
+      prefetch={true}
       onPointerDown={(e) => {
         e.currentTarget.classList.add('is-active');
       }}
       onTouchStart={(e) => {
         e.currentTarget.classList.add('is-active');
+      }}
+      onTouchMove={(e) => {
+        e.currentTarget.classList.remove('is-active');
+      }}
+      onTouchCancel={(e) => {
+        e.currentTarget.classList.remove('is-active');
       }}
       onClick={() => {
         playTapSound();
@@ -153,6 +160,6 @@ export default function PageCard({
           )}
         </div>
       </div>
-    </a>
+    </Link>
   );
 }
