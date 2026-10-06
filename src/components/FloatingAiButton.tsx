@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Sparkles } from 'lucide-react';
 import { playTapSound } from '../lib/audioFeedback';
@@ -194,11 +195,6 @@ export default function FloatingAiButton() {
         }
         return;
       }
-
-      // Nếu bấm nhanh dưới 2.5s (không hủy do cuộn, không kéo thả) => Chuyển đến trang Trợ lý AI siêu tốc
-      if (!cancelledByScrollRef.current && !hasMoved && !justMovedRef.current) {
-        navigateToAi();
-      }
     };
 
     window.addEventListener('pointermove', handlePointerMove, { passive: true });
@@ -206,29 +202,18 @@ export default function FloatingAiButton() {
     window.addEventListener('pointercancel', handlePointerUp);
   };
 
-  const navigateToAi = () => {
-    if (justMovedRef.current) return;
-    justMovedRef.current = true;
-    setTimeout(() => {
-      justMovedRef.current = false;
-    }, 500);
-    playTapSound();
-    router.push('/tro-ly-ai');
-  };
-
-  const handleClick = (e: React.MouseEvent) => {
-    if (cancelledByScrollRef.current || isUnlockedRef.current || isDraggingRef.current || dragInfoRef.current.moved) {
+  const handleLinkClick = (e: React.MouseEvent) => {
+    if (justMovedRef.current || isUnlockedRef.current || isDraggingRef.current || dragInfoRef.current.moved) {
       e.preventDefault();
       return;
     }
-    navigateToAi();
+    playTapSound();
   };
 
   if (isHiddenPage) return null;
 
   return (
     <aside
-      onClick={handleClick}
       onPointerDown={handlePointerDown}
       style={{
         transform: 'translateZ(0)',
@@ -256,8 +241,11 @@ export default function FloatingAiButton() {
         />
       )}
 
-      {/* Thẻ nút dạng viên thuốc cao cấp, kích thước vừa vặn dễ bấm, viền sắc nét nổi bật trên cả nền sáng và tối */}
-      <div
+      {/* Thẻ nút Link tới /tro-ly-ai siêu tốc, kích thước vừa vặn dễ bấm, viền sắc nét nổi bật trên cả nền sáng và tối */}
+      <Link
+        href="/tro-ly-ai"
+        prefetch={true}
+        onClick={handleLinkClick}
         className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full backdrop-blur-md transition-all shadow-md ${
           isUnlocked || isDragging
             ? 'bg-black/85 dark:bg-[#160D30]/95 border-2 border-[#FDE047] text-[#FDE047] shadow-[0_0_22px_rgba(250,204,21,0.65)] ring-2 ring-[#FDE047]/50'
@@ -276,7 +264,7 @@ export default function FloatingAiButton() {
         <span className="text-[12.5px] font-black tracking-tight whitespace-nowrap">
           {isUnlocked ? 'Thả đặt' : 'Hỏi AI'}
         </span>
-      </div>
+      </Link>
 
       {/* Gợi ý nhỏ khi đang giữ gần đủ 2.5 giây */}
       {isHolding && (
