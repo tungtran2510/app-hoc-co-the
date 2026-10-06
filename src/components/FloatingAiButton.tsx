@@ -263,17 +263,30 @@ export default function FloatingAiButton() {
     }
     playTapSound();
 
-    // Nếu đang ở trong bài học hoặc chuyên đề, bám đuổi ngữ cảnh sang Trợ lý AI
+    let targetUrl = '/tro-ly-ai';
     if (activeLesson && activeLesson.topic_slug) {
       const params = new URLSearchParams();
       params.set('topic', activeLesson.topic_slug);
       if (activeLesson.topic_title) params.set('topicTitle', activeLesson.topic_title);
       if (activeLesson.page_slug) params.set('page', activeLesson.page_slug);
       if (activeLesson.page_title) params.set('pageTitle', activeLesson.page_title);
-      router.push(`/tro-ly-ai?${params.toString()}`);
-    } else {
-      router.push('/tro-ly-ai');
+      targetUrl = `/tro-ly-ai?${params.toString()}`;
     }
+
+    try {
+      router.push(targetUrl);
+    } catch {
+      if (typeof window !== 'undefined') {
+        window.location.href = targetUrl;
+      }
+    }
+
+    // Đảm bảo chuyển trang 100% tin cậy trên mọi trình duyệt di động
+    setTimeout(() => {
+      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/tro-ly-ai')) {
+        window.location.href = targetUrl;
+      }
+    }, 120);
   };
 
   if (isHiddenPage) return null;

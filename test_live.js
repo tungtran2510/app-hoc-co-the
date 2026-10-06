@@ -192,7 +192,7 @@ const ARTIFACT_DIR = 'C:\\Users\\Admin\\.gemini\\antigravity\\brain\\23366f77-38
   const tAiStart = Date.now();
   const aiLink = page.locator('aside[aria-label*="Hỏi Trợ lý AI"] button, aside[aria-label*="Hỏi Trợ lý AI"] a').first();
   await aiLink.click();
-  await page.waitForURL('**/tro-ly-ai', { timeout: 10000 });
+  await page.waitForFunction(() => window.location.pathname.startsWith('/tro-ly-ai'), null, { timeout: 10000 });
   const aiTransitionMs = Date.now() - tAiStart;
   console.log(`   ⚡ TRANSITION TIME (Tap AI Button -> /tro-ly-ai): ${aiTransitionMs}ms!`);
 
