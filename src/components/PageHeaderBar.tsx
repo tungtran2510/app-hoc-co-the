@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronLeft, Home, ListOrdered, MoreVertical, X, Lock, Check, Settings as SettingsIcon, Share2, Bookmark, Sun, Moon, Eye, Smartphone, Volume2, VolumeX } from 'lucide-react';
 import { isSoundEnabled, setSoundEnabled, playTapSound } from '../lib/audioFeedback';
@@ -217,27 +218,29 @@ export default function PageHeaderBar({
       <div className="flex items-center justify-between h-[52px] my-1 gap-2">
         {/* 1. Breadcrumb: Home 🏠 › [Tên Chủ Đề] (Về trang chủ 1 chạm, không lặp chữ) */}
         <div className="flex items-center gap-1.5 min-w-0">
-          <a
+          <Link
             href="/"
+            prefetch={true}
             onClick={playTapSound}
             className="w-10 h-10 rounded-full bg-surface-2 hover:bg-surface-3 flex items-center justify-center text-ink hover:text-primary transition-colors shadow-2xs shrink-0"
             title="Về Trang chủ"
             aria-label="Về Trang chủ"
           >
             <Home size={19} strokeWidth={2.2} />
-          </a>
+          </Link>
 
           <span className="text-muted/60 text-[14px] font-bold shrink-0">›</span>
 
-          <a
+          <Link
             href={`/${topicSlug}`}
+            prefetch={true}
             onClick={playTapSound}
             className="flex items-center gap-1 text-[#1E3A8A] hover:text-[#172554] dark:text-purple-300 text-[16px] sm:text-[17px] font-extrabold min-h-[44px] transition-colors truncate"
             aria-label={`Về chủ đề ${topicTitle}`}
             title={`Về chủ đề ${topicTitle}`}
           >
             <span className="truncate">{topicTitle}</span>
-          </a>
+          </Link>
         </div>
 
         {/* 2. Nút Lưu + Nút Tuỳ chọn (Gọn gàng, thích ứng nền sáng / tối) */}
@@ -579,8 +582,9 @@ export default function PageHeaderBar({
                 </button>
               </div>
             ) : (
-              <a
+              <Link
                 href={`/dang-nhap?from=${encodeURIComponent(pathname || '/')}`}
+                prefetch={true}
                 onClick={() => {
                   playTapSound();
                   setShowOptions(false);
@@ -589,7 +593,7 @@ export default function PageHeaderBar({
               >
                 <Lock size={16} />
                 <span>Đăng nhập quản trị</span>
-              </a>
+              </Link>
             )}
           </div>
         </div>

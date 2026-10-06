@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { ChevronRight, BookOpen } from 'lucide-react';
 import { Page, Topic } from '../lib/types';
 import { playTapSound } from '../lib/audioFeedback';
@@ -56,12 +57,17 @@ export default function PageCard({
     : `/${topic.slug}/${page.slug}`;
 
   return (
-    <a
+    <Link
       href={targetUrl}
-      onClick={() => playTapSound()}
+      prefetch={true}
+      onPointerDown={() => onActivate?.()}
+      onClick={() => {
+        playTapSound();
+        onActivate?.();
+      }}
       className={`lesson-page-card flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 bg-white dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] rounded-[14px] border transition-all active:scale-[0.99] shadow-xs group ${
         isActive
-          ? 'border-slate-200/80 dark:border-purple-500/25'
+          ? 'border-[#FDE047] ring-2 ring-[#FDE047] shadow-[0_0_20px_rgba(250,204,21,0.6)]'
           : hasStarted && !isCompleted
           ? 'border-blue-300 dark:border-blue-400/50'
           : isCompleted
@@ -143,6 +149,6 @@ export default function PageCard({
           )}
         </div>
       </div>
-    </a>
+    </Link>
   );
 }
