@@ -37,24 +37,22 @@ async function testAiFollow() {
   const contextBarVisible = await contextBar.isVisible().catch(() => false);
   console.log(`- Thanh bám sát bài học hiển thị: ${contextBarVisible ? 'PASS' : 'FAIL'}`);
 
-  // Kiểm tra câu hỏi chào mừng bám sát bài học
-  const greetingCard = await page.locator('text=Bạn có câu hỏi gì về phần đĩa đệm này không?').first();
-  const greetingVisible = await greetingCard.isVisible().catch(() => false);
-  console.log(`- Lời chào hỏi trọng tâm bài học hiển thị: ${greetingVisible ? 'PASS' : 'FAIL'}`);
-
-  // Kiểm tra gợi ý câu hỏi trọng tâm
-  const promptHeading = await page.locator('text=Câu hỏi trọng tâm về "Đĩa đệm":').first();
+  // Kiểm tra gợi ý câu hỏi trên đỉnh đầu
+  const promptHeading = await page.locator('text=GỢI Ý CÂU HỎI').first();
   const promptHeadingVisible = await promptHeading.isVisible().catch(() => false);
-  console.log(`- Tiêu đề câu hỏi trọng tâm hiển thị: ${promptHeadingVisible ? 'PASS' : 'FAIL'}`);
+  console.log(`- Khu vực gợi ý câu hỏi trên đỉnh hiển thị: ${promptHeadingVisible ? 'PASS' : 'FAIL'}`);
+
+  const topChip = await page.locator('button:has-text("Bài học rút ra từ bài này là gì?")').first();
+  const topChipVisible = await topChip.isVisible().catch(() => false);
+  console.log(`- Chip câu hỏi "Bài học rút ra từ bài này là gì?": ${topChipVisible ? 'PASS' : 'FAIL'}`);
 
   // Chụp màn hình chào mừng bám đuổi
   await page.screenshot({ path: path.join(__dirname, 'verified_ai_welcome_card_followed.png') });
 
-  // BƯỚC 3: Bấm vào câu hỏi gợi ý đầu tiên
+  // BƯỚC 3: Bấm vào câu hỏi gợi ý đầu tiên trên đỉnh đầu
   console.log('3. Bấm vào câu hỏi gợi ý để kiểm tra câu trả lời của AI...');
-  const firstPrompt = page.locator('button:has-text("Giải thích chi tiết hơn về bài học: Đĩa đệm")').first();
-  if (await firstPrompt.isVisible()) {
-    await firstPrompt.click();
+  if (topChipVisible) {
+    await topChip.click();
     console.log('- Đã bấm câu hỏi gợi ý, đang chờ AI phản hồi...');
     // Đợi phản hồi AI (tối đa 25 giây)
     try {
