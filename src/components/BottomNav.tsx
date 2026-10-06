@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, LayoutGrid, Bookmark, Sparkles } from 'lucide-react';
+import { Home, LayoutGrid, Bookmark, Search } from 'lucide-react';
 import { playTapSound } from '../lib/audioFeedback';
 
 export default function BottomNav() {
@@ -11,9 +11,9 @@ export default function BottomNav() {
 
   const isHome = pathname === '/';
   const isSaved = pathname === '/da-luu';
-  const isAi = pathname === '/tro-ly-ai';
+  const isSearch = pathname === '/tim-kiem';
   // Tab "Chuyên đề" sáng khi đang ở trang tất cả chuyên đề, trong một chuyên đề hoặc trong một bài học
-  const isTopics = !isHome && !isAi && !isSaved && !pathname.startsWith('/dang-nhap') && !pathname.startsWith('/tim-kiem');
+  const isTopics = !isHome && !isSearch && !isSaved && !pathname.startsWith('/dang-nhap') && !pathname.startsWith('/tro-ly-ai');
 
   const baseItem =
     'flex flex-col items-center justify-center gap-1 transition-all duration-100 active:scale-90 active:opacity-70 min-h-[48px] cursor-pointer';
@@ -70,18 +70,15 @@ export default function BottomNav() {
           <span className="text-[11px] sm:text-[12px] leading-tight">Đã lưu</span>
         </a>
 
-        {/* 4. Hỏi đáp AI */}
+        {/* 4. Tìm kiếm */}
         <a
-          href="/tro-ly-ai"
-          onClick={(e) => handleTabClick(e, '/tro-ly-ai')}
-          className={`${baseItem} ${isAi ? activeText : idleText}`}
-          aria-label="Hỏi đáp AI"
+          href="/tim-kiem"
+          onClick={(e) => handleTabClick(e, '/tim-kiem')}
+          className={`${baseItem} ${isSearch ? activeText : idleText}`}
+          aria-label="Tìm kiếm"
         >
-          <div className="relative">
-            <Sparkles size={22} strokeWidth={isAi ? 2.5 : 2} className={isAi ? 'fill-[#1E3A8A]/20 text-[#1E3A8A] dark:fill-[#F8DF7B]/20 dark:text-[#F8DF7B]' : ''} />
-            <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#1E3A8A] dark:bg-[#F8DF7B] animate-pulse" />
-          </div>
-          <span className="text-[11px] sm:text-[12px] leading-tight">Hỏi đáp AI</span>
+          <Search size={22} strokeWidth={isSearch ? 2.5 : 2} />
+          <span className="text-[11px] sm:text-[12px] leading-tight">Tìm kiếm</span>
         </a>
       </div>
     </nav>
