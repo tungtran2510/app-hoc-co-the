@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import TopicIcon from './TopicIcon';
 import { Topic } from '../lib/types';
+import { playTapSound } from '../lib/audioFeedback';
 
 export const DEFAULT_TOPIC_COVERS: Record<string, string> = {
   'cot-song': '/images/topics/cot-song.png',
@@ -55,9 +55,9 @@ export default function TopicCard({
     .replace(' - ', '\n');
 
   return (
-    <Link
+    <a
       href={`/${topic.slug}`}
-      prefetch={true}
+      onClick={() => playTapSound()}
       className={`topic-card-container group relative flex flex-col cursor-pointer select-none transition-all duration-300 ${
         isActive ? 'is-active' : ''
       }`}
@@ -125,6 +125,6 @@ export default function TopicCard({
           </span>
         </div>
       </div>
-    </Link>
+    </a>
   );
 }

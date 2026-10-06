@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { BookOpen, ChevronRight } from 'lucide-react';
 import TopicCard, { DEFAULT_TOPIC_COVERS, TOPIC_MIND_MAP_SUBTITLES } from './TopicCard';
 import TopicIcon from './TopicIcon';
 import { Topic } from '../lib/types';
+import { playTapSound } from '../lib/audioFeedback';
 
 export type TopicsDisplayMode = 'card' | 'text' | 'logo' | 'large' | 'catalog';
 
@@ -50,9 +50,9 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
 
   if (mode === 'text') {
     return (
-      <Link
+      <a
         href={`/${topic.slug}`}
-        prefetch={true}
+        onClick={() => playTapSound()}
         className="flex items-center justify-between gap-3 px-4 py-3.5 rounded-[14px] bg-white dark:bg-[#160D30] border border-slate-200/80 dark:border-purple-800/40 shadow-2xs active:scale-[0.99] transition-all"
       >
         <div className="min-w-0">
@@ -60,15 +60,15 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
           <p className="text-[12px] text-slate-500 dark:text-purple-300/80 font-medium mt-0.5">{countText}</p>
         </div>
         <ChevronRight size={18} className="text-slate-400 dark:text-purple-300 shrink-0" />
-      </Link>
+      </a>
     );
   }
 
   if (mode === 'logo') {
     return (
-      <Link
+      <a
         href={`/${topic.slug}`}
-        prefetch={true}
+        onClick={() => playTapSound()}
         className="flex min-h-[84px] sm:min-h-[94px] items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-[17px] sm:rounded-[20px] bg-white dark:bg-[#160D30] border border-slate-200/80 dark:border-purple-800/40 shadow-[0_9px_28px_-22px_rgba(15,23,42,.65)] active:scale-[0.99] transition-all"
       >
         <div className="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] rounded-[14px] sm:rounded-[16px] bg-gradient-to-br from-[#231652] to-[#100629] flex items-center justify-center shrink-0 overflow-hidden">
@@ -84,15 +84,15 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
           <p className="mt-1 flex items-center gap-1 text-[11px] text-slate-500 dark:text-purple-300/80 font-semibold"><BookOpen size={13} />{countText}</p>
         </div>
         <ChevronRight size={18} className="text-slate-400 dark:text-purple-300 shrink-0" />
-      </Link>
+      </a>
     );
   }
 
   if (mode === 'large') {
     return (
-      <Link
+      <a
         href={`/${topic.slug}`}
-        prefetch={true}
+        onClick={() => playTapSound()}
         className="relative flex flex-col justify-between min-h-[190px] sm:min-h-[210px] p-4 rounded-[20px] bg-gradient-to-br from-[#231652] via-[#1A0E3F] to-[#100629] border border-white/10 text-white overflow-hidden shadow-[0_10px_26px_-12px_rgba(0,0,0,0.55)] active:scale-[0.99] transition-all"
       >
         <div className="absolute right-1 top-2 bottom-2 w-[50%] flex items-center justify-center pointer-events-none">
@@ -115,15 +115,15 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
           </span>
           <ChevronRight size={20} className="text-white/80" />
         </div>
-      </Link>
+      </a>
     );
   }
 
   if (mode === 'catalog') {
     return (
-      <Link
+      <a
         href={`/${topic.slug}`}
-        prefetch={true}
+        onClick={() => playTapSound()}
         className="group/catalog block w-full min-w-0 rounded-[16px] border border-slate-200/80 bg-white p-2 shadow-[0_8px_24px_-20px_rgba(15,23,42,.55)] active:scale-[0.98] transition-all"
       >
         <div className="aspect-square w-[74%] mx-auto overflow-hidden rounded-[13px] bg-gradient-to-br from-[#F4F7FF] to-[#EEF2FF] flex items-center justify-center">
@@ -138,7 +138,7 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
           <p className="text-[11px] sm:text-[12px] font-black leading-[1.15] text-[#071735] line-clamp-2 min-h-[25px]">{topic.title}</p>
           <p className="mt-1 text-[9.5px] font-semibold text-slate-500">{countText}</p>
         </div>
-      </Link>
+      </a>
     );
   }
 

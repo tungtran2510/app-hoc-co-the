@@ -54,6 +54,10 @@ Hệ thống hỗ trợ đầy đủ **10 khối nội dung chuẩn**:
    - Cấm dùng link `images.unsplash.com` làm ảnh mặc định vì dễ bị chặn trên Viettel/Vinaphone. Dùng ảnh nội bộ `/spine_hero_clean.png` hoặc Supabase Storage.
 4. **Tự động gắn tệp khi upload:**
    - Khi người dùng bấm "Chọn từ máy", ngay khi hoàn tất tải lên hệ thống phải tự động gán vào mảng dữ liệu, không bắt người dùng bấm thêm nút phụ.
+5. **Quy chuẩn Điều hướng Native, Hiệu ứng CSS Active & Kiểm thử trình duyệt thật (BẮT BUỘC):**
+   - **Điều hướng Native vững chắc:** Toàn bộ các liên kết điều hướng chính (BottomNav, thẻ Chuyên đề TopicCard, danh sách TopicTile, Breadcrumbs, PageCard, nút Chuyển bài) sử dụng thẻ `<a>` chuẩn kết hợp âm thanh phản hồi `playTapSound()`. Tuyệt đối không để React re-render trên `onTouchStart` vì sẽ khiến trình duyệt di động (WebKit/Chrome) hủy sự kiện click.
+   - **Hiệu ứng chạm & phát sáng bằng CSS thuần:** Hiệu ứng phát quang bìa sách 3D (`.topic-card-glow`, `.topic-card-spine`, `.topic-card-badge`, `.topic-card-img`) được kích hoạt tức thì qua CSS `:active` và `:hover`, phản hồi 0ms trên cả điện thoại cảm ứng và chuột máy tính.
+   - **Kiểm thử bằng trình duyệt thật là điều kiện bắt buộc:** Trước khi bàn giao bất kỳ bản sửa lỗi nào liên quan đến click/chuyển trang/giao diện, BẮT BUỘC phải chạy script Playwright trên trình duyệt thật để kiểm tra toàn bộ luồng nhấp chuột và chuyển URL thực tế.
 
 ---
 

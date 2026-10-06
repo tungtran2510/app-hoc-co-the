@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { Play, ArrowRight, Edit2 } from 'lucide-react';
 import { XemTiepInfo } from '../lib/learningProgress';
+import { playTapSound } from '../lib/audioFeedback';
 
 interface ContinueCardProps {
   info: XemTiepInfo;
@@ -23,9 +23,9 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
   const targetUrl = `/${cleanTopicSlug}/${cleanPageSlug}?v=${current}`;
 
   return (
-    <Link
+    <a
       href={targetUrl}
-      prefetch={true}
+      onClick={playTapSound}
       className="group relative block overflow-hidden rounded-[20px] bg-white text-slate-900 border border-slate-200/90 border-l-[4px] border-l-amber-500 shadow-md hover:shadow-[0_0_24px_rgba(248,223,123,0.35)] hover:border-amber-400 dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] dark:border-t-white/15 dark:border-r-black/50 dark:border-b-black/70 dark:border-l-[#A78BFA] dark:text-white dark:hover:border-amber-300/80 dark:hover:shadow-[0_0_26px_rgba(248,223,123,0.4),0_10px_28px_rgba(109,40,217,0.35)] px-4 py-3 sm:px-5 sm:py-3.5 transition-all duration-300 hover:-translate-y-1 active:scale-[0.98] cursor-pointer"
       aria-label={`Xem tiếp ${info.topic_title} bài ${info.page_title}`}
     >
@@ -130,6 +130,6 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
           </div>
         </div>
       </div>
-    </Link>
+    </a>
   );
 }

@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, LayoutGrid, Bookmark, Sparkles } from 'lucide-react';
+import { playTapSound } from '../lib/audioFeedback';
 
 export default function BottomNav() {
   const pathname = usePathname();
@@ -20,6 +20,7 @@ export default function BottomNav() {
   const idleText = 'text-slate-600 dark:text-purple-300/80 font-bold hover:text-[#172554] dark:hover:text-purple-200';
 
   const handleTabClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    playTapSound();
     if (pathname === href) {
       e.preventDefault();
       if (typeof window !== 'undefined') {
@@ -36,45 +37,41 @@ export default function BottomNav() {
     >
       <div className="w-full max-w-[480px] md:max-w-[820px] lg:max-w-[820px] h-[80px] pb-2 grid grid-cols-4 select-none bg-white dark:bg-[#100922] transition-all">
         {/* 1. Tổng quan */}
-        <Link
+        <a
           href="/"
-          prefetch={true}
           onClick={(e) => handleTabClick(e, '/')}
           className={`${baseItem} ${isHome ? activeText : idleText}`}
           aria-label="Tổng quan"
         >
           <Home size={22} strokeWidth={isHome ? 2.5 : 2} />
           <span className="text-[11px] sm:text-[12px] leading-tight">Tổng quan</span>
-        </Link>
+        </a>
 
         {/* 2. Chuyên đề */}
-        <Link
+        <a
           href="/chuyen-de"
-          prefetch={true}
           onClick={(e) => handleTabClick(e, '/chuyen-de')}
           className={`${baseItem} ${isTopics ? activeText : idleText}`}
           aria-label="Chuyên đề"
         >
           <LayoutGrid size={22} strokeWidth={isTopics ? 2.5 : 2} />
           <span className="text-[11px] sm:text-[12px] leading-tight">Chuyên đề</span>
-        </Link>
+        </a>
 
         {/* 3. Đã lưu */}
-        <Link
+        <a
           href="/da-luu"
-          prefetch={true}
           onClick={(e) => handleTabClick(e, '/da-luu')}
           className={`${baseItem} ${isSaved ? activeText : idleText}`}
           aria-label="Bài học đã lưu"
         >
           <Bookmark size={22} strokeWidth={isSaved ? 2.5 : 2} className={isSaved ? 'fill-[#1E3A8A] dark:fill-[#F8DF7B]' : ''} />
           <span className="text-[11px] sm:text-[12px] leading-tight">Đã lưu</span>
-        </Link>
+        </a>
 
         {/* 4. Hỏi đáp AI */}
-        <Link
+        <a
           href="/tro-ly-ai"
-          prefetch={true}
           onClick={(e) => handleTabClick(e, '/tro-ly-ai')}
           className={`${baseItem} ${isAi ? activeText : idleText}`}
           aria-label="Hỏi đáp AI"
@@ -84,7 +81,7 @@ export default function BottomNav() {
             <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#1E3A8A] dark:bg-[#F8DF7B] animate-pulse" />
           </div>
           <span className="text-[11px] sm:text-[12px] leading-tight">Hỏi đáp AI</span>
-        </Link>
+        </a>
       </div>
     </nav>
   );

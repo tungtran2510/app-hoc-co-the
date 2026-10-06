@@ -626,8 +626,10 @@ html.dark .animate-bio-breathing {
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* KHI ACTIVE (SINGLE-ACTIVE QUA REACT STATE CHO MỌI THIẾT BỊ) */
-.topic-card-container.is-active .topic-card-glow {
+/* KHI ACTIVE (HỖ TRỢ CẢ CHẠM TRỰC TIẾP :active, FOCUS VÀ REACT STATE .is-active CHO MỌI THIẾT BỊ) */
+.topic-card-container.is-active .topic-card-glow,
+.topic-card-container:active .topic-card-glow,
+.topic-card-container:focus-visible .topic-card-glow {
   border-top-color: #FDE047 !important;
   border-right-color: rgba(253, 224, 71, 0.9) !important;
   border-left-color: #EAB308 !important;
@@ -639,26 +641,34 @@ html.dark .animate-bio-breathing {
   transform: translateY(-3.5px) scale(1.025);
 }
 
-.topic-card-container.is-active .topic-card-spine {
+.topic-card-container.is-active .topic-card-spine,
+.topic-card-container:active .topic-card-spine,
+.topic-card-container:focus-visible .topic-card-spine {
   filter: brightness(1.35) !important;
   border-color: #FDE047 !important;
   box-shadow: 0 0 16px rgba(250, 204, 21, 0.95) !important;
 }
 
-.topic-card-container.is-active .topic-card-inner-glow {
+.topic-card-container.is-active .topic-card-inner-glow,
+.topic-card-container:active .topic-card-inner-glow,
+.topic-card-container:focus-visible .topic-card-inner-glow {
   opacity: 1 !important;
   transform: scale(1.4) !important;
   background-color: rgba(250, 204, 21, 0.45) !important;
 }
 
-.topic-card-container.is-active .topic-card-badge {
+.topic-card-container.is-active .topic-card-badge,
+.topic-card-container:active .topic-card-badge,
+.topic-card-container:focus-visible .topic-card-badge {
   background-color: #FEF08A !important;
   color: #000000 !important;
   box-shadow: 0 0 16px rgba(250, 204, 21, 0.95) !important;
   transform: scale(1.08) !important;
 }
 
-.topic-card-container.is-active .topic-card-img {
+.topic-card-container.is-active .topic-card-img,
+.topic-card-container:active .topic-card-img,
+.topic-card-container:focus-visible .topic-card-img {
   transform: scale(1.14) !important;
   filter: drop-shadow(0 10px 24px rgba(250, 204, 21, 0.55)) !important;
 }
@@ -711,7 +721,8 @@ html.dark .animate-bio-breathing {
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.page-card-container.is-active {
+.page-card-container.is-active,
+.page-card-container:active {
   border-color: #FBBF24 !important;
   box-shadow: 
     0 0 0 1.5px #FBBF24,

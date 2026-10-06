@@ -1,7 +1,7 @@
 import React from 'react';
-import Link from 'next/link';
 import { ChevronRight, BookOpen } from 'lucide-react';
 import { Page, Topic } from '../lib/types';
+import { playTapSound } from '../lib/audioFeedback';
 
 interface PageCardProps {
   page: Page;
@@ -56,9 +56,9 @@ export default function PageCard({
     : `/${topic.slug}/${page.slug}`;
 
   return (
-    <Link
+    <a
       href={targetUrl}
-      prefetch={true}
+      onClick={() => playTapSound()}
       className={`lesson-page-card flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 bg-white dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] rounded-[14px] border transition-all active:scale-[0.99] shadow-xs group ${
         isActive
           ? 'border-slate-200/80 dark:border-purple-500/25'
@@ -143,6 +143,6 @@ export default function PageCard({
           )}
         </div>
       </div>
-    </Link>
+    </a>
   );
 }

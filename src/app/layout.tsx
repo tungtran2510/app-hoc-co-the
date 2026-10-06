@@ -94,42 +94,6 @@ export default function RootLayout({
         <link rel="preconnect" href="https://i.ytimg.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://i.ytimg.com" />
         <script
-          type="speculationrules"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              prerender: [
-                {
-                  source: 'list',
-                  urls: ['/', '/chuyen-de', '/da-luu', '/tro-ly-ai'],
-                  eagerness: 'moderate',
-                },
-                {
-                  where: {
-                    and: [
-                      { href_matches: '/*' },
-                      { not: { href_matches: '/dang-nhap*' } },
-                      { not: { href_matches: '/api/*' } },
-                      { not: { href_matches: '/*.pdf' } },
-                    ],
-                  },
-                  eagerness: 'moderate',
-                },
-              ],
-              prefetch: [
-                {
-                  where: {
-                    and: [
-                      { href_matches: '/*' },
-                      { not: { href_matches: '/api/*' } },
-                    ],
-                  },
-                  eagerness: 'conservative',
-                },
-              ],
-            }),
-          }}
-        />
-        <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('giao_dien');var isDark=t==='dark'||(!t&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);var color=isDark?'#0C0817':'#FFFFFF';if(isDark){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}var m=document.getElementById('app-theme-color')||document.querySelector('meta[name="theme-color"]');if(!m){m=document.createElement('meta');m.id='app-theme-color';m.name='theme-color';document.head.appendChild(m)}m.setAttribute('content',color);m.removeAttribute('media');var all=document.querySelectorAll('meta[name="theme-color"]');for(var i=0;i<all.length;i++){if(all[i]!==m){all[i].remove()}}}catch(e){}})();`,
           }}
