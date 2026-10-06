@@ -54,13 +54,15 @@ interface SearchData {
   }[];
 }
 
+let cachedSearchData: SearchData | null = null;
+
 export default function SearchPage() {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [allData, setAllData] = useState<SearchData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [allData, setAllData] = useState<SearchData | null>(cachedSearchData);
+  const [loading, setLoading] = useState(!cachedSearchData);
 
   // Tự động focus vào ô nhập và cập nhật tiêu đề trang
   useEffect(() => {
@@ -68,12 +70,17 @@ export default function SearchPage() {
     document.title = 'Tìm kiếm bài học · Học Cơ Thể';
   }, []);
 
-  // Tải dữ liệu tìm kiếm
+  // Tải dữ liệu tìm kiếm (sử dụng cache bộ nhớ tức thì 0ms khi quay lại tab)
   useEffect(() => {
+    if (cachedSearchData) {
+      setLoading(false);
+      return;
+    }
     fetch('/api/search')
       .then((res) => res.json())
       .then((data) => {
         if (!data.error) {
+          cachedSearchData = data;
           setAllData(data);
         }
       })

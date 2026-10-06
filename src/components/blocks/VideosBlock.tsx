@@ -720,7 +720,7 @@ export default function VideosBlock({
 
       {/* 3. NỘI DUNG THEO TAB (GỌN GÀNG, TIÊU ĐỀ RỘNG RÃI, KHÔNG THƯA) */}
       {/* 3. NỘI DUNG THEO TAB (CHUYỂN TAB TỨC THÌ 0MS, GIỮ NGUYÊN DOM KHÔNG BỊ GIẬT LAG) */}
-      <div className={currentTab === 'syllabus' ? 'flex flex-col gap-1.5 mt-1.5 animate-in fade-in duration-100' : 'hidden'}>
+      <div className={currentTab === 'syllabus' ? 'flex flex-col gap-1.5 mt-1.5' : 'hidden'}>
         {videoList.map((vid, idx) => {
           const isActive = idx === safeIndex;
           const isWatched = watchedList.includes(idx + 1);
@@ -905,13 +905,13 @@ export default function VideosBlock({
         </Link>
       </div>
 
-      <div className={currentTab === 'summary' ? 'flex flex-col gap-3 py-1 animate-in fade-in duration-100' : 'hidden'}>
+      <div className={currentTab === 'summary' ? 'flex flex-col gap-3 py-1' : 'hidden'}>
         {summaryContent || (
           <p className="text-muted text-[14px] p-4 text-center">Chưa có tóm tắt bổ sung cho bài học này.</p>
         )}
       </div>
 
-      <div className={currentTab === 'resources' ? 'flex flex-col gap-3 py-1 animate-in fade-in duration-100' : 'hidden'}>
+      <div className={currentTab === 'resources' ? 'flex flex-col gap-3 py-1' : 'hidden'}>
         {resourcesContent}
       </div>
 

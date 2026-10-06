@@ -24,11 +24,25 @@ import UserSyncModal from '../../components/UserSyncModal';
 import BottomNav from '../../components/BottomNav';
 
 export default function SavedPages() {
-  const [savedList, setSavedList] = useState<SavedPageInfo[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [savedList, setSavedList] = useState<SavedPageInfo[]>(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      return getSavedPages();
+    } catch {
+      return [];
+    }
+  });
+  const [isLoading, setIsLoading] = useState(false);
   const [showPhoneSync, setShowPhoneSync] = useState(false);
   const [userPhone, setUserPhone] = useState<string | null>(null);
-  const [resume, setResume] = useState<XemTiepInfo | null>(null);
+  const [resume, setResume] = useState<XemTiepInfo | null>(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      return getStoredXemTiep();
+    } catch {
+      return null;
+    }
+  });
   const [savedView, setSavedView] = useState<'list' | 'compact' | 'grid'>('list');
 
   useEffect(() => {
