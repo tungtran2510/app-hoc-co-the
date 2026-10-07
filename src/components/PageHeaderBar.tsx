@@ -247,25 +247,25 @@ export default function PageHeaderBar({
 
   return (
     <header className="relative w-full z-40">
-      <div className="flex items-center justify-between h-[52px] my-1 gap-2">
+      <div className="flex items-center justify-between h-[42px] my-0 gap-1.5">
         {/* 1. Breadcrumb: Home 🏠 › [Tên Chủ Đề] (Về trang chủ 1 chạm, không lặp chữ) */}
         <div className="flex items-center gap-1.5 min-w-0">
           <Link
             href="/"
             prefetch={true}
-            className="w-10 h-10 rounded-full bg-surface-2 hover:bg-surface-3 flex items-center justify-center text-ink hover:text-primary transition-colors shadow-2xs shrink-0 cursor-pointer"
+            className="w-8.5 h-8.5 sm:w-9 sm:h-9 rounded-full bg-surface-2 hover:bg-surface-3 flex items-center justify-center text-ink hover:text-primary transition-colors shadow-2xs shrink-0 cursor-pointer"
             title="Về Trang chủ"
             aria-label="Về Trang chủ"
           >
-            <Home size={19} strokeWidth={2.2} />
+            <Home size={17} strokeWidth={2.2} />
           </Link>
 
-          <span className="text-muted/60 text-[14px] font-bold shrink-0">›</span>
+          <span className="text-muted/60 text-[13px] font-bold shrink-0">›</span>
 
           <Link
             href={`/${topicSlug}`}
             prefetch={true}
-            className="flex items-center gap-1 text-[#1E3A8A] hover:text-[#172554] dark:text-purple-300 text-[16px] sm:text-[17px] font-extrabold min-h-[44px] transition-colors truncate cursor-pointer"
+            className="flex items-center gap-1 text-[#1E3A8A] hover:text-[#172554] dark:text-purple-300 text-[15px] sm:text-[16px] font-extrabold min-h-[38px] transition-colors truncate cursor-pointer"
             aria-label={`Về chủ đề ${topicTitle}`}
             title={`Về chủ đề ${topicTitle}`}
           >
@@ -274,7 +274,7 @@ export default function PageHeaderBar({
         </div>
 
         {/* 2. Nút 3D + Nút Lưu + Nút Tuỳ chọn (Gọn gàng trên cùng 1 hàng chuẩn mobile) */}
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
           {onOpen3DModal && (
             <button
               type="button"
@@ -282,11 +282,11 @@ export default function PageHeaderBar({
                 playTapSound();
                 onOpen3DModal();
               }}
-              className="flex items-center gap-1 h-[42px] px-2.5 sm:px-3 rounded-[13px] bg-blue-50 hover:bg-blue-100 dark:bg-purple-900/50 dark:hover:bg-purple-900/80 text-[#1E3A8A] dark:text-[#F8DF7B] border-[1.5px] border-blue-200 dark:border-purple-800/80 text-[12px] font-black shadow-2xs transition-all active:scale-95 cursor-pointer"
+              className="flex items-center gap-1 h-[34px] px-2 sm:px-2.5 rounded-[10px] bg-blue-50 hover:bg-blue-100 dark:bg-purple-900/50 dark:hover:bg-purple-900/80 text-[#1E3A8A] dark:text-[#F8DF7B] border border-blue-200 dark:border-purple-800/80 text-[11px] font-black shadow-2xs transition-all active:scale-95 cursor-pointer"
               title="Khám phá mô hình giải phẫu 3D tương tác"
               aria-label="Mở mô hình 3D"
             >
-              <span className="text-[13px]">🦴</span>
+              <span className="text-[12px]">🦴</span>
               <span>3D</span>
             </button>
           )}
@@ -297,7 +297,7 @@ export default function PageHeaderBar({
             onClick={() => {
               if (onToggleSave) onToggleSave();
             }}
-            className={`flex items-center justify-center w-[44px] h-[44px] rounded-[14px] border-[1.5px] transition-all shadow-2xs cursor-pointer active:scale-95 ${
+            className={`flex items-center justify-center w-[36px] h-[34px] rounded-[10px] border transition-all shadow-2xs cursor-pointer active:scale-95 ${
               isSaved
                 ? 'bg-amber-50 border-amber-400 text-amber-600 dark:bg-purple-900/50 dark:border-[#F8DF7B] dark:text-[#F8DF7B]'
                 : 'bg-white border-slate-200 text-slate-700 hover:border-[#1E3A8A] hover:text-[#1E3A8A] dark:bg-[#160D30] dark:border-purple-900/50 dark:text-purple-200 dark:hover:border-purple-600'
@@ -306,7 +306,7 @@ export default function PageHeaderBar({
             title={isSaved ? 'Đã lưu (Bấm để bỏ lưu)' : 'Lưu bài học'}
           >
             <Bookmark
-              size={19}
+              size={16}
               className={isSaved ? 'fill-amber-500 text-amber-500 dark:fill-[#F8DF7B] dark:text-[#F8DF7B]' : 'text-slate-600 dark:text-purple-300'}
               strokeWidth={2.3}
             />
@@ -318,7 +318,7 @@ export default function PageHeaderBar({
             onClick={() => {
               setShowOptions(!showOptions);
             }}
-            className={`flex items-center justify-center w-[44px] h-[44px] rounded-[14px] border-[1.5px] transition-all shadow-2xs cursor-pointer active:scale-95 ${
+            className={`flex items-center justify-center w-[36px] h-[34px] rounded-[10px] border transition-all shadow-2xs cursor-pointer active:scale-95 ${
               showOptions
                 ? 'bg-blue-50 border-[#1E3A8A] text-[#1E3A8A] dark:bg-purple-900/50 dark:border-purple-500 dark:text-purple-200'
                 : 'bg-white border-slate-200 text-slate-700 hover:border-[#1E3A8A] hover:text-[#1E3A8A] dark:bg-[#160D30] dark:border-purple-900/50 dark:text-purple-200 dark:hover:border-purple-600'
@@ -326,7 +326,7 @@ export default function PageHeaderBar({
             aria-expanded={showOptions}
             aria-label="Tùy chọn"
           >
-            <MoreVertical size={19} strokeWidth={2.3} />
+            <MoreVertical size={16} strokeWidth={2.3} />
           </button>
         </div>
       </div>

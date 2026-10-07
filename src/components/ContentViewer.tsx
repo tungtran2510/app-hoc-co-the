@@ -1115,7 +1115,7 @@ export default function ContentViewer({
   };
 
   return (
-    <main className="flex-1 flex flex-col px-5 pt-0 pb-16 sm:pb-20 gap-1 sm:gap-2.5">
+    <main className="flex-1 flex flex-col px-4 sm:px-5 pt-0 pb-16 sm:pb-20 gap-0.5 sm:gap-1.5">
       {/* 1. ĐÃ BỎ THANH ĐEN ĐỈNH ĐẦU ĐỂ TIẾT KIỆM DIỆN TÍCH THEO YÊU CẦU CỦA ANH */}
 
       {/* 2. Thanh điều hướng trang: ‹ [Chủ đề] + [Mục lục] + [⋮] */}
@@ -1142,24 +1142,24 @@ export default function ContentViewer({
       />
 
       {/* 3. Phần đầu bài viết: Badge BÀI 01 / 04 + Tiêu đề lớn (Không lặp lại tên chủ đề) */}
-      <div className="flex flex-col gap-2 sm:gap-2.5" style={{ zoom: fontSizeMode === 'small' ? 0.9 : fontSizeMode === 'large' ? 1.15 : 1 } as React.CSSProperties}>
-      <section className="flex flex-col gap-1 mt-0">
+      <div className="flex flex-col gap-1.5 sm:gap-2" style={{ zoom: fontSizeMode === 'small' ? 0.9 : fontSizeMode === 'large' ? 1.15 : 1 } as React.CSSProperties}>
+      <section className="flex flex-col gap-0.5 -mt-1 sm:-mt-0.5">
         {isAdmin && (
-          <div className="flex items-center justify-end gap-1.5 mb-0.5">
+          <div className="flex items-center justify-end gap-1.5 -mb-0.5">
             <button
               type="button"
               onClick={() => setShowEditPageModal(true)}
-              className="flex items-center gap-1 h-6 px-2 rounded-[7px] bg-white border border-line text-ink font-bold text-[11px] hover:border-primary shadow-2xs"
+              className="flex items-center gap-1 h-5 px-1.5 rounded-[6px] bg-white border border-line text-ink font-bold text-[10px] hover:border-primary shadow-2xs"
               title="Sửa tên bài & tóm tắt"
             >
-              <Edit2 size={11} className="text-primary" />
+              <Edit2 size={10} className="text-primary" />
               <span>Sửa</span>
             </button>
 
             <button
               type="button"
               onClick={handleToggleStatus}
-              className={`text-[11px] font-bold px-2 py-0.5 rounded-full border transition-all ${
+              className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border transition-all ${
                 pageStatus === 'published'
                   ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                   : 'bg-[#FFF1E6] text-[#8A3A14] border-[#F2B38A]'
@@ -1170,18 +1170,18 @@ export default function ContentViewer({
             </button>
           </div>
         )}
-        <h1 className="text-[21px] sm:text-[25px] font-extrabold text-ink leading-[1.16]">
+        <h1 className="text-[20px] sm:text-[24px] font-extrabold text-ink leading-[1.14]">
           {currentPage.title}
         </h1>
         {currentPage.summary && (
-          <p className="text-[12px] sm:text-[13px] text-muted font-normal leading-relaxed mt-0">
+          <p className="text-[11.5px] sm:text-[12.5px] text-muted font-normal leading-snug mt-0">
             {currentPage.summary}
           </p>
         )}
       </section>
 
       {/* 4. Danh sách tất cả các khối theo đúng thứ tự sắp xếp */}
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2.5 sm:gap-3.5">
         {blockList
           .filter((b) => {
             if (!isAdmin && !b.is_visible) return false;

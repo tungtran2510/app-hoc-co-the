@@ -92,36 +92,36 @@ export default function FloatingAiButton() {
     return () => window.removeEventListener('qbiz_current_lesson_changed', handleLessonChanged);
   }, [pathname]);
 
-  // Đọc tọa độ từ localStorage hoặc đặt mặc định ở góc dưới bên phải (ngay trên Tab Tìm kiếm ở BottomNav)
+  // Đọc tọa độ từ localStorage hoặc đặt mặc định ở góc dưới bên phải (sát ngay mép trên thanh bài tiếp)
   useEffect(() => {
-    const btnWidth = hasLessonContext ? 128 : 88;
+    const btnWidth = hasLessonContext ? 104 : 76;
     try {
       const saved = localStorage.getItem('qbiz_floating_ai_pos');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (typeof parsed.x === 'number' && typeof parsed.y === 'number') {
           const clampedX = Math.max(12, Math.min(parsed.x, window.innerWidth - btnWidth - 12));
-          const clampedY = Math.max(50, Math.min(parsed.y, window.innerHeight - 125));
+          const clampedY = Math.max(50, Math.min(parsed.y, window.innerHeight - 68));
           setPos({ x: clampedX, y: clampedY });
           return;
         }
       }
     } catch {}
 
-    // Vị trí mặc định: Góc dưới bên phải (nổi ngay sát trên Tab Tìm kiếm của BottomNav, không che pagination)
+    // Vị trí mặc định: Góc dưới bên phải, nằm sát ngay phía trên thanh bài tiếp
     const defaultX = Math.max(12, window.innerWidth - btnWidth - 14);
-    const defaultY = Math.max(50, window.innerHeight - 130);
+    const defaultY = Math.max(50, window.innerHeight - 76);
     setPos({ x: defaultX, y: defaultY });
   }, [hasLessonContext]);
 
   // Đảm bảo không bị lọt khỏi màn hình khi xoay điện thoại hoặc thay đổi kích thước
   useEffect(() => {
     const handleResize = () => {
-      const btnWidth = hasLessonContext ? 128 : 88;
+      const btnWidth = hasLessonContext ? 104 : 76;
       setPos((prev) => {
         if (!prev) return prev;
         const clampedX = Math.max(12, Math.min(prev.x, window.innerWidth - btnWidth - 12));
-        const clampedY = Math.max(50, Math.min(prev.y, window.innerHeight - 125));
+        const clampedY = Math.max(50, Math.min(prev.y, window.innerHeight - 68));
         return { x: clampedX, y: clampedY };
       });
     };
@@ -202,11 +202,11 @@ export default function FloatingAiButton() {
 
       // Khi ĐÃ mở khóa (sau 2.5s) => Cho phép kéo nút tự do
       dragInfoRef.current.moved = true;
-      const btnWidth = hasLessonContext ? 128 : 88;
+      const btnWidth = hasLessonContext ? 104 : 76;
       const minX = 12;
       const maxX = window.innerWidth - btnWidth - 12;
       const minY = 50;
-      const maxY = window.innerHeight - 120; // Không che BottomNav và thanh phân trang
+      const maxY = window.innerHeight - 68; // Không che thanh bài tiếp (bottom dock)
 
       latestX = Math.max(minX, Math.min(dragInfoRef.current.elemX + dx, maxX));
       latestY = Math.max(minY, Math.min(dragInfoRef.current.elemY + dy, maxY));
@@ -302,9 +302,9 @@ export default function FloatingAiButton() {
       style={{
         transform: 'translateZ(0)',
         left: pos ? `${pos.x}px` : 'auto',
-        right: pos ? 'auto' : '16px',
+        right: pos ? 'auto' : '14px',
         top: pos ? `${pos.y}px` : 'auto',
-        bottom: pos ? 'auto' : '74px',
+        bottom: pos ? 'auto' : '56px',
         WebkitTouchCallout: 'none',
         WebkitUserSelect: 'none',
         userSelect: 'none',
@@ -347,16 +347,16 @@ export default function FloatingAiButton() {
           WebkitUserSelect: 'none',
           userSelect: 'none',
         }}
-        className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full backdrop-blur-md transition-all shadow-sm select-none ${
+        className={`relative flex items-center gap-1 px-2.5 py-1 rounded-full backdrop-blur-md transition-all shadow-sm select-none ${
           isUnlocked || isDragging
             ? 'bg-black/90 dark:bg-[#160D30]/95 border-2 border-[#FDE047] text-[#FDE047] shadow-[0_0_18px_rgba(250,204,21,0.65)] ring-2 ring-[#FDE047]/50'
             : hasLessonContext
-            ? 'bg-white/95 dark:bg-[#160D30]/95 hover:bg-white dark:hover:bg-[#1D1140] border-[1.5px] border-blue-600/60 dark:border-purple-400/60 text-[#1E3A8A] dark:text-[#F8DF7B] shadow-[0_2px_12px_rgba(30,58,138,0.2)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.45)]'
-            : 'bg-white/95 dark:bg-[#160D30]/95 hover:bg-white dark:hover:bg-[#1D1140] border-[1.5px] border-[#1E3A8A]/40 dark:border-blue-400/40 text-[#1E3A8A] dark:text-[#F8DF7B] shadow-[0_2px_10px_rgba(30,58,138,0.12)] dark:shadow-[0_2px_10px_rgba(0,0,0,0.35)]'
+            ? 'bg-white/95 dark:bg-[#160D30]/95 hover:bg-white dark:hover:bg-[#1D1140] border-[1.5px] border-blue-600/60 dark:border-purple-400/60 text-[#1E3A8A] dark:text-[#F8DF7B] shadow-[0_2px_10px_rgba(30,58,138,0.18)] dark:shadow-[0_2px_10px_rgba(0,0,0,0.45)]'
+            : 'bg-white/95 dark:bg-[#160D30]/95 hover:bg-white dark:hover:bg-[#1D1140] border-[1.5px] border-[#1E3A8A]/40 dark:border-blue-400/40 text-[#1E3A8A] dark:text-[#F8DF7B] shadow-[0_2px_8px_rgba(30,58,138,0.12)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.35)]'
         }`}
       >
         <Sparkles
-          size={14}
+          size={12}
           strokeWidth={2.2}
           className={`${
             isUnlocked || isDragging
@@ -366,11 +366,11 @@ export default function FloatingAiButton() {
               : 'text-[#1E3A8A] dark:text-[#F8DF7B] fill-[#1E3A8A]/20 dark:fill-amber-300/30 animate-pulse'
           }`}
         />
-        <span className="text-[12px] font-extrabold tracking-tight whitespace-nowrap">
+        <span className="text-[10.5px] font-bold tracking-tight whitespace-nowrap">
           {isUnlocked ? 'Thả đặt' : hasLessonContext && activeLesson?.page_title ? 'Hỏi bài này' : 'Hỏi AI'}
         </span>
         {hasLessonContext && !isUnlocked && (
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+          <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse shrink-0" />
         )}
       </button>
 

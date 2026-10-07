@@ -47,7 +47,7 @@ export default function OfflineManager() {
       setShowOnlinePill(true);
       const timer = setTimeout(() => {
         setShowOnlinePill(false);
-      }, 2500);
+      }, 1500); // Đúng 1.5 giây theo yêu cầu
       return () => clearTimeout(timer);
     };
 
@@ -212,32 +212,32 @@ export default function OfflineManager() {
 
   return (
     <>
-      {/* THANH CẢNH BÁO TRẠNG THÁI NGOẠI TUYẾN (OFFLINE STATUS PILL) - TINH GỌN, CHUẨN 1 DÒNG */}
+      {/* THANH CẢNH BÁO TRẠNG THÁI NGOẠI TUYẾN (OFFLINE STATUS PILL) - TINH GỌN Ở GÓC DƯỚI TRÁI */}
       {isOffline && (
         <aside
           role="status"
           aria-live="polite"
           aria-label="Thông báo chế độ ngoại tuyến"
-          className="fixed bottom-[72px] left-1/2 -translate-x-1/2 z-50 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-600/95 dark:bg-amber-600/90 text-white shadow-xl border border-amber-400/80 backdrop-blur-md animate-in slide-in-from-bottom-2 duration-200 pointer-events-none select-none max-w-[92%]"
+          className="fixed bottom-[56px] left-3 z-40 flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-600/95 dark:bg-amber-600/90 text-white shadow-md border border-amber-400/80 backdrop-blur-md animate-in slide-in-from-bottom-2 duration-200 pointer-events-none select-none max-w-[55%]"
         >
-          <WifiOff size={13} strokeWidth={2.6} className="shrink-0 text-amber-200 animate-pulse" />
-          <span className="text-[12px] font-bold tracking-tight whitespace-nowrap">
-            Chế độ ngoại tuyến: Đọc từ bộ nhớ máy
+          <WifiOff size={11} strokeWidth={2.6} className="shrink-0 text-amber-200 animate-pulse" />
+          <span className="text-[10px] font-semibold tracking-tight whitespace-nowrap truncate">
+            Ngoại tuyến: Đọc từ máy
           </span>
         </aside>
       )}
 
-      {/* THANH BÁO ĐÃ KẾT NỐI LẠI INTERNET */}
+      {/* THANH BÁO ĐÃ KẾT NỐI LẠI INTERNET (TỰ ẨN SAU 1.5S) */}
       {showOnlinePill && !isOffline && (
         <aside
           role="status"
           aria-live="polite"
           aria-label="Thông báo đã kết nối lại mạng"
-          className="fixed bottom-[72px] left-1/2 -translate-x-1/2 z-50 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-600/95 dark:bg-emerald-600/90 text-white shadow-xl border border-emerald-400/80 backdrop-blur-md animate-in slide-in-from-bottom-2 duration-200 pointer-events-none select-none max-w-[92%]"
+          className="fixed bottom-[56px] left-3 z-40 flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-600/95 dark:bg-emerald-600/90 text-white shadow-md border border-emerald-400/80 backdrop-blur-md animate-in slide-in-from-bottom-2 duration-200 pointer-events-none select-none max-w-[55%]"
         >
-          <CheckCircle2 size={13} strokeWidth={2.6} className="shrink-0 text-emerald-200" />
-          <span className="text-[12px] font-bold tracking-tight whitespace-nowrap">
-            Đã kết nối lại Internet ✓
+          <CheckCircle2 size={11} strokeWidth={2.6} className="shrink-0 text-emerald-200" />
+          <span className="text-[10px] font-semibold tracking-tight whitespace-nowrap truncate">
+            Đã kết nối Internet ✓
           </span>
         </aside>
       )}
