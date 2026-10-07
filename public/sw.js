@@ -3,8 +3,8 @@
 // Đạt tốc độ phản hồi tức thì (< 1ms) khi người dùng chuyển đổi các mục hoặc vào bài học
 // TUÂN THỦ CHỈ THỊ: Chỉ tải từ mạng khi người dùng ấn vào tài liệu sách / video dung lượng lớn
 
-const CACHE_NAME = 'qbiz-books-shell-v37';
-const STATIC_ASSETS_CACHE = 'qbiz-books-static-v37';
+const CACHE_NAME = 'qbiz-books-shell-v40';
+const STATIC_ASSETS_CACHE = 'qbiz-books-static-v40';
 
 // Lắng nghe lệnh xóa cache từ Admin Client khi có thay đổi nội dung/vị trí
 self.addEventListener('message', (event) => {
@@ -150,6 +150,8 @@ self.addEventListener('fetch', (event) => {
     url.pathname.endsWith('.woff2') ||
     url.pathname.endsWith('.png') ||
     url.pathname.endsWith('.jpg') ||
+    url.pathname.endsWith('.jpeg') ||
+    url.pathname.endsWith('.webp') ||
     url.pathname.endsWith('.svg') ||
     url.pathname.endsWith('.ico')
   ) {
@@ -168,6 +170,30 @@ self.addEventListener('fetch', (event) => {
         } catch {
           return cachedResponse || new Response('Offline Asset Not Found', { status: 503 });
         }
+      })
+    );
+    return;
+  }
+
+  // 4b. Với hình ảnh giải phẫu lưu trên Supabase Storage (*.supabase.co):
+  // Chiến lược: STALE WHILE REVALIDATE (Hiện ngay từ cache nếu có, đồng thời cập nhật ngầm nếu có mạng)
+  if (
+    url.hostname.includes('supabase.co') &&
+    (url.pathname.includes('/storage/v1/object/public/') || url.pathname.includes('/images/'))
+  ) {
+    event.respondWith(
+      caches.open(STATIC_ASSETS_CACHE).then(async (cache) => {
+        const cachedResponse = await cache.match(request);
+        const fetchPromise = fetch(request)
+          .then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
+              cache.put(request, networkResponse.clone());
+            }
+            return networkResponse;
+          })
+          .catch(() => cachedResponse);
+
+        return cachedResponse || fetchPromise;
       })
     );
     return;

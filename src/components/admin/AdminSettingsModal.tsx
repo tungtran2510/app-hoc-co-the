@@ -17,6 +17,7 @@ import {
   BookOpen,
   PlayCircle,
   Activity,
+  CloudDownload,
 } from 'lucide-react';
 import {
   getStoredAppSettings,
@@ -51,6 +52,40 @@ export default function AdminSettingsModal({
   const [settings, setSettings] = useState<AppCustomSettings>(getStoredAppSettings());
   const [saveSuccessMsg, setSaveSuccessMsg] = useState('');
   const [isExporting, setIsExporting] = useState(false);
+
+  // Tiến độ tải dữ liệu ngoại tuyến Offline (tối đa 30MB)
+  const [offlineStatus, setOfflineStatus] = useState<{
+    status: 'idle' | 'downloading' | 'completed' | 'error';
+    progress: number;
+    bytesFormatted: string;
+  }>({
+    status: 'idle',
+    progress: 0,
+    bytesFormatted: '',
+  });
+  const [offlineLastMb, setOfflineLastMb] = useState('');
+
+  useEffect(() => {
+    try {
+      const mb = localStorage.getItem('qbiz_offline_cached_mb');
+      if (mb) setOfflineLastMb(mb);
+    } catch {}
+
+    const handleProgress = (e: any) => {
+      if (e?.detail) {
+        setOfflineStatus({
+          status: e.detail.status,
+          progress: e.detail.progress || 0,
+          bytesFormatted: e.detail.bytesFormatted || '',
+        });
+        if (e.detail.status === 'completed' && e.detail.bytesFormatted) {
+          setOfflineLastMb(e.detail.bytesFormatted);
+        }
+      }
+    };
+    window.addEventListener('qbiz_offline_progress', handleProgress);
+    return () => window.removeEventListener('qbiz_offline_progress', handleProgress);
+  }, []);
 
   // Đổi mật khẩu Admin
   const [currentPassword, setCurrentPassword] = useState('');
@@ -545,6 +580,59 @@ export default function AdminSettingsModal({
                       />
                     </div>
                   )}
+                </div>
+
+                {/* 4. Tự động tải dữ liệu Offline sau 2 phút (tối đa 30MB) */}
+                <div className="flex flex-col p-3 hover:bg-surface/50 transition-colors">
+                  <label className="flex items-center justify-between cursor-pointer">
+                    <div className="flex items-center gap-2">
+                      <CloudDownload size={15} className="text-blue-600 shrink-0" />
+                      <span className="text-[13px] font-bold text-ink">
+                        Tự động tải Offline (sau 2 phút)
+                      </span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={settings.auto_offline_cache ?? true}
+                      onChange={(e) => setSettings({ ...settings, auto_offline_cache: e.target.checked })}
+                      className="w-4.5 h-4.5 accent-blue-600 rounded cursor-pointer"
+                    />
+                  </label>
+
+                  {/* Nút chủ động tải ngay 1-chạm & hiển thị tiến độ */}
+                  <div className="mt-2 pt-2 border-t border-line/60 flex items-center justify-between gap-2">
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[11px] font-extrabold text-ink truncate">
+                        {offlineStatus.status === 'downloading'
+                          ? `Đang tải: ${offlineStatus.progress}% (${offlineStatus.bytesFormatted})`
+                          : offlineStatus.status === 'completed'
+                          ? `✓ Đã lưu (${offlineStatus.bytesFormatted || '14.8 MB'})`
+                          : offlineLastMb
+                          ? `Đã lưu: ${offlineLastMb} MB`
+                          : 'Tối đa 30MB · Học 100% không cần mạng'}
+                      </span>
+                      {offlineStatus.status === 'downloading' && (
+                        <div className="w-full max-w-[140px] h-1.5 bg-slate-200 dark:bg-purple-950 rounded-full overflow-hidden mt-1">
+                          <div
+                            className="h-full bg-blue-600 transition-all duration-200"
+                            style={{ width: `${offlineStatus.progress}%` }}
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        window.dispatchEvent(new CustomEvent('qbiz_start_offline_download'));
+                      }}
+                      disabled={offlineStatus.status === 'downloading'}
+                      className="h-7 px-2.5 rounded-[8px] bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-[11px] font-extrabold flex items-center gap-1 hover:bg-blue-100 cursor-pointer shadow-2xs shrink-0 disabled:opacity-50"
+                    >
+                      <Download size={11} strokeWidth={2.5} />
+                      <span>{offlineStatus.status === 'downloading' ? 'Đang tải...' : 'Tải ngay'}</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

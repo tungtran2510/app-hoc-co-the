@@ -12,6 +12,7 @@ export interface AppCustomSettings {
   theme_palette?: 'indigo' | 'navy_luxury';
   show_ebook_bridge?: boolean;
   ebook_app_url?: string;
+  auto_offline_cache?: boolean;
 }
 
 export const DEFAULT_APP_SETTINGS: AppCustomSettings = {
@@ -25,6 +26,7 @@ export const DEFAULT_APP_SETTINGS: AppCustomSettings = {
   theme_palette: 'indigo',
   show_ebook_bridge: true,
   ebook_app_url: 'https://qbiz-ebook.vercel.app',
+  auto_offline_cache: true,
 };
 
 /**
@@ -105,6 +107,7 @@ export function getStoredAppSettings(): AppCustomSettings {
       const savedPalette = localStorage.getItem('qbiz_theme_palette') as 'indigo' | 'navy_luxury' | null;
       const savedShowEbook = localStorage.getItem('qbiz_show_ebook_bridge');
       const savedEbookUrl = localStorage.getItem('qbiz_ebook_app_url');
+      const savedAutoOffline = localStorage.getItem('qbiz_auto_offline_cache');
       const resolvedEbookUrl = (!savedEbookUrl || savedEbookUrl.includes('app-doc-sach.vercel.app'))
         ? DEFAULT_APP_SETTINGS.ebook_app_url
         : savedEbookUrl;
@@ -113,6 +116,7 @@ export function getStoredAppSettings(): AppCustomSettings {
         theme_palette: savedPalette === 'navy_luxury' || savedPalette === 'indigo' ? savedPalette : DEFAULT_APP_SETTINGS.theme_palette,
         show_ebook_bridge: savedShowEbook !== null ? savedShowEbook === 'true' : DEFAULT_APP_SETTINGS.show_ebook_bridge,
         ebook_app_url: resolvedEbookUrl,
+        auto_offline_cache: savedAutoOffline !== null ? savedAutoOffline === 'true' : DEFAULT_APP_SETTINGS.auto_offline_cache,
       };
     } catch {}
   }
@@ -136,6 +140,10 @@ export async function saveStoredAppSettings(settings: Partial<AppCustomSettings>
       }
       if (settings.ebook_app_url) {
         localStorage.setItem('qbiz_ebook_app_url', settings.ebook_app_url.trim());
+      }
+      if (typeof settings.auto_offline_cache !== 'undefined') {
+        localStorage.setItem('qbiz_auto_offline_cache', String(settings.auto_offline_cache));
+        window.dispatchEvent(new CustomEvent('qbiz_auto_offline_changed', { detail: { enabled: settings.auto_offline_cache } }));
       }
     } catch {}
   }
