@@ -162,3 +162,23 @@ Hệ thống hỗ trợ đầy đủ **10 khối nội dung chuẩn**:
    - Tab Chung & Tab Bảo mật: Thu gọn chiều cao ô nhập liệu (`h-10`), label xúc tích, nút hành động cao `h-10` thanh lịch.
 
 
+
+
+---
+
+## 11. TÍNH NĂNG CẦU NỐI ĐỌC SÁCH CHUYÊN SÂU (SMART EBOOK COMPANION BRIDGE)
+1. **Mục tiêu & Triết lý kiến trúc:**
+   - Không nhúng nguyên ứng dụng đọc sách vào bên trong làm nặng tải hoặc xáo trộn giao diện học cơ thể.
+   - Tích hợp một **Cầu Nối Thông Minh (Companion Bridge)** chuẩn 1 dòng (`h-11`) đặt ngay ở cuối mỗi bài học (trước phần chia sẻ & tư vấn).
+   - Tự động nhận diện chuyên đề để giới thiệu đúng cuốn sách chuyên sâu tương ứng (ví dụ Cột sống ➔ "Giải phẫu cột sống & Đĩa đệm", Dinh dưỡng ➔ "Dinh dưỡng chuyên sâu & Chuyển hóa", Tiêu hóa ➔ "Giải phẫu ứng dụng hệ tiêu hóa"...).
+   - URL mở ngoài linh hoạt kèm tham số điều hướng chính xác: `?topic=${topic.slug}&page=${page.slug}`.
+2. **Thiết kế Mobile-First 5 tiêu chí (Thông minh - Tinh gọn - Tinh tế - Chuyên nghiệp - Hiện đại):**
+   - Thẻ Emerald Gradient viền mảnh, bo góc tròn 13px, chuẩn 1 dòng:
+     `[ 📖 ] Giải phẫu cột sống & Đĩa đệm ────────> [ Đọc Ebook → ]`
+   - Tiêu đề ngắn gọn, cỡ chữ `11.5px/12.5px` font-black, không bị rớt dòng và không bị cắt chữ trên màn hình 390px.
+3. **Cài Đặt Quản Trị Chuẩn Apple iOS Card (`AdminSettingsModal.tsx`):**
+   - Tab Giao diện được gom cụm thành các thẻ nhóm liền mạch (Grouped Card):
+     - Bảng màu giao diện (Chàm Y Khoa / Xanh Navy).
+     - Cỡ chữ bài học (Nhỏ / Vừa / Lớn).
+     - Nhóm tùy chọn hiển thị & trải nghiệm: Tự động chuyển video, Thanh tiến độ học tập, Cầu nối đọc sách (Ebook).
+     - Khi bật Ebook, ô URL App hiện ra liền mạch ngay trong khối, không sinh ra các hộp rời rạc thừa thãi.
