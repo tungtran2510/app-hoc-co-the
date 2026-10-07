@@ -218,10 +218,10 @@ export default function OfflineManager() {
           role="status"
           aria-live="polite"
           aria-label="Thông báo chế độ ngoại tuyến"
-          className="fixed top-2.5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-600/95 dark:bg-amber-600/90 text-white shadow-lg border border-amber-400/80 backdrop-blur-md animate-in slide-in-from-top-2 duration-200 pointer-events-none select-none max-w-[90%]"
+          className="fixed bottom-[72px] left-1/2 -translate-x-1/2 z-50 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-600/95 dark:bg-amber-600/90 text-white shadow-xl border border-amber-400/80 backdrop-blur-md animate-in slide-in-from-bottom-2 duration-200 pointer-events-none select-none max-w-[92%]"
         >
           <WifiOff size={13} strokeWidth={2.6} className="shrink-0 text-amber-200 animate-pulse" />
-          <span className="text-[11.5px] font-black tracking-tight whitespace-nowrap">
+          <span className="text-[12px] font-bold tracking-tight whitespace-nowrap">
             Chế độ ngoại tuyến: Đọc từ bộ nhớ máy
           </span>
         </aside>
@@ -233,10 +233,10 @@ export default function OfflineManager() {
           role="status"
           aria-live="polite"
           aria-label="Thông báo đã kết nối lại mạng"
-          className="fixed top-2.5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-600/95 dark:bg-emerald-600/90 text-white shadow-lg border border-emerald-400/80 backdrop-blur-md animate-in slide-in-from-top-2 duration-200 pointer-events-none select-none max-w-[90%]"
+          className="fixed bottom-[72px] left-1/2 -translate-x-1/2 z-50 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-600/95 dark:bg-emerald-600/90 text-white shadow-xl border border-emerald-400/80 backdrop-blur-md animate-in slide-in-from-bottom-2 duration-200 pointer-events-none select-none max-w-[92%]"
         >
           <CheckCircle2 size={13} strokeWidth={2.6} className="shrink-0 text-emerald-200" />
-          <span className="text-[11.5px] font-black tracking-tight whitespace-nowrap">
+          <span className="text-[12px] font-bold tracking-tight whitespace-nowrap">
             Đã kết nối lại Internet ✓
           </span>
         </aside>
