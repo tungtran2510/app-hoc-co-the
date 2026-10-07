@@ -30,6 +30,78 @@ import { saveSettingsApi, changePasswordApi, getAdminHeaders, restoreBackupApi }
 import InstructorManagerSection from './InstructorManagerSection';
 import WorkspaceManagerSection from './WorkspaceManagerSection';
 
+const DEFAULT_ROADMAP_CONFIG = {
+  neck: [
+    {
+      title: 'Đốt sống cổ và góc áp lực đầu cúi',
+      topicSlug: 'chuyen-de-cot-song',
+      pageSlug: 'cau-tao-co-ban-dot-song',
+      tag: 'Bài 01',
+      reason: 'Bảo vệ cổ gáy',
+    },
+    {
+      title: 'Cơ gân & dây chằng vùng cổ gáy',
+      topicSlug: 'chuyen-de-cot-song',
+      pageSlug: 'co-gan-va-day-chang',
+      tag: 'Bài 02',
+      reason: 'Giải tỏa co thắt',
+    },
+    {
+      title: 'Tư thế làm việc văn phòng chuẩn',
+      topicSlug: 'chuyen-de-cot-song',
+      pageSlug: 'tu-the-va-van-dong',
+      tag: 'Bài 03',
+      reason: 'Chỉnh dáng làm việc',
+    },
+  ],
+  lumbar: [
+    {
+      title: 'Cấu tạo cơ bản đốt sống thắt lưng',
+      topicSlug: 'chuyen-de-cot-song',
+      pageSlug: 'cau-tao-co-ban-dot-song',
+      tag: 'Bài 01',
+      reason: 'Trục chịu lực',
+    },
+    {
+      title: 'Đĩa đệm và cơ chế giảm xóc cột sống',
+      topicSlug: 'chuyen-de-cot-song',
+      pageSlug: 'dia-dem-va-chuc-nang-giam-xoc',
+      tag: 'Bài 02',
+      reason: 'Bảo vệ đĩa đệm',
+    },
+    {
+      title: 'Tư thế ngồi và giảm tải cột sống',
+      topicSlug: 'chuyen-de-cot-song',
+      pageSlug: 'tu-the-va-van-dong',
+      tag: 'Bài 03',
+      reason: 'Ứng dụng thực tế',
+    },
+  ],
+  water: [
+    {
+      title: 'Vai trò tối thượng của nước với tế bào',
+      topicSlug: 'chuyen-de-nuoc',
+      pageSlug: 'vai-tro-cua-nuoc-voi-co-the',
+      tag: 'Bài 01',
+      reason: 'Trao đổi chất',
+    },
+    {
+      title: 'Nước và sức khỏe đĩa đệm cột sống',
+      topicSlug: 'chuyen-de-nuoc',
+      pageSlug: 'nuoc-va-dia-dem-cot-song',
+      tag: 'Bài 02',
+      reason: 'Nuôi đĩa đệm',
+    },
+    {
+      title: 'Quy tắc bổ sung nước & điện giải',
+      topicSlug: 'chuyen-de-nuoc',
+      pageSlug: 'uong-nuoc-dung-cach',
+      tag: 'Bài 03',
+      reason: 'Thực hành hằng ngày',
+    },
+  ],
+};
+
 interface AdminSettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -47,7 +119,7 @@ export default function AdminSettingsModal({
 }: AdminSettingsModalProps) {
   const [activeTab, setActiveTab] = useState<'chung' | 'trai_nghiem' | 'du_lieu' | 'giang_vien' | 'khach_hang'>('chung');
   const [isSuper, setIsSuper] = useState(false);
-
+  const [selectedRoadmapArea, setSelectedRoadmapArea] = useState<'neck' | 'lumbar' | 'water'>('neck');
 
   // Cài đặt chung
   const [settings, setSettings] = useState<AppCustomSettings>(getStoredAppSettings());
@@ -634,7 +706,7 @@ export default function AdminSettingsModal({
                           : `Đã sẵn sàng · Tối đa ${settings.offline_max_mb || 60}MB`}
                       </span>
                       {offlineStatus.status === 'downloading' && (
-                        <div className="w-full max-w-[130px] h-1.5 bg-slate-200 dark:bg-purple-950 rounded-full overflow-hidden mt-1">
+                        <div className="w-full max-w-[130px] h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-1">
                           <div
                             className="h-full bg-blue-600 transition-all duration-200"
                             style={{ width: `${offlineStatus.progress}%` }}
@@ -727,31 +799,153 @@ export default function AdminSettingsModal({
                   )}
                 </div>
 
-                {/* 7. Lộ trình cá nhân hóa (Demo) - 3 câu chẩn đoán sơ bộ */}
-                <label className="flex items-center justify-between p-3 hover:bg-surface/50 transition-colors cursor-pointer">
-                  <div className="flex items-center gap-2">
-                    <Compass size={15} className="text-violet-600 shrink-0" />
-                    <span className="text-[13px] font-bold text-ink">
-                      Lộ trình cá nhân hóa
-                    </span>
-                    <span className="text-[9.5px] font-black uppercase tracking-wider text-violet-700 bg-violet-100 border border-violet-200 dark:text-violet-300 dark:bg-violet-950/60 dark:border-violet-800 px-1.5 py-0.2 rounded-md">
-                      Demo
-                    </span>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={settings.enable_personalized_roadmap ?? true}
-                    onChange={(e) => {
-                      const enabled = e.target.checked;
-                      setSettings({ ...settings, enable_personalized_roadmap: enabled });
-                      try {
-                        localStorage.setItem('qbiz_enable_personalized_roadmap', String(enabled));
-                        window.dispatchEvent(new CustomEvent('qbiz_roadmap_setting_changed', { detail: { enabled } }));
-                      } catch {}
-                    }}
-                    className="w-4.5 h-4.5 accent-violet-600 rounded cursor-pointer"
-                  />
-                </label>
+                {/* 7. Lộ trình cá nhân hóa (Tùy chỉnh 3 bài định hướng) */}
+                <div className="flex flex-col p-3 hover:bg-surface/50 transition-colors gap-2.5">
+                  <label className="flex items-center justify-between cursor-pointer">
+                    <div className="flex items-center gap-2">
+                      <Compass size={15} className="text-[#0E2A5C] dark:text-blue-400 shrink-0" />
+                      <span className="text-[13px] font-bold text-ink">
+                        Lộ trình cá nhân hóa
+                      </span>
+                      <span className="text-[9.5px] font-black uppercase tracking-wider text-[#0E2A5C] bg-[#0E2A5C]/10 border border-[#0E2A5C]/20 dark:text-blue-300 dark:bg-blue-950/60 dark:border-blue-800 px-1.5 py-0.2 rounded-md">
+                        Demo
+                      </span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={settings.enable_personalized_roadmap ?? true}
+                      onChange={(e) => {
+                        const enabled = e.target.checked;
+                        setSettings({ ...settings, enable_personalized_roadmap: enabled });
+                        try {
+                          localStorage.setItem('qbiz_enable_personalized_roadmap', String(enabled));
+                          window.dispatchEvent(new CustomEvent('qbiz_roadmap_setting_changed', { detail: { enabled } }));
+                        } catch {}
+                      }}
+                      className="w-4.5 h-4.5 accent-[#0E2A5C] rounded cursor-pointer"
+                    />
+                  </label>
+
+                  {/* Bảng tùy chỉnh 3 bài học cho từng vùng khi bật */}
+                  {(settings.enable_personalized_roadmap ?? true) && (
+                    <div className="mt-1 pt-2.5 border-t border-line/60 flex flex-col gap-2.5">
+                      {/* Bộ chọn 3 vùng cơ thể */}
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="text-[11px] font-bold text-muted shrink-0">Chọn vùng:</span>
+                        <div className="grid grid-cols-3 gap-1 flex-1">
+                          {[
+                            { key: 'neck' as const, label: 'Cổ gáy' },
+                            { key: 'lumbar' as const, label: 'Thắt lưng' },
+                            { key: 'water' as const, label: 'Nước' },
+                          ].map((tab) => (
+                            <button
+                              key={tab.key}
+                              type="button"
+                              onClick={() => setSelectedRoadmapArea(tab.key)}
+                              className={`py-1 px-1.5 rounded-[7px] text-[11px] font-bold border transition-all cursor-pointer text-center truncate ${
+                                selectedRoadmapArea === tab.key
+                                  ? 'bg-[#0E2A5C] text-white border-[#0E2A5C] shadow-2xs'
+                                  : 'bg-white dark:bg-slate-800 text-ink border-line hover:border-slate-400'
+                              }`}
+                            >
+                              {tab.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Header danh sách bài & Nút khôi phục chuẩn */}
+                      <div className="flex items-center justify-between text-[11px] pt-1">
+                        <span className="font-extrabold text-[#0E2A5C] dark:text-blue-400">
+                          3 bài học định hướng ({selectedRoadmapArea === 'neck' ? 'Cổ gáy' : selectedRoadmapArea === 'lumbar' ? 'Thắt lưng' : 'Nước & tế bào'}):
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const currentMap = { ...(settings.custom_roadmap || DEFAULT_ROADMAP_CONFIG) };
+                            currentMap[selectedRoadmapArea] = DEFAULT_ROADMAP_CONFIG[selectedRoadmapArea];
+                            setSettings({ ...settings, custom_roadmap: currentMap });
+                          }}
+                          className="flex items-center gap-1 text-[10.5px] font-bold text-muted hover:text-[#0E2A5C] cursor-pointer"
+                          title="Khôi phục 3 bài gợi ý chuẩn y khoa"
+                        >
+                          <RotateCcw size={11} />
+                          <span>Đặt lại chuẩn</span>
+                        </button>
+                      </div>
+
+                      {/* 3 Form bài học tương ứng */}
+                      <div className="flex flex-col gap-2">
+                        {(settings.custom_roadmap?.[selectedRoadmapArea] || DEFAULT_ROADMAP_CONFIG[selectedRoadmapArea]).map((lesson, idx) => (
+                          <div
+                            key={idx}
+                            className="p-2 rounded-[9px] bg-white dark:bg-slate-800/80 border border-line flex flex-col gap-1.5 shadow-2xs"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-black uppercase text-[#0E2A5C] bg-[#0E2A5C]/10 dark:text-blue-300 dark:bg-blue-950 px-1.5 py-0.5 rounded">
+                                Bài {idx + 1 < 10 ? `0${idx + 1}` : idx + 1}
+                              </span>
+                              <input
+                                type="text"
+                                value={lesson.reason}
+                                onChange={(e) => {
+                                  const currentMap = { ...(settings.custom_roadmap || DEFAULT_ROADMAP_CONFIG) };
+                                  const list = [...(currentMap[selectedRoadmapArea] || DEFAULT_ROADMAP_CONFIG[selectedRoadmapArea])];
+                                  list[idx] = { ...list[idx], reason: e.target.value };
+                                  currentMap[selectedRoadmapArea] = list;
+                                  setSettings({ ...settings, custom_roadmap: currentMap });
+                                }}
+                                placeholder="Lý do gợi ý (ngắn)"
+                                className="h-6 px-1.5 rounded-[5px] border border-line text-[11px] text-right font-medium text-muted focus:text-ink focus:border-[#0E2A5C] bg-surface-2"
+                              />
+                            </div>
+                            <input
+                              type="text"
+                              value={lesson.title}
+                              onChange={(e) => {
+                                const currentMap = { ...(settings.custom_roadmap || DEFAULT_ROADMAP_CONFIG) };
+                                const list = [...(currentMap[selectedRoadmapArea] || DEFAULT_ROADMAP_CONFIG[selectedRoadmapArea])];
+                                list[idx] = { ...list[idx], title: e.target.value };
+                                currentMap[selectedRoadmapArea] = list;
+                                setSettings({ ...settings, custom_roadmap: currentMap });
+                              }}
+                              placeholder="Tiêu đề bài học..."
+                              className="h-7 px-2 rounded-[6px] border border-line text-[12px] font-bold text-ink focus:border-[#0E2A5C] bg-white dark:bg-slate-900"
+                            />
+                            <div className="grid grid-cols-2 gap-1 text-[10.5px]">
+                              <input
+                                type="text"
+                                value={lesson.topicSlug}
+                                onChange={(e) => {
+                                  const currentMap = { ...(settings.custom_roadmap || DEFAULT_ROADMAP_CONFIG) };
+                                  const list = [...(currentMap[selectedRoadmapArea] || DEFAULT_ROADMAP_CONFIG[selectedRoadmapArea])];
+                                  list[idx] = { ...list[idx], topicSlug: e.target.value };
+                                  currentMap[selectedRoadmapArea] = list;
+                                  setSettings({ ...settings, custom_roadmap: currentMap });
+                                }}
+                                placeholder="Slug chuyên đề"
+                                className="h-6 px-1.5 rounded-[5px] border border-line text-[10.5px] font-mono text-muted focus:text-ink focus:border-[#0E2A5C] bg-surface-2"
+                              />
+                              <input
+                                type="text"
+                                value={lesson.pageSlug}
+                                onChange={(e) => {
+                                  const currentMap = { ...(settings.custom_roadmap || DEFAULT_ROADMAP_CONFIG) };
+                                  const list = [...(currentMap[selectedRoadmapArea] || DEFAULT_ROADMAP_CONFIG[selectedRoadmapArea])];
+                                  list[idx] = { ...list[idx], pageSlug: e.target.value };
+                                  currentMap[selectedRoadmapArea] = list;
+                                  setSettings({ ...settings, custom_roadmap: currentMap });
+                                }}
+                                placeholder="Slug bài học"
+                                className="h-6 px-1.5 rounded-[5px] border border-line text-[10.5px] font-mono text-muted focus:text-ink focus:border-[#0E2A5C] bg-surface-2"
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}

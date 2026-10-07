@@ -18,6 +18,7 @@ export interface AppCustomSettings {
   posture_reminder_enabled?: boolean;
   posture_reminder_interval?: number;
   enable_personalized_roadmap?: boolean;
+  custom_roadmap?: Record<string, Array<{ title: string; topicSlug: string; pageSlug: string; tag: string; reason: string }>>;
 }
 
 export const DEFAULT_APP_SETTINGS: AppCustomSettings = {
@@ -118,6 +119,14 @@ export function getStoredAppSettings(): AppCustomSettings {
       const savedShowEbook = localStorage.getItem('qbiz_show_ebook_bridge');
       const savedEbookUrl = localStorage.getItem('qbiz_ebook_app_url');
       const savedAutoOffline = localStorage.getItem('qbiz_auto_offline_cache');
+      const savedEnableRoadmap = localStorage.getItem('qbiz_enable_personalized_roadmap');
+      const savedCustomRoadmapStr = localStorage.getItem('qbiz_custom_roadmap');
+      let parsedCustomRoadmap = undefined;
+      if (savedCustomRoadmapStr) {
+        try {
+          parsedCustomRoadmap = JSON.parse(savedCustomRoadmapStr);
+        } catch {}
+      }
       const resolvedEbookUrl = (!savedEbookUrl || savedEbookUrl.includes('app-doc-sach.vercel.app'))
         ? DEFAULT_APP_SETTINGS.ebook_app_url
         : savedEbookUrl;
@@ -127,6 +136,8 @@ export function getStoredAppSettings(): AppCustomSettings {
         show_ebook_bridge: savedShowEbook !== null ? savedShowEbook === 'true' : DEFAULT_APP_SETTINGS.show_ebook_bridge,
         ebook_app_url: resolvedEbookUrl,
         auto_offline_cache: savedAutoOffline !== null ? savedAutoOffline === 'true' : DEFAULT_APP_SETTINGS.auto_offline_cache,
+        enable_personalized_roadmap: savedEnableRoadmap !== null ? savedEnableRoadmap === 'true' : DEFAULT_APP_SETTINGS.enable_personalized_roadmap,
+        custom_roadmap: parsedCustomRoadmap,
       };
     } catch {}
   }
@@ -154,6 +165,14 @@ export async function saveStoredAppSettings(settings: Partial<AppCustomSettings>
       if (typeof settings.auto_offline_cache !== 'undefined') {
         localStorage.setItem('qbiz_auto_offline_cache', String(settings.auto_offline_cache));
         window.dispatchEvent(new CustomEvent('qbiz_auto_offline_changed', { detail: { enabled: settings.auto_offline_cache } }));
+      }
+      if (typeof settings.enable_personalized_roadmap !== 'undefined') {
+        localStorage.setItem('qbiz_enable_personalized_roadmap', String(settings.enable_personalized_roadmap));
+        window.dispatchEvent(new CustomEvent('qbiz_roadmap_setting_changed', { detail: { enabled: settings.enable_personalized_roadmap } }));
+      }
+      if (settings.custom_roadmap) {
+        localStorage.setItem('qbiz_custom_roadmap', JSON.stringify(settings.custom_roadmap));
+        window.dispatchEvent(new CustomEvent('qbiz_custom_roadmap_changed', { detail: { customRoadmap: settings.custom_roadmap } }));
       }
     } catch {}
   }

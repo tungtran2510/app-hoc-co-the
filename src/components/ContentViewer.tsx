@@ -239,6 +239,25 @@ export default function ContentViewer({
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
   const [shareUrl, setShareUrl] = useState<string>('');
   const [isCopied, setIsCopied] = useState(false);
+  const [zaloCopied, setZaloCopied] = useState(false);
+
+  const handleAskZalo = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const zaloTargetUrl = consultSettings?.zalo_url || (consultSettings?.hotline ? `https://zalo.me/${consultSettings.hotline}` : 'https://zalo.me/0987792400');
+    const messageText = `Chào anh Tùng Dinh Dưỡng, tôi vừa tham khảo bài học "${page.title}" (Chuyên đề ${topic.title}).\nTôi còn một vài điểm chưa rõ và muốn nhờ anh giải đáp thêm về trường hợp của tôi.`;
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(messageText);
+      }
+      setZaloCopied(true);
+      setTimeout(() => setZaloCopied(false), 3000);
+    } catch {}
+
+    setTimeout(() => {
+      window.open(zaloTargetUrl, '_blank', 'noopener,noreferrer');
+    }, 450);
+  };
 
   const handleSelectTocItem = (blockId: string) => {
     const target = blockList.find((b) => b.id === blockId);
@@ -1258,13 +1277,12 @@ export default function ContentViewer({
           <span>Chia sẻ trang này</span>
         </button>
 
-        {/* Thẻ tư vấn Chuyên gia / Zalo chuẩn nhận diện màu xanh Zalo */}
+        {/* Thẻ Hỏi Tùng Dinh Dưỡng qua Zalo - Tự động đính kèm tên bài học & soạn sẵn 2 dòng chuyên nghiệp */}
         {(consultSettings?.zalo_url || consultSettings?.hotline) && (
-          <a
-            href={consultSettings.zalo_url || `https://zalo.me/${consultSettings.hotline}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-between p-3 sm:p-3.5 rounded-[16px] bg-white dark:bg-purple-950/40 border border-[#0068FF]/30 dark:border-[#0068FF]/50 hover:border-[#0068FF] transition-all shadow-2xs mt-1.5 group active:scale-[0.99]"
+          <button
+            type="button"
+            onClick={handleAskZalo}
+            className="flex items-center justify-between p-3 sm:p-3.5 rounded-[16px] bg-gradient-to-r from-blue-50/70 via-white to-sky-50/50 dark:from-[#0B1528] dark:to-[#081224] border border-[#0068FF]/30 dark:border-blue-900/60 hover:border-[#0068FF] transition-all shadow-2xs mt-1.5 group active:scale-[0.99] w-full text-left cursor-pointer"
           >
             <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
               <div className="w-10 h-10 rounded-[12px] bg-[#0068FF] text-white flex items-center justify-center shrink-0 shadow-sm font-black text-[13px] tracking-tight">
@@ -1272,18 +1290,20 @@ export default function ContentViewer({
               </div>
               <div className="flex flex-col min-w-0 text-left">
                 <span className="text-[13px] sm:text-[13.5px] font-black text-slate-900 dark:text-white leading-tight">
-                  Cần tư vấn về cơ thể?
+                  Hỏi Tùng Dinh Dưỡng qua Zalo
                 </span>
-                <span className="text-[11.5px] font-semibold text-[#0068FF] dark:text-sky-300 leading-tight mt-0.5">
-                  Nhắn tin trao đổi qua Zalo
+                <span className="text-[11px] sm:text-[11.5px] font-semibold text-[#0068FF] dark:text-sky-300 leading-tight mt-0.5 truncate">
+                  {zaloCopied
+                    ? '✓ Đã sao chép tin nhắn! Đang mở Zalo...'
+                    : 'Đã soạn sẵn tin nhắn 2 dòng về bài học này'}
                 </span>
               </div>
             </div>
             <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#0068FF] hover:bg-[#0055D4] text-white text-[12px] font-black shadow-xs shrink-0 ml-2 transition-colors">
-              <span>Nhắn Zalo</span>
+              <span>{zaloCopied ? 'Đã sao chép' : 'Nhắn Zalo'}</span>
               <span className="text-[13px] font-bold">›</span>
             </div>
-          </a>
+          </button>
         )}
       </section>
 

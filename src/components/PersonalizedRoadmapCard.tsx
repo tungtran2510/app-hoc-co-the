@@ -49,8 +49,16 @@ interface RecommendedLesson {
   reason: string;
 }
 
-// Bảng đề xuất 3 bài học tối ưu theo vùng mỏi & thói quen
-function getRecommendations(area: string, habit: string): RecommendedLesson[] {
+// Bảng đề xuất 3 bài học tối ưu theo vùng mỏi & thói quen (hỗ trợ tùy chỉnh từ Tùng Dinh Dưỡng)
+function getRecommendations(
+  area: string,
+  habit: string,
+  customRoadmap?: Record<string, RecommendedLesson[]> | null
+): RecommendedLesson[] {
+  if (customRoadmap && customRoadmap[area] && customRoadmap[area].length >= 3) {
+    return customRoadmap[area];
+  }
+
   if (area === 'water') {
     return [
       {
@@ -134,13 +142,19 @@ export default function PersonalizedRoadmapCard() {
   const [currentStep, setCurrentStep] = useState(1);
   const [answers, setAnswers] = useState<{ habit?: string; area?: string; goal?: string }>({});
   const [isCompleted, setIsCompleted] = useState(false);
+  const [customRoadmap, setCustomRoadmap] = useState<Record<string, RecommendedLesson[]> | null>(null);
 
-  // Đọc cài đặt Bật/Tắt & Dữ liệu khảo sát đã lưu
+  // Đọc cài đặt Bật/Tắt & Dữ liệu khảo sát & Tùy chỉnh lộ trình
   useEffect(() => {
     try {
       const savedRoadmapSetting = localStorage.getItem('qbiz_enable_personalized_roadmap');
       if (savedRoadmapSetting === 'false') {
         setIsEnabled(false);
+      }
+
+      const savedCustom = localStorage.getItem('qbiz_custom_roadmap');
+      if (savedCustom) {
+        setCustomRoadmap(JSON.parse(savedCustom));
       }
 
       const savedAnswers = localStorage.getItem('qbiz_personalized_answers');
@@ -162,8 +176,23 @@ export default function PersonalizedRoadmapCard() {
       }
     };
 
+    const handleCustomChange = (e: any) => {
+      if (e?.detail?.roadmap) {
+        setCustomRoadmap(e.detail.roadmap);
+      } else {
+        try {
+          const saved = localStorage.getItem('qbiz_custom_roadmap');
+          if (saved) setCustomRoadmap(JSON.parse(saved));
+        } catch {}
+      }
+    };
+
     window.addEventListener('qbiz_roadmap_setting_changed', handleSettingChange);
-    return () => window.removeEventListener('qbiz_roadmap_setting_changed', handleSettingChange);
+    window.addEventListener('qbiz_custom_roadmap_changed', handleCustomChange);
+    return () => {
+      window.removeEventListener('qbiz_roadmap_setting_changed', handleSettingChange);
+      window.removeEventListener('qbiz_custom_roadmap_changed', handleCustomChange);
+    };
   }, []);
 
   if (!isEnabled) return null;
@@ -194,7 +223,7 @@ export default function PersonalizedRoadmapCard() {
     } catch {}
   };
 
-  const recommendations = getRecommendations(answers.area || 'neck', answers.habit || 'office');
+  const recommendations = getRecommendations(answers.area || 'neck', answers.habit || 'office', customRoadmap);
 
   return (
     <section className="flex flex-col gap-2 p-3.5 sm:p-4 rounded-[20px] bg-gradient-to-br from-slate-50 via-white to-blue-50/50 dark:from-[#0B1528] dark:via-[#09101F] dark:to-[#060D1A] border border-slate-200/90 dark:border-blue-900/50 shadow-xs relative overflow-hidden transition-all">
