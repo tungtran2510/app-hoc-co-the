@@ -180,15 +180,16 @@ export default function SearchPage() {
   // Phân tích thông minh câu truy vấn (Smart Query Analysis)
   const processedQuery: ProcessedSearchQuery = processSearchQuery(debouncedQuery);
 
-  // Lọc và xếp hạng kết quả thông minh
+  // Lọc và xếp hạng kết quả thông minh chuẩn y khoa
   const scoredTopics = (allData?.topics || [])
     .map((t) => {
       const scoreTitle = calculateMatchScore(t.title, processedQuery);
       const scoreDesc = calculateMatchScore(t.description, processedQuery);
       return { topic: t, score: Math.max(scoreTitle, scoreDesc) };
     })
-    .filter((item) => item.score > 0)
-    .sort((a, b) => b.score - a.score);
+    .filter((item) => item.score >= 35) // Chỉ lấy chuyên đề thực sự liên quan, loại bỏ gợi ý lan man
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3); // Tinh gọn tối đa 3 chuyên đề chuẩn xác nhất
 
   const scoredPages = (allData?.pages || [])
     .map((p) => {
@@ -197,26 +198,36 @@ export default function SearchPage() {
       const scoreTopic = calculateMatchScore(p.topic_title, processedQuery);
       const snippetScores = p.text_snippets.map((s) => calculateMatchScore(s, processedQuery));
       const maxSnippet = snippetScores.length ? Math.max(...snippetScores) : 0;
+      
+      // Bài học BẮT BUỘC phải có độ tương thích từ chính bài học đó (tiêu đề, tóm tắt, nội dung)
+      const ownScore = Math.max(scoreTitle * 1.5, scoreSummary, maxSnippet);
+      // Điểm chuyên đề chỉ đóng vai trò cộng hưởng nhẹ (20%) khi bài học đã liên quan
+      const finalScore = ownScore > 0 ? ownScore + scoreTopic * 0.2 : 0;
+
       return {
         page: p,
-        score: Math.max(scoreTitle * 1.5, scoreSummary, scoreTopic, maxSnippet),
+        score: finalScore,
       };
     })
-    .filter((item) => item.score > 0)
-    .sort((a, b) => b.score - a.score);
+    .filter((item) => item.score >= 25) // Loại bỏ bài học dưới ngưỡng liên quan
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 20); // Tối đa 20 bài học liên quan nhất
 
   const scoredVideos = (allData?.videos || [])
     .map((v) => {
       const scoreTitle = calculateMatchScore(v.title, processedQuery);
       const scoreDesc = calculateMatchScore(v.description, processedQuery);
       const scoreTopic = calculateMatchScore(v.topic_title, processedQuery);
+      const ownVideo = Math.max(scoreTitle * 1.4, scoreDesc);
+      const finalScore = ownVideo > 0 ? ownVideo + scoreTopic * 0.2 : 0;
       return {
         video: v,
-        score: Math.max(scoreTitle * 1.4, scoreDesc, scoreTopic),
+        score: finalScore,
       };
     })
-    .filter((item) => item.score > 0)
-    .sort((a, b) => b.score - a.score);
+    .filter((item) => item.score >= 25)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 15);
 
   const totalResults = scoredTopics.length + scoredPages.length + scoredVideos.length;
 
