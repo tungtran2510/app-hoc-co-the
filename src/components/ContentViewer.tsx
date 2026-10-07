@@ -1123,6 +1123,7 @@ export default function ContentViewer({
           setShowPhoneSyncModal(true);
         }}
         onSelectTocItem={handleSelectTocItem}
+        onOpen3DModal={() => setShow3DModal(true)}
       />
 
       {/* 3. Phần đầu bài viết: Badge BÀI 01 / 04 + Tiêu đề lớn (Không lặp lại tên chủ đề) */}
