@@ -26,6 +26,8 @@ import WelcomeModal from './WelcomeModal';
 import HomeContinueSection from './HomeContinueSection';
 import SectionOrderControls from './admin/SectionOrderControls';
 import PersonalizedRoadmapCard from './PersonalizedRoadmapCard';
+import HomeFeaturedSlideSection from './HomeFeaturedSlideSection';
+import HomeReviewVideosSection from './HomeReviewVideosSection';
 
 interface HomeSectionsClientProps {
   initialSectionsOrder?: string[] | null;
@@ -555,6 +557,12 @@ export default function HomeSectionsClient({
               {/* Lộ trình cá nhân hóa (Demo) định hướng học tập đặt DƯỚI phần Chuyên Đề */}
               <div className="mt-3">
                 <PersonalizedRoadmapCard isAdmin={isAdmin} />
+              </div>
+
+              {/* 2 Khối mới: Slide Nổi bật & Video Chưa hiểu cần ôn tập (MẶC ĐỊNH ẨN, ĐẶT DƯỚI KHỐI CHUYÊN ĐỀ) */}
+              <div className="mt-2.5 flex flex-col gap-2">
+                <HomeFeaturedSlideSection defaultHidden={true} />
+                <HomeReviewVideosSection defaultHidden={true} />
               </div>
             </React.Fragment>
           );

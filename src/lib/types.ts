@@ -322,6 +322,20 @@ export interface ContinueInfo {
   page_order_label: string;
 }
 
+export interface ReviewVideoSyncItem {
+  id: string; // `${page_id}_${video_index}`
+  page_id: string;
+  topic_slug: string;
+  topic_title: string;
+  page_slug: string;
+  page_title: string;
+  video_index: number;
+  video_title: string;
+  cover_url?: string | null;
+  takeaway?: string;
+  marked_at: number;
+}
+
 export interface UserProgressSyncData {
   phone: string;
   xem_tiep?: any;
@@ -336,6 +350,8 @@ export interface UserProgressSyncData {
     saved_at: number;
   }>;
   da_hoan_thanh?: string[];
+  can_on_tap_videos?: ReviewVideoSyncItem[];
+  reader_font?: string;
   display_preferences?: {
     home_topics_display?: string;
     topics_page_display?: string;

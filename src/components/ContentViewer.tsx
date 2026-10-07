@@ -23,6 +23,8 @@ import {
   Bookmark,
   X,
   Check,
+  Sparkles,
+  BookOpen,
 } from 'lucide-react';
 import QRCode from 'qrcode';
 import { Topic, Page, Block, Video, FileItem } from '../lib/types';
@@ -1213,6 +1215,35 @@ export default function ContentViewer({
             {currentPage.summary}
           </p>
         )}
+
+        {/* NÚT LƯU BÀI HỌC - NỔI BẬT NGAY ĐỈNH ĐẦU VIDEO */}
+        <div className="flex items-center justify-between gap-2 pt-1 pb-0.5">
+          <span className="text-[10.5px] sm:text-[11px] font-black uppercase text-blue-700 dark:text-sky-300 tracking-wider flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-sky-400 inline-block animate-pulse" />
+            <span>Bài {String(pageIndex || 1).padStart(2, '0')} · {topic.title}</span>
+          </span>
+
+          <button
+            type="button"
+            onClick={() => {
+              playTapSound();
+              handleToggleBookmark();
+            }}
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-[10px] text-[11px] sm:text-[11.5px] font-black tracking-wide shadow-xs active:scale-95 transition-all cursor-pointer ${
+              isSaved
+                ? 'bg-amber-500 text-white shadow-amber-500/25 ring-2 ring-amber-400/40'
+                : 'bg-amber-50/90 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 border border-amber-300/90 dark:border-amber-700/60 hover:bg-amber-100 dark:hover:bg-amber-900/50'
+            }`}
+            title={isSaved ? 'Đã lưu (Bấm để bỏ lưu)' : 'Bấm để lưu bài học này'}
+          >
+            <Bookmark
+              size={13}
+              className={isSaved ? 'fill-white text-white' : 'fill-amber-500 text-amber-600 dark:text-amber-300'}
+              strokeWidth={2.5}
+            />
+            <span>{isSaved ? 'Đã lưu bài học ✓' : 'Lưu bài học'}</span>
+          </button>
+        </div>
       </section>
 
       {/* 4. Danh sách tất cả các khối theo đúng thứ tự sắp xếp */}
@@ -1228,10 +1259,25 @@ export default function ContentViewer({
           })}
 
         {blockList.filter((b) => isAdmin || b.is_visible).length === 0 && (
-          <div className="p-8 text-center bg-white rounded-[22px] border border-line my-4">
-            <p className="text-[17px] text-muted font-medium">
-              Bài học đang được cập nhật nội dung.
-            </p>
+          <div className="p-6 sm:p-8 text-center bg-white dark:bg-[#160D30] rounded-[22px] border border-slate-200/90 dark:border-purple-900/60 shadow-xs my-3 flex flex-col items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-950/60 flex items-center justify-center text-[#1E3A8A] dark:text-sky-300">
+              <BookOpen size={24} />
+            </div>
+            <div className="flex flex-col gap-1 max-w-[320px]">
+              <h4 className="text-[15px] font-black text-slate-900 dark:text-white">
+                Nội dung bài học đang được cập nhật
+              </h4>
+              <p className="text-[12px] text-slate-500 dark:text-slate-400 font-normal leading-relaxed">
+                Bác sĩ và ban chuyên môn đang hoàn thiện bài giảng này. Bạn có thể tham khảo các bài học khác trong chuyên đề {topic.title}.
+              </p>
+            </div>
+            <Link
+              href={`/${topic.slug}`}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[10px] bg-blue-50 dark:bg-blue-950 text-[#1E3A8A] dark:text-sky-300 font-black text-[11.5px] border border-blue-200 dark:border-blue-800/60 hover:bg-blue-100 transition-colors"
+            >
+              <span>Xem chuyên đề {topic.title}</span>
+              <ArrowRight size={13} strokeWidth={2.5} />
+            </Link>
           </div>
         )}
       </div>
@@ -1251,75 +1297,141 @@ export default function ContentViewer({
         </div>
       )}
 
-      {/* 6.3. Khối Thẻ Ôn Tập 1 Chạm (Spaced Repetition / Flashcards) */}
-      {(appCustomSettings.show_lesson_flashcards ?? true) && (
-        <LessonFlashcards topicSlug={topic.slug} pageTitle={currentPage.title} />
-      )}
-
-      {/* 6.5. Thẻ Cầu Nối Sách Chuyên Sâu (Smart Ebook Companion - Chuẩn 1 Dòng Mobile-First) */}
-      {(appCustomSettings.show_ebook_bridge ?? true) && (
+      {/* 6. KHỐI BÀI HỌC TIẾP THEO - NỔI BẬT & SANG TRỌNG (DẪN DẮT LỘ TRÌNH HỌC TẬP) */}
+      {nextPage ? (
         <a
-          href={`${appCustomSettings.ebook_app_url || 'https://qbiz-ebook.vercel.app'}?topic=${topic.slug}&page=${currentPage.slug}`}
-          target="_blank"
-          rel="noopener noreferrer"
+          href={`/${topic.slug}/${nextPage.slug}`}
           onClick={playTapSound}
-          className="w-full h-11 flex items-center justify-between gap-2 px-3 rounded-[13px] bg-gradient-to-r from-emerald-50/90 via-teal-50/70 to-slate-50 dark:from-[#081820] dark:to-[#051017] border border-emerald-300/80 dark:border-emerald-800/60 shadow-2xs hover:border-emerald-500 active:scale-[0.99] transition-all cursor-pointer text-left group mt-2"
+          className="w-full p-4 rounded-[20px] bg-gradient-to-r from-[#0E2A5C] via-[#14336B] to-[#0A1F44] text-white shadow-md hover:shadow-lg border border-sky-400/30 active:scale-[0.99] transition-all flex items-center justify-between gap-3 group mt-3.5"
         >
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="w-7 h-7 rounded-[8px] bg-gradient-to-br from-emerald-600 to-teal-600 text-white flex items-center justify-center font-bold text-[13px] shrink-0 shadow-2xs">
-              📖
+          <div className="flex flex-col min-w-0">
+            <div className="flex items-center gap-1.5">
+              <span className="px-2 py-0.5 rounded-[6px] bg-sky-400/20 border border-sky-400/40 text-[9.5px] font-black uppercase tracking-wider text-sky-200">
+                BÀI TIẾP THEO · BÀI {String(nextPageIndex).padStart(2, '0')}
+              </span>
+            </div>
+            <span className="text-[15px] sm:text-[16px] font-black text-white leading-snug line-clamp-1 mt-1.5 group-hover:text-sky-200 transition-colors">
+              {nextPage.title}
             </span>
-            <span className="text-[11.5px] sm:text-[12.5px] font-black text-slate-900 dark:text-white truncate">
-              {TOPIC_EBOOK_MAP[topic.slug]?.title || `Sách ${topic.title}`}
+            <span className="text-[11px] text-sky-200/80 font-medium mt-0.5 truncate">
+              Tiếp tục bài giảng trong chuyên đề {topic.title}
             </span>
           </div>
-          <div className="flex items-center gap-1 text-[11px] font-extrabold text-emerald-700 dark:text-emerald-300 bg-white dark:bg-emerald-950 px-2 py-1 rounded-[8px] border border-emerald-200/80 dark:border-emerald-700/60 shadow-2xs shrink-0 whitespace-nowrap">
-            <span>Đọc Ebook</span>
-            <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
+          <div className="w-10 h-10 rounded-[14px] bg-[#0284C7] text-white flex items-center justify-center shrink-0 shadow-md group-hover:scale-105 group-hover:translate-x-0.5 transition-all">
+            <ArrowRight size={18} strokeWidth={2.5} />
           </div>
         </a>
+      ) : (
+        <div className="w-full p-4 rounded-[20px] bg-gradient-to-r from-emerald-900 via-teal-900 to-[#0A1F44] text-white shadow-md border border-emerald-400/30 flex items-center justify-between gap-3 mt-3.5">
+          <div className="flex flex-col min-w-0">
+            <span className="text-[9.5px] font-black uppercase tracking-wider text-emerald-300">
+              CHÚC MỪNG BẠN
+            </span>
+            <span className="text-[14.5px] font-black text-white leading-snug mt-1">
+              Đã hoàn thành toàn bộ bài học chuyên đề {topic.title}!
+            </span>
+          </div>
+          <a
+            href={`/${topic.slug}`}
+            onClick={playTapSound}
+            className="px-3.5 py-2 rounded-[12px] bg-white text-emerald-900 font-extrabold text-[12px] shadow-xs shrink-0 whitespace-nowrap hover:bg-emerald-50"
+          >
+            Về chuyên đề
+          </a>
+        </div>
       )}
 
-      {/* 7. Cuối trang: Nút Chia sẻ và Thẻ tư vấn Zalo */}
-      <section className="flex flex-col gap-2 mt-4 pt-3 border-t border-line/50">
-        {/* Nút Chia sẻ trang này (Khung mờ, chữ thường, không quá nổi bật) */}
-        <button
-          type="button"
-          onClick={handleOpenShareModal}
-          className="flex items-center justify-center gap-2 h-[42px] min-h-[40px] w-full rounded-[12px] bg-slate-100/60 dark:bg-purple-950/20 border border-slate-200/80 dark:border-purple-900/40 text-slate-600 dark:text-purple-300 font-medium text-[13.5px] transition-all hover:bg-slate-200/60 dark:hover:bg-purple-950/40 hover:text-slate-900 dark:hover:text-white active:scale-[0.99] cursor-pointer mt-0.5"
-        >
-          <Share2 size={15} className="text-slate-500 dark:text-purple-400 stroke-[1.8]" />
-          <span>Chia sẻ trang này</span>
-        </button>
+      {/* 7. TRẠM ĐỒNG HÀNH & KẾT NỐI (GOM TRỌN AI + ZALO + EBOOK + CHIA SẺ VÀO ĐÚNG 1 KHUNG DUY NHẤT) */}
+      <section className="rounded-[20px] bg-slate-50 dark:bg-[#0E1A33] border border-slate-200/90 dark:border-blue-900/60 p-3.5 flex flex-col gap-3 mt-3 shadow-2xs">
+        {/* Tiêu đề phân cấp rõ ràng */}
+        <div className="flex items-center justify-between px-0.5">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-[#0284C7] animate-pulse" />
+            <span className="text-[11px] font-black uppercase tracking-wider text-[#0E2A5C] dark:text-sky-300">
+              Đồng hành cùng bạn
+            </span>
+          </div>
+          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold">
+            Hỗ trợ 24/7 & Chuyên sâu
+          </span>
+        </div>
 
-        {/* Thẻ Hỏi Tùng Dinh Dưỡng qua Zalo - Tự động đính kèm tên bài học & soạn sẵn 2 dòng chuyên nghiệp */}
-        {(appCustomSettings.show_zalo_ask_card ?? true) && (consultSettings?.zalo_url || consultSettings?.hotline) && (
+        {/* 2 Lựa chọn chính: Trợ lý AI (trái) và Zalo Tùng Dinh Dưỡng (phải) */}
+        <div className="grid grid-cols-2 gap-2">
+          {/* Nút Trợ lý AI */}
+          <Link
+            href={`/tro-ly-ai?topic=${encodeURIComponent(topic.slug)}&page=${encodeURIComponent(currentPage.slug)}&topicTitle=${encodeURIComponent(topic.title)}&pageTitle=${encodeURIComponent(currentPage.title)}`}
+            className="flex flex-col justify-between p-3 rounded-[15px] bg-white dark:bg-blue-950/60 border border-sky-200/80 dark:border-blue-800/60 hover:border-[#0284C7] shadow-2xs group active:scale-[0.98] transition-all cursor-pointer text-left"
+          >
+            <div className="flex items-center justify-between">
+              <div className="w-8 h-8 rounded-[10px] bg-gradient-to-br from-[#0E2A5C] to-[#0284C7] text-white flex items-center justify-center shadow-xs">
+                <Sparkles size={15} />
+              </div>
+              <span className="text-[9.5px] font-black text-[#0284C7] dark:text-sky-300 bg-sky-50 dark:bg-blue-900/50 px-1.5 py-0.5 rounded-[5px]">
+                AI 24/7
+              </span>
+            </div>
+            <div className="flex flex-col mt-2">
+              <span className="text-[13px] font-black text-slate-900 dark:text-white leading-tight group-hover:text-[#0284C7] transition-colors">
+                Hỏi Trợ lý AI
+              </span>
+              <span className="text-[10.5px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">
+                Giải đáp bài này tức thì
+              </span>
+            </div>
+          </Link>
+
+          {/* Nút Zalo Tùng Dinh Dưỡng */}
+          {(consultSettings?.zalo_url || consultSettings?.hotline) && (
+            <button
+              type="button"
+              onClick={handleAskZalo}
+              className="flex flex-col justify-between p-3 rounded-[15px] bg-white dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800/60 hover:border-[#0068FF] shadow-2xs group active:scale-[0.98] transition-all cursor-pointer text-left"
+            >
+              <div className="flex items-center justify-between">
+                <div className="w-8 h-8 rounded-[10px] bg-[#0068FF] text-white flex items-center justify-center font-black text-[11px] shadow-xs">
+                  Zalo
+                </div>
+                <span className="text-[9.5px] font-black text-[#0068FF] dark:text-sky-300 bg-blue-50 dark:bg-blue-900/50 px-1.5 py-0.5 rounded-[5px]">
+                  Trực tiếp
+                </span>
+              </div>
+              <div className="flex flex-col mt-2">
+                <span className="text-[13px] font-black text-slate-900 dark:text-white leading-tight group-hover:text-[#0068FF] transition-colors">
+                  Hỏi Tùng Dinh Dưỡng
+                </span>
+                <span className="text-[10.5px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5 truncate">
+                  {zaloCopied ? '✓ Đang mở Zalo...' : 'Nhắn tin 1-1'}
+                </span>
+              </div>
+            </button>
+          )}
+        </div>
+
+        {/* Dải tiện ích phụ 1 dòng: Ebook + Chia sẻ */}
+        <div className="flex items-center gap-2 pt-2 border-t border-slate-200/70 dark:border-blue-900/40">
+          {(appCustomSettings.show_ebook_bridge ?? true) && (
+            <a
+              href={`${appCustomSettings.ebook_app_url || 'https://qbiz-ebook.vercel.app'}?topic=${topic.slug}&page=${currentPage.slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={playTapSound}
+              className="flex-1 h-8 px-2 rounded-[10px] bg-white dark:bg-blue-950/40 border border-slate-200 dark:border-blue-900/50 flex items-center justify-center gap-1.5 text-[11px] font-bold text-slate-700 dark:text-sky-200 hover:border-emerald-500 shadow-2xs cursor-pointer truncate"
+            >
+              <span>📖</span>
+              <span className="truncate">Đọc Ebook</span>
+            </a>
+          )}
+
           <button
             type="button"
-            onClick={handleAskZalo}
-            className="flex items-center justify-between p-3 sm:p-3.5 rounded-[16px] bg-gradient-to-r from-blue-50/70 via-white to-sky-50/50 dark:from-[#0B1528] dark:to-[#081224] border border-[#0068FF]/30 dark:border-blue-900/60 hover:border-[#0068FF] transition-all shadow-2xs mt-1.5 group active:scale-[0.99] w-full text-left cursor-pointer"
+            onClick={handleOpenShareModal}
+            className="flex-1 h-8 px-2 rounded-[10px] bg-white dark:bg-blue-950/40 border border-slate-200 dark:border-blue-900/50 flex items-center justify-center gap-1.5 text-[11px] font-bold text-slate-700 dark:text-sky-200 hover:border-[#0284C7] shadow-2xs cursor-pointer truncate"
           >
-            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-[12px] bg-[#0068FF] text-white flex items-center justify-center shrink-0 shadow-sm font-black text-[13px] tracking-tight">
-                Zalo
-              </div>
-              <div className="flex flex-col min-w-0 text-left">
-                <span className="text-[13px] sm:text-[13.5px] font-black text-slate-900 dark:text-white leading-tight">
-                  Hỏi Tùng Dinh Dưỡng qua Zalo
-                </span>
-                <span className="text-[11px] sm:text-[11.5px] font-semibold text-[#0068FF] dark:text-sky-300 leading-tight mt-0.5 truncate">
-                  {zaloCopied
-                    ? '✓ Đã sao chép tin nhắn! Đang mở Zalo...'
-                    : 'Đã soạn sẵn tin nhắn 2 dòng về bài học này'}
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#0068FF] hover:bg-[#0055D4] text-white text-[12px] font-black shadow-xs shrink-0 ml-2 transition-colors">
-              <span>{zaloCopied ? 'Đã sao chép' : 'Nhắn Zalo'}</span>
-              <span className="text-[13px] font-bold">›</span>
-            </div>
+            <Share2 size={13} className="text-slate-500 dark:text-sky-400 shrink-0" />
+            <span className="truncate">Chia sẻ bài học</span>
           </button>
-        )}
+        </div>
       </section>
 
       {/* 8. Thanh điều hướng treo dính sát đáy chân màn hình (Sticky Bottom Dock) - Siêu gọn, giảm 50% diện tích theo yêu cầu */}

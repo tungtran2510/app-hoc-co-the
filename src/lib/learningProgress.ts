@@ -212,3 +212,66 @@ export function togglePageCompleted(pageId: string): boolean {
     return false;
   }
 }
+
+// -----------------------------------------------------------------------------
+// VIDEO CẦN ÔN TẬP (ĐÁNH DẤU CHƯA HIỂU ĐỂ ÔN LẠI)
+// -----------------------------------------------------------------------------
+export interface ReviewVideoItem {
+  id: string; // `${page_id}_${video_index}`
+  page_id: string;
+  topic_slug: string;
+  topic_title: string;
+  page_slug: string;
+  page_title: string;
+  video_index: number;
+  video_title: string;
+  cover_url?: string | null;
+  takeaway?: string;
+  marked_at: number;
+}
+
+const CAN_ON_TAP_KEY = 'can_on_tap_videos';
+
+export function getReviewVideos(): ReviewVideoItem[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(CAN_ON_TAP_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw) as ReviewVideoItem[];
+  } catch {
+    return [];
+  }
+}
+
+export function saveReviewVideo(item: ReviewVideoItem): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const list = getReviewVideos();
+    const filtered = list.filter((v) => v.id !== item.id);
+    const updated = [item, ...filtered];
+    localStorage.setItem(CAN_ON_TAP_KEY, JSON.stringify(updated));
+    notifyProgressChanged();
+  } catch {}
+}
+
+export function removeReviewVideo(pageId: string, videoIndex: number): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const id = `${pageId}_${videoIndex}`;
+    const list = getReviewVideos();
+    const updated = list.filter((v) => v.id !== id);
+    localStorage.setItem(CAN_ON_TAP_KEY, JSON.stringify(updated));
+    notifyProgressChanged();
+  } catch {}
+}
+
+export function isReviewVideo(pageId: string, videoIndex: number): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    const id = `${pageId}_${videoIndex}`;
+    const list = getReviewVideos();
+    return list.some((v) => v.id === id);
+  } catch {
+    return false;
+  }
+}

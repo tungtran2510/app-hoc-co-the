@@ -178,12 +178,32 @@ export async function POST(req: NextRequest) {
       mergedXemTiep = cloudTime >= localTime ? cloudData.xem_tiep : localData.xem_tiep;
     }
 
+    // Merge danh sách video cần ôn tập (can_on_tap_videos)
+    const cloudReview = Array.isArray(cloudData?.can_on_tap_videos) ? cloudData!.can_on_tap_videos : [];
+    const localReview = Array.isArray(localData?.can_on_tap_videos) ? localData.can_on_tap_videos : [];
+    const reviewMap = new Map<string, any>();
+    for (const item of [...cloudReview, ...localReview]) {
+      if (!item || !item.id) continue;
+      const existing = reviewMap.get(item.id);
+      if (!existing || (item.marked_at || 0) >= (existing.marked_at || 0)) {
+        reviewMap.set(item.id, item);
+      }
+    }
+    const mergedCanOnTap = Array.from(reviewMap.values()).sort(
+      (a, b) => (b.marked_at || 0) - (a.marked_at || 0)
+    );
+
+    // Merge phông chữ đọc sách
+    const mergedReaderFont = localData?.reader_font || cloudData?.reader_font || 'sans';
+
     const mergedPayload: UserProgressSyncData = {
       phone: '',
       xem_tiep: mergedXemTiep,
       tien_do: mergedTienDo,
       bai_da_luu: mergedBaiDaLuu,
       da_hoan_thanh: mergedDaHoanThanh,
+      can_on_tap_videos: mergedCanOnTap,
+      reader_font: mergedReaderFont,
       display_preferences: displayPreferences,
       updated_at: new Date().toISOString(),
     };

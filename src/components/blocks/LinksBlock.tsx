@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { ChevronRight, ExternalLink } from 'lucide-react';
+import { ChevronRight, ExternalLink, Play } from 'lucide-react';
 import { playTapSound } from '../../lib/audioFeedback';
 
 interface LinkItem {
@@ -151,12 +151,21 @@ export default function LinksBlock({
 
   if (displayStyle === 'related') {
     return (
-      <div id={blockId} className="w-full flex flex-col gap-2.5 scroll-mt-20 my-1">
-        <h4 className="text-[14px] sm:text-[15px] font-extrabold tracking-[0.6px] text-slate-800 dark:text-purple-200 uppercase px-1">
-          BÀI LIÊN QUAN
-        </h4>
+      <div id={blockId} className="w-full flex flex-col gap-2 scroll-mt-20 my-2">
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-600 dark:bg-sky-400 animate-pulse" />
+            <h4 className="text-[13.5px] sm:text-[14.5px] font-black tracking-wide text-slate-900 dark:text-white uppercase">
+              BÀI GIẢNG LIÊN QUAN
+            </h4>
+          </div>
+          <span className="text-[10.5px] font-bold text-slate-400 dark:text-slate-500">
+            Vuốt ngang xem thêm →
+          </span>
+        </div>
 
-        <div className="flex flex-col gap-2">
+        {/* Khung video lớn dạng slide ngang - khác biệt hoàn toàn danh sách bài đang học */}
+        <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2.5 pt-0.5 px-0.5 snap-x snap-mandatory">
           {items.map((item, idx) => {
             const key = item.page_id || item.slug || '';
             const mapped = key ? (pageSlugMap as any)[key] || DEFAULT_PAGE_MAP[key] : null;
@@ -176,26 +185,45 @@ export default function LinksBlock({
                 key={idx}
                 href={href}
                 onClick={playTapSound}
-                className="flex items-center justify-between gap-3 min-h-[64px] px-3.5 py-2.5 bg-white dark:bg-[#160E2E] rounded-[16px] border-[1.5px] border-line dark:border-purple-900/40 hover:border-primary/50 dark:hover:border-purple-500/50 transition-all active:scale-[0.99] shadow-xs group cursor-pointer"
+                className="w-[235px] sm:w-[260px] shrink-0 snap-start flex flex-col bg-white dark:bg-[#150F2E] rounded-[18px] border border-slate-200/90 dark:border-purple-900/50 p-2 shadow-xs hover:shadow-md hover:border-blue-500/50 dark:hover:border-purple-500/50 transition-all active:scale-[0.98] group cursor-pointer"
               >
-                <div className="flex items-center gap-3 min-w-0">
-                  {/* Thumbnail ảnh đại diện sắc nét của từng bài học */}
-                  <div className="w-14 h-10 sm:w-16 sm:h-11 rounded-[10px] overflow-hidden shrink-0 border border-slate-200/90 dark:border-purple-800/40 bg-slate-100 dark:bg-purple-950/40 shadow-2xs relative flex items-center justify-center">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={coverUrl}
-                      alt={label}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/images/topics/cot-song.png';
-                      }}
-                    />
+                {/* 1. Khung video 16:9 to rõ, nổi bật chuẩn player */}
+                <div className="relative w-full aspect-video rounded-[12px] overflow-hidden bg-slate-950 shadow-2xs border border-slate-200/60 dark:border-purple-800/40">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={coverUrl}
+                    alt={label}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '/images/topics/cot-song.png';
+                    }}
+                  />
+                  {/* Lớp phủ dốc tương phản */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+
+                  {/* Huy hiệu BÀI GIẢNG góc trên */}
+                  <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded-[4px] bg-black/75 backdrop-blur-xs text-[8.5px] font-black uppercase text-sky-300 tracking-wider">
+                    BÀI GIẢNG
                   </div>
-                  <span className="text-[15px] sm:text-[16px] font-bold text-ink dark:text-white leading-snug truncate group-hover:text-primary dark:group-hover:text-[#F8DF7B] transition-colors">
-                    {label}
-                  </span>
+
+                  {/* Nút Play to nổi bật ở chính giữa khung video */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-9 h-9 rounded-full bg-white/95 text-blue-600 dark:bg-white dark:text-blue-600 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all ring-2 ring-white/60">
+                      <Play size={15} fill="currentColor" className="ml-0.5" />
+                    </div>
+                  </div>
                 </div>
-                <ChevronRight size={20} className="text-muted dark:text-purple-400 group-hover:text-primary dark:group-hover:text-[#F8DF7B] group-hover:translate-x-0.5 transition-all shrink-0" />
+
+                {/* 2. Tiêu đề và nút khám phá dưới khung video */}
+                <div className="flex flex-col flex-1 justify-between mt-2 px-1">
+                  <h5 className="text-[12.5px] sm:text-[13px] font-extrabold text-slate-900 dark:text-white line-clamp-2 leading-snug group-hover:text-blue-600 dark:group-hover:text-sky-300 transition-colors">
+                    {label}
+                  </h5>
+                  <div className="flex items-center justify-between text-[10.5px] font-bold text-blue-600 dark:text-sky-400 mt-2 pt-1 border-t border-slate-100 dark:border-purple-900/30">
+                    <span>Khám phá bài học</span>
+                    <ChevronRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
+                  </div>
+                </div>
               </a>
             );
           })}

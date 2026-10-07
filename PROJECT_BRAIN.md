@@ -58,6 +58,9 @@ Hệ thống hỗ trợ đầy đủ **10 khối nội dung chuẩn**:
    - **Điều hướng Native vững chắc:** Toàn bộ các liên kết điều hướng chính (BottomNav, thẻ Chuyên đề TopicCard, danh sách TopicTile, Breadcrumbs, PageCard, nút Chuyển bài) sử dụng thẻ `<a>` chuẩn kết hợp âm thanh phản hồi `playTapSound()`. Tuyệt đối không để React re-render trên `onTouchStart` vì sẽ khiến trình duyệt di động (WebKit/Chrome) hủy sự kiện click.
    - **Hiệu ứng chạm & phát sáng bằng CSS thuần:** Hiệu ứng phát quang bìa sách 3D (`.topic-card-glow`, `.topic-card-spine`, `.topic-card-badge`, `.topic-card-img`) được kích hoạt tức thì qua CSS `:active` và `:hover`, phản hồi 0ms trên cả điện thoại cảm ứng và chuột máy tính.
    - **Kiểm thử bằng trình duyệt thật là điều kiện bắt buộc:** Trước khi bàn giao bất kỳ bản sửa lỗi nào liên quan đến click/chuyển trang/giao diện, BẮT BUỘC phải chạy script Playwright trên trình duyệt thật để kiểm tra toàn bộ luồng nhấp chuột và chuyển URL thực tế.
+6. **TUYỆT ĐỐI KHÔNG TỰ Ý ĐẨY LÊN GITHUB HOẶC TRIỂN KHAI VERCEL KHI CHƯA ĐƯỢC PHÉP:**
+   - Mọi thao tác code, sửa lỗi, căn chỉnh chỉ được kiểm thử trên môi trường nội bộ local (Playwright mobile).
+   - BẮT BUỘC phải hỏi và xin phép người dùng trước. Chỉ khi người dùng đồng ý hoặc yêu cầu đẩy thì mới được chạy `git push` hoặc `vercel --prod`. CẤM TUYỆT ĐỐI đẩy ngầm khi chưa được phép!
 
 ---
 

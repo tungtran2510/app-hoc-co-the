@@ -56,12 +56,17 @@ export default function PageHeaderBar({
   const [showOptions, setShowOptions] = useState(false);
   const [soundActive, setSoundActive] = useState(true);
   const [themePalette, setThemePalette] = useState<'indigo' | 'navy_luxury'>('indigo');
+  const [readerFont, setReaderFont] = useState<'sans' | 'serif' | 'rounded'>('sans');
 
   React.useEffect(() => {
     try {
       const p = localStorage.getItem('qbiz_theme_palette');
       if (p === 'navy_luxury' || p === 'indigo') {
         setThemePalette(p);
+      }
+      const font = localStorage.getItem('qbiz_reader_font');
+      if (font === 'serif' || font === 'rounded' || font === 'sans') {
+        setReaderFont(font);
       }
     } catch {}
     const handlePaletteChangeEvt = (e: any) => {
@@ -72,6 +77,16 @@ export default function PageHeaderBar({
     window.addEventListener('qbiz_theme_palette_changed', handlePaletteChangeEvt);
     return () => window.removeEventListener('qbiz_theme_palette_changed', handlePaletteChangeEvt);
   }, []);
+
+  const handleFontChange = (font: 'sans' | 'serif' | 'rounded') => {
+    setReaderFont(font);
+    try {
+      localStorage.setItem('qbiz_reader_font', font);
+      document.documentElement.classList.remove('font-reader-sans', 'font-reader-serif', 'font-reader-rounded');
+      document.documentElement.classList.add(`font-reader-${font}`);
+      window.dispatchEvent(new CustomEvent('qbiz_reader_font_changed', { detail: { font } }));
+    } catch {}
+  };
 
   const handlePaletteChange = (palette: 'indigo' | 'navy_luxury') => {
     setThemePalette(palette);
@@ -291,27 +306,6 @@ export default function PageHeaderBar({
             </button>
           )}
 
-          {/* Nút Lưu bài học */}
-          <button
-            type="button"
-            onClick={() => {
-              if (onToggleSave) onToggleSave();
-            }}
-            className={`flex items-center justify-center w-[36px] h-[34px] rounded-[10px] border transition-all shadow-2xs cursor-pointer active:scale-95 ${
-              isSaved
-                ? 'bg-amber-50 border-amber-400 text-amber-600 dark:bg-purple-900/50 dark:border-[#F8DF7B] dark:text-[#F8DF7B]'
-                : 'bg-white border-slate-200 text-slate-700 hover:border-[#1E3A8A] hover:text-[#1E3A8A] dark:bg-[#160D30] dark:border-purple-900/50 dark:text-purple-200 dark:hover:border-purple-600'
-            }`}
-            aria-label={isSaved ? 'Bỏ lưu bài học này' : 'Lưu bài học này'}
-            title={isSaved ? 'Đã lưu (Bấm để bỏ lưu)' : 'Lưu bài học'}
-          >
-            <Bookmark
-              size={16}
-              className={isSaved ? 'fill-amber-500 text-amber-500 dark:fill-[#F8DF7B] dark:text-[#F8DF7B]' : 'text-slate-600 dark:text-purple-300'}
-              strokeWidth={2.3}
-            />
-          </button>
-
           {/* Nút Tuỳ chọn ⋮ */}
           <button
             type="button"
@@ -491,6 +485,68 @@ export default function PageHeaderBar({
                 }`}
               >
                 Lớn
+              </button>
+            </div>
+          </div>
+
+          {/* 3 Phông chữ: Hiện đại (Sans) - Sách in (Serif) - Dễ đọc (Rounded) */}
+          <div className="flex flex-col gap-2 pt-2 border-t border-line">
+            <div className="flex items-center justify-between">
+              <span className="text-[13px] font-bold text-muted uppercase tracking-wider">
+                Phông chữ đọc sách
+              </span>
+              <span className="text-[11px] font-black text-primary lowercase tracking-normal">
+                {readerFont === 'serif' ? 'sách in cổ điển' : readerFont === 'rounded' ? 'bo tròn êm mắt' : 'hiện đại số'}
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-1.5">
+              <button
+                type="button"
+                onClick={() => {
+                  playTapSound();
+                  handleFontChange('sans');
+                }}
+                className={`h-[44px] rounded-[12px] font-bold text-[13px] transition-all cursor-pointer flex flex-col items-center justify-center ${
+                  readerFont === 'sans'
+                    ? 'bg-primary-soft border-2 border-primary text-primary font-black shadow-2xs'
+                    : 'bg-surface-2 border border-line-strong text-ink hover:bg-line/40'
+                }`}
+                title="Be Vietnam Pro: Sans-serif hiện đại, độ nét cao trên smartphone"
+              >
+                <span className="text-[14px]">Aa</span>
+                <span className="text-[10px] leading-none">Hiện đại</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  playTapSound();
+                  handleFontChange('serif');
+                }}
+                className={`h-[44px] rounded-[12px] font-serif text-[13px] transition-all cursor-pointer flex flex-col items-center justify-center ${
+                  readerFont === 'serif'
+                    ? 'bg-primary-soft border-2 border-primary text-primary font-black shadow-2xs'
+                    : 'bg-surface-2 border border-line-strong text-ink hover:bg-line/40'
+                }`}
+                title="Lora: Serif chuẩn sách in, chống mỏi mắt khi đọc bài dài"
+              >
+                <span className="text-[14px] italic font-serif">Aa</span>
+                <span className="text-[10px] leading-none">Sách in</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  playTapSound();
+                  handleFontChange('rounded');
+                }}
+                className={`h-[44px] rounded-[12px] font-sans text-[13px] transition-all cursor-pointer flex flex-col items-center justify-center ${
+                  readerFont === 'rounded'
+                    ? 'bg-primary-soft border-2 border-primary text-primary font-black shadow-2xs'
+                    : 'bg-surface-2 border border-line-strong text-ink hover:bg-line/40'
+                }`}
+                title="Nunito: Bo tròn thân thiện, dễ đọc cho người lớn tuổi"
+              >
+                <span className="text-[14px] font-bold">Aa</span>
+                <span className="text-[10px] leading-none">Dễ đọc</span>
               </button>
             </div>
           </div>

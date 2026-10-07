@@ -78,6 +78,9 @@ export default function SearchPage() {
   const [voiceNotice, setVoiceNotice] = useState<string | null>(null);
   const recognitionRef = useRef<any>(null);
 
+  // Tab lọc nhanh kết quả (Tất cả · Bài học · Chuyên đề · Video)
+  const [resultFilter, setResultFilter] = useState<'all' | 'pages' | 'topics' | 'videos'>('all');
+
   // Tự động focus vào ô nhập và cập nhật tiêu đề trang
   useEffect(() => {
     inputRef.current?.focus();
@@ -375,28 +378,84 @@ export default function SearchPage() {
             </p>
           </div>
         ) : (
-          /* Danh sách kết quả theo 3 nhóm thiết kế chuẩn MEDICA LEARN */
-          <div className="flex flex-col gap-5">
-            {/* Nhóm 1: Chủ đề */}
-            {scoredTopics.length > 0 && (
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-1.5 text-[12px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-1">
-                  <Layers size={14} className="text-[#0E2A5C] dark:text-sky-400" />
-                  <span>CHUYÊN ĐỀ ({scoredTopics.length})</span>
-                </div>
+          /* Danh sách kết quả tinh gọn chuẩn Mobile-First (Không chữ thừa) */
+          <div className="flex flex-col gap-3">
+            {/* Thanh tab lọc nhanh 1 chạm: Tất cả · Bài học · Chuyên đề · Video */}
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+              <button
+                type="button"
+                onClick={() => setResultFilter('all')}
+                className={`h-8 px-3.5 rounded-full text-[12px] font-extrabold cursor-pointer transition-all whitespace-nowrap shrink-0 ${
+                  resultFilter === 'all'
+                    ? 'bg-[#0E2A5C] text-white shadow-xs dark:bg-sky-500 dark:text-slate-950'
+                    : 'bg-white dark:bg-[#0E1A33] border border-slate-200 dark:border-blue-900/50 text-slate-600 dark:text-sky-200 hover:border-slate-300'
+                }`}
+              >
+                Tất cả ({totalResults})
+              </button>
+              {scoredPages.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setResultFilter('pages')}
+                  className={`h-8 px-3.5 rounded-full text-[12px] font-extrabold cursor-pointer transition-all whitespace-nowrap shrink-0 ${
+                    resultFilter === 'pages'
+                      ? 'bg-[#0E2A5C] text-white shadow-xs dark:bg-sky-500 dark:text-slate-950'
+                      : 'bg-white dark:bg-[#0E1A33] border border-slate-200 dark:border-blue-900/50 text-slate-600 dark:text-sky-200 hover:border-slate-300'
+                  }`}
+                >
+                  Bài học ({scoredPages.length})
+                </button>
+              )}
+              {scoredTopics.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setResultFilter('topics')}
+                  className={`h-8 px-3.5 rounded-full text-[12px] font-extrabold cursor-pointer transition-all whitespace-nowrap shrink-0 ${
+                    resultFilter === 'topics'
+                      ? 'bg-[#0E2A5C] text-white shadow-xs dark:bg-sky-500 dark:text-slate-950'
+                      : 'bg-white dark:bg-[#0E1A33] border border-slate-200 dark:border-blue-900/50 text-slate-600 dark:text-sky-200 hover:border-slate-300'
+                  }`}
+                >
+                  Chuyên đề ({scoredTopics.length})
+                </button>
+              )}
+              {scoredVideos.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setResultFilter('videos')}
+                  className={`h-8 px-3.5 rounded-full text-[12px] font-extrabold cursor-pointer transition-all whitespace-nowrap shrink-0 ${
+                    resultFilter === 'videos'
+                      ? 'bg-[#0E2A5C] text-white shadow-xs dark:bg-sky-500 dark:text-slate-950'
+                      : 'bg-white dark:bg-[#0E1A33] border border-slate-200 dark:border-blue-900/50 text-slate-600 dark:text-sky-200 hover:border-slate-300'
+                  }`}
+                >
+                  Video ({scoredVideos.length})
+                </button>
+              )}
+            </div>
+
+            {/* Nhóm 1: Chuyên đề */}
+            {(resultFilter === 'all' || resultFilter === 'topics') && scoredTopics.length > 0 && (
+              <div className="flex flex-col gap-2 mt-1">
+                {resultFilter === 'all' && (
+                  <div className="flex items-center gap-1.5 text-[11.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider px-1">
+                    <Layers size={13} className="text-[#0E2A5C] dark:text-sky-400" />
+                    <span>CHUYÊN ĐỀ ({scoredTopics.length})</span>
+                  </div>
+                )}
 
                 <div className="flex flex-col gap-2">
                   {scoredTopics.map(({ topic: t }) => {
-                    const iconSrc = t.icon_url || `/images/topics/${t.slug}.png`;
+                    const iconSrc = t.cover_url || t.icon_url || `/images/topics/${t.slug}.png`;
                     return (
                       <Link
                         key={t.id}
                         href={`/${t.slug}`}
-                        className="p-3 rounded-[16px] bg-white dark:bg-[#0E1A33] border border-slate-200/90 dark:border-blue-900/50 hover:border-[#0284C7] dark:hover:border-sky-400 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-3 group"
+                        className="p-3 rounded-[16px] bg-white dark:bg-[#0E1A33] border border-slate-200/90 dark:border-blue-900/50 hover:border-[#0284C7] dark:hover:border-sky-400 shadow-2xs hover:shadow-xs transition-all flex items-center justify-between gap-3 group"
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          {/* Thumbnail 3D chuyên đề sắc nét */}
-                          <div className="w-12 h-12 rounded-[12px] bg-slate-50 dark:bg-blue-950/70 border border-slate-200 dark:border-blue-900/60 p-1 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform overflow-hidden">
+                          {/* Thumbnail 3D chuyên đề sắc nét kèm Fallback Icon an toàn */}
+                          <div className="w-12 h-12 rounded-[13px] bg-sky-50 dark:bg-blue-950/70 border border-sky-100 dark:border-blue-900/60 p-1 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform overflow-hidden relative">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                               src={iconSrc}
@@ -404,22 +463,24 @@ export default function SearchPage() {
                               className="w-full h-full object-contain"
                               onError={(e) => {
                                 (e.target as HTMLElement).style.display = 'none';
+                                const fb = (e.target as HTMLElement).parentElement?.querySelector('.topic-fallback');
+                                if (fb) fb.classList.remove('hidden');
                               }}
                             />
+                            <div className="topic-fallback hidden items-center justify-center text-[#0E2A5C] dark:text-sky-400">
+                              <Layers size={22} />
+                            </div>
                           </div>
 
                           <div className="flex flex-col min-w-0">
-                            <span className="text-[10px] font-black text-[#0E2A5C] dark:text-sky-400 uppercase tracking-wider">
-                              Chuyên đề y khoa
-                            </span>
-                            <span className="text-[15px] font-black text-slate-900 dark:text-white leading-snug truncate group-hover:text-[#0E2A5C] dark:group-hover:text-sky-300 transition-colors">
+                            <div className="flex items-center gap-1.5">
+                              <span className="px-2 py-0.5 rounded-[6px] bg-sky-50 dark:bg-blue-950 border border-sky-100 dark:border-blue-900/50 text-[10px] font-black text-[#0E2A5C] dark:text-sky-300 uppercase tracking-wide">
+                                Chuyên đề
+                              </span>
+                            </div>
+                            <span className="text-[14.5px] font-black text-slate-900 dark:text-white leading-tight truncate mt-1 group-hover:text-[#0284C7] transition-colors">
                               {t.title}
                             </span>
-                            {t.description && (
-                              <p className="text-[12px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">
-                                {t.description}
-                              </p>
-                            )}
                           </div>
                         </div>
 
@@ -433,13 +494,15 @@ export default function SearchPage() {
               </div>
             )}
 
-            {/* Nhóm 2: Trang nội dung */}
-            {scoredPages.length > 0 && (
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-1.5 text-[12px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-1">
-                  <BookOpen size={14} className="text-[#0E2A5C] dark:text-sky-400" />
-                  <span>BÀI HỌC NỘI DUNG ({scoredPages.length})</span>
-                </div>
+            {/* Nhóm 2: Bài học nội dung */}
+            {(resultFilter === 'all' || resultFilter === 'pages') && scoredPages.length > 0 && (
+              <div className="flex flex-col gap-2 mt-1">
+                {resultFilter === 'all' && (
+                  <div className="flex items-center gap-1.5 text-[11.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider px-1">
+                    <BookOpen size={13} className="text-[#0E2A5C] dark:text-sky-400" />
+                    <span>BÀI HỌC NỘI DUNG ({scoredPages.length})</span>
+                  </div>
+                )}
 
                 <div className="flex flex-col gap-2">
                   {scoredPages.map(({ page: p }) => {
@@ -449,11 +512,11 @@ export default function SearchPage() {
                       <Link
                         key={p.id}
                         href={`/${p.topic_slug}/${p.slug}`}
-                        className="p-3 rounded-[16px] bg-white dark:bg-[#0E1A33] border border-slate-200/90 dark:border-blue-900/50 hover:border-[#0284C7] dark:hover:border-sky-400 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-3 group"
+                        className="p-3 rounded-[16px] bg-white dark:bg-[#0E1A33] border border-slate-200/90 dark:border-blue-900/50 hover:border-[#0284C7] dark:hover:border-sky-400 shadow-2xs hover:shadow-xs transition-all flex items-center justify-between gap-3 group"
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          {/* Thumbnail bài học */}
-                          <div className="w-12 h-12 rounded-[12px] bg-slate-50 dark:bg-blue-950/70 border border-slate-200 dark:border-blue-900/60 p-1 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform overflow-hidden">
+                          {/* Thumbnail bài học kèm Fallback Icon an toàn */}
+                          <div className="w-12 h-12 rounded-[13px] bg-slate-50 dark:bg-blue-950/70 border border-slate-200 dark:border-blue-900/60 p-1 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform overflow-hidden relative">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                               src={thumbSrc}
@@ -461,22 +524,27 @@ export default function SearchPage() {
                               className="w-full h-full object-contain"
                               onError={(e) => {
                                 (e.target as HTMLElement).style.display = 'none';
+                                const fb = (e.target as HTMLElement).parentElement?.querySelector('.page-fallback');
+                                if (fb) fb.classList.remove('hidden');
                               }}
                             />
+                            <div className="page-fallback hidden items-center justify-center text-slate-400 dark:text-sky-400">
+                              <BookOpen size={20} />
+                            </div>
                           </div>
 
                           <div className="flex flex-col min-w-0">
-                            <span className="text-[10.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                              {p.topic_title} · Bài {formattedNum}
-                            </span>
-                            <span className="text-[14.5px] font-black text-slate-900 dark:text-white leading-snug truncate group-hover:text-[#0E2A5C] dark:group-hover:text-sky-300 transition-colors">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="px-2 py-0.5 rounded-[6px] bg-slate-100 dark:bg-blue-950 text-[10px] font-black text-slate-600 dark:text-sky-300 uppercase tracking-wide truncate max-w-[170px]">
+                                {p.topic_title}
+                              </span>
+                              <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 whitespace-nowrap">
+                                · Bài {formattedNum}
+                              </span>
+                            </div>
+                            <span className="text-[14.5px] font-black text-slate-900 dark:text-white leading-snug line-clamp-2 mt-1 group-hover:text-[#0284C7] transition-colors">
                               {p.title}
                             </span>
-                            {p.summary && (
-                              <p className="text-[12px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">
-                                {p.summary}
-                              </p>
-                            )}
                           </div>
                         </div>
 
@@ -490,13 +558,15 @@ export default function SearchPage() {
               </div>
             )}
 
-            {/* Nhóm 3: Video */}
-            {scoredVideos.length > 0 && (
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-1.5 text-[12px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-1">
-                  <PlaySquare size={14} className="text-red-500" />
-                  <span>VIDEO HƯỚNG DẪN ({scoredVideos.length})</span>
-                </div>
+            {/* Nhóm 3: Video hướng dẫn */}
+            {(resultFilter === 'all' || resultFilter === 'videos') && scoredVideos.length > 0 && (
+              <div className="flex flex-col gap-2 mt-1">
+                {resultFilter === 'all' && (
+                  <div className="flex items-center gap-1.5 text-[11.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider px-1">
+                    <PlaySquare size={13} className="text-red-500" />
+                    <span>VIDEO HƯỚNG DẪN ({scoredVideos.length})</span>
+                  </div>
+                )}
 
                 <div className="flex flex-col gap-2">
                   {scoredVideos.map(({ video: v }, i) => {
@@ -507,11 +577,11 @@ export default function SearchPage() {
                       <Link
                         key={i}
                         href={`/${v.topic_slug}/${v.page_slug}?v=${v.video_index}`}
-                        className="p-3 rounded-[16px] bg-white dark:bg-[#0E1A33] border border-slate-200/90 dark:border-blue-900/50 hover:border-red-400/50 dark:hover:border-red-500/60 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-3 group"
+                        className="p-3 rounded-[16px] bg-white dark:bg-[#0E1A33] border border-slate-200/90 dark:border-blue-900/50 hover:border-red-400/50 dark:hover:border-red-500/60 shadow-2xs hover:shadow-xs transition-all flex items-center justify-between gap-3 group"
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           {/* Thumbnail video tỷ lệ 16:9 kèm nút Play đỏ */}
-                          <div className="w-[66px] h-[44px] rounded-[10px] bg-slate-900 border border-slate-200 dark:border-purple-800/50 shrink-0 relative overflow-hidden shadow-2xs group-hover:scale-105 transition-transform flex items-center justify-center">
+                          <div className="w-[66px] h-[44px] rounded-[10px] bg-slate-900 border border-slate-200 dark:border-blue-900/50 shrink-0 relative overflow-hidden shadow-2xs group-hover:scale-105 transition-transform flex items-center justify-center">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                               src={videoThumb}
@@ -526,21 +596,21 @@ export default function SearchPage() {
                           </div>
 
                           <div className="flex flex-col min-w-0">
-                            <span className="text-[10px] font-black text-red-600 dark:text-red-400 uppercase tracking-wider">
-                              {v.topic_title} · Bài {formattedNum} · Video {v.video_index}
-                            </span>
-                            <span className="text-[14.5px] font-black text-slate-900 dark:text-white leading-snug truncate group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="px-2 py-0.5 rounded-[6px] bg-red-50 dark:bg-red-950/60 text-[10px] font-black text-red-600 dark:text-red-400 uppercase tracking-wide truncate max-w-[160px]">
+                                {v.topic_title}
+                              </span>
+                              <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 whitespace-nowrap">
+                                · Bài {formattedNum} · Video {v.video_index}
+                              </span>
+                            </div>
+                            <span className="text-[14.5px] font-black text-slate-900 dark:text-white leading-snug line-clamp-2 mt-1 group-hover:text-red-600 transition-colors">
                               {v.title}
                             </span>
-                            {v.description && (
-                              <p className="text-[12px] text-slate-500 dark:text-purple-300/70 line-clamp-1 mt-0.5">
-                                {v.description}
-                              </p>
-                            )}
                           </div>
                         </div>
 
-                        <div className="w-7 h-7 rounded-full bg-slate-50 dark:bg-purple-900/40 text-slate-400 group-hover:text-red-500 flex items-center justify-center shrink-0 transition-transform group-hover:translate-x-0.5">
+                        <div className="w-7 h-7 rounded-full bg-slate-50 dark:bg-red-950/30 text-slate-400 group-hover:text-red-500 flex items-center justify-center shrink-0 transition-transform group-hover:translate-x-0.5">
                           <ChevronRight size={16} />
                         </div>
                       </Link>

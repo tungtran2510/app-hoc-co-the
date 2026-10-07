@@ -40,15 +40,72 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Chuẩn hóa toàn bộ hệ thống phông chữ Be Vietnam Pro và chống dính dấu */
+/* Chuẩn hóa toàn bộ hệ thống phông chữ 3 phong cách đọc sách y khoa */
 html, body, button, input, select, textarea {
-  font-family: var(--font-be-vietnam-pro), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-family: 'Be Vietnam Pro', var(--font-be-vietnam-pro), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-be-vietnam-pro), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-family: 'Be Vietnam Pro', var(--font-be-vietnam-pro), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
   text-rendering: optimizeLegibility;
   font-feature-settings: "kern" 1, "liga" 1;
+}
+
+/* 1. Phông Sách In Cổ Điển (Serif - Lora) */
+html.font-reader-serif,
+html.font-reader-serif body,
+html.font-reader-serif button,
+html.font-reader-serif input,
+html.font-reader-serif select,
+html.font-reader-serif textarea,
+html.font-reader-serif h1,
+html.font-reader-serif h2,
+html.font-reader-serif h3,
+html.font-reader-serif h4,
+html.font-reader-serif h5,
+html.font-reader-serif h6,
+html.font-reader-serif p,
+html.font-reader-serif span,
+html.font-reader-serif .prose {
+  font-family: 'Lora', var(--font-lora), Georgia, Cambria, "Times New Roman", Times, serif !important;
+}
+
+/* 2. Phông Dễ Đọc & Thân Thiện (Rounded - Nunito) */
+html.font-reader-rounded,
+html.font-reader-rounded body,
+html.font-reader-rounded button,
+html.font-reader-rounded input,
+html.font-reader-rounded select,
+html.font-reader-rounded textarea,
+html.font-reader-rounded h1,
+html.font-reader-rounded h2,
+html.font-reader-rounded h3,
+html.font-reader-rounded h4,
+html.font-reader-rounded h5,
+html.font-reader-rounded h6,
+html.font-reader-rounded p,
+html.font-reader-rounded span,
+html.font-reader-rounded .prose {
+  font-family: 'Nunito', var(--font-nunito), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+/* 3. Phông Hiện Đại & Tối Giản MẶC ĐỊNH (Sans - Be Vietnam Pro) */
+html.font-reader-sans,
+html.font-reader-sans body,
+html.font-reader-sans button,
+html.font-reader-sans input,
+html.font-reader-sans select,
+html.font-reader-sans textarea,
+html.font-reader-sans h1,
+html.font-reader-sans h2,
+html.font-reader-sans h3,
+html.font-reader-sans h4,
+html.font-reader-sans h5,
+html.font-reader-sans h6,
+html.font-reader-sans p,
+html.font-reader-sans span,
+html.font-reader-sans .prose {
+  font-family: 'Be Vietnam Pro', var(--font-be-vietnam-pro), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
 }
 
 /* Tối ưu thanh cuộn và chống viền xanh thô kệch mặc định của Chrome */
