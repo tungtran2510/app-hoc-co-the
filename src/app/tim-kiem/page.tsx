@@ -228,7 +228,7 @@ export default function SearchPage() {
           <button
             type="button"
             onClick={() => router.back()}
-            className="w-11 h-11 min-w-[44px] rounded-[14px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 flex items-center justify-center text-slate-700 dark:text-purple-200 hover:text-purple-700 dark:hover:text-[#F8DF7B] transition-colors cursor-pointer shadow-2xs"
+            className="w-11 h-11 min-w-[44px] rounded-[14px] bg-white dark:bg-[#0E1A33] border border-slate-200 dark:border-blue-900/50 flex items-center justify-center text-slate-700 dark:text-sky-200 hover:text-[#0E2A5C] dark:hover:text-white transition-colors cursor-pointer shadow-2xs"
             aria-label="Quay lại"
           >
             <ArrowLeft size={20} />
@@ -244,7 +244,7 @@ export default function SearchPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Tìm bài học, câu hỏi, hoặc bấm micro..."
-              className="w-full h-[48px] pl-10 pr-20 rounded-[16px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 focus:border-purple-600 dark:focus:border-[#F8DF7B] text-[15px] text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden shadow-2xs transition-colors"
+              className="w-full h-[48px] pl-10 pr-20 rounded-[16px] bg-white dark:bg-[#0E1A33] border border-slate-200 dark:border-blue-900/50 focus:border-[#0284C7] dark:focus:border-sky-400 text-[15px] text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden shadow-2xs transition-colors"
               aria-label="Nhập từ khóa tìm kiếm"
             />
 
@@ -271,7 +271,7 @@ export default function SearchPage() {
                 className={`w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer ${
                   isListening
                     ? 'bg-rose-500 text-white animate-pulse shadow-md ring-2 ring-rose-300'
-                    : 'text-slate-500 hover:text-purple-700 dark:text-purple-300 dark:hover:text-[#F8DF7B] hover:bg-slate-100 dark:hover:bg-purple-950/60'
+                    : 'text-slate-500 hover:text-[#0E2A5C] dark:text-sky-300 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-blue-950/60'
                 }`}
                 title={isListening ? 'Đang nghe... Bấm để dừng' : 'Tìm kiếm bằng giọng nói tiếng Việt'}
                 aria-label="Tìm kiếm bằng giọng nói"
@@ -290,10 +290,10 @@ export default function SearchPage() {
           </div>
         )}
 
-        {/* Dải chỉ báo Tìm kiếm thông minh (Smart Search Indicator) khi nhận diện câu hỏi hoặc từ viết tắt */}
+        {/* Dải chỉ báo Tìm kiếm thông minh (Smart Search Indicator) - Tông Xanh Navy Hiện Đại */}
         {processedQuery.clean && (processedQuery.isQuestion || processedQuery.expandedTerms.length > 0) && (
-          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[12px] bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/40 text-[11.5px] text-purple-800 dark:text-purple-200">
-            <Sparkles size={13} className="text-purple-600 dark:text-[#F8DF7B] shrink-0" />
+          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[12px] bg-sky-50 dark:bg-[#0E1A33] border border-sky-200 dark:border-blue-900/60 text-[11.5px] text-[#0E2A5C] dark:text-sky-200">
+            <Sparkles size={13} className="text-[#0284C7] dark:text-sky-400 shrink-0" />
             <span className="font-extrabold shrink-0">Thông minh:</span>
             <div className="flex items-center gap-1 overflow-x-auto no-scrollbar flex-1 whitespace-nowrap">
               {processedQuery.expandedTerms.slice(0, 3).map((term) => (
@@ -301,13 +301,13 @@ export default function SearchPage() {
                   key={term}
                   type="button"
                   onClick={() => setQuery(term)}
-                  className="px-2 py-0.5 rounded-full bg-white dark:bg-purple-900 border border-purple-200 dark:border-purple-700 font-bold hover:border-purple-500 cursor-pointer text-[10.5px]"
+                  className="px-2 py-0.5 rounded-full bg-white dark:bg-blue-950 border border-sky-200 dark:border-blue-800 font-bold hover:border-sky-500 cursor-pointer text-[10.5px] text-[#0E2A5C] dark:text-sky-200"
                 >
                   +{term}
                 </button>
               ))}
               {processedQuery.isQuestion && (
-                <span className="text-[11px] text-purple-600 dark:text-purple-300/80 italic">
+                <span className="text-[11px] text-blue-700 dark:text-sky-300/80 italic">
                   Đã tự động trích lọc từ khóa chính
                 </span>
               )}
@@ -345,7 +345,7 @@ export default function SearchPage() {
                     key={tag}
                     type="button"
                     onClick={() => setQuery(tag)}
-                    className="h-8.5 px-3.5 rounded-full bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 text-[13px] font-bold text-slate-800 dark:text-purple-200 hover:border-purple-600 hover:text-purple-700 dark:hover:text-[#F8DF7B] dark:hover:border-[#F8DF7B] cursor-pointer shadow-2xs transition-all active:scale-95"
+                    className="h-8.5 px-3.5 rounded-full bg-white dark:bg-[#0E1A33] border border-slate-200 dark:border-blue-900/50 text-[13px] font-bold text-slate-800 dark:text-sky-200 hover:border-[#0284C7] hover:text-[#0E2A5C] dark:hover:text-white dark:hover:border-sky-400 cursor-pointer shadow-2xs transition-all active:scale-95"
                   >
                     {tag}
                   </button>
@@ -355,11 +355,11 @@ export default function SearchPage() {
           </div>
         ) : totalResults === 0 ? (
           /* Không tìm thấy */
-          <div className="p-8 text-center bg-white dark:bg-[#160D30] rounded-[20px] border border-slate-200 dark:border-purple-800/40 my-4 flex flex-col gap-1.5 shadow-2xs">
+          <div className="p-8 text-center bg-white dark:bg-[#0E1A33] rounded-[20px] border border-slate-200 dark:border-blue-900/50 my-4 flex flex-col gap-1.5 shadow-2xs">
             <p className="text-[16px] text-slate-900 dark:text-white font-extrabold">
               Không tìm thấy kết quả phù hợp
             </p>
-            <p className="text-[13px] text-slate-500 dark:text-purple-300/70 font-normal">
+            <p className="text-[13px] text-slate-500 dark:text-slate-400 font-normal">
               Thử tìm với từ khóa khác như: cột sống, đĩa đệm, vai gáy, uống nước.
             </p>
           </div>
@@ -369,8 +369,8 @@ export default function SearchPage() {
             {/* Nhóm 1: Chủ đề */}
             {scoredTopics.length > 0 && (
               <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-1.5 text-[12px] font-extrabold text-slate-500 dark:text-purple-300/70 uppercase tracking-wider px-1">
-                  <Layers size={14} className="text-primary dark:text-[#F8DF7B]" />
+                <div className="flex items-center gap-1.5 text-[12px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-1">
+                  <Layers size={14} className="text-[#0E2A5C] dark:text-sky-400" />
                   <span>CHUYÊN ĐỀ ({scoredTopics.length})</span>
                 </div>
 
@@ -381,11 +381,11 @@ export default function SearchPage() {
                       <Link
                         key={t.id}
                         href={`/${t.slug}`}
-                        className="p-3 rounded-[16px] bg-white dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-800/40 hover:border-purple-600/50 dark:hover:border-[#F8DF7B]/60 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-3 group"
+                        className="p-3 rounded-[16px] bg-white dark:bg-[#0E1A33] border border-slate-200/90 dark:border-blue-900/50 hover:border-[#0284C7] dark:hover:border-sky-400 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-3 group"
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           {/* Thumbnail 3D chuyên đề sắc nét */}
-                          <div className="w-12 h-12 rounded-[12px] bg-slate-50 dark:bg-purple-950/70 border border-slate-200 dark:border-purple-800/50 p-1 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform overflow-hidden">
+                          <div className="w-12 h-12 rounded-[12px] bg-slate-50 dark:bg-blue-950/70 border border-slate-200 dark:border-blue-900/60 p-1 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform overflow-hidden">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                               src={iconSrc}
@@ -398,21 +398,21 @@ export default function SearchPage() {
                           </div>
 
                           <div className="flex flex-col min-w-0">
-                            <span className="text-[10px] font-black text-primary dark:text-[#F8DF7B] uppercase tracking-wider">
+                            <span className="text-[10px] font-black text-[#0E2A5C] dark:text-sky-400 uppercase tracking-wider">
                               Chuyên đề y khoa
                             </span>
-                            <span className="text-[15px] font-black text-slate-900 dark:text-white leading-snug truncate group-hover:text-purple-700 dark:group-hover:text-[#F8DF7B] transition-colors">
+                            <span className="text-[15px] font-black text-slate-900 dark:text-white leading-snug truncate group-hover:text-[#0E2A5C] dark:group-hover:text-sky-300 transition-colors">
                               {t.title}
                             </span>
                             {t.description && (
-                              <p className="text-[12px] text-slate-500 dark:text-purple-300/70 line-clamp-1 mt-0.5">
+                              <p className="text-[12px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">
                                 {t.description}
                               </p>
                             )}
                           </div>
                         </div>
 
-                        <div className="w-7 h-7 rounded-full bg-slate-50 dark:bg-purple-900/40 text-slate-400 group-hover:text-purple-700 dark:group-hover:text-[#F8DF7B] flex items-center justify-center shrink-0 transition-transform group-hover:translate-x-0.5">
+                        <div className="w-7 h-7 rounded-full bg-slate-50 dark:bg-blue-950/60 text-slate-400 group-hover:text-[#0284C7] flex items-center justify-center shrink-0 transition-transform group-hover:translate-x-0.5">
                           <ChevronRight size={16} />
                         </div>
                       </Link>
@@ -425,8 +425,8 @@ export default function SearchPage() {
             {/* Nhóm 2: Trang nội dung */}
             {scoredPages.length > 0 && (
               <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-1.5 text-[12px] font-extrabold text-slate-500 dark:text-purple-300/70 uppercase tracking-wider px-1">
-                  <BookOpen size={14} className="text-primary dark:text-[#F8DF7B]" />
+                <div className="flex items-center gap-1.5 text-[12px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-1">
+                  <BookOpen size={14} className="text-[#0E2A5C] dark:text-sky-400" />
                   <span>BÀI HỌC NỘI DUNG ({scoredPages.length})</span>
                 </div>
 
@@ -438,11 +438,11 @@ export default function SearchPage() {
                       <Link
                         key={p.id}
                         href={`/${p.topic_slug}/${p.slug}`}
-                        className="p-3 rounded-[16px] bg-white dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-800/40 hover:border-purple-600/50 dark:hover:border-[#F8DF7B]/60 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-3 group"
+                        className="p-3 rounded-[16px] bg-white dark:bg-[#0E1A33] border border-slate-200/90 dark:border-blue-900/50 hover:border-[#0284C7] dark:hover:border-sky-400 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-3 group"
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           {/* Thumbnail bài học */}
-                          <div className="w-12 h-12 rounded-[12px] bg-slate-50 dark:bg-purple-950/70 border border-slate-200 dark:border-purple-800/50 p-1 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform overflow-hidden">
+                          <div className="w-12 h-12 rounded-[12px] bg-slate-50 dark:bg-blue-950/70 border border-slate-200 dark:border-blue-900/60 p-1 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform overflow-hidden">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                               src={thumbSrc}
@@ -455,21 +455,21 @@ export default function SearchPage() {
                           </div>
 
                           <div className="flex flex-col min-w-0">
-                            <span className="text-[10.5px] font-black text-slate-500 dark:text-purple-300/70 uppercase tracking-wider">
+                            <span className="text-[10.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                               {p.topic_title} · Bài {formattedNum}
                             </span>
-                            <span className="text-[14.5px] font-black text-slate-900 dark:text-white leading-snug truncate group-hover:text-purple-700 dark:group-hover:text-[#F8DF7B] transition-colors">
+                            <span className="text-[14.5px] font-black text-slate-900 dark:text-white leading-snug truncate group-hover:text-[#0E2A5C] dark:group-hover:text-sky-300 transition-colors">
                               {p.title}
                             </span>
                             {p.summary && (
-                              <p className="text-[12px] text-slate-500 dark:text-purple-300/70 line-clamp-1 mt-0.5">
+                              <p className="text-[12px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">
                                 {p.summary}
                               </p>
                             )}
                           </div>
                         </div>
 
-                        <div className="w-7 h-7 rounded-full bg-slate-50 dark:bg-purple-900/40 text-slate-400 group-hover:text-purple-700 dark:group-hover:text-[#F8DF7B] flex items-center justify-center shrink-0 transition-transform group-hover:translate-x-0.5">
+                        <div className="w-7 h-7 rounded-full bg-slate-50 dark:bg-blue-950/60 text-slate-400 group-hover:text-[#0284C7] flex items-center justify-center shrink-0 transition-transform group-hover:translate-x-0.5">
                           <ChevronRight size={16} />
                         </div>
                       </Link>
@@ -482,7 +482,7 @@ export default function SearchPage() {
             {/* Nhóm 3: Video */}
             {scoredVideos.length > 0 && (
               <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-1.5 text-[12px] font-extrabold text-slate-500 dark:text-purple-300/70 uppercase tracking-wider px-1">
+                <div className="flex items-center gap-1.5 text-[12px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-1">
                   <PlaySquare size={14} className="text-red-500" />
                   <span>VIDEO HƯỚNG DẪN ({scoredVideos.length})</span>
                 </div>
@@ -496,7 +496,7 @@ export default function SearchPage() {
                       <Link
                         key={i}
                         href={`/${v.topic_slug}/${v.page_slug}?v=${v.video_index}`}
-                        className="p-3 rounded-[16px] bg-white dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-800/40 hover:border-red-400/50 dark:hover:border-red-500/60 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-3 group"
+                        className="p-3 rounded-[16px] bg-white dark:bg-[#0E1A33] border border-slate-200/90 dark:border-blue-900/50 hover:border-red-400/50 dark:hover:border-red-500/60 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-3 group"
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           {/* Thumbnail video tỷ lệ 16:9 kèm nút Play đỏ */}

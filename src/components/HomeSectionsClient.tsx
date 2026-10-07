@@ -535,8 +535,6 @@ export default function HomeSectionsClient({
           return (
             <React.Fragment key="topics">
               {hiddenBanner}
-              {/* Lộ trình cá nhân hóa (Demo) định hướng học tập 3 bước */}
-              <PersonalizedRoadmapCard />
               <TopicListClient
                 initialTopics={topicsWithCounts}
                 initialTopicsTitle={topicsTitle}
@@ -554,6 +552,10 @@ export default function HomeSectionsClient({
                 onMoveDown={() => handleMoveSection(index, 'down')}
                 onOpenReorderModal={() => setShowReorderModal(true)}
               />
+              {/* Lộ trình cá nhân hóa (Demo) định hướng học tập đặt DƯỚI phần Chuyên Đề */}
+              <div className="mt-3">
+                <PersonalizedRoadmapCard />
+              </div>
             </React.Fragment>
           );
         }

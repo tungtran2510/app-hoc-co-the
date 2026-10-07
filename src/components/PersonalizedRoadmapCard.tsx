@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Compass, CheckCircle2, ChevronRight, RotateCcw, Sparkles, BookOpen, ArrowRight } from 'lucide-react';
+import { Compass, CheckCircle2, ChevronRight, RotateCcw, ArrowRight } from 'lucide-react';
 
 interface QuestionOption {
   id: string;
@@ -197,21 +197,21 @@ export default function PersonalizedRoadmapCard() {
   const recommendations = getRecommendations(answers.area || 'neck', answers.habit || 'office');
 
   return (
-    <section className="flex flex-col gap-2 p-3.5 sm:p-4 rounded-[20px] bg-gradient-to-br from-violet-50/90 via-white to-blue-50/70 dark:from-[#191038] dark:via-[#130B29] dark:to-[#0E172E] border border-violet-200/90 dark:border-purple-800/60 shadow-xs relative overflow-hidden transition-all">
-      {/* Vệt sáng trang trí tinh tế */}
-      <div className="absolute -top-10 -right-10 w-28 h-28 bg-violet-400/10 dark:bg-violet-600/10 rounded-full blur-2xl pointer-events-none" />
+    <section className="flex flex-col gap-2 p-3.5 sm:p-4 rounded-[20px] bg-gradient-to-br from-slate-50 via-white to-blue-50/50 dark:from-[#0B1528] dark:via-[#09101F] dark:to-[#060D1A] border border-slate-200/90 dark:border-blue-900/50 shadow-xs relative overflow-hidden transition-all">
+      {/* Vệt sáng xanh Navy trang trí tinh tế */}
+      <div className="absolute -top-10 -right-10 w-28 h-28 bg-blue-500/10 dark:bg-blue-600/10 rounded-full blur-2xl pointer-events-none" />
 
-      {/* Đầu thẻ: Icon La bàn + Tiêu đề + Nút Làm lại */}
+      {/* Đầu thẻ: Icon La bàn Xanh Navy + Tiêu đề + Nút Làm lại */}
       <div className="flex items-center justify-between gap-2 relative z-10">
         <div className="flex items-center gap-2 min-w-0">
-          <div className="w-8 h-8 rounded-[11px] bg-gradient-to-br from-violet-600 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
-            <Compass size={17} className="animate-spin-slow" />
+          <div className="w-8 h-8 rounded-[11px] bg-gradient-to-br from-[#0E2A5C] via-[#1E3A8A] to-[#0284C7] text-white flex items-center justify-center shrink-0 shadow-2xs">
+            <Compass size={17} className="animate-spin-slow text-sky-200" />
           </div>
           <div className="flex items-center gap-1.5 min-w-0">
-            <h3 className="text-[13px] font-black text-slate-900 dark:text-white truncate">
+            <h3 className="text-[13px] font-black text-[#0E2A5C] dark:text-sky-100 truncate">
               {isCompleted ? 'Gợi ý lộ trình' : 'Định hướng lộ trình'}
             </h3>
-            <span className="text-[9px] font-black uppercase tracking-wider text-violet-700 bg-violet-100 dark:text-violet-300 dark:bg-violet-950/70 px-1.5 py-0.2 rounded-md shrink-0">
+            <span className="text-[9px] font-black uppercase tracking-wider text-[#0E2A5C] bg-blue-50 border border-blue-200 dark:text-sky-300 dark:bg-blue-950/70 dark:border-blue-800 px-1.5 py-0.2 rounded-md shrink-0">
               Demo
             </span>
           </div>
@@ -221,7 +221,7 @@ export default function PersonalizedRoadmapCard() {
           <button
             type="button"
             onClick={handleResetSurvey}
-            className="flex items-center gap-1 text-[11px] font-extrabold text-violet-700 dark:text-violet-300 hover:text-violet-900 bg-violet-100/70 dark:bg-violet-950/60 px-2.5 py-1 rounded-[10px] shrink-0 cursor-pointer transition-colors"
+            className="flex items-center gap-1 text-[11px] font-extrabold text-[#0E2A5C] dark:text-sky-300 hover:text-blue-900 bg-blue-50/90 dark:bg-blue-950/60 px-2.5 py-1 rounded-[10px] shrink-0 cursor-pointer border border-blue-200/80 dark:border-blue-800/80 transition-colors"
             title="Làm lại khảo sát"
           >
             <RotateCcw size={11} />
@@ -233,35 +233,35 @@ export default function PersonalizedRoadmapCard() {
       {/* Nội dung 1: Khi chưa hoàn tất khảo sát (Hiển thị từng câu hỏi 1 chạm) */}
       {!isCompleted ? (
         <div className="flex flex-col gap-2.5 pt-1 relative z-10">
-          <div className="flex items-center justify-between text-[11.5px] font-bold text-slate-500 dark:text-purple-300/70">
+          <div className="flex items-center justify-between text-[11.5px] font-bold text-slate-500 dark:text-slate-400">
             <span className="truncate">Bước {currentStep}/3: {QUESTIONS[currentStep - 1].title}</span>
-            <span className="shrink-0 text-violet-600 dark:text-violet-400 font-extrabold">{currentStep * 33}%</span>
+            <span className="shrink-0 text-[#0E2A5C] dark:text-sky-400 font-extrabold">{currentStep * 33}%</span>
           </div>
 
-          {/* Thanh tiến độ bước */}
-          <div className="w-full h-1.5 bg-slate-200/80 dark:bg-purple-950 rounded-full overflow-hidden">
+          {/* Thanh tiến độ bước - Tông Xanh Navy sang trọng */}
+          <div className="w-full h-1.5 bg-slate-200/80 dark:bg-slate-800 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-violet-600 to-indigo-600 transition-all duration-300 rounded-full"
+              className="h-full bg-gradient-to-r from-[#0E2A5C] via-[#1E3A8A] to-[#0284C7] transition-all duration-300 rounded-full"
               style={{ width: `${currentStep * 33.33}%` }}
             />
           </div>
 
-          {/* Danh sách lựa chọn 1 chạm (Button Card tinh gọn) */}
+          {/* Danh sách lựa chọn 1 chạm (Button Card tinh gọn Xanh Navy) */}
           <div className="grid grid-cols-1 gap-1.5 pt-0.5">
             {QUESTIONS[currentStep - 1].options.map((opt) => (
               <button
                 key={opt.id}
                 type="button"
                 onClick={() => handleSelectOption(opt.id)}
-                className="h-10 px-3 rounded-[12px] bg-white dark:bg-purple-950/40 border border-slate-200/90 dark:border-purple-800/40 hover:border-violet-500 dark:hover:border-violet-400 hover:bg-violet-50/50 dark:hover:bg-purple-900/50 flex items-center justify-between text-left transition-all active:scale-[0.99] cursor-pointer shadow-2xs group"
+                className="h-10 px-3 rounded-[12px] bg-white dark:bg-[#0E1A33] border border-slate-200/90 dark:border-blue-900/50 hover:border-[#0284C7] dark:hover:border-sky-400 hover:bg-blue-50/50 dark:hover:bg-blue-950/40 flex items-center justify-between text-left transition-all active:scale-[0.99] cursor-pointer shadow-2xs group"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <span className="text-[15px] shrink-0">{opt.icon}</span>
-                  <span className="text-[13px] font-bold text-slate-800 dark:text-purple-100 truncate group-hover:text-violet-700 dark:group-hover:text-violet-300">
+                  <span className="text-[13px] font-bold text-slate-800 dark:text-slate-200 truncate group-hover:text-[#0E2A5C] dark:group-hover:text-sky-300">
                     {opt.label}
                   </span>
                 </div>
-                <ChevronRight size={15} className="text-slate-400 group-hover:text-violet-600 transition-transform group-hover:translate-x-0.5 shrink-0" />
+                <ChevronRight size={15} className="text-slate-400 group-hover:text-[#0284C7] transition-transform group-hover:translate-x-0.5 shrink-0" />
               </button>
             ))}
           </div>
@@ -269,7 +269,7 @@ export default function PersonalizedRoadmapCard() {
       ) : (
         /* Nội dung 2: Đã hoàn tất khảo sát -> Ghim ngay 3 bài học tối ưu */
         <div className="flex flex-col gap-2 pt-1 relative z-10">
-          <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-600 dark:text-purple-200/80">
+          <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-600 dark:text-slate-300">
             <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
             <span className="truncate">Đã tối ưu theo thể trạng và thói quen sinh hoạt của bạn:</span>
           </div>
@@ -279,23 +279,23 @@ export default function PersonalizedRoadmapCard() {
               <Link
                 key={idx}
                 href={`/${lesson.topicSlug}/${lesson.pageSlug}`}
-                className="p-2.5 rounded-[14px] bg-white dark:bg-purple-950/40 border border-slate-200/80 dark:border-purple-800/40 hover:border-violet-500/80 hover:bg-violet-50/40 dark:hover:bg-purple-900/40 flex items-center justify-between gap-2.5 transition-all shadow-2xs group"
+                className="p-2.5 rounded-[14px] bg-white dark:bg-[#0E1A33] border border-slate-200/80 dark:border-blue-900/50 hover:border-[#0284C7] hover:bg-blue-50/40 dark:hover:bg-blue-950/40 flex items-center justify-between gap-2.5 transition-all shadow-2xs group"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-6 h-6 rounded-[8px] bg-violet-100 dark:bg-violet-950 text-violet-700 dark:text-violet-300 text-[11px] font-black flex items-center justify-center shrink-0 border border-violet-200 dark:border-violet-800">
+                  <div className="w-6 h-6 rounded-[8px] bg-blue-100 dark:bg-blue-950 text-[#0E2A5C] dark:text-sky-300 text-[11px] font-black flex items-center justify-center shrink-0 border border-blue-200 dark:border-blue-800">
                     {idx + 1}
                   </div>
                   <div className="flex flex-col min-w-0">
-                    <span className="text-[13px] font-black text-slate-900 dark:text-white truncate group-hover:text-violet-700 dark:group-hover:text-violet-300 transition-colors">
+                    <span className="text-[13px] font-black text-slate-900 dark:text-white truncate group-hover:text-[#0E2A5C] dark:group-hover:text-sky-300 transition-colors">
                       {lesson.title}
                     </span>
-                    <span className="text-[10.5px] text-slate-500 dark:text-purple-300/70 truncate">
+                    <span className="text-[10.5px] text-slate-500 dark:text-slate-400 truncate">
                       {lesson.tag} · {lesson.reason}
                     </span>
                   </div>
                 </div>
 
-                <div className="w-6 h-6 rounded-full bg-slate-50 dark:bg-purple-900/40 text-slate-400 group-hover:text-violet-600 flex items-center justify-center shrink-0 transition-transform group-hover:translate-x-0.5">
+                <div className="w-6 h-6 rounded-full bg-slate-50 dark:bg-slate-800 text-slate-400 group-hover:text-[#0284C7] flex items-center justify-center shrink-0 transition-transform group-hover:translate-x-0.5">
                   <ArrowRight size={13} />
                 </div>
               </Link>
