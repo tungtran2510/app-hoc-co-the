@@ -234,39 +234,36 @@ export default function AdminSettingsModal({
         <div className="w-12 h-1.5 bg-line-strong rounded-full mx-auto mt-3 mb-1 sm:hidden" />
 
         {/* Header */}
-        <div className="flex items-center justify-between p-4 px-5 border-b border-line">
+        <div className="flex items-center justify-between p-3.5 px-4 sm:p-4 border-b border-line">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-[10px] bg-primary-soft text-primary flex items-center justify-center">
-              <Settings size={18} strokeWidth={2.5} />
+            <div className="w-7 h-7 rounded-[9px] bg-primary-soft text-primary flex items-center justify-center shrink-0">
+              <Settings size={16} strokeWidth={2.5} />
             </div>
             <div>
-              <h3 className="text-[19px] font-extrabold text-ink leading-tight">
+              <h3 className="text-[16px] sm:text-[17px] font-extrabold text-ink leading-tight">
                 Cài đặt quản trị
               </h3>
-              <p className="text-[13px] text-muted leading-tight">
-                Tùy chỉnh thông tin, hiển thị và dữ liệu
-              </p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-surface-2 flex items-center justify-center text-muted hover:text-ink cursor-pointer"
+            className="w-8 h-8 rounded-full bg-surface-2 flex items-center justify-center text-muted hover:text-ink cursor-pointer"
             aria-label="Đóng"
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
-        {/* Tabs */}
-        <div className={`grid ${isSuper ? 'grid-cols-5' : 'grid-cols-3'} border-b border-line bg-surface p-1.5 gap-1`}>
+        {/* Tabs - Cuộn ngang mượt mà trên Mobile, không bị vỡ cột */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar px-3 py-1.5 border-b border-line bg-surface-2">
           <button
             type="button"
             onClick={() => setActiveTab('chung')}
-            className={`h-10 rounded-[10px] text-[12px] sm:text-[13px] font-extrabold transition-all cursor-pointer ${
+            className={`h-8 px-3 rounded-[9px] text-[12px] font-extrabold whitespace-nowrap shrink-0 transition-all cursor-pointer ${
               activeTab === 'chung'
-                ? 'bg-white text-primary shadow-xs'
-                : 'text-muted hover:text-ink'
+                ? 'bg-primary text-white shadow-2xs'
+                : 'text-muted hover:text-ink hover:bg-surface'
             }`}
           >
             Chung
@@ -274,10 +271,10 @@ export default function AdminSettingsModal({
           <button
             type="button"
             onClick={() => setActiveTab('trai_nghiem')}
-            className={`h-10 rounded-[10px] text-[12px] sm:text-[13px] font-extrabold transition-all cursor-pointer ${
+            className={`h-8 px-3 rounded-[9px] text-[12px] font-extrabold whitespace-nowrap shrink-0 transition-all cursor-pointer ${
               activeTab === 'trai_nghiem'
-                ? 'bg-white text-primary shadow-xs'
-                : 'text-muted hover:text-ink'
+                ? 'bg-primary text-white shadow-2xs'
+                : 'text-muted hover:text-ink hover:bg-surface'
             }`}
           >
             Giao diện
@@ -285,10 +282,10 @@ export default function AdminSettingsModal({
           <button
             type="button"
             onClick={() => setActiveTab('du_lieu')}
-            className={`h-10 rounded-[10px] text-[12px] sm:text-[13px] font-extrabold transition-all cursor-pointer ${
+            className={`h-8 px-3 rounded-[9px] text-[12px] font-extrabold whitespace-nowrap shrink-0 transition-all cursor-pointer ${
               activeTab === 'du_lieu'
-                ? 'bg-white text-primary shadow-xs'
-                : 'text-muted hover:text-ink'
+                ? 'bg-primary text-white shadow-2xs'
+                : 'text-muted hover:text-ink hover:bg-surface'
             }`}
           >
             Bảo mật
@@ -298,10 +295,10 @@ export default function AdminSettingsModal({
               <button
                 type="button"
                 onClick={() => setActiveTab('giang_vien')}
-                className={`h-10 rounded-[10px] text-[12px] sm:text-[13px] font-extrabold transition-all cursor-pointer ${
+                className={`h-8 px-3 rounded-[9px] text-[12px] font-extrabold whitespace-nowrap shrink-0 transition-all cursor-pointer ${
                   activeTab === 'giang_vien'
-                    ? 'bg-white text-primary shadow-xs'
-                    : 'text-muted hover:text-ink'
+                    ? 'bg-primary text-white shadow-2xs'
+                    : 'text-muted hover:text-ink hover:bg-surface'
                 }`}
               >
                 Giảng viên
@@ -309,10 +306,10 @@ export default function AdminSettingsModal({
               <button
                 type="button"
                 onClick={() => setActiveTab('khach_hang')}
-                className={`h-10 rounded-[10px] text-[12px] sm:text-[13px] font-extrabold transition-all cursor-pointer ${
+                className={`h-8 px-3 rounded-[9px] text-[12px] font-extrabold whitespace-nowrap shrink-0 transition-all cursor-pointer ${
                   activeTab === 'khach_hang'
-                    ? 'bg-white text-primary shadow-xs'
-                    : 'text-muted hover:text-ink'
+                    ? 'bg-primary text-white shadow-2xs'
+                    : 'text-muted hover:text-ink hover:bg-surface'
                 }`}
               >
                 Cơ sở SaaS
@@ -323,12 +320,12 @@ export default function AdminSettingsModal({
 
 
         {/* Tab Body */}
-        <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-4">
+        <div className="flex-1 overflow-y-auto p-3.5 sm:p-4 flex flex-col gap-3.5">
           {/* TAB 1: CÀI ĐẶT CHUNG */}
           {activeTab === 'chung' && (
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[14px] font-bold text-ink">
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-1">
+                <label className="text-[12.5px] font-bold text-ink">
                   Tên ứng dụng
                 </label>
                 <input
@@ -336,12 +333,12 @@ export default function AdminSettingsModal({
                   value={settings.app_name}
                   onChange={(e) => setSettings({ ...settings, app_name: e.target.value })}
                   placeholder="Ví dụ: Sống Khỏe Mỗi Ngày"
-                  className="w-full h-11 px-3.5 rounded-[12px] border border-line text-[15px] text-ink font-semibold focus:border-primary"
+                  className="w-full h-10 px-3 rounded-[10px] border border-line text-[13.5px] text-ink font-semibold focus:border-primary"
                 />
               </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[14px] font-bold text-ink">
+              <div className="flex flex-col gap-1">
+                <label className="text-[12.5px] font-bold text-ink">
                   Thông tin tác giả / Chuyên gia sức khỏe
                 </label>
                 <input
@@ -349,13 +346,13 @@ export default function AdminSettingsModal({
                   value={settings.expert_title}
                   onChange={(e) => setSettings({ ...settings, expert_title: e.target.value })}
                   placeholder="Ví dụ: Chuyên gia Phục hồi chức năng Cột sống"
-                  className="w-full h-11 px-3.5 rounded-[12px] border border-line text-[15px] text-ink focus:border-primary"
+                  className="w-full h-10 px-3 rounded-[10px] border border-line text-[13.5px] text-ink focus:border-primary"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[14px] font-bold text-ink">
+              <div className="grid grid-cols-2 gap-2.5">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[12.5px] font-bold text-ink">
                     Số Hotline tư vấn
                   </label>
                   <input
@@ -363,12 +360,12 @@ export default function AdminSettingsModal({
                     value={settings.hotline}
                     onChange={(e) => setSettings({ ...settings, hotline: e.target.value })}
                     placeholder="0988..."
-                    className="w-full h-11 px-3.5 rounded-[12px] border border-line text-[15px] text-ink focus:border-primary"
+                    className="w-full h-10 px-3 rounded-[10px] border border-line text-[13.5px] text-ink focus:border-primary"
                   />
                 </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[14px] font-bold text-ink">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[12.5px] font-bold text-ink">
                     Đường dẫn Zalo
                   </label>
                   <input
@@ -376,7 +373,7 @@ export default function AdminSettingsModal({
                     value={settings.zalo_url}
                     onChange={(e) => setSettings({ ...settings, zalo_url: e.target.value })}
                     placeholder="https://zalo.me/..."
-                    className="w-full h-11 px-3.5 rounded-[12px] border border-line text-[15px] text-ink focus:border-primary"
+                    className="w-full h-10 px-3 rounded-[10px] border border-line text-[13.5px] text-ink focus:border-primary"
                   />
                 </div>
               </div>
@@ -385,23 +382,20 @@ export default function AdminSettingsModal({
 
           {/* TAB 2: TRẢI NGHIỆM HỌC TẬP & GIAO DIỆN */}
           {activeTab === 'trai_nghiem' && (
-            <div className="flex flex-col gap-4">
-              {/* Bảng màu giao diện */}
-              <div className="flex flex-col gap-2.5 p-3.5 rounded-[16px] bg-surface-2 border border-line">
+            <div className="flex flex-col gap-3">
+              {/* Bảng màu giao diện - Tinh gọn 1 dòng */}
+              <div className="flex flex-col gap-2 p-3 rounded-[14px] bg-surface-2 border border-line">
                 <div className="flex items-center justify-between">
-                  <span className="text-[14px] font-bold text-ink flex items-center gap-1.5">
-                    <Sparkles size={16} className="text-primary" />
+                  <span className="text-[13px] font-bold text-ink flex items-center gap-1.5">
+                    <Sparkles size={15} className="text-primary" />
                     <span>Bảng màu giao diện</span>
                   </span>
-                  <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-primary-soft text-primary border border-primary/20">
+                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-primary-soft text-primary border border-primary/20">
                     {settings.theme_palette === 'navy_luxury' ? 'Xanh Navy' : 'Chàm Y Khoa'}
                   </span>
                 </div>
-                <p className="text-[12.5px] text-muted leading-snug">
-                  Tùy chọn tông màu sắc hiển thị toàn bộ nút bấm, tiêu đề và khối nội dung của ứng dụng.
-                </p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                <div className="grid grid-cols-2 gap-2 pt-0.5">
                   {/* Tông 1: Chàm Y Khoa (Mặc định) */}
                   <button
                     type="button"
@@ -414,29 +408,23 @@ export default function AdminSettingsModal({
                         window.dispatchEvent(new CustomEvent('qbiz_theme_palette_changed', { detail: { palette: 'indigo' } }));
                       } catch {}
                     }}
-                    className={`relative p-3 rounded-[14px] border-2 text-left flex items-start gap-3 transition-all cursor-pointer ${
+                    className={`h-11 px-2.5 rounded-[11px] border-2 flex items-center gap-2 transition-all cursor-pointer text-left ${
                       (!settings.theme_palette || settings.theme_palette === 'indigo')
-                        ? 'bg-white border-[#1E3A8A] shadow-sm ring-1 ring-[#1E3A8A]/20'
+                        ? 'bg-white border-[#1E3A8A] shadow-2xs ring-1 ring-[#1E3A8A]/20'
                         : 'bg-white/70 border-line hover:border-slate-300'
                     }`}
                   >
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1E3A8A] via-[#2563EB] to-[#60A5FA] flex items-center justify-center shrink-0 shadow-xs border-2 border-white">
+                    <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#1E3A8A] via-[#2563EB] to-[#60A5FA] flex items-center justify-center shrink-0 shadow-2xs border border-white">
                       {(!settings.theme_palette || settings.theme_palette === 'indigo') && (
-                        <Check size={18} className="text-white stroke-[3]" />
+                        <Check size={12} className="text-white stroke-[3]" />
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[14px] font-extrabold text-ink leading-tight">Chàm Y Khoa</span>
-                        <span className="text-[10px] font-black px-1.5 py-0.2 rounded-full bg-slate-100 text-slate-600">Mặc định</span>
-                      </div>
-                      <p className="text-[11.5px] text-muted leading-tight mt-1">
-                        Xanh chàm cổ điển, thanh lịch & chuẩn mực y tế.
-                      </p>
+                      <span className="text-[12px] font-extrabold text-ink truncate block">Chàm Y Khoa</span>
                     </div>
                   </button>
 
-                  {/* Tông 2: Xanh Navy Sang Trọng (Mới) */}
+                  {/* Tông 2: Xanh Navy Sang Trọng */}
                   <button
                     type="button"
                     onClick={() => {
@@ -448,35 +436,29 @@ export default function AdminSettingsModal({
                         window.dispatchEvent(new CustomEvent('qbiz_theme_palette_changed', { detail: { palette: 'navy_luxury' } }));
                       } catch {}
                     }}
-                    className={`relative p-3 rounded-[14px] border-2 text-left flex items-start gap-3 transition-all cursor-pointer ${
+                    className={`h-11 px-2.5 rounded-[11px] border-2 flex items-center gap-2 transition-all cursor-pointer text-left ${
                       settings.theme_palette === 'navy_luxury'
-                        ? 'bg-white border-[#0E2A5C] shadow-sm ring-2 ring-[#0284C7]/30'
+                        ? 'bg-white border-[#0E2A5C] shadow-2xs ring-2 ring-[#0284C7]/30'
                         : 'bg-white/70 border-line hover:border-slate-300'
                     }`}
                   >
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#06142B] via-[#0E2A5C] to-[#0284C7] flex items-center justify-center shrink-0 shadow-xs border-2 border-[#38BDF8]">
+                    <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#06142B] via-[#0E2A5C] to-[#0284C7] flex items-center justify-center shrink-0 shadow-2xs border border-[#38BDF8]">
                       {settings.theme_palette === 'navy_luxury' && (
-                        <Check size={18} className="text-white stroke-[3]" />
+                        <Check size={12} className="text-white stroke-[3]" />
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[14px] font-extrabold text-[#0E2A5C] leading-tight">Xanh Navy Sang Trọng</span>
-                        <span className="text-[10px] font-black px-1.5 py-0.2 rounded-full bg-sky-100 text-sky-800">Mới</span>
-                      </div>
-                      <p className="text-[11.5px] text-muted leading-tight mt-1">
-                        Đẳng cấp, sắc sảo, chiều sâu công nghiệp & công nghệ.
-                      </p>
+                      <span className="text-[12px] font-extrabold text-[#0E2A5C] truncate block">Xanh Navy</span>
                     </div>
                   </button>
                 </div>
               </div>
 
-              {/* Cỡ chữ mặc định */}
-              <div className="flex flex-col gap-2 p-3.5 rounded-[16px] bg-surface-2 border border-line">
-                <span className="text-[14px] font-bold text-ink flex items-center gap-1.5">
-                  <Sliders size={16} className="text-primary" />
-                  <span>Cỡ chữ mặc định khi mở bài học</span>
+              {/* Cỡ chữ đọc bài học */}
+              <div className="flex flex-col gap-2 p-3 rounded-[14px] bg-surface-2 border border-line">
+                <span className="text-[13px] font-bold text-ink flex items-center gap-1.5">
+                  <Sliders size={15} className="text-primary" />
+                  <span>Cỡ chữ đọc bài học</span>
                 </span>
                 <div className="grid grid-cols-3 gap-2">
                   {(['small', 'normal', 'large'] as const).map((mode) => (
@@ -484,9 +466,9 @@ export default function AdminSettingsModal({
                       key={mode}
                       type="button"
                       onClick={() => setSettings({ ...settings, default_font_size: mode })}
-                      className={`h-10 rounded-[10px] font-extrabold text-[13px] border transition-all cursor-pointer ${
+                      className={`h-9 rounded-[9px] font-extrabold text-[12px] border transition-all cursor-pointer ${
                         settings.default_font_size === mode
-                          ? 'bg-primary text-white border-primary shadow-xs'
+                          ? 'bg-primary text-white border-primary shadow-2xs'
                           : 'bg-white text-ink border-line hover:border-primary/40'
                       }`}
                     >
@@ -496,87 +478,74 @@ export default function AdminSettingsModal({
                 </div>
               </div>
 
-              {/* Tự động chuyển video */}
-              <div className="flex items-center justify-between p-3.5 rounded-[16px] bg-surface-2 border border-line">
-                <div className="flex flex-col gap-0.5 max-w-[80%]">
-                  <span className="text-[15px] font-bold text-ink">
-                    Tự động chuyển video kế tiếp
-                  </span>
-                  <span className="text-[13px] text-muted">
-                    Sau khi phát xong 1 video, trình phát tự chọn video tiếp theo trong danh sách
-                  </span>
-                </div>
+              {/* Tự động chuyển video - Tinh gọn 1 dòng */}
+              <label className="flex items-center justify-between p-3 rounded-[14px] bg-surface-2 border border-line cursor-pointer">
+                <span className="text-[13px] font-bold text-ink">
+                  Tự động phát video kế tiếp
+                </span>
                 <input
                   type="checkbox"
                   checked={settings.auto_next_video}
                   onChange={(e) => setSettings({ ...settings, auto_next_video: e.target.checked })}
-                  className="w-5 h-5 accent-primary rounded cursor-pointer"
+                  className="w-4.5 h-4.5 accent-primary rounded cursor-pointer"
                 />
-              </div>
+              </label>
 
-              {/* Thanh tiến độ */}
-              <div className="flex items-center justify-between p-3.5 rounded-[16px] bg-surface-2 border border-line">
-                <div className="flex flex-col gap-0.5 max-w-[80%]">
-                  <span className="text-[15px] font-bold text-ink">
-                    Hiện thanh tiến độ học tập
-                  </span>
-                  <span className="text-[13px] text-muted">
-                    Hiển thị thanh tiến trình % trên thẻ Xem tiếp ở trang chủ
-                  </span>
-                </div>
+              {/* Thanh tiến độ - Tinh gọn 1 dòng */}
+              <label className="flex items-center justify-between p-3 rounded-[14px] bg-surface-2 border border-line cursor-pointer">
+                <span className="text-[13px] font-bold text-ink">
+                  Hiện thanh tiến độ học tập (%)
+                </span>
                 <input
                   type="checkbox"
                   checked={settings.show_progress_bar}
                   onChange={(e) => setSettings({ ...settings, show_progress_bar: e.target.checked })}
-                  className="w-5 h-5 accent-primary rounded cursor-pointer"
+                  className="w-4.5 h-4.5 accent-primary rounded cursor-pointer"
                 />
-              </div>
+              </label>
             </div>
           )}
 
           {/* TAB 3: DỮ LIỆU & BẢO MẬT */}
           {activeTab === 'du_lieu' && (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               {/* Sao lưu 1 chạm */}
-              <div className="flex flex-col gap-2 p-3.5 rounded-[16px] bg-surface-2 border border-line">
-                <span className="text-[14px] font-bold text-ink">
-                  Sao lưu dữ liệu 1 chạm
-                </span>
-                <p className="text-[13px] text-muted leading-relaxed">
-                  Tải toàn bộ 4 bảng dữ liệu (chủ đề, bài học, các khối và cấu hình) về máy tính để lưu trữ dự phòng.
-                </p>
+              <div className="flex flex-col gap-2 p-3 rounded-[14px] bg-surface-2 border border-line">
+                <div className="flex items-center justify-between">
+                  <span className="text-[13px] font-bold text-ink">
+                    Sao lưu dữ liệu 1 chạm
+                  </span>
+                  <span className="text-[10px] font-extrabold text-muted">Định dạng JSON</span>
+                </div>
                 <button
                   type="button"
                   onClick={handleExportBackup}
                   disabled={isExporting}
-                  className="flex items-center justify-center gap-1.5 h-11 rounded-[12px] bg-primary text-white font-bold text-[14px] shadow-xs cursor-pointer hover:bg-primary-dark"
+                  className="flex items-center justify-center gap-1.5 h-10 rounded-[10px] bg-primary text-white font-bold text-[13px] shadow-2xs cursor-pointer hover:bg-primary-dark"
                 >
-                  <Download size={16} />
+                  <Download size={15} />
                   <span>{isExporting ? 'Đang xuất tệp...' : 'Tải file sao lưu (JSON)'}</span>
                 </button>
               </div>
 
               {/* Phục hồi dữ liệu từ bản sao lưu */}
               {isSuper && (
-                <div className="flex flex-col gap-2.5 p-3.5 rounded-[16px] bg-amber-500/5 dark:bg-amber-950/20 border border-amber-300/60 dark:border-amber-700/50">
-                  <div className="flex items-center gap-2">
-                    <RotateCcw size={16} className="text-amber-600 dark:text-amber-400" />
-                    <span className="text-[14px] font-bold text-ink">
-                      Phục hồi dữ liệu từ bản sao lưu
+                <div className="flex flex-col gap-2 p-3 rounded-[14px] bg-amber-500/5 dark:bg-amber-950/20 border border-amber-300/60 dark:border-amber-700/50">
+                  <div className="flex items-center gap-1.5">
+                    <RotateCcw size={15} className="text-amber-600 dark:text-amber-400" />
+                    <span className="text-[13px] font-bold text-ink">
+                      Phục hồi dữ liệu CSDL
                     </span>
                   </div>
-                  <p className="text-[13px] text-muted leading-relaxed">
-                    Tải file JSON đã sao lưu lên để khôi phục toàn bộ chủ đề, bài học, khối nội dung và cài đặt vào CSDL Supabase.
-                  </p>
 
                   {restoreError && (
-                    <div className="p-2.5 rounded-[10px] bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-[13px] font-bold">
+                    <div className="p-2 rounded-[8px] bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-[12px] font-bold">
                       {restoreError}
                     </div>
                   )}
 
                   {restoreSuccess && (
-                    <div className="p-2.5 rounded-[10px] bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-[13px] font-bold">
+                    <div className="p-2 rounded-[8px] bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-[12px] font-bold">
                       {restoreSuccess}
                     </div>
                   )}
@@ -591,32 +560,30 @@ export default function AdminSettingsModal({
                   />
 
                   {pendingRestoreData ? (
-                    <div className="flex flex-col gap-2 p-3 rounded-[12px] bg-white dark:bg-[#1A1235] border border-amber-400/80 shadow-xs">
-                      <span className="text-[13px] font-bold text-amber-900 dark:text-amber-300">
-                        Xác nhận dữ liệu cần phục hồi:
+                    <div className="flex flex-col gap-2 p-2.5 rounded-[10px] bg-white dark:bg-[#1A1235] border border-amber-400/80 shadow-2xs">
+                      <span className="text-[12px] font-bold text-amber-900 dark:text-amber-300">
+                        Xác nhận dữ liệu phục hồi:
                       </span>
-                      <ul className="text-[12px] text-slate-700 dark:text-slate-300 space-y-0.5 list-disc pl-4 font-medium">
-                        <li>Thời điểm xuất file: <strong>{new Date(pendingRestoreData.exported_at || Date.now()).toLocaleString('vi-VN')}</strong></li>
-                        <li>Chuyên đề: <strong>{pendingRestoreData.topics?.length || 0}</strong></li>
-                        <li>Bài học: <strong>{pendingRestoreData.pages?.length || 0}</strong></li>
+                      <ul className="text-[11.5px] text-slate-700 dark:text-slate-300 space-y-0.5 list-disc pl-4 font-medium">
+                        <li>Chuyên đề: <strong>{pendingRestoreData.topics?.length || 0}</strong> · Bài học: <strong>{pendingRestoreData.pages?.length || 0}</strong></li>
                         <li>Khối nội dung: <strong>{pendingRestoreData.blocks?.length || 0}</strong></li>
                       </ul>
-                      <div className="flex items-center gap-2 mt-1">
+                      <div className="flex items-center gap-2 mt-0.5">
                         <button
                           type="button"
                           onClick={handleConfirmRestore}
                           disabled={isRestoring}
-                          className="flex-1 flex items-center justify-center gap-1.5 h-10 rounded-[10px] bg-amber-600 hover:bg-amber-700 text-white font-bold text-[13.5px] cursor-pointer shadow-xs disabled:opacity-50"
+                          className="flex-1 flex items-center justify-center gap-1 h-9 rounded-[9px] bg-amber-600 hover:bg-amber-700 text-white font-bold text-[12.5px] cursor-pointer shadow-2xs disabled:opacity-50"
                         >
                           {isRestoring ? (
                             <>
-                              <Loader2 size={15} className="animate-spin" />
-                              <span>Đang ghi vào CSDL...</span>
+                              <Loader2 size={13} className="animate-spin" />
+                              <span>Đang khôi phục...</span>
                             </>
                           ) : (
                             <>
-                              <RotateCcw size={15} />
-                              <span>Tiến hành phục hồi ngay</span>
+                              <RotateCcw size={13} />
+                              <span>Phục hồi ngay</span>
                             </>
                           )}
                         </button>
@@ -624,7 +591,7 @@ export default function AdminSettingsModal({
                           type="button"
                           onClick={() => setPendingRestoreData(null)}
                           disabled={isRestoring}
-                          className="px-3 h-10 rounded-[10px] bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-slate-300 font-bold text-[13px] cursor-pointer hover:bg-slate-300"
+                          className="px-3 h-9 rounded-[9px] bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-slate-300 font-bold text-[12px] cursor-pointer hover:bg-slate-300"
                         >
                           Hủy
                         </button>
@@ -635,39 +602,39 @@ export default function AdminSettingsModal({
                       type="button"
                       onClick={() => restoreFileInputRef.current?.click()}
                       disabled={isRestoring}
-                      className="flex items-center justify-center gap-1.5 h-11 rounded-[12px] bg-white dark:bg-white/5 border border-amber-400 text-amber-800 dark:text-amber-300 font-bold text-[14px] shadow-xs cursor-pointer hover:bg-amber-50 dark:hover:bg-amber-950/30"
+                      className="flex items-center justify-center gap-1.5 h-10 rounded-[10px] bg-white dark:bg-white/5 border border-amber-400 text-amber-800 dark:text-amber-300 font-bold text-[13px] shadow-2xs cursor-pointer hover:bg-amber-50"
                     >
-                      <Upload size={16} />
-                      <span>Chọn file sao lưu (JSON) để phục hồi</span>
+                      <Upload size={15} />
+                      <span>Chọn file JSON để phục hồi</span>
                     </button>
                   )}
                 </div>
               )}
 
               {/* Đổi mật khẩu Admin */}
-              <div className="flex flex-col gap-3 p-4 rounded-[16px] bg-surface-2 border border-line">
-                <div className="flex items-center gap-2">
-                  <Key size={16} className="text-primary" />
-                  <span className="text-[14px] font-bold text-ink">
+              <div className="flex flex-col gap-2.5 p-3 rounded-[14px] bg-surface-2 border border-line">
+                <div className="flex items-center gap-1.5">
+                  <Key size={15} className="text-primary" />
+                  <span className="text-[13px] font-bold text-ink">
                     Đổi mật khẩu quản trị (Admin)
                   </span>
                 </div>
 
                 {passwordError && (
-                  <div className="p-2.5 rounded-[10px] bg-red-50 border border-red-200 text-red-700 text-[13px] font-bold">
+                  <div className="p-2 rounded-[8px] bg-red-50 border border-red-200 text-red-700 text-[12px] font-bold">
                     {passwordError}
                   </div>
                 )}
 
                 {passwordSuccess && (
-                  <div className="p-2.5 rounded-[10px] bg-emerald-50 border border-emerald-200 text-emerald-800 text-[13px] font-bold">
+                  <div className="p-2 rounded-[8px] bg-emerald-50 border border-emerald-200 text-emerald-800 text-[12px] font-bold">
                     {passwordSuccess}
                   </div>
                 )}
 
                 <div className="flex flex-col gap-2">
                   <div className="flex flex-col gap-1">
-                    <label className="text-[12px] font-bold text-ink">
+                    <label className="text-[11.5px] font-bold text-ink">
                       Mật khẩu hiện tại
                     </label>
                     <input
@@ -675,13 +642,13 @@ export default function AdminSettingsModal({
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       placeholder="Nhập mật khẩu đang dùng"
-                      className="w-full h-9 px-3 rounded-[10px] border border-line text-[14px] text-ink focus:border-primary bg-white"
+                      className="w-full h-9 px-3 rounded-[9px] border border-line text-[13px] text-ink focus:border-primary bg-white"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
                     <div className="flex flex-col gap-1">
-                      <label className="text-[12px] font-bold text-ink">
+                      <label className="text-[11.5px] font-bold text-ink">
                         Mật khẩu mới
                       </label>
                       <input
@@ -689,12 +656,12 @@ export default function AdminSettingsModal({
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                         placeholder="Tối thiểu 4 ký tự"
-                        className="w-full h-9 px-3 rounded-[10px] border border-line text-[14px] text-ink focus:border-primary bg-white"
+                        className="w-full h-9 px-3 rounded-[9px] border border-line text-[13px] text-ink focus:border-primary bg-white"
                       />
                     </div>
 
                     <div className="flex flex-col gap-1">
-                      <label className="text-[12px] font-bold text-ink">
+                      <label className="text-[11.5px] font-bold text-ink">
                         Nhập lại mật khẩu
                       </label>
                       <input
@@ -702,7 +669,7 @@ export default function AdminSettingsModal({
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         placeholder="Xác nhận lại"
-                        className="w-full h-9 px-3 rounded-[10px] border border-line text-[14px] text-ink focus:border-primary bg-white"
+                        className="w-full h-9 px-3 rounded-[9px] border border-line text-[13px] text-ink focus:border-primary bg-white"
                       />
                     </div>
                   </div>
@@ -711,7 +678,7 @@ export default function AdminSettingsModal({
                     type="button"
                     onClick={handleChangePassword}
                     disabled={isChangingPassword || !newPassword}
-                    className="mt-1 flex items-center justify-center gap-1.5 h-9 rounded-[10px] bg-primary text-white font-bold text-[13px] hover:bg-primary-dark cursor-pointer disabled:opacity-50 transition-colors"
+                    className="mt-0.5 flex items-center justify-center gap-1.5 h-9 rounded-[9px] bg-primary text-white font-bold text-[12.5px] hover:bg-primary-dark cursor-pointer disabled:opacity-50 transition-colors"
                   >
                     {isChangingPassword ? (
                       <>
@@ -726,13 +693,13 @@ export default function AdminSettingsModal({
               </div>
 
               {/* Đăng xuất */}
-              <div className="flex flex-col gap-2 pt-2 border-t border-line">
+              <div className="flex flex-col gap-2 pt-1 border-t border-line">
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="flex items-center justify-center gap-1.5 h-11 rounded-[12px] bg-red-50 text-red-600 font-bold text-[14px] border border-red-200 hover:bg-red-100 cursor-pointer"
+                  className="flex items-center justify-center gap-1.5 h-10 rounded-[10px] bg-red-50 text-red-600 font-bold text-[13px] border border-red-200 hover:bg-red-100 cursor-pointer"
                 >
-                  <LogOut size={16} />
+                  <LogOut size={15} />
                   <span>Thoát quyền quản trị (Đăng xuất)</span>
                 </button>
               </div>
@@ -752,19 +719,19 @@ export default function AdminSettingsModal({
 
 
         {/* Footer */}
-        <div className="p-3.5 px-5 border-t border-line flex items-center justify-between bg-surface">
+        <div className="p-3 px-4 sm:px-5 border-t border-line flex items-center justify-between bg-surface">
           <div>
             {saveSuccessMsg && (
-              <span className="text-[13px] text-primary font-bold">
+              <span className="text-[12.5px] text-primary font-bold">
                 ✓ {saveSuccessMsg}
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="h-[44px] px-4 rounded-[12px] bg-surface-2 text-ink font-bold text-[14px] cursor-pointer"
+              className="h-10 px-4 rounded-[10px] bg-surface-2 text-ink font-bold text-[13px] cursor-pointer"
             >
               Đóng
             </button>
@@ -772,9 +739,9 @@ export default function AdminSettingsModal({
               <button
                 type="button"
                 onClick={handleSaveSettings}
-                className="flex items-center justify-center gap-1.5 h-[44px] px-5 rounded-[12px] bg-primary text-white font-extrabold text-[14px] shadow-sm cursor-pointer hover:bg-primary-dark"
+                className="flex items-center justify-center gap-1.5 h-10 px-4 sm:px-5 rounded-[10px] bg-primary text-white font-extrabold text-[13px] shadow-2xs cursor-pointer hover:bg-primary-dark"
               >
-                <Save size={16} />
+                <Save size={15} />
                 <span>Lưu cài đặt</span>
               </button>
             )}
