@@ -234,28 +234,28 @@ export default function TopicLearningExperience({
         <div className="flex flex-col gap-3">
           <PageListClient initialPages={pages} topic={topic} />
 
-          {/* Cẩm Nang Y Khoa & Mã QR (Dưới cùng lộ trình học, chuẩn tinh gọn 1 dòng) */}
+          {/* Cẩm Nang Y Khoa & Mã QR (Dưới cùng lộ trình học, chuẩn tinh gọn 1 dòng không bị cắt) */}
           <button
             type="button"
             onClick={() => {
               playTapSound();
               setShowHandbookModal(true);
             }}
-            className="w-full h-11 flex items-center justify-between gap-2 px-3 rounded-[13px] bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-slate-50 dark:from-[#181033] dark:to-[#120B24] border border-blue-200/80 dark:border-purple-800/60 shadow-2xs hover:border-blue-400 active:scale-[0.99] transition-all cursor-pointer text-left group"
+            className="w-full h-11 mb-12 flex items-center justify-between gap-1.5 px-3 rounded-[13px] bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-slate-50 dark:from-[#181033] dark:to-[#120B24] border border-blue-200/80 dark:border-purple-800/60 shadow-2xs hover:border-blue-400 active:scale-[0.99] transition-all cursor-pointer text-left group"
           >
             <div className="flex items-center gap-2 min-w-0">
               <span className="w-7 h-7 rounded-[8px] bg-blue-600 dark:bg-purple-600 text-white flex items-center justify-center font-bold text-[13px] shrink-0 shadow-2xs">
                 📚
               </span>
-              <span className="text-[12.5px] font-bold text-slate-900 dark:text-white truncate">
-                Cẩm nang y khoa & Mã QR
+              <span className="text-[12.5px] font-black text-slate-900 dark:text-white shrink-0">
+                Cẩm nang y khoa
               </span>
               <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-blue-100 dark:bg-purple-900/80 text-blue-700 dark:text-purple-200 shrink-0">
-                {visiblePages.length} bài
+                Mã QR ({visiblePages.length} bài)
               </span>
             </div>
             <div className="flex items-center gap-1 text-[11px] font-extrabold text-blue-700 dark:text-purple-300 bg-white dark:bg-purple-950 px-2 py-1 rounded-[8px] border border-blue-200/80 dark:border-purple-700/60 shadow-2xs shrink-0 whitespace-nowrap">
-              <span>Mở bản in</span>
+              <span>Bản in A4</span>
               <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
             </div>
           </button>
