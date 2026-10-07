@@ -15,6 +15,8 @@ import {
   Sparkles,
   Check,
   BookOpen,
+  PlayCircle,
+  Activity,
 } from 'lucide-react';
 import {
   getStoredAppSettings,
@@ -479,62 +481,72 @@ export default function AdminSettingsModal({
                 </div>
               </div>
 
-              {/* Tự động chuyển video - Tinh gọn 1 dòng */}
-              <label className="flex items-center justify-between p-3 rounded-[14px] bg-surface-2 border border-line cursor-pointer">
-                <span className="text-[13px] font-bold text-ink">
-                  Tự động phát video kế tiếp
-                </span>
-                <input
-                  type="checkbox"
-                  checked={settings.auto_next_video}
-                  onChange={(e) => setSettings({ ...settings, auto_next_video: e.target.checked })}
-                  className="w-4.5 h-4.5 accent-primary rounded cursor-pointer"
-                />
-              </label>
-
-              {/* Thanh tiến độ - Tinh gọn 1 dòng */}
-              <label className="flex items-center justify-between p-3 rounded-[14px] bg-surface-2 border border-line cursor-pointer">
-                <span className="text-[13px] font-bold text-ink">
-                  Hiện thanh tiến độ học tập (%)
-                </span>
-                <input
-                  type="checkbox"
-                  checked={settings.show_progress_bar}
-                  onChange={(e) => setSettings({ ...settings, show_progress_bar: e.target.checked })}
-                  className="w-4.5 h-4.5 accent-primary rounded cursor-pointer"
-                />
-              </label>
-
-              {/* Cầu nối đọc sách chuyên sâu (Ebook) - Tinh gọn 1 dòng */}
-              <label className="flex items-center justify-between p-3 rounded-[14px] bg-surface-2 border border-line cursor-pointer">
-                <span className="text-[13px] font-bold text-ink flex items-center gap-1.5">
-                  <BookOpen size={15} className="text-emerald-600 shrink-0" />
-                  <span>Cầu nối đọc sách chuyên sâu (Ebook)</span>
-                </span>
-                <input
-                  type="checkbox"
-                  checked={settings.show_ebook_bridge ?? true}
-                  onChange={(e) => setSettings({ ...settings, show_ebook_bridge: e.target.checked })}
-                  className="w-4.5 h-4.5 accent-emerald-600 rounded cursor-pointer"
-                />
-              </label>
-
-              {/* Địa chỉ ứng dụng Ebook (tinh gọn) */}
-              {(settings.show_ebook_bridge ?? true) && (
-                <div className="flex flex-col gap-1 p-2.5 px-3 rounded-[14px] bg-surface-2 border border-line">
-                  <label className="text-[11.5px] font-bold text-ink flex items-center justify-between">
-                    <span>Địa chỉ ứng dụng Ebook (URL)</span>
-                    <span className="text-[10px] text-muted font-medium">Liên kết ngoài</span>
-                  </label>
+              {/* Nhóm tùy chọn hiển thị & trải nghiệm - Tinh gọn, chuẩn Apple iOS card */}
+              <div className="flex flex-col rounded-[15px] bg-surface-2 border border-line divide-y divide-line/70 overflow-hidden">
+                {/* 1. Tự động chuyển video */}
+                <label className="flex items-center justify-between p-3 hover:bg-surface/50 transition-colors cursor-pointer">
+                  <div className="flex items-center gap-2">
+                    <PlayCircle size={15} className="text-primary shrink-0" />
+                    <span className="text-[13px] font-bold text-ink">
+                      Tự động phát video kế tiếp
+                    </span>
+                  </div>
                   <input
-                    type="text"
-                    value={settings.ebook_app_url || ''}
-                    onChange={(e) => setSettings({ ...settings, ebook_app_url: e.target.value })}
-                    placeholder="https://app-doc-sach.vercel.app"
-                    className="w-full h-8.5 px-3 rounded-[9px] border border-line text-[12.5px] text-ink focus:border-emerald-500 bg-white"
+                    type="checkbox"
+                    checked={settings.auto_next_video}
+                    onChange={(e) => setSettings({ ...settings, auto_next_video: e.target.checked })}
+                    className="w-4.5 h-4.5 accent-primary rounded cursor-pointer"
                   />
+                </label>
+
+                {/* 2. Thanh tiến độ học tập */}
+                <label className="flex items-center justify-between p-3 hover:bg-surface/50 transition-colors cursor-pointer">
+                  <div className="flex items-center gap-2">
+                    <Activity size={15} className="text-primary shrink-0" />
+                    <span className="text-[13px] font-bold text-ink">
+                      Hiện thanh tiến độ học tập (%)
+                    </span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={settings.show_progress_bar}
+                    onChange={(e) => setSettings({ ...settings, show_progress_bar: e.target.checked })}
+                    className="w-4.5 h-4.5 accent-primary rounded cursor-pointer"
+                  />
+                </label>
+
+                {/* 3. Cầu nối đọc sách (Ebook) */}
+                <div className="flex flex-col p-3 hover:bg-surface/50 transition-colors">
+                  <label className="flex items-center justify-between cursor-pointer">
+                    <div className="flex items-center gap-2">
+                      <BookOpen size={15} className="text-emerald-600 shrink-0" />
+                      <span className="text-[13px] font-bold text-ink">
+                        Cầu nối đọc sách (Ebook)
+                      </span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={settings.show_ebook_bridge ?? true}
+                      onChange={(e) => setSettings({ ...settings, show_ebook_bridge: e.target.checked })}
+                      className="w-4.5 h-4.5 accent-emerald-600 rounded cursor-pointer"
+                    />
+                  </label>
+
+                  {/* Địa chỉ URL Ebook (tinh gọn, lồng liền mạch khi bật) */}
+                  {(settings.show_ebook_bridge ?? true) && (
+                    <div className="mt-2.5 pt-2 border-t border-line/60 flex items-center gap-2">
+                      <span className="text-[11px] font-bold text-muted shrink-0">URL App:</span>
+                      <input
+                        type="text"
+                        value={settings.ebook_app_url || ''}
+                        onChange={(e) => setSettings({ ...settings, ebook_app_url: e.target.value })}
+                        placeholder="https://app-doc-sach.vercel.app"
+                        className="flex-1 h-8 px-2.5 rounded-[8px] border border-line text-[12px] text-ink focus:border-emerald-500 bg-white"
+                      />
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
           )}
 

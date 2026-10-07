@@ -1230,14 +1230,11 @@ export default function ContentViewer({
               📖
             </span>
             <span className="text-[12.5px] font-black text-slate-900 dark:text-white truncate">
-              Sách chuyên sâu: {TOPIC_EBOOK_MAP[topic.slug]?.title || `Giải phẫu ${topic.title}`}
-            </span>
-            <span className="text-[9.5px] font-black px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 shrink-0 uppercase tracking-wide">
-              Ebook
+              {TOPIC_EBOOK_MAP[topic.slug]?.title || `Sách ${topic.title}`}
             </span>
           </div>
-          <div className="flex items-center gap-1 text-[11px] font-extrabold text-emerald-700 dark:text-emerald-300 bg-white dark:bg-emerald-950 px-2 py-1 rounded-[8px] border border-emerald-200/80 dark:border-emerald-700/60 shadow-2xs shrink-0 whitespace-nowrap">
-            <span>Đọc sách</span>
+          <div className="flex items-center gap-1 text-[11px] font-extrabold text-emerald-700 dark:text-emerald-300 bg-white dark:bg-emerald-950 px-2.5 py-1 rounded-[8px] border border-emerald-200/80 dark:border-emerald-700/60 shadow-2xs shrink-0 whitespace-nowrap">
+            <span>Đọc Ebook</span>
             <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </a>
