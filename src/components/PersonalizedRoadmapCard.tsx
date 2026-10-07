@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Compass, CheckCircle2, ChevronRight, RotateCcw, ArrowRight } from 'lucide-react';
+import { Compass, CheckCircle2, ChevronRight, RotateCcw, ArrowRight, Eye, EyeOff, ChevronUp, ChevronDown } from 'lucide-react';
 
 interface QuestionOption {
   id: string;
@@ -137,8 +137,13 @@ function getRecommendations(
   ];
 }
 
-export default function PersonalizedRoadmapCard() {
+interface PersonalizedRoadmapCardProps {
+  isAdmin?: boolean;
+}
+
+export default function PersonalizedRoadmapCard({ isAdmin = false }: PersonalizedRoadmapCardProps) {
   const [isEnabled, setIsEnabled] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [answers, setAnswers] = useState<{ habit?: string; area?: string; goal?: string }>({});
   const [isCompleted, setIsCompleted] = useState(false);
@@ -195,7 +200,36 @@ export default function PersonalizedRoadmapCard() {
     };
   }, []);
 
-  if (!isEnabled) return null;
+  const toggleVisibility = () => {
+    const nextState = !isEnabled;
+    setIsEnabled(nextState);
+    try {
+      localStorage.setItem('qbiz_enable_personalized_roadmap', String(nextState));
+      window.dispatchEvent(new CustomEvent('qbiz_roadmap_setting_changed', { detail: { enabled: nextState } }));
+    } catch {}
+  };
+
+  // Nếu bị ẩn: người dùng thường không thấy gì, Admin thấy thanh nét đứt để bật lại
+  if (!isEnabled) {
+    if (!isAdmin) return null;
+    return (
+      <div className="flex items-center justify-between p-2.5 px-3 rounded-[14px] bg-amber-500/10 border border-dashed border-amber-500/40 text-amber-900 dark:text-amber-200 text-[11.5px] font-bold">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+          <span className="truncate">Lộ trình cá nhân hóa (Đang ẩn với học viên)</span>
+        </div>
+        <button
+          type="button"
+          onClick={toggleVisibility}
+          className="flex items-center gap-1 px-2.5 py-1 rounded-[7px] bg-amber-500 text-white font-extrabold text-[11px] hover:bg-amber-600 transition-colors cursor-pointer shrink-0 shadow-2xs"
+          title="Hiện lại lộ trình cho học viên"
+        >
+          <Eye size={12} />
+          <span>Hiện lại</span>
+        </button>
+      </div>
+    );
+  }
 
   const handleSelectOption = (optionId: string) => {
     if (currentStep === 1) {
@@ -226,13 +260,50 @@ export default function PersonalizedRoadmapCard() {
   const recommendations = getRecommendations(answers.area || 'neck', answers.habit || 'office', customRoadmap);
 
   return (
-    <section className="flex flex-col gap-2 p-3.5 sm:p-4 rounded-[20px] bg-gradient-to-br from-slate-50 via-white to-blue-50/50 dark:from-[#0B1528] dark:via-[#09101F] dark:to-[#060D1A] border border-slate-200/90 dark:border-blue-900/50 shadow-xs relative overflow-hidden transition-all">
-      {/* Vệt sáng xanh Navy trang trí tinh tế */}
-      <div className="absolute -top-10 -right-10 w-28 h-28 bg-blue-500/10 dark:bg-blue-600/10 rounded-full blur-2xl pointer-events-none" />
+    <div className="flex flex-col gap-1.5">
+      {/* Thanh Admin: Thu gọn & Ẩn hiện nhanh trên Trang chủ */}
+      {isAdmin && (
+        <div data-testid="roadmap-admin-bar" className="flex items-center justify-between px-3 py-1.5 rounded-[12px] bg-slate-900 dark:bg-[#120A24] text-white border border-white/10 text-[11px] font-bold shadow-xs">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+            <span className="uppercase tracking-wider font-black text-[10px] text-white/90 truncate">
+              LỘ TRÌNH ĐỊNH HƯỚNG
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              data-testid="roadmap-collapse-btn"
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="flex items-center gap-1 px-2 py-0.5 rounded-[6px] bg-white/15 hover:bg-white/25 text-white text-[10.5px] font-bold cursor-pointer"
+              title={isCollapsed ? 'Mở rộng khối' : 'Thu gọn khối'}
+            >
+              {isCollapsed ? <ChevronDown size={11} /> : <ChevronUp size={11} />}
+              <span>{isCollapsed ? 'Mở rộng' : 'Thu gọn'}</span>
+            </button>
 
-      {/* Đầu thẻ: Icon La bàn Xanh Navy + Tiêu đề + Nút Làm lại */}
-      <div className="flex items-center justify-between gap-2 relative z-10">
-        <div className="flex items-center gap-2 min-w-0">
+            <button
+              type="button"
+              onClick={toggleVisibility}
+              className="p-1 px-1.5 rounded-[6px] bg-white/15 hover:bg-white/25 text-white transition-colors cursor-pointer flex items-center gap-1 text-[10.5px] font-bold"
+              title="Ẩn lộ trình khỏi học viên"
+            >
+              <Eye size={12} />
+              <span>Ẩn</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Thẻ Lộ trình (ẩn khi Admin bấm Thu gọn) */}
+      {!(isAdmin && isCollapsed) && (
+        <section className="flex flex-col gap-2 p-3.5 sm:p-4 rounded-[20px] bg-gradient-to-br from-slate-50 via-white to-blue-50/50 dark:from-[#0B1528] dark:via-[#09101F] dark:to-[#060D1A] border border-slate-200/90 dark:border-blue-900/50 shadow-xs relative overflow-hidden transition-all">
+          {/* Vệt sáng xanh Navy trang trí tinh tế */}
+          <div className="absolute -top-10 -right-10 w-28 h-28 bg-blue-500/10 dark:bg-blue-600/10 rounded-full blur-2xl pointer-events-none" />
+
+          {/* Đầu thẻ: Icon La bàn Xanh Navy + Tiêu đề + Nút Làm lại */}
+          <div className="flex items-center justify-between gap-2 relative z-10">
+            <div className="flex items-center gap-2 min-w-0">
           <div className="w-8 h-8 rounded-[11px] bg-gradient-to-br from-[#0E2A5C] via-[#1E3A8A] to-[#0284C7] text-white flex items-center justify-center shrink-0 shadow-2xs">
             <Compass size={17} className="animate-spin-slow text-sky-200" />
           </div>
@@ -333,5 +404,7 @@ export default function PersonalizedRoadmapCard() {
         </div>
       )}
     </section>
+      )}
+    </div>
   );
 }

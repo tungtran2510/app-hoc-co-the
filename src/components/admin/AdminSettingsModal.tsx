@@ -946,6 +946,54 @@ export default function AdminSettingsModal({
                     </div>
                   )}
                 </div>
+
+                {/* 8. Nút Hỏi Tùng Dinh Dưỡng qua Zalo (ở cuối bài học) */}
+                <label className="flex items-center justify-between p-3 hover:bg-surface/50 transition-colors cursor-pointer">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded bg-[#0068FF] text-white flex items-center justify-center font-black text-[9px] shrink-0">
+                      Z
+                    </div>
+                    <span className="text-[13px] font-bold text-ink">
+                      Nút "Hỏi Tùng Dinh Dưỡng qua Zalo" (cuối bài)
+                    </span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={settings.show_zalo_ask_card ?? true}
+                    onChange={(e) => {
+                      const enabled = e.target.checked;
+                      setSettings({ ...settings, show_zalo_ask_card: enabled });
+                      try {
+                        localStorage.setItem('qbiz_show_zalo_ask_card', String(enabled));
+                        window.dispatchEvent(new CustomEvent('qbiz_show_zalo_changed', { detail: { enabled } }));
+                      } catch {}
+                    }}
+                    className="w-4.5 h-4.5 accent-[#0068FF] rounded cursor-pointer"
+                  />
+                </label>
+
+                {/* 9. Thẻ Ôn tập 1 chạm Flashcards (ở cuối bài học) */}
+                <label className="flex items-center justify-between p-3 hover:bg-surface/50 transition-colors cursor-pointer">
+                  <div className="flex items-center gap-2">
+                    <Sparkles size={15} className="text-amber-500 shrink-0" />
+                    <span className="text-[13px] font-bold text-ink">
+                      Thẻ "Ôn tập 1 chạm Flashcards" (cuối bài)
+                    </span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={settings.show_lesson_flashcards ?? true}
+                    onChange={(e) => {
+                      const enabled = e.target.checked;
+                      setSettings({ ...settings, show_lesson_flashcards: enabled });
+                      try {
+                        localStorage.setItem('qbiz_show_lesson_flashcards', String(enabled));
+                        window.dispatchEvent(new CustomEvent('qbiz_show_flashcards_changed', { detail: { enabled } }));
+                      } catch {}
+                    }}
+                    className="w-4.5 h-4.5 accent-amber-500 rounded cursor-pointer"
+                  />
+                </label>
               </div>
             </div>
           )}

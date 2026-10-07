@@ -554,7 +554,7 @@ export default function HomeSectionsClient({
               />
               {/* Lộ trình cá nhân hóa (Demo) định hướng học tập đặt DƯỚI phần Chuyên Đề */}
               <div className="mt-3">
-                <PersonalizedRoadmapCard />
+                <PersonalizedRoadmapCard isAdmin={isAdmin} />
               </div>
             </React.Fragment>
           );

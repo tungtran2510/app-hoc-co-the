@@ -200,6 +200,19 @@ export default function ContentViewer({
     } catch {
       // Bỏ qua lỗi truy cập client storage
     }
+
+    const handleZaloSetting = (e: any) => {
+      setAppCustomSettings((prev) => ({ ...prev, show_zalo_ask_card: e?.detail?.enabled }));
+    };
+    const handleFlashcardSetting = (e: any) => {
+      setAppCustomSettings((prev) => ({ ...prev, show_lesson_flashcards: e?.detail?.enabled }));
+    };
+    window.addEventListener('qbiz_show_zalo_changed', handleZaloSetting);
+    window.addEventListener('qbiz_show_flashcards_changed', handleFlashcardSetting);
+    return () => {
+      window.removeEventListener('qbiz_show_zalo_changed', handleZaloSetting);
+      window.removeEventListener('qbiz_show_flashcards_changed', handleFlashcardSetting);
+    };
   }, [page.id, initialBlocks, page.status, page]);
 
   // Lưu thông tin bài học đang xem để Trợ lý AI (nút nổi & trang trợ lý) bám đuổi ngữ cảnh bài học
@@ -1239,7 +1252,9 @@ export default function ContentViewer({
       )}
 
       {/* 6.3. Khối Thẻ Ôn Tập 1 Chạm (Spaced Repetition / Flashcards) */}
-      <LessonFlashcards topicSlug={topic.slug} pageTitle={currentPage.title} />
+      {(appCustomSettings.show_lesson_flashcards ?? true) && (
+        <LessonFlashcards topicSlug={topic.slug} pageTitle={currentPage.title} />
+      )}
 
       {/* 6.5. Thẻ Cầu Nối Sách Chuyên Sâu (Smart Ebook Companion - Chuẩn 1 Dòng Mobile-First) */}
       {(appCustomSettings.show_ebook_bridge ?? true) && (
@@ -1278,7 +1293,7 @@ export default function ContentViewer({
         </button>
 
         {/* Thẻ Hỏi Tùng Dinh Dưỡng qua Zalo - Tự động đính kèm tên bài học & soạn sẵn 2 dòng chuyên nghiệp */}
-        {(consultSettings?.zalo_url || consultSettings?.hotline) && (
+        {(appCustomSettings.show_zalo_ask_card ?? true) && (consultSettings?.zalo_url || consultSettings?.hotline) && (
           <button
             type="button"
             onClick={handleAskZalo}

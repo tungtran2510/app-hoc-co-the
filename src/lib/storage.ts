@@ -19,6 +19,8 @@ export interface AppCustomSettings {
   posture_reminder_interval?: number;
   enable_personalized_roadmap?: boolean;
   custom_roadmap?: Record<string, Array<{ title: string; topicSlug: string; pageSlug: string; tag: string; reason: string }>>;
+  show_zalo_ask_card?: boolean;
+  show_lesson_flashcards?: boolean;
 }
 
 export const DEFAULT_APP_SETTINGS: AppCustomSettings = {
@@ -38,6 +40,8 @@ export const DEFAULT_APP_SETTINGS: AppCustomSettings = {
   posture_reminder_enabled: true,
   posture_reminder_interval: 60,
   enable_personalized_roadmap: true,
+  show_zalo_ask_card: true,
+  show_lesson_flashcards: true,
 };
 
 /**
@@ -120,6 +124,8 @@ export function getStoredAppSettings(): AppCustomSettings {
       const savedEbookUrl = localStorage.getItem('qbiz_ebook_app_url');
       const savedAutoOffline = localStorage.getItem('qbiz_auto_offline_cache');
       const savedEnableRoadmap = localStorage.getItem('qbiz_enable_personalized_roadmap');
+      const savedShowZalo = localStorage.getItem('qbiz_show_zalo_ask_card');
+      const savedShowFlashcards = localStorage.getItem('qbiz_show_lesson_flashcards');
       const savedCustomRoadmapStr = localStorage.getItem('qbiz_custom_roadmap');
       let parsedCustomRoadmap = undefined;
       if (savedCustomRoadmapStr) {
@@ -137,6 +143,8 @@ export function getStoredAppSettings(): AppCustomSettings {
         ebook_app_url: resolvedEbookUrl,
         auto_offline_cache: savedAutoOffline !== null ? savedAutoOffline === 'true' : DEFAULT_APP_SETTINGS.auto_offline_cache,
         enable_personalized_roadmap: savedEnableRoadmap !== null ? savedEnableRoadmap === 'true' : DEFAULT_APP_SETTINGS.enable_personalized_roadmap,
+        show_zalo_ask_card: savedShowZalo !== null ? savedShowZalo === 'true' : DEFAULT_APP_SETTINGS.show_zalo_ask_card,
+        show_lesson_flashcards: savedShowFlashcards !== null ? savedShowFlashcards === 'true' : DEFAULT_APP_SETTINGS.show_lesson_flashcards,
         custom_roadmap: parsedCustomRoadmap,
       };
     } catch {}
@@ -169,6 +177,14 @@ export async function saveStoredAppSettings(settings: Partial<AppCustomSettings>
       if (typeof settings.enable_personalized_roadmap !== 'undefined') {
         localStorage.setItem('qbiz_enable_personalized_roadmap', String(settings.enable_personalized_roadmap));
         window.dispatchEvent(new CustomEvent('qbiz_roadmap_setting_changed', { detail: { enabled: settings.enable_personalized_roadmap } }));
+      }
+      if (typeof settings.show_zalo_ask_card !== 'undefined') {
+        localStorage.setItem('qbiz_show_zalo_ask_card', String(settings.show_zalo_ask_card));
+        window.dispatchEvent(new CustomEvent('qbiz_show_zalo_changed', { detail: { enabled: settings.show_zalo_ask_card } }));
+      }
+      if (typeof settings.show_lesson_flashcards !== 'undefined') {
+        localStorage.setItem('qbiz_show_lesson_flashcards', String(settings.show_lesson_flashcards));
+        window.dispatchEvent(new CustomEvent('qbiz_show_flashcards_changed', { detail: { enabled: settings.show_lesson_flashcards } }));
       }
       if (settings.custom_roadmap) {
         localStorage.setItem('qbiz_custom_roadmap', JSON.stringify(settings.custom_roadmap));
