@@ -146,3 +146,19 @@ Hệ thống hỗ trợ đầy đủ **10 khối nội dung chuẩn**:
    - Trong **Menu Tùy chọn ⋮ bài học** (`PageHeaderBar.tsx`): 2 nút chọn nhanh chuyển đổi 0ms.
    - Lưu trữ bền vững tại `localStorage` (`qbiz_theme_palette`) và đồng bộ Supabase `settings.block_styles.theme_palette`.
 
+---
+
+## 10. CHUẨN HOÁ TINH GỌN DI ĐỘNG (MOBILE-FIRST COMPACT STANDARDS)
+1. **Khối Cẩm Nang Y Khoa & Mã QR:**
+   - Vị trí: Đặt ở **DƯỚI CÙNG LỘ TRÌNH HỌC TẬP** (sau tất cả bài học), không chen vào đầu trang.
+   - Bố cục: Đúng **1 DÒNG DUY NHẤT** (`h-11`, `mb-12`), định dạng:
+     `[ 📚 Cẩm nang y khoa ] [ Mã QR (n bài) ] ------------> [ Bản in A4 → ]`
+   - Tuyệt đối không dùng 2 dòng văn bản mô tả dài dòng; giữ khoảng cách đáy an toàn với nút nổi "Hỏi AI".
+2. **Modal Cài Đặt Quản Trị Trên Di Động (`AdminSettingsModal.tsx`):**
+   - Thanh Tab: Chuyển sang thanh cuộn ngang mượt mà (`overflow-x-auto no-scrollbar`), các tab dạng pill bo tròn `h-8 px-3 text-[12px] font-extrabold`. Không chia cột ép co rúm.
+   - Bảng màu: Lưới 2 cột cao đúng 44px (`h-11`), hiển thị vòng màu gradient + tên bảng màu + checkmark. Bỏ mô tả dài dòng.
+   - Cỡ chữ đọc bài: 3 nút ngang cao 36px (`h-9`).
+   - Tự động chuyển video & Hiện tiến độ: Đóng gói thành nhãn 1 dòng kèm checkbox bật/tắt tiện lợi.
+   - Tab Chung & Tab Bảo mật: Thu gọn chiều cao ô nhập liệu (`h-10`), label xúc tích, nút hành động cao `h-10` thanh lịch.
+
+

@@ -17,9 +17,9 @@ async function run() {
 
   const page = await context.newPage();
 
-  const baseUrl = 'https://app-hoc-co-kfnunmax1-tungtran2510-3020s-projects.vercel.app';
+  const baseUrl = 'https://app-hoc-co-29proejsz-tungtran2510-3020s-projects.vercel.app';
   console.log('Sử dụng baseUrl:', baseUrl);
-  await page.goto(baseUrl + '/dang-nhap', { waitUntil: 'networkidle' });
+  await page.goto(baseUrl + '/dang-nhap', { waitUntil: 'domcontentloaded' });
   await page.fill('input[type="tel"]', '0974248716');
   await page.fill('input[type="password"]', 'Tung@2510');
   await page.click('button[type="submit"]', { force: true });
@@ -27,11 +27,11 @@ async function run() {
 
   // 1. Chụp trang chuyên đề - khối Cẩm nang y khoa & Mã QR tinh gọn 1 dòng ở dưới cùng lộ trình
   console.log('2. Chụp trang chuyên đề Cột sống & khối Cẩm nang 1 dòng...');
-  await page.goto(baseUrl + '/cot-song', { waitUntil: 'networkidle' });
+  await page.goto(baseUrl + '/cot-song', { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1200);
 
-  // Cuộn thẳng đến nút Cẩm nang y khoa & Mã QR ở cuối cùng lộ trình
-  const handbookBtn = page.locator('button:has-text("Cẩm nang y khoa & Mã QR")');
+  // Cuộn thẳng đến nút Cẩm nang y khoa ở cuối cùng lộ trình
+  const handbookBtn = page.locator('button:has-text("Cẩm nang y khoa")');
   await handbookBtn.scrollIntoViewIfNeeded();
   await page.waitForTimeout(600);
 
@@ -42,7 +42,7 @@ async function run() {
 
   // Mở bài học để mở menu Tùy chọn -> Cài đặt quản trị
   console.log('3. Mở bài học và mở Modal Cài đặt...');
-  await page.goto(baseUrl + '/cot-song/tong-quan-ve-cot-song', { waitUntil: 'networkidle' });
+  await page.goto(baseUrl + '/cot-song/tong-quan-ve-cot-song', { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1000);
 
   // Bấm menu "Tùy chọn"
