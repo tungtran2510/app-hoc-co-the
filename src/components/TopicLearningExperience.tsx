@@ -250,14 +250,14 @@ export default function TopicLearningExperience({
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5 flex-nowrap">
                   <span className="text-[13px] font-black text-slate-900 dark:text-white truncate">
-                    Cẩm nang bỏ túi & Mã QR
+                    Cẩm nang & Mã QR
                   </span>
                   <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-blue-100 dark:bg-purple-900/80 text-blue-700 dark:text-purple-200 shrink-0">
                     {visiblePages.length} bài
                   </span>
                 </div>
                 <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">
-                  Bản in màu A4 chất lượng cao · Quét QR mở video tức thì
+                  Bản in màu A4 · Quét QR mở video tức thì
                 </p>
               </div>
             </div>
