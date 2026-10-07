@@ -25,6 +25,7 @@ import BookDetailModal from './BookDetailModal';
 import WelcomeModal from './WelcomeModal';
 import HomeContinueSection from './HomeContinueSection';
 import SectionOrderControls from './admin/SectionOrderControls';
+import PersonalizedRoadmapCard from './PersonalizedRoadmapCard';
 
 interface HomeSectionsClientProps {
   initialSectionsOrder?: string[] | null;
@@ -534,6 +535,8 @@ export default function HomeSectionsClient({
           return (
             <React.Fragment key="topics">
               {hiddenBanner}
+              {/* Lộ trình cá nhân hóa (Demo) định hướng học tập 3 bước */}
+              <PersonalizedRoadmapCard />
               <TopicListClient
                 initialTopics={topicsWithCounts}
                 initialTopicsTitle={topicsTitle}

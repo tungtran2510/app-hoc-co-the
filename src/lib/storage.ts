@@ -17,6 +17,7 @@ export interface AppCustomSettings {
   data_saver_mode?: boolean;
   posture_reminder_enabled?: boolean;
   posture_reminder_interval?: number;
+  enable_personalized_roadmap?: boolean;
 }
 
 export const DEFAULT_APP_SETTINGS: AppCustomSettings = {
@@ -35,6 +36,7 @@ export const DEFAULT_APP_SETTINGS: AppCustomSettings = {
   data_saver_mode: false,
   posture_reminder_enabled: true,
   posture_reminder_interval: 60,
+  enable_personalized_roadmap: true,
 };
 
 /**

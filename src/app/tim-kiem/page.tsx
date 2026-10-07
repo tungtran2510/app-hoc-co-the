@@ -3,21 +3,29 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Search as SearchIcon, X, ArrowLeft, BookOpen, PlaySquare, Layers, ChevronRight } from 'lucide-react';
+import {
+  Search as SearchIcon,
+  X,
+  ArrowLeft,
+  BookOpen,
+  PlaySquare,
+  Layers,
+  ChevronRight,
+  Mic,
+  MicOff,
+  Sparkles,
+  HelpCircle,
+} from 'lucide-react';
 import BottomNav from '../../components/BottomNav';
 import BodyMapNavigator from '../../components/BodyMapNavigator';
+import {
+  processSearchQuery,
+  calculateMatchScore,
+  removeVietnameseTones,
+  ProcessedSearchQuery,
+} from '../../lib/smartSearch';
 
 export const dynamic = 'force-dynamic';
-
-function removeVietnameseTones(str: string): string {
-  return str
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd')
-    .replace(/Đ/g, 'D')
-    .toLowerCase()
-    .trim();
-}
 
 interface SearchData {
   topics: {
@@ -65,6 +73,11 @@ export default function SearchPage() {
   const [allData, setAllData] = useState<SearchData | null>(cachedSearchData);
   const [loading, setLoading] = useState(!cachedSearchData);
 
+  // Trạng thái Tìm kiếm bằng giọng nói (Voice Search)
+  const [isListening, setIsListening] = useState(false);
+  const [voiceNotice, setVoiceNotice] = useState<string | null>(null);
+  const recognitionRef = useRef<any>(null);
+
   // Tự động focus vào ô nhập và cập nhật tiêu đề trang
   useEffect(() => {
     inputRef.current?.focus();
@@ -89,83 +102,218 @@ export default function SearchPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Debounce 300ms sau khi ngừng gõ
+  // Debounce 250ms sau khi ngừng gõ
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedQuery(query.trim());
-    }, 300);
+    }, 250);
     return () => clearTimeout(timer);
   }, [query]);
 
-  const cleanQuery = removeVietnameseTones(debouncedQuery);
+  // Khởi tạo và xử lý Tìm kiếm Giọng nói 1 chạm (Web Speech API)
+  const toggleVoiceSearch = () => {
+    if (isListening) {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      setIsListening(false);
+      setVoiceNotice(null);
+      return;
+    }
 
-  // Lọc kết quả theo 3 nhóm: Chủ đề, Trang nội dung, Video
-  const matchedTopics = (allData?.topics || []).filter((t) => {
-    if (!cleanQuery) return false;
-    const titleMatch = removeVietnameseTones(t.title).includes(cleanQuery);
-    const descMatch = t.description && removeVietnameseTones(t.description).includes(cleanQuery);
-    return titleMatch || descMatch;
-  });
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
-  const matchedPages = (allData?.pages || []).filter((p) => {
-    if (!cleanQuery) return false;
-    const titleMatch = removeVietnameseTones(p.title).includes(cleanQuery);
-    const summaryMatch = p.summary && removeVietnameseTones(p.summary).includes(cleanQuery);
-    const snippetMatch = p.text_snippets.some((snip) =>
-      removeVietnameseTones(snip).includes(cleanQuery)
-    );
-    return titleMatch || summaryMatch || snippetMatch;
-  });
+    if (!SpeechRecognition) {
+      setVoiceNotice('Trình duyệt chưa hỗ trợ micro hoặc cần cấp quyền micro');
+      setTimeout(() => setVoiceNotice(null), 3000);
+      return;
+    }
 
-  const matchedVideos = (allData?.videos || []).filter((v) => {
-    if (!cleanQuery) return false;
-    const titleMatch = removeVietnameseTones(v.title).includes(cleanQuery);
-    const descMatch = v.description && removeVietnameseTones(v.description).includes(cleanQuery);
-    return titleMatch || descMatch;
-  });
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'vi-VN';
+      recognition.continuous = false;
+      recognition.interimResults = true;
 
-  const totalResults = matchedTopics.length + matchedPages.length + matchedVideos.length;
+      recognition.onstart = () => {
+        setIsListening(true);
+        setVoiceNotice('Đang nghe bạn nói... Hãy nói từ khóa hoặc câu hỏi');
+      };
+
+      recognition.onresult = (event: any) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          transcript += event.results[i][0].transcript;
+        }
+        if (transcript.trim()) {
+          setQuery(transcript.trim());
+        }
+      };
+
+      recognition.onerror = (event: any) => {
+        setIsListening(false);
+        if (event.error === 'not-allowed') {
+          setVoiceNotice('Vui lòng cấp quyền Microphone trên trình duyệt');
+        } else if (event.error !== 'no-speech') {
+          setVoiceNotice('Không nhận diện được giọng nói. Vui lòng thử lại');
+        } else {
+          setVoiceNotice(null);
+        }
+        setTimeout(() => setVoiceNotice(null), 3500);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+        setTimeout(() => setVoiceNotice(null), 1500);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch {
+      setIsListening(false);
+      setVoiceNotice('Không thể kích hoạt micro. Vui lòng thử lại.');
+      setTimeout(() => setVoiceNotice(null), 3000);
+    }
+  };
+
+  // Phân tích thông minh câu truy vấn (Smart Query Analysis)
+  const processedQuery: ProcessedSearchQuery = processSearchQuery(debouncedQuery);
+
+  // Lọc và xếp hạng kết quả thông minh
+  const scoredTopics = (allData?.topics || [])
+    .map((t) => {
+      const scoreTitle = calculateMatchScore(t.title, processedQuery);
+      const scoreDesc = calculateMatchScore(t.description, processedQuery);
+      return { topic: t, score: Math.max(scoreTitle, scoreDesc) };
+    })
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  const scoredPages = (allData?.pages || [])
+    .map((p) => {
+      const scoreTitle = calculateMatchScore(p.title, processedQuery);
+      const scoreSummary = calculateMatchScore(p.summary, processedQuery);
+      const scoreTopic = calculateMatchScore(p.topic_title, processedQuery);
+      const snippetScores = p.text_snippets.map((s) => calculateMatchScore(s, processedQuery));
+      const maxSnippet = snippetScores.length ? Math.max(...snippetScores) : 0;
+      return {
+        page: p,
+        score: Math.max(scoreTitle * 1.5, scoreSummary, scoreTopic, maxSnippet),
+      };
+    })
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  const scoredVideos = (allData?.videos || [])
+    .map((v) => {
+      const scoreTitle = calculateMatchScore(v.title, processedQuery);
+      const scoreDesc = calculateMatchScore(v.description, processedQuery);
+      const scoreTopic = calculateMatchScore(v.topic_title, processedQuery);
+      return {
+        video: v,
+        score: Math.max(scoreTitle * 1.4, scoreDesc, scoreTopic),
+      };
+    })
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  const totalResults = scoredTopics.length + scoredPages.length + scoredVideos.length;
 
   return (
-    <main className="flex-1 flex flex-col px-4 sm:px-5 pt-3 pb-28 gap-4 max-w-[640px] w-full mx-auto">
-      {/* 1. Thanh đầu trang: Nút quay lại + Ô tìm kiếm */}
-      <section className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="w-11 h-11 min-w-[44px] rounded-[14px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 flex items-center justify-center text-slate-700 dark:text-purple-200 hover:text-purple-700 dark:hover:text-[#F8DF7B] transition-colors cursor-pointer shadow-2xs"
-          aria-label="Quay lại"
-        >
-          <ArrowLeft size={20} />
-        </button>
+    <main className="flex-1 flex flex-col px-4 sm:px-5 pt-3 pb-28 gap-3 max-w-[640px] w-full mx-auto font-[var(--font-be-vietnam-pro)]">
+      {/* 1. Thanh đầu trang: Nút quay lại + Ô tìm kiếm + Nút Voice Search 1 chạm */}
+      <section className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="w-11 h-11 min-w-[44px] rounded-[14px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 flex items-center justify-center text-slate-700 dark:text-purple-200 hover:text-purple-700 dark:hover:text-[#F8DF7B] transition-colors cursor-pointer shadow-2xs"
+            aria-label="Quay lại"
+          >
+            <ArrowLeft size={20} />
+          </button>
 
-        <div className="relative flex-1">
-          <div className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-slate-400">
-            <SearchIcon size={18} />
+          <div className="relative flex-1">
+            <div className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-slate-400">
+              <SearchIcon size={18} />
+            </div>
+            <input
+              ref={inputRef}
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Tìm bài học, câu hỏi, hoặc bấm micro..."
+              className="w-full h-[48px] pl-10 pr-20 rounded-[16px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 focus:border-purple-600 dark:focus:border-[#F8DF7B] text-[15px] text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden shadow-2xs transition-colors"
+              aria-label="Nhập từ khóa tìm kiếm"
+            />
+
+            {/* Các nút bên phải: Xóa & Nút Giọng nói Micro */}
+            <div className="absolute inset-y-0 right-2 flex items-center gap-1">
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuery('');
+                    inputRef.current?.focus();
+                  }}
+                  className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+                  aria-label="Xóa từ khóa"
+                >
+                  <X size={15} />
+                </button>
+              )}
+
+              {/* Nút Micro Voice Search 1 chạm */}
+              <button
+                type="button"
+                onClick={toggleVoiceSearch}
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+                  isListening
+                    ? 'bg-rose-500 text-white animate-pulse shadow-md ring-2 ring-rose-300'
+                    : 'text-slate-500 hover:text-purple-700 dark:text-purple-300 dark:hover:text-[#F8DF7B] hover:bg-slate-100 dark:hover:bg-purple-950/60'
+                }`}
+                title={isListening ? 'Đang nghe... Bấm để dừng' : 'Tìm kiếm bằng giọng nói tiếng Việt'}
+                aria-label="Tìm kiếm bằng giọng nói"
+              >
+                {isListening ? <Mic size={17} className="animate-bounce" /> : <Mic size={17} />}
+              </button>
+            </div>
           </div>
-          <input
-            ref={inputRef}
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Tìm bài học, đĩa đệm, cột sống..."
-            className="w-full h-[48px] pl-10 pr-10 rounded-[16px] bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 focus:border-purple-600 dark:focus:border-[#F8DF7B] text-[15px] text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden shadow-2xs transition-colors"
-            aria-label="Nhập từ khóa tìm kiếm"
-          />
-          {query && (
-            <button
-              type="button"
-              onClick={() => {
-                setQuery('');
-                inputRef.current?.focus();
-              }}
-              className="absolute inset-y-0 right-2 my-auto w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
-              aria-label="Xóa từ khóa"
-            >
-              <X size={16} />
-            </button>
-          )}
         </div>
+
+        {/* Thông báo vi mô khi đang ghi âm giọng nói */}
+        {voiceNotice && (
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-[12px] bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-[12px] font-bold shadow-2xs animate-fade-in">
+            <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping shrink-0" />
+            <span className="truncate">{voiceNotice}</span>
+          </div>
+        )}
+
+        {/* Dải chỉ báo Tìm kiếm thông minh (Smart Search Indicator) khi nhận diện câu hỏi hoặc từ viết tắt */}
+        {processedQuery.clean && (processedQuery.isQuestion || processedQuery.expandedTerms.length > 0) && (
+          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[12px] bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/40 text-[11.5px] text-purple-800 dark:text-purple-200">
+            <Sparkles size={13} className="text-purple-600 dark:text-[#F8DF7B] shrink-0" />
+            <span className="font-extrabold shrink-0">Thông minh:</span>
+            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar flex-1 whitespace-nowrap">
+              {processedQuery.expandedTerms.slice(0, 3).map((term) => (
+                <button
+                  key={term}
+                  type="button"
+                  onClick={() => setQuery(term)}
+                  className="px-2 py-0.5 rounded-full bg-white dark:bg-purple-900 border border-purple-200 dark:border-purple-700 font-bold hover:border-purple-500 cursor-pointer text-[10.5px]"
+                >
+                  +{term}
+                </button>
+              ))}
+              {processedQuery.isQuestion && (
+                <span className="text-[11px] text-purple-600 dark:text-purple-300/80 italic">
+                  Đã tự động trích lọc từ khóa chính
+                </span>
+              )}
+            </div>
+          </div>
+        )}
       </section>
 
       {/* 2. Nội dung kết quả */}
@@ -174,7 +322,7 @@ export default function SearchPage() {
           <div className="p-8 text-center text-slate-400 text-[14px] font-medium animate-pulse">
             Đang tải dữ liệu tìm kiếm...
           </div>
-        ) : !cleanQuery ? (
+        ) : !processedQuery.clean ? (
           /* Gợi ý khi chưa gõ */
           <div className="flex flex-col gap-4 py-1">
             {/* Bản Đồ Cơ Thể 1 Chạm Trực Quan */}
@@ -185,7 +333,14 @@ export default function SearchPage() {
                 Từ khóa tìm kiếm nhanh
               </h2>
               <div className="flex flex-wrap gap-2">
-                {['Cột sống', 'Đĩa đệm', 'Thần kinh', 'Tư thế', 'Dây chằng', 'Dinh dưỡng'].map((tag) => (
+                {[
+                  'Cột sống',
+                  'Đĩa đệm',
+                  'Cổ vai gáy',
+                  'Tư thế ngồi',
+                  'Dây chằng',
+                  'Uống nước',
+                ].map((tag) => (
                   <button
                     key={tag}
                     type="button"
@@ -205,22 +360,22 @@ export default function SearchPage() {
               Không tìm thấy kết quả phù hợp
             </p>
             <p className="text-[13px] text-slate-500 dark:text-purple-300/70 font-normal">
-              Thử tìm với từ khóa khác như: cột sống, đĩa đệm, dinh dưỡng.
+              Thử tìm với từ khóa khác như: cột sống, đĩa đệm, vai gáy, uống nước.
             </p>
           </div>
         ) : (
-          /* Danh sách kết quả theo 3 nhóm thiết kế dạng Flycy */
+          /* Danh sách kết quả theo 3 nhóm thiết kế chuẩn MEDICA LEARN */
           <div className="flex flex-col gap-5">
             {/* Nhóm 1: Chủ đề */}
-            {matchedTopics.length > 0 && (
+            {scoredTopics.length > 0 && (
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-1.5 text-[12px] font-extrabold text-slate-500 dark:text-purple-300/70 uppercase tracking-wider px-1">
                   <Layers size={14} className="text-primary dark:text-[#F8DF7B]" />
-                  <span>CHUYÊN ĐỀ ({matchedTopics.length})</span>
+                  <span>CHUYÊN ĐỀ ({scoredTopics.length})</span>
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  {matchedTopics.map((t) => {
+                  {scoredTopics.map(({ topic: t }) => {
                     const iconSrc = t.icon_url || `/images/topics/${t.slug}.png`;
                     return (
                       <Link
@@ -268,15 +423,15 @@ export default function SearchPage() {
             )}
 
             {/* Nhóm 2: Trang nội dung */}
-            {matchedPages.length > 0 && (
+            {scoredPages.length > 0 && (
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-1.5 text-[12px] font-extrabold text-slate-500 dark:text-purple-300/70 uppercase tracking-wider px-1">
                   <BookOpen size={14} className="text-primary dark:text-[#F8DF7B]" />
-                  <span>BÀI HỌC NỘI DUNG ({matchedPages.length})</span>
+                  <span>BÀI HỌC NỘI DUNG ({scoredPages.length})</span>
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  {matchedPages.map((p) => {
+                  {scoredPages.map(({ page: p }) => {
                     const formattedNum = String(p.page_number).padStart(2, '0');
                     const thumbSrc = p.cover_url || `/images/topics/${p.topic_slug}.png`;
                     return (
@@ -325,17 +480,18 @@ export default function SearchPage() {
             )}
 
             {/* Nhóm 3: Video */}
-            {matchedVideos.length > 0 && (
+            {scoredVideos.length > 0 && (
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-1.5 text-[12px] font-extrabold text-slate-500 dark:text-purple-300/70 uppercase tracking-wider px-1">
                   <PlaySquare size={14} className="text-red-500" />
-                  <span>VIDEO HƯỚNG DẪN ({matchedVideos.length})</span>
+                  <span>VIDEO HƯỚNG DẪN ({scoredVideos.length})</span>
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  {matchedVideos.map((v, i) => {
+                  {scoredVideos.map(({ video: v }, i) => {
                     const formattedNum = String(v.page_number).padStart(2, '0');
-                    const videoThumb = v.thumbnail_url || `https://img.youtube.com/vi/${v.youtube_id}/hqdefault.jpg`;
+                    const videoThumb =
+                      v.thumbnail_url || `https://img.youtube.com/vi/${v.youtube_id}/hqdefault.jpg`;
                     return (
                       <Link
                         key={i}

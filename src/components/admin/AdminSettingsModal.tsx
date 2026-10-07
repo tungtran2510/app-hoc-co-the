@@ -18,6 +18,7 @@ import {
   PlayCircle,
   Activity,
   CloudDownload,
+  Compass,
 } from 'lucide-react';
 import {
   getStoredAppSettings,
@@ -725,6 +726,32 @@ export default function AdminSettingsModal({
                     </div>
                   )}
                 </div>
+
+                {/* 7. Lộ trình cá nhân hóa (Demo) - 3 câu chẩn đoán sơ bộ */}
+                <label className="flex items-center justify-between p-3 hover:bg-surface/50 transition-colors cursor-pointer">
+                  <div className="flex items-center gap-2">
+                    <Compass size={15} className="text-violet-600 shrink-0" />
+                    <span className="text-[13px] font-bold text-ink">
+                      Lộ trình cá nhân hóa
+                    </span>
+                    <span className="text-[9.5px] font-black uppercase tracking-wider text-violet-700 bg-violet-100 border border-violet-200 dark:text-violet-300 dark:bg-violet-950/60 dark:border-violet-800 px-1.5 py-0.2 rounded-md">
+                      Demo
+                    </span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={settings.enable_personalized_roadmap ?? true}
+                    onChange={(e) => {
+                      const enabled = e.target.checked;
+                      setSettings({ ...settings, enable_personalized_roadmap: enabled });
+                      try {
+                        localStorage.setItem('qbiz_enable_personalized_roadmap', String(enabled));
+                        window.dispatchEvent(new CustomEvent('qbiz_roadmap_setting_changed', { detail: { enabled } }));
+                      } catch {}
+                    }}
+                    className="w-4.5 h-4.5 accent-violet-600 rounded cursor-pointer"
+                  />
+                </label>
               </div>
             </div>
           )}
