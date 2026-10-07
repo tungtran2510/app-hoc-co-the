@@ -582,8 +582,8 @@ export default function AdminSettingsModal({
                   )}
                 </div>
 
-                {/* 4. Tự động tải dữ liệu Offline sau 2 phút (tối đa 30MB) */}
-                <div className="flex flex-col p-3 hover:bg-surface/50 transition-colors">
+                {/* 4. Quản trị Bộ nhớ & Tự động tải Offline */}
+                <div className="flex flex-col p-3 hover:bg-surface/50 transition-colors gap-2.5">
                   <label className="flex items-center justify-between cursor-pointer">
                     <div className="flex items-center gap-2">
                       <CloudDownload size={15} className="text-blue-600 shrink-0" />
@@ -599,8 +599,29 @@ export default function AdminSettingsModal({
                     />
                   </label>
 
-                  {/* Nút chủ động tải ngay 1-chạm & hiển thị tiến độ */}
-                  <div className="mt-2 pt-2 border-t border-line/60 flex items-center justify-between gap-2">
+                  {/* Tùy chọn giới hạn dung lượng tải về */}
+                  <div className="flex items-center justify-between pt-1 text-[11.5px]">
+                    <span className="font-bold text-muted">Hạn mức tải tối đa:</span>
+                    <div className="flex items-center gap-1">
+                      {([30, 60, 100, 200] as const).map((mb) => (
+                        <button
+                          key={mb}
+                          type="button"
+                          onClick={() => setSettings({ ...settings, offline_max_mb: mb })}
+                          className={`px-2 py-0.5 rounded-[7px] text-[11px] font-extrabold border transition-all cursor-pointer ${
+                            (settings.offline_max_mb || 60) === mb
+                              ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
+                              : 'bg-white dark:bg-slate-800 text-ink border-line hover:border-blue-400'
+                          }`}
+                        >
+                          {mb}MB
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Nút chủ động tải ngay 1-chạm & Nút Dọn dẹp cache */}
+                  <div className="pt-2 border-t border-line/60 flex items-center justify-between gap-2">
                     <div className="flex flex-col min-w-0">
                       <span className="text-[11px] font-extrabold text-ink truncate">
                         {offlineStatus.status === 'downloading'
@@ -609,10 +630,10 @@ export default function AdminSettingsModal({
                           ? `✓ Đã lưu (${offlineStatus.bytesFormatted || '14.8 MB'})`
                           : offlineLastMb
                           ? `Đã lưu: ${offlineLastMb} MB`
-                          : 'Tối đa 30MB · Học 100% không cần mạng'}
+                          : `Đã sẵn sàng · Tối đa ${settings.offline_max_mb || 60}MB`}
                       </span>
                       {offlineStatus.status === 'downloading' && (
-                        <div className="w-full max-w-[140px] h-1.5 bg-slate-200 dark:bg-purple-950 rounded-full overflow-hidden mt-1">
+                        <div className="w-full max-w-[130px] h-1.5 bg-slate-200 dark:bg-purple-950 rounded-full overflow-hidden mt-1">
                           <div
                             className="h-full bg-blue-600 transition-all duration-200"
                             style={{ width: `${offlineStatus.progress}%` }}
@@ -621,18 +642,88 @@ export default function AdminSettingsModal({
                       )}
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        window.dispatchEvent(new CustomEvent('qbiz_start_offline_download'));
-                      }}
-                      disabled={offlineStatus.status === 'downloading'}
-                      className="h-7 px-2.5 rounded-[8px] bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-[11px] font-extrabold flex items-center gap-1 hover:bg-blue-100 cursor-pointer shadow-2xs shrink-0 disabled:opacity-50"
-                    >
-                      <Download size={11} strokeWidth={2.5} />
-                      <span>{offlineStatus.status === 'downloading' ? 'Đang tải...' : 'Tải ngay'}</span>
-                    </button>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          window.dispatchEvent(new CustomEvent('qbiz_clear_offline_cache'));
+                          setOfflineLastMb('');
+                        }}
+                        className="h-7 px-2 rounded-[8px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-line text-[11px] font-bold hover:bg-slate-200 cursor-pointer shadow-2xs"
+                        title="Dọn dẹp giải phóng bộ nhớ đệm"
+                      >
+                        Dọn dẹp
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          window.dispatchEvent(new CustomEvent('qbiz_start_offline_download'));
+                        }}
+                        disabled={offlineStatus.status === 'downloading'}
+                        className="h-7 px-2.5 rounded-[8px] bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-[11px] font-extrabold flex items-center gap-1 hover:bg-blue-100 cursor-pointer shadow-2xs disabled:opacity-50"
+                      >
+                        <Download size={11} strokeWidth={2.5} />
+                        <span>{offlineStatus.status === 'downloading' ? 'Đang tải...' : 'Tải ngay'}</span>
+                      </button>
+                    </div>
                   </div>
+                </div>
+
+                {/* 5. Chế độ Tiết kiệm dữ liệu di động (Data Saver) */}
+                <label className="flex items-center justify-between p-3 hover:bg-surface/50 transition-colors cursor-pointer">
+                  <div className="flex items-center gap-2">
+                    <Activity size={15} className="text-amber-600 shrink-0" />
+                    <span className="text-[13px] font-bold text-ink">
+                      Tiết kiệm dữ liệu di động (4G/5G)
+                    </span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={settings.data_saver_mode ?? false}
+                    onChange={(e) => setSettings({ ...settings, data_saver_mode: e.target.checked })}
+                    className="w-4.5 h-4.5 accent-amber-600 rounded cursor-pointer"
+                  />
+                </label>
+
+                {/* 6. Nhắc nhở chỉnh tư thế & Uống nước thông minh */}
+                <div className="flex flex-col p-3 hover:bg-surface/50 transition-colors gap-2">
+                  <label className="flex items-center justify-between cursor-pointer">
+                    <div className="flex items-center gap-2">
+                      <Sparkles size={15} className="text-teal-600 shrink-0" />
+                      <span className="text-[13px] font-bold text-ink">
+                        Nhắc nhở chỉnh tư thế & Uống nước
+                      </span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={settings.posture_reminder_enabled ?? true}
+                      onChange={(e) => setSettings({ ...settings, posture_reminder_enabled: e.target.checked })}
+                      className="w-4.5 h-4.5 accent-teal-600 rounded cursor-pointer"
+                    />
+                  </label>
+
+                  {(settings.posture_reminder_enabled ?? true) && (
+                    <div className="flex items-center justify-between pt-1 border-t border-line/60 text-[11.5px]">
+                      <span className="font-bold text-muted">Chu kỳ nhắc nhở:</span>
+                      <div className="flex items-center gap-1">
+                        {([45, 60, 90] as const).map((mins) => (
+                          <button
+                            key={mins}
+                            type="button"
+                            onClick={() => setSettings({ ...settings, posture_reminder_interval: mins })}
+                            className={`px-2 py-0.5 rounded-[7px] text-[11px] font-extrabold border transition-all cursor-pointer ${
+                              (settings.posture_reminder_interval || 60) === mins
+                                ? 'bg-teal-600 text-white border-teal-600 shadow-2xs'
+                                : 'bg-white dark:bg-slate-800 text-ink border-line hover:border-teal-400'
+                            }`}
+                          >
+                            {mins} phút
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

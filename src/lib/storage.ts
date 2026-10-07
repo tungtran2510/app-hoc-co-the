@@ -13,6 +13,10 @@ export interface AppCustomSettings {
   show_ebook_bridge?: boolean;
   ebook_app_url?: string;
   auto_offline_cache?: boolean;
+  offline_max_mb?: number;
+  data_saver_mode?: boolean;
+  posture_reminder_enabled?: boolean;
+  posture_reminder_interval?: number;
 }
 
 export const DEFAULT_APP_SETTINGS: AppCustomSettings = {
@@ -27,6 +31,10 @@ export const DEFAULT_APP_SETTINGS: AppCustomSettings = {
   show_ebook_bridge: true,
   ebook_app_url: 'https://qbiz-ebook.vercel.app',
   auto_offline_cache: true,
+  offline_max_mb: 60,
+  data_saver_mode: false,
+  posture_reminder_enabled: true,
+  posture_reminder_interval: 60,
 };
 
 /**

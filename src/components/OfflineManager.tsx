@@ -4,8 +4,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { WifiOff, CheckCircle2, Download, CloudOff } from 'lucide-react';
 import { getStoredAppSettings } from '../lib/storage';
 
-const MAX_SAFE_BYTES = 30 * 1024 * 1024; // 30 MB an toàn tuyệt đối
+const DEFAULT_MAX_SAFE_BYTES = 60 * 1024 * 1024; // 60 MB mặc định
 const TWO_MINUTES_MS = 120 * 1000; // Đúng 2 phút theo yêu cầu
+const CURRENT_SHELL_CACHE = 'qbiz-books-shell-v42';
+const CURRENT_STATIC_CACHE = 'qbiz-books-static-v42';
 
 export interface OfflineProgressData {
   status: 'idle' | 'downloading' | 'completed' | 'error';
@@ -67,6 +69,10 @@ export default function OfflineManager() {
 
     try {
       isDownloadingRef.current = true;
+      const settings = getStoredAppSettings();
+      const userMaxMb = settings.offline_max_mb && settings.offline_max_mb > 0 ? settings.offline_max_mb : 60;
+      const maxAllowedBytes = userMaxMb * 1024 * 1024;
+
       const initial: OfflineProgressData = {
         status: 'downloading',
         current: 0,
@@ -90,13 +96,13 @@ export default function OfflineManager() {
       let current = 0;
       let totalBytes = 0;
 
-      const cacheStorage = 'caches' in window ? await caches.open('qbiz-books-shell-v40') : null;
-      const staticCache = 'caches' in window ? await caches.open('qbiz-books-static-v40') : null;
+      const cacheStorage = 'caches' in window ? await caches.open(CURRENT_SHELL_CACHE) : null;
+      const staticCache = 'caches' in window ? await caches.open(CURRENT_STATIC_CACHE) : null;
 
       for (const url of allUrls) {
-        // Kiểm tra ngưỡng an toàn 30MB
-        if (totalBytes >= MAX_SAFE_BYTES) {
-          console.log(`[OfflineManager] Đã đạt ngưỡng an toàn 30MB (${(totalBytes / 1024 / 1024).toFixed(1)} MB). Dừng tải.`);
+        // Kiểm tra ngưỡng an toàn theo dung lượng người dùng đã cấu hình
+        if (totalBytes >= maxAllowedBytes) {
+          console.log(`[OfflineManager] Đã đạt ngưỡng an toàn ${userMaxMb}MB (${(totalBytes / 1024 / 1024).toFixed(1)} MB). Dừng tải.`);
           break;
         }
 
@@ -208,6 +214,40 @@ export default function OfflineManager() {
 
     window.addEventListener('qbiz_start_offline_download', handleManualTrigger);
     return () => window.removeEventListener('qbiz_start_offline_download', handleManualTrigger);
+  }, []);
+
+  // 5. Lắng nghe yêu cầu xóa sạch bộ nhớ đệm (Dọn dẹp cache)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleClearCache = async () => {
+      try {
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          for (const key of keys) {
+            await caches.delete(key);
+          }
+        }
+        localStorage.removeItem('qbiz_offline_cached_at');
+        localStorage.removeItem('qbiz_offline_cached_mb');
+        const resetData: OfflineProgressData = {
+          status: 'idle',
+          current: 0,
+          total: 0,
+          progress: 0,
+          downloadedBytes: 0,
+          bytesFormatted: '0 MB',
+          message: 'Đã dọn dẹp sạch bộ nhớ đệm!',
+        };
+        setDownloadProgress(resetData);
+        window.dispatchEvent(new CustomEvent('qbiz_offline_progress', { detail: resetData }));
+      } catch (err) {
+        console.warn('[OfflineManager] Lỗi dọn dẹp cache:', err);
+      }
+    };
+
+    window.addEventListener('qbiz_clear_offline_cache', handleClearCache);
+    return () => window.removeEventListener('qbiz_clear_offline_cache', handleClearCache);
   }, []);
 
   return (

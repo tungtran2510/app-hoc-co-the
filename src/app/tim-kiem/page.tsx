@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Search as SearchIcon, X, ArrowLeft, BookOpen, PlaySquare, Layers, ChevronRight } from 'lucide-react';
 import BottomNav from '../../components/BottomNav';
+import BodyMapNavigator from '../../components/BodyMapNavigator';
 
 export const dynamic = 'force-dynamic';
 
@@ -175,21 +176,26 @@ export default function SearchPage() {
           </div>
         ) : !cleanQuery ? (
           /* Gợi ý khi chưa gõ */
-          <div className="flex flex-col gap-2.5 py-3 px-1">
-            <h2 className="text-[12px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-purple-300/70">
-              Gợi ý tìm kiếm phổ biến
-            </h2>
-            <div className="flex flex-wrap gap-2">
-              {['Cột sống', 'Đĩa đệm', 'Thần kinh', 'Tư thế', 'Dây chằng', 'Dinh dưỡng'].map((tag) => (
-                <button
-                  key={tag}
-                  type="button"
-                  onClick={() => setQuery(tag)}
-                  className="h-8.5 px-3.5 rounded-full bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 text-[13px] font-bold text-slate-800 dark:text-purple-200 hover:border-purple-600 hover:text-purple-700 dark:hover:text-[#F8DF7B] dark:hover:border-[#F8DF7B] cursor-pointer shadow-2xs transition-all active:scale-95"
-                >
-                  {tag}
-                </button>
-              ))}
+          <div className="flex flex-col gap-4 py-1">
+            {/* Bản Đồ Cơ Thể 1 Chạm Trực Quan */}
+            <BodyMapNavigator onSelectKeyword={(kw) => setQuery(kw)} />
+
+            <div className="flex flex-col gap-2 px-1">
+              <h2 className="text-[12px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-purple-300/70">
+                Từ khóa tìm kiếm nhanh
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {['Cột sống', 'Đĩa đệm', 'Thần kinh', 'Tư thế', 'Dây chằng', 'Dinh dưỡng'].map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => setQuery(tag)}
+                    className="h-8.5 px-3.5 rounded-full bg-white dark:bg-[#160D30] border border-slate-200 dark:border-purple-800/40 text-[13px] font-bold text-slate-800 dark:text-purple-200 hover:border-purple-600 hover:text-purple-700 dark:hover:text-[#F8DF7B] dark:hover:border-[#F8DF7B] cursor-pointer shadow-2xs transition-all active:scale-95"
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         ) : totalResults === 0 ? (

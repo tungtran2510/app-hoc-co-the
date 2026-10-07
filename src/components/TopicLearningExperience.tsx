@@ -13,6 +13,7 @@ import EditBlockModal from './admin/EditBlockModal';
 import VideoLessonLink from './VideoLessonLink';
 import { playTapSound } from '../lib/audioFeedback';
 import TopicHandbookModal from './TopicHandbookModal';
+import AchievementBadgeCard from './AchievementBadgeCard';
 
 interface TopicPageItem { page: Page; orderNumber: number; videoCount: number }
 interface TopicFaqVideo { video: Video; index: number; pageSlug: string; pageId?: string; pageTitle?: string }
@@ -218,6 +219,14 @@ export default function TopicLearningExperience({
           </Link>
         </div>
       </section>
+
+      {/* Thẻ Huy Hiệu Hoàn Thành Chuyên Đề */}
+      <AchievementBadgeCard
+        topicTitle={topic.title}
+        topicSlug={topic.slug}
+        progress={progress}
+        totalLessons={visiblePages.length}
+      />
 
       
 

@@ -37,6 +37,7 @@ import AddBlockDrawer from './admin/AddBlockDrawer';
 import EditPageModal from './admin/EditPageModal';
 import AdminSettingsModal from './admin/AdminSettingsModal';
 import MedicalDocumentsTab from './MedicalDocumentsTab';
+import LessonFlashcards from './LessonFlashcards';
 import dynamic from 'next/dynamic';
 const FlipbookViewer = dynamic(() => import('./FlipbookViewer'), {
   ssr: false,
@@ -1217,6 +1218,9 @@ export default function ContentViewer({
           </button>
         </div>
       )}
+
+      {/* 6.3. Khối Thẻ Ôn Tập 1 Chạm (Spaced Repetition / Flashcards) */}
+      <LessonFlashcards topicSlug={topic.slug} pageTitle={currentPage.title} />
 
       {/* 6.5. Thẻ Cầu Nối Sách Chuyên Sâu (Smart Ebook Companion - Chuẩn 1 Dòng Mobile-First) */}
       {(appCustomSettings.show_ebook_bridge ?? true) && (
