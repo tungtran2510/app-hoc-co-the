@@ -2,7 +2,7 @@ const { chromium } = require('playwright');
 const path = require('path');
 
 const ARTIFACT_DIR = 'C:\\Users\\Admin\\.gemini\\antigravity\\brain\\23366f77-380f-4e19-b36c-a5afcfb63db3';
-const TARGET_BASE = process.env.TEST_URL || 'http://localhost:3008';
+const TARGET_BASE = process.env.TEST_URL || 'https://app-hoc-co-the.vercel.app';
 
 (async () => {
   console.log('================================================================');
