@@ -19,7 +19,41 @@ import {
   Activity,
   CloudDownload,
   Compass,
+  Plus,
+  Minus,
 } from 'lucide-react';
+
+function ToggleSwitch({
+  checked,
+  onChange,
+  activeColor = 'bg-[#0E2A5C]',
+}: {
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  activeColor?: string;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={(e) => {
+        e.stopPropagation();
+        onChange(!checked);
+      }}
+      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+        checked ? activeColor : 'bg-slate-300 dark:bg-slate-700'
+      }`}
+    >
+      <span
+        aria-hidden="true"
+        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+          checked ? 'translate-x-5' : 'translate-x-0'
+        }`}
+      />
+    </button>
+  );
+}
 import {
   getStoredAppSettings,
   saveStoredAppSettings,
@@ -120,6 +154,18 @@ export default function AdminSettingsModal({
   const [activeTab, setActiveTab] = useState<'chung' | 'trai_nghiem' | 'du_lieu' | 'giang_vien' | 'khach_hang'>('chung');
   const [isSuper, setIsSuper] = useState(false);
   const [selectedRoadmapArea, setSelectedRoadmapArea] = useState<'neck' | 'lumbar' | 'water'>('neck');
+
+  // Trạng thái mở rộng tấm chi tiết (Accordion)
+  const [expandedSections, setExpandedSections] = useState<{
+    roadmap?: boolean;
+    ebook?: boolean;
+    offline?: boolean;
+    reminder?: boolean;
+  }>({});
+
+  const toggleExpand = (key: 'roadmap' | 'ebook' | 'offline' | 'reminder') => {
+    setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   // Cài đặt chung
   const [settings, setSettings] = useState<AppCustomSettings>(getStoredAppSettings());
@@ -589,60 +635,72 @@ export default function AdminSettingsModal({
                 </div>
               </div>
 
-              {/* Nhóm tùy chọn hiển thị & trải nghiệm - Tinh gọn, chuẩn Apple iOS card */}
+              {/* Nhóm tùy chọn hiển thị & trải nghiệm - Tinh gọn, chuẩn Apple iOS card dạng tấm mở rộng */}
               <div className="flex flex-col rounded-[15px] bg-surface-2 border border-line divide-y divide-line/70 overflow-hidden">
                 {/* 1. Tự động chuyển video */}
-                <label className="flex items-center justify-between p-3 hover:bg-surface/50 transition-colors cursor-pointer">
-                  <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between p-3 hover:bg-surface/50 transition-colors">
+                  <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
                     <PlayCircle size={15} className="text-primary shrink-0" />
-                    <span className="text-[13px] font-bold text-ink">
+                    <span className="text-[13px] font-bold text-ink truncate">
                       Tự động phát video kế tiếp
                     </span>
                   </div>
-                  <input
-                    type="checkbox"
+                  <ToggleSwitch
                     checked={settings.auto_next_video}
-                    onChange={(e) => setSettings({ ...settings, auto_next_video: e.target.checked })}
-                    className="w-4.5 h-4.5 accent-primary rounded cursor-pointer"
+                    onChange={(val) => setSettings({ ...settings, auto_next_video: val })}
+                    activeColor="bg-primary"
                   />
-                </label>
+                </div>
 
                 {/* 2. Thanh tiến độ học tập */}
-                <label className="flex items-center justify-between p-3 hover:bg-surface/50 transition-colors cursor-pointer">
-                  <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between p-3 hover:bg-surface/50 transition-colors">
+                  <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
                     <Activity size={15} className="text-primary shrink-0" />
-                    <span className="text-[13px] font-bold text-ink">
+                    <span className="text-[13px] font-bold text-ink truncate">
                       Hiện thanh tiến độ học tập (%)
                     </span>
                   </div>
-                  <input
-                    type="checkbox"
+                  <ToggleSwitch
                     checked={settings.show_progress_bar}
-                    onChange={(e) => setSettings({ ...settings, show_progress_bar: e.target.checked })}
-                    className="w-4.5 h-4.5 accent-primary rounded cursor-pointer"
+                    onChange={(val) => setSettings({ ...settings, show_progress_bar: val })}
+                    activeColor="bg-primary"
                   />
-                </label>
+                </div>
 
-                {/* 3. Cầu nối đọc sách (Ebook) */}
+                {/* 3. Cầu nối đọc sách (Ebook) - Dạng tấm Accordion */}
                 <div className="flex flex-col p-3 hover:bg-surface/50 transition-colors">
-                  <label className="flex items-center justify-between cursor-pointer">
-                    <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
                       <BookOpen size={15} className="text-emerald-600 shrink-0" />
-                      <span className="text-[13px] font-bold text-ink">
+                      <span className="text-[13px] font-bold text-ink truncate">
                         Cầu nối đọc sách (Ebook)
                       </span>
                     </div>
-                    <input
-                      type="checkbox"
-                      checked={settings.show_ebook_bridge ?? true}
-                      onChange={(e) => setSettings({ ...settings, show_ebook_bridge: e.target.checked })}
-                      className="w-4.5 h-4.5 accent-emerald-600 rounded cursor-pointer"
-                    />
-                  </label>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <ToggleSwitch
+                        checked={settings.show_ebook_bridge ?? true}
+                        onChange={(val) => setSettings({ ...settings, show_ebook_bridge: val })}
+                        activeColor="bg-emerald-600"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => toggleExpand('ebook')}
+                        className={`w-7 h-7 rounded-[8px] flex items-center justify-center font-bold transition-all cursor-pointer shrink-0 ${
+                          expandedSections.ebook
+                            ? 'bg-emerald-600 text-white shadow-2xs'
+                            : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                        }`}
+                        title={expandedSections.ebook ? 'Thu gọn' : 'Mở rộng cài đặt'}
+                        aria-label="Mở rộng cài đặt Ebook"
+                      >
+                        {expandedSections.ebook ? <Minus size={14} strokeWidth={2.5} /> : <Plus size={14} strokeWidth={2.5} />}
+                      </button>
+                    </div>
+                  </div>
 
-                  {/* Địa chỉ URL Ebook (tinh gọn, lồng liền mạch khi bật) */}
-                  {(settings.show_ebook_bridge ?? true) && (
-                    <div className="mt-2.5 pt-2 border-t border-line/60 flex items-center gap-2">
+                  {/* Tấm con mở rộng: Địa chỉ URL Ebook (chỉ hiện khi ấn dấu +) */}
+                  {expandedSections.ebook && (
+                    <div className="mt-2.5 pt-2.5 border-t border-line/60 flex items-center gap-2 animate-in fade-in duration-150">
                       <span className="text-[11px] font-bold text-muted shrink-0">URL App:</span>
                       <input
                         type="text"
@@ -655,129 +713,162 @@ export default function AdminSettingsModal({
                   )}
                 </div>
 
-                {/* 4. Quản trị Bộ nhớ & Tự động tải Offline */}
-                <div className="flex flex-col p-3 hover:bg-surface/50 transition-colors gap-2.5">
-                  <label className="flex items-center justify-between cursor-pointer">
-                    <div className="flex items-center gap-2">
+                {/* 4. Quản trị Bộ nhớ & Tự động tải Offline - Dạng tấm Accordion */}
+                <div className="flex flex-col p-3 hover:bg-surface/50 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
                       <CloudDownload size={15} className="text-blue-600 shrink-0" />
-                      <span className="text-[13px] font-bold text-ink">
-                        Tự động tải Offline (sau 2 phút)
+                      <span className="text-[13px] font-bold text-ink truncate">
+                        Tự động tải Offline (sau 2p)
                       </span>
                     </div>
-                    <input
-                      type="checkbox"
-                      checked={settings.auto_offline_cache ?? true}
-                      onChange={(e) => setSettings({ ...settings, auto_offline_cache: e.target.checked })}
-                      className="w-4.5 h-4.5 accent-blue-600 rounded cursor-pointer"
-                    />
-                  </label>
-
-                  {/* Tùy chọn giới hạn dung lượng tải về */}
-                  <div className="flex items-center justify-between pt-1 text-[11.5px]">
-                    <span className="font-bold text-muted">Hạn mức tải tối đa:</span>
-                    <div className="flex items-center gap-1">
-                      {([30, 60, 100, 200] as const).map((mb) => (
-                        <button
-                          key={mb}
-                          type="button"
-                          onClick={() => setSettings({ ...settings, offline_max_mb: mb })}
-                          className={`px-2 py-0.5 rounded-[7px] text-[11px] font-extrabold border transition-all cursor-pointer ${
-                            (settings.offline_max_mb || 60) === mb
-                              ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
-                              : 'bg-white dark:bg-slate-800 text-ink border-line hover:border-blue-400'
-                          }`}
-                        >
-                          {mb}MB
-                        </button>
-                      ))}
+                    <div className="flex items-center gap-2 shrink-0">
+                      <ToggleSwitch
+                        checked={settings.auto_offline_cache ?? true}
+                        onChange={(val) => setSettings({ ...settings, auto_offline_cache: val })}
+                        activeColor="bg-blue-600"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => toggleExpand('offline')}
+                        className={`w-7 h-7 rounded-[8px] flex items-center justify-center font-bold transition-all cursor-pointer shrink-0 ${
+                          expandedSections.offline
+                            ? 'bg-blue-600 text-white shadow-2xs'
+                            : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                        }`}
+                        title={expandedSections.offline ? 'Thu gọn' : 'Mở rộng cài đặt'}
+                        aria-label="Mở rộng cài đặt bộ nhớ Offline"
+                      >
+                        {expandedSections.offline ? <Minus size={14} strokeWidth={2.5} /> : <Plus size={14} strokeWidth={2.5} />}
+                      </button>
                     </div>
                   </div>
 
-                  {/* Nút chủ động tải ngay 1-chạm & Nút Dọn dẹp cache */}
-                  <div className="pt-2 border-t border-line/60 flex items-center justify-between gap-2">
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-[11px] font-extrabold text-ink truncate">
-                        {offlineStatus.status === 'downloading'
-                          ? `Đang tải: ${offlineStatus.progress}% (${offlineStatus.bytesFormatted})`
-                          : offlineStatus.status === 'completed'
-                          ? `✓ Đã lưu (${offlineStatus.bytesFormatted || '14.8 MB'})`
-                          : offlineLastMb
-                          ? `Đã lưu: ${offlineLastMb} MB`
-                          : `Đã sẵn sàng · Tối đa ${settings.offline_max_mb || 60}MB`}
-                      </span>
-                      {offlineStatus.status === 'downloading' && (
-                        <div className="w-full max-w-[130px] h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-1">
-                          <div
-                            className="h-full bg-blue-600 transition-all duration-200"
-                            style={{ width: `${offlineStatus.progress}%` }}
-                          />
+                  {/* Tấm con mở rộng: Hạn mức MB & Nút tải ngay/dọn dẹp (chỉ hiện khi ấn dấu +) */}
+                  {expandedSections.offline && (
+                    <div className="mt-2.5 pt-2.5 border-t border-line/60 flex flex-col gap-2.5 animate-in fade-in duration-150">
+                      {/* Tùy chọn giới hạn dung lượng tải về */}
+                      <div className="flex items-center justify-between text-[11.5px]">
+                        <span className="font-bold text-muted">Hạn mức tải tối đa:</span>
+                        <div className="flex items-center gap-1">
+                          {([30, 60, 100, 200] as const).map((mb) => (
+                            <button
+                              key={mb}
+                              type="button"
+                              onClick={() => setSettings({ ...settings, offline_max_mb: mb })}
+                              className={`px-2 py-0.5 rounded-[7px] text-[11px] font-extrabold border transition-all cursor-pointer ${
+                                (settings.offline_max_mb || 60) === mb
+                                  ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
+                                  : 'bg-white dark:bg-slate-800 text-ink border-line hover:border-blue-400'
+                              }`}
+                            >
+                              {mb}MB
+                            </button>
+                          ))}
                         </div>
-                      )}
-                    </div>
+                      </div>
 
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          window.dispatchEvent(new CustomEvent('qbiz_clear_offline_cache'));
-                          setOfflineLastMb('');
-                        }}
-                        className="h-7 px-2 rounded-[8px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-line text-[11px] font-bold hover:bg-slate-200 cursor-pointer shadow-2xs"
-                        title="Dọn dẹp giải phóng bộ nhớ đệm"
-                      >
-                        Dọn dẹp
-                      </button>
+                      {/* Nút chủ động tải ngay 1-chạm & Nút Dọn dẹp cache */}
+                      <div className="pt-2 border-t border-line/60 flex items-center justify-between gap-2">
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-[11px] font-extrabold text-ink truncate">
+                            {offlineStatus.status === 'downloading'
+                              ? `Đang tải: ${offlineStatus.progress}% (${offlineStatus.bytesFormatted})`
+                              : offlineStatus.status === 'completed'
+                              ? `✓ Đã lưu (${offlineStatus.bytesFormatted || '14.8 MB'})`
+                              : offlineLastMb
+                              ? `Đã lưu: ${offlineLastMb} MB`
+                              : `Đã sẵn sàng · Tối đa ${settings.offline_max_mb || 60}MB`}
+                          </span>
+                          {offlineStatus.status === 'downloading' && (
+                            <div className="w-full max-w-[130px] h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-1">
+                              <div
+                                className="h-full bg-blue-600 transition-all duration-200"
+                                style={{ width: `${offlineStatus.progress}%` }}
+                              />
+                            </div>
+                          )}
+                        </div>
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          window.dispatchEvent(new CustomEvent('qbiz_start_offline_download'));
-                        }}
-                        disabled={offlineStatus.status === 'downloading'}
-                        className="h-7 px-2.5 rounded-[8px] bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-[11px] font-extrabold flex items-center gap-1 hover:bg-blue-100 cursor-pointer shadow-2xs disabled:opacity-50"
-                      >
-                        <Download size={11} strokeWidth={2.5} />
-                        <span>{offlineStatus.status === 'downloading' ? 'Đang tải...' : 'Tải ngay'}</span>
-                      </button>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              window.dispatchEvent(new CustomEvent('qbiz_clear_offline_cache'));
+                              setOfflineLastMb('');
+                            }}
+                            className="h-7 px-2 rounded-[8px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-line text-[11px] font-bold hover:bg-slate-200 cursor-pointer shadow-2xs"
+                            title="Dọn dẹp giải phóng bộ nhớ đệm"
+                          >
+                            Dọn dẹp
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              window.dispatchEvent(new CustomEvent('qbiz_start_offline_download'));
+                            }}
+                            disabled={offlineStatus.status === 'downloading'}
+                            className="h-7 px-2.5 rounded-[8px] bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-[11px] font-extrabold flex items-center gap-1 hover:bg-blue-100 cursor-pointer shadow-2xs disabled:opacity-50"
+                          >
+                            <Download size={11} strokeWidth={2.5} />
+                            <span>{offlineStatus.status === 'downloading' ? 'Đang tải...' : 'Tải ngay'}</span>
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* 5. Chế độ Tiết kiệm dữ liệu di động (Data Saver) */}
-                <label className="flex items-center justify-between p-3 hover:bg-surface/50 transition-colors cursor-pointer">
-                  <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between p-3 hover:bg-surface/50 transition-colors">
+                  <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
                     <Activity size={15} className="text-amber-600 shrink-0" />
-                    <span className="text-[13px] font-bold text-ink">
+                    <span className="text-[13px] font-bold text-ink truncate">
                       Tiết kiệm dữ liệu di động (4G/5G)
                     </span>
                   </div>
-                  <input
-                    type="checkbox"
+                  <ToggleSwitch
                     checked={settings.data_saver_mode ?? false}
-                    onChange={(e) => setSettings({ ...settings, data_saver_mode: e.target.checked })}
-                    className="w-4.5 h-4.5 accent-amber-600 rounded cursor-pointer"
+                    onChange={(val) => setSettings({ ...settings, data_saver_mode: val })}
+                    activeColor="bg-amber-600"
                   />
-                </label>
+                </div>
 
-                {/* 6. Nhắc nhở chỉnh tư thế & Uống nước thông minh */}
-                <div className="flex flex-col p-3 hover:bg-surface/50 transition-colors gap-2">
-                  <label className="flex items-center justify-between cursor-pointer">
-                    <div className="flex items-center gap-2">
+                {/* 6. Nhắc nhở chỉnh tư thế & Uống nước thông minh - Dạng tấm Accordion */}
+                <div className="flex flex-col p-3 hover:bg-surface/50 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
                       <Sparkles size={15} className="text-teal-600 shrink-0" />
-                      <span className="text-[13px] font-bold text-ink">
-                        Nhắc nhở chỉnh tư thế & Uống nước
+                      <span className="text-[13px] font-bold text-ink truncate">
+                        Nhắc nhở tư thế & Nước
                       </span>
                     </div>
-                    <input
-                      type="checkbox"
-                      checked={settings.posture_reminder_enabled ?? true}
-                      onChange={(e) => setSettings({ ...settings, posture_reminder_enabled: e.target.checked })}
-                      className="w-4.5 h-4.5 accent-teal-600 rounded cursor-pointer"
-                    />
-                  </label>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <ToggleSwitch
+                        checked={settings.posture_reminder_enabled ?? true}
+                        onChange={(val) => setSettings({ ...settings, posture_reminder_enabled: val })}
+                        activeColor="bg-teal-600"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => toggleExpand('reminder')}
+                        className={`w-7 h-7 rounded-[8px] flex items-center justify-center font-bold transition-all cursor-pointer shrink-0 ${
+                          expandedSections.reminder
+                            ? 'bg-teal-600 text-white shadow-2xs'
+                            : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                        }`}
+                        title={expandedSections.reminder ? 'Thu gọn' : 'Mở rộng cài đặt'}
+                        aria-label="Mở rộng cài đặt nhắc nhở"
+                      >
+                        {expandedSections.reminder ? <Minus size={14} strokeWidth={2.5} /> : <Plus size={14} strokeWidth={2.5} />}
+                      </button>
+                    </div>
+                  </div>
 
-                  {(settings.posture_reminder_enabled ?? true) && (
-                    <div className="flex items-center justify-between pt-1 border-t border-line/60 text-[11.5px]">
+                  {/* Tấm con mở rộng: Chọn chu kỳ 45/60/90 phút (chỉ hiện khi ấn dấu +) */}
+                  {expandedSections.reminder && (
+                    <div className="mt-2.5 pt-2.5 border-t border-line/60 flex items-center justify-between text-[11.5px] animate-in fade-in duration-150">
                       <span className="font-bold text-muted">Chu kỳ nhắc nhở:</span>
                       <div className="flex items-center gap-1">
                         {([45, 60, 90] as const).map((mins) => (
@@ -799,36 +890,49 @@ export default function AdminSettingsModal({
                   )}
                 </div>
 
-                {/* 7. Lộ trình cá nhân hóa (Tùy chỉnh 3 bài định hướng) */}
-                <div className="flex flex-col p-3 hover:bg-surface/50 transition-colors gap-2.5">
-                  <label className="flex items-center justify-between cursor-pointer">
-                    <div className="flex items-center gap-2">
+                {/* 7. Lộ trình cá nhân hóa (Tùy chỉnh 3 bài định hướng) - Dạng tấm Accordion */}
+                <div className="flex flex-col p-3 hover:bg-surface/50 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 min-w-0 flex-1 mr-2">
                       <Compass size={15} className="text-[#0E2A5C] dark:text-blue-400 shrink-0" />
-                      <span className="text-[13px] font-bold text-ink">
+                      <span className="text-[13px] font-bold text-ink truncate">
                         Lộ trình cá nhân hóa
                       </span>
-                      <span className="text-[9.5px] font-black uppercase tracking-wider text-[#0E2A5C] bg-[#0E2A5C]/10 border border-[#0E2A5C]/20 dark:text-blue-300 dark:bg-blue-950/60 dark:border-blue-800 px-1.5 py-0.2 rounded-md">
+                      <span className="text-[9px] font-black uppercase tracking-wider text-[#0E2A5C] bg-[#0E2A5C]/10 border border-[#0E2A5C]/20 dark:text-blue-300 dark:bg-blue-950/60 dark:border-blue-800 px-1 py-0.2 rounded shrink-0">
                         Demo
                       </span>
                     </div>
-                    <input
-                      type="checkbox"
-                      checked={settings.enable_personalized_roadmap ?? true}
-                      onChange={(e) => {
-                        const enabled = e.target.checked;
-                        setSettings({ ...settings, enable_personalized_roadmap: enabled });
-                        try {
-                          localStorage.setItem('qbiz_enable_personalized_roadmap', String(enabled));
-                          window.dispatchEvent(new CustomEvent('qbiz_roadmap_setting_changed', { detail: { enabled } }));
-                        } catch {}
-                      }}
-                      className="w-4.5 h-4.5 accent-[#0E2A5C] rounded cursor-pointer"
-                    />
-                  </label>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <ToggleSwitch
+                        checked={settings.enable_personalized_roadmap ?? true}
+                        onChange={(enabled) => {
+                          setSettings({ ...settings, enable_personalized_roadmap: enabled });
+                          try {
+                            localStorage.setItem('qbiz_enable_personalized_roadmap', String(enabled));
+                            window.dispatchEvent(new CustomEvent('qbiz_roadmap_setting_changed', { detail: { enabled } }));
+                          } catch {}
+                        }}
+                        activeColor="bg-[#0E2A5C]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => toggleExpand('roadmap')}
+                        className={`w-7 h-7 rounded-[8px] flex items-center justify-center font-bold transition-all cursor-pointer shrink-0 ${
+                          expandedSections.roadmap
+                            ? 'bg-[#0E2A5C] text-white shadow-2xs'
+                            : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                        }`}
+                        title={expandedSections.roadmap ? 'Thu gọn' : 'Mở rộng cài đặt'}
+                        aria-label="Mở rộng cài đặt lộ trình cá nhân hóa"
+                      >
+                        {expandedSections.roadmap ? <Minus size={14} strokeWidth={2.5} /> : <Plus size={14} strokeWidth={2.5} />}
+                      </button>
+                    </div>
+                  </div>
 
-                  {/* Bảng tùy chỉnh 3 bài học cho từng vùng khi bật */}
-                  {(settings.enable_personalized_roadmap ?? true) && (
-                    <div className="mt-1 pt-2.5 border-t border-line/60 flex flex-col gap-2.5">
+                  {/* Tấm con mở rộng: Bảng tùy chỉnh 3 bài học cho từng vùng khi ấn dấu + */}
+                  {expandedSections.roadmap && (
+                    <div className="mt-2.5 pt-2.5 border-t border-line/60 flex flex-col gap-2.5 animate-in fade-in duration-150">
                       {/* Bộ chọn 3 vùng cơ thể */}
                       <div className="flex items-center justify-between gap-1">
                         <span className="text-[11px] font-bold text-muted shrink-0">Chọn vùng:</span>
@@ -948,52 +1052,48 @@ export default function AdminSettingsModal({
                 </div>
 
                 {/* 8. Nút Hỏi Tùng Dinh Dưỡng qua Zalo (ở cuối bài học) */}
-                <label className="flex items-center justify-between p-3 hover:bg-surface/50 transition-colors cursor-pointer">
-                  <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between p-3 hover:bg-surface/50 transition-colors">
+                  <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
                     <div className="w-4 h-4 rounded bg-[#0068FF] text-white flex items-center justify-center font-black text-[9px] shrink-0">
                       Z
                     </div>
-                    <span className="text-[13px] font-bold text-ink">
+                    <span className="text-[13px] font-bold text-ink truncate">
                       Nút "Hỏi Tùng Dinh Dưỡng qua Zalo" (cuối bài)
                     </span>
                   </div>
-                  <input
-                    type="checkbox"
+                  <ToggleSwitch
                     checked={settings.show_zalo_ask_card ?? true}
-                    onChange={(e) => {
-                      const enabled = e.target.checked;
+                    onChange={(enabled) => {
                       setSettings({ ...settings, show_zalo_ask_card: enabled });
                       try {
                         localStorage.setItem('qbiz_show_zalo_ask_card', String(enabled));
                         window.dispatchEvent(new CustomEvent('qbiz_show_zalo_changed', { detail: { enabled } }));
                       } catch {}
                     }}
-                    className="w-4.5 h-4.5 accent-[#0068FF] rounded cursor-pointer"
+                    activeColor="bg-[#0068FF]"
                   />
-                </label>
+                </div>
 
                 {/* 9. Thẻ Ôn tập 1 chạm Flashcards (ở cuối bài học) */}
-                <label className="flex items-center justify-between p-3 hover:bg-surface/50 transition-colors cursor-pointer">
-                  <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between p-3 hover:bg-surface/50 transition-colors">
+                  <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
                     <Sparkles size={15} className="text-amber-500 shrink-0" />
-                    <span className="text-[13px] font-bold text-ink">
+                    <span className="text-[13px] font-bold text-ink truncate">
                       Thẻ "Ôn tập 1 chạm Flashcards" (cuối bài)
                     </span>
                   </div>
-                  <input
-                    type="checkbox"
+                  <ToggleSwitch
                     checked={settings.show_lesson_flashcards ?? true}
-                    onChange={(e) => {
-                      const enabled = e.target.checked;
+                    onChange={(enabled) => {
                       setSettings({ ...settings, show_lesson_flashcards: enabled });
                       try {
                         localStorage.setItem('qbiz_show_lesson_flashcards', String(enabled));
                         window.dispatchEvent(new CustomEvent('qbiz_show_flashcards_changed', { detail: { enabled } }));
                       } catch {}
                     }}
-                    className="w-4.5 h-4.5 accent-amber-500 rounded cursor-pointer"
+                    activeColor="bg-amber-500"
                   />
-                </label>
+                </div>
               </div>
             </div>
           )}
