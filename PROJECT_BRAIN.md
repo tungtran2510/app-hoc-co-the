@@ -128,3 +128,21 @@ Hệ thống hỗ trợ đầy đủ **10 khối nội dung chuẩn**:
 1. **5 Tiêu chí bắt buộc:** 1. Thông minh · 2. Tinh gọn · 3. Tinh tế · 4. Chuyên nghiệp · 5. Hiện đại.
 2. **Quy tắc 1 dòng (Trị dứt điểm rớt dòng):** Không bao giờ làm bố cục vụng về, rải rác. Mọi thông số (số bài, số video, thời lượng), nhãn nút, tiêu đề phụ nếu gom được trên 1 dòng phải tối ưu hoàn toàn trên 1 dòng. Triệt tiêu dứt điểm lỗi rớt lại 1 chữ (orphan word) xuống dòng tiếp theo.
 3. **Vị trí Cẩm nang & Mã QR:** Cẩm nang tải PDF / in ấn luôn đặt ở CUỐI trang lộ trình (dưới danh sách bài học), không bao giờ đặt ở trên đầu gây rối mắt và đẩy bài học xuống.
+
+---
+
+## 9. HỆ THỐNG 2 BẢNG MÀU GIAO DIỆN (THEME PALETTES) & TÙY CHỌN TRONG CÀI ĐẶT
+1. **Tông 1: Chàm Y Khoa (Mặc định - `indigo`):**
+   - Giữ nguyên 100% chuẩn mực y khoa thanh lịch, dịu mắt, sắc thái y tế truyền thống.
+   - Primary: `#1E3A8A` / `#2563EB`.
+2. **Tông 2: Xanh Navy Sang Trọng (`navy_luxury`):**
+   - Thiết kế theo chuẩn kỹ thuật & công nghiệp cao cấp từ mẫu thực tế của người dùng:
+     - Primary: `#0E2A5C` (Xanh Navy đậm sang trọng).
+     - Điểm nhấn Cyan / Blue Electric: `#0284C7` / `#38BDF8`.
+     - Thẻ trắng viền mảnh lịch lãm: `#D3DFEE`.
+     - Chế độ đêm Night Navy: Nền `#061021`, thẻ `#0B1C38`, viền `#18335D`, chữ `#F8FAFC`.
+3. **Bộ chọn bảng màu đa điểm:**
+   - Trong **Cài đặt quản trị** (`AdminSettingsModal.tsx`) tab "Giao diện": thẻ chọn trực quan có vòng màu mẫu và mô tả.
+   - Trong **Menu Tùy chọn ⋮ bài học** (`PageHeaderBar.tsx`): 2 nút chọn nhanh chuyển đổi 0ms.
+   - Lưu trữ bền vững tại `localStorage` (`qbiz_theme_palette`) và đồng bộ Supabase `settings.block_styles.theme_palette`.
+
