@@ -30,6 +30,7 @@ interface PageHeaderBarProps {
   onThemeChange?: (mode: ThemeModeOption) => void;
   onOpenPhoneSync?: () => void;
   onSelectTocItem?: (blockId: string) => void;
+  onOpen3DModal?: () => void;
 }
 
 export default function PageHeaderBar({
@@ -48,6 +49,7 @@ export default function PageHeaderBar({
   onThemeChange,
   onOpenPhoneSync,
   onSelectTocItem,
+  onOpen3DModal,
 }: PageHeaderBarProps) {
   const pathname = usePathname();
   const [showToc, setShowToc] = useState(false);
@@ -241,8 +243,24 @@ export default function PageHeaderBar({
           </Link>
         </div>
 
-        {/* 2. Nút Lưu + Nút Tuỳ chọn (Gọn gàng, thích ứng nền sáng / tối) */}
+        {/* 2. Nút 3D + Nút Lưu + Nút Tuỳ chọn (Gọn gàng trên cùng 1 hàng chuẩn mobile) */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {onOpen3DModal && (
+            <button
+              type="button"
+              onClick={() => {
+                playTapSound();
+                onOpen3DModal();
+              }}
+              className="flex items-center gap-1 h-[42px] px-2.5 sm:px-3 rounded-[13px] bg-blue-50 hover:bg-blue-100 dark:bg-purple-900/50 dark:hover:bg-purple-900/80 text-[#1E3A8A] dark:text-[#F8DF7B] border-[1.5px] border-blue-200 dark:border-purple-800/80 text-[12px] font-black shadow-2xs transition-all active:scale-95 cursor-pointer"
+              title="Khám phá mô hình giải phẫu 3D tương tác"
+              aria-label="Mở mô hình 3D"
+            >
+              <span className="text-[13px]">🦴</span>
+              <span>3D</span>
+            </button>
+          )}
+
           {/* Nút Lưu bài học */}
           <button
             type="button"

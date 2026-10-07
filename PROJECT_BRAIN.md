@@ -123,3 +123,8 @@ Hệ thống hỗ trợ đầy đủ **10 khối nội dung chuẩn**:
 ### B. QUY TẮC BẤT KHẢ XÂM PHẠM (MANDATORY SUPREME RULE):
 - **Bắt buộc gửi ảnh trực tiếp vào chat:** Sau BẤT KỂ một thao tác, tính năng, sửa lỗi, căn chỉnh nút bấm hay văn bản nào: Agent BẮT BUỘC phải dùng trình duyệt thật (Playwright mobile viewport 390x844) chụp ảnh màn hình giao diện thực tế và **GỬI TRỰC TIẾP HÌNH ẢNH ĐÓ VÀO ĐOẠN CHAT** để người dùng nghiệm thu bằng mắt thường. Tuyệt đối **CẤM báo cáo chay bằng chữ hay chỉ đưa tên file**.
 - **Chuẩn tinh gọn trên điện thoại (Mobile-First):** Hoàn thiện mỗi tính năng là phải chuẩn tinh gọn trên màn hình điện thoại, **CẤM TUYỆT ĐỐI các dòng thừa**, chữ vụn vặt, khoảng hở cồng kềnh làm rối mắt.
+
+### C. NGUYÊN TẮC BỐ CỤC MOBILE-FIRST ƯU TIÊN SỐ 1 (5 TIÊU CHÍ & QUY TẮC 1 DÒNG):
+1. **5 Tiêu chí bắt buộc:** 1. Thông minh · 2. Tinh gọn · 3. Tinh tế · 4. Chuyên nghiệp · 5. Hiện đại.
+2. **Quy tắc 1 dòng (Trị dứt điểm rớt dòng):** Không bao giờ làm bố cục vụng về, rải rác. Mọi thông số (số bài, số video, thời lượng), nhãn nút, tiêu đề phụ nếu gom được trên 1 dòng phải tối ưu hoàn toàn trên 1 dòng. Triệt tiêu dứt điểm lỗi rớt lại 1 chữ (orphan word) xuống dòng tiếp theo.
+3. **Vị trí Cẩm nang & Mã QR:** Cẩm nang tải PDF / in ấn luôn đặt ở CUỐI trang lộ trình (dưới danh sách bài học), không bao giờ đặt ở trên đầu gây rối mắt và đẩy bài học xuống.

@@ -1128,51 +1128,32 @@ export default function ContentViewer({
       {/* 3. Phần đầu bài viết: Badge BÀI 01 / 04 + Tiêu đề lớn (Không lặp lại tên chủ đề) */}
       <div className="flex flex-col gap-2 sm:gap-2.5" style={{ zoom: fontSizeMode === 'small' ? 0.9 : fontSizeMode === 'large' ? 1.15 : 1 } as React.CSSProperties}>
       <section className="flex flex-col gap-1 mt-0">
-        <div className="flex items-center justify-end gap-2 flex-wrap sm:flex-nowrap">
-
-          <div className="flex items-center gap-2 shrink-0">
-            {/* Nút Xem Mô hình 3D Giải phẫu */}
+        {isAdmin && (
+          <div className="flex items-center justify-end gap-1.5 mb-0.5">
             <button
               type="button"
-              onClick={() => {
-                playTapSound();
-                setShow3DModal(true);
-              }}
-              className="flex items-center gap-1 h-7 px-2.5 rounded-full bg-blue-50 hover:bg-blue-100 dark:bg-purple-950/60 dark:hover:bg-purple-900/60 text-[#1E3A8A] dark:text-[#F8DF7B] border border-blue-200 dark:border-purple-800/80 text-[11.5px] font-bold shadow-2xs transition-all active:scale-95 cursor-pointer"
-              title="Khám phá mô hình giải phẫu 3D tương tác"
+              onClick={() => setShowEditPageModal(true)}
+              className="flex items-center gap-1 h-6 px-2 rounded-[7px] bg-white border border-line text-ink font-bold text-[11px] hover:border-primary shadow-2xs"
+              title="Sửa tên bài & tóm tắt"
             >
-              <span>🦴</span>
-              <span>Mô hình 3D</span>
+              <Edit2 size={11} className="text-primary" />
+              <span>Sửa</span>
             </button>
 
-            {isAdmin && (
-              <div className="flex items-center gap-1.5 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setShowEditPageModal(true)}
-                  className="flex items-center gap-1 h-7 px-2 rounded-[8px] bg-white border border-line text-ink font-bold text-[11.5px] hover:border-primary shadow-2xs"
-                  title="Sửa tên bài & tóm tắt"
-                >
-                  <Edit2 size={12} className="text-primary" />
-                  <span>Sửa</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleToggleStatus}
-                  className={`text-[11.5px] font-bold px-2 py-0.5 rounded-full border transition-all ${
-                    pageStatus === 'published'
-                      ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                      : 'bg-[#FFF1E6] text-[#8A3A14] border-[#F2B38A]'
-                  }`}
-                  title="Bấm để đổi trạng thái"
-                >
-                  {pageStatus === 'published' ? '● Hiện' : '○ Nháp'}
-                </button>
-              </div>
-            )}
+            <button
+              type="button"
+              onClick={handleToggleStatus}
+              className={`text-[11px] font-bold px-2 py-0.5 rounded-full border transition-all ${
+                pageStatus === 'published'
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                  : 'bg-[#FFF1E6] text-[#8A3A14] border-[#F2B38A]'
+              }`}
+              title="Bấm để đổi trạng thái"
+            >
+              {pageStatus === 'published' ? '● Hiện' : '○ Nháp'}
+            </button>
           </div>
-        </div>
+        )}
         <h1 className="text-[21px] sm:text-[25px] font-extrabold text-ink leading-[1.16]">
           {currentPage.title}
         </h1>

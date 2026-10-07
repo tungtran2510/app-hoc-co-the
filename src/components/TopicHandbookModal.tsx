@@ -122,38 +122,38 @@ export default function TopicHandbookModal({
       <div className="w-full max-w-[820px] max-h-[95vh] bg-white dark:bg-[#120B24] rounded-t-[24px] sm:rounded-[24px] shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-purple-900/60 print:max-h-none print:shadow-none print:border-none print:rounded-none">
         
         {/* Header điều khiển (Ẩn khi In) */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 bg-slate-50 dark:bg-[#1A1033] border-b border-slate-200 dark:border-purple-900/50 shrink-0 no-print">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-full bg-blue-600 dark:bg-purple-600 text-white flex items-center justify-center shadow-xs">
-              <BookOpen size={18} />
+        <div className="flex items-center justify-between px-3.5 py-2.5 sm:px-6 sm:py-3.5 bg-slate-50 dark:bg-[#1A1033] border-b border-slate-200 dark:border-purple-900/50 shrink-0 no-print">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-8 h-8 rounded-full bg-blue-600 dark:bg-purple-600 text-white flex items-center justify-center shadow-xs shrink-0">
+              <BookOpen size={16} />
             </div>
-            <div>
-              <h3 className="text-[15px] sm:text-[16px] font-black text-slate-900 dark:text-white leading-tight">
+            <div className="min-w-0">
+              <h3 className="text-[14px] sm:text-[16px] font-black text-slate-900 dark:text-white leading-tight truncate">
                 Cẩm Nang Y Khoa & Mã QR
               </h3>
-              <p className="text-[11.5px] text-slate-500 dark:text-purple-300">
-                Bản in màu chất lượng cao tích hợp mã QR cho từng bài học
+              <p className="text-[11px] text-slate-500 dark:text-purple-300 truncate">
+                Bản in màu A4 chất lượng cao · Quét QR mở bài học tức thì
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
               onClick={handlePrint}
-              className="hidden sm:flex items-center gap-1.5 h-9 px-3.5 rounded-[12px] bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black text-[13px] shadow-sm transition-all cursor-pointer"
+              className="hidden sm:flex items-center gap-1.5 h-8 px-3 rounded-[10px] bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black text-[12px] shadow-xs transition-all cursor-pointer"
               title="In ra giấy hoặc Lưu dưới dạng file PDF"
             >
-              <Printer size={15} />
-              <span>In cẩm nang / Lưu PDF</span>
+              <Printer size={14} />
+              <span>In cẩm nang / PDF</span>
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="w-9 h-9 rounded-full bg-slate-200 dark:bg-purple-900/60 text-slate-600 dark:text-purple-200 hover:bg-slate-300 dark:hover:bg-purple-800 flex items-center justify-center cursor-pointer transition-colors"
+              className="w-8 h-8 rounded-full bg-slate-200 dark:bg-purple-900/60 text-slate-600 dark:text-purple-200 hover:bg-slate-300 dark:hover:bg-purple-800 flex items-center justify-center cursor-pointer transition-colors"
               aria-label="Đóng"
             >
-              <X size={18} strokeWidth={2.5} />
+              <X size={16} strokeWidth={2.5} />
             </button>
           </div>
         </div>
@@ -162,48 +162,46 @@ export default function TopicHandbookModal({
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col gap-6 print:overflow-visible print:p-0">
           
           {/* Form Thu nhận SĐT Zalo (Ẩn khi In) */}
-          <div className="p-4 rounded-[18px] bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 dark:from-[#1E1342] dark:to-[#170E33] border border-blue-200 dark:border-purple-800/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3.5 no-print">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#0068FF] text-white flex items-center justify-center font-black text-[13px] shadow-xs shrink-0">
+          <div className="p-3 rounded-[14px] bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 dark:from-[#1E1342] dark:to-[#170E33] border border-blue-200 dark:border-purple-800/80 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-2.5 no-print">
+            <div className="flex items-center gap-2.5 min-w-0 w-full sm:w-auto">
+              <div className="w-8 h-8 rounded-full bg-[#0068FF] text-white flex items-center justify-center font-black text-[11px] shadow-xs shrink-0">
                 Zalo
               </div>
-              <div>
-                <h4 className="text-[13.5px] sm:text-[14px] font-black text-slate-900 dark:text-white">
-                  Đăng ký nhận cập nhật Cẩm nang qua Zalo
+              <div className="min-w-0 flex-1">
+                <h4 className="text-[12.5px] sm:text-[13px] font-black text-slate-900 dark:text-white truncate">
+                  Đăng ký nhận cẩm nang qua Zalo
                 </h4>
-                <p className="text-[12px] text-slate-600 dark:text-purple-300">
-                  {savedPhone
-                    ? `Đang kết nối: ${savedPhone} (Tiến độ & cẩm nang đã được sao lưu)`
-                    : 'Nhập số điện thoại để đồng bộ tiến độ và nhận thông báo bài học mới'}
+                <p className="text-[11px] text-slate-500 dark:text-purple-300 truncate">
+                  {savedPhone ? `Đang kết nối: ${savedPhone}` : 'Nhập SĐT để nhận bản in và cập nhật mới'}
                 </p>
               </div>
             </div>
 
-            <form onSubmit={handleSavePhone} className="flex items-center gap-2 w-full sm:w-auto">
+            <form onSubmit={handleSavePhone} className="flex items-center gap-1.5 w-full sm:w-auto shrink-0">
               <input
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="Nhập SĐT Zalo của bạn..."
-                className="h-10 px-3.5 rounded-[12px] border border-slate-300 dark:border-purple-700 bg-white dark:bg-[#120A28] text-[13px] font-bold text-ink w-full sm:w-[200px] focus:outline-hidden focus:border-blue-600"
+                placeholder="Số điện thoại Zalo..."
+                className="h-8 px-3 rounded-[9px] border border-slate-300 dark:border-purple-700 bg-white dark:bg-[#120A28] text-[12px] font-bold text-ink flex-1 sm:w-[170px] focus:outline-hidden focus:border-blue-600"
                 disabled={isSubmittingPhone}
               />
               <button
                 type="submit"
                 disabled={isSubmittingPhone}
-                className="h-10 px-3.5 rounded-[12px] bg-[#0068FF] hover:bg-[#0055D4] active:scale-95 text-white font-extrabold text-[12.5px] shrink-0 shadow-xs transition-all cursor-pointer disabled:opacity-60"
+                className="h-8 px-3 rounded-[9px] bg-[#0068FF] hover:bg-[#0055D4] active:scale-95 text-white font-black text-[11.5px] shrink-0 shadow-xs transition-all cursor-pointer disabled:opacity-60 whitespace-nowrap"
               >
                 {isSubmittingPhone ? 'Đang lưu...' : savedPhone ? 'Cập nhật' : 'Nhận cẩm nang'}
               </button>
             </form>
 
             {phoneError && (
-              <p className="text-[11.5px] font-bold text-red-600 dark:text-red-400 w-full">
+              <p className="text-[11px] font-bold text-red-600 dark:text-red-400 w-full">
                 {phoneError}
               </p>
             )}
             {phoneSuccess && (
-              <p className="text-[11.5px] font-bold text-emerald-600 dark:text-emerald-400 w-full">
+              <p className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 w-full">
                 ✓ Đã lưu thành công số điện thoại Zalo!
               </p>
             )}
@@ -213,21 +211,25 @@ export default function TopicHandbookModal({
           <div id="handbook-printable-area" className="flex flex-col gap-6 text-slate-900 bg-white p-2 sm:p-6 rounded-[16px] print:p-0 print:rounded-none">
             
             {/* 1. TRANG BÌA CẨM NANG (COVER PAGE) */}
-            <div className="p-6 sm:p-8 rounded-[20px] bg-gradient-to-b from-blue-900 to-[#0F172A] text-white flex flex-col items-center text-center relative overflow-hidden shadow-md print:bg-white print:text-black print:border-b-2 print:border-black print:p-4">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-blue-200 border border-white/20 text-[11px] font-black uppercase tracking-wider mb-3 print:border-black print:text-black">
-                <span>📚 Tủ Sách Y Học & Sống Khỏe Mỗi Ngày</span>
+            <div className="p-4 sm:p-7 rounded-[18px] bg-gradient-to-b from-blue-900 to-[#0F172A] text-white flex flex-col items-center text-center relative overflow-hidden shadow-md print:bg-white print:text-black print:border-b-2 print:border-black print:p-4">
+              <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/10 text-blue-200 border border-white/20 text-[10px] font-black uppercase tracking-wider mb-2 print:border-black print:text-black">
+                <span>📚 Tủ Sách Sống Khỏe Mỗi Ngày</span>
               </div>
-              <h1 className="text-[24px] sm:text-[30px] font-black tracking-tight leading-snug max-w-[650px] uppercase">
+              <h1 className="text-[20px] sm:text-[28px] font-black tracking-tight leading-tight max-w-[650px] uppercase">
                 CẨM NANG Y KHOA: {topic.title}
               </h1>
-              <p className="text-[14px] sm:text-[15px] text-blue-100 max-w-[600px] mt-2 font-medium leading-relaxed print:text-slate-700">
-                {topic.description || 'Tài liệu hướng dẫn chuyên sâu về giải phẫu, cơ chế sinh học và phương pháp phục hồi sức khỏe tự nhiên.'}
-              </p>
+              {topic.description && (
+                <p className="text-[12px] sm:text-[14px] text-blue-100 max-w-[600px] mt-1.5 font-medium leading-snug print:text-slate-700 line-clamp-2">
+                  {topic.description}
+                </p>
+              )}
 
-              <div className="flex items-center gap-4 mt-5 text-[12.5px] text-blue-200 font-semibold print:text-slate-800">
-                <span>• Chuyên gia: Thầy Tùng Dinh Dưỡng</span>
-                <span>• Quy mô: {pages.length} bài học</span>
-                <span>• Xuất bản: 2026</span>
+              <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 mt-3 text-[11px] sm:text-[12px] text-blue-200 font-semibold print:text-slate-800">
+                <span className="whitespace-nowrap">Chuyên gia: Thầy Tùng Dinh Dưỡng</span>
+                <span className="opacity-60">•</span>
+                <span className="whitespace-nowrap">Quy mô: {pages.length} bài</span>
+                <span className="opacity-60">•</span>
+                <span className="whitespace-nowrap">Xuất bản: 2026</span>
               </div>
             </div>
 
@@ -274,39 +276,39 @@ export default function TopicHandbookModal({
                 return (
                   <div
                     key={item.page.id}
-                    className="p-4 sm:p-5 rounded-[16px] border border-slate-300/80 bg-white flex flex-col sm:flex-row gap-4 items-start justify-between page-break-avoid shadow-2xs print:border-black print:shadow-none"
+                    className="p-3 sm:p-4 rounded-[14px] border border-slate-200/90 bg-white flex flex-row gap-3 items-center justify-between page-break-avoid shadow-2xs print:border-black print:shadow-none"
                   >
-                    {/* Phần nội dung bài học */}
-                    <div className="flex-1 min-w-0 pr-2">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="px-2 py-0.5 rounded-[6px] bg-blue-100 text-blue-800 font-black text-[11px] font-mono print:border print:border-black">
+                    {/* Phần nội dung bài học bên trái */}
+                    <div className="flex-1 min-w-0 pr-1">
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        <span className="px-1.5 py-0.2 rounded-[5px] bg-blue-100 text-blue-800 font-black text-[10px] font-mono print:border print:border-black">
                           BÀI {String(idx + 1).padStart(2, '0')}
                         </span>
                         {item.videoCount ? (
-                          <span className="text-[11.5px] text-slate-500 font-medium">
-                            • {item.videoCount} video bài giảng
+                          <span className="text-[11px] text-slate-500 font-medium">
+                            · {item.videoCount} video
                           </span>
                         ) : null}
                       </div>
 
-                      <h4 className="text-[16px] sm:text-[17px] font-black text-slate-900 leading-snug">
+                      <h4 className="text-[14px] sm:text-[16px] font-black text-slate-900 leading-snug line-clamp-2">
                         {item.page.title}
                       </h4>
 
                       {item.page.summary && (
-                        <p className="text-[13px] text-slate-700 mt-1.5 leading-relaxed font-normal">
+                        <p className="text-[11.5px] sm:text-[12.5px] text-slate-600 mt-0.5 leading-snug font-normal line-clamp-2">
                           {item.page.summary}
                         </p>
                       )}
 
                       {/* Điểm cốt lõi nếu có */}
                       {keyPointsBlock?.data?.lines && keyPointsBlock.data.lines.length > 0 && (
-                        <div className="mt-2.5 pt-2 border-t border-slate-100">
-                          <span className="text-[11.5px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                        <div className="mt-1.5 pt-1 border-t border-slate-100 hidden sm:block">
+                          <span className="text-[10.5px] font-bold uppercase tracking-wider text-slate-500 block mb-0.5">
                             {keyPointsBlock.data.title || 'Điểm cốt lõi cần nhớ'}:
                           </span>
-                          <ul className="list-disc pl-4 text-[12.5px] text-slate-800 space-y-0.5">
-                            {keyPointsBlock.data.lines.slice(0, 3).map((line: string, lIdx: number) => (
+                          <ul className="list-disc pl-4 text-[11.5px] text-slate-800 space-y-0.5">
+                            {keyPointsBlock.data.lines.slice(0, 2).map((line: string, lIdx: number) => (
                               <li key={lIdx}>{line}</li>
                             ))}
                           </ul>
@@ -314,25 +316,22 @@ export default function TopicHandbookModal({
                       )}
                     </div>
 
-                    {/* Khung Mã QR bên phải */}
-                    <div className="w-[125px] flex flex-col items-center text-center shrink-0 self-center sm:self-start bg-slate-50 p-2.5 rounded-[12px] border border-slate-200 print:bg-white print:border-black">
+                    {/* Khung Mã QR bên phải - Tinh gọn, sắc nét */}
+                    <div className="w-[84px] sm:w-[96px] flex flex-col items-center text-center shrink-0 bg-slate-50 p-1.5 rounded-[10px] border border-slate-200 print:bg-white print:border-black">
                       {qrUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={qrUrl}
                           alt={`QR ${item.page.title}`}
-                          className="w-[105px] h-[105px] object-contain rounded-[6px]"
+                          className="w-[70px] h-[70px] sm:w-[82px] sm:h-[82px] object-contain rounded-[4px]"
                         />
                       ) : (
-                        <div className="w-[105px] h-[105px] bg-slate-200 rounded-[6px] flex items-center justify-center text-[10px] text-slate-500">
-                          Đang tạo QR...
+                        <div className="w-[70px] h-[70px] bg-slate-200 rounded-[4px] flex items-center justify-center text-[9px] text-slate-500">
+                          Đang tạo...
                         </div>
                       )}
-                      <span className="text-[9.5px] font-bold text-slate-700 mt-1.5 leading-tight">
-                        Quét xem video bài giảng
-                      </span>
-                      <span className="text-[8.5px] text-slate-400 font-mono mt-0.5">
-                        /{topic.slug}/{item.page.slug}
+                      <span className="text-[8.5px] font-bold text-slate-700 mt-1 leading-tight whitespace-nowrap">
+                        Quét mở video
                       </span>
                     </div>
                   </div>

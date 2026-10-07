@@ -195,10 +195,16 @@ export default function TopicLearningExperience({
             <h1 className="mt-1.5 text-[19px] font-black uppercase leading-[1.08] tracking-tight text-[#101B38] dark:text-white sm:text-[24px]">{topic.title}</h1>
             <p className="mt-1 text-[10px] font-semibold text-slate-600 dark:text-slate-300">Tác giả: <strong className="text-slate-900 dark:text-white">Tùng Dinh Dưỡng</strong></p>
             {topic.description && <p className="mt-1.5 line-clamp-2 text-[10.5px] leading-snug text-slate-600 dark:text-slate-300 sm:text-[13px]">{topic.description}</p>}
-            <div className="mt-2 grid grid-cols-3 gap-1">
-              <span className="inline-flex min-w-0 items-center justify-center gap-1 whitespace-nowrap rounded-[9px] border border-slate-200 bg-white/90 px-1 py-1 text-[9px] font-bold text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-200"><BookOpen size={11} className="shrink-0" />{visiblePages.length} bài học</span>
-              <span className="inline-flex min-w-0 items-center justify-center gap-1 whitespace-nowrap rounded-[9px] border border-slate-200 bg-white/90 px-1 py-1 text-[9px] font-bold text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-200"><PlaySquare size={11} className="shrink-0" />{totalVideos} video</span>
-              <span className="inline-flex min-w-0 items-center justify-center gap-1 whitespace-nowrap rounded-[9px] border border-slate-200 bg-white/90 px-1 py-1 text-[9px] font-bold text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-200"><Clock3 size={11} className="shrink-0" />~{totalVideos * 5} phút</span>
+            <div className="mt-2 flex items-center gap-1.5 flex-nowrap text-[10px] font-bold text-slate-600 dark:text-slate-300">
+              <span className="inline-flex items-center gap-1 rounded-[7px] bg-white/90 dark:bg-white/10 px-2 py-0.5 border border-slate-200 dark:border-white/10 shrink-0 whitespace-nowrap">
+                <BookOpen size={10} className="text-blue-600 shrink-0" />{visiblePages.length} bài
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-[7px] bg-white/90 dark:bg-white/10 px-2 py-0.5 border border-slate-200 dark:border-white/10 shrink-0 whitespace-nowrap">
+                <PlaySquare size={10} className="text-emerald-600 shrink-0" />{totalVideos} video
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-[7px] bg-white/90 dark:bg-white/10 px-2 py-0.5 border border-slate-200 dark:border-white/10 shrink-0 whitespace-nowrap">
+                <Clock3 size={10} className="text-amber-600 shrink-0" />~{totalVideos * 5}p
+              </span>
             </div>
           </div>
         </div>
@@ -213,33 +219,7 @@ export default function TopicLearningExperience({
         </div>
       </section>
 
-      {/* Nút Khám phá & Tải Cẩm Nang Y Khoa & QR */}
-      <button
-        type="button"
-        onClick={() => {
-          playTapSound();
-          setShowHandbookModal(true);
-        }}
-        className="w-full flex items-center justify-between p-3 rounded-[16px] bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 dark:from-[#1A1236] dark:via-[#1D1440] dark:to-[#160E30] border border-blue-200 dark:border-purple-800/60 text-slate-800 dark:text-purple-100 hover:border-blue-400 transition-all shadow-2xs group cursor-pointer"
-      >
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-blue-600 dark:bg-purple-600 text-white flex items-center justify-center font-bold text-[14px] shadow-xs shrink-0">
-            📥
-          </div>
-          <div className="text-left">
-            <span className="text-[13px] sm:text-[14px] font-black text-blue-950 dark:text-blue-100 block">
-              Cẩm Nang Y Khoa & Mã QR ({visiblePages.length} bài)
-            </span>
-            <span className="text-[11px] text-slate-500 dark:text-purple-300">
-              Bản in PDF màu chất lượng cao · Quét QR mở video bài giảng
-            </span>
-          </div>
-        </div>
-        <div className="flex items-center gap-1 text-[11.5px] font-black text-blue-700 dark:text-purple-300 bg-white dark:bg-purple-900/60 px-2.5 py-1 rounded-[10px] border border-blue-200/80 dark:border-purple-700/60 shadow-2xs shrink-0">
-          <span>Xem cẩm nang</span>
-          <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
-        </div>
-      </button>
+      
 
       <div role="tablist" aria-label="Nội dung chuyên đề" className="grid grid-cols-2 gap-2">
         <button type="button" role="tab" aria-selected={tab === 'path'} onClick={() => setTab('path')} className={`flex min-h-[44px] items-center justify-center gap-2 rounded-[13px] text-[13px] font-black transition-colors ${tab === 'path' ? 'bg-[#1E4697] text-white shadow-md' : 'bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-300'}`}>
@@ -251,7 +231,42 @@ export default function TopicLearningExperience({
       </div>
 
       {tab === 'path' ? (
-        <PageListClient initialPages={pages} topic={topic} />
+        <div className="flex flex-col gap-3">
+          <PageListClient initialPages={pages} topic={topic} />
+
+          {/* Cẩm Nang Bỏ Túi & Mã QR (Xếp dưới cùng lộ trình học, chuẩn tinh gọn 1 dòng) */}
+          <button
+            type="button"
+            onClick={() => {
+              playTapSound();
+              setShowHandbookModal(true);
+            }}
+            className="w-full flex items-center justify-between gap-2.5 px-3.5 py-2.5 rounded-[15px] bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-slate-50 dark:from-[#181033] dark:to-[#120B24] border border-blue-200/80 dark:border-purple-800/60 shadow-2xs hover:border-blue-400 active:scale-[0.99] transition-all cursor-pointer text-left group"
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-[10px] bg-blue-600 dark:bg-purple-600 text-white flex items-center justify-center font-bold text-[14px] shrink-0 shadow-2xs">
+                📚
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 flex-nowrap">
+                  <span className="text-[13px] font-black text-slate-900 dark:text-white truncate">
+                    Cẩm nang bỏ túi & Mã QR
+                  </span>
+                  <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-blue-100 dark:bg-purple-900/80 text-blue-700 dark:text-purple-200 shrink-0">
+                    {visiblePages.length} bài
+                  </span>
+                </div>
+                <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                  Bản in màu A4 chất lượng cao · Quét QR mở video tức thì
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1 text-[11px] font-extrabold text-blue-700 dark:text-purple-300 bg-white dark:bg-purple-950 px-2.5 py-1.5 rounded-[9px] border border-blue-200/80 dark:border-purple-700/60 shadow-2xs shrink-0 whitespace-nowrap">
+              <span>Xem ngay</span>
+              <ArrowRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
+            </div>
+          </button>
+        </div>
       ) : (
         <section className="flex flex-col gap-2.5" role="tabpanel">
           {isAdmin && <div className="flex items-center justify-between gap-2 rounded-[14px] border border-blue-200 bg-blue-50/70 px-3 py-2 dark:border-blue-400/20 dark:bg-blue-950/20">

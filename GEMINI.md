@@ -11,6 +11,11 @@
    - **Bắt buộc gửi ảnh trực tiếp vào chat:** Sau BẤT KỂ một thao tác, tính năng, sửa lỗi, căn chỉnh nút bấm hay văn bản nào: Agent BẮT BUỘC phải dùng trình duyệt thật (Playwright mobile viewport 390x844) chụp ảnh màn hình giao diện thực tế và **GỬI TRỰC TIẾP HÌNH ẢNH ĐÓ VÀO ĐOẠN CHAT** để người dùng nghiệm thu bằng mắt thường. Tuyệt đối **CẤM báo cáo chay bằng chữ hay chỉ đưa tên file**.
    - **Chuẩn tinh gọn trên điện thoại (Mobile-First):** Hoàn thiện mỗi tính năng là phải chuẩn tinh gọn trên màn hình điện thoại, **CẤM TUYỆT ĐỐI các dòng thừa**, chữ vụn vặt, khoảng hở cồng kềnh làm rối mắt.
 
+7. **NGUYÊN TẮC THIẾT KẾ MOBILE-FIRST ƯU TIÊN SỐ 1 (5 TIÊU CHÍ BẮT BUỘC & QUY TẮC 1 DÒNG):**
+   - **5 Tiêu chí cốt lõi:** 1. Thông minh · 2. Tinh gọn · 3. Tinh tế · 4. Chuyên nghiệp · 5. Hiện đại.
+   - **Quy tắc 1 dòng (Trị dứt điểm rớt dòng / orphan word):** Diện tích màn hình điện thoại rất hẹp. Bất kỳ thành phần nào (tiêu đề, thẻ thông số, nút bấm, mô tả) có thể tối ưu trên 1 dòng BẮT BUỘC phải làm trên 1 dòng. CẤM TUYỆT ĐỐI tình trạng một dòng rồi rớt lại 1 chữ sang dòng thứ hai. Tinh chỉnh câu chữ cô đọng, dùng `truncate`, `whitespace-nowrap`, `flex-nowrap` triệt để.
+   - **Vị trí khối Cẩm nang y khoa:** Cẩm nang bỏ túi & tài liệu in ấn BẮT BUỘC phải xếp ở DƯỚI CÙNG lộ trình học tập, TUYỆT ĐỐI KHÔNG để trên đầu chèn ép bài học chính.
+
 ## 2. QUY TRÌNH TRIỂN KHAI CHUẨN
 - Kiểm tra biên dịch: `cmd.exe /c npx tsc --noEmit`
 - Kiểm tra build: `cmd.exe /c npm run build`
