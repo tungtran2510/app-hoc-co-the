@@ -141,7 +141,7 @@ export default function TopicHandbookModal({
             <button
               type="button"
               onClick={handlePrint}
-              className="flex items-center gap-1.5 h-9 px-3.5 rounded-[12px] bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black text-[13px] shadow-sm transition-all cursor-pointer"
+              className="hidden sm:flex items-center gap-1.5 h-9 px-3.5 rounded-[12px] bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black text-[13px] shadow-sm transition-all cursor-pointer"
               title="In ra giấy hoặc Lưu dưới dạng file PDF"
             >
               <Printer size={15} />
@@ -357,10 +357,10 @@ export default function TopicHandbookModal({
 
         {/* Footer actions (Ẩn khi In) */}
         <div className="p-3.5 px-6 bg-slate-50 dark:bg-[#1A1033] border-t border-slate-200 dark:border-purple-900/50 flex items-center justify-between no-print shrink-0">
-          <span className="text-[12px] text-slate-500 dark:text-purple-300">
+          <span className="hidden sm:inline-block text-[12px] text-slate-500 dark:text-purple-300">
             💡 Gợi ý: Chọn máy in "Lưu dưới dạng PDF" để tải file về máy
           </span>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
             <button
               type="button"
               onClick={onClose}
@@ -371,7 +371,7 @@ export default function TopicHandbookModal({
             <button
               type="button"
               onClick={handlePrint}
-              className="flex items-center gap-1.5 h-10 px-5 rounded-[12px] bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black text-[13px] shadow-sm transition-all cursor-pointer"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 h-10 px-5 rounded-[12px] bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black text-[13px] shadow-sm transition-all cursor-pointer"
             >
               <Printer size={15} />
               <span>In cẩm nang / Tải PDF</span>
