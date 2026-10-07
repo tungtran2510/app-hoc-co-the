@@ -63,10 +63,42 @@ export default function EditPageModal({
 
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isAiSummarizing, setIsAiSummarizing] = useState(false);
   const [isCropOpen, setIsCropOpen] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   if (!isOpen) return null;
+
+  const handleAiSummarize = async () => {
+    const inputUrl = prompt('Nhập link video YouTube để AI tự động điền tóm tắt & ảnh đại diện:', '');
+    if (inputUrl === null) return;
+    setIsAiSummarizing(true);
+    try {
+      const res = await fetch('/api/ai/transcribe-youtube', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: inputUrl.trim() || 'https://www.youtube.com/watch?v=c9kmCxFKHPY',
+          pageTitle: title || '',
+        }),
+      });
+      const data = await res.json();
+      if (data.success && data.data?.summary) {
+        setSummary(data.data.summary);
+        if (!title.trim() && data.data.title) {
+          setTitle(data.data.title);
+          setSlug(generateSlug(data.data.title));
+        }
+        if (!coverUrl && data.data.thumbnailUrl) {
+          setCoverUrl(data.data.thumbnailUrl);
+        }
+      }
+    } catch {
+      // Ignored
+    } finally {
+      setIsAiSummarizing(false);
+    }
+  };
 
   const handleTitleChange = (val: string) => {
     setTitle(val);
@@ -196,9 +228,21 @@ export default function EditPageModal({
 
           {/* Tóm tắt */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[14px] font-bold text-ink">
-              Tóm tắt ngắn (1–2 câu)
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="text-[14px] font-bold text-ink">
+                Tóm tắt ngắn (1–2 câu)
+              </label>
+              <button
+                type="button"
+                onClick={handleAiSummarize}
+                disabled={isAiSummarizing}
+                className="flex items-center gap-1 text-[12px] font-bold text-blue-600 dark:text-purple-300 hover:underline cursor-pointer"
+                title="Tự động điền tóm tắt và ảnh bìa bằng AI từ YouTube"
+              >
+                <Sparkles size={13} />
+                <span>{isAiSummarizing ? 'Đang tóm tắt...' : '⚡ AI Gợi ý tóm tắt'}</span>
+              </button>
+            </div>
             <textarea
               rows={2}
               value={summary}

@@ -67,7 +67,17 @@ import {
 import { playTapSound, playSuccessChime } from '../lib/audioFeedback';
 import { getUserPhone } from '../lib/userSync';
 import UserSyncModal from './UserSyncModal';
+import Anatomy3DModal from './Anatomy3DModal';
 import { Settings as SettingsIcon } from 'lucide-react';
+
+const get3DSystemForTopic = (slug: string): string => {
+  if (slug === 'cot-song') return 'skeletal';
+  if (slug === 'tieu-hoa' || slug === 'gan-mat-tuy' || slug === 'noi-tiet-chuyen-hoa' || slug === 'dinh-duong') return 'visceral';
+  if (slug === 'co-the-nguoi') return 'muscular';
+  if (slug === 'nuoc') return 'cardiovascular';
+  if (slug === 'mien-dich') return 'lymphatic';
+  return 'skeletal';
+};
 
 interface ContentViewerProps {
   topic: Topic;
@@ -126,6 +136,7 @@ export default function ContentViewer({
   const [showAddDrawer, setShowAddDrawer] = useState(false);
   const [showEditPageModal, setShowEditPageModal] = useState(false);
   const [showAdminSettingsModal, setShowAdminSettingsModal] = useState(false);
+  const [show3DModal, setShow3DModal] = useState(false);
   const [activeMenuBlockId, setActiveMenuBlockId] = useState<string | null>(null);
 
   // Đọc dữ liệu từ localStorage khi client mount
@@ -1120,6 +1131,19 @@ export default function ContentViewer({
         <div className="flex items-center justify-end gap-2 flex-wrap sm:flex-nowrap">
 
           <div className="flex items-center gap-2 shrink-0">
+            {/* Nút Xem Mô hình 3D Giải phẫu */}
+            <button
+              type="button"
+              onClick={() => {
+                playTapSound();
+                setShow3DModal(true);
+              }}
+              className="flex items-center gap-1 h-7 px-2.5 rounded-full bg-blue-50 hover:bg-blue-100 dark:bg-purple-950/60 dark:hover:bg-purple-900/60 text-[#1E3A8A] dark:text-[#F8DF7B] border border-blue-200 dark:border-purple-800/80 text-[11.5px] font-bold shadow-2xs transition-all active:scale-95 cursor-pointer"
+              title="Khám phá mô hình giải phẫu 3D tương tác"
+            >
+              <span>🦴</span>
+              <span>Mô hình 3D</span>
+            </button>
 
             {isAdmin && (
               <div className="flex items-center gap-1.5 shrink-0">
@@ -1400,6 +1424,9 @@ export default function ContentViewer({
           pageId={page.id}
           onAddBlock={handleAddBlock}
           nextSortOrder={blockList.length + 1}
+          initialYoutubeUrl={currentVideos?.[0]?.youtube_id ? `https://www.youtube.com/watch?v=${currentVideos[0].youtube_id}` : ''}
+          topicTitle={topic.title}
+          pageTitle={currentPage.title}
         />
       )}
 
@@ -1421,6 +1448,16 @@ export default function ContentViewer({
           isOpen={true}
           onClose={() => setShowAdminSettingsModal(false)}
           onLogout={() => setIsAdmin(false)}
+        />
+      )}
+
+      {/* Modal Mô hình Giải Phẫu 3D Tương Tác */}
+      {show3DModal && (
+        <Anatomy3DModal
+          isOpen={true}
+          onClose={() => setShow3DModal(false)}
+          initialSystem={get3DSystemForTopic(topic.slug)}
+          topicTitle={topic.title}
         />
       )}
 

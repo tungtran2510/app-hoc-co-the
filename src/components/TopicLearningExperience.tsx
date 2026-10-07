@@ -12,6 +12,7 @@ import { generateUuid } from '../lib/uuid';
 import EditBlockModal from './admin/EditBlockModal';
 import VideoLessonLink from './VideoLessonLink';
 import { playTapSound } from '../lib/audioFeedback';
+import TopicHandbookModal from './TopicHandbookModal';
 
 interface TopicPageItem { page: Page; orderNumber: number; videoCount: number }
 interface TopicFaqVideo { video: Video; index: number; pageSlug: string; pageId?: string; pageTitle?: string }
@@ -41,6 +42,7 @@ export default function TopicLearningExperience({
   const [resume, setResume] = useState<XemTiepInfo | null>(null);
   const [completedIds, setCompletedIds] = useState<string[]>([]);
   const [openFaq, setOpenFaq] = useState<string | null>(faqs[0]?.id || null);
+  const [showHandbookModal, setShowHandbookModal] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [faqManagerOpen, setFaqManagerOpen] = useState(false);
   const [managedFaqBlocks, setManagedFaqBlocks] = useState<ManagedFaqBlock[]>([]);
@@ -211,6 +213,34 @@ export default function TopicLearningExperience({
         </div>
       </section>
 
+      {/* Nút Khám phá & Tải Cẩm Nang Y Khoa & QR */}
+      <button
+        type="button"
+        onClick={() => {
+          playTapSound();
+          setShowHandbookModal(true);
+        }}
+        className="w-full flex items-center justify-between p-3 rounded-[16px] bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 dark:from-[#1A1236] dark:via-[#1D1440] dark:to-[#160E30] border border-blue-200 dark:border-purple-800/60 text-slate-800 dark:text-purple-100 hover:border-blue-400 transition-all shadow-2xs group cursor-pointer"
+      >
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-full bg-blue-600 dark:bg-purple-600 text-white flex items-center justify-center font-bold text-[14px] shadow-xs shrink-0">
+            📥
+          </div>
+          <div className="text-left">
+            <span className="text-[13px] sm:text-[14px] font-black text-blue-950 dark:text-blue-100 block">
+              Cẩm Nang Y Khoa & Mã QR ({visiblePages.length} bài)
+            </span>
+            <span className="text-[11px] text-slate-500 dark:text-purple-300">
+              Bản in PDF màu chất lượng cao · Quét QR mở video bài giảng
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center gap-1 text-[11.5px] font-black text-blue-700 dark:text-purple-300 bg-white dark:bg-purple-900/60 px-2.5 py-1 rounded-[10px] border border-blue-200/80 dark:border-purple-700/60 shadow-2xs shrink-0">
+          <span>Xem cẩm nang</span>
+          <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
+        </div>
+      </button>
+
       <div role="tablist" aria-label="Nội dung chuyên đề" className="grid grid-cols-2 gap-2">
         <button type="button" role="tab" aria-selected={tab === 'path'} onClick={() => setTab('path')} className={`flex min-h-[44px] items-center justify-center gap-2 rounded-[13px] text-[13px] font-black transition-colors ${tab === 'path' ? 'bg-[#1E4697] text-white shadow-md' : 'bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-300'}`}>
           <BookOpen size={17} /> Lộ trình
@@ -273,6 +303,14 @@ export default function TopicLearningExperience({
         </section>
       )}
                       {editingFaqBlock && <EditBlockModal isOpen onClose={() => setEditingFaqBlock(null)} block={editingFaqBlock} onSaveBlock={handleSaveFaqBlock} faqTopicOptions={[{ id: topic.id, title: topic.title }]} faqVideoOptions={faqVideos.map((entry) => ({ key: entry.key, page_id: entry.page_id, page_title: entry.page_title, video_title: entry.video.title || `Video ${entry.index}`, thumbnail_url: entry.video.thumbnail_url, index: entry.index, topic_id: entry.topic_id, topic_title: entry.topic_title }))} />}
+      {showHandbookModal && (
+        <TopicHandbookModal
+          isOpen={true}
+          onClose={() => setShowHandbookModal(false)}
+          topic={topic}
+          pages={visiblePages}
+        />
+      )}
     </>
   );
 }

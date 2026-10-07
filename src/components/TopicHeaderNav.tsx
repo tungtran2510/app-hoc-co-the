@@ -97,6 +97,17 @@ export default function TopicHeaderNav({ topicTitle, topicSlug }: TopicHeaderNav
         </Link>
 
         <div className="flex items-center gap-2">
+          {/* Nút Khám phá 3D */}
+          <Link
+            href="/giai-phau-3d"
+            onClick={playTapSound}
+            className="flex items-center gap-1 h-8 sm:h-9 px-2.5 sm:px-3 rounded-full bg-blue-50 hover:bg-blue-100 dark:bg-purple-950/60 dark:hover:bg-purple-900/60 text-[#1E3A8A] dark:text-[#F8DF7B] font-bold text-[12px] sm:text-[13px] border border-blue-200 dark:border-purple-800/80 shadow-2xs transition-all active:scale-95 cursor-pointer"
+            title="Khám phá mô hình giải phẫu 3D"
+          >
+            <span>🦴</span>
+            <span>Atlas 3D</span>
+          </Link>
+
           {/* Nút Chia sẻ chuyên đề (đúng vị trí góc trên phải) */}
           <button
             type="button"

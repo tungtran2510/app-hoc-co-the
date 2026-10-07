@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   X,
   Image as ImageIcon,
@@ -22,6 +22,7 @@ import {
   List,
   LayoutGrid,
   BookOpen,
+  Sparkles,
 } from 'lucide-react';
 import { Block } from '../../lib/types';
 import { generateUuid } from '../../lib/uuid';
@@ -32,6 +33,9 @@ interface AddBlockDrawerProps {
   pageId: string;
   onAddBlock: (newBlock: Block) => void;
   nextSortOrder: number;
+  initialYoutubeUrl?: string;
+  topicTitle?: string;
+  pageTitle?: string;
 }
 
 export default function AddBlockDrawer({
@@ -40,8 +44,64 @@ export default function AddBlockDrawer({
   pageId,
   onAddBlock,
   nextSortOrder,
+  initialYoutubeUrl = '',
+  topicTitle = '',
+  pageTitle = '',
 }: AddBlockDrawerProps) {
+  const [aiYoutubeUrl, setAiYoutubeUrl] = useState(initialYoutubeUrl);
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [aiError, setAiError] = useState('');
+
   if (!isOpen) return null;
+
+  const handleAiGenerate = async () => {
+    if (!aiYoutubeUrl.trim()) {
+      setAiError('Vui lòng nhập link video YouTube');
+      return;
+    }
+    setIsAiLoading(true);
+    setAiError('');
+    try {
+      const res = await fetch('/api/ai/transcribe-youtube', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: aiYoutubeUrl.trim(),
+          topicTitle: topicTitle || 'Cơ thể người',
+          pageTitle: pageTitle || '',
+        }),
+      });
+      const result = await res.json();
+      if (!res.ok || !result.success || !result.data?.blocks) {
+        throw new Error(result.error || 'Không thể tạo nội dung từ video này, vui lòng thử lại');
+      }
+
+      // Thêm tuần tự 4 khối do AI sinh ra
+      const generatedBlocks = result.data.blocks;
+      generatedBlocks.forEach((b: any, i: number) => {
+        const newBlock: Block = {
+          id: generateUuid(),
+          page_id: pageId,
+          type: 'text',
+          display_style: b.display_style,
+          sort_order: nextSortOrder + i,
+          is_visible: true,
+          data: {
+            title: b.title,
+            lines: b.lines,
+            format: b.format || 'paragraph',
+            mode: 'text',
+          },
+        };
+        onAddBlock(newBlock);
+      });
+      onClose();
+    } catch (err: any) {
+      setAiError(err.message || 'Lỗi khi gọi AI soạn bài');
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
 
   const createAndAdd = (type: Block['type'], displayStyle: string) => {
     const id = generateUuid();
@@ -251,6 +311,59 @@ export default function AddBlockDrawer({
 
         {/* Groups */}
         <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-6">
+          {/* TÍNH NĂNG MỚI: AI Soạn 4 khối bài học chuẩn y khoa từ YouTube */}
+          <div className="p-4 rounded-[20px] bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 dark:from-[#181136] dark:via-[#1D1442] dark:to-[#171032] border-2 border-blue-300/80 dark:border-purple-600/60 shadow-sm flex flex-col gap-2.5">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-blue-600 dark:bg-purple-600 text-white flex items-center justify-center shadow-xs shrink-0">
+                <Sparkles size={16} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-[14px] font-black text-blue-950 dark:text-purple-100 flex items-center gap-1.5">
+                  <span>⚡ AI Soạn 4 khối kiến thức từ Video</span>
+                </h4>
+                <p className="text-[11.5px] text-slate-600 dark:text-purple-300 line-clamp-1">
+                  Tự động sinh: Ý nghĩa, Điểm cần nhớ, Sai lầm & Giải pháp
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5 mt-0.5">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={aiYoutubeUrl}
+                  onChange={(e) => setAiYoutubeUrl(e.target.value)}
+                  placeholder="Dán link YouTube bài giảng (hoặc gõ ID)..."
+                  className="flex-1 h-10 px-3 rounded-[12px] border border-blue-300 dark:border-purple-700/60 bg-white dark:bg-[#120A28] text-[13px] text-ink font-medium focus:outline-hidden focus:border-blue-600"
+                  disabled={isAiLoading}
+                />
+                <button
+                  type="button"
+                  onClick={handleAiGenerate}
+                  disabled={isAiLoading}
+                  className="h-10 px-3.5 rounded-[12px] bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-extrabold text-[12.5px] flex items-center gap-1.5 shrink-0 shadow-xs transition-all cursor-pointer disabled:opacity-60"
+                >
+                  {isAiLoading ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Đang soạn...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles size={13} />
+                      <span>Soạn ngay</span>
+                    </>
+                  )}
+                </button>
+              </div>
+              {aiError && (
+                <p className="text-[12px] font-bold text-red-600 dark:text-red-400 mt-0.5">
+                  {aiError}
+                </p>
+              )}
+            </div>
+          </div>
+
           {/* Nhóm 1: Hình ảnh & Video */}
           <div className="flex flex-col gap-2.5">
             <span className="text-[13px] font-extrabold tracking-[0.5px] uppercase text-muted">
