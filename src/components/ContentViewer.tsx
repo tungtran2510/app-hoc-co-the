@@ -57,7 +57,20 @@ import {
   saveStoredPage,
   getStoredAppSettings,
   DEFAULT_APP_SETTINGS,
+  AppCustomSettings,
 } from '../lib/storage';
+
+const TOPIC_EBOOK_MAP: Record<string, { title: string }> = {
+  'cot-song': { title: 'Giải phẫu cột sống & Đĩa đệm' },
+  'dinh-duong': { title: 'Dinh dưỡng chuyên sâu & Chuyển hóa' },
+  'co-the-nguoi': { title: 'Atlas giải phẫu cơ thể người' },
+  'tieu-hoa': { title: 'Giải phẫu ứng dụng hệ tiêu hóa' },
+  'gan-mat-tuy': { title: 'Giải phẫu gan mật & Chức năng chuyển hóa' },
+  'mien-dich': { title: 'Gốc bệnh & Miễn dịch học cơ thể' },
+  'tuan-hoan': { title: 'Hệ tuần hoàn & Sinh lý tim mạch' },
+  'tim-mach': { title: 'Giải phẫu & Sinh lý tim mạch' },
+  'ho-hap': { title: 'Giải phẫu & Cơ chế hô hấp' },
+};
 import {
   isPageSaved,
   toggleSavePage,
@@ -119,6 +132,7 @@ export default function ContentViewer({
   const [supabaseOk, setSupabaseOk] = useState(false);
   const [currentPage, setCurrentPage] = useState<Page>(page);
   const [pageStatus, setPageStatus] = useState<'draft' | 'published'>(page.status);
+  const [appCustomSettings, setAppCustomSettings] = useState<AppCustomSettings>(() => getStoredAppSettings());
   // Khởi tạo và chuẩn hóa danh sách khối (loại bỏ khối sách ảo/flipbook tự sinh theo yêu cầu người dùng)
   const initializeBlocks = (rawBlocks: Block[]): Block[] => {
     let list = rawBlocks.filter(
@@ -178,6 +192,7 @@ export default function ContentViewer({
       const appSet = getStoredAppSettings();
       if (appSet) {
         setConsultSettings({ zalo_url: appSet.zalo_url, hotline: appSet.hotline });
+        setAppCustomSettings(appSet);
       }
     } catch {
       // Bỏ qua lỗi truy cập client storage
@@ -1199,6 +1214,33 @@ export default function ContentViewer({
             <span>Thêm nội dung</span>
           </button>
         </div>
+      )}
+
+      {/* 6.5. Thẻ Cầu Nối Sách Chuyên Sâu (Smart Ebook Companion - Chuẩn 1 Dòng Mobile-First) */}
+      {(appCustomSettings.show_ebook_bridge ?? true) && (
+        <a
+          href={`${appCustomSettings.ebook_app_url || 'https://app-doc-sach.vercel.app'}?topic=${topic.slug}&page=${currentPage.slug}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={playTapSound}
+          className="w-full h-11 flex items-center justify-between gap-2 px-3 rounded-[13px] bg-gradient-to-r from-emerald-50/90 via-teal-50/70 to-slate-50 dark:from-[#081820] dark:to-[#051017] border border-emerald-300/80 dark:border-emerald-800/60 shadow-2xs hover:border-emerald-500 active:scale-[0.99] transition-all cursor-pointer text-left group mt-2"
+        >
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="w-7 h-7 rounded-[8px] bg-gradient-to-br from-emerald-600 to-teal-600 text-white flex items-center justify-center font-bold text-[13px] shrink-0 shadow-2xs">
+              📖
+            </span>
+            <span className="text-[12.5px] font-black text-slate-900 dark:text-white truncate">
+              Sách chuyên sâu: {TOPIC_EBOOK_MAP[topic.slug]?.title || `Giải phẫu ${topic.title}`}
+            </span>
+            <span className="text-[9.5px] font-black px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 shrink-0 uppercase tracking-wide">
+              Ebook
+            </span>
+          </div>
+          <div className="flex items-center gap-1 text-[11px] font-extrabold text-emerald-700 dark:text-emerald-300 bg-white dark:bg-emerald-950 px-2 py-1 rounded-[8px] border border-emerald-200/80 dark:border-emerald-700/60 shadow-2xs shrink-0 whitespace-nowrap">
+            <span>Đọc sách</span>
+            <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
+          </div>
+        </a>
       )}
 
       {/* 7. Cuối trang: Nút Chia sẻ và Thẻ tư vấn Zalo */}

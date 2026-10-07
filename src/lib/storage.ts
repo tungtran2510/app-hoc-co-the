@@ -10,6 +10,8 @@ export interface AppCustomSettings {
   default_font_size: 'small' | 'normal' | 'large';
   show_progress_bar: boolean;
   theme_palette?: 'indigo' | 'navy_luxury';
+  show_ebook_bridge?: boolean;
+  ebook_app_url?: string;
 }
 
 export const DEFAULT_APP_SETTINGS: AppCustomSettings = {
@@ -21,6 +23,8 @@ export const DEFAULT_APP_SETTINGS: AppCustomSettings = {
   default_font_size: 'normal',
   show_progress_bar: true,
   theme_palette: 'indigo',
+  show_ebook_bridge: true,
+  ebook_app_url: 'https://app-doc-sach.vercel.app',
 };
 
 /**
@@ -99,27 +103,37 @@ export function getStoredAppSettings(): AppCustomSettings {
   if (typeof window !== 'undefined') {
     try {
       const savedPalette = localStorage.getItem('qbiz_theme_palette') as 'indigo' | 'navy_luxury' | null;
-      if (savedPalette === 'navy_luxury' || savedPalette === 'indigo') {
-        return {
-          ...DEFAULT_APP_SETTINGS,
-          theme_palette: savedPalette,
-        };
-      }
+      const savedShowEbook = localStorage.getItem('qbiz_show_ebook_bridge');
+      const savedEbookUrl = localStorage.getItem('qbiz_ebook_app_url');
+      return {
+        ...DEFAULT_APP_SETTINGS,
+        theme_palette: savedPalette === 'navy_luxury' || savedPalette === 'indigo' ? savedPalette : DEFAULT_APP_SETTINGS.theme_palette,
+        show_ebook_bridge: savedShowEbook !== null ? savedShowEbook === 'true' : DEFAULT_APP_SETTINGS.show_ebook_bridge,
+        ebook_app_url: savedEbookUrl || DEFAULT_APP_SETTINGS.ebook_app_url,
+      };
     } catch {}
   }
   return DEFAULT_APP_SETTINGS;
 }
 
 export async function saveStoredAppSettings(settings: Partial<AppCustomSettings>): Promise<boolean> {
-  if (typeof window !== 'undefined' && settings.theme_palette) {
+  if (typeof window !== 'undefined') {
     try {
-      localStorage.setItem('qbiz_theme_palette', settings.theme_palette);
-      if (settings.theme_palette === 'navy_luxury') {
-        document.documentElement.classList.add('theme-navy-luxury');
-      } else {
-        document.documentElement.classList.remove('theme-navy-luxury');
+      if (settings.theme_palette) {
+        localStorage.setItem('qbiz_theme_palette', settings.theme_palette);
+        if (settings.theme_palette === 'navy_luxury') {
+          document.documentElement.classList.add('theme-navy-luxury');
+        } else {
+          document.documentElement.classList.remove('theme-navy-luxury');
+        }
+        window.dispatchEvent(new CustomEvent('qbiz_theme_palette_changed', { detail: { palette: settings.theme_palette } }));
       }
-      window.dispatchEvent(new CustomEvent('qbiz_theme_palette_changed', { detail: { palette: settings.theme_palette } }));
+      if (typeof settings.show_ebook_bridge !== 'undefined') {
+        localStorage.setItem('qbiz_show_ebook_bridge', String(settings.show_ebook_bridge));
+      }
+      if (settings.ebook_app_url) {
+        localStorage.setItem('qbiz_ebook_app_url', settings.ebook_app_url.trim());
+      }
     } catch {}
   }
 

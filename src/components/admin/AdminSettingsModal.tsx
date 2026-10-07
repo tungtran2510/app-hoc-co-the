@@ -14,6 +14,7 @@ import {
   Loader2,
   Sparkles,
   Check,
+  BookOpen,
 } from 'lucide-react';
 import {
   getStoredAppSettings,
@@ -503,6 +504,37 @@ export default function AdminSettingsModal({
                   className="w-4.5 h-4.5 accent-primary rounded cursor-pointer"
                 />
               </label>
+
+              {/* Cầu nối đọc sách chuyên sâu (Ebook) - Tinh gọn 1 dòng */}
+              <label className="flex items-center justify-between p-3 rounded-[14px] bg-surface-2 border border-line cursor-pointer">
+                <span className="text-[13px] font-bold text-ink flex items-center gap-1.5">
+                  <BookOpen size={15} className="text-emerald-600 shrink-0" />
+                  <span>Cầu nối đọc sách chuyên sâu (Ebook)</span>
+                </span>
+                <input
+                  type="checkbox"
+                  checked={settings.show_ebook_bridge ?? true}
+                  onChange={(e) => setSettings({ ...settings, show_ebook_bridge: e.target.checked })}
+                  className="w-4.5 h-4.5 accent-emerald-600 rounded cursor-pointer"
+                />
+              </label>
+
+              {/* Địa chỉ ứng dụng Ebook (tinh gọn) */}
+              {(settings.show_ebook_bridge ?? true) && (
+                <div className="flex flex-col gap-1 p-2.5 px-3 rounded-[14px] bg-surface-2 border border-line">
+                  <label className="text-[11.5px] font-bold text-ink flex items-center justify-between">
+                    <span>Địa chỉ ứng dụng Ebook (URL)</span>
+                    <span className="text-[10px] text-muted font-medium">Liên kết ngoài</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={settings.ebook_app_url || ''}
+                    onChange={(e) => setSettings({ ...settings, ebook_app_url: e.target.value })}
+                    placeholder="https://app-doc-sach.vercel.app"
+                    className="w-full h-8.5 px-3 rounded-[9px] border border-line text-[12.5px] text-ink focus:border-emerald-500 bg-white"
+                  />
+                </div>
+              )}
             </div>
           )}
 
