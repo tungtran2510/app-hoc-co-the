@@ -9,6 +9,7 @@ export interface AppCustomSettings {
   auto_next_video: boolean;
   default_font_size: 'small' | 'normal' | 'large';
   show_progress_bar: boolean;
+  theme_palette?: 'indigo' | 'navy_luxury';
 }
 
 export const DEFAULT_APP_SETTINGS: AppCustomSettings = {
@@ -19,6 +20,7 @@ export const DEFAULT_APP_SETTINGS: AppCustomSettings = {
   auto_next_video: true,
   default_font_size: 'normal',
   show_progress_bar: true,
+  theme_palette: 'indigo',
 };
 
 /**
@@ -94,16 +96,40 @@ export async function saveStoredPageStatus(pageId: string, status: 'draft' | 'pu
  * Cài đặt ứng dụng
  */
 export function getStoredAppSettings(): AppCustomSettings {
+  if (typeof window !== 'undefined') {
+    try {
+      const savedPalette = localStorage.getItem('qbiz_theme_palette') as 'indigo' | 'navy_luxury' | null;
+      if (savedPalette === 'navy_luxury' || savedPalette === 'indigo') {
+        return {
+          ...DEFAULT_APP_SETTINGS,
+          theme_palette: savedPalette,
+        };
+      }
+    } catch {}
+  }
   return DEFAULT_APP_SETTINGS;
 }
 
 export async function saveStoredAppSettings(settings: Partial<AppCustomSettings>): Promise<boolean> {
+  if (typeof window !== 'undefined' && settings.theme_palette) {
+    try {
+      localStorage.setItem('qbiz_theme_palette', settings.theme_palette);
+      if (settings.theme_palette === 'navy_luxury') {
+        document.documentElement.classList.add('theme-navy-luxury');
+      } else {
+        document.documentElement.classList.remove('theme-navy-luxury');
+      }
+      window.dispatchEvent(new CustomEvent('qbiz_theme_palette_changed', { detail: { palette: settings.theme_palette } }));
+    } catch {}
+  }
+
   const res = await saveSettingsApi({
     app_name: settings.app_name,
     expert_title: settings.expert_title,
     hotline: settings.hotline,
     zalo_url: settings.zalo_url,
     workspace_id: 'default',
-  });
+    theme_palette: settings.theme_palette,
+  } as any);
   return res.success;
 }

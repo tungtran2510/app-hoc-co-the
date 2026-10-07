@@ -12,6 +12,8 @@ import {
   Sliders,
   Key,
   Loader2,
+  Sparkles,
+  Check,
 } from 'lucide-react';
 import {
   getStoredAppSettings,
@@ -127,7 +129,10 @@ export default function AdminSettingsModal({
           phone: settings.hotline?.trim() || null,
           zalo_url: settings.zalo_url?.trim() || null,
         },
-      });
+        block_styles: {
+          theme_palette: settings.theme_palette || 'indigo',
+        },
+      } as any);
       if (!res.success) {
         throw new Error(res.error || 'Chưa lưu được cài đặt');
       }
@@ -378,9 +383,95 @@ export default function AdminSettingsModal({
             </div>
           )}
 
-          {/* TAB 2: TRẢI NGHIỆM HỌC TẬP */}
+          {/* TAB 2: TRẢI NGHIỆM HỌC TẬP & GIAO DIỆN */}
           {activeTab === 'trai_nghiem' && (
             <div className="flex flex-col gap-4">
+              {/* Bảng màu giao diện */}
+              <div className="flex flex-col gap-2.5 p-3.5 rounded-[16px] bg-surface-2 border border-line">
+                <div className="flex items-center justify-between">
+                  <span className="text-[14px] font-bold text-ink flex items-center gap-1.5">
+                    <Sparkles size={16} className="text-primary" />
+                    <span>Bảng màu giao diện</span>
+                  </span>
+                  <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-primary-soft text-primary border border-primary/20">
+                    {settings.theme_palette === 'navy_luxury' ? 'Xanh Navy' : 'Chàm Y Khoa'}
+                  </span>
+                </div>
+                <p className="text-[12.5px] text-muted leading-snug">
+                  Tùy chọn tông màu sắc hiển thị toàn bộ nút bấm, tiêu đề và khối nội dung của ứng dụng.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                  {/* Tông 1: Chàm Y Khoa (Mặc định) */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = { ...settings, theme_palette: 'indigo' as const };
+                      setSettings(next);
+                      try {
+                        localStorage.setItem('qbiz_theme_palette', 'indigo');
+                        document.documentElement.classList.remove('theme-navy-luxury');
+                        window.dispatchEvent(new CustomEvent('qbiz_theme_palette_changed', { detail: { palette: 'indigo' } }));
+                      } catch {}
+                    }}
+                    className={`relative p-3 rounded-[14px] border-2 text-left flex items-start gap-3 transition-all cursor-pointer ${
+                      (!settings.theme_palette || settings.theme_palette === 'indigo')
+                        ? 'bg-white border-[#1E3A8A] shadow-sm ring-1 ring-[#1E3A8A]/20'
+                        : 'bg-white/70 border-line hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1E3A8A] via-[#2563EB] to-[#60A5FA] flex items-center justify-center shrink-0 shadow-xs border-2 border-white">
+                      {(!settings.theme_palette || settings.theme_palette === 'indigo') && (
+                        <Check size={18} className="text-white stroke-[3]" />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[14px] font-extrabold text-ink leading-tight">Chàm Y Khoa</span>
+                        <span className="text-[10px] font-black px-1.5 py-0.2 rounded-full bg-slate-100 text-slate-600">Mặc định</span>
+                      </div>
+                      <p className="text-[11.5px] text-muted leading-tight mt-1">
+                        Xanh chàm cổ điển, thanh lịch & chuẩn mực y tế.
+                      </p>
+                    </div>
+                  </button>
+
+                  {/* Tông 2: Xanh Navy Sang Trọng (Mới) */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = { ...settings, theme_palette: 'navy_luxury' as const };
+                      setSettings(next);
+                      try {
+                        localStorage.setItem('qbiz_theme_palette', 'navy_luxury');
+                        document.documentElement.classList.add('theme-navy-luxury');
+                        window.dispatchEvent(new CustomEvent('qbiz_theme_palette_changed', { detail: { palette: 'navy_luxury' } }));
+                      } catch {}
+                    }}
+                    className={`relative p-3 rounded-[14px] border-2 text-left flex items-start gap-3 transition-all cursor-pointer ${
+                      settings.theme_palette === 'navy_luxury'
+                        ? 'bg-white border-[#0E2A5C] shadow-sm ring-2 ring-[#0284C7]/30'
+                        : 'bg-white/70 border-line hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#06142B] via-[#0E2A5C] to-[#0284C7] flex items-center justify-center shrink-0 shadow-xs border-2 border-[#38BDF8]">
+                      {settings.theme_palette === 'navy_luxury' && (
+                        <Check size={18} className="text-white stroke-[3]" />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[14px] font-extrabold text-[#0E2A5C] leading-tight">Xanh Navy Sang Trọng</span>
+                        <span className="text-[10px] font-black px-1.5 py-0.2 rounded-full bg-sky-100 text-sky-800">Mới</span>
+                      </div>
+                      <p className="text-[11.5px] text-muted leading-tight mt-1">
+                        Đẳng cấp, sắc sảo, chiều sâu công nghiệp & công nghệ.
+                      </p>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
               {/* Cỡ chữ mặc định */}
               <div className="flex flex-col gap-2 p-3.5 rounded-[16px] bg-surface-2 border border-line">
                 <span className="text-[14px] font-bold text-ink flex items-center gap-1.5">

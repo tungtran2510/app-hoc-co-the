@@ -55,6 +55,36 @@ export default function PageHeaderBar({
   const [showToc, setShowToc] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   const [soundActive, setSoundActive] = useState(true);
+  const [themePalette, setThemePalette] = useState<'indigo' | 'navy_luxury'>('indigo');
+
+  React.useEffect(() => {
+    try {
+      const p = localStorage.getItem('qbiz_theme_palette');
+      if (p === 'navy_luxury' || p === 'indigo') {
+        setThemePalette(p);
+      }
+    } catch {}
+    const handlePaletteChangeEvt = (e: any) => {
+      if (e?.detail?.palette) {
+        setThemePalette(e.detail.palette);
+      }
+    };
+    window.addEventListener('qbiz_theme_palette_changed', handlePaletteChangeEvt);
+    return () => window.removeEventListener('qbiz_theme_palette_changed', handlePaletteChangeEvt);
+  }, []);
+
+  const handlePaletteChange = (palette: 'indigo' | 'navy_luxury') => {
+    setThemePalette(palette);
+    try {
+      localStorage.setItem('qbiz_theme_palette', palette);
+      if (palette === 'navy_luxury') {
+        document.documentElement.classList.add('theme-navy-luxury');
+      } else {
+        document.documentElement.classList.remove('theme-navy-luxury');
+      }
+      window.dispatchEvent(new CustomEvent('qbiz_theme_palette_changed', { detail: { palette } }));
+    } catch {}
+  };
 
   React.useEffect(() => {
     setSoundActive(isSoundEnabled());
@@ -500,6 +530,48 @@ export default function PageHeaderBar({
               >
                 <Moon size={16} />
                 <span>Nền Tối</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Bảng màu sắc */}
+          <div className="flex flex-col gap-2 pt-2 border-t border-line">
+            <span className="text-[13px] font-bold text-muted uppercase tracking-wider flex items-center justify-between">
+              <span>Tông màu sắc</span>
+              <span className="text-[11px] font-black text-primary lowercase tracking-normal">
+                {themePalette === 'navy_luxury' ? 'xanh navy' : 'chàm y khoa'}
+              </span>
+            </span>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  playTapSound();
+                  handlePaletteChange('indigo');
+                }}
+                className={`h-[42px] rounded-[12px] font-bold text-[12.5px] flex items-center justify-center gap-1.5 border transition-all cursor-pointer ${
+                  themePalette === 'indigo'
+                    ? 'bg-primary text-white border-primary shadow-xs font-black'
+                    : 'bg-surface-2 border-line-strong text-ink hover:bg-line/40'
+                }`}
+              >
+                <span className="w-3.5 h-3.5 rounded-full bg-[#1E3A8A] border border-white/60 shadow-2xs shrink-0" />
+                <span>Chàm Y Khoa</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  playTapSound();
+                  handlePaletteChange('navy_luxury');
+                }}
+                className={`h-[42px] rounded-[12px] font-bold text-[12.5px] flex items-center justify-center gap-1.5 border transition-all cursor-pointer ${
+                  themePalette === 'navy_luxury'
+                    ? 'bg-[#0E2A5C] text-white border-[#0E2A5C] shadow-xs font-black'
+                    : 'bg-surface-2 border-line-strong text-ink hover:bg-line/40'
+                }`}
+              >
+                <span className="w-3.5 h-3.5 rounded-full bg-[#0E2A5C] border border-cyan-400 shadow-2xs shrink-0" />
+                <span>Xanh Navy</span>
               </button>
             </div>
           </div>

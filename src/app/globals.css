@@ -287,6 +287,156 @@ html.gray ::-webkit-scrollbar-thumb {
 }
 
 /* ============================================================================
+   BẢNG MÀU XANH NAVY SANG TRỌNG (DEEP NAVY LUXURY PALETTE)
+   Lấy cảm hứng từ 3 ảnh thiết kế công nghiệp & kỹ thuật cao cấp của người dùng:
+   - Màu chủ đạo Navy nguyên khối (#0E2A5C / #0A192F)
+   - Tương phản siêu nét, viền mảnh lịch lãm (#D3DFEE)
+   - Điểm nhấn Cyan / Blue Electric (#0284C7 / #38BDF8)
+   - Chế độ đêm Deep Night Blue (#061021 / #0B1C38)
+   ============================================================================ */
+html.theme-navy-luxury {
+  --color-bg: #F4F6FA;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #E9EFF8;
+  --color-ink: #07142E;
+  --color-ink-2: #0E2248;
+  --color-muted: #4B5B76;
+  --color-line: #D3DFEE;
+  --color-line-strong: #B4C6DE;
+  --color-primary: #0E2A5C;
+  --color-primary-dark: #081B3D;
+  --color-primary-soft: #EEF4FB;
+  --color-primary-track: #D0E0F3;
+  --color-on-primary-muted: #0284C7;
+}
+
+html.theme-navy-luxury body {
+  background-color: #F4F6FA;
+  background-image: 
+    radial-gradient(ellipse 90% 40% at 50% -10%, rgba(14, 42, 92, 0.07), transparent 70%),
+    radial-gradient(ellipse 60% 30% at 100% 50%, rgba(7, 20, 46, 0.04), transparent 60%);
+  color: #07142E;
+}
+
+/* Biến đổi các nút và khối xanh chính sang tông Navy Đậm Sang Trọng */
+html.theme-navy-luxury [class*="bg-[#1E3A8A]"],
+html.theme-navy-luxury [class*="bg-[#1E4697]"],
+html.theme-navy-luxury [class*="from-[#204DA4]"] {
+  background-color: #0E2A5C !important;
+  color: #FFFFFF !important;
+}
+
+html.theme-navy-luxury [class*="to-[#173B85]"] {
+  --tw-gradient-to: #081B3D !important;
+}
+
+html.theme-navy-luxury [class*="text-[#1E3A8A]"],
+html.theme-navy-luxury [class*="text-[#101B38]"] {
+  color: #0E2A5C !important;
+}
+
+html.theme-navy-luxury [class*="border-[#1E3A8A]"],
+html.theme-navy-luxury [class*="border-[#CAD5E5]"] {
+  border-color: #0E2A5C !important;
+}
+
+html.theme-navy-luxury .badge-navy-accent {
+  background-color: #EEF4FB;
+  color: #0E2A5C;
+  border: 1px solid #C6DBF5;
+}
+
+/* CHẾ ĐỘ TỐI TRONG TÔNG NAVY (NIGHT NAVY - THEO ẢNH 3 CỦA NGƯỜI DÙNG) */
+html.theme-navy-luxury.dark {
+  --color-bg: #061021;
+  --color-surface: #0B1C38;
+  --color-surface-2: #12284C;
+  --color-ink: #F8FAFC;
+  --color-ink-2: #BAE6FD;
+  --color-muted: #8AA0BF;
+  --color-line: #18335D;
+  --color-line-strong: #244880;
+  --color-primary: #0284C7;
+  --color-primary-dark: #0369A1;
+  --color-primary-soft: #0B2446;
+  --color-primary-track: #143767;
+  --color-on-primary-muted: #38BDF8;
+}
+
+html.theme-navy-luxury.dark,
+html.theme-navy-luxury.dark body,
+body.theme-navy-luxury.dark {
+  background-color: #061021 !important;
+  color: #F8FAFC !important;
+}
+
+html.theme-navy-luxury.dark body {
+  background-image: 
+    radial-gradient(ellipse 90% 40% at 50% -10%, rgba(2, 132, 199, 0.16), transparent 70%),
+    radial-gradient(ellipse 60% 30% at 100% 50%, rgba(11, 28, 56, 0.3), transparent 60%) !important;
+}
+
+html.theme-navy-luxury.dark .bg-bg {
+  background-color: #061021 !important;
+}
+
+html.theme-navy-luxury.dark .bg-white,
+html.theme-navy-luxury.dark .bg-surface {
+  background-color: #0B1C38 !important;
+  color: #F8FAFC !important;
+}
+
+html.theme-navy-luxury.dark .bg-surface-2 {
+  background-color: #12284C !important;
+  color: #F8FAFC !important;
+}
+
+html.theme-navy-luxury.dark .block-styled-card {
+  background-color: #0B1C38 !important;
+  border: 1px solid #18335D !important;
+}
+
+html.theme-navy-luxury.dark .text-ink,
+html.theme-navy-luxury.dark p,
+html.theme-navy-luxury.dark h1,
+html.theme-navy-luxury.dark h2,
+html.theme-navy-luxury.dark h3,
+html.theme-navy-luxury.dark h4,
+html.theme-navy-luxury.dark h5,
+html.theme-navy-luxury.dark h6,
+html.theme-navy-luxury.dark li,
+html.theme-navy-luxury.dark strong {
+  color: #F8FAFC !important;
+}
+
+html.theme-navy-luxury.dark .text-ink-2 {
+  color: #BAE6FD !important;
+}
+
+html.theme-navy-luxury.dark .text-muted {
+  color: #8AA0BF !important;
+}
+
+html.theme-navy-luxury.dark .border-line,
+html.theme-navy-luxury.dark .border-line-strong,
+html.theme-navy-luxury.dark .border-line\/40,
+html.theme-navy-luxury.dark .border-line\/60 {
+  border-color: #18335D !important;
+}
+
+html.theme-navy-luxury.dark input,
+html.theme-navy-luxury.dark textarea,
+html.theme-navy-luxury.dark select {
+  background-color: #0B1C38 !important;
+  color: #FFFFFF !important;
+  border-color: #18335D !important;
+}
+
+html.theme-navy-luxury.dark ::-webkit-scrollbar-thumb {
+  background: #18335D;
+}
+
+/* ============================================================================
    3D BOOK UTILITIES (QBIZ BOOKS LUXURY OPENING)
    ============================================================================ */
 .backface-hidden {

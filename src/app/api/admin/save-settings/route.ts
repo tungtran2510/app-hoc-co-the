@@ -58,6 +58,7 @@ export async function POST(req: NextRequest) {
       featured_topic_ids: settings.featured_topic_ids !== undefined ? settings.featured_topic_ids : (existingBlockStyles.featured_topic_ids ?? []),
       topics_description: settings.topics_description !== undefined ? settings.topics_description : (existingBlockStyles.topics_description ?? null),
       topics_guide: settings.topics_guide !== undefined ? settings.topics_guide : (existingBlockStyles.topics_guide ?? null),
+      theme_palette: settings.theme_palette !== undefined ? settings.theme_palette : (settings.block_styles?.theme_palette !== undefined ? settings.block_styles.theme_palette : (existingBlockStyles.theme_palette ?? 'indigo')),
     };
 
     const existingAuthorProfile = existing?.author_profile || {};
