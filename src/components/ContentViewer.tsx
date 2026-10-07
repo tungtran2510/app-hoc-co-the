@@ -61,7 +61,7 @@ import {
 } from '../lib/storage';
 
 const TOPIC_EBOOK_MAP: Record<string, { title: string }> = {
-  'cot-song': { title: 'Giải phẫu cột sống & Đĩa đệm' },
+  'cot-song': { title: 'Hiểu đúng về cột sống' },
   'dinh-duong': { title: 'Dinh dưỡng chuyên sâu & Chuyển hóa' },
   'co-the-nguoi': { title: 'Atlas giải phẫu cơ thể người' },
   'tieu-hoa': { title: 'Giải phẫu ứng dụng hệ tiêu hóa' },
@@ -1219,7 +1219,7 @@ export default function ContentViewer({
       {/* 6.5. Thẻ Cầu Nối Sách Chuyên Sâu (Smart Ebook Companion - Chuẩn 1 Dòng Mobile-First) */}
       {(appCustomSettings.show_ebook_bridge ?? true) && (
         <a
-          href={`${appCustomSettings.ebook_app_url || 'https://app-doc-sach.vercel.app'}?topic=${topic.slug}&page=${currentPage.slug}`}
+          href={`${appCustomSettings.ebook_app_url || 'https://qbiz-ebook.vercel.app'}?topic=${topic.slug}&page=${currentPage.slug}`}
           target="_blank"
           rel="noopener noreferrer"
           onClick={playTapSound}

@@ -540,7 +540,7 @@ export default function AdminSettingsModal({
                         type="text"
                         value={settings.ebook_app_url || ''}
                         onChange={(e) => setSettings({ ...settings, ebook_app_url: e.target.value })}
-                        placeholder="https://app-doc-sach.vercel.app"
+                        placeholder="https://qbiz-ebook.vercel.app"
                         className="flex-1 h-8 px-2.5 rounded-[8px] border border-line text-[12px] text-ink focus:border-emerald-500 bg-white"
                       />
                     </div>

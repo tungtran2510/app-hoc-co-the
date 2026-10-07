@@ -24,7 +24,7 @@ export const DEFAULT_APP_SETTINGS: AppCustomSettings = {
   show_progress_bar: true,
   theme_palette: 'indigo',
   show_ebook_bridge: true,
-  ebook_app_url: 'https://app-doc-sach.vercel.app',
+  ebook_app_url: 'https://qbiz-ebook.vercel.app',
 };
 
 /**
@@ -105,11 +105,14 @@ export function getStoredAppSettings(): AppCustomSettings {
       const savedPalette = localStorage.getItem('qbiz_theme_palette') as 'indigo' | 'navy_luxury' | null;
       const savedShowEbook = localStorage.getItem('qbiz_show_ebook_bridge');
       const savedEbookUrl = localStorage.getItem('qbiz_ebook_app_url');
+      const resolvedEbookUrl = (!savedEbookUrl || savedEbookUrl.includes('app-doc-sach.vercel.app'))
+        ? DEFAULT_APP_SETTINGS.ebook_app_url
+        : savedEbookUrl;
       return {
         ...DEFAULT_APP_SETTINGS,
         theme_palette: savedPalette === 'navy_luxury' || savedPalette === 'indigo' ? savedPalette : DEFAULT_APP_SETTINGS.theme_palette,
         show_ebook_bridge: savedShowEbook !== null ? savedShowEbook === 'true' : DEFAULT_APP_SETTINGS.show_ebook_bridge,
-        ebook_app_url: savedEbookUrl || DEFAULT_APP_SETTINGS.ebook_app_url,
+        ebook_app_url: resolvedEbookUrl,
       };
     } catch {}
   }
