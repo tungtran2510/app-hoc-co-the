@@ -105,3 +105,21 @@ Hệ thống hỗ trợ đầy đủ **10 khối nội dung chuẩn**:
 - **Quy tắc kiểm duyệt thương hiệu tuyệt đối (Strict Zero-Brand Rule):**
   - Toàn bộ tên thương hiệu (DoctorLoan, Hydro Gems, Gems, các thiết bị thương mại) bị loại bỏ 100% khỏi câu trả lời, câu hỏi gợi ý và cơ sở tri thức huấn luyện AI.
 
+
+
+---
+
+## 8. CÁC TÍNH NĂNG MỚI NÂNG CẤP & BỘ NHỚ QUY TẮC BẤT KHẢ XÂM PHẠM
+### A. Ba tính năng mới hoàn thiện:
+1. **Bước 1 - AI YouTube Lesson Drafter (`/api/admin/draft-lesson`):** Tự động bóc tách transcript, tiêu đề, tóm tắt ý nghĩa y học và soạn sẵn bộ 10 khối nội dung chuẩn chỉ từ link YouTube cho bài học.
+2. **Bước 2 - Atlas Giải Phẫu 3D Tương Tác Đa Hệ Cơ Quan (`InteractiveAnatomyModal.tsx` & `/giai-phau-3d`):**
+   - Tích hợp mô hình 3D tương tác trực quan 7 hệ cơ quan (Cột sống, Tim mạch, Hô hấp, Tiêu hóa, Thần kinh, Cơ bắp, Xương khớp).
+   - Nút bật nhanh "🦴 Mô hình 3D" trên Header từng bài học và nút "Atlas 3D" trên trang chuyên đề.
+3. **Bước 4 - Cẩm Nang Y Khoa, Mã QR Từng Bài Học & Chốt Khách Zalo (`HandbookModal.tsx`):**
+   - Xuất cẩm nang học tập bỏ túi chuẩn mobile, in ấn/lưu PDF.
+   - Sinh mã QR động cho từng bài học để quét xem video/bài giảng tức thì trên điện thoại.
+   - Tích hợp form nhận cẩm nang bỏ túi gửi thẳng về Zalo admin (`0974248716`).
+
+### B. QUY TẮC BẤT KHẢ XÂM PHẠM (MANDATORY SUPREME RULE):
+- **Bắt buộc gửi ảnh trực tiếp vào chat:** Sau BẤT KỂ một thao tác, tính năng, sửa lỗi, căn chỉnh nút bấm hay văn bản nào: Agent BẮT BUỘC phải dùng trình duyệt thật (Playwright mobile viewport 390x844) chụp ảnh màn hình giao diện thực tế và **GỬI TRỰC TIẾP HÌNH ẢNH ĐÓ VÀO ĐOẠN CHAT** để người dùng nghiệm thu bằng mắt thường. Tuyệt đối **CẤM báo cáo chay bằng chữ hay chỉ đưa tên file**.
+- **Chuẩn tinh gọn trên điện thoại (Mobile-First):** Hoàn thiện mỗi tính năng là phải chuẩn tinh gọn trên màn hình điện thoại, **CẤM TUYỆT ĐỐI các dòng thừa**, chữ vụn vặt, khoảng hở cồng kềnh làm rối mắt.

@@ -7,10 +7,13 @@
 3. **Chỉ sửa đúng Delta:** Giữ nguyên các khối và bài học người dùng đã soạn.
 4. **Tham khảo chi tiết:** Đọc file `PROJECT_BRAIN.md` trong thư mục gốc để nắm rõ toàn bộ kiến trúc 10 khối nội dung, tài khoản quản trị và quy trình triển khai Vercel.
 5. **Kiểm thử trình duyệt thật (Playwright) là điều kiện BẮT BUỘC:** Mọi thay đổi liên quan đến click, điều hướng, chuyển trang hay hiệu ứng BẮT BUỘC phải được chạy kịch bản Playwright kiểm thử trên trình duyệt thật (mobile viewport), xác nhận trang chuyển đổi thành công 100% trước khi nghiệm thu.
+6. **QUY TẮC BẤT KHẢ XÂM PHẠM (CHỤP ẢNH MOBILE & GỬI TRỰC TIẾP VÀO CHAT):**
+   - **Bắt buộc gửi ảnh trực tiếp vào chat:** Sau BẤT KỂ một thao tác, tính năng, sửa lỗi, căn chỉnh nút bấm hay văn bản nào: Agent BẮT BUỘC phải dùng trình duyệt thật (Playwright mobile viewport 390x844) chụp ảnh màn hình giao diện thực tế và **GỬI TRỰC TIẾP HÌNH ẢNH ĐÓ VÀO ĐOẠN CHAT** để người dùng nghiệm thu bằng mắt thường. Tuyệt đối **CẤM báo cáo chay bằng chữ hay chỉ đưa tên file**.
+   - **Chuẩn tinh gọn trên điện thoại (Mobile-First):** Hoàn thiện mỗi tính năng là phải chuẩn tinh gọn trên màn hình điện thoại, **CẤM TUYỆT ĐỐI các dòng thừa**, chữ vụn vặt, khoảng hở cồng kềnh làm rối mắt.
 
 ## 2. QUY TRÌNH TRIỂN KHAI CHUẨN
 - Kiểm tra biên dịch: `cmd.exe /c npx tsc --noEmit`
 - Kiểm tra build: `cmd.exe /c npm run build`
 - Đẩy mã nguồn: `git push origin main`
-- Triển khai Vercel: `npx vercel --prod --yes`
-- **Kiểm thử trình duyệt thật (Playwright Test):** `node test_live.js` (xác nhận click các tab và chuyển trang thành công 100%)
+- Triển khai Vercel: `cmd.exe /c npx vercel --prod --yes`
+- **Kiểm thử trình duyệt thật & Chụp ảnh (Playwright Test Mobile 390x844):** Chạy script chụp ảnh thực tế, lưu vào thư mục artifact và nhúng trực tiếp ảnh vào câu trả lời để người dùng nghiệm thu.
