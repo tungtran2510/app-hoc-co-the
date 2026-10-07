@@ -7,14 +7,14 @@ import TopicIcon from './TopicIcon';
 import { Topic } from '../lib/types';
 
 export const DEFAULT_TOPIC_COVERS: Record<string, string> = {
-  'cot-song': '/images/topics/cot-song.png',
-  'dinh-duong': '/images/topics/dinh-duong.png',
-  'nuoc': '/images/topics/nuoc.png',
-  'tieu-hoa': '/images/topics/tieu-hoa.png',
-  'co-the-nguoi': '/images/topics/co-the-nguoi.png',
-  'noi-tiet-chuyen-hoa': '/images/topics/noi-tiet-chuyen-hoa.png',
-  'gan-mat-tuy': '/images/topics/gan-mat-tuy.png',
-  'mien-dich': '/images/topics/mien-dich.png',
+  'cot-song': '/images/topics/cot-song.webp',
+  'dinh-duong': '/images/topics/dinh-duong.webp',
+  'nuoc': '/images/topics/nuoc.webp',
+  'tieu-hoa': '/images/topics/tieu-hoa.webp',
+  'co-the-nguoi': '/images/topics/co-the-nguoi.webp',
+  'noi-tiet-chuyen-hoa': '/images/topics/noi-tiet-chuyen-hoa.webp',
+  'gan-mat-tuy': '/images/topics/gan-mat-tuy.webp',
+  'mien-dich': '/images/topics/mien-dich.webp',
 };
 
 export const TOPIC_MIND_MAP_SUBTITLES: Record<string, string> = {

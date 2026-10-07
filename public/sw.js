@@ -3,8 +3,8 @@
 // Đạt tốc độ phản hồi tức thì (< 1ms) khi người dùng chuyển đổi các mục hoặc vào bài học
 // TUÂN THỦ CHỈ THỊ: Chỉ tải từ mạng khi người dùng ấn vào tài liệu sách / video dung lượng lớn
 
-const CACHE_NAME = 'qbiz-books-shell-v40';
-const STATIC_ASSETS_CACHE = 'qbiz-books-static-v40';
+const CACHE_NAME = 'qbiz-books-shell-v42';
+const STATIC_ASSETS_CACHE = 'qbiz-books-static-v42';
 
 // Lắng nghe lệnh xóa cache từ Admin Client khi có thay đổi nội dung/vị trí
 self.addEventListener('message', (event) => {
@@ -41,6 +41,14 @@ const PRECACHE_SHELL_URLS = [
   '/icon-maskable-512.png',
   '/images/book_cover_blank.jpg',
   '/spine_hero_clean.png',
+  '/images/topics/cot-song.webp',
+  '/images/topics/dinh-duong.webp',
+  '/images/topics/nuoc.webp',
+  '/images/topics/tieu-hoa.webp',
+  '/images/topics/co-the-nguoi.webp',
+  '/images/topics/noi-tiet-chuyen-hoa.webp',
+  '/images/topics/gan-mat-tuy.webp',
+  '/images/topics/mien-dich.webp',
 ];
 
 // Next App Router payloads (RSC) phải luôn khớp với HTML/JS đang chạy.
@@ -85,9 +93,8 @@ self.addEventListener('fetch', (event) => {
 
   // 2. TUÂN THỦ: Không can thiệp các luồng stream video YouTube hoặc file tài liệu lớn
   if (
-    url.hostname.includes('youtube.com') ||
     url.hostname.includes('googlevideo.com') ||
-    url.hostname.includes('ytimg.com') ||
+    (url.hostname.includes('youtube.com') && !url.pathname.includes('/vi/')) ||
     url.pathname.endsWith('.pdf') ||
     url.pathname.includes('/documents/pdf/')
   ) {
@@ -187,6 +194,30 @@ self.addEventListener('fetch', (event) => {
         const fetchPromise = fetch(request)
           .then((networkResponse) => {
             if (networkResponse && networkResponse.status === 200) {
+              cache.put(request, networkResponse.clone());
+            }
+            return networkResponse;
+          })
+          .catch(() => cachedResponse);
+
+        return cachedResponse || fetchPromise;
+      })
+    );
+    return;
+  }
+
+  // 4c. Với hình ảnh thumbnail video YouTube (*.ytimg.com, img.youtube.com):
+  // Chiến lược: STALE WHILE REVALIDATE (Hiện ngay từ cache nếu có, tự lưu cache khi tải)
+  if (
+    (url.hostname.includes('ytimg.com') || url.hostname.includes('youtube.com')) &&
+    (url.pathname.endsWith('.jpg') || url.pathname.endsWith('.webp') || url.pathname.includes('/vi/'))
+  ) {
+    event.respondWith(
+      caches.open(STATIC_ASSETS_CACHE).then(async (cache) => {
+        const cachedResponse = await cache.match(request);
+        const fetchPromise = fetch(request, { mode: 'cors' })
+          .then((networkResponse) => {
+            if (networkResponse && (networkResponse.status === 200 || networkResponse.type === 'opaque')) {
               cache.put(request, networkResponse.clone());
             }
             return networkResponse;

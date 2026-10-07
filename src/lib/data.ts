@@ -354,6 +354,36 @@ export async function getTopicBySlug(slug: string): Promise<Topic | null> {
   });
 }
 
+export const TOPIC_UUID_MAP: Record<string, string> = {
+  'cot-song': 'a0000000-0000-0000-0000-000000000001',
+  'dinh-duong': 'a0000000-0000-0000-0000-000000000002',
+  'co-the-nguoi': 'a0000000-0000-0000-0000-000000000003',
+  'tieu-hoa': 'a0000000-0000-0000-0000-000000000004',
+  'nuoc': 'a0000000-0000-0000-0000-000000000005',
+  'noi-tiet-chuyen-hoa': 'a0000000-0000-0000-0000-000000000006',
+  'gan-mat-tuy': 'a0000000-0000-0000-0000-000000000007',
+  'mien-dich': 'a0000000-0000-0000-0000-000000000008',
+};
+
+export const UUID_TO_SAMPLE_TOPIC_ID: Record<string, string> = {
+  'a0000000-0000-0000-0000-000000000001': 'topic-cot-song',
+  'a0000000-0000-0000-0000-000000000002': 'topic-dinh-duong',
+  'a0000000-0000-0000-0000-000000000003': 'topic-co-the-nguoi',
+  'a0000000-0000-0000-0000-000000000004': 'topic-tieu-hoa',
+  'a0000000-0000-0000-0000-000000000005': 'topic-nuoc',
+  'a0000000-0000-0000-0000-000000000006': 'topic-noi-tiet-chuyen-hoa',
+  'a0000000-0000-0000-0000-000000000007': 'topic-gan-mat-tuy',
+  'a0000000-0000-0000-0000-000000000008': 'topic-mien-dich',
+  'cot-song': 'topic-cot-song',
+  'dinh-duong': 'topic-dinh-duong',
+  'co-the-nguoi': 'topic-co-the-nguoi',
+  'tieu-hoa': 'topic-tieu-hoa',
+  'nuoc': 'topic-nuoc',
+  'noi-tiet-chuyen-hoa': 'topic-noi-tiet-chuyen-hoa',
+  'gan-mat-tuy': 'topic-gan-mat-tuy',
+  'mien-dich': 'topic-mien-dich',
+};
+
 export async function getPagesByTopic(topicId: string, includeHidden = false): Promise<Page[]> {
   const cacheKey = `pages_by_topic:${topicId}:${includeHidden}`;
   return getCachedOrFetch(cacheKey, async () => {
@@ -365,13 +395,15 @@ export async function getPagesByTopic(topicId: string, includeHidden = false): P
           query = query.eq('is_visible', true).eq('status', 'published');
         }
         const { data } = await query.order('sort_order', { ascending: true });
-        if (data) return data as Page[];
+        if (data && data.length > 0) return data as Page[];
       } catch {
         // fallback
       }
     }
+    const targetSampleId = UUID_TO_SAMPLE_TOPIC_ID[topicId] || topicId;
+    const targetUuid = TOPIC_UUID_MAP[topicId] || topicId;
     return samplePages
-      .filter((p) => p.topic_id === topicId && (includeHidden || (p.is_visible && p.status === 'published')))
+      .filter((p) => (p.topic_id === topicId || p.topic_id === targetSampleId || p.topic_id === targetUuid) && (includeHidden || (p.is_visible && p.status === 'published')))
       .sort((a, b) => a.sort_order - b.sort_order);
   });
 }
@@ -405,10 +437,14 @@ export async function getTopicsWithCounts(includeHidden = false): Promise<{ topi
       }
     }
 
-    return topics.map((topic) => ({
-      topic,
-      pageCount: pageCounts[topic.id] ?? samplePages.filter((p) => p.topic_id === topic.id).length,
-    }));
+    return topics.map((topic) => {
+      const targetSampleId = UUID_TO_SAMPLE_TOPIC_ID[topic.id] || topic.id;
+      const targetUuid = TOPIC_UUID_MAP[topic.id] || topic.id;
+      return {
+        topic,
+        pageCount: pageCounts[topic.id] ?? samplePages.filter((p) => p.topic_id === topic.id || p.topic_id === targetSampleId || p.topic_id === targetUuid).length,
+      };
+    });
   });
 }
 

@@ -180,7 +180,7 @@ export default function TopicLearningExperience({
   const actionHref = continuePage?.page_slug
     ? `/${topic.slug}/${continuePage.page_slug}?v=${continuePage.video_index || 1}`
     : firstPage ? `/${topic.slug}/${firstPage.slug}` : `/${topic.slug}`;
-  const cover = topic.cover_url || `/images/topics/${topic.slug}.png`;
+  const cover = topic.cover_url || `/images/topics/${topic.slug}.webp`;
 
   return (
     <>

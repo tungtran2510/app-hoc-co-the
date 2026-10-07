@@ -63,8 +63,10 @@ import {
 const TOPIC_EBOOK_MAP: Record<string, { title: string }> = {
   'cot-song': { title: 'Hiểu đúng về cột sống' },
   'dinh-duong': { title: 'Dinh dưỡng chuyên sâu & Chuyển hóa' },
+  'nuoc': { title: 'Khoa học nguồn nước & Cân bằng tế bào' },
   'co-the-nguoi': { title: 'Atlas giải phẫu cơ thể người' },
   'tieu-hoa': { title: 'Giải phẫu ứng dụng hệ tiêu hóa' },
+  'noi-tiet-chuyen-hoa': { title: 'Cơ chế nội tiết & Chuyển hóa' },
   'gan-mat-tuy': { title: 'Giải phẫu gan mật & Chức năng chuyển hóa' },
   'mien-dich': { title: 'Gốc bệnh & Miễn dịch học cơ thể' },
   'tuan-hoan': { title: 'Hệ tuần hoàn & Sinh lý tim mạch' },
