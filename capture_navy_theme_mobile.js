@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const artifactDir = 'C:\\Users\\Admin\\.gemini\\antigravity\\brain\\23366f77-380f-4e19-b36c-a5afcfb63db3';
-const deployUrl = 'https://app-hoc-co-aq6c6efcc-tungtran2510-3020s-projects.vercel.app';
+const deployUrl = 'https://app-hoc-co-the.vercel.app';
 
 async function run() {
   console.log('Khởi động Playwright Mobile Viewport 390x844...');

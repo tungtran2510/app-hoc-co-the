@@ -17,6 +17,10 @@
 8. **QUY TẮC BẤT KHẢ XÂM PHẠM: TUYỆT ĐỐI KHÔNG TỰ Ý ĐẨY CODE LÊN GITHUB HOẶC VERCEL (MANDATORY PERMISSION BEFORE PUSH & DEPLOY):**
    - **Cấm tuyệt đối tự ý push/deploy:** Mọi thao tác phát triển, sửa lỗi, hoàn thiện giao diện CHỈ ĐƯỢC kiểm thử trên môi trường nội bộ (Localhost / Playwright Mobile Viewport 390x844).
    - **Bắt buộc hỏi và xin phép trước:** Sau khi sửa xong và chụp ảnh nghiệm thu, Agent BẮT BUỘC phải hỏi ý kiến người dùng và CHỜ người dùng xác nhận "Đồng ý", "Đẩy lên", "Triển khai" thì mới được phép thực thi lệnh đẩy mã nguồn (`git push origin main`) và triển khai Vercel (`vercel --prod`). Tuyệt đối KHÔNG ĐƯỢC tự ý đẩy ngầm trong im lặng khi chưa được phép!
+9. **QUY TẮC DUY NHẤT MỘT TÊN MIỀN PRODUCTION CHÍNH THỨC (SINGLE CANONICAL DOMAIN):**
+   - **Tên miền chính thức duy nhất:** Toàn bộ hệ thống, báo cáo, tài liệu và liên kết CHỈ ĐƯỢC sử dụng duy nhất: **`https://app-hoc-co-the.vercel.app/`**.
+   - **Cấm tuyệt đối tên miền phụ / team alias:** CẤM TUYỆT ĐỐI sử dụng, dẫn link hoặc đưa vào bộ nhớ bất kỳ tên miền phụ, team alias tự sinh (dạng `*tungtran2510-3020s-projects*`).
+   - **Đồng bộ alias bắt buộc sau deploy:** Mỗi khi chạy `vercel --prod`, phải luôn đảm bảo alias trỏ thẳng sang `https://app-hoc-co-the.vercel.app/` (`npx vercel alias set <deployment> app-hoc-co-the.vercel.app`).
 
 ## 2. QUY TRÌNH TRIỂN KHAI CHUẨN (KHI ĐƯỢC NGƯỜI DÙNG CHO PHÉP)
 - Kiểm tra biên dịch: `cmd.exe /c npx tsc --noEmit`
@@ -26,3 +30,4 @@
 - **CHỈ KHI NGƯỜI DÙNG ĐỒNG Ý / YÊU CẦU MỚI CHẠY:**
   - Đẩy mã nguồn: `git push origin main`
   - Triển khai Vercel: `cmd.exe /c npx vercel --prod --yes`
+  - Đảm bảo alias chính trỏ tới bản build: `cmd.exe /c npx vercel alias set <deployment-url> app-hoc-co-the.vercel.app`

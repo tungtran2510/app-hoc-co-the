@@ -17,7 +17,7 @@ async function run() {
 
   const page = await context.newPage();
 
-  const baseUrl = 'https://app-hoc-co-29proejsz-tungtran2510-3020s-projects.vercel.app';
+  const baseUrl = 'https://app-hoc-co-the.vercel.app';
   console.log('Sử dụng baseUrl:', baseUrl);
   await page.goto(baseUrl + '/dang-nhap', { waitUntil: 'domcontentloaded' });
   await page.fill('input[type="tel"]', '0974248716');
