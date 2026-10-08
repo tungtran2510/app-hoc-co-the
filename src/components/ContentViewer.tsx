@@ -1428,13 +1428,13 @@ export default function ContentViewer({
         className="fixed bottom-0 left-0 right-0 z-40 flex justify-center pointer-events-none"
       >
         <div className="w-full max-w-[540px] px-3 pt-1.5 pb-[max(8px,env(safe-area-inset-bottom))] bg-white/95 dark:bg-[#0E0820]/95 backdrop-blur-md border-t border-slate-200/90 dark:border-purple-900/60 shadow-[0_-4px_16px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_16px_rgba(0,0,0,0.5)] pointer-events-auto transition-all">
-          <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
+          <div className="flex items-center gap-2">
             {/* Nút Khung chữ nhật Bài trước / Quay lại - 1 dòng siêu gọn */}
             {prevPage ? (
               <a
                 href={`/${topic.slug}/${prevPage.slug}`}
                 onClick={playTapSound}
-                className="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-[10px] bg-slate-100 dark:bg-[#1E1438] border border-slate-300/90 dark:border-purple-700/60 hover:bg-slate-200 dark:hover:bg-[#281A4E] text-slate-800 dark:text-white transition-all shadow-xs group active:scale-[0.98] h-[36px] overflow-hidden cursor-pointer"
+                className="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-[10px] bg-slate-100 dark:bg-[#1E1438] border border-slate-300/90 dark:border-purple-700/60 hover:bg-slate-200 dark:hover:bg-[#281A4E] text-slate-800 dark:text-white transition-all shadow-xs group active:scale-[0.98] h-[36px] overflow-hidden cursor-pointer flex-1 min-w-0"
               >
                 <ArrowLeft size={13} strokeWidth={2.5} className="shrink-0 text-slate-500 dark:text-purple-300 group-hover:-translate-x-0.5 transition-transform" />
                 <span className="text-[11.5px] sm:text-[12px] font-bold truncate">
@@ -1445,21 +1445,21 @@ export default function ContentViewer({
               <a
                 href={`/${topic.slug}`}
                 onClick={playTapSound}
-                className="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-[10px] bg-slate-100 dark:bg-[#1E1438] border border-slate-300/90 dark:border-purple-700/60 hover:bg-slate-200 dark:hover:bg-[#281A4E] text-slate-800 dark:text-white transition-all shadow-xs group active:scale-[0.98] h-[36px] overflow-hidden cursor-pointer"
+                className="flex items-center justify-center gap-1 px-3 py-1 rounded-[10px] bg-slate-100 dark:bg-[#1E1438] border border-slate-300/90 dark:border-purple-700/60 hover:bg-slate-200 dark:hover:bg-[#281A4E] text-slate-800 dark:text-white transition-all shadow-xs group active:scale-[0.98] h-[36px] shrink-0 cursor-pointer whitespace-nowrap"
               >
                 <ArrowLeft size={13} strokeWidth={2.5} className="shrink-0 text-slate-500 dark:text-purple-300 group-hover:-translate-x-0.5 transition-transform" />
-                <span className="text-[11.5px] sm:text-[12px] font-bold truncate">
-                  Về danh sách
+                <span className="text-[11.5px] sm:text-[12px] font-bold">
+                  Danh sách
                 </span>
               </a>
             )}
 
-            {/* Nút Khung chữ nhật Bài tiếp theo - 1 dòng siêu gọn */}
+            {/* Nút Khung chữ nhật Bài tiếp theo - Mở rộng tối đa diện tích */}
             {nextPage ? (
               <a
                 href={`/${topic.slug}/${nextPage.slug}`}
                 onClick={playTapSound}
-                className="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-[10px] bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white font-black shadow-sm shadow-blue-600/20 border border-blue-300/50 hover:brightness-105 transition-all group active:scale-[0.98] h-[36px] overflow-hidden cursor-pointer"
+                className="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-[10px] bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white font-black shadow-sm shadow-blue-600/20 border border-blue-300/50 hover:brightness-105 transition-all group active:scale-[0.98] h-[36px] overflow-hidden cursor-pointer flex-1 min-w-0"
               >
                 <span className="text-[11.5px] sm:text-[12px] font-black text-white truncate">
                   Bài {String(nextPageIndex).padStart(2, '0')}: {nextPage.title}
@@ -1470,7 +1470,7 @@ export default function ContentViewer({
               <a
                 href={`/${topic.slug}`}
                 onClick={playTapSound}
-                className="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-[10px] bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white shadow-sm shadow-emerald-500/20 border border-emerald-400/40 hover:brightness-105 transition-all group active:scale-[0.98] h-[36px] overflow-hidden cursor-pointer"
+                className="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-[10px] bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white shadow-sm shadow-emerald-500/20 border border-emerald-400/40 hover:brightness-105 transition-all group active:scale-[0.98] h-[36px] overflow-hidden cursor-pointer flex-1 min-w-0"
               >
                 <span className="text-[11.5px] sm:text-[12px] font-bold text-white truncate">
                   Hoàn thành bài

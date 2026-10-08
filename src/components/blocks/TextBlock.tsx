@@ -113,7 +113,7 @@ export function sanitizeHtml(raw: string): string {
 
 export default function TextBlock({
   displayStyle,
-  lines,
+  lines = [],
   format = 'paragraph',
   fontSizeMode = 'normal',
   blockId,
@@ -131,6 +131,7 @@ export default function TextBlock({
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selectedImgIndex, setSelectedImgIndex] = useState(0);
 
+  const safeLines = Array.isArray(lines) ? lines : typeof lines === 'string' ? [lines] : [];
   const style = getBlockStyle(displayStyle);
 
   // Xác định cỡ chữ: cỡ riêng của khối (nếu có) là cỡ gốc; cỡ chữ chung của trang (Nhỏ/Vừa/Lớn) luôn được cộng thêm lên trên,
@@ -168,7 +169,7 @@ export default function TextBlock({
 
   // Khối HTML tùy biến
   if (mode === 'html' || displayStyle === 'html') {
-    const rawHtml = html || lines.join('\n');
+    const rawHtml = html || safeLines.join('\n');
     return (
       <div id={blockId} className="w-full scroll-mt-20 flex flex-col gap-2.5">
         {title && (
@@ -180,12 +181,12 @@ export default function TextBlock({
           </h3>
         )}
 
-        {html && lines.filter((l) => l && l !== 'Khối nội dung HTML').length > 0 && (
+        {html && safeLines.filter((l) => l && l !== 'Khối nội dung HTML').length > 0 && (
           <div
             className={`w-full text-ink leading-relaxed ${resolvedTextSizeClass} flex flex-col gap-2`}
             style={contentCustomStyle}
           >
-            {lines
+            {safeLines
               .filter((l) => l && l !== 'Khối nội dung HTML')
               .map((l, i) => (
                 <p key={i} className="m-0 whitespace-pre-wrap">
@@ -353,7 +354,7 @@ export default function TextBlock({
       <div className={`flex flex-col gap-2 font-normal ${textSizeClass}`} style={{ color: textColor || undefined, ...contentCustomStyle }}>
         {format === 'numbered' && (
           <ol className="flex flex-col gap-1.5 list-none p-0 m-0">
-            {lines.map((line, idx) => (
+            {safeLines.map((line, idx) => (
               <li key={idx} className="flex gap-2">
                 <span className="font-bold text-ink shrink-0">{idx + 1}.</span>
                 <span>{renderFormattedLine(line)}</span>
@@ -364,7 +365,7 @@ export default function TextBlock({
 
         {format === 'bullet' && (
           <ul className="flex flex-col gap-1.5 list-none p-0 m-0">
-            {lines.map((line, idx) => (
+            {safeLines.map((line, idx) => (
               <li key={idx} className="flex gap-2.5">
                 <span className="shrink-0 text-ink text-[16px] leading-relaxed">•</span>
                 <span>{renderFormattedLine(line)}</span>
@@ -374,7 +375,7 @@ export default function TextBlock({
         )}
 
         {format === 'paragraph' &&
-          lines.map((line, idx) => (
+          safeLines.map((line, idx) => (
             <p key={idx} className="m-0">
               {renderFormattedLine(line)}
             </p>

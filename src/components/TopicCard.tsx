@@ -15,7 +15,7 @@ export const DEFAULT_TOPIC_COVERS: Record<string, string> = {
   'co-the-nguoi': '/images/topics/co-the-nguoi.webp',
   'noi-tiet-chuyen-hoa': '/images/topics/noi-tiet-chuyen-hoa.webp',
   'gan-mat-tuy': '/images/topics/gan-mat-tuy.webp',
-  'mien-dich': '/images/topics/mien-dich.webp',
+  'tung-dinh-duong': '/images/topics/tung-dinh-duong.webp',
 };
 
 export const TOPIC_MIND_MAP_SUBTITLES: Record<string, string> = {
@@ -27,6 +27,7 @@ export const TOPIC_MIND_MAP_SUBTITLES: Record<string, string> = {
   'noi-tiet-chuyen-hoa': 'ENDOCRINE',
   'gan-mat-tuy': 'LIVER & GLAND',
   'mien-dich': 'IMMUNITY',
+  'tung-dinh-duong': 'EXPERT TRAINING',
 };
 
 interface TopicCardProps {
@@ -48,14 +49,19 @@ export default function TopicCard({
   const router = useRouter();
   const [imgError, setImgError] = useState(false);
   const isAvailable = pageCount > 0;
-  const coverUrl = topic.cover_url || DEFAULT_TOPIC_COVERS[topic.slug] || null;
+  const coverUrl = (topic.slug === 'tung-dinh-duong' ? DEFAULT_TOPIC_COVERS[topic.slug] : (topic.cover_url || DEFAULT_TOPIC_COVERS[topic.slug])) || null;
   const hasCoverImage = Boolean(coverUrl) && !imgError;
   const mindMapSubtitle = TOPIC_MIND_MAP_SUBTITLES[topic.slug] || 'ANATOMY';
 
   // Định dạng tiêu đề hiển thị đồng bộ, ngắt dòng tự nhiên không bị cắt dấu
-  const displayTitle = topic.title
-    .replace(' – ', '\n')
-    .replace(' - ', '\n');
+  const formatTopicTitle = (title: string) => {
+    let t = title.replace(' – ', '\n').replace(' - ', '\n');
+    if (/dinh\s+dưỡng\s+nền\s+tảng/i.test(t)) {
+      t = t.replace(/dinh\s+dưỡng\s+nền\s+tảng/i, (m) => m.replace(/\s+nền/i, '\nNền'));
+    }
+    return t;
+  };
+  const displayTitle = formatTopicTitle(topic.title);
 
   const handleNavigate = () => {
     playTapSound();
@@ -109,11 +115,13 @@ export default function TopicCard({
               src={coverUrl!}
               alt={topic.title}
               decoding="async"
-              className={`topic-card-img w-full h-full max-h-[120px] sm:max-h-[132px] object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.55)] transition-all duration-100 group-active:scale-110 group-[.is-active]:scale-110 ${
-                topic.slug === 'cot-song' ? 'scale-115' : ''
-              }`}
+              className={`topic-card-img w-full h-full max-h-[120px] sm:max-h-[132px] drop-shadow-[0_8px_16px_rgba(0,0,0,0.55)] transition-all duration-100 group-active:scale-110 group-[.is-active]:scale-110 ${
+                topic.slug === 'tung-dinh-duong'
+                  ? 'max-w-[76px] max-h-[76px] sm:max-w-[84px] sm:max-h-[84px] object-cover rounded-[14px] border border-white/25 shadow-lg'
+                  : 'object-contain'
+              } ${topic.slug === 'cot-song' ? 'scale-115' : ''}`}
               onError={() => setImgError(true)}
-              loading="lazy"
+              loading="eager"
             />
           ) : (
             <div className="text-purple-300/60 drop-shadow-md">
@@ -123,7 +131,7 @@ export default function TopicCard({
         </div>
 
         {/* 4. CỘT THÔNG TIN BÊN TRÁI: TIẾNG ANH PHỤ TRÊN CÙNG + TIÊU ĐỀ TIẾNG VIỆT TO RÕ ĐỒNG BỘ */}
-        <div className={`relative z-10 flex flex-col gap-1 ${boldTitle ? 'max-w-[65%]' : 'max-w-[60%] sm:max-w-[58%]'}`}>
+        <div className={`relative z-10 flex flex-col gap-1 ${boldTitle ? 'max-w-[70%]' : 'max-w-[66%] sm:max-w-[62%]'}`}>
           {/* Nhãn tiếng Anh phụ trên cùng (ngắn gọn, chuẩn nhãn bìa sách) */}
           <div className="flex items-center gap-1 text-[8.5px] sm:text-[9.5px] font-bold uppercase tracking-wider text-purple-200/90 leading-tight">
             <svg className="w-2.5 h-2.5 text-purple-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -133,7 +141,7 @@ export default function TopicCard({
           </div>
 
           {/* Tiêu đề tiếng Việt in hoa ĐỒNG BỘ KÍCH THƯỚC, CHUẨN DẤU VÀ KHOẢNG CÁCH FONT */}
-          <h3 className={`font-extrabold text-white uppercase tracking-normal leading-[1.25] drop-shadow-sm mt-0.5 line-clamp-2 text-[14.5px] sm:text-[15.5px] whitespace-pre-line ${boldTitle ? 'topic-card-title-bold' : ''}`}>
+          <h3 className={`font-extrabold text-white uppercase tracking-normal leading-[1.2] drop-shadow-sm mt-0.5 line-clamp-2 text-[13.5px] min-[390px]:text-[14px] sm:text-[15.5px] whitespace-pre-line ${boldTitle ? 'topic-card-title-bold' : ''}`}>
             {displayTitle}
           </h3>
         </div>

@@ -259,105 +259,55 @@ export default function VideosBlock({
     }
   };
 
-  // CHẾ ĐỘ PHÁT: 'video' (Nút 1: Xem video) | 'audio' (Nút 2: Nghe khi tắt màn hình)
-  const [mediaMode, setMediaMode] = useState<'video' | 'audio'>('video');
+  // TÍNH NĂNG TỰ ĐỘNG: Nghe khi tắt màn hình (Background Audio & MediaSession API)
+  const [backgroundAudioEnabled, setBackgroundAudioEnabled] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+    try {
+      return localStorage.getItem('qbiz_background_audio_enabled') !== 'false';
+    } catch {
+      return true;
+    }
+  });
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState<boolean>(false);
-  const [audioCurrentTime, setAudioCurrentTime] = useState<number>(0);
-  const [audioDuration, setAudioDuration] = useState<number>(0);
 
-  // Chuyển đổi giữa 2 chế độ: Xem video (Nút 1) & Nghe khi tắt màn hình (Nút 2)
-  const handleSwitchMode = (mode: 'video' | 'audio') => {
+  const handleToggleBackgroundAudio = () => {
     playTapSound();
-    setMediaMode(mode);
-    if (mode === 'audio') {
-      // 1. Tạm dừng YouTube iframe để tránh 2 nguồn âm thanh cùng phát
-      try {
-        playerRef.current?.pauseVideo?.();
-      } catch {}
-      setIsPlaying(false);
-
-      // 2. Kích hoạt phát audio ngay từ cú chạm của người dùng (User Gesture trực tiếp)
-      // Đảm bảo 100% trình duyệt điện thoại (iOS/Android) cấp quyền phát nền khi tắt màn hình
-      if (audioRef.current) {
-        audioRef.current.playbackRate = playbackRateRef.current;
-        audioRef.current.play().then(() => {
-          setIsAudioPlaying(true);
-          if ('mediaSession' in navigator) {
-            navigator.mediaSession.playbackState = 'playing';
-          }
-        }).catch((err) => {
-          console.warn('Audio playback error:', err);
-        });
-      }
-    } else {
-      // Chuyển về chế độ Xem video
-      if (audioRef.current) {
-        audioRef.current.pause();
-        setIsAudioPlaying(false);
-        if ('mediaSession' in navigator) {
-          navigator.mediaSession.playbackState = 'paused';
-        }
-      }
-      setIsPlaying(true);
-      try {
-        playerRef.current?.playVideo?.();
-      } catch {}
-    }
-  };
-
-  // Điều khiển phát / tạm dừng trong chế độ Audio
-  const handleToggleAudioPlay = () => {
-    playTapSound();
-    if (!audioRef.current) return;
-    if (isAudioPlaying) {
+    const nextVal = !backgroundAudioEnabled;
+    setBackgroundAudioEnabled(nextVal);
+    try {
+      localStorage.setItem('qbiz_background_audio_enabled', nextVal ? 'true' : 'false');
+    } catch {}
+    if (!nextVal && audioRef.current) {
       audioRef.current.pause();
       setIsAudioPlaying(false);
-      if ('mediaSession' in navigator) {
-        navigator.mediaSession.playbackState = 'paused';
-      }
-    } else {
-      audioRef.current.play().then(() => {
-        setIsAudioPlaying(true);
-        if ('mediaSession' in navigator) {
-          navigator.mediaSession.playbackState = 'playing';
-        }
-      }).catch(() => {});
     }
   };
 
-  // Tua audio (+/- giây)
-  const handleAudioSkip = (seconds: number) => {
-    playTapSound();
-    if (audioRef.current) {
-      const nextTime = Math.max(0, Math.min(audioRef.current.duration || 9999, audioRef.current.currentTime + seconds));
-      audioRef.current.currentTime = nextTime;
-      setAudioCurrentTime(nextTime);
-    }
-  };
-
-  // Kéo thanh thời gian (Scrubber)
-  const handleAudioSeek = (newTime: number) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = newTime;
-      setAudioCurrentTime(newTime);
-    }
-  };
-
-  // Đồng bộ Screen Wake Lock khi video đang phát ở chế độ Video
+  // Đồng bộ Screen Wake Lock khi video đang phát
   useEffect(() => {
-    if (mediaMode === 'video' && isPlaying && wakeLockEnabled) {
+    if (isPlaying && wakeLockEnabled) {
       requestWakeLock();
-    } else {
+    } else if (!isPlaying) {
       releaseWakeLock();
     }
-  }, [isPlaying, wakeLockEnabled, mediaMode]);
+  }, [isPlaying, wakeLockEnabled]);
 
-  // Khôi phục Wake Lock khi màn hình sáng trở lại (nếu đang xem video)
+  // Tự động phát âm thanh nền khi màn hình tắt / khóa máy & đồng bộ Wake Lock
   useEffect(() => {
     const handleVisibility = () => {
-      if (document.visibilityState === 'visible') {
-        if (wakeLockEnabled && isPlaying && mediaMode === 'video') {
+      if (document.visibilityState === 'hidden') {
+        // TỰ ĐỘNG: Màn hình tắt hoặc khóa máy -> Phát âm thanh nền
+        if (isPlaying && backgroundAudioEnabled && audioRef.current) {
+          audioRef.current.play().then(() => setIsAudioPlaying(true)).catch(() => {});
+        }
+      } else if (document.visibilityState === 'visible') {
+        // Màn hình sáng trở lại -> Dừng âm thanh nền
+        if (audioRef.current && isAudioPlaying) {
+          audioRef.current.pause();
+          setIsAudioPlaying(false);
+        }
+        if (wakeLockEnabled && isPlaying) {
           requestWakeLock();
         }
       }
@@ -367,7 +317,7 @@ export default function VideosBlock({
       document.removeEventListener('visibilitychange', handleVisibility);
       releaseWakeLock();
     };
-  }, [wakeLockEnabled, isPlaying, mediaMode]);
+  }, [wakeLockEnabled, isPlaying, isAudioPlaying, backgroundAudioEnabled]);
 
   // Đồng bộ tốc độ phát với thẻ Audio
   useEffect(() => {
@@ -741,32 +691,15 @@ export default function VideosBlock({
     setIsEndedPlaylist(false);
     recordXemTiep(idx);
 
-    if (mediaMode === 'audio') {
-      // Đang ở chế độ nghe khi tắt màn hình: phát audio của bài mới
-      if (audioRef.current) {
-        audioRef.current.currentTime = 0;
-        setAudioCurrentTime(0);
-        setTimeout(() => {
-          if (audioRef.current) {
-            audioRef.current.playbackRate = playbackRateRef.current;
-            audioRef.current.play().then(() => {
-              setIsAudioPlaying(true);
-              if ('mediaSession' in navigator) {
-                navigator.mediaSession.playbackState = 'playing';
-              }
-            }).catch(() => {});
-          }
-        }, 150);
-      }
-    } else {
-      // Đang ở chế độ xem video: phát YouTube bài mới
-      setIsPlaying(true);
-      const targetVid = videoList[idx];
-      if (targetVid?.youtube_id && playerRef.current?.loadVideoById) {
-        playerRef.current.loadVideoById(targetVid.youtube_id);
-        if (typeof playerRef.current.setPlaybackRate === 'function') {
-          playerRef.current.setPlaybackRate(playbackRateRef.current);
-        }
+    setIsPlaying(true);
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+    }
+    const targetVid = videoList[idx];
+    if (targetVid?.youtube_id && playerRef.current?.loadVideoById) {
+      playerRef.current.loadVideoById(targetVid.youtube_id);
+      if (typeof playerRef.current.setPlaybackRate === 'function') {
+        playerRef.current.setPlaybackRate(playbackRateRef.current);
       }
     }
   };
@@ -792,42 +725,39 @@ export default function VideosBlock({
       });
 
       navigator.mediaSession.setActionHandler('play', () => {
-        if (mediaMode === 'audio') {
-          if (audioRef.current) {
-            audioRef.current.play().then(() => {
-              setIsAudioPlaying(true);
-              navigator.mediaSession.playbackState = 'playing';
-            }).catch(() => {});
-          }
-        } else {
-          setIsPlaying(true);
-          try {
-            playerRef.current?.playVideo?.();
-          } catch {}
+        setIsPlaying(true);
+        try {
+          playerRef.current?.playVideo?.();
+        } catch {}
+        if (backgroundAudioEnabled && audioRef.current) {
+          audioRef.current.play().then(() => setIsAudioPlaying(true)).catch(() => {});
         }
       });
 
       navigator.mediaSession.setActionHandler('pause', () => {
-        if (mediaMode === 'audio') {
-          if (audioRef.current) {
-            audioRef.current.pause();
-            setIsAudioPlaying(false);
-            navigator.mediaSession.playbackState = 'paused';
-          }
-        } else {
-          setIsPlaying(false);
-          try {
-            playerRef.current?.pauseVideo?.();
-          } catch {}
+        setIsPlaying(false);
+        try {
+          playerRef.current?.pauseVideo?.();
+        } catch {}
+        if (audioRef.current) {
+          audioRef.current.pause();
+          setIsAudioPlaying(false);
         }
       });
 
       navigator.mediaSession.setActionHandler('seekbackward', () => {
-        handleAudioSkip(-10);
+        if (audioRef.current) {
+          audioRef.current.currentTime = Math.max(0, audioRef.current.currentTime - 10);
+        }
       });
 
       navigator.mediaSession.setActionHandler('seekforward', () => {
-        handleAudioSkip(10);
+        if (audioRef.current) {
+          audioRef.current.currentTime = Math.min(
+            audioRef.current.duration || 9999,
+            audioRef.current.currentTime + 10
+          );
+        }
       });
 
       navigator.mediaSession.setActionHandler('previoustrack', () => {
@@ -838,7 +768,7 @@ export default function VideosBlock({
         if (safeIndex + 1 < videoList.length) handleSelectVideo(safeIndex + 1);
       });
     } catch {}
-  }, [currentVideo, topicTitle, pageTitle, mediaMode, safeIndex, videoList.length]);
+  }, [currentVideo, topicTitle, pageTitle, backgroundAudioEnabled, safeIndex, videoList.length]);
 
   // Khóa cứng khung ngang 16:9 theo yêu cầu của người dùng, không bao giờ tự động bung dọc to
   const isVertical = false;
@@ -849,288 +779,116 @@ export default function VideosBlock({
       id={blockId}
       className="w-full flex flex-col gap-2 sm:gap-2.5 scroll-mt-20"
     >
-      {/* THẺ AUDIO PHÁT CHUẨN HTML5 HỖ TRỢ CHẠY NGẦM KHI MÀN HÌNH TẮT */}
-      <audio
-        ref={audioRef}
-        src={currentVideo.audio_url || '/audio/lesson_podcast_sample.mp3'}
-        preload="auto"
-        onTimeUpdate={() => {
-          if (audioRef.current) {
-            setAudioCurrentTime(audioRef.current.currentTime);
-          }
-        }}
-        onLoadedMetadata={() => {
-          if (audioRef.current) {
-            setAudioDuration(audioRef.current.duration || 0);
-          }
-        }}
-        onPlay={() => {
-          setIsAudioPlaying(true);
-          if ('mediaSession' in navigator) {
-            navigator.mediaSession.playbackState = 'playing';
-          }
-        }}
-        onPause={() => {
-          setIsAudioPlaying(false);
-          if ('mediaSession' in navigator) {
-            navigator.mediaSession.playbackState = 'paused';
-          }
-        }}
-        onEnded={() => {
-          setIsAudioPlaying(false);
-          markWatched(safeIndex);
-          if (safeIndex + 1 < videoList.length) {
-            handleSelectVideo(safeIndex + 1);
-          } else {
-            setIsEndedPlaylist(true);
-          }
-        }}
-        className="hidden"
-      />
+      {/* THẺ AUDIO PHÁT NỀN KHI CÓ FILE AUDIO THỰC TẾ (TÀNG HÌNH, KHÔNG CHIẾM DIỆN TÍCH) */}
+      {Boolean(currentVideo.audio_url) && (
+        <audio
+          ref={audioRef}
+          src={currentVideo.audio_url || undefined}
+          preload="metadata"
+          loop={!isPlaylist}
+          onPlay={() => setIsAudioPlaying(true)}
+          onPause={() => setIsAudioPlaying(false)}
+          onEnded={() => {
+            setIsAudioPlaying(false);
+            markWatched(safeIndex);
+            if (safeIndex + 1 < videoList.length) {
+              handleSelectVideo(safeIndex + 1);
+            } else {
+              setIsEndedPlaylist(true);
+            }
+          }}
+          className="hidden"
+        />
+      )}
 
-      {/* THANH 2 NÚT CHUYỂN ĐỔI CHẾ ĐỘ: NÚT 1 (XEM VIDEO) & NÚT 2 (NGHE KHI TẮT MÀN HÌNH) */}
-      <div className="grid grid-cols-2 gap-1.5 p-1 rounded-[13px] bg-slate-100 dark:bg-[#0B1528] border border-slate-200/90 dark:border-sky-950/60 shadow-2xs">
-        {/* NÚT 1: XEM VIDEO */}
-        <button
-          type="button"
-          onClick={() => handleSwitchMode('video')}
-          className={`flex items-center justify-center gap-1.5 h-8 px-2.5 rounded-[9px] text-[11.5px] sm:text-[12px] font-black transition-all cursor-pointer whitespace-nowrap ${
-            mediaMode === 'video'
-              ? 'bg-[#0E2A5C] text-white dark:bg-sky-500 dark:text-slate-950 shadow-xs'
-              : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/5'
-          }`}
-          title="Chế độ 1: Xem bài giảng video trực quan"
-        >
-          <Play size={13} fill={mediaMode === 'video' ? 'currentColor' : 'none'} className={mediaMode === 'video' ? 'text-sky-300 dark:text-slate-950' : 'text-slate-400'} />
-          <span>1. Xem video</span>
-        </button>
-
-        {/* NÚT 2: NGHE KHI TẮT MÀN HÌNH */}
-        <button
-          type="button"
-          onClick={() => handleSwitchMode('audio')}
-          className={`flex items-center justify-center gap-1.5 h-8 px-2.5 rounded-[9px] text-[11.5px] sm:text-[12px] font-black transition-all cursor-pointer whitespace-nowrap ${
-            mediaMode === 'audio'
-              ? 'bg-[#0E2A5C] text-white dark:bg-sky-500 dark:text-slate-950 shadow-xs'
-              : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/5'
-          }`}
-          title="Chế độ 2: Nghe Podcast, khóa màn hình âm thanh vẫn chạy liên tục"
-        >
-          <Headphones size={13} className={mediaMode === 'audio' ? 'text-sky-300 dark:text-slate-950' : 'text-slate-400'} />
-          <span>2. Nghe khi tắt màn hình</span>
-        </button>
-      </div>
-
-      {/* KHUNG TRÌNH PHÁT MEDIA CHUẨN NGANG 16:9 (KHÔNG PHÌNH DỌC) */}
+      {/* KHUNG TRÌNH PHÁT VIDEO CHUẨN NGANG 16:9 (KHÔNG PHÌNH DỌC) */}
       <div
         className="relative w-full p-0 overflow-hidden rounded-[18px] sm:rounded-[22px] bg-black border-[2px] border-slate-700/80 shadow-[0_12px_28px_rgba(15,23,42,0.22)] dark:border-blue-900/50 transition-all duration-300 max-w-full"
       >
-        {mediaMode === 'audio' ? (
-          /* GIAO DIỆN TRÌNH PHÁT PODCAST / AUDIO CHUYÊN DỤNG (CHẠY NGẦM KHI KHÓA MÀN HÌNH) */
-          <div className="relative w-full aspect-video flex flex-col justify-between p-3 sm:p-4 bg-gradient-to-br from-[#0B1528] via-[#0F2342] to-[#0A1628] text-white overflow-hidden">
-            {/* Background cover làm mờ nhẹ tạo chiều sâu */}
-            {(currentVideo.thumbnail_url || currentVideo.youtube_id) && (
-              <div
-                className="absolute inset-0 bg-cover bg-center opacity-15 filter blur-md pointer-events-none scale-110"
-                style={{
-                  backgroundImage: `url(${currentVideo.thumbnail_url || `https://i.ytimg.com/vi/${currentVideo.youtube_id}/hqdefault.jpg`})`,
-                }}
-              />
-            )}
+        {/* TRÌNH PHÁT VIDEO YOUTUBE GỐC */}
+        <div
+          className="relative w-full rounded-none bg-black overflow-hidden flex items-center justify-center aspect-video"
+        >
+            {currentVideo.youtube_id ? (
+              <>
+                {isPlaying ? (
+                  <iframe
+                    key={currentVideo.youtube_id}
+                    id={`yt-player-${blockId || 'default'}`}
+                    src={`https://www.youtube-nocookie.com/embed/${currentVideo.youtube_id}?autoplay=1&rel=0&playsinline=1&modestbranding=1&enablejsapi=1`}
+                    title={currentVideo.title}
+                    className="w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allowFullScreen
+                  />
+                ) : (
+                  /* Lớp phủ ảnh bên ngoài khi video chưa bắt đầu phát - 0 iframe, siêu nhẹ */
+                  <div
+                    onClick={() => {
+                      setIsPlaying(true);
+                    }}
+                    className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 cursor-pointer group"
+                    title="Bấm để phát video"
+                  >
+                    {(currentVideo.thumbnail_url || currentVideo.youtube_id) && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={
+                          currentVideo.thumbnail_url ||
+                          `https://i.ytimg.com/vi/${currentVideo.youtube_id}/hqdefault.jpg`
+                        }
+                        alt={currentVideo.title}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        loading="eager"
+                      />
+                    )}
+                    <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors" />
 
-            {/* Phần trên: Ảnh bìa + Tiêu đề bài giảng + Huy hiệu nghe nền */}
-            <div className="relative z-10 flex items-center gap-3">
-              {/* Ảnh thumbnail mini có viền phát sáng */}
-              <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-[12px] overflow-hidden shrink-0 ring-2 ring-sky-400/40 shadow-md bg-black/60">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={
-                    currentVideo.thumbnail_url ||
-                    (currentVideo.youtube_id ? `https://i.ytimg.com/vi/${currentVideo.youtube_id}/hqdefault.jpg` : pageCoverUrl || '')
-                  }
-                  alt={currentVideo.title}
-                  className="w-full h-full object-cover"
-                />
-                {isAudioPlaying && (
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                    <Radio size={18} className="text-sky-300 animate-pulse" />
+                    <div className="relative z-10 w-[64px] h-[64px] sm:w-[70px] sm:h-[70px] rounded-full bg-white/95 flex items-center justify-center text-[#1E3A8A] shadow-2xl transition-transform group-hover:scale-105 active:scale-95 ring-4 ring-blue-400/40">
+                      <Play size={28} fill="currentColor" className="ml-1 text-[#1E3A8A]" />
+                    </div>
+
+                    <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between z-10 text-white text-[12.5px] sm:text-[13.5px] font-semibold bg-black/75 px-3 py-1.5 rounded-[10px] border border-white/15">
+                      <span className="truncate pr-2">{currentVideo.title}</span>
+                      <span className="shrink-0 text-white/80 text-[11px] sm:text-[12px] font-mono">
+                        {currentVideo.duration_text || '5 phút'}
+                      </span>
+                    </div>
                   </div>
                 )}
-              </div>
-
-              {/* Thông tin bài học */}
-              <div className="flex flex-col min-w-0 flex-1">
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] sm:text-[9.5px] font-black uppercase tracking-wider bg-emerald-950/80 text-emerald-300 border border-emerald-500/40">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    Khóa máy vẫn phát
-                  </span>
-                  <span className="text-[10px] text-sky-300/80 font-mono">
-                    {formatTime(audioCurrentTime)} / {formatTime(audioDuration || 300)}
-                  </span>
+              </>
+            ) : (
+              /* Khung mô phỏng video khi chưa có youtube_id */
+              <div className="relative w-full h-full flex flex-col items-center justify-center p-4 bg-gradient-to-b from-[#111A24] to-[#1C2735]">
+                <div className="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none">
+                  <SpineIllustration className="h-[80%] max-w-[200px]" />
                 </div>
-                <h3 className="text-[12.5px] sm:text-[13.5px] font-black text-white leading-snug line-clamp-1">
-                  {currentVideo.title}
-                </h3>
-                <p className="text-[10px] sm:text-[10.5px] text-slate-300/70 truncate">
-                  {topicTitle || 'Chuyên đề Y khoa'} · Video {safeIndex + 1}/{videoList.length}
-                </p>
-              </div>
-            </div>
 
-            {/* Phần giữa: Thanh trượt tiến độ Audio (Scrubber) */}
-            <div className="relative z-10 flex flex-col gap-1 my-auto">
-              <div className="relative w-full h-2 rounded-full bg-white/15 overflow-hidden cursor-pointer group flex items-center">
-                <div
-                  className="h-full bg-gradient-to-r from-sky-400 to-blue-500 rounded-full transition-all duration-150"
-                  style={{
-                    width: `${audioDuration > 0 ? (audioCurrentTime / audioDuration) * 100 : 0}%`,
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isAdmin && onOpenVideoManager) {
+                      onOpenVideoManager();
+                    } else {
+                      alert('Video đang được cập nhật.');
+                    }
                   }}
-                />
-                <input
-                  type="range"
-                  min={0}
-                  max={audioDuration || 300}
-                  step={1}
-                  value={audioCurrentTime}
-                  onChange={(e) => handleAudioSeek(parseFloat(e.target.value))}
-                  className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
-                  aria-label="Thanh thời lượng phát audio"
-                />
-              </div>
-            </div>
-
-            {/* Phần dưới: Bộ điều khiển phát trung tâm */}
-            <div className="relative z-10 flex items-center justify-between pt-1">
-              <span className="text-[10px] text-slate-300/80 font-medium flex items-center gap-1">
-                <Headphones size={11} className="text-sky-400" />
-                <span>Tắt màn hình, âm thanh vẫn chạy</span>
-              </span>
-
-              {/* Cụm nút Play / Pause / Tua */}
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleAudioSkip(-10)}
-                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer"
-                  title="Tua lại 10 giây"
-                  aria-label="Tua lại 10 giây"
+                  className="relative z-10 w-[72px] h-[72px] rounded-full bg-white flex items-center justify-center text-[#1E3A8A] shadow-lg transition-transform active:scale-95 ring-4 ring-blue-400/40"
+                  aria-label={`Phát video: ${currentVideo.title}`}
                 >
-                  <RotateCcw size={14} />
+                  <Play size={32} fill="currentColor" className="ml-1 text-[#1E3A8A]" />
                 </button>
 
-                <button
-                  type="button"
-                  onClick={handleToggleAudioPlay}
-                  className="w-10 h-10 rounded-full bg-gradient-to-r from-sky-400 to-blue-500 text-slate-950 flex items-center justify-center font-black shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer ring-2 ring-sky-300/40"
-                  title={isAudioPlaying ? 'Tạm dừng phát' : 'Tiếp tục phát'}
-                  aria-label={isAudioPlaying ? 'Tạm dừng phát' : 'Tiếp tục phát'}
-                >
-                  {isAudioPlaying ? (
-                    <Pause size={18} fill="currentColor" />
-                  ) : (
-                    <Play size={18} fill="currentColor" className="ml-0.5" />
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleAudioSkip(10)}
-                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer"
-                  title="Tua tới 10 giây"
-                  aria-label="Tua tới 10 giây"
-                >
-                  <RotateCw size={14} />
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : (
-          /* TRÌNH PHÁT VIDEO YOUTUBE GỐC */
-          <div
-            className="relative w-full rounded-none bg-black overflow-hidden flex items-center justify-center aspect-video"
-          >
-              {currentVideo.youtube_id ? (
-                <>
-                  {isPlaying ? (
-                    <iframe
-                      key={currentVideo.youtube_id}
-                      id={`yt-player-${blockId || 'default'}`}
-                      src={`https://www.youtube-nocookie.com/embed/${currentVideo.youtube_id}?autoplay=1&rel=0&playsinline=1&modestbranding=1&enablejsapi=1`}
-                      title={currentVideo.title}
-                      className="w-full h-full border-0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      referrerPolicy="strict-origin-when-cross-origin"
-                      allowFullScreen
-                    />
-                  ) : (
-                    /* Lớp phủ ảnh bên ngoài khi video chưa bắt đầu phát - 0 iframe, siêu nhẹ */
-                    <div
-                      onClick={() => {
-                        setIsPlaying(true);
-                      }}
-                      className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 cursor-pointer group"
-                      title="Bấm để phát video"
-                    >
-                      {(currentVideo.thumbnail_url || currentVideo.youtube_id) && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={
-                            currentVideo.thumbnail_url ||
-                            `https://i.ytimg.com/vi/${currentVideo.youtube_id}/hqdefault.jpg`
-                          }
-                          alt={currentVideo.title}
-                          className="absolute inset-0 w-full h-full object-cover"
-                          loading="eager"
-                        />
-                      )}
-                      <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors" />
-
-                      <div className="relative z-10 w-[64px] h-[64px] sm:w-[70px] sm:h-[70px] rounded-full bg-white/95 flex items-center justify-center text-[#1E3A8A] shadow-2xl transition-transform group-hover:scale-105 active:scale-95 ring-4 ring-blue-400/40">
-                        <Play size={28} fill="currentColor" className="ml-1 text-[#1E3A8A]" />
-                      </div>
-
-                      <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between z-10 text-white text-[12.5px] sm:text-[13.5px] font-semibold bg-black/75 px-3 py-1.5 rounded-[10px] border border-white/15">
-                        <span className="truncate pr-2">{currentVideo.title}</span>
-                        <span className="shrink-0 text-white/80 text-[11px] sm:text-[12px] font-mono">
-                          {currentVideo.duration_text || '5 phút'}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </>
-              ) : (
-                /* Khung mô phỏng video khi chưa có youtube_id */
-                <div className="relative w-full h-full flex flex-col items-center justify-center p-4 bg-gradient-to-b from-[#111A24] to-[#1C2735]">
-                  <div className="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none">
-                    <SpineIllustration className="h-[80%] max-w-[200px]" />
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (isAdmin && onOpenVideoManager) {
-                        onOpenVideoManager();
-                      } else {
-                        alert('Video đang được cập nhật.');
-                      }
-                    }}
-                    className="relative z-10 w-[72px] h-[72px] rounded-full bg-white flex items-center justify-center text-[#1E3A8A] shadow-lg transition-transform active:scale-95 ring-4 ring-blue-400/40"
-                    aria-label={`Phát video: ${currentVideo.title}`}
-                  >
-                    <Play size={32} fill="currentColor" className="ml-1 text-[#1E3A8A]" />
-                  </button>
-
-                  <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between z-10 text-white text-[14px] font-semibold bg-black/60 px-3 py-1.5 rounded-lg backdrop-blur-xs border border-white/15">
-                    <span className="truncate pr-2">{currentVideo.title}</span>
-                    <span className="shrink-0 text-white/80 font-normal">
-                      {currentVideo.duration_text || 'Chưa có video'}
-                    </span>
-                  </div>
+                <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between z-10 text-white text-[14px] font-semibold bg-black/60 px-3 py-1.5 rounded-lg backdrop-blur-xs border border-white/15">
+                  <span className="truncate pr-2">{currentVideo.title}</span>
+                  <span className="shrink-0 text-white/80 font-normal">
+                    {currentVideo.duration_text || 'Chưa có video'}
+                  </span>
                 </div>
-              )}
-            </div>
-        )}
+              </div>
+            )}
+          </div>
       </div>
 
       {/* Thông báo khi đã xem hết danh sách */}
@@ -1163,7 +921,7 @@ export default function VideosBlock({
 
       {/* 1. KHUNG TIỆN ÍCH VIDEO & TIẾN ĐỘ HỌC TẬP (HỢP NHẤT VÀO 1 KHUNG DUY NHẤT, TINH GỌN, KHÔNG NHIỀU KHUNG) */}
       <div className="flex flex-col w-full min-w-0 rounded-[13px] border border-slate-200/90 bg-slate-50/90 p-2 dark:border-blue-900/40 dark:bg-[#0E1A33] shadow-2xs gap-1.5">
-        {/* HÀNG 1: TỐC ĐỘ PHÁT + TIỆN ÍCH TƯƠNG ỨNG */}
+        {/* HÀNG 1: TỐC ĐỘ PHÁT + BIỂU TƯỢNG TAI NGHE + GIỮ SÁNG */}
         <div className="flex w-full items-center justify-between gap-1.5">
           {/* Bên trái: Khung tốc độ phát rõ ràng, dạng khối nổi dễ ấn */}
           <div className="flex items-center gap-1.5 shrink-0">
@@ -1190,28 +948,41 @@ export default function VideosBlock({
             </div>
           </div>
 
-          {/* Bên phải: Nút Giữ sáng (ở chế độ Video) hoặc Badge đang phát (ở chế độ Audio) */}
+          {/* Bên phải: Biểu tượng tai nghe nghe nền (bên trái nút giữ sáng) + Nút giữ sáng mờ nhạt */}
           <div className="flex items-center gap-1.5 shrink-0">
-            {mediaMode === 'audio' ? (
-              <span className="inline-flex items-center gap-1 h-7 px-2 rounded-[7px] text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-300 dark:bg-sky-950/70 dark:text-sky-300 dark:border-sky-800 shadow-2xs">
-                <Headphones size={11} className="text-sky-600 dark:text-sky-400" />
-                <span>Nghe nền</span>
-              </span>
-            ) : (
+            {/* Biểu tượng tai nghe: Chỉ hiển thị khi có file audio thực tế */}
+            {Boolean(currentVideo.audio_url) && (
               <button
                 type="button"
-                onClick={handleToggleWakeLock}
-                className={`inline-flex items-center gap-1 h-7 px-2 rounded-[7px] text-[10.5px] font-medium border transition-colors cursor-pointer shrink-0 ${
-                  wakeLockEnabled
-                    ? 'bg-slate-200/70 text-slate-700 border-slate-300/80 dark:bg-white/5 dark:text-slate-300 dark:border-white/10'
+                onClick={handleToggleBackgroundAudio}
+                className={`w-7 h-7 rounded-[7px] flex items-center justify-center border transition-colors cursor-pointer shrink-0 ${
+                  backgroundAudioEnabled
+                    ? 'bg-sky-100 text-sky-800 border-sky-300 dark:bg-sky-950/70 dark:text-sky-300 dark:border-sky-800 shadow-2xs'
                     : 'bg-transparent text-slate-400 border-slate-200/80 dark:text-slate-500 dark:border-slate-800'
                 }`}
-                title="Bật/Tắt giữ màn hình điện thoại luôn sáng khi đang xem video"
+                title={backgroundAudioEnabled ? 'Đang bật tự động phát âm thanh khi tắt màn hình hoặc khóa máy' : 'Bấm để bật tự động phát khi tắt màn hình'}
+                aria-label="Tự động phát khi tắt màn hình"
               >
-                <Sun size={12} className={wakeLockEnabled ? 'text-amber-500/80' : 'text-slate-400'} />
-                <span className="whitespace-nowrap">Giữ sáng</span>
+                <Headphones size={13} className={backgroundAudioEnabled ? 'text-sky-600 dark:text-sky-400' : 'text-slate-400'} />
               </button>
             )}
+
+            {/* Nút Giữ sáng màn hình (Thiết kế mờ nhạt, nhẹ nhàng, không phô trương) */}
+            <button
+              type="button"
+              onClick={handleToggleWakeLock}
+              className={`inline-flex items-center gap-1 h-7 px-2 rounded-[7px] text-[10.5px] font-medium border transition-colors cursor-pointer shrink-0 ${
+                wakeLockEnabled
+                  ? 'bg-slate-200/70 text-slate-700 border-slate-300/80 dark:bg-white/5 dark:text-slate-300 dark:border-white/10'
+                  : 'bg-transparent text-slate-400 border-slate-200/80 dark:text-slate-500 dark:border-slate-800'
+              }`}
+              title="Bật/Tắt giữ màn hình điện thoại luôn sáng khi đang học"
+            >
+              <Sun size={12} className={wakeLockEnabled ? 'text-amber-500/80' : 'text-slate-400'} />
+              <span className="whitespace-nowrap">
+                Giữ sáng
+              </span>
+            </button>
           </div>
         </div>
 

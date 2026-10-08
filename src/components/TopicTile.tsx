@@ -47,7 +47,7 @@ interface TopicTileProps {
 export default function TopicTile({ mode, topic, pageCount, isActive, onActivate, boldTitle }: TopicTileProps) {
   const router = useRouter();
   const [imgError, setImgError] = useState(false);
-  const coverUrl = topic.cover_url || DEFAULT_TOPIC_COVERS[topic.slug] || null;
+  const coverUrl = (topic.slug === 'tung-dinh-duong' ? DEFAULT_TOPIC_COVERS[topic.slug] : (topic.cover_url || DEFAULT_TOPIC_COVERS[topic.slug])) || null;
   const hasCover = Boolean(coverUrl) && !imgError;
   const countText = pageCount > 0 ? `${pageCount} bài học` : 'Sắp ra mắt';
 

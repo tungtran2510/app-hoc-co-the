@@ -289,8 +289,27 @@ export default function PageHeaderBar({
           </Link>
         </div>
 
-        {/* 2. Nút 3D + Nút Lưu + Nút Tuỳ chọn (Gọn gàng trên cùng 1 hàng chuẩn mobile) */}
+        {/* 2. Nút Mục lục + Nút 3D + Nút Tuỳ chọn (Gọn gàng trên cùng 1 hàng chuẩn mobile) */}
         <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+          {tocItems.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                playTapSound();
+                setShowToc(true);
+              }}
+              className="flex items-center gap-1 h-[34px] px-2 sm:px-2.5 rounded-[10px] bg-slate-100 hover:bg-slate-200 dark:bg-purple-900/50 dark:hover:bg-purple-900/80 text-slate-800 dark:text-purple-200 border border-slate-300/80 dark:border-purple-800/80 text-[11px] font-black shadow-2xs transition-all active:scale-95 cursor-pointer"
+              title="Mục lục bài học"
+              aria-label="Mở mục lục bài học"
+            >
+              <ListOrdered size={14} strokeWidth={2.4} className="text-purple-700 dark:text-[#F8DF7B]" />
+              <span className="hidden xs:inline">Mục lục</span>
+              <span className="px-1 py-0.2 rounded-full bg-amber-400 text-slate-900 text-[9px] font-black">
+                {tocItems.length}
+              </span>
+            </button>
+          )}
+
           {onOpen3DModal && (
             <button
               type="button"
@@ -325,44 +344,6 @@ export default function PageHeaderBar({
           </button>
         </div>
       </div>
-
-      {/* 3. Nút Mục lục nổi thông minh (Bán trong suốt, có thể kéo thả di chuyển) */}
-      {tocItems.length > 0 && (
-        <div
-          onPointerDown={handlePointerDown}
-          onClick={handleButtonClick}
-          className={`fixed z-40 select-none touch-none ${
-            isDragging
-              ? 'opacity-100 cursor-grabbing scale-110'
-              : 'opacity-65 hover:opacity-100 active:opacity-100 cursor-grab hover:scale-105 active:scale-95 transition-opacity transition-transform duration-200'
-          }`}
-          style={{
-            transform: 'translateZ(0)',
-            left: tocPos ? `${tocPos.x}px` : '12px',
-            top: tocPos ? `${tocPos.y}px` : 'calc(65% - 24px)',
-            transition: isDragging
-              ? 'none'
-              : 'left 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.25s ease, transform 0.2s ease',
-          }}
-          title="Mục lục bài học (Giữ để di chuyển)"
-          role="button"
-          tabIndex={0}
-          aria-label="Mở mục lục bài học"
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              handleButtonClick();
-            }
-          }}
-        >
-          <div className="relative w-12 h-12 rounded-full bg-purple-900/80 dark:bg-purple-900/75 backdrop-blur-md text-white flex items-center justify-center shadow-[0_6px_20px_rgba(0,0,0,0.28)] border-1.5 border-white/35 dark:border-purple-400/40 group">
-            <ListOrdered size={20} strokeWidth={2.3} className="group-hover:scale-110 transition-transform" />
-            <span className="absolute -top-1 -right-1 min-w-[19px] h-[19px] px-1 rounded-full bg-amber-400/95 text-slate-900 text-[10px] font-black flex items-center justify-center shadow-xs ring-1.5 ring-white/60 dark:ring-[#160D30]">
-              {tocItems.length}
-            </span>
-          </div>
-        </div>
-      )}
 
       {/* 4. Pop-up Mục lục nổi (Gọn gàng, nhảy popup giữa màn hình, không tràn viền ngang) */}
       {showToc && (

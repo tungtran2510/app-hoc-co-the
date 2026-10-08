@@ -45,7 +45,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   const [settings, topicsWithCounts] = await Promise.all([
     getSettings(),
-    getTopicsWithCounts(true),
+    getTopicsWithCounts(false),
   ]);
 
   return (

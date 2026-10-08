@@ -363,6 +363,7 @@ export const TOPIC_UUID_MAP: Record<string, string> = {
   'noi-tiet-chuyen-hoa': 'a0000000-0000-0000-0000-000000000006',
   'gan-mat-tuy': 'a0000000-0000-0000-0000-000000000007',
   'mien-dich': 'a0000000-0000-0000-0000-000000000008',
+  'tung-dinh-duong': 'a0000000-0000-0000-0000-000000000009',
 };
 
 export const UUID_TO_SAMPLE_TOPIC_ID: Record<string, string> = {
@@ -374,6 +375,7 @@ export const UUID_TO_SAMPLE_TOPIC_ID: Record<string, string> = {
   'a0000000-0000-0000-0000-000000000006': 'topic-noi-tiet-chuyen-hoa',
   'a0000000-0000-0000-0000-000000000007': 'topic-gan-mat-tuy',
   'a0000000-0000-0000-0000-000000000008': 'topic-mien-dich',
+  'a0000000-0000-0000-0000-000000000009': 'topic-tung-dinh-duong',
   'cot-song': 'topic-cot-song',
   'dinh-duong': 'topic-dinh-duong',
   'co-the-nguoi': 'topic-co-the-nguoi',
@@ -382,7 +384,11 @@ export const UUID_TO_SAMPLE_TOPIC_ID: Record<string, string> = {
   'noi-tiet-chuyen-hoa': 'topic-noi-tiet-chuyen-hoa',
   'gan-mat-tuy': 'topic-gan-mat-tuy',
   'mien-dich': 'topic-mien-dich',
+  'tung-dinh-duong': 'topic-tung-dinh-duong',
 };
+
+/** Danh sách slug bài học bản nháp trống cần ẩn khỏi học viên (chỉ admin mới thấy) */
+export const EXCLUDED_DRAFT_PAGE_SLUGS = ['08', 'hbv'];
 
 export async function getPagesByTopic(topicId: string, includeHidden = false): Promise<Page[]> {
   const cacheKey = `pages_by_topic:${topicId}:${includeHidden}`;
@@ -392,7 +398,7 @@ export async function getPagesByTopic(topicId: string, includeHidden = false): P
       try {
         let query = supabase.from('pages').select('*').eq('topic_id', topicId);
         if (!includeHidden) {
-          query = query.eq('is_visible', true).eq('status', 'published');
+          query = query.eq('is_visible', true).eq('status', 'published').not('slug', 'in', '("08","hbv")');
         }
         const { data } = await query.order('sort_order', { ascending: true });
         if (data && data.length > 0) return data as Page[];
@@ -403,7 +409,11 @@ export async function getPagesByTopic(topicId: string, includeHidden = false): P
     const targetSampleId = UUID_TO_SAMPLE_TOPIC_ID[topicId] || topicId;
     const targetUuid = TOPIC_UUID_MAP[topicId] || topicId;
     return samplePages
-      .filter((p) => (p.topic_id === topicId || p.topic_id === targetSampleId || p.topic_id === targetUuid) && (includeHidden || (p.is_visible && p.status === 'published')))
+      .filter(
+        (p) =>
+          (p.topic_id === topicId || p.topic_id === targetSampleId || p.topic_id === targetUuid) &&
+          (includeHidden || (p.is_visible && p.status === 'published' && !EXCLUDED_DRAFT_PAGE_SLUGS.includes(p.slug)))
+      )
       .sort((a, b) => a.sort_order - b.sort_order);
   });
 }
@@ -420,9 +430,9 @@ export async function getTopicsWithCounts(includeHidden = false): Promise<{ topi
 
     if (supabase) {
       try {
-        let query = supabase.from('pages').select('id, topic_id, is_visible, status');
+        let query = supabase.from('pages').select('id, topic_id, is_visible, status, slug');
         if (!includeHidden) {
-          query = query.eq('is_visible', true).eq('status', 'published');
+          query = query.eq('is_visible', true).eq('status', 'published').not('slug', 'in', '("08","hbv")');
         }
         const { data } = await query;
         if (data) {
@@ -442,7 +452,13 @@ export async function getTopicsWithCounts(includeHidden = false): Promise<{ topi
       const targetUuid = TOPIC_UUID_MAP[topic.id] || topic.id;
       return {
         topic,
-        pageCount: pageCounts[topic.id] ?? samplePages.filter((p) => p.topic_id === topic.id || p.topic_id === targetSampleId || p.topic_id === targetUuid).length,
+        pageCount:
+          pageCounts[topic.id] ??
+          samplePages.filter(
+            (p) =>
+              (p.topic_id === topic.id || p.topic_id === targetSampleId || p.topic_id === targetUuid) &&
+              (includeHidden || !EXCLUDED_DRAFT_PAGE_SLUGS.includes(p.slug))
+          ).length,
       };
     });
   });
@@ -581,7 +597,7 @@ export async function getAllPages(includeHidden = false): Promise<Page[]> {
       try {
         let query = supabase.from('pages').select('*');
         if (!includeHidden) {
-          query = query.eq('is_visible', true).eq('status', 'published');
+          query = query.eq('is_visible', true).eq('status', 'published').not('slug', 'in', '("08","hbv")');
         }
         const { data } = await query.order('sort_order', { ascending: true });
         if (data) return data as Page[];
@@ -590,7 +606,7 @@ export async function getAllPages(includeHidden = false): Promise<Page[]> {
       }
     }
     return samplePages
-      .filter((p) => includeHidden || (p.is_visible && p.status === 'published'))
+      .filter((p) => includeHidden || (p.is_visible && p.status === 'published' && !EXCLUDED_DRAFT_PAGE_SLUGS.includes(p.slug)))
       .sort((a, b) => a.sort_order - b.sort_order);
   });
 }
