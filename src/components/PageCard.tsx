@@ -56,15 +56,10 @@ export default function PageCard({
     : `/${topic.slug}/${page.slug}`;
 
   return (
-    <a
+    <Link
       href={targetUrl}
-      onClick={(e) => {
-        onActivate?.();
-        e.preventDefault();
-        if (typeof window !== 'undefined') {
-          window.location.href = targetUrl;
-        }
-      }}
+      prefetch={true}
+      onClick={() => onActivate?.()}
       className={`lesson-page-card flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 bg-white dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] rounded-[14px] border transition-all active:scale-[0.99] shadow-xs group [&.is-active]:border-[#FDE047] [&.is-active]:ring-2 [&.is-active]:ring-[#FDE047] [&.is-active]:shadow-[0_0_20px_rgba(250,204,21,0.6)] ${
         isActive
           ? 'border-[#FDE047] ring-2 ring-[#FDE047] shadow-[0_0_20px_rgba(250,204,21,0.6)]'
@@ -149,6 +144,6 @@ export default function PageCard({
           )}
         </div>
       </div>
-    </a>
+    </Link>
   );
 }

@@ -29,8 +29,8 @@ const STOPWORDS = new Set([
 
 // Bản đồ từ viết tắt & từ đồng nghĩa phổ biến trong ứng dụng học cơ thể
 const ABBREVIATIONS_MAP: Record<string, string[]> = {
-  vg: ['vai gay', 'co vai gay'],
-  tl: ['that lung', 'cot song'],
+  vg: ['vai gay', 'cot song', 'day chang'],
+  tl: ['that lung', 'cot song', 'dia dem'],
   dd: ['dia dem', 'da day'],
   cs: ['cot song', 'dot song'],
   tk: ['than kinh', 'tuy song'],
@@ -42,16 +42,27 @@ const ABBREVIATIONS_MAP: Record<string, string[]> = {
 
 const MEDICAL_SYNONYMS: Record<string, string[]> = {
   'dau lung': ['cot song', 'that lung', 'dia dem', 'tu the'],
-  'moi co': ['vai gay', 'co vai gay', 'dot song co'],
-  'dau gay': ['vai gay', 'co vai gay', 'dot song co'],
+  'that lung': ['cot song', 'dia dem', 'lung', 'tu the'],
+  'moi co': ['vai gay', 'co vai gay', 'dot song co', 'cot song'],
+  'dau gay': ['vai gay', 'co vai gay', 'dot song co', 'cot song'],
+  'vai gay': ['cot song', 'co gan', 'day chang', 'tu the'],
+  'co vai gay': ['cot song', 'co gan', 'day chang', 'tu the'],
   'thoat vi': ['dia dem', 'cot song', 'chen ep'],
   'thoai hoa': ['cot song', 'khop', 'dia dem'],
   'ngoi nhieu': ['tu the', 'van dong', 'that lung', 'cot song'],
   'uong nuoc': ['nuoc', 'dien giai', 'te bao'],
   'tieu hoa': ['da day', 'ruot', 'men vi sinh'],
+  'da day': ['tieu hoa', 'ruot', 'vi sinh'],
   'than kinh': ['tuy song', 'day than kinh', 'chen ep'],
-  'khop goi': ['khop', 'day chang', 'sun khop'],
+  'khop': ['khung xuong', 'khop goi', 'khung chau'],
+  'khop goi': ['khop', 'day chang', 'sun khop', 'khung xuong'],
   'tim mach': ['tuan hoan', 'mach mau'],
+  'gan': ['mat', 'thai doc', 'tuy'],
+  'mat': ['gan', 'thai doc'],
+  'tuyen giap': ['noi tiet', 'hormone', 'trao doi chat'],
+  'noi tiet': ['tuyen giap', 'hormone', 'trao doi chat'],
+  'mien dich': ['de khang', 'bach cau', 'khang the', 'viem'],
+  'de khang': ['mien dich', 'bach cau', 'khang the'],
 };
 
 export interface ProcessedSearchQuery {

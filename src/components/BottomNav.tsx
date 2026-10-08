@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Home, LayoutGrid, Bookmark, Search } from 'lucide-react';
 
+import { playTapSound } from '../lib/audioFeedback';
+
 export default function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
@@ -33,6 +35,7 @@ export default function BottomNav() {
   const idleText = 'text-slate-500 dark:text-purple-300/70 font-medium hover:text-slate-800 dark:hover:text-purple-200';
 
   const handleTabClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    playTapSound();
     if (pathname === href) {
       e.preventDefault();
       if (typeof window !== 'undefined') {
@@ -41,8 +44,13 @@ export default function BottomNav() {
       return;
     }
     e.preventDefault();
+    router.push(href);
     if (typeof window !== 'undefined') {
-      window.location.href = href;
+      setTimeout(() => {
+        if (window.location.pathname !== href) {
+          window.location.href = href;
+        }
+      }, 80);
     }
   };
 
@@ -61,8 +69,8 @@ export default function BottomNav() {
           className={`${baseItem} ${isHome ? activeText : idleText}`}
           aria-label="Tổng quan"
         >
-          <Home size={22} strokeWidth={isHome ? 2.5 : 2} />
-          <span className="text-[11px] sm:text-[12px] leading-tight">Tổng quan</span>
+          <Home size={22} strokeWidth={isHome ? 2.5 : 2} className="pointer-events-none" />
+          <span className="text-[11px] sm:text-[12px] leading-tight pointer-events-none">Tổng quan</span>
         </Link>
 
         {/* 2. Chuyên đề */}
@@ -73,8 +81,8 @@ export default function BottomNav() {
           className={`${baseItem} ${isTopics ? activeText : idleText}`}
           aria-label="Chuyên đề"
         >
-          <LayoutGrid size={22} strokeWidth={isTopics ? 2.5 : 2} />
-          <span className="text-[11px] sm:text-[12px] leading-tight">Chuyên đề</span>
+          <LayoutGrid size={22} strokeWidth={isTopics ? 2.5 : 2} className="pointer-events-none" />
+          <span className="text-[11px] sm:text-[12px] leading-tight pointer-events-none">Chuyên đề</span>
         </Link>
 
         {/* 3. Đã lưu */}
@@ -85,8 +93,8 @@ export default function BottomNav() {
           className={`${baseItem} ${isSaved ? activeText : idleText}`}
           aria-label="Bài học đã lưu"
         >
-          <Bookmark size={22} strokeWidth={isSaved ? 2.5 : 2} className={isSaved ? 'fill-[#1E3A8A] dark:fill-[#F8DF7B]' : ''} />
-          <span className="text-[11px] sm:text-[12px] leading-tight">Đã lưu</span>
+          <Bookmark size={22} strokeWidth={isSaved ? 2.5 : 2} className={`pointer-events-none ${isSaved ? 'fill-[#1E3A8A] dark:fill-[#F8DF7B]' : ''}`} />
+          <span className="text-[11px] sm:text-[12px] leading-tight pointer-events-none">Đã lưu</span>
         </Link>
 
         {/* 4. Tìm kiếm */}
@@ -97,8 +105,8 @@ export default function BottomNav() {
           className={`${baseItem} ${isSearch ? activeText : idleText}`}
           aria-label="Tìm kiếm"
         >
-          <Search size={22} strokeWidth={isSearch ? 2.5 : 2} />
-          <span className="text-[11px] sm:text-[12px] leading-tight">Tìm kiếm</span>
+          <Search size={22} strokeWidth={isSearch ? 2.5 : 2} className="pointer-events-none" />
+          <span className="text-[11px] sm:text-[12px] leading-tight pointer-events-none">Tìm kiếm</span>
         </Link>
       </div>
     </nav>

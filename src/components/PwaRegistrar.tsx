@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Download, X, Smartphone } from 'lucide-react';
 import PwaInstallModal from './PwaInstallModal';
 
@@ -11,6 +12,7 @@ declare global {
 }
 
 export default function PwaRegistrar() {
+  const router = useRouter();
   const [showBanner, setShowBanner] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [isStandalone, setIsStandalone] = useState<boolean>(false);
@@ -119,7 +121,7 @@ export default function PwaRegistrar() {
         '/mien-dich',
       ];
       coreRoutes.forEach((route) => {
-        fetch(route, { priority: 'low' }).catch(() => {});
+        try { router.prefetch(route); } catch {}
       });
     };
 

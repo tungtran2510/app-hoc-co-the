@@ -6,8 +6,8 @@ import { getStoredAppSettings } from '../lib/storage';
 
 const DEFAULT_MAX_SAFE_BYTES = 60 * 1024 * 1024; // 60 MB mặc định
 const TWO_MINUTES_MS = 120 * 1000; // Đúng 2 phút theo yêu cầu
-const CURRENT_SHELL_CACHE = 'qbiz-books-shell-v42';
-const CURRENT_STATIC_CACHE = 'qbiz-books-static-v42';
+const CURRENT_SHELL_CACHE = 'qbiz-books-shell-v43';
+const CURRENT_STATIC_CACHE = 'qbiz-books-static-v43';
 
 export interface OfflineProgressData {
   status: 'idle' | 'downloading' | 'completed' | 'error';

@@ -53,9 +53,7 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
   const handleNav = (e?: React.MouseEvent) => {
     onActivate?.();
     e?.preventDefault();
-    if (typeof window !== 'undefined') {
-      window.location.href = `/${topic.slug}`;
-    }
+    router.push(`/${topic.slug}`);
   };
 
   if (mode === 'text') {

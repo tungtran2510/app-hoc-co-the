@@ -332,28 +332,32 @@ export default function SearchPage() {
 
       {/* 2. Nội dung kết quả */}
       <section className="flex flex-col gap-5">
-        {loading ? (
-          <div className="p-8 text-center text-slate-400 text-[14px] font-medium animate-pulse">
-            Đang tải dữ liệu tìm kiếm...
-          </div>
-        ) : !processedQuery.clean ? (
-          /* Gợi ý khi chưa gõ */
+        {!processedQuery.clean ? (
+          /* Gợi ý thông minh khi chưa gõ (0ms Instant Render, hoàn toàn độc lập với API) */
           <div className="flex flex-col gap-4 py-1">
-            {/* Bản Đồ Cơ Thể 1 Chạm Trực Quan */}
+            {/* Bản Đồ Cơ Thể Thông Minh 3 Chế Độ: Theo Bộ Phận · Theo Hệ · Triệu Chứng */}
             <BodyMapNavigator onSelectKeyword={(kw) => setQuery(kw)} />
 
+            {/* Từ khóa tìm kiếm nhanh */}
             <div className="flex flex-col gap-2 px-1">
-              <h2 className="text-[12px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-purple-300/70">
-                Từ khóa tìm kiếm nhanh
-              </h2>
+              <div className="flex items-center justify-between">
+                <h2 className="text-[12px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-sky-300/80">
+                  Từ khóa tra cứu phổ biến
+                </h2>
+                <span className="text-[11px] font-medium text-slate-400 dark:text-slate-500">
+                  Chạm để tìm
+                </span>
+              </div>
               <div className="flex flex-wrap gap-2">
                 {[
                   'Cột sống',
                   'Đĩa đệm',
                   'Cổ vai gáy',
                   'Tư thế ngồi',
-                  'Dây chằng',
                   'Uống nước',
+                  'Dạ dày',
+                  'Dây chằng',
+                  'Thoái hóa',
                 ].map((tag) => (
                   <button
                     key={tag}
@@ -366,6 +370,14 @@ export default function SearchPage() {
                 ))}
               </div>
             </div>
+          </div>
+        ) : loading ? (
+          /* Đang tải kết quả tìm kiếm khi đã nhập từ khóa */
+          <div className="flex flex-col items-center justify-center p-8 gap-3 bg-white dark:bg-[#0E1A33] rounded-[20px] border border-slate-200 dark:border-blue-900/50 my-4 shadow-2xs">
+            <div className="w-8 h-8 rounded-full border-3 border-sky-500 border-t-transparent animate-spin" />
+            <p className="text-[13.5px] font-bold text-slate-700 dark:text-sky-200">
+              Đang tra cứu dữ liệu y khoa...
+            </p>
           </div>
         ) : totalResults === 0 ? (
           /* Không tìm thấy */
@@ -523,12 +535,21 @@ export default function SearchPage() {
                               alt={p.title}
                               className="w-full h-full object-contain"
                               onError={(e) => {
-                                (e.target as HTMLElement).style.display = 'none';
-                                const fb = (e.target as HTMLElement).parentElement?.querySelector('.page-fallback');
-                                if (fb) fb.classList.remove('hidden');
+                                const target = e.target as HTMLImageElement;
+                                const topicFallback = `/images/topics/${p.topic_slug}.png`;
+                                if (target.src && !target.src.endsWith(topicFallback)) {
+                                  target.src = topicFallback;
+                                } else {
+                                  target.style.display = 'none';
+                                  const fb = target.parentElement?.querySelector('.page-fallback');
+                                  if (fb) {
+                                    fb.classList.remove('hidden');
+                                    fb.classList.add('flex');
+                                  }
+                                }
                               }}
                             />
-                            <div className="page-fallback hidden items-center justify-center text-slate-400 dark:text-sky-400">
+                            <div className="page-fallback hidden w-full h-full items-center justify-center text-[#0E2A5C] dark:text-sky-400">
                               <BookOpen size={20} />
                             </div>
                           </div>

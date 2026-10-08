@@ -33,6 +33,7 @@ import {
   saveVideoWatched,
 } from '../../lib/learningProgress';
 import { getUserPhone, syncUserProgress, LEARNING_PROGRESS_EVENT } from '../../lib/userSync';
+import { playTapSound } from '../../lib/audioFeedback';
 import UserSyncModal from '../../components/UserSyncModal';
 import BottomNav from '../../components/BottomNav';
 
@@ -187,28 +188,28 @@ export default function SavedPages() {
         </div>
       </header>
 
-      {/* 2. Tiêu đề trang */}
-      <section className="flex flex-col gap-0.5 pt-0">
-        <h1 className="text-[22px] sm:text-[25px] font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+      {/* 2. Tiêu đề trang tinh gọn 1 dòng - Tối ưu triệt để không gian mobile */}
+      <section className="pt-0 pb-0.5">
+        <h1 className="text-[20px] sm:text-[22px] font-black tracking-tight text-slate-900 dark:text-white leading-tight">
           Học tập cá nhân
         </h1>
-        <p className="text-[12.5px] sm:text-[13px] text-slate-500 dark:text-purple-200/80 leading-relaxed font-normal">
-          Quản lý bài học yêu thích và các video cần ôn tập để nắm vững cốt lõi.
-        </p>
       </section>
 
       {/* 3. Segmented Control: [ ⭐ Đã lưu (N) ] và [ ⚡ Cần ôn tập (X) ] */}
-      <section className="grid grid-cols-2 p-1 rounded-[16px] bg-slate-200/70 dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-800/40 gap-1 select-none">
+      <section className="grid grid-cols-2 p-1 rounded-[14px] bg-slate-200/70 dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-800/40 gap-1 select-none">
         <button
           type="button"
-          onClick={() => setActiveTab('saved')}
-          className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-[12px] text-[13px] font-extrabold transition-all cursor-pointer ${
+          onClick={() => {
+            playTapSound();
+            setActiveTab('saved');
+          }}
+          className={`flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-[11px] text-[13px] font-extrabold transition-all cursor-pointer ${
             activeTab === 'saved'
               ? 'bg-white dark:bg-[#1E1342] text-[#1E3A8A] dark:text-[#F8DF7B] shadow-xs'
               : 'text-slate-600 dark:text-purple-300 hover:text-slate-900'
           }`}
         >
-          <Bookmark size={15} className={activeTab === 'saved' ? 'fill-current' : ''} />
+          <Bookmark size={14} className={activeTab === 'saved' ? 'fill-current' : ''} />
           <span className="whitespace-nowrap">Đã lưu</span>
           <span
             className={`text-[10px] px-1.5 py-0.5 rounded-full font-black ${
@@ -223,14 +224,17 @@ export default function SavedPages() {
 
         <button
           type="button"
-          onClick={() => setActiveTab('review')}
-          className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-[12px] text-[13px] font-extrabold transition-all cursor-pointer ${
+          onClick={() => {
+            playTapSound();
+            setActiveTab('review');
+          }}
+          className={`flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-[11px] text-[13px] font-extrabold transition-all cursor-pointer ${
             activeTab === 'review'
               ? 'bg-white dark:bg-[#1E1342] text-amber-800 dark:text-amber-300 shadow-xs'
               : 'text-slate-600 dark:text-purple-300 hover:text-slate-900'
           }`}
         >
-          <Zap size={15} className="fill-amber-500 text-amber-500" />
+          <Zap size={14} className="fill-amber-500 text-amber-500" />
           <span className="whitespace-nowrap">Cần ôn tập</span>
           <span
             className={`text-[10px] px-1.5 py-0.5 rounded-full font-black ${
@@ -245,10 +249,9 @@ export default function SavedPages() {
       </section>
 
       {/* ========================================================================= */}
-      {/* TAB 1: DANH SÁCH BÀI ĐÃ LƯU                                               */}
+      {/* TAB 1: DANH SÁCH BÀI ĐÃ LƯU (CHUYỂN TAB TỨC THÌ 0MS)                       */}
       {/* ========================================================================= */}
-      {activeTab === 'saved' && (
-        <>
+      <div className={activeTab === 'saved' ? 'flex flex-col gap-3' : 'hidden'}>
           {/* Đang học dở */}
           {resume && resume.topic_slug && resume.page_slug && (
             <section className="flex flex-col gap-2">
@@ -538,13 +541,12 @@ export default function SavedPages() {
               </div>
             </section>
           )}
-        </>
-      )}
+      </div>
 
       {/* ========================================================================= */}
-      {/* TAB 2: DANH SÁCH VIDEO CẦN ÔN TẬP (ĐÃ GẠT CHƯA HIỂU)                      */}
+      {/* TAB 2: DANH SÁCH VIDEO CẦN ÔN TẬP (CHUYỂN TAB TỨC THÌ 0MS)                */}
       {/* ========================================================================= */}
-      {activeTab === 'review' && (
+      <div className={activeTab === 'review' ? 'flex flex-col gap-3' : 'hidden'}>
         <section className="flex flex-col gap-3">
           {reviewList.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-7 bg-white dark:bg-[#160D30] rounded-[22px] border border-slate-200/80 dark:border-purple-800/40 text-center gap-3 my-1 shadow-xs">
@@ -686,7 +688,7 @@ export default function SavedPages() {
             </div>
           )}
         </section>
-      )}
+      </div>
 
       {/* 4. Thanh điều hướng dưới cùng */}
       <BottomNav />

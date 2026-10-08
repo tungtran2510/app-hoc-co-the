@@ -63,9 +63,7 @@ export default function TopicCard({
       onClick={(e) => {
         onActivate?.();
         e.preventDefault();
-        if (typeof window !== 'undefined') {
-          window.location.href = `/${topic.slug}`;
-        }
+        router.push(`/${topic.slug}`);
       }}
       className={`topic-card-container group relative flex flex-col cursor-pointer select-none transition-transform duration-100 active:scale-[0.98] [&.is-active]:scale-[0.98] ${
         isActive ? 'is-active' : ''
