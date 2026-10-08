@@ -1295,129 +1295,37 @@ export default function ContentViewer({
         </div>
       )}
 
-      {/* 6. KHỐI BÀI HỌC TIẾP THEO - NỔI BẬT & SANG TRỌNG (DẪN DẮT LỘ TRÌNH HỌC TẬP) */}
-      {nextPage ? (
-        <a
-          href={`/${topic.slug}/${nextPage.slug}`}
-          onClick={playTapSound}
-          className="w-full p-4 rounded-[20px] bg-gradient-to-r from-[#0E2A5C] via-[#14336B] to-[#0A1F44] text-white shadow-md hover:shadow-lg border border-sky-400/30 active:scale-[0.99] transition-all flex items-center justify-between gap-3 group mt-3.5"
-        >
-          <div className="flex flex-col min-w-0">
-            <div className="flex items-center gap-1.5">
-              <span className="px-2 py-0.5 rounded-[6px] bg-sky-400/20 border border-sky-400/40 text-[9.5px] font-black uppercase tracking-wider text-sky-200">
-                BÀI TIẾP THEO · BÀI {String(nextPageIndex).padStart(2, '0')}
-              </span>
-            </div>
-            <span className="text-[15px] sm:text-[16px] font-black text-white leading-snug line-clamp-1 mt-1.5 group-hover:text-sky-200 transition-colors">
-              {nextPage.title}
-            </span>
-            <span className="text-[11px] text-sky-200/80 font-medium mt-0.5 truncate">
-              Tiếp tục bài giảng trong chuyên đề {topic.title}
-            </span>
-          </div>
-          <div className="w-10 h-10 rounded-[14px] bg-[#0284C7] text-white flex items-center justify-center shrink-0 shadow-md group-hover:scale-105 group-hover:translate-x-0.5 transition-all">
-            <ArrowRight size={18} strokeWidth={2.5} />
-          </div>
-        </a>
-      ) : (
-        <div className="w-full p-4 rounded-[20px] bg-gradient-to-r from-emerald-900 via-teal-900 to-[#0A1F44] text-white shadow-md border border-emerald-400/30 flex items-center justify-between gap-3 mt-3.5">
-          <div className="flex flex-col min-w-0">
-            <span className="text-[9.5px] font-black uppercase tracking-wider text-emerald-300">
-              CHÚC MỪNG BẠN
-            </span>
-            <span className="text-[14.5px] font-black text-white leading-snug mt-1">
-              Đã hoàn thành toàn bộ bài học chuyên đề {topic.title}!
-            </span>
-          </div>
-          <a
-            href={`/${topic.slug}`}
-            onClick={playTapSound}
-            className="px-3.5 py-2 rounded-[12px] bg-white text-emerald-900 font-extrabold text-[12px] shadow-xs shrink-0 whitespace-nowrap hover:bg-emerald-50"
-          >
-            Về chuyên đề
-          </a>
-        </div>
-      )}
+      {/* PHÂN CÁCH DANH SÁCH BÀI HỌC VÀ TIỆN ÍCH */}
+      <div className="border-t border-slate-200/80 dark:border-slate-800 my-4" />
 
-      {/* 7. TRẠM ĐỒNG HÀNH & KẾT NỐI - GIAO DIỆN SÁNG, ĐƠN GIẢN, KHÔNG 24/7, ĐỌC EBOOK TO RÕ RÀNG */}
-      <section className="relative overflow-hidden rounded-[20px] bg-slate-50/95 dark:bg-[#141226] border border-slate-200/90 dark:border-slate-800/80 p-3.5 sm:p-4 flex flex-col gap-3 mt-4 text-slate-800 dark:text-slate-100 shadow-2xs">
-        {/* Tiêu đề đơn giản, tinh gọn */}
-        <div className="flex items-center justify-between px-0.5">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-blue-600 dark:bg-sky-400 inline-block" />
-            <span className="text-[12px] font-extrabold uppercase tracking-wide text-slate-900 dark:text-white">
-              Đồng hành cùng bạn
-            </span>
-          </div>
-          <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
-            Học tập & Trao đổi
-          </span>
-        </div>
-
-        {/* 2 Lựa chọn chính: Trợ lý AI & Zalo Tùng Dinh Dưỡng */}
-        <div className="grid grid-cols-2 gap-2">
-          {/* Nút Trợ lý AI */}
-          <Link
-            href={`/tro-ly-ai?topic=${encodeURIComponent(topic.slug)}&page=${encodeURIComponent(currentPage.slug)}&topicTitle=${encodeURIComponent(topic.title)}&pageTitle=${encodeURIComponent(currentPage.title)}`}
-            className="flex flex-col justify-between p-3 rounded-[14px] bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-700/60 shadow-2xs hover:border-blue-300 dark:hover:border-sky-500 active:scale-[0.98] transition-all cursor-pointer text-left"
-          >
-            <div className="flex items-center justify-between">
-              <div className="w-8 h-8 rounded-[10px] bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center shadow-2xs">
-                <Sparkles size={16} strokeWidth={2.5} />
-              </div>
-              <span className="text-[9.5px] font-bold text-blue-700 dark:text-sky-300 bg-blue-50 dark:bg-sky-950/70 px-1.5 py-0.5 rounded-[5px]">
-                Hỏi đáp
-              </span>
-            </div>
-            <div className="flex flex-col mt-2">
-              <span className="text-[12.5px] font-bold text-slate-900 dark:text-white leading-tight">
-                Hỏi Trợ lý AI
-              </span>
-              <span className="text-[10.5px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5 truncate">
-                Giải đáp bài học này
-              </span>
-            </div>
-          </Link>
-
-          {/* Nút Zalo Tùng Dinh Dưỡng */}
-          {(consultSettings?.zalo_url || consultSettings?.hotline) && (
-            <button
-              type="button"
-              onClick={handleAskZalo}
-              className="flex flex-col justify-between p-3 rounded-[14px] bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-700/60 shadow-2xs hover:border-blue-300 dark:hover:border-sky-500 active:scale-[0.98] transition-all cursor-pointer text-left"
-            >
-              <div className="flex items-center justify-between">
-                <div className="w-8 h-8 rounded-[10px] bg-[#0068FF] text-white flex items-center justify-center font-black text-[11px] shadow-2xs">
-                  Zalo
-                </div>
-                <span className="text-[9.5px] font-bold text-blue-700 dark:text-sky-300 bg-blue-50 dark:bg-blue-950/70 px-1.5 py-0.5 rounded-[5px]">
-                  Chuyên môn
-                </span>
-              </div>
-              <div className="flex flex-col mt-2">
-                <span className="text-[12.5px] font-bold text-slate-900 dark:text-white leading-tight">
-                  Tùng Dinh Dưỡng
-                </span>
-                <span className="text-[10.5px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5 truncate">
-                  {zaloCopied ? '✓ Đang mở Zalo...' : 'Nhắn tin hỗ trợ'}
-                </span>
-              </div>
-            </button>
-          )}
-        </div>
-
-        {/* NÚT ĐỌC EBOOK TO RÕ RÀNG, NỔI BẬT */}
+      {/* 6. TIỆN ÍCH CUỐI BÀI HỌC: ĐỌC EBOOK CHUYÊN SÂU & HỖ TRỢ ZALO (DẠNG VIÊN THUỐC PILL BUTTONS 1 DÒNG - KHÁC BIỆT HOÀN TOÀN KHUNG BÀI HỌC) */}
+      <section className="grid grid-cols-2 gap-2.5 mb-16">
+        {/* Nút Đọc Ebook Chuyên Sâu - Dạng viên thuốc viền xanh y khoa rõ ràng */}
         {(appCustomSettings.show_ebook_bridge ?? true) && (
           <a
             href={`${appCustomSettings.ebook_app_url || 'https://qbiz-ebook.vercel.app'}?topic=${topic.slug}&page=${currentPage.slug}`}
             target="_blank"
             rel="noopener noreferrer"
             onClick={playTapSound}
-            className="w-full h-11 px-3 rounded-[12px] bg-white dark:bg-slate-900 border-2 border-blue-600/80 dark:border-sky-500/80 hover:bg-blue-50 dark:hover:bg-slate-800 text-blue-800 dark:text-sky-300 flex items-center justify-center gap-2 text-[13px] font-extrabold shadow-xs cursor-pointer transition-all active:scale-[0.99]"
+            className="flex items-center justify-center gap-2 h-[44px] px-3 rounded-full bg-white dark:bg-slate-900 border-2 border-blue-600/80 dark:border-sky-500/80 hover:bg-blue-50 dark:hover:bg-slate-800 text-blue-700 dark:text-sky-300 font-black text-[12.5px] shadow-xs active:scale-[0.98] transition-all cursor-pointer whitespace-nowrap"
           >
             <BookOpen size={16} strokeWidth={2.5} className="shrink-0 text-blue-600 dark:text-sky-400" />
-            <span>Đọc Sách Ebook Chuyên Sâu</span>
+            <span>Đọc Sách Ebook</span>
           </a>
+        )}
+
+        {/* Nút Khung Zalo - Dạng viên thuốc màu xanh Zalo nhận diện trực quan */}
+        {(consultSettings?.zalo_url || consultSettings?.hotline) && (
+          <button
+            type="button"
+            onClick={handleAskZalo}
+            className="flex items-center justify-center gap-2 h-[44px] px-3 rounded-full bg-[#0068FF] hover:bg-[#0057d8] text-white font-black text-[12.5px] shadow-sm shadow-blue-500/20 active:scale-[0.98] transition-all cursor-pointer whitespace-nowrap"
+          >
+            <div className="w-5 h-5 rounded-full bg-white text-[#0068FF] flex items-center justify-center font-black text-[9px] shrink-0 shadow-2xs">
+              Z
+            </div>
+            <span>{zaloCopied ? '✓ Đang mở Zalo' : 'Hỗ trợ Zalo'}</span>
+          </button>
         )}
       </section>
 
