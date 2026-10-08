@@ -486,13 +486,16 @@ export default function FlipbookViewer({
   const [isLoadingPdf, setIsLoadingPdf] = useState<boolean>(false);
   const [pdfProgressText, setPdfProgressText] = useState<string>('');
 
-  // Tiêu đề sách: Tự sinh hoặc do người dùng tự điền
+  // Tiêu đề sách: Tự sinh hoặc do người dùng tự điền (Loại bỏ tiền tố thừa để tên sách hiển thị trọn vẹn trên Mobile)
   const defaultAutoTitle = (() => {
-    if (title && title !== 'Tài liệu tham khảo' && title !== 'Đọc thử sách 3D' && title !== 'Đọc thử tài liệu 3D') return title;
-    if (book?.title) return book.title;
-    if (pageTitle && pageTitle.trim()) return `Atlas Giải Phẫu · ${pageTitle.trim()}`;
-    if (topicTitle && topicTitle.trim()) return `Atlas Y Khoa · ${topicTitle.trim()}`;
-    return 'Atlas Giải Phẫu & Sức Khỏe 3D';
+    const raw = (() => {
+      if (title && title !== 'Tài liệu tham khảo' && title !== 'Đọc thử sách 3D' && title !== 'Đọc thử tài liệu 3D') return title;
+      if (book?.title) return book.title;
+      if (pageTitle && pageTitle.trim()) return `Atlas Giải Phẫu · ${pageTitle.trim()}`;
+      if (topicTitle && topicTitle.trim()) return `Atlas Y Khoa · ${topicTitle.trim()}`;
+      return 'Atlas Giải Phẫu & Sức Khỏe 3D';
+    })();
+    return (raw || '').replace(/^(Đọc thử tài liệu 3D:\s*|Đọc thử sách 3D:\s*|Đọc thử:\s*)/i, '').trim();
   })();
 
   const [bookTitle, setBookTitle] = useState<string>(defaultAutoTitle);
@@ -1502,15 +1505,27 @@ export default function FlipbookViewer({
             </span>
           </div>
 
-          <button
-            type="button"
-            onClick={handleFlipNext}
-            disabled={currentPage >= totalPages}
-            className="flex items-center gap-1 h-7 px-2.5 rounded-[8px] bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 cursor-pointer shadow-xs font-black"
-          >
-            <span>Tiếp</span>
-            <ChevronRight size={14} />
-          </button>
+          {currentPage >= totalPages ? (
+            <button
+              type="button"
+              onClick={() => handleJumpToPage(1)}
+              className="flex items-center gap-1 h-7 px-2.5 rounded-[8px] bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 hover:opacity-90 cursor-pointer shadow-xs font-black text-[11.5px]"
+              title="Cuộn về trang 1"
+            >
+              <RotateCcw size={12} strokeWidth={2.5} />
+              <span>Về trang 1</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleFlipNext}
+              disabled={currentPage >= totalPages}
+              className="flex items-center gap-1 h-7 px-2.5 rounded-[8px] bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 cursor-pointer shadow-xs font-black"
+            >
+              <span>Tiếp</span>
+              <ChevronRight size={14} />
+            </button>
+          )}
         </div>
       </section>
       )}
@@ -1528,117 +1543,82 @@ export default function FlipbookViewer({
         >
           {/* TOP BAR FULLSCREEN (Tự động mờ ẩn khi đọc để tập trung vào sách) */}
           <div
-            className={`flex items-center justify-between px-3 sm:px-4 pt-2.5 pb-2 border-b border-white/10 shrink-0 transition-all duration-500 ease-in-out ${
+            className={`flex items-center justify-between px-2 sm:px-4 pt-2 pb-1.5 border-b border-white/10 shrink-0 gap-1.5 transition-all duration-500 ease-in-out ${
               isChromeVisible
                 ? 'opacity-100 translate-y-0 pointer-events-auto'
                 : 'opacity-0 -translate-y-6 pointer-events-none'
             }`}
           >
-            <div className="flex items-center gap-2 min-w-0">
-              {/* Nút Quay Lại nổi bật ở góc trên bên trái */}
-              <button
-                type="button"
-                onClick={handleCloseFullscreen}
-                className="flex items-center gap-1 h-8 px-2.5 rounded-[9px] bg-white/20 hover:bg-white/30 text-white font-extrabold text-[12.5px] cursor-pointer transition-all active:scale-95 shrink-0 shadow-sm border border-white/15"
-                title="Quay lại (Đóng sách)"
-                aria-label="Quay lại"
-              >
-                <ChevronLeft size={18} strokeWidth={2.5} />
-                <span>Quay lại</span>
-              </button>
+            {/* 1. NÚT QUAY LẠI GỌN GÀNG GÓC TRÁI */}
+            <button
+              type="button"
+              onClick={handleCloseFullscreen}
+              className="flex items-center gap-1 h-7.5 px-2 rounded-[8px] bg-white/15 hover:bg-white/25 text-white font-extrabold text-[11.5px] sm:text-[12px] cursor-pointer transition-all active:scale-95 shrink-0 shadow-xs border border-white/15"
+              title="Quay lại"
+              aria-label="Quay lại"
+            >
+              <ChevronLeft size={16} strokeWidth={2.5} />
+              <span>Quay lại</span>
+            </button>
 
-              <div className="w-8 h-8 rounded-[9px] bg-amber-500 text-slate-950 flex items-center justify-center font-black shrink-0 hidden sm:flex">
-                <BookOpen size={18} strokeWidth={2.5} />
-              </div>
-              <div className="min-w-0">
-                {isEditingTitleInFullscreen ? (
-                  <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                    <input
-                      type="text"
-                      value={tempTitle}
-                      onChange={(e) => setTempTitle(e.target.value)}
-                      className="h-8 px-2.5 rounded-[8px] bg-slate-900 border border-amber-400 text-amber-200 text-[13px] font-serif font-bold focus:outline-none max-w-[220px] sm:max-w-[320px]"
-                      placeholder="Tiêu đề sách..."
-                      autoFocus
-                    />
+            {/* 2. KHU VỰC GIỮA: HIỂN THỊ ĐẦY ĐỦ TIÊU ĐỀ SÁCH VÀ SỐ TRANG (RỘNG RÃI, KHÔNG BỊ CỤT Đ... TR...) */}
+            <div className="flex-1 min-w-0 px-1 flex flex-col justify-center text-center sm:text-left">
+              {isEditingTitleInFullscreen ? (
+                <div className="flex items-center gap-1.5 justify-center sm:justify-start" onClick={(e) => e.stopPropagation()}>
+                  <input
+                    type="text"
+                    value={tempTitle}
+                    onChange={(e) => setTempTitle(e.target.value)}
+                    className="h-7 px-2 rounded-[7px] bg-slate-900 border border-amber-400 text-amber-200 text-[12px] font-serif font-bold focus:outline-none max-w-[180px] sm:max-w-[300px]"
+                    placeholder="Tiêu đề sách..."
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleSaveTitle(tempTitle);
+                      setIsEditingTitleInFullscreen(false);
+                    }}
+                    className="h-7 px-2 rounded-[7px] bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-[11px] cursor-pointer"
+                  >
+                    Lưu
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingTitleInFullscreen(false)}
+                    className="h-7 px-1.5 rounded-[7px] bg-white/10 hover:bg-white/20 text-white text-[11px] cursor-pointer"
+                  >
+                    Hủy
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1 min-w-0 justify-center sm:justify-start">
+                  <h3 className="text-[12px] sm:text-[14px] font-black text-white truncate font-serif leading-tight">
+                    {(bookTitle || title || 'Tài Liệu 3D').replace(/^(Đọc thử tài liệu 3D:\s*|Đọc thử sách 3D:\s*|Đọc thử:\s*)/i, '').trim()}
+                  </h3>
+                  {isAdmin && (
                     <button
                       type="button"
                       onClick={() => {
-                        handleSaveTitle(tempTitle);
-                        setIsEditingTitleInFullscreen(false);
+                        setTempTitle(bookTitle);
+                        setIsEditingTitleInFullscreen(true);
                       }}
-                      className="h-8 px-2.5 rounded-[8px] bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-[12px] cursor-pointer"
+                      className="p-0.5 rounded-[4px] bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-amber-300 transition-colors cursor-pointer shrink-0"
+                      title="Sửa tiêu đề sách"
                     >
-                      Lưu
+                      <Edit2 size={11} />
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => setIsEditingTitleInFullscreen(false)}
-                      className="h-8 px-2 rounded-[8px] bg-white/10 hover:bg-white/20 text-white text-[12px] cursor-pointer"
-                    >
-                      Hủy
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <h3 className="text-[13.5px] sm:text-[16px] font-black text-white truncate font-serif">
-                      {bookTitle || title}
-                    </h3>
-                    {isAdmin && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setTempTitle(bookTitle);
-                          setIsEditingTitleInFullscreen(true);
-                        }}
-                        className="p-1 rounded-[6px] bg-white/10 hover:bg-amber-500 hover:text-slate-950 text-amber-300 transition-colors cursor-pointer shrink-0"
-                        title="Sửa tiêu đề sách ngay tại đây"
-                      >
-                        <Edit2 size={12} />
-                      </button>
-                    )}
-                  </div>
-                )}
-                <span className="text-[10.5px] sm:text-[11.5px] text-amber-300 font-bold block truncate">
-                  Trang {currentPage} / {totalPages} · Chạm trang để ẩn/hiện thanh công cụ
-                </span>
-              </div>
+                  )}
+                </div>
+              )}
+              <span className="text-[10px] sm:text-[11px] text-amber-300 font-bold block truncate leading-tight mt-0.5">
+                Trang {currentPage} / {totalPages}
+              </span>
             </div>
 
-            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-              {/* Thanh điều khiển Zoom Phóng to / Thu nhỏ (Zoom In / Zoom Out / Reset 100%) */}
-              <div className="flex items-center gap-0.5 bg-white/10 rounded-full p-0.5 border border-white/15">
-                <button
-                  type="button"
-                  onClick={handleZoomOut}
-                  disabled={zoomScale <= 1.0}
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-white disabled:opacity-30 hover:bg-white/20 cursor-pointer transition-colors"
-                  title="Thu nhỏ (-)"
-                  aria-label="Thu nhỏ"
-                >
-                  <ZoomOut size={14} />
-                </button>
-                <button
-                  type="button"
-                  onClick={handleResetZoom}
-                  className="px-1.5 h-7 flex items-center justify-center text-[11px] font-black text-amber-300 hover:text-white cursor-pointer select-none"
-                  title="Bấm để đặt lại 100%"
-                >
-                  {Math.round(zoomScale * 100)}%
-                </button>
-                <button
-                  type="button"
-                  onClick={handleZoomIn}
-                  disabled={zoomScale >= 3.0}
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-white disabled:opacity-30 hover:bg-white/20 cursor-pointer transition-colors"
-                  title="Phóng to (+)"
-                  aria-label="Phóng to"
-                >
-                  <ZoomIn size={14} />
-                </button>
-              </div>
-
-              {/* 1 Nút Loa Duy Nhất - Bật/Tắt Âm Thanh Lật Sách & Phản Hồi Âm Thanh Chuẩn */}
+            {/* 3. KHU VỰC PHẢI: NÚT BẬT/TẮT ÂM VÀ NÚT ĐÓNG TINH GỌN (LOẠI BỎ ZOOM 100% CỒNG KỀNH) */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              {/* Nút Loa Duy Nhất - Bật/Tắt Âm Thanh Lật Sách */}
               <button
                 type="button"
                 onClick={() => {
@@ -1648,27 +1628,25 @@ export default function FlipbookViewer({
                     playPageFlipSound();
                   }
                 }}
-                className={`flex items-center gap-1 h-8 px-2 sm:px-2.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                className={`w-7.5 h-7.5 rounded-full flex items-center justify-center transition-all cursor-pointer ${
                   isSoundEnabled
-                    ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/30'
+                    ? 'bg-amber-400 text-slate-950 font-black shadow-xs'
                     : 'bg-white/10 hover:bg-white/20 text-white/50'
                 }`}
-                title={isSoundEnabled ? 'Tắt âm thanh lật sách' : 'Bật âm thanh lật sách (tiếng sột soạt)'}
+                title={isSoundEnabled ? 'Tắt âm thanh lật sách' : 'Bật âm thanh lật sách'}
                 aria-label="Bật tắt âm thanh"
               >
-                {isSoundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-                <span className="hidden sm:inline">
-                  {isSoundEnabled ? 'Bật âm' : 'Tắt âm'}
-                </span>
+                {isSoundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
               </button>
 
               {/* Nút Đóng Fullscreen */}
               <button
                 type="button"
                 onClick={handleCloseFullscreen}
-                className="flex items-center gap-1.5 h-8 px-3 rounded-[9px] bg-white/20 hover:bg-white/30 text-white font-extrabold text-[12.5px] cursor-pointer transition-colors"
+                className="flex items-center gap-1 h-7.5 px-2 rounded-[8px] bg-white/15 hover:bg-white/25 text-white font-extrabold text-[11.5px] cursor-pointer transition-colors border border-white/15"
+                title="Đóng sách"
               >
-                <X size={16} />
+                <X size={14} strokeWidth={2.5} />
                 <span>Đóng</span>
               </button>
             </div>
@@ -1785,6 +1763,24 @@ export default function FlipbookViewer({
               </button>
             )}
 
+            {/* Huy hiệu thông báo khi đã đọc đến trang cuối cùng & Nút cuộn về trang 1 */}
+            {currentPage >= totalPages && zoomScale <= 1.0 && (
+              <div className="absolute top-2 left-1/2 -translate-x-1/2 z-30 px-3 py-1 rounded-full bg-slate-950/90 border border-amber-400 text-white text-[11px] font-black shadow-lg flex items-center gap-2 backdrop-blur-xs animate-in fade-in slide-in-from-top-2">
+                <span className="text-amber-300">🎉 Đã đọc hết sách</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleJumpToPage(1);
+                    resetChromeTimer();
+                  }}
+                  className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 hover:bg-amber-300 font-black cursor-pointer shadow-xs active:scale-95 transition-transform"
+                >
+                  <RotateCcw size={12} strokeWidth={2.5} />
+                  <span>Về trang 1</span>
+                </button>
+              </div>
+            )}
+
             <div
               style={{
                 transform: `scale(${zoomScale}) translate(${panPosition.x / zoomScale}px, ${panPosition.y / zoomScale}px)`,
@@ -1832,22 +1828,36 @@ export default function FlipbookViewer({
               <ChevronLeft size={16} strokeWidth={2.5} />
             </button>
 
-            {/* Nút lật trang sau: Mờ 50%, dịch xuống góc dưới, thu nhỏ để không che chữ sách */}
+            {/* Nút lật trang sau / hoặc Cuộn về trang 1 khi hết sách */}
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                handleFlipNext();
+                if (currentPage >= totalPages) {
+                  handleJumpToPage(1);
+                } else {
+                  handleFlipNext();
+                }
                 resetChromeTimer();
               }}
-              disabled={currentPage >= totalPages}
-              className={`absolute right-3 sm:right-6 bottom-3 sm:bottom-5 w-8 h-8 rounded-full bg-black/50 hover:bg-black/80 text-white/90 hover:text-white border border-white/20 flex items-center justify-center shadow-md hover:scale-105 disabled:opacity-0 disabled:pointer-events-none transition-all duration-500 cursor-pointer z-20 ${
-                isChromeVisible ? 'opacity-50 hover:opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
+              className={`absolute right-3 sm:right-6 bottom-3 sm:bottom-5 ${
+                currentPage >= totalPages
+                  ? 'h-8 px-2.5 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black text-[11px] shadow-lg flex items-center gap-1 border border-amber-300 animate-pulse'
+                  : 'w-8 h-8 rounded-full bg-black/50 hover:bg-black/80 text-white/90 hover:text-white border border-white/20 flex items-center justify-center shadow-md hover:scale-105'
+              } transition-all duration-300 cursor-pointer z-20 ${
+                isChromeVisible ? 'opacity-90 hover:opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
               }`}
-              title="Trang sau"
-              aria-label="Trang sau"
+              title={currentPage >= totalPages ? 'Cuộn về trang 1' : 'Trang sau'}
+              aria-label={currentPage >= totalPages ? 'Cuộn về trang 1' : 'Trang sau'}
             >
-              <ChevronRight size={16} strokeWidth={2.5} />
+              {currentPage >= totalPages ? (
+                <>
+                  <RotateCcw size={13} strokeWidth={2.5} />
+                  <span>Về trang 1</span>
+                </>
+              ) : (
+                <ChevronRight size={16} strokeWidth={2.5} />
+              )}
             </button>
           </div>
 
@@ -1889,18 +1899,33 @@ export default function FlipbookViewer({
               </span>
             </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                handleFlipNext();
-                resetChromeTimer();
-              }}
-              disabled={currentPage >= totalPages}
-              className="flex items-center gap-1.5 h-8 sm:h-9 px-3 sm:px-3.5 rounded-[10px] bg-amber-400 text-slate-950 hover:bg-amber-300 disabled:opacity-30 disabled:cursor-not-allowed font-black text-[12.5px] sm:text-[13px] cursor-pointer shadow-md"
-            >
-              <span>Trang tiếp</span>
-              <ChevronRight size={16} />
-            </button>
+            {currentPage >= totalPages ? (
+              <button
+                type="button"
+                onClick={() => {
+                  handleJumpToPage(1);
+                  resetChromeTimer();
+                }}
+                className="flex items-center gap-1.5 h-8 sm:h-9 px-3 sm:px-3.5 rounded-[10px] bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 hover:brightness-110 font-black text-[12px] sm:text-[13px] cursor-pointer shadow-md active:scale-95 transition-all whitespace-nowrap animate-pulse"
+                title="Đã đến trang cuối · Bấm để cuộn về trang 1"
+              >
+                <RotateCcw size={15} strokeWidth={2.5} />
+                <span>Về trang 1</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  handleFlipNext();
+                  resetChromeTimer();
+                }}
+                disabled={currentPage >= totalPages}
+                className="flex items-center gap-1.5 h-8 sm:h-9 px-3 sm:px-3.5 rounded-[10px] bg-amber-400 text-slate-950 hover:bg-amber-300 disabled:opacity-30 disabled:cursor-not-allowed font-black text-[12.5px] sm:text-[13px] cursor-pointer shadow-md"
+              >
+                <span>Trang tiếp</span>
+                <ChevronRight size={16} />
+              </button>
+            )}
           </div>
         </div>
       )}

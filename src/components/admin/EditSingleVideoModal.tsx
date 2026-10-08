@@ -13,6 +13,7 @@ import {
   Clock,
   FileText,
   Video as VideoIcon,
+  Headphones,
 } from 'lucide-react';
 import { Video } from '../../lib/types';
 import { extractYouTubeId, fetchYouTubeMeta, checkIsShorts } from '../../lib/youtube';
@@ -46,6 +47,7 @@ export default function EditSingleVideoModal({
   const [urlInput, setUrlInput] = useState('');
   const [durationText, setDurationText] = useState('');
   const [description, setDescription] = useState('');
+  const [audioUrl, setAudioUrl] = useState('');
   const [isVertical, setIsVertical] = useState(false);
   const [isLoadingMeta, setIsLoadingMeta] = useState(false);
   const [metaNotice, setMetaNotice] = useState('');
@@ -58,12 +60,14 @@ export default function EditSingleVideoModal({
         setUrlInput(yid ? `https://www.youtube.com/watch?v=${yid}` : '');
         setDurationText(video.duration_text || '');
         setDescription(video.description || '');
+        setAudioUrl(video.audio_url || '');
         setIsVertical(Boolean(video.is_vertical || video.aspect_ratio === 'vertical' || video.aspect_ratio === '9:16'));
       } else {
         setTitle('');
         setUrlInput('');
         setDurationText('');
         setDescription('');
+        setAudioUrl('');
         setIsVertical(false);
       }
       setMetaNotice('');
@@ -119,6 +123,7 @@ export default function EditSingleVideoModal({
       is_vertical: isVertical,
       aspect_ratio: isVertical ? 'vertical' : 'horizontal',
       thumbnail_url: yid ? `https://i.ytimg.com/vi/${yid}/hqdefault.jpg` : (video?.thumbnail_url || undefined),
+      audio_url: audioUrl.trim() || undefined,
     };
 
     onSave(updated, videoIndex);
@@ -292,6 +297,24 @@ export default function EditSingleVideoModal({
               placeholder="Mô tả ngắn gọn nội dung bài học trong video này..."
               rows={2}
               className="p-2.5 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[12.5px] font-normal shadow-2xs focus:border-purple-500 focus:outline-hidden resize-none"
+            />
+          </div>
+
+          {/* 5. Link Audio / Podcast MP3 (Nghe khi tắt màn hình) */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[12px] font-black uppercase tracking-wider text-slate-700 dark:text-purple-200 flex items-center justify-between">
+              <span className="flex items-center gap-1.5">
+                <Headphones size={13} className="text-amber-600 dark:text-[#F8DF7B]" />
+                <span>File âm thanh / Podcast MP3</span>
+              </span>
+              <span className="text-[11px] text-muted font-normal">Nghe khi tắt màn hình</span>
+            </label>
+            <input
+              type="text"
+              value={audioUrl}
+              onChange={(e) => setAudioUrl(e.target.value)}
+              placeholder="https://...mp3 (Hỗ trợ phát âm thanh khi tắt màn hình)"
+              className="h-9 px-3 rounded-[10px] border border-slate-300 dark:border-purple-800/80 bg-white dark:bg-[#1E1342] text-[12.5px] font-medium shadow-2xs focus:border-purple-500 focus:outline-hidden"
             />
           </div>
         </div>

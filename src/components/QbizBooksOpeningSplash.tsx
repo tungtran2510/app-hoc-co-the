@@ -19,7 +19,7 @@ export function markIntroAsSeenPermanent() {
       sessionStorage.setItem('qbiz_books_intro_seen', '1');
     }
     if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('qbiz_books_intro_seen', String(Date.now()));
+      localStorage.removeItem('qbiz_books_intro_seen');
     }
     if (typeof window !== 'undefined') {
       (window as any).__qbiz_books_intro_seen = true;
@@ -28,21 +28,12 @@ export function markIntroAsSeenPermanent() {
   } catch {}
 }
 
-// Kiểm tra xem lần mở app hiện tại đã chiếu intro chưa
+// Kiểm tra xem lần mở app hiện tại đã chiếu intro chưa (chỉ lưu theo phiên sessionStorage)
 export function hasSeenIntroAnywhere(): boolean {
   try {
     if (hasShownIntroInSession) return true;
     if (typeof window !== 'undefined' && (window as any).__qbiz_books_intro_seen) return true;
     if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('qbiz_books_intro_seen') === '1') return true;
-    if (typeof localStorage !== 'undefined') {
-      const seenTime = localStorage.getItem('qbiz_books_intro_seen');
-      if (seenTime) {
-        const elapsed = Date.now() - parseInt(seenTime, 10);
-        if (!isNaN(elapsed) && elapsed < 24 * 60 * 60 * 1000) {
-          return true;
-        }
-      }
-    }
   } catch {}
   return false;
 }
@@ -69,6 +60,9 @@ export default function QbizBooksOpeningSplash({
     let shouldShow = false;
 
     try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem('qbiz_books_intro_seen');
+      }
       if (decidedRef.current === null) {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('skip_intro') === '1') {

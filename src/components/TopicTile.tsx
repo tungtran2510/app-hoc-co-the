@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import TopicCard, { DEFAULT_TOPIC_COVERS, TOPIC_MIND_MAP_SUBTITLES } from './TopicCard';
 import TopicIcon from './TopicIcon';
 import { Topic } from '../lib/types';
+import { playTapSound } from '../lib/audioFeedback';
 
 export type TopicsDisplayMode = 'card' | 'text' | 'logo' | 'large' | 'catalog';
 
@@ -50,10 +51,20 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
   const hasCover = Boolean(coverUrl) && !imgError;
   const countText = pageCount > 0 ? `${pageCount} bài học` : 'Sắp ra mắt';
 
-  const handleNav = (e?: React.MouseEvent) => {
+  const handleNav = () => {
+    playTapSound();
     onActivate?.();
-    e?.preventDefault();
-    router.push(`/${topic.slug}`);
+    const targetUrl = `/${topic.slug}`;
+    if (typeof window !== 'undefined') {
+      try {
+        router.push(targetUrl);
+      } catch {}
+      setTimeout(() => {
+        if (window.location.pathname !== targetUrl) {
+          window.location.href = targetUrl;
+        }
+      }, 70);
+    }
   };
 
   if (mode === 'text') {

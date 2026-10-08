@@ -873,7 +873,7 @@ export default function BookDetailModal({
         mode="modal-only"
         isOpen={show3DFlipbook}
         book={book}
-        title={`Đọc thử tài liệu 3D: ${book.title}`}
+        title={book.title || 'Tài liệu 3D'}
         onClose={() => setShow3DFlipbook(false)}
       />
     </>

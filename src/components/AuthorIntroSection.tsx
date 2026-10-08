@@ -810,7 +810,7 @@ export function AuthorBooksSection({
         mode="modal-only"
         isOpen={Boolean(previewBook)}
         book={previewBook}
-        title={previewBook?.title ? `Đọc thử tài liệu 3D: ${previewBook.title}` : 'Đọc thử tài liệu 3D'}
+        title={previewBook?.title || 'Tài liệu 3D'}
         onClose={() => setPreviewBook(null)}
       />
 

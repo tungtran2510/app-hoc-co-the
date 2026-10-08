@@ -3,7 +3,26 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Play, Check, BarChart2, MoreVertical, ArrowRight, Sparkles, Gauge, Edit2, Plus, ChevronDown } from 'lucide-react';
+import {
+  Play,
+  Pause,
+  Check,
+  BarChart2,
+  MoreVertical,
+  ArrowRight,
+  Sparkles,
+  Gauge,
+  Edit2,
+  Plus,
+  ChevronDown,
+  Sun,
+  Headphones,
+  Radio,
+  Volume2,
+  RotateCcw,
+  RotateCw,
+  ShieldCheck,
+} from 'lucide-react';
 import { Video } from '../../lib/types';
 import SpineIllustration from '../SpineIllustration';
 import EditSingleVideoModal from '../admin/EditSingleVideoModal';
@@ -178,6 +197,134 @@ export default function VideosBlock({
       // Bỏ qua
     }
   };
+
+  // Helper định dạng thời lượng (giây -> mm:ss)
+  const formatTime = (seconds: number): string => {
+    if (isNaN(seconds) || seconds < 0) return '00:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  };
+
+  // GIẢI PHÁP 1: Screen Wake Lock API (Giữ màn hình luôn sáng khi xem/học)
+  const [wakeLockEnabled, setWakeLockEnabled] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+    try {
+      return localStorage.getItem('qbiz_wakelock_enabled') !== 'false';
+    } catch {
+      return true;
+    }
+  });
+  const [isWakeLockActive, setIsWakeLockActive] = useState<boolean>(false);
+  const wakeLockSentinelRef = useRef<any>(null);
+
+  const requestWakeLock = async () => {
+    if (typeof window === 'undefined' || !('wakeLock' in navigator)) return;
+    try {
+      if (!wakeLockSentinelRef.current || wakeLockSentinelRef.current.released) {
+        wakeLockSentinelRef.current = await (navigator as any).wakeLock.request('screen');
+        setIsWakeLockActive(true);
+        wakeLockSentinelRef.current.addEventListener('release', () => {
+          setIsWakeLockActive(false);
+        });
+      }
+    } catch {
+      // Bỏ qua nếu bị hệ thống hạn chế
+    }
+  };
+
+  const releaseWakeLock = async () => {
+    if (wakeLockSentinelRef.current && !wakeLockSentinelRef.current.released) {
+      try {
+        await wakeLockSentinelRef.current.release();
+      } catch {}
+    }
+    wakeLockSentinelRef.current = null;
+    setIsWakeLockActive(false);
+  };
+
+  const handleToggleWakeLock = async () => {
+    playTapSound();
+    const nextVal = !wakeLockEnabled;
+    setWakeLockEnabled(nextVal);
+    try {
+      localStorage.setItem('qbiz_wakelock_enabled', nextVal ? 'true' : 'false');
+    } catch {}
+    if (!nextVal) {
+      await releaseWakeLock();
+    } else {
+      if (isPlaying) {
+        await requestWakeLock();
+      }
+    }
+  };
+
+  // TÍNH NĂNG TỰ ĐỘNG: Nghe khi tắt màn hình (Background Audio & MediaSession API)
+  const [backgroundAudioEnabled, setBackgroundAudioEnabled] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+    try {
+      return localStorage.getItem('qbiz_background_audio_enabled') !== 'false';
+    } catch {
+      return true;
+    }
+  });
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isAudioPlaying, setIsAudioPlaying] = useState<boolean>(false);
+
+  const handleToggleBackgroundAudio = () => {
+    playTapSound();
+    const nextVal = !backgroundAudioEnabled;
+    setBackgroundAudioEnabled(nextVal);
+    try {
+      localStorage.setItem('qbiz_background_audio_enabled', nextVal ? 'true' : 'false');
+    } catch {}
+    if (!nextVal && audioRef.current) {
+      audioRef.current.pause();
+      setIsAudioPlaying(false);
+    }
+  };
+
+  // Đồng bộ Screen Wake Lock khi video đang phát
+  useEffect(() => {
+    if (isPlaying && wakeLockEnabled) {
+      requestWakeLock();
+    } else if (!isPlaying) {
+      releaseWakeLock();
+    }
+  }, [isPlaying, wakeLockEnabled]);
+
+  // Tự động phát âm thanh nền khi màn hình tắt / khóa máy & đồng bộ Wake Lock
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'hidden') {
+        // TỰ ĐỘNG: Màn hình tắt hoặc khóa máy -> Phát âm thanh nền
+        if (isPlaying && backgroundAudioEnabled && audioRef.current) {
+          audioRef.current.play().then(() => setIsAudioPlaying(true)).catch(() => {});
+        }
+      } else if (document.visibilityState === 'visible') {
+        // Màn hình sáng trở lại -> Dừng âm thanh nền
+        if (audioRef.current && isAudioPlaying) {
+          audioRef.current.pause();
+          setIsAudioPlaying(false);
+        }
+        if (wakeLockEnabled && isPlaying) {
+          requestWakeLock();
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+      releaseWakeLock();
+    };
+  }, [wakeLockEnabled, isPlaying, isAudioPlaying, backgroundAudioEnabled]);
+
+  // Đồng bộ tốc độ phát với thẻ Audio
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.playbackRate = playbackRate;
+    }
+  }, [playbackRate]);
 
   // Đọc danh sách video đã xem và video cần ôn tập từ localStorage
   useEffect(() => {
@@ -540,11 +687,14 @@ export default function VideosBlock({
   const handleSelectVideo = (idx: number) => {
     playTapSound();
     setActiveIndex(idx);
-    setIsPlaying(true);
     setManualOverrideAspect('auto');
     setIsEndedPlaylist(false);
     recordXemTiep(idx);
 
+    setIsPlaying(true);
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+    }
     const targetVid = videoList[idx];
     if (targetVid?.youtube_id && playerRef.current?.loadVideoById) {
       playerRef.current.loadVideoById(targetVid.youtube_id);
@@ -553,6 +703,72 @@ export default function VideosBlock({
       }
     }
   };
+
+  // Cấu hình MediaSession API (Điều khiển phát trực tiếp trên Màn hình khóa của iOS/Android)
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('mediaSession' in navigator)) return;
+
+    const thumb =
+      currentVideo.thumbnail_url ||
+      (currentVideo.youtube_id ? `https://i.ytimg.com/vi/${currentVideo.youtube_id}/hqdefault.jpg` : pageCoverUrl || '');
+
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: currentVideo.title,
+        artist: 'Tùng Dinh Dưỡng · Qbiz Books',
+        album: topicTitle || pageTitle || 'Học Cơ Thể Người',
+        artwork: [
+          { src: thumb, sizes: '512x512', type: 'image/jpeg' },
+          { src: thumb, sizes: '256x256', type: 'image/jpeg' },
+          { src: thumb, sizes: '96x96', type: 'image/jpeg' },
+        ],
+      });
+
+      navigator.mediaSession.setActionHandler('play', () => {
+        setIsPlaying(true);
+        try {
+          playerRef.current?.playVideo?.();
+        } catch {}
+        if (backgroundAudioEnabled && audioRef.current) {
+          audioRef.current.play().then(() => setIsAudioPlaying(true)).catch(() => {});
+        }
+      });
+
+      navigator.mediaSession.setActionHandler('pause', () => {
+        setIsPlaying(false);
+        try {
+          playerRef.current?.pauseVideo?.();
+        } catch {}
+        if (audioRef.current) {
+          audioRef.current.pause();
+          setIsAudioPlaying(false);
+        }
+      });
+
+      navigator.mediaSession.setActionHandler('seekbackward', () => {
+        if (audioRef.current) {
+          audioRef.current.currentTime = Math.max(0, audioRef.current.currentTime - 10);
+        }
+      });
+
+      navigator.mediaSession.setActionHandler('seekforward', () => {
+        if (audioRef.current) {
+          audioRef.current.currentTime = Math.min(
+            audioRef.current.duration || 9999,
+            audioRef.current.currentTime + 10
+          );
+        }
+      });
+
+      navigator.mediaSession.setActionHandler('previoustrack', () => {
+        if (safeIndex > 0) handleSelectVideo(safeIndex - 1);
+      });
+
+      navigator.mediaSession.setActionHandler('nexttrack', () => {
+        if (safeIndex + 1 < videoList.length) handleSelectVideo(safeIndex + 1);
+      });
+    } catch {}
+  }, [currentVideo, topicTitle, pageTitle, backgroundAudioEnabled, safeIndex, videoList.length]);
 
   // Khóa cứng khung ngang 16:9 theo yêu cầu của người dùng, không bao giờ tự động bung dọc to
   const isVertical = false;
@@ -563,94 +779,114 @@ export default function VideosBlock({
       id={blockId}
       className="w-full flex flex-col gap-2 sm:gap-2.5 scroll-mt-20"
     >
+      {/* THẺ AUDIO TỰ ĐỘNG PHÁT NỀN KHI MÀN HÌNH TẮT / KHÓA MÁY (TÀNG HÌNH, KHÔNG CHIẾM DIỆN TÍCH) */}
+      <audio
+        ref={audioRef}
+        src={currentVideo.audio_url || '/audio/lesson_podcast_sample.mp3'}
+        preload="metadata"
+        loop={!isPlaylist}
+        onPlay={() => setIsAudioPlaying(true)}
+        onPause={() => setIsAudioPlaying(false)}
+        onEnded={() => {
+          setIsAudioPlaying(false);
+          markWatched(safeIndex);
+          if (safeIndex + 1 < videoList.length) {
+            handleSelectVideo(safeIndex + 1);
+          } else {
+            setIsEndedPlaylist(true);
+          }
+        }}
+        className="hidden"
+      />
+
       {/* KHUNG TRÌNH PHÁT VIDEO CHUẨN NGANG 16:9 (KHÔNG PHÌNH DỌC) */}
       <div
         className="relative w-full p-0 overflow-hidden rounded-[18px] sm:rounded-[22px] bg-black border-[2px] border-slate-700/80 shadow-[0_12px_28px_rgba(15,23,42,0.22)] dark:border-blue-900/50 transition-all duration-300 max-w-full"
       >
-        {/* Khung màn hình hiển thị: Luôn luôn tỷ lệ 16:9 (aspect-video) chuẩn YouTube */}
+        {/* TRÌNH PHÁT VIDEO YOUTUBE GỐC */}
         <div
           className="relative w-full rounded-none bg-black overflow-hidden flex items-center justify-center aspect-video"
         >
-          {currentVideo.youtube_id ? (
-            <>
-              {isPlaying ? (
-                <iframe
-                  key={currentVideo.youtube_id}
-                  id={`yt-player-${blockId || 'default'}`}
-                  src={`https://www.youtube-nocookie.com/embed/${currentVideo.youtube_id}?autoplay=1&rel=0&playsinline=1&modestbranding=1&enablejsapi=1`}
-                  title={currentVideo.title}
-                  className="w-full h-full border-0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
-                />
-              ) : (
-                /* Lớp phủ ảnh bên ngoài khi video chưa bắt đầu phát - 0 iframe, siêu nhẹ */
-                <div
-                  onClick={() => {
-                    setIsPlaying(true);
-                  }}
-                  className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 cursor-pointer group"
-                  title="Bấm để phát video"
-                >
-                  {(currentVideo.thumbnail_url || currentVideo.youtube_id) && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={
-                        currentVideo.thumbnail_url ||
-                        `https://i.ytimg.com/vi/${currentVideo.youtube_id}/hqdefault.jpg`
-                      }
-                      alt={currentVideo.title}
-                      className="absolute inset-0 w-full h-full object-cover"
-                      loading="eager"
-                    />
-                  )}
-                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors" />
+            {currentVideo.youtube_id ? (
+              <>
+                {isPlaying ? (
+                  <iframe
+                    key={currentVideo.youtube_id}
+                    id={`yt-player-${blockId || 'default'}`}
+                    src={`https://www.youtube-nocookie.com/embed/${currentVideo.youtube_id}?autoplay=1&rel=0&playsinline=1&modestbranding=1&enablejsapi=1`}
+                    title={currentVideo.title}
+                    className="w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allowFullScreen
+                  />
+                ) : (
+                  /* Lớp phủ ảnh bên ngoài khi video chưa bắt đầu phát - 0 iframe, siêu nhẹ */
+                  <div
+                    onClick={() => {
+                      setIsPlaying(true);
+                    }}
+                    className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 cursor-pointer group"
+                    title="Bấm để phát video"
+                  >
+                    {(currentVideo.thumbnail_url || currentVideo.youtube_id) && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={
+                          currentVideo.thumbnail_url ||
+                          `https://i.ytimg.com/vi/${currentVideo.youtube_id}/hqdefault.jpg`
+                        }
+                        alt={currentVideo.title}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        loading="eager"
+                      />
+                    )}
+                    <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors" />
 
-                  <div className="relative z-10 w-[64px] h-[64px] sm:w-[70px] sm:h-[70px] rounded-full bg-white/95 flex items-center justify-center text-[#1E3A8A] shadow-2xl transition-transform group-hover:scale-105 active:scale-95 ring-4 ring-blue-400/40">
-                    <Play size={28} fill="currentColor" className="ml-1 text-[#1E3A8A]" />
-                  </div>
+                    <div className="relative z-10 w-[64px] h-[64px] sm:w-[70px] sm:h-[70px] rounded-full bg-white/95 flex items-center justify-center text-[#1E3A8A] shadow-2xl transition-transform group-hover:scale-105 active:scale-95 ring-4 ring-blue-400/40">
+                      <Play size={28} fill="currentColor" className="ml-1 text-[#1E3A8A]" />
+                    </div>
 
-                  <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between z-10 text-white text-[12.5px] sm:text-[13.5px] font-semibold bg-black/75 px-3 py-1.5 rounded-[10px] border border-white/15">
-                    <span className="truncate pr-2">{currentVideo.title}</span>
-                    <span className="shrink-0 text-white/80 text-[11px] sm:text-[12px] font-mono">
-                      {currentVideo.duration_text || '5 phút'}
-                    </span>
+                    <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between z-10 text-white text-[12.5px] sm:text-[13.5px] font-semibold bg-black/75 px-3 py-1.5 rounded-[10px] border border-white/15">
+                      <span className="truncate pr-2">{currentVideo.title}</span>
+                      <span className="shrink-0 text-white/80 text-[11px] sm:text-[12px] font-mono">
+                        {currentVideo.duration_text || '5 phút'}
+                      </span>
+                    </div>
                   </div>
+                )}
+              </>
+            ) : (
+              /* Khung mô phỏng video khi chưa có youtube_id */
+              <div className="relative w-full h-full flex flex-col items-center justify-center p-4 bg-gradient-to-b from-[#111A24] to-[#1C2735]">
+                <div className="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none">
+                  <SpineIllustration className="h-[80%] max-w-[200px]" />
                 </div>
-              )}
-            </>
-          ) : (
-            /* Khung mô phỏng video khi chưa có youtube_id */
-            <div className="relative w-full h-full flex flex-col items-center justify-center p-4 bg-gradient-to-b from-[#111A24] to-[#1C2735]">
-              <div className="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none">
-                <SpineIllustration className="h-[80%] max-w-[200px]" />
-              </div>
 
-              <button
-                type="button"
-                onClick={() => {
-                  if (isAdmin && onOpenVideoManager) {
-                    onOpenVideoManager();
-                  } else {
-                    alert('Video đang được cập nhật.');
-                  }
-                }}
-                className="relative z-10 w-[72px] h-[72px] rounded-full bg-white flex items-center justify-center text-[#1E3A8A] shadow-lg transition-transform active:scale-95 ring-4 ring-blue-400/40"
-                aria-label={`Phát video: ${currentVideo.title}`}
-              >
-                <Play size={32} fill="currentColor" className="ml-1 text-[#1E3A8A]" />
-              </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isAdmin && onOpenVideoManager) {
+                      onOpenVideoManager();
+                    } else {
+                      alert('Video đang được cập nhật.');
+                    }
+                  }}
+                  className="relative z-10 w-[72px] h-[72px] rounded-full bg-white flex items-center justify-center text-[#1E3A8A] shadow-lg transition-transform active:scale-95 ring-4 ring-blue-400/40"
+                  aria-label={`Phát video: ${currentVideo.title}`}
+                >
+                  <Play size={32} fill="currentColor" className="ml-1 text-[#1E3A8A]" />
+                </button>
 
-              <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between z-10 text-white text-[14px] font-semibold bg-black/60 px-3 py-1.5 rounded-lg backdrop-blur-xs border border-white/15">
-                <span className="truncate pr-2">{currentVideo.title}</span>
-                <span className="shrink-0 text-white/80 font-normal">
-                  {currentVideo.duration_text || 'Chưa có video'}
-                </span>
+                <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between z-10 text-white text-[14px] font-semibold bg-black/60 px-3 py-1.5 rounded-lg backdrop-blur-xs border border-white/15">
+                  <span className="truncate pr-2">{currentVideo.title}</span>
+                  <span className="shrink-0 text-white/80 font-normal">
+                    {currentVideo.duration_text || 'Chưa có video'}
+                  </span>
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
       </div>
 
       {/* Thông báo khi đã xem hết danh sách */}
@@ -681,59 +917,99 @@ export default function VideosBlock({
         </div>
       )}
 
-      {/* 1. THANH TÙY CHỈNH TỐC ĐỘ PHÁT VIDEO CHUYÊN NGHIỆP (ĐẶT Ở TRÊN, SÁT DƯỚI KHUNG VIDEO) */}
-      <div className="flex w-full min-w-0 items-center justify-between overflow-hidden rounded-[11px] border border-slate-200/80 bg-slate-50 px-2.5 py-1 dark:border-blue-900/40 dark:bg-[#0E1A33] text-[11px] font-bold">
-        <div className="flex items-center gap-1.5 text-slate-500 dark:text-sky-300">
-          <Gauge size={13} className="shrink-0 text-[#0284C7] dark:text-sky-400" />
-          <span className="text-[10.5px] font-extrabold uppercase tracking-wide">Tốc độ phát:</span>
-        </div>
-        <div className="flex items-center gap-1 overflow-x-auto">
-          {[1, 1.1, 1.25, 1.5, 2].map((spd) => (
-            <button
-              key={spd}
-              type="button"
-              onClick={() => handleSetSpeed(spd)}
-              className={`shrink-0 rounded-[6px] px-2 py-0.5 text-[10.5px] font-extrabold transition-all cursor-pointer ${
-                playbackRate === spd
-                  ? 'bg-[#0E2A5C] text-white dark:bg-sky-400 dark:text-slate-950 shadow-2xs font-black'
-                  : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200/80 dark:bg-blue-950/60 dark:text-sky-200 dark:border-blue-900/40'
-              }`}
-              title={`Phát video ở tốc độ ${spd}x`}
-            >
-              {spd}x
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* 1. KHUNG TIỆN ÍCH VIDEO & TIẾN ĐỘ HỌC TẬP (HỢP NHẤT VÀO 1 KHUNG DUY NHẤT, TINH GỌN, KHÔNG NHIỀU KHUNG) */}
+      <div className="flex flex-col w-full min-w-0 rounded-[13px] border border-slate-200/90 bg-slate-50/90 p-2 dark:border-blue-900/40 dark:bg-[#0E1A33] shadow-2xs gap-1.5">
+        {/* HÀNG 1: TỐC ĐỘ PHÁT + BIỂU TƯỢNG TAI NGHE + GIỮ SÁNG */}
+        <div className="flex w-full items-center justify-between gap-1.5">
+          {/* Bên trái: Khung tốc độ phát rõ ràng, dạng khối nổi dễ ấn */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span className="text-[10.5px] font-black text-slate-500 dark:text-sky-300 flex items-center gap-1 shrink-0">
+              <Gauge size={12} className="text-[#0284C7] dark:text-sky-400" />
+              <span>Tốc độ:</span>
+            </span>
+            <div className="inline-flex items-center p-0.5 rounded-[8px] bg-slate-200/80 dark:bg-slate-800/90 border border-slate-300/80 dark:border-slate-700/80 gap-0.5 shadow-2xs">
+              {[1, 1.25, 1.5, 2].map((spd) => (
+                <button
+                  key={spd}
+                  type="button"
+                  onClick={() => handleSetSpeed(spd)}
+                  className={`min-w-[28px] h-6 px-1.5 rounded-[6px] text-[10.5px] font-black transition-all cursor-pointer flex items-center justify-center ${
+                    playbackRate === spd
+                      ? 'bg-[#0E2A5C] text-white dark:bg-sky-400 dark:text-slate-950 shadow-xs'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-black dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/10'
+                  }`}
+                  title={`Tốc độ ${spd}x`}
+                >
+                  {spd}x
+                </button>
+              ))}
+            </div>
+          </div>
 
-      {/* 2. THANH TIẾN ĐỘ HỌC TẬP (GỌN GÀNG, SÁT DƯỚI TỐC ĐỘ PHÁT, BỎ KHOẢNG HỞ THỪA) */}
-      <div className="flex flex-col gap-1 px-0.5">
-        <div className="flex items-center justify-between gap-2 text-[11px] sm:text-[12px] font-bold text-ink">
-          <span className="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-muted">
+          {/* Bên phải: Biểu tượng tai nghe nghe nền (bên trái nút giữ sáng) + Nút giữ sáng mờ nhạt */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* Biểu tượng tai nghe: Tự động phát khi tắt màn hình / khóa máy */}
+            <button
+              type="button"
+              onClick={handleToggleBackgroundAudio}
+              className={`w-7 h-7 rounded-[7px] flex items-center justify-center border transition-colors cursor-pointer shrink-0 ${
+                backgroundAudioEnabled
+                  ? 'bg-sky-100 text-sky-800 border-sky-300 dark:bg-sky-950/70 dark:text-sky-300 dark:border-sky-800 shadow-2xs'
+                  : 'bg-transparent text-slate-400 border-slate-200/80 dark:text-slate-500 dark:border-slate-800'
+              }`}
+              title={backgroundAudioEnabled ? 'Đang bật tự động phát âm thanh khi tắt màn hình hoặc khóa máy' : 'Bấm để bật tự động phát khi tắt màn hình'}
+              aria-label="Tự động phát khi tắt màn hình"
+            >
+              <Headphones size={13} className={backgroundAudioEnabled ? 'text-sky-600 dark:text-sky-400' : 'text-slate-400'} />
+            </button>
+
+            {/* Nút Giữ sáng màn hình (Thiết kế mờ nhạt, nhẹ nhàng, không phô trương) */}
+            <button
+              type="button"
+              onClick={handleToggleWakeLock}
+              className={`inline-flex items-center gap-1 h-7 px-2 rounded-[7px] text-[10.5px] font-medium border transition-colors cursor-pointer shrink-0 ${
+                wakeLockEnabled
+                  ? 'bg-slate-200/70 text-slate-700 border-slate-300/80 dark:bg-white/5 dark:text-slate-300 dark:border-white/10'
+                  : 'bg-transparent text-slate-400 border-slate-200/80 dark:text-slate-500 dark:border-slate-800'
+              }`}
+              title="Bật/Tắt giữ màn hình điện thoại luôn sáng khi đang học"
+            >
+              <Sun size={12} className={wakeLockEnabled ? 'text-amber-500/80' : 'text-slate-400'} />
+              <span className="whitespace-nowrap">
+                Giữ sáng
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* HÀNG 2: TIẾN ĐỘ CÙNG MỘT DÒNG (BIỂU TƯỢNG + PHẦN TRĂM + THANH TIẾN ĐỘ CÙNG 1 DÒNG DUY NHẤT) */}
+        <div className="flex items-center gap-2 pt-1 border-t border-slate-200/70 dark:border-blue-900/30">
+          <div className="flex items-center gap-1 text-[11px] font-bold text-slate-600 dark:text-slate-300 shrink-0">
+            <BarChart2 size={12} className="text-blue-600 dark:text-[#93C5FD] shrink-0" />
             <span>Tiến độ:</span>
             <strong className="text-blue-700 dark:text-[#93C5FD] font-black">
               {Math.min(100, Math.round(((videoList.filter((_, idx) => watchedList.includes(idx + 1)).length) / (videoList.length || 1)) * 100))}%
             </strong>
-          </span>
-          {progressAction ? (
-            <div className="shrink-0">{progressAction}</div>
-          ) : null}
-          {!progressAction && videoList.filter((_, idx) => watchedList.includes(idx + 1)).length === videoList.length && videoList.length > 0 && (
-            <span className="text-emerald-700 dark:text-emerald-300 text-[10.5px] font-black bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-500/30 px-2 py-0.5 rounded-full">
-              ĐÃ HOÀN THÀNH
+          </div>
+
+          {/* Dải tiến độ ngang trên cùng dòng */}
+          <div className="flex-1 h-1.5 rounded-full bg-slate-200 dark:bg-purple-950/80 border border-slate-300/60 dark:border-purple-900/30 overflow-hidden p-0.5">
+            <div
+              className="h-full rounded-full bg-blue-600 dark:bg-gradient-to-r dark:from-purple-500 dark:to-[#93C5FD] transition-all duration-500"
+              style={{
+                width: `${Math.max(
+                  Math.min(100, Math.round(((videoList.filter((_, idx) => watchedList.includes(idx + 1)).length) / (videoList.length || 1)) * 100)),
+                  4
+                )}%`,
+              }}
+            />
+          </div>
+
+          {videoList.filter((_, idx) => watchedList.includes(idx + 1)).length === videoList.length && videoList.length > 0 && (
+            <span className="text-emerald-700 dark:text-emerald-300 text-[10px] font-black bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-500/30 px-1.5 py-0.2 rounded-full shrink-0">
+              ✓ Hoàn thành
             </span>
           )}
-        </div>
-        <div className="w-full h-1.5 rounded-full bg-slate-200 dark:bg-purple-950/80 border border-slate-300/60 dark:border-purple-900/30 overflow-hidden p-0.5">
-          <div
-            className="h-full rounded-full bg-blue-600 dark:bg-gradient-to-r dark:from-purple-500 dark:to-[#93C5FD] transition-all duration-500"
-            style={{
-              width: `${Math.max(
-                Math.min(100, Math.round(((videoList.filter((_, idx) => watchedList.includes(idx + 1)).length) / (videoList.length || 1)) * 100)),
-                4
-              )}%`,
-            }}
-          />
         </div>
       </div>
 

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import TopicIcon from './TopicIcon';
 import { Topic } from '../lib/types';
+import { playTapSound } from '../lib/audioFeedback';
 
 export const DEFAULT_TOPIC_COVERS: Record<string, string> = {
   'cot-song': '/images/topics/cot-song.webp',
@@ -56,15 +57,27 @@ export default function TopicCard({
     .replace(' – ', '\n')
     .replace(' - ', '\n');
 
+  const handleNavigate = () => {
+    playTapSound();
+    onActivate?.();
+    const targetUrl = `/${topic.slug}`;
+    if (typeof window !== 'undefined') {
+      try {
+        router.push(targetUrl);
+      } catch {}
+      setTimeout(() => {
+        if (window.location.pathname !== targetUrl) {
+          window.location.href = targetUrl;
+        }
+      }, 70);
+    }
+  };
+
   return (
     <Link
       href={`/${topic.slug}`}
       prefetch={true}
-      onClick={(e) => {
-        onActivate?.();
-        e.preventDefault();
-        router.push(`/${topic.slug}`);
-      }}
+      onClick={handleNavigate}
       className={`topic-card-container group relative flex flex-col cursor-pointer select-none transition-transform duration-100 active:scale-[0.98] [&.is-active]:scale-[0.98] ${
         isActive ? 'is-active' : ''
       }`}

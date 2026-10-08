@@ -572,7 +572,7 @@ export default function RecommendedBooksSection({
         mode="modal-only"
         isOpen={Boolean(flipbookPreviewBook)}
         book={flipbookPreviewBook}
-        title={flipbookPreviewBook?.title ? `Đọc thử tài liệu 3D: ${flipbookPreviewBook.title}` : 'Đọc thử tài liệu 3D'}
+        title={flipbookPreviewBook?.title || 'Tài liệu 3D'}
         onClose={() => setFlipbookPreviewBook(null)}
       />
 

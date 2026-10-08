@@ -175,6 +175,7 @@ export interface Video {
   thumbnail_url?: string;
   is_vertical?: boolean;
   aspect_ratio?: 'horizontal' | 'vertical' | '9:16' | '16:9';
+  audio_url?: string | null;
 }
 
 export interface FileItem {

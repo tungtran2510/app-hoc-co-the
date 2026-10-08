@@ -979,30 +979,6 @@ export default function ContentViewer({
           pageNumber={pageIndex}
           pageCoverUrl={currentPage.cover_url}
           pageSlugMap={pageSlugMap}
-          progressAction={
-            <button
-              type="button"
-              onClick={handleToggleCompleted}
-              className={`inline-flex items-center gap-1 whitespace-nowrap px-2 py-0.5 rounded-full border text-[10px] sm:text-[11px] font-bold transition-all shadow-2xs cursor-pointer active:scale-95 shrink-0 ${
-                isCompleted
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-500 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-500 animate-breathe-emerald'
-                  : 'bg-white text-slate-700 border-slate-300 hover:border-emerald-500 hover:text-emerald-700 dark:bg-[#1E1342] dark:text-purple-200 dark:border-purple-800/60'
-              }`}
-              title={isCompleted ? 'Bấm để hủy đánh dấu' : 'Bấm để đánh dấu đã hiểu bài này'}
-            >
-              {isCompleted ? (
-                <>
-                  <CheckCircle2 size={15} className="text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />
-                  <span>Đã hiểu bài ✓</span>
-                </>
-              ) : (
-                <>
-                  <Circle size={14} className="text-slate-400 dark:text-purple-400 stroke-[2]" />
-                  <span>Đánh dấu đã hiểu</span>
-                </>
-              )}
-            </button>
-          }
           nextPage={
             nextPage
               ? {
