@@ -17,6 +17,7 @@ import EditTopicModal from './admin/EditTopicModal';
 import EditBlockModal from './admin/EditBlockModal';
 import VideoLessonLink from './VideoLessonLink';
 import SectionOrderControls from './admin/SectionOrderControls';
+import AllTopicsFaqHub from './AllTopicsFaqHub';
 import {
   getTopicDisplayPreferenceKey,
   getTopicDisplayPreferences,
@@ -862,55 +863,8 @@ export default function TopicListClient({
         })}
       </div>
 
-      {enableSearch && query.trim().length === 0 && (initialFaqs.length > 0 || isAdmin) && (
-        <section aria-labelledby="topic-faq-heading" className="mt-5 border-t border-slate-200/80 pt-5 dark:border-white/10">
-          <div className="rounded-[22px] border border-[#D8E2F0] bg-gradient-to-b from-[#F5F8FD] to-[#EEF3FA] p-3 shadow-[0_10px_28px_-25px_rgba(24,52,103,.7)] dark:border-white/10 dark:from-[#191330] dark:to-[#130E25] sm:p-4">
-            <header className="mb-3 flex items-center justify-between gap-3 px-0.5">
-              <div className="flex min-w-0 items-center gap-2.5">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-[#E1EBFA] text-[#214B91] dark:bg-blue-400/10 dark:text-blue-200">
-                  <CircleHelp size={19} />
-                </span>
-                <div className="min-w-0">
-                  <h3 id="topic-faq-heading" className="text-[15px] font-black leading-tight text-[#102144] dark:text-white sm:text-[17px]">Vấn đề thường gặp</h3>
-                  <p className="mt-0.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">Chọn chủ đề để xem câu hỏi và hướng học phù hợp</p>
-                </div>
-              </div>
-              <span className="shrink-0 rounded-full border border-[#DCE5F2] bg-white/80 px-2.5 py-1 text-[10px] font-bold text-slate-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">{filteredFaqRows.length} câu hỏi</span>
-            </header>
-
-            <div className="mb-2 flex flex-wrap items-center gap-1.5" aria-label="Lọc vấn đề theo chủ đề">
-              <button type="button" onClick={() => setSelectedFaqCategory('all')} aria-pressed={selectedFaqCategory === 'all'} className={`rounded-full border px-3 py-1.5 text-[10px] font-extrabold transition-colors ${selectedFaqCategory === 'all' ? 'border-[#214B91] bg-[#214B91] text-white' : 'border-[#DCE5F2] bg-white text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-200'}`}>Tất cả</button>
-              {faqCategories.map((category) => <button key={category.id} type="button" onClick={() => setSelectedFaqCategory(category.id)} aria-pressed={selectedFaqCategory === category.id} className={`rounded-full border px-3 py-1.5 text-[10px] font-extrabold transition-colors ${selectedFaqCategory === category.id ? 'border-[#214B91] bg-[#214B91] text-white' : 'border-[#DCE5F2] bg-white text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-200'}`}>{category.title}</button>)}
-              {isAdmin && <button type="button" onClick={() => { setFaqCategoryPickerAction('category'); setFaqCategoryPickerOpen((open) => !open); }} className="inline-flex min-h-[30px] items-center gap-1 rounded-full border border-dashed border-[#214B91] px-3 py-1.5 text-[10px] font-extrabold text-[#214B91] dark:border-blue-300 dark:text-blue-200"><Plus size={12} />Thêm danh mục</button>}
-            </div>
-
-            {isAdmin && <div className="mb-2 flex justify-start"><button type="button" onClick={() => { if (selectedFaqCategory !== 'all') void handleAddFaqQuestion(selectedFaqCategory); else { setFaqCategoryPickerAction('question'); setFaqCategoryPickerOpen(true); } }} className="inline-flex min-h-8 items-center gap-1 rounded-[9px] bg-[#214B91] px-2.5 text-[10px] font-extrabold text-white"><Plus size={13} />Thêm câu hỏi</button></div>}
-
-            {isAdmin && faqCategoryPickerOpen && <div className="mb-3 rounded-[12px] border border-blue-200 bg-white p-2.5 dark:border-blue-400/20 dark:bg-[#191330]"><div className="mb-2 flex items-center justify-between gap-2"><p className="text-[11px] font-extrabold text-[#102144] dark:text-white">{faqCategoryPickerAction === 'category' ? 'Tên danh mục mới' : 'Chọn danh mục cho câu hỏi mới'}</p><button type="button" onClick={() => setFaqCategoryPickerOpen(false)} aria-label="Đóng" className="rounded p-1 text-slate-500"><X size={14} /></button></div>{faqCategoryPickerAction === 'category' ? <form onSubmit={(event) => { event.preventDefault(); void handleCreateFaqCategory(); }} className="flex gap-2"><input autoFocus value={newFaqCategoryName} onChange={(event) => setNewFaqCategoryName(event.target.value)} placeholder="Nhập tên danh mục bạn muốn…" aria-label="Tên danh mục mới" className="h-9 min-w-0 flex-1 rounded-[8px] border border-[#DCE5F2] bg-white px-2.5 text-[11px] text-slate-800 outline-none focus:border-[#214B91] dark:border-white/10 dark:bg-white/5 dark:text-white" /><button type="submit" disabled={!newFaqCategoryName.trim()} className="inline-flex h-9 shrink-0 items-center gap-1 rounded-[8px] bg-[#214B91] px-2.5 text-[10px] font-extrabold text-white disabled:opacity-40"><Plus size={13} />Tạo danh mục</button></form> : <div className="flex max-h-36 flex-wrap gap-1.5 overflow-y-auto">{faqCategories.map((category) => <button key={category.id} type="button" onClick={() => void handleAddFaqQuestion(category.id)} className="rounded-full border border-[#DCE5F2] bg-slate-50 px-2.5 py-1.5 text-[10px] font-bold text-slate-700 hover:border-[#214B91] hover:text-[#214B91] dark:border-white/10 dark:bg-white/5 dark:text-slate-200">{category.title}</button>)}{faqCategories.length === 0 && <p className="text-[10px] text-slate-500">Chưa có danh mục. Hãy thêm danh mục trước.</p>}</div>}</div>}
-
-            {faqSaveError && <p role="alert" className="mb-2 rounded-lg bg-red-50 px-3 py-2 text-[11px] font-bold text-red-700 dark:bg-red-950/30 dark:text-red-200">{faqSaveError}</p>}
-
-            <div className="flex flex-col gap-2">
-              {filteredFaqRows.map((faq) => {
-                const answers = faq.learningAnswers;
-                const label = faq.faqCategoryTitle;
-                return <div key={faq.id} className="flex items-start gap-1.5">
-                  <details className="group min-w-0 flex-1 overflow-hidden rounded-[15px] border border-slate-200/90 bg-white shadow-[0_3px_10px_-9px_rgba(15,23,42,.35)] dark:border-white/10 dark:bg-[#1B1630]">
-                    <summary className="flex min-h-[54px] cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-3 text-left [&::-webkit-details-marker]:hidden">
-                      <span className="min-w-0 flex-1"><span className="mb-1 block text-[9px] font-extrabold uppercase tracking-[.08em] text-[#315991] dark:text-blue-300">{label}</span><span className="block text-[12.5px] font-extrabold leading-snug text-slate-900 dark:text-slate-100 sm:text-[13px]">{faq.question}</span></span>
-                      <ChevronDown size={17} className="shrink-0 text-slate-400 transition-transform group-open:rotate-180" />
-                    </summary>
-                    <div className="border-t border-slate-100 px-3.5 pb-3.5 pt-3 dark:border-white/10">
-                      {faq.answer && <p className="whitespace-pre-line text-[12px] leading-relaxed text-slate-600 dark:text-slate-300">{faq.answer}</p>}
-                      {answers.length > 0 && <div className="flex flex-col gap-2">{answers.map((answer, index) => <div key={answer.id} className="rounded-[11px] bg-[#F1F6FD] p-2.5 dark:bg-blue-950/20">{answers.length > 1 && <span className="mb-1 block text-[9px] font-black uppercase tracking-wide text-[#315991] dark:text-blue-300">Trả lời {index + 1}</span>}{answer.text && <p className="mb-2 text-[11px] leading-relaxed text-slate-700 dark:text-slate-200">{answer.text}</p>}{answer.href && (answer.destinationType === 'topic' ? <Link href={answer.href} prefetch={true} onClick={() => playTapSound()} className="inline-flex min-h-8 items-center gap-1 rounded-full border border-[#D7E3F3] bg-white px-3 text-[10.5px] font-bold text-[#234B8B] dark:border-white/10 dark:bg-white/5 dark:text-blue-200">Xem chuyên đề <span aria-hidden="true">›</span></Link> : <VideoLessonLink href={answer.href} title={answer.videoTitle} thumbnailUrl={answer.thumbnailUrl} />)}{answer.linkedVideos?.map((video, videoIndex) => <VideoLessonLink key={`${answer.id}-video-${videoIndex}`} href={video.href} title={video.title} thumbnailUrl={video.thumbnailUrl} />)}</div>)}</div>}
-                    </div>
-                  </details>
-                  {isAdmin && <button type="button" onClick={() => { setFaqSaveError(''); setEditingFaqBlock(faq.block); }} title="Sửa vấn đề thường gặp này" aria-label={`Sửa: ${faq.question}`} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[11px] border border-blue-200 bg-white text-blue-700 shadow-sm dark:border-blue-300/15 dark:bg-[#1B1630] dark:text-blue-200"><Pencil size={15} /></button>}
-                </div>;
-              })}
-            </div>
-          </div>
-        </section>
+      {enableSearch && query.trim().length === 0 && (
+        <AllTopicsFaqHub />
       )}
 
       {!enableSearch && !hideViewAll && (

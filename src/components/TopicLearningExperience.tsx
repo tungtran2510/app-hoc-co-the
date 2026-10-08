@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, BarChart3, BookOpen, ChevronDown, Clock3, Eye, EyeOff, HelpCircle, Pencil, Play, PlaySquare, Plus, Trash2 } from 'lucide-react';
+import { ArrowRight, BarChart3, BookOpen, ChevronDown, ChevronRight, Clock3, Eye, EyeOff, HelpCircle, Pencil, Play, PlaySquare, Plus, Sparkles, Trash2 } from 'lucide-react';
 import { Block, FaqResource, Page, Topic, Video } from '../lib/types';
 import { getCompletedPages, getStoredXemTiep, XemTiepInfo } from '../lib/learningProgress';
 import PageListClient from './PageListClient';
@@ -17,8 +17,35 @@ import AchievementBadgeCard from './AchievementBadgeCard';
 
 interface TopicPageItem { page: Page; orderNumber: number; videoCount: number }
 interface TopicFaqVideo { video: Video; index: number; pageSlug: string; pageId?: string; pageTitle?: string }
-interface TopicFaqItem { id: string; question: string; answer: string; image_url?: string; resources?: FaqResource[]; learning_answers?: Array<{ id: string; text: string; target_topic_id?: string; target_page_id: string; target_video_index: number; video_links?: Array<{ id: string; target_topic_id: string; target_page_id: string; target_video_index: number }>; resolved_video_links?: Array<{ id: string; href: string; title: string; thumbnail_url?: string | null }>; target_url?: string; target_kind?: string; video_title?: string }> }
-interface TopicFaq { id: string; title: string; items: TopicFaqItem[] }
+interface TopicFaqItem {
+  id: string;
+  question: string;
+  answer: string;
+  key_takeaway?: string;
+  image_url?: string;
+  resources?: FaqResource[];
+  learning_answers?: Array<{
+    id: string;
+    text: string;
+    target_topic_id?: string;
+    target_page_id?: string;
+    target_video_index?: number;
+    video_links?: Array<{ id: string; target_topic_id: string; target_page_id: string; target_video_index: number }>;
+    resolved_video_links?: Array<{ id: string; href: string; title: string; thumbnail_url?: string | null }>;
+    target_url?: string;
+    target_kind?: string;
+    video_title?: string;
+  }>;
+}
+interface TopicFaq {
+  id: string;
+  title: string;
+  subtitle?: string;
+  badge?: string;
+  colorTheme?: string;
+  iconName?: string;
+  items: TopicFaqItem[];
+}
 type FaqBlock = Extract<Block, { type: 'faq' }>;
 interface ManagedFaqBlock extends FaqBlock {
   page_title: string;
@@ -80,10 +107,10 @@ export default function TopicLearningExperience({
     }
   };
 
-  const displayedFaqs = useMemo(() => {
+  const displayedFaqs: TopicFaq[] = useMemo(() => {
     if (!faqManagerLoaded) return faqs;
     return managedFaqBlocks.filter((block) => block.is_visible && block.data.faq_surface !== 'overview').flatMap((block) => {
-      const items = (block.data.items || []).filter((item) => item.is_visible !== false && (item.question.trim() || item.answer.trim()))
+      const items: TopicFaqItem[] = (block.data.items || []).filter((item) => item.is_visible !== false && (item.question.trim() || item.answer.trim()))
         .map((item) => ({ ...item, id: `${block.id}-${item.id}`, learning_answers: (item.learning_answers || []).map((answer) => {
           const video = faqVideos.find((entry) => entry.page_id === answer.target_page_id && entry.index === answer.target_video_index);
           const resolved_video_links = (answer.video_links || []).flatMap((linked) => {
@@ -221,11 +248,42 @@ export default function TopicLearningExperience({
       </section>
 
       <div role="tablist" aria-label="Nội dung chuyên đề" className="grid grid-cols-2 gap-2">
-        <button type="button" role="tab" aria-selected={tab === 'path'} onClick={() => setTab('path')} className={`flex min-h-[44px] items-center justify-center gap-2 rounded-[13px] text-[13px] font-black transition-colors ${tab === 'path' ? 'bg-[#1E4697] text-white shadow-md' : 'bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-300'}`}>
-          <BookOpen size={17} /> Lộ trình
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'path'}
+          onClick={() => {
+            playTapSound();
+            setTab('path');
+          }}
+          className={`flex min-h-[44px] items-center justify-center gap-1.5 rounded-[13px] text-[12.5px] font-black transition-colors cursor-pointer ${
+            tab === 'path' ? 'bg-[#1E4697] text-white shadow-md' : 'bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-300'
+          }`}
+        >
+          <BookOpen size={16} />
+          <span>Lộ trình ({visiblePages.length})</span>
         </button>
-        <button type="button" role="tab" aria-selected={tab === 'faq'} onClick={() => setTab('faq')} className={`flex min-h-[44px] items-center justify-center gap-2 rounded-[13px] text-[13px] font-black transition-colors ${tab === 'faq' ? 'bg-[#1E4697] text-white shadow-md' : 'bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-300'}`}>
-          <HelpCircle size={17} /> Vấn đề thường gặp
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'faq'}
+          onClick={() => {
+            playTapSound();
+            setTab('faq');
+          }}
+          className={`flex min-h-[44px] items-center justify-center gap-1.5 rounded-[13px] text-[12.5px] font-black transition-colors cursor-pointer ${
+            tab === 'faq' ? 'bg-[#1E4697] text-white shadow-md' : 'bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-300'
+          }`}
+        >
+          <HelpCircle size={16} />
+          <span>Vấn đề thường gặp</span>
+          {displayedFaqs.reduce((sum, f) => sum + f.items.length, 0) > 0 && (
+            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+              tab === 'faq' ? 'bg-white/20 text-white' : 'bg-blue-100 dark:bg-sky-950/80 text-blue-700 dark:text-sky-300'
+            }`}>
+              {displayedFaqs.reduce((sum, f) => sum + f.items.length, 0)}
+            </span>
+          )}
         </button>
       </div>
 
@@ -270,7 +328,22 @@ export default function TopicLearningExperience({
           />
         </div>
       ) : (
-        <section className="flex flex-col gap-2.5" role="tabpanel">
+        <section className="flex flex-col gap-3 mb-14" role="tabpanel">
+          {/* Header Chuyên mục Vấn đề thường gặp */}
+          <div className="flex items-center justify-between px-1 pt-1">
+            <div>
+              <span className="text-[9.5px] font-black uppercase tracking-wider text-blue-600 dark:text-sky-400">
+                Lâm sàng & Giải đáp
+              </span>
+              <h2 className="text-[15px] sm:text-[17px] font-black text-slate-900 dark:text-white leading-tight">
+                Vấn đề thường gặp theo từng mục
+              </h2>
+            </div>
+            <span className="px-2.5 py-1 rounded-full bg-blue-50 dark:bg-sky-950/60 border border-blue-200/80 dark:border-sky-800/60 text-blue-700 dark:text-sky-300 font-extrabold text-[10.5px] shrink-0">
+              {displayedFaqs.reduce((sum, f) => sum + f.items.length, 0)} câu hỏi
+            </span>
+          </div>
+
           {isAdmin && <div className="flex items-center justify-between gap-2 rounded-[14px] border border-blue-200 bg-blue-50/70 px-3 py-2 dark:border-blue-400/20 dark:bg-blue-950/20">
             <div className="min-w-0"><p className="text-[11px] font-extrabold text-blue-900 dark:text-blue-100">Quản lý vấn đề thường gặp</p><p className="text-[10px] text-blue-800/75 dark:text-blue-200/75">Mỗi câu hỏi có thể có nhiều hướng trả lời gắn với video bài học.</p></div>
             <button type="button" onClick={() => { const next = !faqManagerOpen; setFaqManagerOpen(next); if (next && !faqManagerLoaded) void loadFaqManager(); }} className="flex h-8 shrink-0 items-center gap-1 rounded-[9px] bg-[#1E4697] px-2.5 text-[10px] font-extrabold text-white"><Pencil size={12} />{faqManagerOpen ? 'Đóng' : 'Quản lý'}</button>
@@ -291,32 +364,132 @@ export default function TopicLearningExperience({
             })}
             {faqError && <p role="alert" className="rounded-[9px] bg-red-50 px-2.5 py-2 text-[11px] font-semibold text-red-700 dark:bg-red-950/30 dark:text-red-200">{faqError}</p>}
           </div>}
-          {displayedFaqs.length ? displayedFaqs.map((faq) => (
-            <article key={faq.id} className="overflow-hidden rounded-[16px] border border-slate-200 bg-white shadow-[0_5px_18px_-16px_rgba(15,23,42,.55)] dark:border-white/10 dark:bg-[#170F2F]">
-              <header className="border-b border-slate-100 bg-slate-50/70 px-3.5 py-3 dark:border-white/10 dark:bg-white/[.025]">
-                <div className="flex items-center justify-between gap-2"><h3 className="text-[13px] font-extrabold leading-snug text-slate-900 dark:text-white">{faq.title}</h3><span className="shrink-0 text-[9px] font-bold text-slate-500 dark:text-slate-400">{faq.items.length} câu</span></div>
+
+          {/* Danh sách từng MỤC lớn */}
+          {displayedFaqs.length ? displayedFaqs.map((faq, catIdx) => (
+            <article
+              key={faq.id}
+              className="overflow-hidden rounded-[18px] border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-[#150F2C] shadow-2xs"
+            >
+              {/* Header của từng MỤC */}
+              <header className="border-b border-slate-100 dark:border-slate-800/80 bg-gradient-to-r from-slate-50 via-blue-50/20 to-transparent dark:from-white/[0.04] dark:to-transparent px-3.5 py-3">
+                <div className="flex items-start justify-between gap-2.5">
+                  <div className="flex items-start gap-2.5 min-w-0">
+                    <div className="w-8 h-8 rounded-[10px] bg-blue-600/10 dark:bg-sky-500/20 text-blue-700 dark:text-sky-300 flex items-center justify-center shrink-0 mt-0.5 font-black text-[13px] border border-blue-500/20 shadow-2xs">
+                      {String(catIdx + 1).padStart(2, '0')}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <h3 className="text-[13px] sm:text-[14px] font-black leading-snug text-slate-900 dark:text-white">
+                          {faq.title}
+                        </h3>
+                        {faq.badge && (
+                          <span className="px-2 py-0.5 rounded-[6px] bg-blue-100 dark:bg-sky-950/80 text-blue-800 dark:text-sky-200 font-bold text-[9px]">
+                            {faq.badge}
+                          </span>
+                        )}
+                      </div>
+                      {faq.subtitle && (
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">
+                          {faq.subtitle}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <span className="shrink-0 text-[10px] font-bold text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-white/10 px-2 py-0.5 rounded-full whitespace-nowrap">
+                    {faq.items.length} câu
+                  </span>
+                </div>
               </header>
-              <div className="flex flex-col gap-1.5 p-2.5">
-                {faq.items.map((item) => {
+
+              {/* Danh sách câu hỏi trong MỤC */}
+              <div className="flex flex-col divide-y divide-slate-100 dark:divide-slate-800/60 p-1.5 sm:p-2">
+                {faq.items.map((item, qIdx) => {
                   const itemKey = `${faq.id}:${item.id}`;
-                  return <div key={item.id} className="overflow-hidden rounded-[11px] border border-slate-200 dark:border-white/10">
-                    <button type="button" aria-expanded={openFaq === itemKey} onClick={() => setOpenFaq(openFaq === itemKey ? null : itemKey)} className="flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-[12px] font-extrabold text-slate-900 dark:text-white">
-                      <span>{item.question}</span><ChevronDown size={16} className={`shrink-0 text-slate-400 transition-transform ${openFaq === itemKey ? 'rotate-180' : ''}`} />
-                    </button>
-                    {openFaq === itemKey && <div className="border-t border-slate-100 px-3 py-2.5 dark:border-white/10">{item.answer && <p className="whitespace-pre-line text-[11.5px] leading-relaxed text-slate-600 dark:text-slate-300">{item.answer}</p>}
-                      {item.image_url && <img src={item.image_url} alt="" loading="lazy" className="mt-2.5 max-h-64 w-full rounded-[10px] border border-slate-200 object-cover dark:border-white/10" />}
-                      {!!item.learning_answers?.length && <div className="mt-3 flex flex-col gap-1.5">{item.learning_answers.map((answer, index) => {
-                        const video = faqVideos.find((entry) => entry.page_id === answer.target_page_id && entry.index === answer.target_video_index);
-                        const href = answer.target_url || (video ? `/${topic.slug}/${video.page_slug}?v=${video.index}` : undefined);
-                        return <div key={answer.id} className="rounded-[9px] bg-blue-50/80 p-2.5 dark:bg-blue-950/20">{answer.text && <p className="text-[10px] font-bold leading-relaxed text-slate-700 dark:text-slate-200">{answer.text}</p>}{href && <div className={answer.text ? 'mt-2' : ''}>{answer.target_kind === 'topic' ? <Link href={href} className="inline-flex min-h-8 items-center gap-1 rounded-full border border-[#D7E3F3] bg-white px-3 text-[10.5px] font-bold text-[#234B8B] dark:border-white/10 dark:bg-white/5 dark:text-blue-200">Xem chuyên đề <span aria-hidden="true">›</span></Link> : <VideoLessonLink href={href} title={answer.video_title || video?.video.title || 'Mở video bài học'} thumbnailUrl={video?.video.thumbnail_url} />}</div>}{answer.resolved_video_links?.map((linked) => <VideoLessonLink key={linked.id} href={linked.href} title={linked.title} thumbnailUrl={linked.thumbnail_url} />)}</div>;
-                      })}</div>}
-                      {item.resources?.length ? <div className="mt-2.5 flex flex-col gap-1.5">{item.resources.map((resource, index) => <a key={`${item.id}-resource-${index}`} href={resource.url} target={/^https?:\/\//i.test(resource.url) ? '_blank' : undefined} rel={/^https?:\/\//i.test(resource.url) ? 'noreferrer' : undefined} className="flex min-w-0 items-center gap-2 rounded-[9px] border border-slate-100 bg-slate-50/80 p-1.5 text-slate-700 hover:border-blue-200 hover:bg-blue-50/70 dark:border-white/10 dark:bg-white/[.035] dark:text-slate-200 dark:hover:border-blue-400/30">{resource.thumbnail_url ? <img src={resource.thumbnail_url} alt="" loading="lazy" className="h-9 w-[52px] shrink-0 rounded-[6px] object-cover" /> : <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-200"><Play size={14} fill="currentColor" /></span>}<span className="min-w-0 flex-1 line-clamp-2 text-[10px] font-bold">{resource.title || resource.url}</span><ArrowRight size={14} className="shrink-0 text-blue-600 dark:text-blue-300" /></a>)}</div> : null}
-                    </div>}
-                  </div>;
+                  const isOpen = openFaq === itemKey;
+                  return (
+                    <div key={item.id} className="transition-colors rounded-[12px] overflow-hidden">
+                      <button
+                        type="button"
+                        aria-expanded={isOpen}
+                        onClick={() => {
+                          playTapSound();
+                          setOpenFaq(isOpen ? null : itemKey);
+                        }}
+                        className={`flex min-h-[46px] w-full items-center justify-between gap-3 px-3 py-2.5 text-left transition-colors cursor-pointer ${
+                          isOpen ? 'bg-blue-50/50 dark:bg-white/[0.03]' : 'hover:bg-slate-50 dark:hover:bg-white/[0.02]'
+                        }`}
+                      >
+                        <div className="flex items-start gap-2.5 min-w-0">
+                          <span className="w-5 h-5 rounded-full bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-[9.5px] shrink-0 mt-0.5">
+                            Q{qIdx + 1}
+                          </span>
+                          <span className="text-[12.5px] font-black text-slate-900 dark:text-white leading-snug">
+                            {item.question}
+                          </span>
+                        </div>
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-transform ${
+                          isOpen ? 'rotate-180 bg-blue-100 text-blue-700 dark:bg-sky-950 dark:text-sky-300' : 'bg-slate-100 text-slate-400 dark:bg-white/10'
+                        }`}>
+                          <ChevronDown size={14} strokeWidth={2.5} />
+                        </div>
+                      </button>
+
+                      {isOpen && (
+                        <div className="px-3 pb-3 pt-1 text-[12px] leading-relaxed text-slate-700 dark:text-slate-300 border-t border-slate-100/80 dark:border-slate-800/60 bg-slate-50/40 dark:bg-white/[0.015]">
+                          {/* Nội dung câu trả lời */}
+                          <div className="whitespace-pre-line leading-relaxed pl-7 py-1 text-[11.5px] sm:text-[12px]">
+                            {item.answer}
+                          </div>
+
+                          {/* Điểm cốt lõi rút ra (Key Takeaway) nếu có */}
+                          {item.key_takeaway && (
+                            <div className="mt-2.5 ml-7 p-2.5 rounded-[10px] bg-amber-50/90 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-800/50 flex items-start gap-2">
+                              <Sparkles size={14} className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                              <div className="text-[11px] text-amber-900 dark:text-amber-200 font-bold leading-snug">
+                                <span className="font-black text-amber-800 dark:text-amber-300">Điểm cốt lõi: </span>
+                                {item.key_takeaway}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Liên kết tới video bài học liên quan */}
+                          {!!item.learning_answers?.length && (
+                            <div className="mt-2.5 ml-7 flex flex-col gap-1.5">
+                              {item.learning_answers.map((answer) => {
+                                const href = answer.target_url;
+                                if (!href) return null;
+                                return (
+                                  <Link
+                                    key={answer.id}
+                                    href={href}
+                                    onClick={playTapSound}
+                                    className="inline-flex items-center gap-2 p-2 rounded-[10px] bg-blue-50 hover:bg-blue-100/80 dark:bg-blue-950/50 dark:hover:bg-blue-900/60 border border-blue-200/80 dark:border-blue-800/60 text-blue-800 dark:text-sky-300 text-[11px] font-extrabold transition-all group active:scale-[0.99] w-fit"
+                                  >
+                                    <div className="w-5 h-5 rounded-[6px] bg-blue-600 text-white flex items-center justify-center shrink-0">
+                                      <Play size={10} fill="currentColor" />
+                                    </div>
+                                    <span className="truncate">
+                                      {answer.video_title || 'Xem bài giảng chi tiết liên quan'}
+                                    </span>
+                                    <ChevronRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
+                                  </Link>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
                 })}
               </div>
             </article>
-          )) : !faqManagerOpen && <div className="rounded-[16px] border border-slate-200 bg-white p-4 text-[13px] text-slate-500 dark:border-white/10 dark:bg-[#170F2F] dark:text-slate-300">Chuyên đề này chưa có câu hỏi thường gặp.</div>}
+          )) : !faqManagerOpen && (
+            <div className="rounded-[16px] border border-slate-200 bg-white p-4 text-[13px] text-slate-500 dark:border-white/10 dark:bg-[#170F2F] dark:text-slate-300 text-center">
+              Chuyên đề này đang được cập nhật câu hỏi thường gặp.
+            </div>
+          )}
         </section>
       )}
                       {editingFaqBlock && <EditBlockModal isOpen onClose={() => setEditingFaqBlock(null)} block={editingFaqBlock} onSaveBlock={handleSaveFaqBlock} faqTopicOptions={[{ id: topic.id, title: topic.title }]} faqVideoOptions={faqVideos.map((entry) => ({ key: entry.key, page_id: entry.page_id, page_title: entry.page_title, video_title: entry.video.title || `Video ${entry.index}`, thumbnail_url: entry.video.thumbnail_url, index: entry.index, topic_id: entry.topic_id, topic_title: entry.topic_title }))} />}

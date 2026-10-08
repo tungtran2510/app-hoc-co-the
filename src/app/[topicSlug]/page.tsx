@@ -1,6 +1,7 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
 import { getTopics, getTopicBySlug, getPagesByTopic, getBlocksByPages, getSettings } from '../../lib/data';
+import { getTopicMasterFaqs } from '../../data/topicFaqs';
 import TopicHeaderNav from '../../components/TopicHeaderNav';
 import TopicLearningExperience from '../../components/TopicLearningExperience';
 import BottomNav from '../../components/BottomNav';
@@ -85,7 +86,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
 
   const totalVideos = pagesWithDetails.reduce((sum, item) => sum + item.videoCount, 0);
   const topicVideos = pagesWithDetails.flatMap(({ page, pageVideos }) => pageVideos.map((entry) => ({ ...entry, pageId: page.id })));
-  const faqs = pagesWithDetails.flatMap((item) => item.faqGroups.map((group) => ({
+  const dbFaqs = pagesWithDetails.flatMap((item) => item.faqGroups.map((group) => ({
     ...group,
     targetVideo: group.scope === 'video'
       ? topicVideos.find((entry) => entry.pageId === group.target_page_id && entry.index === group.target_video_index) || null
@@ -103,6 +104,31 @@ export default async function TopicPage({ params }: TopicPageProps) {
       }),
     })),
   })));
+
+  const masterFaqCategories = getTopicMasterFaqs(topic.slug);
+  const masterFaqs = masterFaqCategories.map((cat) => ({
+    id: cat.id,
+    title: cat.title,
+    subtitle: cat.subtitle,
+    badge: cat.badge,
+    colorTheme: cat.colorTheme,
+    iconName: cat.iconName,
+    items: cat.items.map((item) => ({
+      id: item.id,
+      question: item.question,
+      answer: item.answer,
+      key_takeaway: item.key_takeaway,
+      learning_answers: item.related_lesson ? [{
+        id: `link-${item.id}`,
+        text: item.related_lesson.title,
+        target_url: `/${topic.slug}/${item.related_lesson.slug}${item.related_lesson.video_index ? `?v=${item.related_lesson.video_index}` : ''}`,
+        target_kind: 'video',
+        video_title: item.related_lesson.title,
+      }] : [],
+    })),
+  }));
+
+  const faqs = dbFaqs.length > 0 ? [...dbFaqs, ...masterFaqs] : masterFaqs;
 
   return (
     <main className="flex-1 flex flex-col px-4 sm:px-5 pt-3 pb-28 gap-3.5 sm:gap-4">
