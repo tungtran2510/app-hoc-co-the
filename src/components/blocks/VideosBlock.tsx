@@ -493,6 +493,13 @@ export default function VideosBlock({
     });
   };
 
+  // Tự động đồng bộ bài học & video đang chọn vào xem_tiep ngay khi mở trang
+  useEffect(() => {
+    if (topicSlug && pageSlug && videoList && videoList.length > 0) {
+      recordXemTiep(safeIndex);
+    }
+  }, [topicSlug, pageSlug, safeIndex, videoList?.length]);
+
   // Đánh dấu video đã xem
   const markWatched = (vidIndex: number) => {
     const videoNum = vidIndex + 1;
@@ -741,6 +748,7 @@ export default function VideosBlock({
 
       navigator.mediaSession.setActionHandler('play', () => {
         setIsPlaying(true);
+        recordXemTiep(safeIndex);
         try {
           playerRef.current?.playVideo?.();
         } catch {}
@@ -801,7 +809,10 @@ export default function VideosBlock({
           src={currentVideo.audio_url || undefined}
           preload="metadata"
           loop={!isPlaylist}
-          onPlay={() => setIsAudioPlaying(true)}
+          onPlay={() => {
+            setIsAudioPlaying(true);
+            recordXemTiep(safeIndex);
+          }}
           onPause={() => setIsAudioPlaying(false)}
           onEnded={() => {
             setIsAudioPlaying(false);
@@ -842,6 +853,7 @@ export default function VideosBlock({
                   <div
                     onClick={() => {
                       setIsPlaying(true);
+                      recordXemTiep(safeIndex);
                     }}
                     className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 cursor-pointer group"
                     title="Bấm để phát video"

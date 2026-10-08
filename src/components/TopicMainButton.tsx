@@ -15,14 +15,20 @@ export default function TopicMainButton({ topic, firstPage }: TopicMainButtonPro
   const [continueInfo, setContinueInfo] = useState<XemTiepInfo | null>(null);
 
   useEffect(() => {
-    try {
-      const stored = getStoredXemTiep();
-      if (stored && stored.topic_slug === topic.slug) {
-        setContinueInfo(stored);
+    const updateProgress = () => {
+      try {
+        const stored = getStoredXemTiep();
+        if (stored && stored.topic_slug === topic.slug) {
+          setContinueInfo(stored);
+        }
+      } catch {
+        // Bỏ qua
       }
-    } catch {
-      // Bỏ qua
-    }
+    };
+
+    updateProgress();
+    window.addEventListener('learning_progress_changed', updateProgress);
+    return () => window.removeEventListener('learning_progress_changed', updateProgress);
   }, [topic.slug]);
 
   if (!firstPage) return null;

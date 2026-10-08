@@ -46,10 +46,13 @@ export function getStoredXemTiep(): XemTiepInfo | null {
 export function saveStoredXemTiep(info: Partial<XemTiepInfo>): void {
   if (typeof window === 'undefined') return;
   try {
-    const current = getStoredXemTiep() || ({} as XemTiepInfo);
+    const current = getStoredXemTiep();
+    const isNewPage = current && info.page_slug && current.page_slug !== info.page_slug;
+    const base = isNewPage ? {} : (current || {});
     const updated: XemTiepInfo = {
-      ...current,
+      ...base,
       ...info,
+      scroll_y: isNewPage ? 0 : (info.scroll_y !== undefined ? info.scroll_y : current?.scroll_y || 0),
       updated_at: Date.now(),
     } as XemTiepInfo;
     localStorage.setItem(XEM_TIEP_KEY, JSON.stringify(updated));

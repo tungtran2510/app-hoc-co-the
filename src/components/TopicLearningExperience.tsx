@@ -82,11 +82,16 @@ export default function TopicLearningExperience({
   const [editingFaqBlock, setEditingFaqBlock] = useState<FaqBlock | null>(null);
 
   useEffect(() => {
-    setResume(getStoredXemTiep());
-    setCompletedIds(getCompletedPages());
+    const handleProgress = () => {
+      setResume(getStoredXemTiep());
+      setCompletedIds(getCompletedPages());
+    };
+    handleProgress();
     checkAdminStatus().then((status) => {
       setIsAdmin(status.isAdmin && (canManageTopic(topic.id, status.user) || canManageTopic(topic.slug, status.user)));
     });
+    window.addEventListener('learning_progress_changed', handleProgress);
+    return () => window.removeEventListener('learning_progress_changed', handleProgress);
   }, [topic.id, topic.slug]);
 
   const loadFaqManager = async () => {

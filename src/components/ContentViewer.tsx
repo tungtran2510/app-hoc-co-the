@@ -81,6 +81,7 @@ import {
   toggleSavePage,
   isPageCompleted,
   togglePageCompleted,
+  saveStoredXemTiep,
 } from '../lib/learningProgress';
 import { playTapSound, playSuccessChime } from '../lib/audioFeedback';
 import { getUserPhone } from '../lib/userSync';
@@ -131,6 +132,23 @@ export default function ContentViewer({
     if (nextPage) router.prefetch(`/${topic.slug}/${nextPage.slug}`);
     router.prefetch(`/${topic.slug}`);
   }, [router, topic.slug, prevPage, nextPage]);
+
+  // Ghi nhận ngay lập tức bài học đang học dở khi mở bài
+  useEffect(() => {
+    if (topic?.slug && page?.slug) {
+      saveStoredXemTiep({
+        topic_slug: topic.slug,
+        topic_title: topic.title,
+        page_slug: page.slug,
+        page_title: page.title,
+        page_number: page.sort_order || 1,
+        video_index: 1,
+        video_total: 1,
+        video_title: page.title,
+        cover_url: page.cover_url || null,
+      });
+    }
+  }, [topic?.slug, topic?.title, page?.slug, page?.title, page?.sort_order, page?.cover_url]);
 
   const [fontSizeMode, setFontSizeMode] = useState<FontSizeOption>('normal');
   const [isAdmin, setIsAdmin] = useState(false);

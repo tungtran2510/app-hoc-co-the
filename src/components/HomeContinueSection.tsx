@@ -68,9 +68,21 @@ export default function HomeContinueSection() {
 
     window.addEventListener(LEARNING_PROGRESS_EVENT, handleUpdate);
     window.addEventListener('learning_progress_changed', handleUpdate);
+    window.addEventListener('focus', handleUpdate);
+    window.addEventListener('pageshow', handleUpdate);
+    const handleVisibilityChange = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        updateFromLocal();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
       window.removeEventListener(LEARNING_PROGRESS_EVENT, handleUpdate);
       window.removeEventListener('learning_progress_changed', handleUpdate);
+      window.removeEventListener('focus', handleUpdate);
+      window.removeEventListener('pageshow', handleUpdate);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
 
