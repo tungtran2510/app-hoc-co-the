@@ -350,36 +350,141 @@ export default function TextBlock({
         <span>{title ? title : style.label}</span>
       </div>
 
-      {/* Nội dung chữ */}
-      <div className={`flex flex-col gap-2 font-normal ${textSizeClass}`} style={{ color: textColor || undefined, ...contentCustomStyle }}>
+      {/* Nội dung chữ - Bố cục thông minh, xuống dòng rõ ràng từng ý, tránh dính liền */}
+      <div className={`flex flex-col gap-2.5 font-normal ${textSizeClass}`} style={{ color: textColor || undefined, ...contentCustomStyle }}>
         {format === 'numbered' && (
-          <ol className="flex flex-col gap-1.5 list-none p-0 m-0">
-            {safeLines.map((line, idx) => (
-              <li key={idx} className="flex gap-2">
-                <span className="font-bold text-ink shrink-0">{idx + 1}.</span>
-                <span>{renderFormattedLine(line)}</span>
-              </li>
-            ))}
-          </ol>
+          <div className="flex flex-col gap-2.5">
+            {safeLines.map((rawLine, idx) => {
+              const trimmed = rawLine.trim();
+              const match = trimmed.match(/^\s*\*\*(.*?)\*\*\s*[:–-]?\s*([\s\S]*)$/);
+
+              if (match) {
+                const heading = match[1].trim();
+                const body = match[2].trim();
+                const subLines = body
+                  ? body.split(/\n+/).flatMap((l) => {
+                      if (/(\d+\)\s+|•\s+)/.test(l)) {
+                        return l.split(/(?=\d+\)\s+|•\s+)/).map((s) => s.trim()).filter(Boolean);
+                      }
+                      return [l.trim()];
+                    }).filter(Boolean)
+                  : [];
+
+                return (
+                  <div
+                    key={idx}
+                    className="p-3.5 rounded-[15px] bg-white/95 dark:bg-[#16122C] border border-slate-200/90 dark:border-purple-900/40 shadow-2xs flex flex-col gap-2 transition-all"
+                  >
+                    {/* Dòng 1: Số thứ tự + Tiêu đề in đậm trên một hàng riêng */}
+                    <div className="flex items-start gap-2">
+                      <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5">
+                        {idx + 1}
+                      </span>
+                      <h4 className="text-[14px] sm:text-[15px] font-black text-slate-900 dark:text-white leading-snug m-0">
+                        {heading}
+                      </h4>
+                    </div>
+
+                    {/* Dòng 2+: Nội dung chi tiết xuống dòng hoàn toàn, thụt lề chuẩn */}
+                    {subLines.length > 0 && (
+                      <div className="pl-4 ml-2.5 flex flex-col gap-1.5 text-[12.5px] sm:text-[13px] text-slate-700 dark:text-slate-300 font-normal leading-relaxed border-l-2 border-blue-200 dark:border-sky-900/60">
+                        {subLines.map((sub, sIdx) => (
+                          <div key={sIdx} className="m-0">
+                            {renderFormattedLine(sub)}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              return (
+                <div
+                  key={idx}
+                  className="p-3 rounded-[14px] bg-white/95 dark:bg-[#16122C] border border-slate-200/90 dark:border-purple-900/40 shadow-2xs flex items-start gap-2.5 text-[12.5px] sm:text-[13px] leading-relaxed"
+                >
+                  <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-sky-300 text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5">
+                    {idx + 1}
+                  </span>
+                  <div className="flex-1 font-normal text-slate-700 dark:text-slate-200">
+                    {renderFormattedLine(rawLine)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         )}
 
         {format === 'bullet' && (
-          <ul className="flex flex-col gap-1.5 list-none p-0 m-0">
-            {safeLines.map((line, idx) => (
-              <li key={idx} className="flex gap-2.5">
-                <span className="shrink-0 text-ink text-[16px] leading-relaxed">•</span>
-                <span>{renderFormattedLine(line)}</span>
-              </li>
-            ))}
-          </ul>
+          <div className="flex flex-col gap-2.5">
+            {safeLines.map((rawLine, idx) => {
+              const trimmed = rawLine.trim();
+              const match = trimmed.match(/^\s*\*\*(.*?)\*\*\s*[:–-]?\s*([\s\S]*)$/);
+
+              if (match) {
+                const heading = match[1].trim();
+                const body = match[2].trim();
+                const subLines = body
+                  ? body.split(/\n+/).flatMap((l) => {
+                      if (/(\d+\)\s+|•\s+)/.test(l)) {
+                        return l.split(/(?=\d+\)\s+|•\s+)/).map((s) => s.trim()).filter(Boolean);
+                      }
+                      return [l.trim()];
+                    }).filter(Boolean)
+                  : [];
+
+                return (
+                  <div
+                    key={idx}
+                    className="p-3.5 rounded-[15px] bg-white/95 dark:bg-[#16122C] border border-slate-200/90 dark:border-purple-900/40 shadow-2xs flex flex-col gap-2 transition-all"
+                  >
+                    {/* Dòng 1: Điểm nhấn + Tiêu đề in đậm trên một hàng riêng biệt */}
+                    <div className="flex items-start gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-blue-600 dark:bg-sky-400 mt-1.5 shrink-0" />
+                      <h4 className="text-[14px] sm:text-[15px] font-black text-slate-900 dark:text-white leading-snug m-0">
+                        {heading}
+                      </h4>
+                    </div>
+
+                    {/* Dòng 2+: Nội dung chi tiết xuống dòng hoàn toàn, thụt lề chuẩn */}
+                    {subLines.length > 0 && (
+                      <div className="pl-4 ml-1 flex flex-col gap-1.5 text-[12.5px] sm:text-[13px] text-slate-700 dark:text-slate-300 font-normal leading-relaxed border-l-2 border-blue-200 dark:border-sky-900/60">
+                        {subLines.map((sub, sIdx) => (
+                          <div key={sIdx} className="m-0">
+                            {renderFormattedLine(sub)}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              return (
+                <div
+                  key={idx}
+                  className="p-3 rounded-[14px] bg-white/95 dark:bg-[#16122C] border border-slate-200/90 dark:border-purple-900/40 shadow-2xs flex items-start gap-2.5 text-[12.5px] sm:text-[13px] leading-relaxed"
+                >
+                  <span className="w-2 h-2 rounded-full bg-blue-600 dark:bg-sky-400 mt-2 shrink-0" />
+                  <div className="flex-1 font-normal text-slate-700 dark:text-slate-200">
+                    {renderFormattedLine(rawLine)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         )}
 
-        {format === 'paragraph' &&
-          safeLines.map((line, idx) => (
-            <p key={idx} className="m-0">
-              {renderFormattedLine(line)}
-            </p>
-          ))}
+        {format === 'paragraph' && (
+          <div className="flex flex-col gap-2.5">
+            {safeLines.map((line, idx) => (
+              <p key={idx} className="m-0 leading-relaxed text-[13px] sm:text-[13.5px] text-slate-700 dark:text-slate-300">
+                {renderFormattedLine(line)}
+              </p>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Đính kèm ảnh nếu có */}

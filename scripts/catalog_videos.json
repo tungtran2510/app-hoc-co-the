@@ -1,0 +1,984 @@
+{
+  "cot-song": {
+    "title": "Cột sống",
+    "pages": [
+      {
+        "id": "b0000000-0000-0000-0000-000000000001",
+        "slug": "tong-quan-ve-cot-song",
+        "title": "Tổng quan về cột sống",
+        "videos": [
+          {
+            "title": "01. Giải phẫu cột sống và các vùng đốt sống"
+          },
+          {
+            "title": "02. Chuyển động cơ bản cột sống thắt lưng và khung chậu"
+          },
+          {
+            "title": "03. Giải phẫu X-quang cột sống cổ bình thường"
+          },
+          {
+            "title": "04. X-quang cột sống cổ thẳng, nghiêng, chếch lâm sàng"
+          },
+          {
+            "title": "05. Chuyên đề Cột sống - Tùng Dinh Dưỡng"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0000-000000000002",
+        "slug": "dia-dem",
+        "title": "Đĩa đệm và cơ chế giảm xóc",
+        "videos": [
+          {
+            "title": "01. Cơ chế thoát vị đĩa đệm và chèn ép rễ thần kinh"
+          },
+          {
+            "title": "02. Rách vòng sợi và thoát vị đĩa đệm chèn ép"
+          },
+          {
+            "title": "03. Thoái hóa đĩa đệm thắt lưng và cơ chế gây đau"
+          },
+          {
+            "title": "04. Thoái hóa đĩa đệm cột sống cổ và cơ chế đau"
+          },
+          {
+            "title": "05. Thoát vị đĩa đệm và hẹp ống sống thắt lưng"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0000-000000000003",
+        "slug": "co-gan-day-chang",
+        "title": "Cơ – gân – dây chằng cột sống",
+        "videos": [
+          {
+            "title": "01. Giải phẫu và chức năng các nhóm cơ vùng thắt lưng"
+          },
+          {
+            "title": "02. Giải phẫu cơ cổ và nguyên nhân đau mỏi cổ vai gáy"
+          },
+          {
+            "title": "03. Cấu trúc cung đốt sống và hệ thống dây chằng vàng"
+          },
+          {
+            "title": "04. Cấu trúc và chi phối thần kinh khớp liên mỏm"
+          },
+          {
+            "title": "05. Cơ lưng rộng: Nguyên ủy, bám tận và chức năng vận động"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0000-000000000004",
+        "slug": "than-kinh",
+        "title": "Tủy sống & Các rễ thần kinh",
+        "videos": [
+          {
+            "title": "01. Tủy sống và dây thần kinh tủy: Khác biệt về chức năng"
+          },
+          {
+            "title": "02. Giải phẫu và chèn ép dây thần kinh tủy cổ"
+          },
+          {
+            "title": "03. Giải phẫu và chức năng dây thần kinh tủy thắt lưng"
+          },
+          {
+            "title": "04. Giải phẫu và đường đi dây thần kinh tọa chi phối chân"
+          },
+          {
+            "title": "05. Hội chứng đuôi ngựa do chèn ép rễ thần kinh thắt lưng"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0000-000000000005",
+        "slug": "tu-the-va-van-dong",
+        "title": "Tư thế chuẩn & Vận động giải áp",
+        "videos": [
+          {
+            "title": "01. Kỹ thuật nâng vật an toàn và bảo vệ cột sống thắt lưng"
+          },
+          {
+            "title": "02. Tác hại của ngồi khom lưng lên cột sống ngực và cơ"
+          },
+          {
+            "title": "03. Tổn thương cột sống thắt lưng do ngồi khom gù kéo dài"
+          },
+          {
+            "title": "04. Bài tập và điều chỉnh tư thế đầu đưa ra trước (Text Neck)"
+          },
+          {
+            "title": "05. Bài tập phục hồi nhóm cơ cổ chuyên sâu (Dr.Loan)"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0000-000000000006",
+        "slug": "cac-van-de-thuong-gap",
+        "title": "Các vấn đề cột sống thường gặp",
+        "videos": [
+          {
+            "title": "01. Thoát vị đĩa đệm cột sống và cơ chế chèn ép thần kinh"
+          },
+          {
+            "title": "02. Trượt đốt sống thoái hóa L4-L5 và hẹp ống sống"
+          },
+          {
+            "title": "03. Viêm cột sống dính khớp và quá trình vôi hóa cột sống"
+          },
+          {
+            "title": "04. Vẹo cột sống vô căn và biến dạng cột sống"
+          },
+          {
+            "title": "05. Phân biệt đau thần kinh tọa và chèn ép rễ thần kinh"
+          }
+        ]
+      }
+    ]
+  },
+  "dinh-duong": {
+    "title": "Dinh Dưỡng Nền Tảng",
+    "pages": [
+      {
+        "id": "b0000000-0000-0000-0000-000000000011",
+        "slug": "tong-quan-dinh-duong-hoc",
+        "title": "Tổng quan dinh dưỡng học tế bào",
+        "videos": [
+          {
+            "title": "01. Dinh dưỡng mục tiêu là gì – Tùng Dinh Dưỡng Wellness"
+          },
+          {
+            "title": "02. Cơ chế nhịn ăn gián đoạn và đốt mỡ dự trữ"
+          },
+          {
+            "title": "03. Top 7 Thực phẩm lên men cho đường ruột khỏe mạnh"
+          },
+          {
+            "title": "04. [Cần bổ sung] 4 Trụ cột dinh dưỡng tế bào tự chữa lành"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0000-000000000012",
+        "slug": "chat-dam-protein",
+        "title": "Chất đạm (Protein) & Tái tạo mô cơ",
+        "videos": [
+          {
+            "title": "01. Cơ chế dịch mã tổng hợp protein và nuôi dưỡng tế bào"
+          },
+          {
+            "title": "02. [Cần bổ sung] Phân loại đạm thực vật vs đạm động vật"
+          },
+          {
+            "title": "03. [Cần bổ sung] Nhu cầu Protein chuẩn theo trọng lượng cơ thể"
+          },
+          {
+            "title": "04. [Cần bổ sung] Tái tạo khối cơ và sụn khớp sau chấn thương"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0000-000000000013",
+        "slug": "chat-beo-lipid",
+        "title": "Chất béo tốt (Lipid) & Màng tế bào",
+        "videos": [
+          {
+            "title": "01. Chuyển hóa lipid: Tiêu hóa, vận chuyển và nhiễm toan xeton"
+          },
+          {
+            "title": "02. Chuyển hóa cholesterol và vai trò thực tế của LDL, HDL"
+          },
+          {
+            "title": "03. [Cần bổ sung] Omega-3 EPA/DHA và màng phospholipid tế bào"
+          },
+          {
+            "title": "04. [Cần bổ sung] Nhận diện chất béo chuyển hóa (Trans fat) gây hại"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0000-000000000014",
+        "slug": "tinh-bot-carbohydrate",
+        "title": "Tinh bột (Carbohydrate) & Chỉ số GI",
+        "videos": [
+          {
+            "title": "01. Cơ chế kháng insulin và tiền đái tháo đường do lối sống"
+          },
+          {
+            "title": "02. Thói quen ăn uống xấu khiến bệnh tiểu đường trầm trọng hơn"
+          },
+          {
+            "title": "03. [Cần bổ sung] Phân biệt tinh bột nhanh vs tinh bột chuyển hóa chậm (GI)"
+          },
+          {
+            "title": "04. [Cần bổ sung] Chiến lược kiểm soát cơn thèm đường và hạ đường huyết"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0000-000000000015",
+        "slug": "vitamin-khoang-chat",
+        "title": "Vitamin & Khoáng chất thiết yếu",
+        "videos": [
+          {
+            "title": "01. Điều hòa canxi máu qua PTH, calcitonin và vitamin D"
+          },
+          {
+            "title": "02. Cân bằng nội môi canxi và vai trò PTH, vitamin D3"
+          },
+          {
+            "title": "03. Chuyển hóa magie và hậu quả của hạ magie máu"
+          },
+          {
+            "title": "04. [Cần bổ sung] Vitamin tan trong dầu (A, D, E, K) và khoáng vi lượng"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0000-000000000016",
+        "slug": "dinh-duong-khang-viem",
+        "title": "Dinh dưỡng kháng viêm & Tái tạo mô",
+        "videos": [
+          {
+            "title": "01. Phản ứng viêm mạn tính và cơ chế tổn thương mô tế bào"
+          },
+          {
+            "title": "02. Nguyên nhân gốc rễ gây bệnh Gút (Gout) & Dinh dưỡng đào thải Urat"
+          },
+          {
+            "title": "03. Cơ chế tác dụng và tác dụng phụ của thuốc chống viêm NSAIDs"
+          },
+          {
+            "title": "04. [Cần bổ sung] Thực đơn kháng viêm tự nhiên giải độc đĩa đệm"
+          }
+        ]
+      }
+    ]
+  },
+  "co-the-nguoi": {
+    "title": "Cơ Thể Người 3D",
+    "pages": [
+      {
+        "id": "b0000000-0000-0000-0003-000000000001",
+        "slug": "tong-quan-he-co-quan",
+        "title": "Tổng quan các hệ cơ quan cơ thể",
+        "videos": [
+          {
+            "title": "01. Giải phẫu não người: 3 phần chính và 4 thùy đại não 3D"
+          },
+          {
+            "title": "02. Tổng quan giải phẫu và chức năng hệ tuần hoàn tim mạch"
+          },
+          {
+            "title": "03. Giải phẫu và chức năng sinh lý hệ hô hấp"
+          },
+          {
+            "title": "04. Tổng quan hệ bạch huyết và vai trò dẫn lưu miễn dịch"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0000-000000000022",
+        "slug": "he-co-xuong-khop",
+        "title": "Hệ cơ xương khớp & Cơ chế vận động",
+        "videos": [
+          {
+            "title": "01. Phân loại và chức năng năm loại xương trong cơ thể người"
+          },
+          {
+            "title": "02. Phân loại và đặc điểm các loại khớp hoạt dịch"
+          },
+          {
+            "title": "03. Cơ chế co cơ xương từ kích thích thần kinh đến trượt sợi actin-myosin"
+          },
+          {
+            "title": "04. Giải phẫu khớp gối và chức năng vận động chịu lực"
+          },
+          {
+            "title": "05. Loãng xương: Cơ chế hủy cốt bào, yếu tố nguy cơ và phòng ngừa"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0000-000000000023",
+        "slug": "he-tuan-hoan-tim-mach",
+        "title": "Trái tim & Hệ tuần hoàn máu",
+        "videos": [
+          {
+            "title": "01. Giải phẫu buồng tim, van tim và vòng tuần hoàn lớn nhỏ"
+          },
+          {
+            "title": "02. Phản xạ thụ thể áp lực điều hòa huyết áp tức thời"
+          },
+          {
+            "title": "03. Cấu tạo hồng cầu và cơ chế vận chuyển oxy, CO2"
+          },
+          {
+            "title": "04. Suy giãn tĩnh mạch chân: Nguyên nhân và cách phòng ngừa"
+          },
+          {
+            "title": "05. Cơ chế điều hòa huyết áp và các nhóm can thiệp y khoa"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0000-000000000024",
+        "slug": "he-ho-hap-phoi",
+        "title": "Hệ hô hấp & Trao đổi khí tại phế nang",
+        "videos": [
+          {
+            "title": "01. Giải phẫu đường dẫn khí và cơ chế hít thở"
+          },
+          {
+            "title": "02. Giải phẫu màng phế nang - mao mạch và con đường trao đổi khí"
+          },
+          {
+            "title": "03. Viêm phế quản: Tại sao tái đi tái lại & Giải pháp gốc rễ"
+          },
+          {
+            "title": "04. Bệnh phổi tắc nghẽn mạn tính (COPD) và khí phế thủng"
+          },
+          {
+            "title": "05. Ngáy và hội chứng ngưng thở khi ngủ do tắc nghẽn đường thở"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0000-000000000025",
+        "slug": "he-than-kinh-nao-bo",
+        "title": "Não bộ & Mạng lưới neuron thần kinh",
+        "videos": [
+          {
+            "title": "01. Giải phẫu và chức năng 12 đôi dây thần kinh sọ não 3D"
+          },
+          {
+            "title": "02. Hàng rào máu não: Tấm khiên bảo vệ trung ương thần kinh"
+          },
+          {
+            "title": "03. Chất dẫn truyền thần kinh GABA và Glutamate: Ức chế vs Kích thích"
+          },
+          {
+            "title": "04. Hệ thần kinh thực vật: Giao cảm (Fight/Flight) và Đối giao cảm (Rest/Digest)"
+          },
+          {
+            "title": "05. Nguyên tắc bảo vệ não bộ: Giảm nguy cơ suy giảm trí nhớ & sa sút trí tuệ"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0000-000000000026",
+        "slug": "he-bai-tiet-than",
+        "title": "Hệ bài tiết & Bộ lọc sinh học của thận",
+        "videos": [
+          {
+            "title": "01. Nhiễm trùng đường tiết niệu: Nguyên nhân, cơ chế và phòng ngừa"
+          },
+          {
+            "title": "02. Cơ chế thần kinh kiểm soát phản xạ bàng quang và đi tiểu"
+          },
+          {
+            "title": "03. Tiểu không tự chủ khi gắng sức do suy yếu cơ sàn chậu"
+          },
+          {
+            "title": "04. [Cần bổ sung] Cấu trúc Nephron lọc máu và cân bằng nước tiểu của thận"
+          }
+        ]
+      }
+    ]
+  },
+  "tieu-hoa": {
+    "title": "Hệ Tiêu Hóa",
+    "pages": [
+      {
+        "id": "b0000000-0000-0000-0004-000000000001",
+        "slug": "khoang-mieng-da-day",
+        "title": "Khoang miệng & Dạ dày: Bước đầu tiêu hóa",
+        "videos": [
+          {
+            "title": "01. Giải phẫu và tổng quan chức năng hệ tiêu hóa ở người"
+          },
+          {
+            "title": "02. Giải phẫu và sinh lý dạ dày: Tiết axit HCl và enzyme Pepsin"
+          },
+          {
+            "title": "03. Mô phỏng 3D hệ tiêu hóa từ khoang miệng đến thực quản"
+          },
+          {
+            "title": "04. Cơ chế trào ngược dạ dày thực quản (GERD) và biến chứng"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0004-000000000002",
+        "slug": "ruot-non-hap-thu",
+        "title": "Ruột non: Trung tâm hấp thu dưỡng chất",
+        "videos": [
+          {
+            "title": "01. Cơ thể hấp thu thức ăn như thế nào qua nhung mao ruột non"
+          },
+          {
+            "title": "02. Mô phỏng 3D quá trình tiêu hóa và hấp thu dinh dưỡng"
+          },
+          {
+            "title": "03. Các giai đoạn phân cắt thức ăn và vận chuyển dưỡng chất"
+          },
+          {
+            "title": "04. [Cần bổ sung] Hội chứng rò rỉ ruột (Leaky Gut) và viêm niêm mạc"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0004-000000000003",
+        "slug": "dai-trang-bai-tiet",
+        "title": "Đại tràng & Cơ chế bài tiết",
+        "videos": [
+          {
+            "title": "01. Giải phẫu và chức năng đại tràng: Tái hấp thu nước & Tạo khuôn phân"
+          },
+          {
+            "title": "02. Sinh lý nhu động ruột già và cơ chế phản xạ tống phân"
+          },
+          {
+            "title": "03. [Cần bổ sung] Táo bón mạn tính, trĩ và các rối loạn bài tiết"
+          },
+          {
+            "title": "04. [Cần bổ sung] Tầm soát Polyp đại tràng và phòng ngừa ung thư đại trực tràng"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0004-000000000004",
+        "slug": "he-vi-sinh-microbiome",
+        "title": "Hệ vi sinh đường ruột (Microbiome)",
+        "videos": [
+          {
+            "title": "01. Hệ vi sinh đường ruột: 7 Thực phẩm lên men nuôi dưỡng lợi khuẩn"
+          },
+          {
+            "title": "02. Tế bào NeuroPort và trục thần kinh ruột - não bộ (Gut-Brain Axis)"
+          },
+          {
+            "title": "03. [Cần bổ sung] Mất cân bằng hệ vi sinh đường ruột (Dysbiosis)"
+          },
+          {
+            "title": "04. [Cần bổ sung] Vai trò của Prebiotic (chất xơ) và Probiotic sống"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0004-000000000005",
+        "slug": "enzym-tieu-hoa",
+        "title": "Enzym tiêu hóa & Hấp thu vi chất",
+        "videos": [
+          {
+            "title": "01. Enzyme tiêu hóa: Amylase, Protease và Lipase phân giải thức ăn"
+          },
+          {
+            "title": "02. Vai trò của Insulin và men chuyển hóa trong cơ thể"
+          },
+          {
+            "title": "03. [Cần bổ sung] Thiếu hụt enzyme tiêu hóa ở người trưởng thành"
+          },
+          {
+            "title": "04. [Cần bổ sung] Cách kích hoạt cơ thể tự tiết đủ enzyme tự nhiên"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0004-000000000006",
+        "slug": "benh-duong-ruot-thuong-gap",
+        "title": "Phòng ngừa bệnh tiêu hóa thường gặp",
+        "videos": [
+          {
+            "title": "01. Cơ chế trào ngược dạ dày thực quản và biến chứng viêm loét"
+          },
+          {
+            "title": "02. Thoát vị khe hoành và can thiệp phẫu thuật chống trào ngược"
+          },
+          {
+            "title": "03. Miễn dịch niêm mạc ruột và cơ chế bệnh viêm đại tràng (IBD)"
+          },
+          {
+            "title": "04. [Cần bổ sung] Vi khuẩn HP dạ dày và phác đồ chăm sóc niêm mạc"
+          }
+        ]
+      }
+    ]
+  },
+  "nuoc": {
+    "title": "Nước & Điện Giải",
+    "pages": [
+      {
+        "id": "b0000000-0000-0000-0005-000000000001",
+        "slug": "vai-tro-cua-nuoc",
+        "title": "Nước – Dung môi của sự sống",
+        "videos": [
+          {
+            "title": "01. Trao đổi mao mạch, áp lực keo và cơ chế hình thành phù nề"
+          },
+          {
+            "title": "02. Dịch não tủy (CSF) và vai trò dung môi đệm thần kinh"
+          },
+          {
+            "title": "03. Phần 1: Nước sạch tạp chất và sạch hợp chất hóa học"
+          },
+          {
+            "title": "04. Phần 2: Nước tốt – Chỉ số TDS, pH, Hydrogen và cụm phân tử nhỏ"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0005-000000000002",
+        "slug": "chat-dien-giai",
+        "title": "Chất điện giải Natri, Kali & Áp suất thẩm thấu",
+        "videos": [
+          {
+            "title": "01. Tăng kali máu: Nguyên nhân, sinh lý và tác động lên nhịp tim"
+          },
+          {
+            "title": "02. Hạ kali máu: Triệu chứng yếu cơ và rối loạn nhịp tim"
+          },
+          {
+            "title": "03. Tăng canxi máu: Cơ chế bệnh sinh và triệu chứng lâm sàng"
+          },
+          {
+            "title": "04. Hạ canxi máu: Co rút cơ (dấu hiệu Chvostek/Trousseau) và điều hòa canxi"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0005-000000000003",
+        "slug": "dau-hieu-thieu-nuoc",
+        "title": "Dấu hiệu thiếu nước & Mất cân bằng",
+        "videos": [
+          {
+            "title": "01. Chuyển hóa magie, dấu hiệu chuột rút và hạ magie máu"
+          },
+          {
+            "title": "02. TDS và điện phân bóng đèn: Nhận thức các chất dẫn truyền hòa tan trong nước"
+          },
+          {
+            "title": "03. Kỹ thuật đo và kiểm chuẩn chỉ số TDS để nhận biết độ tinh khiết"
+          },
+          {
+            "title": "04. Kiểm tra độ suy giảm chất lượng nước và nồng độ Hydrogen"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0005-000000000004",
+        "slug": "nguyen-tac-uong-nuoc",
+        "title": "Nguyên tắc uống nước đúng cách",
+        "videos": [
+          {
+            "title": "01. Cách sử dụng nước tinh khiết và nước hydrogen ion kiềm khoa học"
+          },
+          {
+            "title": "02. Khi nào cơ thể nên dùng nước kiềm và cách dùng chuẩn sinh học"
+          },
+          {
+            "title": "03. Chỉ số ORP, Hydrogen hoạt tính và khả năng hấp thu của nước"
+          },
+          {
+            "title": "04. Kinh nghiệm thực nghiệm và lưu ý sử dụng nước hydrogen ion kiềm"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0005-000000000005",
+        "slug": "nuoc-va-chuyen-hoa",
+        "title": "Nước trong thải độc và chuyển hóa",
+        "videos": [
+          {
+            "title": "01. Sự hình thành, luân chuyển và tái hấp thu dịch não tủy 3D"
+          },
+          {
+            "title": "02. Tuần hoàn dịch não tủy từ não thất đến khoang dưới nhện"
+          },
+          {
+            "title": "03. Thí nghiệm rửa thực phẩm & Quản trị dinh dưỡng qua dòng nước"
+          },
+          {
+            "title": "04. Than hoạt tính và cơ chế lọc hấp phụ tạp chất hữu cơ"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0005-000000000006",
+        "slug": "can-bang-ph-mau",
+        "title": "Cân bằng toan kiềm & pH nội môi",
+        "videos": [
+          {
+            "title": "01. Cân bằng acid-base và cơ chế điều hòa pH máu sinh học"
+          },
+          {
+            "title": "02. Nhiễm toan chuyển hóa vs Nhiễm kiềm hô hấp: Cơ chế và triệu chứng"
+          },
+          {
+            "title": "03. Nước tinh khiết – Tính axit của nước RO và cơ chế nước kiềm"
+          },
+          {
+            "title": "04. Kiềm sạch vs Kiềm bẩn, Kiềm khoáng tự nhiên vs Kiềm nhân tạo"
+          }
+        ]
+      }
+    ]
+  },
+  "noi-tiet-chuyen-hoa": {
+    "title": "Nội Tiết – Chuyển Hóa",
+    "pages": [
+      {
+        "id": "b0000000-0000-0000-0000-000000000051",
+        "slug": "tong-quan-he-noi-tiet",
+        "title": "Tổng quan hệ nội tiết & Sứ giả hormone",
+        "videos": [
+          {
+            "title": "01. Hệ nội tiết và cơ chế truyền tín hiệu của hormone 3D"
+          },
+          {
+            "title": "02. Vùng dưới đồi: Trung tâm điều khiển nội tiết và thần kinh tự chủ"
+          },
+          {
+            "title": "03. Sinh lý tuyến tùng và điều hòa nhịp sinh học ngày đêm"
+          },
+          {
+            "title": "04. Tổng quan tuyến giáp và tuyến cận giáp trong cơ thể"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0006-000000000001",
+        "slug": "tuyen-giap-chuyen-hoa",
+        "title": "Tuyến giáp – Nhạc trưởng chuyển hóa năng lượng",
+        "videos": [
+          {
+            "title": "01. Giải phẫu tuyến giáp và các rối loạn chức năng thường gặp"
+          },
+          {
+            "title": "02. Bệnh tuyến giáp (Suy giáp, cường giáp): Nguyên nhân gốc rễ & Giải pháp"
+          },
+          {
+            "title": "03. Cường giáp do bệnh Basedow / Graves và cơ chế tự miễn"
+          },
+          {
+            "title": "04. Cường tuyến cận giáp: Nguyên nhân, biến chứng loãng xương & Điều trị"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0006-000000000002",
+        "slug": "tuyen-thuong-than-stress",
+        "title": "Tuyến thượng thận, Cortisol & Phản ứng Stress",
+        "videos": [
+          {
+            "title": "01. Giải phẫu và chức năng hormone tuyến thượng thận (Adrenaline/Cortisol)"
+          },
+          {
+            "title": "02. Mất ngủ, khó ngủ: Nguyên nhân gốc rễ liên quan Stress thượng thận"
+          },
+          {
+            "title": "03. Trầm cảm và lo âu ở người trẻ: Nguyên nhân sinh hóa và cách phục hồi"
+          },
+          {
+            "title": "04. [Cần bổ sung] Hội chứng kiệt quệ thượng thận (Adrenal Fatigue)"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0006-000000000003",
+        "slug": "tuyen-tuy-insulin",
+        "title": "Tuyến tụy, Insulin & Điều hòa đường huyết",
+        "videos": [
+          {
+            "title": "01. Giải phẫu và sinh lý tuyến tụy ngoại tiết và nội tiết 3D"
+          },
+          {
+            "title": "02. Hiểu rõ về bệnh tiểu đường Tuýp 2: Kháng insulin tại gan và cơ bắp"
+          },
+          {
+            "title": "03. Tiểu đường Tuýp 2: Nguyên nhân gốc rễ và giải pháp can thiệp tự nhiên"
+          },
+          {
+            "title": "04. Đái tháo đường Tuýp 1: Cơ chế tự miễn phá hủy tế bào Beta tụy"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0006-000000000004",
+        "slug": "hormone-tang-truong-giac-ngu",
+        "title": "Hormone tăng trưởng GH & Melatonin giấc ngủ",
+        "videos": [
+          {
+            "title": "01. Tuyến tùng, Melatonin và chu kỳ giấc ngủ sâu phục hồi"
+          },
+          {
+            "title": "02. Rối loạn giấc ngủ và cách cân bằng lại trục sinh học"
+          },
+          {
+            "title": "03. [Cần bổ sung] Hormone tăng trưởng (GH) tiết ra lúc 23h - 2h sáng"
+          },
+          {
+            "title": "04. [Cần bổ sung] Tối ưu hóa phòng ngủ và giảm ánh sáng xanh bảo vệ Melatonin"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0006-000000000005",
+        "slug": "hoi-chung-chuyen-hoa",
+        "title": "Hội chứng chuyển hóa & Giải pháp phục hồi",
+        "videos": [
+          {
+            "title": "01. Cơ chế kháng insulin và tiền đái tháo đường do lối sống ít vận động"
+          },
+          {
+            "title": "02. Bệnh Gút: Cơ chế lắng đọng tinh thể Urat gây viêm khớp sưng đau"
+          },
+          {
+            "title": "03. Bệnh Gút (Thống phong): Nguyên nhân gốc rễ, triệu chứng và giải pháp"
+          },
+          {
+            "title": "04. Rối loạn tiền đình và tuần hoàn não: Nguyên nhân gốc rễ & Phòng ngừa"
+          }
+        ]
+      }
+    ]
+  },
+  "gan-mat-tuy": {
+    "title": "Gan – Mật – Tụy",
+    "pages": [
+      {
+        "id": "b0000000-0000-0000-0007-000000000001",
+        "slug": "nha-may-sinh-hoa-gan",
+        "title": "Gan – Nhà máy sinh hóa 500 chức năng",
+        "videos": [
+          {
+            "title": "01. Suy gan: Nguyên nhân, cơ chế bệnh sinh và hướng phục hồi"
+          },
+          {
+            "title": "02. Tuần hoàn ruột gan và quá trình chuyển hóa acid mật"
+          },
+          {
+            "title": "03. [Cần bổ sung] Giải phẫu lá gan và 500 chức năng sinh hóa 3D"
+          },
+          {
+            "title": "04. [Cần bổ sung] Gan dự trữ Glycogen và điều hòa đường huyết 24/7"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0007-000000000002",
+        "slug": "co-che-gan-thai-doc",
+        "title": "Cơ chế giải độc gan giai đoạn 1 & 2",
+        "videos": [
+          {
+            "title": "01. Cơ chế chuyển hóa và đào thải độc chất qua dịch mật"
+          },
+          {
+            "title": "02. [Cần bổ sung] Thải độc gan giai đoạn 1 (Cytochrome P450)"
+          },
+          {
+            "title": "03. [Cần bổ sung] Thải độc gan giai đoạn 2 (Liên hợp Glutathione/Sulfate)"
+          },
+          {
+            "title": "04. [Cần bổ sung] Dấu hiệu nhận biết sớm lá gan đang bị quá tải độc chất"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0007-000000000003",
+        "slug": "tui-mat-dich-mat",
+        "title": "Túi mật & Dịch mật nhũ tương hóa chất béo",
+        "videos": [
+          {
+            "title": "01. Cơ vòng Oddi và chức năng dự trữ cô đặc mật của túi mật"
+          },
+          {
+            "title": "02. Sỏi mật: Nguyên nhân gốc rễ hình thành sỏi bùn, sỏi cholesterol & Giải pháp"
+          },
+          {
+            "title": "03. Mô phỏng phẫu thuật cắt túi mật mở (Open Cholecystectomy)"
+          },
+          {
+            "title": "04. Phẫu thuật cắt túi mật mở và giải phẫu hệ thống đường mật 3D"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0007-000000000004",
+        "slug": "tuyen-tuy-ngoai-tiet",
+        "title": "Tuyến tụy ngoại tiết & Dịch tụy tiêu hóa",
+        "videos": [
+          {
+            "title": "01. Viêm tụy cấp và mạn tính: Cơ chế, triệu chứng và cấp cứu y khoa"
+          },
+          {
+            "title": "02. Phẫu thuật cắt tụy và tự ghép đảo tụy giảm đau viêm"
+          },
+          {
+            "title": "03. [Cần bổ sung] Dịch tụy ngoại tiết: Bicarbonate trung hòa axit dạ dày"
+          },
+          {
+            "title": "04. [Cần bổ sung] Bảo vệ tuyến tụy tránh làm việc quá tải do rượu bia và mỡ xấu"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0007-000000000005",
+        "slug": "gan-nhiem-mo",
+        "title": "Gan nhiễm mỡ & Xơ hóa: Cơ chế và phục hồi",
+        "videos": [
+          {
+            "title": "01. Bệnh gan nhiễm mỡ không do rượu (NAFLD) và biến chứng xơ gan"
+          },
+          {
+            "title": "02. Tiến trình xơ hóa gan từ gan nhiễm mỡ: Cơ chế và cách phát hiện"
+          },
+          {
+            "title": "03. [Cần bổ sung] Đảo ngược gan nhiễm mỡ độ 1 và độ 2 bằng chế độ ăn"
+          },
+          {
+            "title": "04. [Cần bổ sung] Vận động và đốt mỡ nội tạng quanh tế bào gan"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0007-000000000006",
+        "slug": "dinh-duong-bo-gan",
+        "title": "Dinh dưỡng & Thảo dược bảo vệ tế bào gan",
+        "videos": [
+          {
+            "title": "01. [Cần bổ sung] Top thảo dược tự nhiên hạ men gan và bảo vệ màng tế bào gan"
+          },
+          {
+            "title": "02. [Cần bổ sung] Nghệ vàng Curcumin và Silymarin từ cây kế sữa"
+          },
+          {
+            "title": "03. [Cần bổ sung] Thực phẩm giàu Choline giúp vận chuyển mỡ ra khỏi gan"
+          },
+          {
+            "title": "04. [Cần bổ sung] 5 Thói quen đơn giản để gan tự làm sạch mỗi đêm"
+          }
+        ]
+      }
+    ]
+  },
+  "mien-dich": {
+    "title": "Hệ Miễn Dịch",
+    "pages": [
+      {
+        "id": "b0000000-0000-0000-0008-000000000001",
+        "slug": "hang-rao-phong-thu",
+        "title": "Hàng rào bảo vệ cơ thể & Miễn dịch bẩm sinh",
+        "videos": [
+          {
+            "title": "01. Phản ứng viêm: Đáp ứng miễn dịch đầu tiên và cơ chế bảo vệ mô"
+          },
+          {
+            "title": "02. Cơ chế sốt tự nhiên: Phân biệt sốt sinh lý và tăng thân nhiệt nguy hiểm"
+          },
+          {
+            "title": "03. [Cần bổ sung] Hàng rào da, niêm mạc và axit dạ dày ngăn vi khuẩn xâm nhập"
+          },
+          {
+            "title": "04. [Cần bổ sung] Vi khuẩn thường trú trên da và bảo vệ cửa ngõ cơ thể"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0008-000000000002",
+        "slug": "te-bao-bach-cau",
+        "title": "Đội quân bạch cầu thực bào & Đại thực bào",
+        "videos": [
+          {
+            "title": "01. Quá trình tạo máu tại tủy xương và biệt hóa tế bào gốc miễn dịch"
+          },
+          {
+            "title": "02. Histamine và cơ chế dị ứng, sốc phản vệ của hệ miễn dịch"
+          },
+          {
+            "title": "03. [Cần bổ sung] Bạch cầu trung tính và đại thực bào săn lùng vi khuẩn"
+          },
+          {
+            "title": "04. [Cần bổ sung] Tế bào sát thủ tự nhiên (NK Cell) tiêu diệt tế bào lạ"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0008-000000000003",
+        "slug": "mien-dich-thich-ung",
+        "title": "Miễn dịch thích ứng: Tế bào T & Tế bào B",
+        "videos": [
+          {
+            "title": "01. Giải phẫu và chức năng lọc máu, bảo vệ miễn dịch của lách 3D"
+          },
+          {
+            "title": "02. Tuyến ức và lách: Cơ quan huấn luyện tế bào T trưởng thành"
+          },
+          {
+            "title": "03. [Cần bổ sung] Tế bào lympho T (T hỗ trợ, T gây độc) và tế bào B"
+          },
+          {
+            "title": "04. [Cần bổ sung] Cơ chế hình thành kháng thể và trí nhớ miễn dịch"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0008-000000000004",
+        "slug": "khang-the-immunoglobulin",
+        "title": "Kháng thể (IgG, IgA, IgM) & Khóa mục tiêu",
+        "videos": [
+          {
+            "title": "01. [Cần bổ sung] 5 Lớp kháng thể chính: IgG, IgA, IgM, IgE, IgD"
+          },
+          {
+            "title": "02. [Cần bổ sung] Kháng thể IgA niêm mạc bảo vệ đường ruột và đường hô hấp"
+          },
+          {
+            "title": "03. [Cần bổ sung] IgG: Kháng thể bảo vệ bền vững xuyên qua nhau thai"
+          },
+          {
+            "title": "04. [Cần bổ sung] Kháng thể trung hòa độc tố và khóa mục tiêu virus"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0008-000000000005",
+        "slug": "he-bach-huyet",
+        "title": "Hệ bạch huyết & Mạng lưới hạch an ninh",
+        "videos": [
+          {
+            "title": "01. Tổng quan giải phẫu hệ bạch huyết và vai trò dẫn lưu miễn dịch 3D"
+          },
+          {
+            "title": "02. Bể dưỡng chấp và đường dẫn lưu dịch bạch huyết về tĩnh mạch dưới đòn"
+          },
+          {
+            "title": "03. [Cần bổ sung] Mạng lưới hạch an ninh (hạch cổ, hạch nách, hạch bẹn)"
+          },
+          {
+            "title": "04. [Cần bổ sung] Massage dẫn lưu bạch huyết và vận động lưu thông dòng dịch"
+          }
+        ]
+      },
+      {
+        "id": "b0000000-0000-0000-0008-000000000006",
+        "slug": "tang-cuong-de-khang",
+        "title": "Tăng cường đề kháng tự nhiên",
+        "videos": [
+          {
+            "title": "01. Miễn dịch niêm mạc ruột: Nơi tập trung 70% hệ miễn dịch cơ thể"
+          },
+          {
+            "title": "02. Bệnh tự miễn (Vẩy nến): Cơ chế bệnh học khi miễn dịch tấn công cơ thể"
+          },
+          {
+            "title": "03. [Cần bổ sung] Bộ ba Vitamin C, Vitamin D3 và Kẽm tăng sức đề kháng"
+          },
+          {
+            "title": "04. [Cần bổ sung] Giấc ngủ và quản lý Stress kích hoạt tế bào miễn dịch"
+          }
+        ]
+      }
+    ]
+  }
+}

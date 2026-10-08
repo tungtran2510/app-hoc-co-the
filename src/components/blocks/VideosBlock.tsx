@@ -48,6 +48,21 @@ declare global {
   }
 }
 
+// Helper: parse **bold** text safely for takeaway descriptions
+function renderFormattedTakeaway(text: string) {
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return (
+        <strong key={index} className="font-extrabold text-slate-900 dark:text-white">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    return part;
+  });
+}
+
 interface VideosBlockProps {
   videos: Video[];
   displayStyle?: 'single' | 'playlist';
@@ -1273,19 +1288,34 @@ export default function VideosBlock({
                 )}
               </div>
 
-              {/* Khối bung "Bài học rút ra" - khung trắng, viền & điểm nhấn xanh navy nhẹ, không nổi bật quá */}
+              {/* Khối bung "Bài học rút ra" - khung trắng, viền & điểm nhấn xanh nhẹ, xuống dòng rõ ràng */}
               {vid.description && expandedTakeaways[idx] && (
                 <div
                   onClick={(e) => e.stopPropagation()}
-                  className="mx-2 mb-2 p-2.5 rounded-[10px] bg-white dark:bg-[#121B2E] border border-blue-100 dark:border-blue-900/50 shadow-xs text-[11px] sm:text-[11.5px] leading-relaxed animate-in fade-in slide-in-from-top-1 duration-200 cursor-default"
+                  className="mx-2 mb-2 p-3 rounded-[12px] bg-white dark:bg-[#121B2E] border border-blue-100 dark:border-blue-900/50 shadow-2xs text-[11.5px] sm:text-[12px] leading-relaxed animate-in fade-in slide-in-from-top-1 duration-200 cursor-default"
                 >
-                  <div className="flex items-center gap-1.5 text-[9.5px] sm:text-[10px] font-black uppercase text-[#1E3A8A] dark:text-sky-300 tracking-wider mb-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#1E3A8A] dark:bg-sky-400 inline-block" />
+                  <div className="flex items-center gap-1.5 text-[9.5px] sm:text-[10px] font-black uppercase text-[#1E3A8A] dark:text-sky-300 tracking-wider mb-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-sky-400 inline-block" />
                     <span>BÀI HỌC RÚT RA</span>
                   </div>
-                  <p className="font-normal text-slate-600 dark:text-slate-300 pl-2.5 border-l-2 border-blue-200 dark:border-blue-800/60">
-                    {vid.description}
-                  </p>
+                  <div className="flex flex-col gap-1.5 pl-3 border-l-2 border-blue-400 dark:border-sky-500">
+                    {vid.description
+                      .split('\n')
+                      .map((l) => l.trim())
+                      .filter(Boolean)
+                      .map((line, lIdx) => {
+                        const bulletMatch = line.match(/^(?:•|-|\*|\d+\.)\s*([\s\S]*)$/);
+                        const content = bulletMatch ? bulletMatch[1].trim() : line;
+                        return (
+                          <div key={lIdx} className="flex items-start gap-1.5 font-normal text-slate-700 dark:text-slate-200 leading-relaxed">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 dark:bg-sky-400 mt-1.5 shrink-0" />
+                            <div className="flex-1">
+                              {renderFormattedTakeaway(content)}
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
                 </div>
               )}
             </div>

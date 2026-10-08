@@ -1082,8 +1082,8 @@ export default function ContentViewer({
                           titleColor={b.data.title_color}
                           mode={b.data.mode}
                           html={b.data.html}
-                          lines={b.data.lines}
-                          format={b.data.format}
+                          lines={Array.isArray(b.data.lines) && b.data.lines.length > 0 ? b.data.lines : (typeof (b.data as Record<string, any>).text === 'string' ? (b.data as Record<string, any>).text.split('\n').map((l: string) => l.trim()).filter((l: string) => l.length > 0 && !l.startsWith('###')).map((l: string) => l.replace(/^[-*]\s*/, '')) : [])}
+                          format={b.data.format || 'bullet'}
                           fontSizeMode={fontSizeMode}
                           fontSize={b.data.font_size}
                           textColor={b.data.text_color}
@@ -1199,33 +1199,48 @@ export default function ContentViewer({
           </p>
         )}
 
-        {/* NÚT LƯU BÀI HỌC - NỔI BẬT NGAY ĐỈNH ĐẦU VIDEO */}
-        <div className="flex items-center justify-between gap-2 pt-1 pb-0.5">
-          <span className="text-[10.5px] sm:text-[11px] font-black uppercase text-blue-700 dark:text-sky-300 tracking-wider flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-sky-400 inline-block animate-pulse" />
-            <span>Bài {String(pageIndex || 1).padStart(2, '0')} · {topic.title}</span>
+        {/* THANH ĐỈNH ĐẦU BÀI HỌC: BÀI SỐ + CÁC NÚT TÁC VỤ (CHIA SẺ & LƯU BÀI) */}
+        <div className="flex items-center justify-between gap-1.5 pt-1 pb-0.5">
+          <span className="text-[10.5px] sm:text-[11px] font-black uppercase text-blue-700 dark:text-sky-300 tracking-wider flex items-center gap-1.5 min-w-0 truncate">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-sky-400 inline-block animate-pulse shrink-0" />
+            <span className="truncate">Bài {String(pageIndex || 1).padStart(2, '0')} · {topic.title}</span>
           </span>
 
-          <button
-            type="button"
-            onClick={() => {
-              playTapSound();
-              handleToggleBookmark();
-            }}
-            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-[10px] text-[11px] sm:text-[11.5px] font-black tracking-wide shadow-xs active:scale-95 transition-all cursor-pointer ${
-              isSaved
-                ? 'bg-amber-500 text-white shadow-amber-500/25 ring-2 ring-amber-400/40'
-                : 'bg-amber-50/90 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 border border-amber-300/90 dark:border-amber-700/60 hover:bg-amber-100 dark:hover:bg-amber-900/50'
-            }`}
-            title={isSaved ? 'Đã lưu (Bấm để bỏ lưu)' : 'Bấm để lưu bài học này'}
-          >
-            <Bookmark
-              size={13}
-              className={isSaved ? 'fill-white text-white' : 'fill-amber-500 text-amber-600 dark:text-amber-300'}
-              strokeWidth={2.5}
-            />
-            <span>{isSaved ? 'Đã lưu bài học ✓' : 'Lưu bài học'}</span>
-          </button>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                playTapSound();
+                handleOpenShareModal();
+              }}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[10px] text-[11px] font-bold tracking-wide bg-blue-50 dark:bg-sky-950/50 text-blue-700 dark:text-sky-200 border border-blue-200/90 dark:border-sky-800/60 hover:bg-blue-100 transition-all cursor-pointer shadow-2xs active:scale-95 whitespace-nowrap"
+              title="Chia sẻ bài học này"
+            >
+              <Share2 size={12} className="text-blue-600 dark:text-sky-300 shrink-0" strokeWidth={2.5} />
+              <span>Chia sẻ</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                playTapSound();
+                handleToggleBookmark();
+              }}
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-[10px] text-[11px] font-bold tracking-wide shadow-2xs active:scale-95 transition-all cursor-pointer whitespace-nowrap ${
+                isSaved
+                  ? 'bg-amber-500 text-white shadow-amber-500/25 ring-2 ring-amber-400/40'
+                  : 'bg-amber-50/90 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 border border-amber-300/90 dark:border-amber-700/60 hover:bg-amber-100 dark:hover:bg-amber-900/50'
+              }`}
+              title={isSaved ? 'Đã lưu (Bấm để bỏ lưu)' : 'Bấm để lưu bài học này'}
+            >
+              <Bookmark
+                size={12}
+                className={isSaved ? 'fill-white text-white' : 'fill-amber-500 text-amber-600 dark:text-amber-300'}
+                strokeWidth={2.5}
+              />
+              <span>{isSaved ? 'Đã lưu ✓' : 'Lưu bài'}</span>
+            </button>
+          </div>
         </div>
       </section>
 
@@ -1324,47 +1339,42 @@ export default function ContentViewer({
         </div>
       )}
 
-      {/* 7. TRẠM ĐỒNG HÀNH & KẾT NỐI (ĐỒNG BỘ 100% PHONG CÁCH MIDNIGHT NAVY & CYAN ĐẲNG CẤP) */}
-      <section className="relative overflow-hidden rounded-[20px] bg-gradient-to-br from-[#0B1528] via-[#102244] to-[#0A1628] border border-sky-500/30 shadow-[0_10px_28px_rgba(2,132,199,0.14)] p-3.5 flex flex-col gap-3 mt-4 text-white">
-        {/* Vệt phát quang tinh tế góc trên */}
-        <div className="absolute top-0 right-0 w-36 h-36 bg-sky-500/10 rounded-full blur-2xl pointer-events-none" />
-
-        {/* Tiêu đề phân cấp sang trọng */}
-        <div className="relative z-10 flex items-center justify-between px-0.5">
+      {/* 7. TRẠM ĐỒNG HÀNH & KẾT NỐI - GIAO DIỆN SÁNG, ĐƠN GIẢN, KHÔNG 24/7, ĐỌC EBOOK TO RÕ RÀNG */}
+      <section className="relative overflow-hidden rounded-[20px] bg-slate-50/95 dark:bg-[#141226] border border-slate-200/90 dark:border-slate-800/80 p-3.5 sm:p-4 flex flex-col gap-3 mt-4 text-slate-800 dark:text-slate-100 shadow-2xs">
+        {/* Tiêu đề đơn giản, tinh gọn */}
+        <div className="flex items-center justify-between px-0.5">
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-full bg-sky-500/20 border border-sky-400/40 flex items-center justify-center">
-              <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse" />
-            </div>
-            <span className="text-[11.5px] font-black uppercase tracking-wider text-sky-300">
+            <span className="w-2 h-2 rounded-full bg-blue-600 dark:bg-sky-400 inline-block" />
+            <span className="text-[12px] font-extrabold uppercase tracking-wide text-slate-900 dark:text-white">
               Đồng hành cùng bạn
             </span>
           </div>
-          <span className="text-[9.5px] text-sky-300/80 font-bold bg-sky-950/70 border border-sky-800/50 px-2 py-0.5 rounded-full">
-            Hỗ trợ 24/7 & Chuyên sâu
+          <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+            Học tập & Trao đổi
           </span>
         </div>
 
-        {/* 2 Lựa chọn chính: Trợ lý AI (trái) và Zalo Tùng Dinh Dưỡng (phải) */}
-        <div className="relative z-10 grid grid-cols-2 gap-2">
+        {/* 2 Lựa chọn chính: Trợ lý AI & Zalo Tùng Dinh Dưỡng */}
+        <div className="grid grid-cols-2 gap-2">
           {/* Nút Trợ lý AI */}
           <Link
             href={`/tro-ly-ai?topic=${encodeURIComponent(topic.slug)}&page=${encodeURIComponent(currentPage.slug)}&topicTitle=${encodeURIComponent(topic.title)}&pageTitle=${encodeURIComponent(currentPage.title)}`}
-            className="flex flex-col justify-between p-3 rounded-[15px] bg-white/[0.07] hover:bg-white/[0.12] border border-sky-400/30 hover:border-sky-400/60 shadow-xs group active:scale-[0.98] transition-all cursor-pointer text-left"
+            className="flex flex-col justify-between p-3 rounded-[14px] bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-700/60 shadow-2xs hover:border-blue-300 dark:hover:border-sky-500 active:scale-[0.98] transition-all cursor-pointer text-left"
           >
             <div className="flex items-center justify-between">
-              <div className="w-8 h-8 rounded-[10px] bg-gradient-to-br from-sky-400 to-blue-600 text-slate-950 flex items-center justify-center shadow-xs">
+              <div className="w-8 h-8 rounded-[10px] bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center shadow-2xs">
                 <Sparkles size={16} strokeWidth={2.5} />
               </div>
-              <span className="text-[9px] font-black text-sky-300 bg-sky-950/80 border border-sky-700/50 px-1.5 py-0.5 rounded-[5px]">
-                AI 24/7
+              <span className="text-[9.5px] font-bold text-blue-700 dark:text-sky-300 bg-blue-50 dark:bg-sky-950/70 px-1.5 py-0.5 rounded-[5px]">
+                Hỏi đáp
               </span>
             </div>
-            <div className="flex flex-col mt-2.5">
-              <span className="text-[12.5px] font-black text-white leading-tight group-hover:text-sky-300 transition-colors">
+            <div className="flex flex-col mt-2">
+              <span className="text-[12.5px] font-bold text-slate-900 dark:text-white leading-tight">
                 Hỏi Trợ lý AI
               </span>
-              <span className="text-[10px] text-slate-300/80 leading-tight mt-0.5 truncate">
-                Giải đáp bài này tức thì
+              <span className="text-[10.5px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5 truncate">
+                Giải đáp bài học này
               </span>
             </div>
           </Link>
@@ -1374,52 +1384,41 @@ export default function ContentViewer({
             <button
               type="button"
               onClick={handleAskZalo}
-              className="flex flex-col justify-between p-3 rounded-[15px] bg-white/[0.07] hover:bg-white/[0.12] border border-blue-400/30 hover:border-blue-400/60 shadow-xs group active:scale-[0.98] transition-all cursor-pointer text-left"
+              className="flex flex-col justify-between p-3 rounded-[14px] bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-700/60 shadow-2xs hover:border-blue-300 dark:hover:border-sky-500 active:scale-[0.98] transition-all cursor-pointer text-left"
             >
               <div className="flex items-center justify-between">
-                <div className="w-8 h-8 rounded-[10px] bg-[#0068FF] text-white flex items-center justify-center font-black text-[11px] shadow-xs">
+                <div className="w-8 h-8 rounded-[10px] bg-[#0068FF] text-white flex items-center justify-center font-black text-[11px] shadow-2xs">
                   Zalo
                 </div>
-                <span className="text-[9px] font-black text-sky-200 bg-blue-950/80 border border-blue-700/50 px-1.5 py-0.5 rounded-[5px]">
-                  Trực tiếp
+                <span className="text-[9.5px] font-bold text-blue-700 dark:text-sky-300 bg-blue-50 dark:bg-blue-950/70 px-1.5 py-0.5 rounded-[5px]">
+                  Chuyên môn
                 </span>
               </div>
-              <div className="flex flex-col mt-2.5">
-                <span className="text-[12.5px] font-black text-white leading-tight group-hover:text-sky-300 transition-colors">
+              <div className="flex flex-col mt-2">
+                <span className="text-[12.5px] font-bold text-slate-900 dark:text-white leading-tight">
                   Tùng Dinh Dưỡng
                 </span>
-                <span className="text-[10px] text-slate-300/80 leading-tight mt-0.5 truncate">
-                  {zaloCopied ? '✓ Đang mở Zalo...' : 'Nhắn tin 1-1'}
+                <span className="text-[10.5px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5 truncate">
+                  {zaloCopied ? '✓ Đang mở Zalo...' : 'Nhắn tin hỗ trợ'}
                 </span>
               </div>
             </button>
           )}
         </div>
 
-        {/* Dải tiện ích phụ 1 dòng: Ebook + Chia sẻ */}
-        <div className="relative z-10 flex items-center gap-2 pt-2 border-t border-white/10">
-          {(appCustomSettings.show_ebook_bridge ?? true) && (
-            <a
-              href={`${appCustomSettings.ebook_app_url || 'https://qbiz-ebook.vercel.app'}?topic=${topic.slug}&page=${currentPage.slug}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={playTapSound}
-              className="flex-1 h-8 px-2 rounded-[10px] bg-white/[0.08] hover:bg-white/[0.15] border border-white/15 flex items-center justify-center gap-1 text-[10.5px] sm:text-[11px] font-bold text-white/90 hover:text-white shadow-2xs cursor-pointer whitespace-nowrap transition-all"
-            >
-              <span>📖</span>
-              <span>Đọc Ebook</span>
-            </a>
-          )}
-
-          <button
-            type="button"
-            onClick={handleOpenShareModal}
-            className="flex-1 h-8 px-2 rounded-[10px] bg-white/[0.08] hover:bg-white/[0.15] border border-white/15 flex items-center justify-center gap-1 text-[10.5px] sm:text-[11px] font-bold text-white/90 hover:text-white shadow-2xs cursor-pointer whitespace-nowrap transition-all"
+        {/* NÚT ĐỌC EBOOK TO RÕ RÀNG, NỔI BẬT */}
+        {(appCustomSettings.show_ebook_bridge ?? true) && (
+          <a
+            href={`${appCustomSettings.ebook_app_url || 'https://qbiz-ebook.vercel.app'}?topic=${topic.slug}&page=${currentPage.slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={playTapSound}
+            className="w-full h-11 px-3 rounded-[12px] bg-white dark:bg-slate-900 border-2 border-blue-600/80 dark:border-sky-500/80 hover:bg-blue-50 dark:hover:bg-slate-800 text-blue-800 dark:text-sky-300 flex items-center justify-center gap-2 text-[13px] font-extrabold shadow-xs cursor-pointer transition-all active:scale-[0.99]"
           >
-            <Share2 size={12} className="text-sky-300 shrink-0" />
-            <span>Chia sẻ bài học</span>
-          </button>
-        </div>
+            <BookOpen size={16} strokeWidth={2.5} className="shrink-0 text-blue-600 dark:text-sky-400" />
+            <span>Đọc Sách Ebook Chuyên Sâu</span>
+          </a>
+        )}
       </section>
 
       {/* 8. Thanh điều hướng treo dính sát đáy chân màn hình (Sticky Bottom Dock) - Siêu gọn, giảm 50% diện tích theo yêu cầu */}
