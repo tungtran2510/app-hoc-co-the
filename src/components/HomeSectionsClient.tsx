@@ -572,11 +572,11 @@ export default function HomeSectionsClient({
         if (sectionKey === 'recent_activity') {
           const isRecentCollapsed = isSectionCollapsed('recent_activity');
           return (
-            <section key="recent_activity" className="flex flex-col gap-1.5 mt-2">
+            <section key="recent_activity" className="flex flex-col gap-1 mt-1">
               {hiddenBanner}
               {isAdmin && (
                 <SectionOrderControls
-                  sectionTitle="HOẠT ĐỘNG GẦN ĐÂY"
+                  sectionTitle="ĐANG HỌC DỞ"
                   sectionIndex={index}
                   totalSections={sectionsOrder.length}
                   isHidden={isHidden}
@@ -591,14 +591,9 @@ export default function HomeSectionsClient({
               {isAdmin && isRecentCollapsed ? null : (
                 <>
                   <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <h3 className="text-[17.5px] sm:text-[18.5px] font-black text-ink tracking-tight whitespace-nowrap">
-                        Hoạt động gần đây
-                      </h3>
-                      <span className="text-[10px] font-black uppercase tracking-wider text-amber-700 bg-amber-100/80 border border-amber-300/60 dark:text-[#F8DF7B] dark:bg-[#2E1B58] dark:border-0 px-2 py-0.5 rounded-full shrink-0">
-                        Đang học dở
-                      </span>
-                    </div>
+                    <h3 className="text-[17.5px] sm:text-[18.5px] font-black text-ink tracking-tight whitespace-nowrap">
+                      Đang học dở
+                    </h3>
                   </div>
                   <HomeContinueSection />
                 </>

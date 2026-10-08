@@ -42,7 +42,7 @@ const SECTION_DEFS: Record<string, SectionMeta> = {
   },
   recent_activity: {
     key: 'recent_activity',
-    name: 'Hoạt động gần đây (Đang học dở)',
+    name: 'Đang học dở',
     desc: 'Thẻ bài học đang theo dõi dở dang của người dùng',
     icon: Sparkles,
   },
