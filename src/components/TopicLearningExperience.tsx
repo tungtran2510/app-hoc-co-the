@@ -220,16 +220,6 @@ export default function TopicLearningExperience({
         </div>
       </section>
 
-      {/* Thẻ Huy Hiệu Hoàn Thành Chuyên Đề */}
-      <AchievementBadgeCard
-        topicTitle={topic.title}
-        topicSlug={topic.slug}
-        progress={progress}
-        totalLessons={visiblePages.length}
-      />
-
-      
-
       <div role="tablist" aria-label="Nội dung chuyên đề" className="grid grid-cols-2 gap-2">
         <button type="button" role="tab" aria-selected={tab === 'path'} onClick={() => setTab('path')} className={`flex min-h-[44px] items-center justify-center gap-2 rounded-[13px] text-[13px] font-black transition-colors ${tab === 'path' ? 'bg-[#1E4697] text-white shadow-md' : 'bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-300'}`}>
           <BookOpen size={17} /> Lộ trình
@@ -243,31 +233,41 @@ export default function TopicLearningExperience({
         <div className="flex flex-col gap-3">
           <PageListClient initialPages={pages} topic={topic} />
 
-          {/* Cẩm Nang Y Khoa & Mã QR (Dưới cùng lộ trình học, chuẩn tinh gọn 1 dòng không bị cắt) */}
+          {/* Cẩm Nang Y Khoa & Mã QR (Đồng bộ màu sắc Midnight Navy & Electric Cyan cùng Huy hiệu) */}
           <button
             type="button"
             onClick={() => {
               playTapSound();
               setShowHandbookModal(true);
             }}
-            className="w-full h-11 mb-12 flex items-center justify-between gap-1.5 px-3 rounded-[13px] bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-slate-50 dark:from-[#181033] dark:to-[#120B24] border border-blue-200/80 dark:border-purple-800/60 shadow-2xs hover:border-blue-400 active:scale-[0.99] transition-all cursor-pointer text-left group"
+            className="w-full h-11 flex items-center justify-between gap-1.5 px-3 rounded-[14px] bg-gradient-to-r from-[#0B1528] via-[#102244] to-[#0A1628] border border-sky-500/40 shadow-[0_4px_16px_-4px_rgba(14,42,92,0.35)] hover:border-cyan-400/70 active:scale-[0.99] transition-all cursor-pointer text-left group"
           >
             <div className="flex items-center gap-2 min-w-0">
-              <span className="w-7 h-7 rounded-[8px] bg-blue-600 dark:bg-purple-600 text-white flex items-center justify-center font-bold text-[13px] shrink-0 shadow-2xs">
+              <span className="w-7 h-7 rounded-[8px] bg-gradient-to-br from-[#0284C7] to-[#2563EB] text-white flex items-center justify-center font-bold text-[13px] shrink-0 shadow-2xs border border-sky-300/30">
                 📚
               </span>
-              <span className="text-[12.5px] font-black text-slate-900 dark:text-white shrink-0">
+              <span className="text-[12.5px] font-black text-white shrink-0">
                 Cẩm nang y khoa
               </span>
-              <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-blue-100 dark:bg-purple-900/80 text-blue-700 dark:text-purple-200 shrink-0">
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-sky-500/20 text-cyan-300 border border-cyan-400/30 shrink-0 shadow-2xs">
                 Mã QR ({visiblePages.length} bài)
               </span>
             </div>
-            <div className="flex items-center gap-1 text-[11px] font-extrabold text-blue-700 dark:text-purple-300 bg-white dark:bg-purple-950 px-2 py-1 rounded-[8px] border border-blue-200/80 dark:border-purple-700/60 shadow-2xs shrink-0 whitespace-nowrap">
+            <div className="flex items-center gap-1 text-[11px] font-black text-white bg-gradient-to-r from-cyan-500 to-blue-600 px-2.5 py-1 rounded-[8px] shadow-sm shrink-0 whitespace-nowrap group-hover:brightness-110 transition-all">
               <span>Bản in A4</span>
-              <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
+              <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform text-white" />
             </div>
           </button>
+
+          {/* Thẻ Huy Hiệu Hoàn Thành Chuyên Đề (Dưới cùng của lộ trình học, nổi bật & phong cách khác hẳn) */}
+          <AchievementBadgeCard
+            topicTitle={topic.title}
+            topicSlug={topic.slug}
+            progress={progress}
+            completedLessons={completedIds.filter((id) => visiblePages.some(({ page }) => page.id === id)).length}
+            totalLessons={visiblePages.length}
+            className="mb-12"
+          />
         </div>
       ) : (
         <section className="flex flex-col gap-2.5" role="tabpanel">

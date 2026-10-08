@@ -141,11 +141,12 @@ export default function PageHeaderBar({
       // Bỏ qua lỗi localStorage
     }
 
-    // Mặc định: Phía bên trái màn hình (12px), khoảng 2/3 góc dưới (khoảng 65% chiều cao)
+    // Mặc định: Phía bên trái màn hình (12px), ở khoảng giữa thân màn hình (45% chiều cao) để không che khối bài học
     const defaultX = 12;
-    const defaultY = Math.round(window.innerHeight * 0.65 - 24);
+    const defaultY = Math.round(window.innerHeight * 0.45 - 24);
     setTocPos({ x: defaultX, y: defaultY });
   }, []);
+
 
   // Đảm bảo nút luôn nằm trong màn hình khi xoay máy hoặc đổi kích thước cửa sổ
   React.useEffect(() => {
@@ -325,7 +326,7 @@ export default function PageHeaderBar({
         </div>
       </div>
 
-      {/* 3. Nút Mục lục nổi thông minh (Bán trong suốt, có thể kéo thả di chuyển, mặc định bên trái ở 2/3 góc dưới) */}
+      {/* 3. Nút Mục lục nổi thông minh (Bán trong suốt, có thể kéo thả di chuyển) */}
       {tocItems.length > 0 && (
         <div
           onPointerDown={handlePointerDown}

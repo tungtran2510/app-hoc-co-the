@@ -1135,7 +1135,7 @@ export default function ContentViewer({
   };
 
   return (
-    <main className="flex-1 flex flex-col px-4 sm:px-5 pt-0 pb-16 sm:pb-20 gap-0.5 sm:gap-1.5">
+    <main className="flex-1 flex flex-col px-4 sm:px-5 pt-0 pb-36 sm:pb-40 gap-0.5 sm:gap-1.5">
       {/* 1. ĐÃ BỎ THANH ĐEN ĐỈNH ĐẦU ĐỂ TIẾT KIỆM DIỆN TÍCH THEO YÊU CẦU CỦA ANH */}
 
       {/* 2. Thanh điều hướng trang: ‹ [Chủ đề] + [Mục lục] + [⋮] */}
@@ -1324,41 +1324,46 @@ export default function ContentViewer({
         </div>
       )}
 
-      {/* 7. TRẠM ĐỒNG HÀNH & KẾT NỐI (GOM TRỌN AI + ZALO + EBOOK + CHIA SẺ VÀO ĐÚNG 1 KHUNG DUY NHẤT) */}
-      <section className="rounded-[20px] bg-slate-50 dark:bg-[#0E1A33] border border-slate-200/90 dark:border-blue-900/60 p-3.5 flex flex-col gap-3 mt-3 shadow-2xs">
-        {/* Tiêu đề phân cấp rõ ràng */}
-        <div className="flex items-center justify-between px-0.5">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-[#0284C7] animate-pulse" />
-            <span className="text-[11px] font-black uppercase tracking-wider text-[#0E2A5C] dark:text-sky-300">
+      {/* 7. TRẠM ĐỒNG HÀNH & KẾT NỐI (ĐỒNG BỘ 100% PHONG CÁCH MIDNIGHT NAVY & CYAN ĐẲNG CẤP) */}
+      <section className="relative overflow-hidden rounded-[20px] bg-gradient-to-br from-[#0B1528] via-[#102244] to-[#0A1628] border border-sky-500/30 shadow-[0_10px_28px_rgba(2,132,199,0.14)] p-3.5 flex flex-col gap-3 mt-4 text-white">
+        {/* Vệt phát quang tinh tế góc trên */}
+        <div className="absolute top-0 right-0 w-36 h-36 bg-sky-500/10 rounded-full blur-2xl pointer-events-none" />
+
+        {/* Tiêu đề phân cấp sang trọng */}
+        <div className="relative z-10 flex items-center justify-between px-0.5">
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 rounded-full bg-sky-500/20 border border-sky-400/40 flex items-center justify-center">
+              <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse" />
+            </div>
+            <span className="text-[11.5px] font-black uppercase tracking-wider text-sky-300">
               Đồng hành cùng bạn
             </span>
           </div>
-          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold">
+          <span className="text-[9.5px] text-sky-300/80 font-bold bg-sky-950/70 border border-sky-800/50 px-2 py-0.5 rounded-full">
             Hỗ trợ 24/7 & Chuyên sâu
           </span>
         </div>
 
         {/* 2 Lựa chọn chính: Trợ lý AI (trái) và Zalo Tùng Dinh Dưỡng (phải) */}
-        <div className="grid grid-cols-2 gap-2">
+        <div className="relative z-10 grid grid-cols-2 gap-2">
           {/* Nút Trợ lý AI */}
           <Link
             href={`/tro-ly-ai?topic=${encodeURIComponent(topic.slug)}&page=${encodeURIComponent(currentPage.slug)}&topicTitle=${encodeURIComponent(topic.title)}&pageTitle=${encodeURIComponent(currentPage.title)}`}
-            className="flex flex-col justify-between p-3 rounded-[15px] bg-white dark:bg-blue-950/60 border border-sky-200/80 dark:border-blue-800/60 hover:border-[#0284C7] shadow-2xs group active:scale-[0.98] transition-all cursor-pointer text-left"
+            className="flex flex-col justify-between p-3 rounded-[15px] bg-white/[0.07] hover:bg-white/[0.12] border border-sky-400/30 hover:border-sky-400/60 shadow-xs group active:scale-[0.98] transition-all cursor-pointer text-left"
           >
             <div className="flex items-center justify-between">
-              <div className="w-8 h-8 rounded-[10px] bg-gradient-to-br from-[#0E2A5C] to-[#0284C7] text-white flex items-center justify-center shadow-xs">
-                <Sparkles size={15} />
+              <div className="w-8 h-8 rounded-[10px] bg-gradient-to-br from-sky-400 to-blue-600 text-slate-950 flex items-center justify-center shadow-xs">
+                <Sparkles size={16} strokeWidth={2.5} />
               </div>
-              <span className="text-[9.5px] font-black text-[#0284C7] dark:text-sky-300 bg-sky-50 dark:bg-blue-900/50 px-1.5 py-0.5 rounded-[5px]">
+              <span className="text-[9px] font-black text-sky-300 bg-sky-950/80 border border-sky-700/50 px-1.5 py-0.5 rounded-[5px]">
                 AI 24/7
               </span>
             </div>
-            <div className="flex flex-col mt-2">
-              <span className="text-[13px] font-black text-slate-900 dark:text-white leading-tight group-hover:text-[#0284C7] transition-colors">
+            <div className="flex flex-col mt-2.5">
+              <span className="text-[12.5px] font-black text-white leading-tight group-hover:text-sky-300 transition-colors">
                 Hỏi Trợ lý AI
               </span>
-              <span className="text-[10.5px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">
+              <span className="text-[10px] text-slate-300/80 leading-tight mt-0.5 truncate">
                 Giải đáp bài này tức thì
               </span>
             </div>
@@ -1369,21 +1374,21 @@ export default function ContentViewer({
             <button
               type="button"
               onClick={handleAskZalo}
-              className="flex flex-col justify-between p-3 rounded-[15px] bg-white dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800/60 hover:border-[#0068FF] shadow-2xs group active:scale-[0.98] transition-all cursor-pointer text-left"
+              className="flex flex-col justify-between p-3 rounded-[15px] bg-white/[0.07] hover:bg-white/[0.12] border border-blue-400/30 hover:border-blue-400/60 shadow-xs group active:scale-[0.98] transition-all cursor-pointer text-left"
             >
               <div className="flex items-center justify-between">
                 <div className="w-8 h-8 rounded-[10px] bg-[#0068FF] text-white flex items-center justify-center font-black text-[11px] shadow-xs">
                   Zalo
                 </div>
-                <span className="text-[9.5px] font-black text-[#0068FF] dark:text-sky-300 bg-blue-50 dark:bg-blue-900/50 px-1.5 py-0.5 rounded-[5px]">
+                <span className="text-[9px] font-black text-sky-200 bg-blue-950/80 border border-blue-700/50 px-1.5 py-0.5 rounded-[5px]">
                   Trực tiếp
                 </span>
               </div>
-              <div className="flex flex-col mt-2">
-                <span className="text-[13px] font-black text-slate-900 dark:text-white leading-tight group-hover:text-[#0068FF] transition-colors">
-                  Hỏi Tùng Dinh Dưỡng
+              <div className="flex flex-col mt-2.5">
+                <span className="text-[12.5px] font-black text-white leading-tight group-hover:text-sky-300 transition-colors">
+                  Tùng Dinh Dưỡng
                 </span>
-                <span className="text-[10.5px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5 truncate">
+                <span className="text-[10px] text-slate-300/80 leading-tight mt-0.5 truncate">
                   {zaloCopied ? '✓ Đang mở Zalo...' : 'Nhắn tin 1-1'}
                 </span>
               </div>
@@ -1392,27 +1397,27 @@ export default function ContentViewer({
         </div>
 
         {/* Dải tiện ích phụ 1 dòng: Ebook + Chia sẻ */}
-        <div className="flex items-center gap-2 pt-2 border-t border-slate-200/70 dark:border-blue-900/40">
+        <div className="relative z-10 flex items-center gap-2 pt-2 border-t border-white/10">
           {(appCustomSettings.show_ebook_bridge ?? true) && (
             <a
               href={`${appCustomSettings.ebook_app_url || 'https://qbiz-ebook.vercel.app'}?topic=${topic.slug}&page=${currentPage.slug}`}
               target="_blank"
               rel="noopener noreferrer"
               onClick={playTapSound}
-              className="flex-1 h-8 px-2 rounded-[10px] bg-white dark:bg-blue-950/40 border border-slate-200 dark:border-blue-900/50 flex items-center justify-center gap-1.5 text-[11px] font-bold text-slate-700 dark:text-sky-200 hover:border-emerald-500 shadow-2xs cursor-pointer truncate"
+              className="flex-1 h-8 px-2 rounded-[10px] bg-white/[0.08] hover:bg-white/[0.15] border border-white/15 flex items-center justify-center gap-1 text-[10.5px] sm:text-[11px] font-bold text-white/90 hover:text-white shadow-2xs cursor-pointer whitespace-nowrap transition-all"
             >
               <span>📖</span>
-              <span className="truncate">Đọc Ebook</span>
+              <span>Đọc Ebook</span>
             </a>
           )}
 
           <button
             type="button"
             onClick={handleOpenShareModal}
-            className="flex-1 h-8 px-2 rounded-[10px] bg-white dark:bg-blue-950/40 border border-slate-200 dark:border-blue-900/50 flex items-center justify-center gap-1.5 text-[11px] font-bold text-slate-700 dark:text-sky-200 hover:border-[#0284C7] shadow-2xs cursor-pointer truncate"
+            className="flex-1 h-8 px-2 rounded-[10px] bg-white/[0.08] hover:bg-white/[0.15] border border-white/15 flex items-center justify-center gap-1 text-[10.5px] sm:text-[11px] font-bold text-white/90 hover:text-white shadow-2xs cursor-pointer whitespace-nowrap transition-all"
           >
-            <Share2 size={13} className="text-slate-500 dark:text-sky-400 shrink-0" />
-            <span className="truncate">Chia sẻ bài học</span>
+            <Share2 size={12} className="text-sky-300 shrink-0" />
+            <span>Chia sẻ bài học</span>
           </button>
         </div>
       </section>

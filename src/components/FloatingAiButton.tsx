@@ -61,6 +61,7 @@ export default function FloatingAiButton() {
 
   const hasLessonContext = !!(activeLesson && (activeLesson.page_title || activeLesson.topic_title));
 
+
   useEffect(() => {
     const updateContext = () => {
       if (!isLessonPage) {
@@ -112,16 +113,16 @@ export default function FloatingAiButton() {
         const parsed = JSON.parse(saved);
         if (typeof parsed.x === 'number' && typeof parsed.y === 'number') {
           const clampedX = Math.max(12, Math.min(parsed.x, window.innerWidth - btnWidth - 12));
-          const clampedY = Math.max(50, Math.min(parsed.y, window.innerHeight - 68));
+          const clampedY = Math.max(50, Math.min(parsed.y, window.innerHeight - 110));
           setPos({ x: clampedX, y: clampedY });
           return;
         }
       }
     } catch {}
 
-    // Vị trí mặc định: Góc dưới bên phải, nằm sát ngay phía trên thanh bài tiếp
+    // Vị trí mặc định: Góc phải màn hình, ở khoảng 58% chiều cao (vừa tầm ngón tay cái, không che thanh điều hướng đáy và các nút chân trang)
     const defaultX = Math.max(12, window.innerWidth - btnWidth - 14);
-    const defaultY = Math.max(50, window.innerHeight - 76);
+    const defaultY = Math.round(window.innerHeight * 0.58);
     setPos({ x: defaultX, y: defaultY });
   }, [hasLessonContext]);
 
@@ -132,7 +133,7 @@ export default function FloatingAiButton() {
       setPos((prev) => {
         if (!prev) return prev;
         const clampedX = Math.max(12, Math.min(prev.x, window.innerWidth - btnWidth - 12));
-        const clampedY = Math.max(50, Math.min(prev.y, window.innerHeight - 68));
+        const clampedY = Math.max(50, Math.min(prev.y, window.innerHeight - 110));
         return { x: clampedX, y: clampedY };
       });
     };
