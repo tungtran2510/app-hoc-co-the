@@ -554,9 +554,9 @@ export default function HomeSectionsClient({
                 onMoveDown={() => handleMoveSection(index, 'down')}
                 onOpenReorderModal={() => setShowReorderModal(true)}
               />
-              {/* Lộ trình cá nhân hóa (Demo) định hướng học tập đặt DƯỚI phần Chuyên Đề */}
-              <div className="mt-3">
-                <PersonalizedRoadmapCard isAdmin={isAdmin} />
+              {/* Lộ trình cá nhân hóa (Demo) định hướng học tập đặt DƯỚI phần Chuyên Đề (MẶC ĐỊNH ẨN) */}
+              <div className="mt-2.5">
+                <PersonalizedRoadmapCard isAdmin={isAdmin} defaultHidden={true} />
               </div>
 
               {/* 2 Khối mới: Slide Nổi bật & Video Chưa hiểu cần ôn tập (MẶC ĐỊNH ẨN, ĐẶT DƯỚI KHỐI CHUYÊN ĐỀ) */}

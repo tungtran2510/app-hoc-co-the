@@ -10,8 +10,16 @@ export default function FloatingAiButton() {
   const pathname = usePathname();
   const router = useRouter();
 
-  // Không hiển thị trên trang Trợ lý AI và trang Đăng nhập
-  const isHiddenPage = pathname === '/tro-ly-ai' || pathname?.startsWith('/dang-nhap');
+  // Xác định rõ ràng: Nút nổi AI chỉ xuất hiện khi học viên ĐANG Ở TRONG TRANG BÀI HỌC (/[topicSlug]/[pageSlug])
+  // Tuyệt đối không hiển thị ở Trang chủ, Chuyên đề, Đã lưu, Tìm kiếm hoặc trang khác để tránh che khuất nội dung
+  const parts = (pathname || '').split('/').filter(Boolean);
+  const nonTopicPaths = ['da-luu', 'tim-kiem', 'tro-ly-ai', 'chuyen-de', 'dang-nhap', 'admin', 'giai-phau-3d', 'chan-doan-hinh-anh', 'lop-hoc'];
+  const isLessonPage = Boolean(
+    pathname &&
+    pathname !== '/' &&
+    parts.length === 2 &&
+    !nonTopicPaths.includes(parts[0])
+  );
 
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   const [isHolding, setIsHolding] = useState(false);
@@ -55,42 +63,45 @@ export default function FloatingAiButton() {
 
   useEffect(() => {
     const updateContext = () => {
+      if (!isLessonPage) {
+        setActiveLesson(null);
+        return;
+      }
+
+      const currentTopicSlug = parts[0];
+      const currentPageSlug = parts[1];
+
       try {
         const raw = sessionStorage.getItem('qbiz_current_lesson');
         if (raw) {
           const parsed = JSON.parse(raw);
-          if (parsed && parsed.topic_slug) {
+          if (parsed && parsed.topic_slug === currentTopicSlug && parsed.page_slug === currentPageSlug) {
             setActiveLesson(parsed);
             return;
           }
         }
       } catch {}
 
-      if (pathname) {
-        const parts = pathname.split('/').filter(Boolean);
-        const nonTopicPaths = ['da-luu', 'tim-kiem', 'tro-ly-ai', 'chuyen-de', 'dang-nhap', 'admin'];
-        if (parts.length >= 1 && !nonTopicPaths.includes(parts[0])) {
-          setActiveLesson({
-            topic_slug: parts[0],
-            topic_title: parts[0] === 'cot-song' ? 'Cột Sống' : parts[0] === 'nuoc' ? 'Nước & Điện Giải' : parts[0],
-            page_slug: parts[1] || undefined,
-          });
-          return;
-        }
-      }
-      setActiveLesson(null);
+      // Dự phòng từ URL params
+      setActiveLesson({
+        topic_slug: currentTopicSlug,
+        topic_title: currentTopicSlug === 'cot-song' ? 'Cột Sống' : currentTopicSlug === 'nuoc' ? 'Nước & Điện Giải' : currentTopicSlug,
+        page_slug: currentPageSlug,
+      });
     };
 
     updateContext();
 
     const handleLessonChanged = (e: any) => {
-      if (e.detail) {
+      if (e.detail && e.detail.topic_slug === parts[0] && e.detail.page_slug === parts[1]) {
         setActiveLesson(e.detail);
+      } else if (!e.detail) {
+        setActiveLesson(null);
       }
     };
     window.addEventListener('qbiz_current_lesson_changed', handleLessonChanged);
     return () => window.removeEventListener('qbiz_current_lesson_changed', handleLessonChanged);
-  }, [pathname]);
+  }, [pathname, isLessonPage]);
 
   // Đọc tọa độ từ localStorage hoặc đặt mặc định ở góc dưới bên phải (sát ngay mép trên thanh bài tiếp)
   useEffect(() => {
@@ -289,7 +300,7 @@ export default function FloatingAiButton() {
     }, 120);
   };
 
-  if (isHiddenPage) return null;
+  if (!isLessonPage) return null;
 
   return (
     <aside

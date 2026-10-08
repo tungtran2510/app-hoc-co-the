@@ -20,7 +20,7 @@ import {
   Users,
   Building2,
 } from 'lucide-react';
-import { checkAdminStatus, logoutAdmin, isSuperAdmin } from '../lib/adminAuth';
+import { checkAdminStatus, logoutAdmin, isSuperAdmin, getAdminTokenClient } from '../lib/adminAuth';
 import { getStoredAppSettings } from '../lib/storage';
 import AdminSettingsModal from './admin/AdminSettingsModal';
 import EditAppModal from './admin/EditAppModal';
@@ -189,7 +189,10 @@ export default function HomeHeader({
   const handleBackup = async () => {
     try {
       setIsExporting(true);
-      const res = await fetch('/api/admin/sao-luu');
+      const token = getAdminTokenClient();
+      const headers: Record<string, string> = {};
+      if (token) headers['x-admin-token'] = token;
+      const res = await fetch('/api/admin/sao-luu', { headers });
       if (!res.ok) {
         throw new Error('Chưa lưu được sao lưu hoặc chưa đăng nhập');
       }

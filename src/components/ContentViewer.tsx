@@ -234,6 +234,13 @@ export default function ContentViewer({
     } catch {
       // Bỏ qua lỗi truy cập client storage
     }
+
+    return () => {
+      try {
+        sessionStorage.removeItem('qbiz_current_lesson');
+        window.dispatchEvent(new CustomEvent('qbiz_current_lesson_changed', { detail: null }));
+      } catch {}
+    };
   }, [topic?.slug, topic?.title, currentPage?.slug, currentPage?.title, currentPage?.summary]);
 
   const [saveErrorMsg, setSaveErrorMsg] = useState('');

@@ -288,6 +288,8 @@ export default function AdminSettingsModal({
         },
         block_styles: {
           theme_palette: settings.theme_palette || 'indigo',
+          enable_personalized_roadmap: settings.enable_personalized_roadmap,
+          custom_roadmap: settings.custom_roadmap,
         },
       } as any);
       if (!res.success) {

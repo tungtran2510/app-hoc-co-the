@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Compass, CheckCircle2, ChevronRight, RotateCcw, ArrowRight, Eye, EyeOff, ChevronUp, ChevronDown } from 'lucide-react';
+import { playTapSound } from '../lib/audioFeedback';
 
 interface QuestionOption {
   id: string;
@@ -139,11 +140,15 @@ function getRecommendations(
 
 interface PersonalizedRoadmapCardProps {
   isAdmin?: boolean;
+  defaultHidden?: boolean;
 }
 
-export default function PersonalizedRoadmapCard({ isAdmin = false }: PersonalizedRoadmapCardProps) {
+export default function PersonalizedRoadmapCard({
+  isAdmin = false,
+  defaultHidden = true,
+}: PersonalizedRoadmapCardProps) {
   const [isEnabled, setIsEnabled] = useState(true);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(defaultHidden);
   const [currentStep, setCurrentStep] = useState(1);
   const [answers, setAnswers] = useState<{ habit?: string; area?: string; goal?: string }>({});
   const [isCompleted, setIsCompleted] = useState(false);
@@ -259,6 +264,69 @@ export default function PersonalizedRoadmapCard({ isAdmin = false }: Personalize
 
   const recommendations = getRecommendations(answers.area || 'neck', answers.habit || 'office', customRoadmap);
 
+  // Mặc định thu gọn 1 dòng thanh nhã: không choáng ngợp trang chủ
+  if (isCollapsed) {
+    return (
+      <div className="w-full flex flex-col gap-1.5">
+        {isAdmin && (
+          <div data-testid="roadmap-admin-bar" className="flex items-center justify-between px-3 py-1.5 rounded-[12px] bg-slate-900 dark:bg-[#120A24] text-white border border-white/10 text-[11px] font-bold shadow-xs">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+              <span className="uppercase tracking-wider font-black text-[10px] text-white/90 truncate">
+                LỘ TRÌNH ĐỊNH HƯỚNG
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                type="button"
+                data-testid="roadmap-collapse-btn"
+                onClick={() => setIsCollapsed(false)}
+                className="flex items-center gap-1 px-2 py-0.5 rounded-[6px] bg-white/15 hover:bg-white/25 text-white text-[10.5px] font-bold cursor-pointer"
+                title="Mở rộng khối"
+              >
+                <ChevronDown size={11} />
+                <span>Mở rộng</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={toggleVisibility}
+                className="p-1 px-1.5 rounded-[6px] bg-white/15 hover:bg-white/25 text-white transition-colors cursor-pointer flex items-center gap-1 text-[10.5px] font-bold"
+                title="Ẩn lộ trình khỏi học viên"
+              >
+                <Eye size={12} />
+                <span>Ẩn</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        <button
+          type="button"
+          data-testid="roadmap-toggle-bar"
+          onClick={() => {
+            playTapSound();
+            setIsCollapsed(false);
+          }}
+          className="w-full flex items-center justify-between px-3 py-2 rounded-[14px] bg-white dark:bg-[#160D30] border border-slate-200/90 dark:border-purple-900/50 shadow-2xs hover:border-blue-400 active:scale-[0.99] transition-all cursor-pointer group"
+        >
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-5 h-5 rounded-full bg-blue-500/10 dark:bg-blue-400/10 flex items-center justify-center shrink-0">
+              <Compass size={12} className="text-blue-600 dark:text-sky-300" />
+            </div>
+            <span className="text-[12px] sm:text-[13px] font-black text-slate-800 dark:text-white truncate">
+              {isCompleted ? 'Gợi ý lộ trình cá nhân hóa (Đã có bài phù hợp)' : 'Định hướng lộ trình học tập cá nhân hóa'}
+            </span>
+          </div>
+          <div className="flex items-center gap-1 text-[11px] font-bold text-blue-700 dark:text-sky-300 shrink-0">
+            <span>Mở xem</span>
+            <ChevronDown size={13} strokeWidth={2.5} className="group-hover:translate-y-0.5 transition-transform" />
+          </div>
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-1.5">
       {/* Thanh Admin: Thu gọn & Ẩn hiện nhanh trên Trang chủ */}
@@ -274,12 +342,12 @@ export default function PersonalizedRoadmapCard({ isAdmin = false }: Personalize
             <button
               type="button"
               data-testid="roadmap-collapse-btn"
-              onClick={() => setIsCollapsed(!isCollapsed)}
+              onClick={() => setIsCollapsed(true)}
               className="flex items-center gap-1 px-2 py-0.5 rounded-[6px] bg-white/15 hover:bg-white/25 text-white text-[10.5px] font-bold cursor-pointer"
-              title={isCollapsed ? 'Mở rộng khối' : 'Thu gọn khối'}
+              title="Thu gọn khối"
             >
-              {isCollapsed ? <ChevronDown size={11} /> : <ChevronUp size={11} />}
-              <span>{isCollapsed ? 'Mở rộng' : 'Thu gọn'}</span>
+              <ChevronUp size={11} />
+              <span>Thu gọn</span>
             </button>
 
             <button
@@ -295,40 +363,55 @@ export default function PersonalizedRoadmapCard({ isAdmin = false }: Personalize
         </div>
       )}
 
-      {/* Thẻ Lộ trình (ẩn khi Admin bấm Thu gọn) */}
-      {!(isAdmin && isCollapsed) && (
-        <section className="flex flex-col gap-2 p-3.5 sm:p-4 rounded-[20px] bg-gradient-to-br from-slate-50 via-white to-blue-50/50 dark:from-[#0B1528] dark:via-[#09101F] dark:to-[#060D1A] border border-slate-200/90 dark:border-blue-900/50 shadow-xs relative overflow-hidden transition-all">
-          {/* Vệt sáng xanh Navy trang trí tinh tế */}
-          <div className="absolute -top-10 -right-10 w-28 h-28 bg-blue-500/10 dark:bg-blue-600/10 rounded-full blur-2xl pointer-events-none" />
+      {/* Thẻ Lộ trình đầy đủ */}
+      <section className="flex flex-col gap-2 p-3.5 sm:p-4 rounded-[20px] bg-gradient-to-br from-slate-50 via-white to-blue-50/50 dark:from-[#0B1528] dark:via-[#09101F] dark:to-[#060D1A] border border-slate-200/90 dark:border-blue-900/50 shadow-xs relative overflow-hidden transition-all animate-fadeIn">
+        {/* Vệt sáng xanh Navy trang trí tinh tế */}
+        <div className="absolute -top-10 -right-10 w-28 h-28 bg-blue-500/10 dark:bg-blue-600/10 rounded-full blur-2xl pointer-events-none" />
 
-          {/* Đầu thẻ: Icon La bàn Xanh Navy + Tiêu đề + Nút Làm lại */}
-          <div className="flex items-center justify-between gap-2 relative z-10">
-            <div className="flex items-center gap-2 min-w-0">
-          <div className="w-8 h-8 rounded-[11px] bg-gradient-to-br from-[#0E2A5C] via-[#1E3A8A] to-[#0284C7] text-white flex items-center justify-center shrink-0 shadow-2xs">
-            <Compass size={17} className="animate-spin-slow text-sky-200" />
+        {/* Đầu thẻ: Icon La bàn Xanh Navy + Tiêu đề + Nút Làm lại + Nút Thu gọn */}
+        <div className="flex items-center justify-between gap-2 relative z-10">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-8 h-8 rounded-[11px] bg-gradient-to-br from-[#0E2A5C] via-[#1E3A8A] to-[#0284C7] text-white flex items-center justify-center shrink-0 shadow-2xs">
+              <Compass size={17} className="animate-spin-slow text-sky-200" />
+            </div>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <h3 className="text-[13px] font-black text-[#0E2A5C] dark:text-sky-100 truncate">
+                {isCompleted ? 'Gợi ý lộ trình' : 'Định hướng lộ trình'}
+              </h3>
+              <span className="text-[9px] font-black uppercase tracking-wider text-[#0E2A5C] bg-blue-50 border border-blue-200 dark:text-sky-300 dark:bg-blue-950/70 dark:border-blue-800 px-1.5 py-0.2 rounded-md shrink-0">
+                Demo
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-1.5 min-w-0">
-            <h3 className="text-[13px] font-black text-[#0E2A5C] dark:text-sky-100 truncate">
-              {isCompleted ? 'Gợi ý lộ trình' : 'Định hướng lộ trình'}
-            </h3>
-            <span className="text-[9px] font-black uppercase tracking-wider text-[#0E2A5C] bg-blue-50 border border-blue-200 dark:text-sky-300 dark:bg-blue-950/70 dark:border-blue-800 px-1.5 py-0.2 rounded-md shrink-0">
-              Demo
-            </span>
+
+          <div className="flex items-center gap-1.5 shrink-0">
+            {isCompleted && (
+              <button
+                type="button"
+                onClick={handleResetSurvey}
+                className="flex items-center gap-1 text-[11px] font-extrabold text-[#0E2A5C] dark:text-sky-300 hover:text-blue-900 bg-blue-50/90 dark:bg-blue-950/60 px-2.5 py-1 rounded-[10px] shrink-0 cursor-pointer border border-blue-200/80 dark:border-blue-800/80 transition-colors"
+                title="Làm lại khảo sát"
+              >
+                <RotateCcw size={11} />
+                <span className="whitespace-nowrap">Đổi nhu cầu</span>
+              </button>
+            )}
+
+            <button
+              type="button"
+              data-testid="roadmap-user-collapse-btn"
+              onClick={() => {
+                playTapSound();
+                setIsCollapsed(true);
+              }}
+              className="flex items-center gap-1 text-[11px] font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white px-2 py-1 rounded-[8px] hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors cursor-pointer"
+              title="Thu gọn định hướng lộ trình"
+            >
+              <ChevronUp size={13} strokeWidth={2.5} />
+              <span className="whitespace-nowrap">Thu gọn</span>
+            </button>
           </div>
         </div>
-
-        {isCompleted && (
-          <button
-            type="button"
-            onClick={handleResetSurvey}
-            className="flex items-center gap-1 text-[11px] font-extrabold text-[#0E2A5C] dark:text-sky-300 hover:text-blue-900 bg-blue-50/90 dark:bg-blue-950/60 px-2.5 py-1 rounded-[10px] shrink-0 cursor-pointer border border-blue-200/80 dark:border-blue-800/80 transition-colors"
-            title="Làm lại khảo sát"
-          >
-            <RotateCcw size={11} />
-            <span className="whitespace-nowrap">Đổi nhu cầu</span>
-          </button>
-        )}
-      </div>
 
       {/* Nội dung 1: Khi chưa hoàn tất khảo sát (Hiển thị từng câu hỏi 1 chạm) */}
       {!isCompleted ? (
@@ -404,7 +487,6 @@ export default function PersonalizedRoadmapCard({ isAdmin = false }: Personalize
         </div>
       )}
     </section>
-      )}
-    </div>
-  );
+  </div>
+);
 }
