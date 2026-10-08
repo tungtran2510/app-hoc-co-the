@@ -10,16 +10,21 @@ export default function FloatingAiButton() {
   const pathname = usePathname();
   const router = useRouter();
 
-  // Xác định rõ ràng: Nút nổi AI chỉ xuất hiện khi học viên ĐANG Ở TRONG TRANG BÀI HỌC (/[topicSlug]/[pageSlug])
-  // Tuyệt đối không hiển thị ở Trang chủ, Chuyên đề, Đã lưu, Tìm kiếm hoặc trang khác để tránh che khuất nội dung
+  // Phân tích đường dẫn để xác định ngữ cảnh bài học hoặc chuyên đề
   const parts = (pathname || '').split('/').filter(Boolean);
   const nonTopicPaths = ['da-luu', 'tim-kiem', 'tro-ly-ai', 'chuyen-de', 'dang-nhap', 'admin', 'giai-phau-3d', 'chan-doan-hinh-anh', 'lop-hoc'];
+
+  // Trang bài học cụ thể: /[topicSlug]/[pageSlug] (ví dụ /cot-song/tong-quan-ve-cot-song)
   const isLessonPage = Boolean(
     pathname &&
     pathname !== '/' &&
     parts.length === 2 &&
     !nonTopicPaths.includes(parts[0])
   );
+
+  // NÚT AI HIỆN DIỆN Ở MỌI NƠI TRÊN TOÀN BỘ ỨNG DỤNG (Trang chủ, Chuyên đề, Bài học, Đã lưu, Tìm kiếm, 3D...)
+  // Chỉ ẩn khi đang ở trong chính phòng chat Trợ lý AI (/tro-ly-ai) hoặc trang đăng nhập/quản trị
+  const isHidden = !pathname || pathname.startsWith('/tro-ly-ai') || pathname.startsWith('/admin') || pathname.startsWith('/dang-nhap');
 
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   const [isHolding, setIsHolding] = useState(false);
@@ -65,6 +70,14 @@ export default function FloatingAiButton() {
   useEffect(() => {
     const updateContext = () => {
       if (!isLessonPage) {
+        // Nếu ở trang chuyên đề (ví dụ /cot-song)
+        if (parts.length === 1 && !nonTopicPaths.includes(parts[0])) {
+          setActiveLesson({
+            topic_slug: parts[0],
+            topic_title: parts[0] === 'cot-song' ? 'Cột Sống' : parts[0] === 'nuoc' ? 'Nước & Điện Giải' : parts[0],
+          });
+          return;
+        }
         setActiveLesson(null);
         return;
       }
@@ -104,27 +117,29 @@ export default function FloatingAiButton() {
     return () => window.removeEventListener('qbiz_current_lesson_changed', handleLessonChanged);
   }, [pathname, isLessonPage]);
 
-  // Đọc tọa độ từ localStorage hoặc đặt mặc định ở góc dưới bên phải (sát ngay mép trên thanh bài tiếp)
+  // Đọc tọa độ từ localStorage hoặc đặt mặc định: "Dưới chân bên trên tìm kiếm"
   useEffect(() => {
     const btnWidth = hasLessonContext ? 104 : 76;
     try {
-      const saved = localStorage.getItem('qbiz_floating_ai_pos');
+      const saved = localStorage.getItem('qbiz_floating_ai_pos_v2');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (typeof parsed.x === 'number' && typeof parsed.y === 'number') {
           const clampedX = Math.max(12, Math.min(parsed.x, window.innerWidth - btnWidth - 12));
-          const clampedY = Math.max(50, Math.min(parsed.y, window.innerHeight - 110));
+          const clampedY = Math.max(50, Math.min(parsed.y, window.innerHeight - (isLessonPage ? 80 : 110)));
           setPos({ x: clampedX, y: clampedY });
           return;
         }
       }
     } catch {}
 
-    // Vị trí mặc định: Góc phải màn hình, ở khoảng 58% chiều cao (vừa tầm ngón tay cái, không che thanh điều hướng đáy và các nút chân trang)
+    // Vị trí mặc định: Dưới chân bên trên tìm kiếm
+    // - Trang có BottomNav (cao 80px): Đặt tại góc phải (right: 14px), ngay trên tab Tìm kiếm (bottom: 88px, y ≈ innerHeight - 118)
+    // - Trang bài học có Sticky Dock (cao 52px): Đặt tại góc phải (right: 14px), ngay trên dock (bottom: 60px, y ≈ innerHeight - 88)
     const defaultX = Math.max(12, window.innerWidth - btnWidth - 14);
-    const defaultY = Math.round(window.innerHeight * 0.58);
+    const defaultY = Math.max(50, window.innerHeight - (isLessonPage ? 88 : 118));
     setPos({ x: defaultX, y: defaultY });
-  }, [hasLessonContext]);
+  }, [hasLessonContext, isLessonPage]);
 
   // Đảm bảo không bị lọt khỏi màn hình khi xoay điện thoại hoặc thay đổi kích thước
   useEffect(() => {
@@ -133,21 +148,21 @@ export default function FloatingAiButton() {
       setPos((prev) => {
         if (!prev) return prev;
         const clampedX = Math.max(12, Math.min(prev.x, window.innerWidth - btnWidth - 12));
-        const clampedY = Math.max(50, Math.min(prev.y, window.innerHeight - 110));
+        const clampedY = Math.max(50, Math.min(prev.y, window.innerHeight - (isLessonPage ? 80 : 110)));
         return { x: clampedX, y: clampedY };
       });
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [hasLessonContext]);
+  }, [hasLessonContext, isLessonPage]);
 
   // Xử lý sự kiện nhấn chạm
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0 && e.pointerType === 'mouse') return;
 
-    const btnWidth = hasLessonContext ? 128 : 88;
+    const btnWidth = hasLessonContext ? 104 : 76;
     const currentX = pos ? pos.x : Math.max(12, window.innerWidth - btnWidth - 14);
-    const currentY = pos ? pos.y : Math.max(50, window.innerHeight - 130);
+    const currentY = pos ? pos.y : Math.max(50, window.innerHeight - (isLessonPage ? 88 : 118));
 
     dragInfoRef.current = {
       startX: e.clientX,
@@ -218,7 +233,7 @@ export default function FloatingAiButton() {
       const minX = 12;
       const maxX = window.innerWidth - btnWidth - 12;
       const minY = 50;
-      const maxY = window.innerHeight - 68; // Không che thanh bài tiếp (bottom dock)
+      const maxY = window.innerHeight - (isLessonPage ? 64 : 92); // Không che thanh bài tiếp hoặc BottomNav
 
       latestX = Math.max(minX, Math.min(dragInfoRef.current.elemX + dx, maxX));
       latestY = Math.max(minY, Math.min(dragInfoRef.current.elemY + dy, maxY));
@@ -255,7 +270,7 @@ export default function FloatingAiButton() {
           const finalPos = { x: latestX, y: latestY };
           setPos(finalPos);
           try {
-            localStorage.setItem('qbiz_floating_ai_pos', JSON.stringify(finalPos));
+            localStorage.setItem('qbiz_floating_ai_pos_v2', JSON.stringify(finalPos));
           } catch {}
         }
         return;
@@ -301,7 +316,7 @@ export default function FloatingAiButton() {
     }, 120);
   };
 
-  if (!isLessonPage) return null;
+  if (isHidden) return null;
 
   return (
     <aside
@@ -316,7 +331,7 @@ export default function FloatingAiButton() {
         left: pos ? `${pos.x}px` : 'auto',
         right: pos ? 'auto' : '14px',
         top: pos ? `${pos.y}px` : 'auto',
-        bottom: pos ? 'auto' : '56px',
+        bottom: pos ? 'auto' : isLessonPage ? '60px' : '88px',
         WebkitTouchCallout: 'none',
         WebkitUserSelect: 'none',
         userSelect: 'none',
