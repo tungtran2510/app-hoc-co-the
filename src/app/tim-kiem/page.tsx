@@ -25,8 +25,6 @@ import {
   ProcessedSearchQuery,
 } from '../../lib/smartSearch';
 
-export const dynamic = 'force-dynamic';
-
 interface SearchData {
   topics: {
     id: string;
@@ -81,9 +79,8 @@ export default function SearchPage() {
   // Tab lọc nhanh kết quả (Tất cả · Bài học · Chuyên đề · Video)
   const [resultFilter, setResultFilter] = useState<'all' | 'pages' | 'topics' | 'videos'>('all');
 
-  // Tự động focus vào ô nhập và cập nhật tiêu đề trang
+  // Cập nhật tiêu đề trang (Không tự động focus để tránh bàn phím ảo bật lên che màn hình trên di động)
   useEffect(() => {
-    inputRef.current?.focus();
     document.title = 'Tìm kiếm bài học · Học Cơ Thể';
   }, []);
 

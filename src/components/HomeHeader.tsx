@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { playTapSound } from '../lib/audioFeedback';
 import {
@@ -326,15 +327,20 @@ export default function HomeHeader({
 
           <div className="flex items-center gap-2">
             {/* Kính lúp tìm kiếm */}
-            <a
+            <Link
               href="/tim-kiem"
-              onClick={playTapSound}
+              onClick={() => {
+                playTapSound();
+                if (typeof window !== 'undefined') {
+                  window.location.href = '/tim-kiem';
+                }
+              }}
               className="w-9 h-9 rounded-full bg-white dark:bg-[#1E1342] hover:bg-slate-100 dark:hover:bg-[#281855] border border-slate-200 dark:border-purple-800/40 flex items-center justify-center text-[#1E3A8A] dark:text-purple-200 transition-colors shadow-2xs"
               title="Tìm kiếm bài học"
               aria-label="Tìm kiếm"
             >
               <Search size={18} strokeWidth={2.2} />
-            </a>
+            </Link>
 
             {/* Nút chuyển chế độ Sáng / Tối trực tiếp 1 chạm */}
             <button
