@@ -84,72 +84,59 @@ export default function TopicCard({
       href={`/${topic.slug}`}
       prefetch={true}
       onClick={handleNavigate}
-      className={`topic-card-container group relative flex flex-col cursor-pointer select-none transition-transform duration-100 active:scale-[0.98] [&.is-active]:scale-[0.98] ${
+      className={`topic-card-container group relative flex flex-col cursor-pointer select-none transition-transform duration-100 active:scale-[0.985] [&.is-active]:scale-[0.985] ${
         isActive ? 'is-active' : ''
       }`}
     >
-      {/* 1. GÁY TRÊN 3D CỦA CUỐN SÁCH (Bừng sáng viền vàng rực rỡ khi lướt tay / chạm) */}
-      <div className="topic-card-spine mx-1.5 h-[5px] sm:h-[6px] bg-gradient-to-r from-[#CBC3E3] via-[#FAF9FD] to-[#B8ADD6] rounded-t-[3px] border-t border-l border-r border-white/50 shadow-xs flex items-center justify-center overflow-hidden transition-all duration-100 group-active:border-[#FDE047] group-[.is-active]:border-[#FDE047] group-active:brightness-125 group-[.is-active]:brightness-125 group-active:shadow-[0_0_16px_rgba(250,204,21,0.95)] group-[.is-active]:shadow-[0_0_16px_rgba(250,204,21,0.95)]">
-        {/* Rãnh trang giấy xếp lớp */}
-        <div className="w-full h-[1px] bg-purple-950/20" />
-      </div>
+      {/* THẺ NGUYÊN KHỐI LIỀN MẠCH CHUẨN THƯƠNG MẠI CAO CẤP */}
+      <div className="topic-card-glow relative flex flex-col justify-between p-3.5 sm:p-4 rounded-[18px] bg-gradient-to-br from-white via-[#FAFBFD] to-[#F4F6FB] dark:from-[#1E1238] dark:via-[#160D2C] dark:to-[#0F0820] border border-slate-200/90 dark:border-white/10 text-slate-900 dark:text-white overflow-hidden min-h-[150px] sm:min-h-[160px] shadow-[0_4px_20px_-4px_rgba(15,23,42,0.08),0_1px_3px_rgba(15,23,42,0.04)] dark:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.6)] transition-all duration-100">
+        
+        {/* VẦNG SÁNG HÀO QUANG KÍNH MỜ ÊM DỊU */}
+        <div className="topic-card-inner-glow absolute -top-8 -right-8 w-28 h-28 rounded-full blur-xl pointer-events-none bg-blue-500/5 dark:bg-purple-600/20 transition-all duration-100" />
+        <div className="topic-card-inner-glow absolute -bottom-8 -left-8 w-24 h-24 rounded-full blur-xl pointer-events-none bg-blue-500/5 dark:bg-purple-600/15 transition-all duration-100" />
 
-      {/* 2. MẶT BÌA CHÍNH CỦA CUỐN SÁCH (3D HARDCOVER VỚI HÀO QUANG VÀNG PHÁT QUANG RỰC RỠ KHI NHẤN) */}
-      <div className="topic-card-glow relative flex flex-col justify-between p-3 sm:p-3.5 rounded-b-[14px] rounded-tl-[3px] rounded-tr-[12px] bg-gradient-to-br from-[#231652] via-[#1A0E3F] to-[#100629] border-t border-t-white/25 border-r border-r-black/60 border-b-2 border-b-black/80 border-l-[4px] border-l-[#4A2D9E] text-white overflow-hidden min-h-[148px] sm:min-h-[158px] shadow-[3px_8px_18px_rgba(0,0,0,0.45)] transition-all duration-100 group-active:ring-2 group-active:ring-[#FDE047] group-active:shadow-[0_0_35px_rgba(250,204,21,0.95)] group-[.is-active]:ring-2 group-[.is-active]:ring-[#FDE047] group-[.is-active]:shadow-[0_0_35px_rgba(250,204,21,0.95)] group-active:border-[#FDE047] group-[.is-active]:border-[#FDE047]">
-        {/* Đường gân gáy sách (Spine crease) */}
-        <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-gradient-to-b from-white/35 via-purple-300/20 to-white/10 pointer-events-none" />
-        <div className="absolute left-[2.5px] top-0 bottom-0 w-[1.5px] bg-black/40 pointer-events-none" />
-
-        {/* VẦNG SÁNG HÀO QUANG KÉP - BỪNG SÁNG VÀNG RỰC RỠ KHI NHẤN */}
-        <div className="topic-card-inner-glow absolute -top-10 -right-10 w-32 h-32 rounded-full blur-xl pointer-events-none bg-purple-600/25 transition-all duration-100 group-active:!bg-[#FDE047]/40 group-active:!opacity-100 group-active:scale-125 group-[.is-active]:!bg-[#FDE047]/40 group-[.is-active]:!opacity-100 group-[.is-active]:scale-125" />
-        <div className="topic-card-inner-glow absolute -bottom-8 -left-8 w-28 h-28 rounded-full blur-xl pointer-events-none bg-purple-600/15 transition-all duration-100 group-active:!bg-[#FDE047]/30 group-active:!opacity-100 group-[.is-active]:!bg-[#FDE047]/30 group-[.is-active]:!opacity-100" />
-
-        {/* VỆT SÁNG PHẢN CHIẾU ÁNH KIM (SHINE GLINT) */}
-        <div className="topic-card-inner-glow absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent pointer-events-none opacity-0" />
-
-        {/* 3. ẢNH GIẢI PHẪU 3D TRONG SUỐT BÊN PHẢI (TO HẲN, NỔI BẬT KHÔNG NỀN ĐEN) */}
-        <div className={`absolute right-0.5 top-1 bottom-4 flex items-center justify-center pointer-events-none overflow-visible select-none z-0 ${boldTitle ? 'w-[49%]' : 'w-[54%] sm:w-[52%]'}`}>
+        {/* 1. ẢNH GIẢI PHẪU 3D TRONG SUỐT BÊN PHẢI (NỔI BẬT NHƯ TÁC PHẨM NGHỆ THUẬT Y KHOA) */}
+        <div className={`absolute right-1 top-2 bottom-2 flex items-center justify-center pointer-events-none overflow-visible select-none z-0 ${boldTitle ? 'w-[48%]' : 'w-[52%] sm:w-[50%]'}`}>
           {hasCoverImage ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={coverUrl!}
               alt={topic.title}
               decoding="async"
-              className={`topic-card-img w-full h-full max-h-[120px] sm:max-h-[132px] drop-shadow-[0_8px_16px_rgba(0,0,0,0.55)] transition-all duration-100 group-active:scale-110 group-[.is-active]:scale-110 ${
+              className={`topic-card-img w-full h-full max-h-[118px] sm:max-h-[128px] drop-shadow-[0_4px_12px_rgba(15,23,42,0.14)] dark:drop-shadow-[0_8px_16px_rgba(0,0,0,0.55)] transition-all duration-100 group-active:scale-105 group-[.is-active]:scale-105 ${
                 topic.slug === 'tung-dinh-duong'
-                  ? 'max-w-[76px] max-h-[76px] sm:max-w-[84px] sm:max-h-[84px] object-cover rounded-[14px] border border-white/25 shadow-lg'
+                  ? 'max-w-[74px] max-h-[74px] sm:max-w-[82px] sm:max-h-[82px] object-cover rounded-[14px] border border-slate-200 dark:border-white/25 shadow-md'
                   : 'object-contain'
-              } ${topic.slug === 'cot-song' ? 'scale-115' : ''}`}
+              } ${topic.slug === 'cot-song' ? 'scale-110' : ''}`}
               onError={() => setImgError(true)}
               loading="eager"
             />
           ) : (
-            <div className="text-purple-300/60 drop-shadow-md">
+            <div className="text-[#1E3A8A] dark:text-purple-300/60 drop-shadow-md">
               <TopicIcon name={topic.icon} size={44} />
             </div>
           )}
         </div>
 
-        {/* 4. CỘT THÔNG TIN BÊN TRÁI: TIẾNG ANH PHỤ TRÊN CÙNG + TIÊU ĐỀ TIẾNG VIỆT TO RÕ ĐỒNG BỘ */}
-        <div className={`relative z-10 flex flex-col gap-1 ${boldTitle ? 'max-w-[70%]' : 'max-w-[66%] sm:max-w-[62%]'}`}>
-          {/* Nhãn tiếng Anh phụ trên cùng (ngắn gọn, chuẩn nhãn bìa sách) */}
-          <div className="flex items-center gap-1 text-[8.5px] sm:text-[9.5px] font-bold uppercase tracking-wider text-purple-200/90 leading-tight">
-            <svg className="w-2.5 h-2.5 text-purple-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-            </svg>
+        {/* 2. CỘT THÔNG TIN BÊN TRÁI: NHÃN PHỤ TINH GỌN + TIÊU ĐỀ XANH THAN QUYỀN LỰC */}
+        <div className={`relative z-10 flex flex-col gap-1 ${boldTitle ? 'max-w-[66%]' : 'max-w-[62%] sm:max-w-[58%]'}`}>
+          {/* Nhãn tiếng Anh phụ trên cùng: Slate-400 thanh lịch ở Light, Tím nhạt ở Dark */}
+          <div className="flex items-center gap-1.5 text-[8.5px] sm:text-[9.5px] font-bold uppercase tracking-wider text-slate-400 dark:text-purple-300/80 leading-tight">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#1E3A8A] dark:bg-purple-400 shrink-0" />
             <span className="truncate">{mindMapSubtitle}</span>
           </div>
 
-          {/* Tiêu đề tiếng Việt in hoa ĐỒNG BỘ KÍCH THƯỚC, CHUẨN DẤU VÀ KHOẢNG CÁCH FONT */}
-          <h3 className={`font-extrabold text-white uppercase tracking-normal leading-[1.2] drop-shadow-sm mt-0.5 line-clamp-2 text-[13.5px] min-[390px]:text-[14px] sm:text-[15.5px] whitespace-pre-line ${boldTitle ? 'topic-card-title-bold' : ''}`}>
+          {/* Tiêu đề tiếng Việt in hoa đồng bộ: Xanh Than #071735 ở Light Mode & Trắng sáng ở Dark Mode */}
+          <h3 className={`font-extrabold text-[#071735] dark:text-white uppercase tracking-normal leading-[1.2] drop-shadow-none dark:drop-shadow-sm mt-0.5 line-clamp-2 text-[13.5px] min-[390px]:text-[14px] sm:text-[15px] whitespace-pre-line ${boldTitle ? 'topic-card-title-bold' : ''}`}>
             {displayTitle}
           </h3>
         </div>
 
-        {/* 5. KHUNG VÀNG NỔI BẬT PHÍA DƯỚI (PHÁT QUANG RỰC RỠ KHI NHẤN HOẶC HOVER) */}
-        <div className="relative z-10 mt-auto pt-2 flex items-center">
-          <span className="topic-card-badge inline-flex items-center px-2 py-0.5 rounded-[4px] bg-[#FCE38A] dark:bg-[#FADB67] text-[#190E33] text-[9px] sm:text-[10px] font-black uppercase tracking-wider shadow-sm transition-all duration-100 group-active:!bg-[#FEF08A] group-active:!text-black group-[.is-active]:!bg-[#FEF08A] group-[.is-active]:!text-black group-active:shadow-[0_0_16px_rgba(250,204,21,0.95)] group-[.is-active]:shadow-[0_0_16px_rgba(250,204,21,0.95)]">
-            {isAvailable ? `${pageCount} BÀI CỐT LÕI` : 'QUICK REVISION'}
+        {/* 3. HUY HIỆU DẠNG VIÊN THUỐC (PILL BADGE) TINH TẾ & THÔNG MINH */}
+        <div className="relative z-10 mt-auto pt-2.5 flex items-center">
+          <span className="topic-card-badge inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100/90 dark:bg-purple-950/70 border border-slate-200/80 dark:border-purple-800/50 text-slate-700 dark:text-purple-200 text-[9.5px] sm:text-[10px] font-bold tracking-tight shadow-2xs transition-all duration-100 group-active:!bg-[#1E3A8A] group-active:!text-white group-active:!border-[#1E3A8A] group-[.is-active]:!bg-[#1E3A8A] group-[.is-active]:!text-white group-[.is-active]:!border-[#1E3A8A] dark:group-active:!bg-[#FDE047] dark:group-active:!text-black dark:group-[.is-active]:!bg-[#FDE047] dark:group-[.is-active]:!text-black">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#1E3A8A] dark:bg-purple-400 shrink-0" />
+            <span>{isAvailable ? `${pageCount} bài cốt lõi` : 'Sắp ra mắt'}</span>
           </span>
         </div>
       </div>

@@ -123,31 +123,32 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
         href={`/${topic.slug}`}
         prefetch={true}
         onClick={handleNav}
-        className={`relative flex flex-col justify-between min-h-[190px] sm:min-h-[210px] p-4 rounded-[20px] bg-gradient-to-br from-[#231652] via-[#1A0E3F] to-[#100629] border text-white overflow-hidden shadow-[0_10px_26px_-12px_rgba(0,0,0,0.55)] active:scale-[0.99] transition-all [&.is-active]:border-[#FDE047] [&.is-active]:ring-2 [&.is-active]:ring-[#FDE047] [&.is-active]:shadow-[0_0_25px_rgba(250,204,21,0.7)] ${
+        className={`relative flex flex-col justify-between min-h-[190px] sm:min-h-[210px] p-4 rounded-[20px] bg-gradient-to-br from-white via-[#FAFBFD] to-[#F1F5F9] dark:from-[#231652] dark:via-[#1A0E3F] dark:to-[#100629] border border-slate-200/90 dark:border-white/10 text-slate-900 dark:text-white overflow-hidden shadow-[0_4px_16px_-4px_rgba(15,23,42,0.10)] dark:shadow-[0_10px_26px_-12px_rgba(0,0,0,0.55)] active:scale-[0.99] transition-all [&.is-active]:border-[#FDE047] [&.is-active]:ring-2 [&.is-active]:ring-[#FDE047] [&.is-active]:shadow-[0_0_25px_rgba(250,204,21,0.7)] ${
           isActive
             ? 'border-[#FDE047] ring-2 ring-[#FDE047] shadow-[0_0_25px_rgba(250,204,21,0.7)]'
-            : 'border-white/10'
+            : 'border-slate-200/90 dark:border-white/10'
         }`}
       >
         <div className="absolute right-1 top-2 bottom-2 w-[50%] flex items-center justify-center pointer-events-none">
           {hasCover ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={coverUrl!} alt={topic.title} className="w-full h-full object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.55)]" onError={() => setImgError(true)} loading="lazy" decoding="async" />
+            <img src={coverUrl!} alt={topic.title} className="w-full h-full object-contain drop-shadow-[0_4px_12px_rgba(15,23,42,0.16)] dark:drop-shadow-[0_8px_16px_rgba(0,0,0,0.55)]" onError={() => setImgError(true)} loading="lazy" decoding="async" />
           ) : (
             <TopicIcon name={topic.icon} size={72} />
           )}
         </div>
         <div className="relative z-10 flex flex-col gap-1.5 max-w-[52%]">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-purple-200/90">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[#1E3A8A] dark:text-purple-200/90">
             {TOPIC_MIND_MAP_SUBTITLES[topic.slug] || 'ANATOMY'}
           </span>
-          <h3 className="text-[19px] font-black uppercase leading-tight line-clamp-3">{topic.title}</h3>
+          <h3 className="text-[19px] font-black uppercase leading-tight line-clamp-3 text-[#071735] dark:text-white">{topic.title}</h3>
         </div>
         <div className="relative z-10 flex items-center justify-between">
-          <span className="inline-flex items-center px-2.5 py-1 rounded-[6px] bg-[#FCE38A] text-[#190E33] text-[11px] font-black uppercase tracking-wider">
-            {pageCount > 0 ? `${pageCount} BÀI CỐT LÕI` : 'QUICK REVISION'}
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-100/90 dark:bg-purple-950/70 border border-slate-200/80 dark:border-purple-800/50 text-slate-700 dark:text-purple-200 text-[10.5px] font-bold tracking-tight">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#1E3A8A] dark:bg-purple-400 shrink-0" />
+            <span>{pageCount > 0 ? `${pageCount} bài cốt lõi` : 'Sắp ra mắt'}</span>
           </span>
-          <ChevronRight size={20} className="text-white/80" />
+          <ChevronRight size={20} className="text-slate-400 dark:text-white/80" />
         </div>
       </Link>
     );

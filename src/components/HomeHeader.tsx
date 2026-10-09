@@ -301,7 +301,7 @@ export default function HomeHeader({
                 title="Bấm để đổi tên của bạn"
               >
                 <div className="flex items-center gap-1.5 animate-greeting-bounce">
-                  <span className="text-[21px] sm:text-[23px] font-black text-ink tracking-tight leading-tight group-hover:text-amber-600 dark:group-hover:text-[#F8DF7B] transition-colors">
+                  <span className="text-[21px] sm:text-[23px] font-black text-ink tracking-tight leading-tight group-hover:text-[#1E3A8A] dark:group-hover:text-purple-300 transition-colors">
                     Hi, {userName || 'bạn'}!
                   </span>
                   {/* 1 biểu tượng duy nhất ngay cạnh tên: Chuông thông báo & Đồng bộ */}
@@ -310,7 +310,7 @@ export default function HomeHeader({
                       e.stopPropagation();
                       setShowPhoneSync(true);
                     }}
-                    className="w-5.5 h-5.5 rounded-full bg-amber-500/15 dark:bg-[#F8DF7B]/20 flex items-center justify-center text-amber-500 dark:text-[#F8DF7B] relative hover:scale-110 transition-transform cursor-pointer shrink-0"
+                    className="w-5.5 h-5.5 rounded-full bg-blue-50 dark:bg-purple-950/60 border border-blue-200/60 dark:border-purple-800/50 flex items-center justify-center text-[#1E3A8A] dark:text-purple-200 relative hover:scale-110 transition-transform cursor-pointer shrink-0"
                     title="Thông báo & Đồng bộ tiến độ học tập"
                     aria-label="Thông báo"
                   >
@@ -346,18 +346,18 @@ export default function HomeHeader({
             <button
               type="button"
               onClick={toggleTheme}
-              className="w-9 h-9 rounded-full bg-white dark:bg-[#1E1342] hover:bg-slate-100 dark:hover:bg-[#281855] border border-slate-200 dark:border-purple-800/40 flex items-center justify-center text-amber-500 dark:text-[#F8DF7B] transition-colors shadow-2xs cursor-pointer"
+              className="w-9 h-9 rounded-full bg-white dark:bg-[#1E1342] hover:bg-slate-100 dark:hover:bg-[#281855] border border-slate-200 dark:border-purple-800/40 flex items-center justify-center text-slate-700 dark:text-purple-200 hover:text-[#1E3A8A] transition-colors shadow-2xs cursor-pointer"
               title={isDark ? "Chuyển sang nền sáng" : "Chuyển sang nền tối"}
               aria-label="Chuyển chế độ Sáng / Tối"
             >
               {isDark ? <Sun size={18} strokeWidth={2.2} /> : <Moon size={18} strokeWidth={2.2} />}
             </button>
 
-            {/* Avatar Bác sĩ / Quản trị viền vàng kim */}
+            {/* Avatar Bác sĩ / Quản trị viền Navy sang trọng */}
             <button
               type="button"
               onClick={() => setShowMenu(!showMenu)}
-              className="w-9 h-9 rounded-full p-[2px] bg-gradient-to-b from-amber-300 via-amber-400 to-amber-600 shadow-sm cursor-pointer hover:scale-105 transition-transform"
+              className="w-9 h-9 rounded-full p-[2px] bg-gradient-to-b from-blue-300 via-[#1E3A8A] to-blue-950 shadow-sm cursor-pointer hover:scale-105 transition-transform"
               title="Tài khoản & Quản trị"
               aria-label="Quản trị"
             >
