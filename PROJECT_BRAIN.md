@@ -18,10 +18,8 @@
 
 ## 2. TÀI KHOẢN QUẢN TRỊ CỦA NGƯỜI DÙNG
 - **Trang đăng nhập:** `https://app-hoc-co-the.vercel.app/dang-nhap`
-- **Số điện thoại:** `0974248716`
-- **Mật khẩu:** `Tung@2510`
-- **Tên người dùng:** Tùng Dinh Dưỡng
-- **Vai trò:** Admin toàn quyền (Chỉnh sửa nội dung trực tiếp tại chỗ trên trang học).
+- **Số điện thoại & Mật khẩu:** Thiết lập bảo mật qua biến môi trường `ADMIN_PHONE` và `ADMIN_PASSWORD` trên máy chủ (Vercel/.env.local), hoàn toàn không lưu trữ trong mã nguồn hoặc tài liệu công khai.
+- **Vai trò:** Super Admin toàn quyền (Chỉnh sửa nội dung trực tiếp tại chỗ trên trang học).
 
 ---
 
@@ -66,7 +64,7 @@ Hệ thống hỗ trợ đầy đủ **10 khối nội dung chuẩn**:
 
 ## 5. HỆ THỐNG PHÂN QUYỀN ĐA KHÓA HỌC & GIẢNG VIÊN (RBAC) - ĐÃ HOÀN TẤT
 - **Chủ sở hữu tối cao (Super Admin):**
-  - SĐT: `0974248716` (Tùng Dinh Dưỡng) hoặc mật khẩu quản trị máy chủ.
+  - Xác thực qua biến môi trường `ADMIN_PHONE` và `ADMIN_PASSWORD`.
   - Toàn quyền 100%: Quản lý tất cả khóa học, cài đặt chung, sao lưu CSDL, và trực tiếp cấp/sửa/xóa tài khoản giảng viên con tại tab "Giảng viên" trong Cài đặt quản trị.
 - **Tài khoản Giảng viên (Instructor Sub-Accounts):**
   - Đăng nhập bằng SĐT + Mật khẩu riêng tại `/dang-nhap`.
@@ -81,7 +79,7 @@ Hệ thống hỗ trợ đầy đủ **10 khối nội dung chuẩn**:
 ## 6. HỆ THỐNG ĐA CƠ SỞ SAAS & WHITE-LABEL WORKSPACES - ĐÃ HOÀN TẤT
 - **Mô hình Cơ sở / Khách hàng SaaS (`?ws=[slug]` hoặc Custom Domain):**
   - Cung cấp web riêng với logo, thương hiệu, tài khoản Admin và nội dung độc lập cho từng bác sĩ / phòng khám / đối tác.
-  - Quản trị tập trung tại tab **"Cơ sở SaaS"** trong Cài đặt quản trị (chỉ Super Admin `0974248716` truy cập được).
+  - Quản trị tập trung tại tab **"Cơ sở SaaS"** trong Cài đặt quản trị (chỉ Super Admin mới truy cập được).
   - Tính năng cấp app tức thì:
     + Tự động tạo slug định danh (vd: `bs-tuan` -> link `/?ws=bs-tuan`).
     + Cấp tài khoản quản trị riêng (SĐT + Mật khẩu quản trị cho khách).
@@ -121,7 +119,7 @@ Hệ thống hỗ trợ đầy đủ **10 khối nội dung chuẩn**:
 3. **Bước 4 - Cẩm Nang Y Khoa, Mã QR Từng Bài Học & Chốt Khách Zalo (`HandbookModal.tsx`):**
    - Xuất cẩm nang học tập bỏ túi chuẩn mobile, in ấn/lưu PDF.
    - Sinh mã QR động cho từng bài học để quét xem video/bài giảng tức thì trên điện thoại.
-   - Tích hợp form nhận cẩm nang bỏ túi gửi thẳng về Zalo admin (`0974248716`).
+   - Tích hợp form nhận cẩm nang bỏ túi gửi thẳng về Zalo / hotline cấu hình của quản trị viên.
 
 ### B. QUY TẮC BẤT KHẢ XÂM PHẠM (MANDATORY SUPREME RULE):
 - **Bắt buộc gửi ảnh trực tiếp vào chat:** Sau BẤT KỂ một thao tác, tính năng, sửa lỗi, căn chỉnh nút bấm hay văn bản nào: Agent BẮT BUỘC phải dùng trình duyệt thật (Playwright mobile viewport 390x844) chụp ảnh màn hình giao diện thực tế và **GỬI TRỰC TIẾP HÌNH ẢNH ĐÓ VÀO ĐOẠN CHAT** để người dùng nghiệm thu bằng mắt thường. Tuyệt đối **CẤM báo cáo chay bằng chữ hay chỉ đưa tên file**.

@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { checkIsAdminRequest, hashPassword, verifyPassword, rateLimit, getClientIp } from '../../../../lib/authServer';
+import {
+  getAdminUserFromRequest,
+  hashPassword,
+  verifyPassword,
+  rateLimit,
+  getClientIp,
+} from '../../../../lib/authServer';
 import { getSupabaseServer } from '../../../../lib/supabaseServer';
 
 export async function POST(req: NextRequest) {
-  if (!checkIsAdminRequest(req)) {
+  const user = getAdminUserFromRequest(req);
+  if (!user) {
     return NextResponse.json({ error: 'Chưa đăng nhập quyền quản trị' }, { status: 401 });
   }
 
@@ -23,33 +30,47 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Mật khẩu mới phải có tối thiểu 8 ký tự' }, { status: 400 });
     }
 
-    // 1. Kiểm tra mật khẩu hiện tại
-    let expectedPassword = process.env.ADMIN_PASSWORD;
-    const { data: currentSettings } = await supabase
-      .from('settings')
-      .select('admin_password')
-      .eq('workspace_id', 'default')
-      .single();
-
-    if (currentSettings?.admin_password) {
-      expectedPassword = currentSettings.admin_password;
+    // 1. Nếu là Super Admin (dùng master password từ ADMIN_PASSWORD)
+    if (user.role === 'super_admin') {
+      const masterPassword = process.env.ADMIN_PASSWORD;
+      if (masterPassword && !verifyPassword(String(currentPassword || ''), masterPassword) && currentPassword !== masterPassword) {
+        return NextResponse.json({ error: 'Mật khẩu hiện tại không chính xác' }, { status: 400 });
+      }
+      return NextResponse.json(
+        {
+          error:
+            'Mật khẩu chủ tối cao được quản lý an toàn qua biến môi trường ADMIN_PASSWORD trên Vercel. Vui lòng cập nhật trực tiếp tại Vercel Settings > Environment Variables và redeploy.',
+        },
+        { status: 400 }
+      );
     }
 
-    if (expectedPassword && !verifyPassword(String(currentPassword || ''), expectedPassword)) {
+    // 2. Nếu là Giảng viên / Admin chi nhánh (quản lý qua bảng riêng admin_accounts)
+    const { data: acc, error: findErr } = await supabase
+      .from('admin_accounts')
+      .select('id, password_hash')
+      .eq('phone', user.phone)
+      .maybeSingle();
+
+    if (findErr || !acc) {
+      return NextResponse.json({ error: 'Không tìm thấy thông tin tài khoản' }, { status: 404 });
+    }
+
+    if (!verifyPassword(String(currentPassword || ''), acc.password_hash)) {
       return NextResponse.json({ error: 'Mật khẩu hiện tại không chính xác' }, { status: 400 });
     }
 
-    // 2. Lưu mật khẩu mới dưới dạng đã băm (scrypt + muối)
-    const { error } = await supabase
-      .from('settings')
+    // Lưu mật khẩu băm scrypt mới vào bảng admin_accounts
+    const { error: updateErr } = await supabase
+      .from('admin_accounts')
       .update({
-        admin_password: hashPassword(newPassword.trim()),
+        password_hash: hashPassword(newPassword.trim()),
         updated_at: new Date().toISOString(),
       })
-      .eq('workspace_id', 'default');
+      .eq('id', acc.id);
 
-    if (error) {
-      return NextResponse.json({ error: error.message || 'Lỗi khi cập nhật mật khẩu' }, { status: 500 });
+    if (updateErr) {
+      return NextResponse.json({ error: updateErr.message || 'Lỗi cập nhật mật khẩu' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, message: 'Đổi mật khẩu thành công' });

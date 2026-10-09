@@ -1,49 +1,24 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { X, Maximize2, Minimize2, Sparkles, RefreshCw } from 'lucide-react';
-import { playTapSound } from '../lib/audioFeedback';
+import React, { useState } from 'react';
+import { X, Maximize2, Minimize2 } from 'lucide-react';
 
 interface Anatomy3DModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialSystem?: string; // skeletal | joints | muscular | cardiovascular | lymphatic | nervous | visceral
+  initialSystem?: string;
   topicTitle?: string;
 }
-
-const SYSTEMS = [
-  { id: 'skeletal', label: 'Hệ Xương', icon: '🦴', color: 'from-amber-500/20 to-orange-500/20' },
-  { id: 'joints', label: 'Hệ Khớp', icon: '🔗', color: 'from-blue-500/20 to-indigo-500/20' },
-  { id: 'muscular', label: 'Hệ Cơ', icon: '💪', color: 'from-red-500/20 to-rose-500/20' },
-  { id: 'visceral', label: 'Nội Tạng', icon: '🫁', color: 'from-emerald-500/20 to-teal-500/20' },
-  { id: 'cardiovascular', label: 'Tim Mạch', icon: '🫀', color: 'from-rose-500/20 to-pink-500/20' },
-  { id: 'nervous', label: 'Thần Kinh', icon: '🧠', color: 'from-purple-500/20 to-violet-500/20' },
-  { id: 'lymphatic', label: 'Bạch Huyết', icon: '🛡️', color: 'from-teal-500/20 to-cyan-500/20' },
-];
 
 export default function Anatomy3DModal({
   isOpen,
   onClose,
-  initialSystem = 'skeletal',
   topicTitle,
 }: Anatomy3DModalProps) {
-  const [activeSystem, setActiveSystem] = useState(initialSystem);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    if (initialSystem) {
-      setActiveSystem(initialSystem);
-    }
-  }, [initialSystem]);
-
   if (!isOpen) return null;
-
-  const handleSelectSystem = (sysId: string) => {
-    playTapSound();
-    setActiveSystem(sysId);
-    setIsLoading(true);
-  };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-0 sm:p-3 animate-in fade-in duration-200">
@@ -54,7 +29,7 @@ export default function Anatomy3DModal({
             : 'h-full sm:h-[92vh] sm:max-w-[760px] md:max-w-[900px] sm:rounded-[24px]'
         }`}
       >
-        {/* Header bar */}
+        {/* Header bar tinh gọn */}
         <div className="flex items-center justify-between px-3.5 sm:px-5 py-2.5 bg-[#141C2E] border-b border-slate-700/60 shrink-0">
           <div className="flex items-center gap-2 min-w-0">
             <span className="w-8 h-8 rounded-full bg-blue-600/30 border border-blue-400/40 text-blue-300 flex items-center justify-center text-[15px] shrink-0">
@@ -62,7 +37,7 @@ export default function Anatomy3DModal({
             </span>
             <div className="min-w-0">
               <h3 className="text-[14.5px] sm:text-[16px] font-black text-white flex items-center gap-1.5 truncate">
-                <span>Mô hình Giải phẫu 3D</span>
+                <span>Mô hình 3D Cột sống & Đĩa đệm</span>
                 {topicTitle && (
                   <span className="hidden sm:inline text-slate-400 font-normal text-[13px] truncate">
                     · {topicTitle}
@@ -70,7 +45,7 @@ export default function Anatomy3DModal({
                 )}
               </h3>
               <p className="text-[11px] text-blue-300/80 hidden sm:block">
-                Tương tác xoay 360°, phóng to thu nhỏ & phân tích lớp giải phẫu
+                Tương tác xoay 360°, phóng to thu nhỏ & phân tích chi tiết đĩa đệm
               </p>
             </div>
           </div>
@@ -95,43 +70,20 @@ export default function Anatomy3DModal({
           </div>
         </div>
 
-        {/* Thanh chuyển nhanh 7 hệ cơ quan */}
-        <div className="flex items-center gap-1.5 px-3 py-2 bg-[#0B0F19] border-b border-slate-800 overflow-x-auto no-scrollbar shrink-0">
-          {SYSTEMS.map((sys) => {
-            const isActive = activeSystem === sys.id;
-            return (
-              <button
-                key={sys.id}
-                type="button"
-                onClick={() => handleSelectSystem(sys.id)}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-bold whitespace-nowrap transition-all cursor-pointer ${
-                  isActive
-                    ? 'bg-blue-600 text-white shadow-xs ring-2 ring-blue-400/40'
-                    : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/60'
-                }`}
-              >
-                <span>{sys.icon}</span>
-                <span>{sys.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Khung nhúng Three.js 3D Viewer */}
+        {/* Khung nhúng Three.js 3D Viewer: Tải trực tiếp Xương và Đĩa đệm (skeletal,joints) */}
         <div className="relative flex-1 w-full bg-[#050811] overflow-hidden">
           {isLoading && (
             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#050811] text-slate-300 gap-2">
               <div className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full animate-spin" />
               <span className="text-[13px] font-bold text-blue-300">
-                Đang nạp mô hình 3D giải phẫu...
+                Đang nạp mô hình 3D cột sống & đĩa đệm...
               </span>
             </div>
           )}
 
           <iframe
-            key={activeSystem}
-            src={`/3d/index.html?system=${activeSystem}`}
-            title={`Mô hình 3D hệ ${activeSystem}`}
+            src="/3d/index.html#sys=skeletal,joints&cam=0,1.15,1.6,0,1.15,0"
+            title="Mô hình 3D Cột sống & Đĩa đệm"
             className="w-full h-full border-0"
             onLoad={() => setIsLoading(false)}
             allow="fullscreen; accelerometer; gyroscope"
@@ -144,7 +96,7 @@ export default function Anatomy3DModal({
             💡 <strong>Thao tác:</strong> 1 ngón tay xoay · 2 ngón tay thu phóng · Chạm 2 lần để reset góc nhìn
           </span>
           <span className="hidden sm:inline-block text-blue-400 font-semibold shrink-0">
-            Atlas Giải Phẫu Y Khoa 3D
+            Cột sống & Đĩa đệm 3D
           </span>
         </div>
       </div>

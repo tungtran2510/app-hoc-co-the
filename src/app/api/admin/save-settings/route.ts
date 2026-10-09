@@ -62,6 +62,9 @@ export async function POST(req: NextRequest) {
       theme_palette: settings.theme_palette !== undefined ? settings.theme_palette : (settings.block_styles?.theme_palette !== undefined ? settings.block_styles.theme_palette : (existingBlockStyles.theme_palette ?? 'indigo')),
     };
 
+    // Loại bỏ hoàn toàn admin_accounts ra khỏi block_styles của settings (đã chuyển sang bảng admin_accounts riêng)
+    delete (updatedBlockStyles as any).admin_accounts;
+
     const existingAuthorProfile = existing?.author_profile || {};
     
     // Đồng bộ 2 chiều hoàn hảo giữa settings.hotline/zalo_url và author_profile.phone/zalo_url
@@ -91,7 +94,6 @@ export async function POST(req: NextRequest) {
       hotline: finalHotline,
       zalo_url: finalZaloUrl,
       author_profile: updatedAuthorProfile,
-      admin_password: existing?.admin_password ?? null,
       updated_at: new Date().toISOString(),
     };
 

@@ -17,7 +17,7 @@ const ARTIFACT_DIR = 'C:/Users/Admin/.gemini/antigravity/brain/23366f77-380f-4e1
   // 1. Đăng nhập Admin
   console.log('1. Logging in as admin...');
   const loginRes = await page.request.post('http://localhost:3270/api/admin/login', {
-    data: { phone: '0974248716', password: 'Tung@2510' }
+    data: { phone: process.env.ADMIN_PHONE || '', password: process.env.ADMIN_PASSWORD || '' }
   });
   const loginData = await loginRes.json();
 

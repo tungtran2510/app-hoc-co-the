@@ -28,8 +28,8 @@ async function run() {
   // 1. Đăng nhập Quản trị viên
   console.log('1. Đăng nhập tài khoản quản trị...');
   await page.goto(baseUrl + '/dang-nhap', { waitUntil: 'networkidle' });
-  await page.fill('input[type="tel"]', '0974248716');
-  await page.fill('input[type="password"]', 'Tung@2510');
+  await page.fill('input[type="tel"]', process.env.ADMIN_PHONE || '');
+  await page.fill('input[type="password"]', process.env.ADMIN_PASSWORD || '');
   await page.click('button[type="submit"]', { force: true });
   await page.waitForTimeout(1500);
 

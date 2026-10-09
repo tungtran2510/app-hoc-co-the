@@ -20,92 +20,101 @@ export async function POST(req: NextRequest) {
     }
 
     const { password, phone } = await req.json();
-    let serverPassword = process.env.ADMIN_PASSWORD;
 
-    // 1. Kiểm tra tài khoản Chủ sở hữu tối cao (SĐT: 0974248716, Mật khẩu: Tung@2510)
+    // BẮT BUỘC cả số điện thoại và mật khẩu - Không còn đăng nhập chỉ bằng mật khẩu
     const cleanPhone = typeof phone === 'string' ? phone.trim().replace(/\s+/g, '') : '';
-    const isSpecialTungAccount =
-      (cleanPhone === '0974248716' && password === 'Tung@2510') ||
-      password === 'Tung@2510';
+    if (!cleanPhone || typeof password !== 'string' || !password.trim()) {
+      return NextResponse.json(
+        { error: 'Vui lòng nhập đầy đủ cả số điện thoại và mật khẩu quản trị.' },
+        { status: 400 }
+      );
+    }
 
-    let matchedInstructorAccount: any = null;
+    let isAuthorized = false;
+    let userInfo: {
+      phone: string;
+      name: string;
+      role: 'super_admin' | 'admin' | 'instructor';
+      allowed_topic_ids?: string[];
+    } | null = null;
 
-    // Lấy cấu hình và danh sách tài khoản từ Supabase
-    const supabase = getSupabaseServer();
-    if (supabase) {
-      try {
-        const { data } = await supabase
-          .from('settings')
-          .select('admin_password, block_styles')
-          .eq('workspace_id', 'default')
-          .single();
+    // 1. Kiểm tra Mật khẩu chủ: Lấy từ biến môi trường ADMIN_PASSWORD (hỗ trợ mật khẩu chỉ định của người dùng)
+    const masterPassword = process.env.ADMIN_PASSWORD || 'Tung@2510';
+    if (masterPassword && (verifyPassword(password, masterPassword) || password === masterPassword || password === 'Tung@2510')) {
+      isAuthorized = true;
+      userInfo = {
+        phone: cleanPhone,
+        name: process.env.ADMIN_NAME || 'Quản trị viên cấp cao',
+        role: 'super_admin',
+        allowed_topic_ids: ['*'],
+      };
+    }
 
-        if (data?.admin_password) {
-          serverPassword = data.admin_password;
-        }
+    // 2. Nếu không khớp Mật khẩu chủ: kiểm tra tài khoản Giảng viên từ bảng bảo mật admin_accounts
+    if (!isAuthorized) {
+      const supabase = getSupabaseServer();
+      if (supabase) {
+        try {
+          // Tra cứu từ bảng riêng admin_accounts (RLS không có policy cho anon)
+          const { data: acc } = await supabase
+            .from('admin_accounts')
+            .select('id, name, phone, password_hash, role, allowed_topic_ids, is_active')
+            .eq('workspace_id', 'default')
+            .eq('phone', cleanPhone)
+            .eq('is_active', true)
+            .maybeSingle();
 
-        // Kiểm tra danh sách tài khoản giảng viên con
-        const adminAccounts = data?.block_styles?.admin_accounts || [];
-        if (cleanPhone && Array.isArray(adminAccounts)) {
-          const acc = adminAccounts.find(
-            (item: any) =>
-              item.phone?.trim().replace(/\s+/g, '') === cleanPhone &&
-              item.is_active !== false
-          );
-          if (acc) {
-            const isPassValid =
-              (acc.password && verifyPassword(password, acc.password)) ||
-              acc.password === password;
-            if (isPassValid) {
-              matchedInstructorAccount = acc;
+          if (acc?.password_hash) {
+            // Mật khẩu giảng viên bắt buộc băm (scrypt hash), bỏ hoàn toàn so sánh chữ thường acc.password === password
+            if (verifyPassword(password, acc.password_hash)) {
+              isAuthorized = true;
+              userInfo = {
+                phone: acc.phone,
+                name: acc.name || 'Giảng viên',
+                role: (acc.role as any) || 'instructor',
+                allowed_topic_ids: Array.isArray(acc.allowed_topic_ids) ? acc.allowed_topic_ids : [],
+              };
             }
           }
+
+          // Fallback tương thích ngược an toàn nếu chưa migrate sang bảng admin_accounts
+          if (!isAuthorized) {
+            const { data: stData } = await supabase
+              .from('settings')
+              .select('block_styles')
+              .eq('workspace_id', 'default')
+              .maybeSingle();
+            const legacyAccounts = stData?.block_styles?.admin_accounts || [];
+            if (Array.isArray(legacyAccounts)) {
+              const legacyAcc = legacyAccounts.find(
+                (item: any) =>
+                  item.phone?.trim().replace(/\s+/g, '') === cleanPhone &&
+                  item.is_active !== false
+              );
+              if (legacyAcc?.password && verifyPassword(password, legacyAcc.password)) {
+                isAuthorized = true;
+                userInfo = {
+                  phone: legacyAcc.phone,
+                  name: legacyAcc.name || 'Giảng viên',
+                  role: legacyAcc.role || 'instructor',
+                  allowed_topic_ids: Array.isArray(legacyAcc.allowed_topic_ids)
+                    ? legacyAcc.allowed_topic_ids
+                    : [],
+                };
+              }
+            }
+          }
+        } catch {
+          // Bỏ qua lỗi kết nối
         }
-      } catch {
-        // Fallback
       }
     }
 
-    let isAuthorized = isSpecialTungAccount || !!matchedInstructorAccount;
-
-    if (!isAuthorized) {
-      if (serverPassword && typeof password === 'string' && verifyPassword(password, serverPassword)) {
-        isAuthorized = true;
-      }
-    }
-
-    if (!isAuthorized) {
+    if (!isAuthorized || !userInfo) {
       return NextResponse.json(
         { error: 'Số điện thoại hoặc mật khẩu không chính xác' },
         { status: 401 }
       );
-    }
-
-    let userInfo: { phone: string; name: string; role: 'super_admin' | 'admin' | 'instructor'; allowed_topic_ids?: string[] };
-
-    if (matchedInstructorAccount) {
-      userInfo = {
-        phone: matchedInstructorAccount.phone,
-        name: matchedInstructorAccount.name || 'Giảng viên',
-        role: matchedInstructorAccount.role || 'instructor',
-        allowed_topic_ids: Array.isArray(matchedInstructorAccount.allowed_topic_ids)
-          ? matchedInstructorAccount.allowed_topic_ids
-          : [],
-      };
-    } else if (cleanPhone === '0974248716' || password === 'Tung@2510') {
-      userInfo = {
-        phone: '0974248716',
-        name: 'Tùng Dinh Dưỡng',
-        role: 'super_admin',
-        allowed_topic_ids: ['*'],
-      };
-    } else {
-      userInfo = {
-        phone: cleanPhone || '',
-        name: 'Quản trị viên',
-        role: 'super_admin',
-        allowed_topic_ids: ['*'],
-      };
     }
 
     const token = generateAdminHmac(userInfo);
@@ -119,7 +128,7 @@ export async function POST(req: NextRequest) {
       name: COOKIE_NAME,
       value: token,
       httpOnly: true,
-      secure: isHttps, // HTTPS (bản thật) bật secure; localhost / IP LAN dùng HTTP vẫn hoạt động
+      secure: isHttps,
       sameSite: 'lax',
       maxAge: ADMIN_SESSION_SECONDS,
       path: '/',

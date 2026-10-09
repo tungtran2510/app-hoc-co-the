@@ -16,7 +16,7 @@ export interface AdminStatus {
 
 export function isSuperAdmin(user?: { role?: string; phone?: string } | null): boolean {
   if (!user) return false;
-  return user.role === 'super_admin' || user.phone === '0974248716';
+  return user.role === 'super_admin';
 }
 
 export function canManageTopic(

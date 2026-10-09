@@ -49,8 +49,8 @@ async function run() {
   // Đăng nhập Admin chuẩn qua API
   const loginRes = await adminPage.request.post('http://localhost:3270/api/admin/login', {
     data: {
-      phone: '0974248716',
-      password: 'Tung@2510',
+      phone: process.env.ADMIN_PHONE || '',
+      password: process.env.ADMIN_PASSWORD || '',
     },
   });
   const loginData = await loginRes.json();

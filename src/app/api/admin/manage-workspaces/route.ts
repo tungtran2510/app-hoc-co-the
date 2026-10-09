@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { checkIsSuperAdminRequest } from '../../../../lib/authServer';
+import { checkIsSuperAdminRequest, hashPassword } from '../../../../lib/authServer';
 import { getSupabaseServer } from '../../../../lib/supabaseServer';
 import { WorkspaceTenant } from '../../../../lib/types';
 import { generateUuid } from '../../../../lib/uuid';
@@ -28,7 +28,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    const workspaces: WorkspaceTenant[] = data?.block_styles?.workspaces || [];
+    const rawWorkspaces: any[] = data?.block_styles?.workspaces || [];
+    const workspaces = rawWorkspaces.map(({ admin_password, ...w }: any) => w);
     return NextResponse.json({ success: true, workspaces });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || 'Lỗi khi tải danh sách khách hàng' }, { status: 500 });
@@ -94,7 +95,6 @@ export async function POST(req: NextRequest) {
         name: name.trim(),
         owner_name: owner_name?.trim() || name.trim(),
         owner_phone: cleanPhone,
-        admin_password: tenantPassword,
         custom_domain: custom_domain?.trim() || null,
         subdomain: `${cleanId}.app-hoc-co-the.vn`,
         is_active: true,
@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
         note: note?.trim() || '',
       };
 
-      // 1. Tạo bản ghi settings mới cho workspace này
+      // 1. Tạo bản ghi settings mới cho workspace này (không chứa mật khẩu hay danh sách tài khoản)
       const newSettings = {
         workspace_id: cleanId,
         app_name: name.trim(),
@@ -112,7 +112,6 @@ export async function POST(req: NextRequest) {
         logo_url: defaultData.logo_url || null,
         primary_color: defaultData.primary_color || '#0C0817',
         access_mode: defaultData.access_mode || 'OPEN',
-        admin_password: tenantPassword,
         hotline: cleanPhone,
         zalo_url: `https://zalo.me/${cleanPhone}`,
         author_profile: {
@@ -123,27 +122,29 @@ export async function POST(req: NextRequest) {
         },
         block_styles: {
           ...(defaultData.block_styles || {}),
-          admin_accounts: [
-            {
-              id: `acc_owner_${cleanId}`,
-              name: owner_name?.trim() || name.trim(),
-              phone: cleanPhone,
-              password: tenantPassword,
-              role: 'super_admin',
-              allowed_topic_ids: ['*'],
-              is_active: true,
-              created_at: new Date().toISOString(),
-            },
-          ],
           workspaces: undefined, // Không sao chép danh sách khách hàng sang tenant con
         },
         updated_at: new Date().toISOString(),
       };
+      // Xoá admin_accounts khỏi block_styles nếu có
+      delete (newSettings.block_styles as any).admin_accounts;
 
       const { error: insertErr } = await supabase.from('settings').upsert(newSettings, { onConflict: 'workspace_id' });
       if (insertErr) {
         return NextResponse.json({ error: `Lỗi tạo cấu hình cơ sở: ${insertErr.message}` }, { status: 500 });
       }
+
+      // Lưu tài khoản quản trị của tenant vào bảng bảo mật admin_accounts với mật khẩu băm scrypt
+      await supabase.from('admin_accounts').insert({
+        id: `acc_owner_${cleanId}`,
+        workspace_id: cleanId,
+        name: owner_name?.trim() || name.trim(),
+        phone: cleanPhone,
+        password_hash: hashPassword(tenantPassword),
+        role: 'admin',
+        allowed_topic_ids: ['*'],
+        is_active: true,
+      });
 
       // 2. Nếu chọn nhân bản khóa học mẫu: Sao chép các topics sang workspace mới
       if (copy_template) {
@@ -242,28 +243,41 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Không tìm thấy cơ sở / khách hàng cần sửa' }, { status: 404 });
       }
 
+      const newPhone = workspace.owner_phone ? workspace.owner_phone.trim().replace(/\s+/g, '') : workspaces[idx].owner_phone;
+
       workspaces[idx] = {
         ...workspaces[idx],
         name: workspace.name?.trim() || workspaces[idx].name,
         owner_name: workspace.owner_name?.trim() || workspaces[idx].owner_name,
-        owner_phone: workspace.owner_phone ? workspace.owner_phone.trim().replace(/\s+/g, '') : workspaces[idx].owner_phone,
-        admin_password: workspace.admin_password?.trim() ? workspace.admin_password.trim() : workspaces[idx].admin_password,
+        owner_phone: newPhone,
         custom_domain: workspace.custom_domain !== undefined ? (workspace.custom_domain?.trim() || null) : workspaces[idx].custom_domain,
         is_active: workspace.is_active !== undefined ? Boolean(workspace.is_active) : workspaces[idx].is_active,
         expires_at: workspace.expires_at !== undefined ? workspace.expires_at : workspaces[idx].expires_at,
         note: workspace.note !== undefined ? workspace.note.trim() : workspaces[idx].note,
       };
+      delete (workspaces[idx] as any).admin_password;
 
       // Đồng bộ sang bảng settings của workspace đó
-      if (workspace.name || workspace.admin_password) {
+      if (workspace.name) {
         await supabase
           .from('settings')
           .update({
-            app_name: workspace.name?.trim() || undefined,
-            admin_password: workspace.admin_password?.trim() || undefined,
+            app_name: workspace.name.trim(),
             updated_at: new Date().toISOString(),
           })
           .eq('workspace_id', targetId);
+      }
+
+      // Nếu cập nhật mật khẩu cho cơ sở, lưu vào bảng bảo mật admin_accounts với scrypt hash
+      if (workspace.admin_password && workspace.admin_password.trim()) {
+        await supabase
+          .from('admin_accounts')
+          .update({
+            password_hash: hashPassword(workspace.admin_password.trim()),
+            updated_at: new Date().toISOString(),
+          })
+          .eq('workspace_id', targetId)
+          .eq('phone', newPhone);
       }
     } else if (action === 'toggle') {
       const targetId = workspaceId || workspace?.id;

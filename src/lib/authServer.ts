@@ -54,7 +54,7 @@ export function parseAdminToken(token?: string | null): { isValid: boolean; user
       if (a.length === b.length && crypto.timingSafeEqual(a, b)) {
         return {
           isValid: true,
-          user: { phone: '0974248716', name: 'Tùng Dinh Dưỡng', role: 'super_admin' },
+          user: { phone: process.env.ADMIN_PHONE || 'admin', name: process.env.ADMIN_NAME || 'Quản trị viên', role: 'super_admin' },
         };
       }
     } catch {
@@ -111,7 +111,7 @@ export function checkIsAdminRequest(request?: NextRequest): boolean {
 export function checkIsSuperAdminRequest(request?: NextRequest): boolean {
   const user = getAdminUserFromRequest(request);
   if (!user) return false;
-  return user.role === 'super_admin' || user.phone === '0974248716';
+  return user.role === 'super_admin';
 }
 
 
