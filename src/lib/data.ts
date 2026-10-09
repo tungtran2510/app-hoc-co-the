@@ -127,8 +127,8 @@ export function normalizeAuthorProfile(raw?: any, supplementalFlatBooks?: any[])
 
 export const DEFAULT_HOME_SECTIONS_ORDER = [
   'brand_card',
-  'topics',
   'recent_activity',
+  'topics',
   'author_profile',
   'author_books',
   'author_philosophy',
@@ -170,23 +170,29 @@ export function normalizeHomeSectionsOrder(raw?: any): string[] {
     unique.unshift('brand_card');
   }
 
-  // Tự động đảm bảo topics luôn hiện diện nếu dữ liệu cũ chưa có (không can thiệp nếu người dùng đã tự xếp vị trí)
-  if (!unique.includes('topics')) {
+  // Tự động đảm bảo recent_activity luôn hiển thị trước topics để người dùng vào app là thấy ngay bài học dở
+  const recentIdx = unique.indexOf('recent_activity');
+  const topicsIdx = unique.indexOf('topics');
+  if (recentIdx === -1) {
     const brandIdx = unique.indexOf('brand_card');
     if (brandIdx !== -1) {
-      unique.splice(brandIdx + 1, 0, 'topics');
+      unique.splice(brandIdx + 1, 0, 'recent_activity');
     } else {
-      unique.unshift('topics');
+      unique.unshift('recent_activity');
     }
+  } else if (topicsIdx !== -1 && recentIdx > topicsIdx) {
+    unique.splice(recentIdx, 1);
+    const newTopicsIdx = unique.indexOf('topics');
+    unique.splice(newTopicsIdx, 0, 'recent_activity');
   }
 
-  // Tự động bổ sung recent_activity ngay sau topics nếu dữ liệu cũ chưa có
-  if (!unique.includes('recent_activity')) {
-    const topicsIdx = unique.indexOf('topics');
-    if (topicsIdx !== -1) {
-      unique.splice(topicsIdx + 1, 0, 'recent_activity');
+  // Tự động đảm bảo topics luôn hiện diện nếu dữ liệu cũ chưa có
+  if (!unique.includes('topics')) {
+    const rIdx = unique.indexOf('recent_activity');
+    if (rIdx !== -1) {
+      unique.splice(rIdx + 1, 0, 'topics');
     } else {
-      unique.push('recent_activity');
+      unique.push('topics');
     }
   }
 

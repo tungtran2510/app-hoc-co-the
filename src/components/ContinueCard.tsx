@@ -14,13 +14,23 @@ interface ContinueCardProps {
 export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCardProps) {
   const total = info.video_total || 1;
   const current = info.video_index || 1;
-  const progressPercent =
-    info.video_total && info.video_total > 1
-      ? Math.min(100, Math.round((current / total) * 100))
-      : 60;
+  const hasMultipleVideos = total > 1;
+  const progressPercent = hasMultipleVideos
+    ? Math.min(100, Math.round((current / total) * 100))
+    : 100;
   const cleanTopicSlug = (info.topic_slug || 'cot-song').replace('cot-song-that-lung', 'cot-song');
   const cleanPageSlug = info.page_slug || 'tu-the-va-van-dong';
   const targetUrl = `/${cleanTopicSlug}/${cleanPageSlug}?v=${current}`;
+
+  // Kiểm tra trùng lặp tiêu đề bài học và tiêu đề video để khử lặp chữ
+  const stripPrefix = (str: string) => str.replace(/^(\d+[\.\-\s:]+)+/, '').trim().toLowerCase();
+  const pageTitleCore = stripPrefix(info.page_title || '');
+  const videoTitleCore = stripPrefix(info.video_title || '');
+  const isSameTitle =
+    !videoTitleCore ||
+    pageTitleCore === videoTitleCore ||
+    pageTitleCore.includes(videoTitleCore) ||
+    videoTitleCore.includes(pageTitleCore);
 
   return (
     <a
@@ -48,7 +58,7 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
           }`}
         />
         {/* Gradient mờ chuyển từ nền sang ảnh */}
-        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent dark:from-[#1C123D] dark:via-[#1C123D]/60 dark:to-transparent w-16" />
+        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 via-50% to-transparent dark:from-[#1C123D] dark:via-[#1C123D]/80 dark:via-50% dark:to-transparent w-28 pointer-events-none" />
       </div>
 
       <div className="relative z-10 flex flex-col gap-0.5 sm:gap-1">
@@ -78,41 +88,54 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
               </button>
             )}
 
-            <span className="text-[10.5px] sm:text-[11px] font-bold text-slate-500 dark:text-white/75 shrink-0 pr-0.5">
-              Video {String(current).padStart(2, '0')}/{String(total).padStart(2, '0')}
-            </span>
+            {hasMultipleVideos && (
+              <span className="px-1.5 py-0.5 rounded-md bg-white/90 dark:bg-black/60 border border-slate-200/80 dark:border-white/10 text-[9.5px] sm:text-[10px] font-bold text-slate-700 dark:text-white/90 shrink-0 backdrop-blur-xs shadow-2xs">
+                Video {String(current).padStart(2, '0')}/{String(total).padStart(2, '0')}
+              </span>
+            )}
           </div>
         </div>
 
         {/* Dòng 2: Tiêu đề bài học chính - TO RÕ CHO DỄ NHÌN */}
-        <h2 className="text-[16px] sm:text-[18px] font-black text-slate-900 dark:text-white leading-tight tracking-tight line-clamp-1 max-w-[84%] sm:max-w-[86%]">
+        <h2 className="text-[15.5px] sm:text-[17px] font-black text-slate-900 dark:text-white leading-tight tracking-tight line-clamp-1 max-w-[84%] sm:max-w-[86%]">
           {String(info.page_number || 1).padStart(2, '0')} - {info.page_title || 'Tổng quan về cột sống'}
         </h2>
 
-        {/* Dòng 3: Mô tả/Tiêu đề video - 1 dòng gọn gàng để chiều cao bé lại */}
-        <p className="text-[11px] sm:text-[11.5px] text-slate-600 dark:text-white/80 leading-tight line-clamp-1 max-w-[70%] sm:max-w-[76%] font-medium">
-          {info.video_title || 'Cấu tạo & chức năng cột sống'}
-        </p>
+        {/* Dòng 3: Mô tả/Tiêu đề video - CHỈ HIỂN THỊ KHI KHÁC TIÊU ĐỀ BÀI (KHỬ LẶP CHỮ) */}
+        {!isSameTitle && Boolean(info.video_title) && (
+          <p className="text-[11px] sm:text-[11.5px] text-slate-600 dark:text-white/80 leading-tight line-clamp-1 max-w-[70%] sm:max-w-[76%] font-medium">
+            {info.video_title}
+          </p>
+        )}
 
         {/* Dòng 4: Thanh tiến độ + Phần trăm + Nút Xem tiếp phát sáng chuyên nghiệp */}
         <div className="flex items-center justify-between gap-2.5 pt-0.5">
-          <div className="flex-1 max-w-[54%] sm:max-w-[62%] flex items-center gap-2">
-            <div
-              className="flex-1 h-1.5 bg-slate-200 dark:bg-black/30 rounded-full overflow-hidden p-[0.5px]"
-              role="progressbar"
-              aria-valuenow={progressPercent}
-              aria-valuemin={0}
-              aria-valuemax={100}
-            >
+          {hasMultipleVideos ? (
+            <div className="flex-1 max-w-[54%] sm:max-w-[62%] flex items-center gap-2">
               <div
-                className="h-full bg-amber-500 dark:bg-gradient-to-r dark:from-amber-300 dark:via-amber-400 dark:to-amber-500 rounded-full transition-all duration-300 shadow-xs"
-                style={{ width: `${progressPercent}%` }}
-              />
+                className="flex-1 h-1.5 bg-slate-200 dark:bg-black/30 rounded-full overflow-hidden p-[0.5px]"
+                role="progressbar"
+                aria-valuenow={progressPercent}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              >
+                <div
+                  className="h-full bg-amber-500 dark:bg-gradient-to-r dark:from-amber-300 dark:via-amber-400 dark:to-amber-500 rounded-full transition-all duration-300 shadow-xs"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+              <span className="text-[10px] font-extrabold text-amber-700 dark:text-amber-300 shrink-0 font-mono">
+                {progressPercent}%
+              </span>
             </div>
-            <span className="text-[10.5px] font-extrabold text-amber-700 dark:text-amber-300 shrink-0 font-mono">
-              {progressPercent}%
-            </span>
-          </div>
+          ) : (
+            <div className="flex-1 max-w-[54%] sm:max-w-[62%] flex items-center gap-1.5">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/60 text-amber-800 dark:text-amber-200 text-[10px] font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                Bài học trọng tâm
+              </span>
+            </div>
+          )}
 
           {/* Nút Xem tiếp */}
           <div className="relative shrink-0 flex items-center gap-1.5 h-[27px] sm:h-[29px] px-2.5 sm:px-3 rounded-full bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 hover:from-amber-600 hover:to-amber-700 dark:from-[#FDE68A] dark:via-[#F8DF7B] dark:to-[#F59E0B] text-slate-950 font-black text-[11.5px] sm:text-[12px] shadow-sm transition-all duration-300 animate-pulse-glow overflow-hidden select-none">

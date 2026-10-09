@@ -9,7 +9,7 @@ import LongPressSave from './LongPressSave';
 import { checkIsAdminClient } from '../lib/adminAuth';
 import { savePageApi, deletePageApi } from '../lib/apiAdmin';
 import EditPageModal from './admin/EditPageModal';
-import { getStoredTienDo, TienDoMap, getCompletedPages } from '../lib/learningProgress';
+import { getStoredTienDo, TienDoMap, getCompletedPages, getStoredXemTiep, XemTiepInfo } from '../lib/learningProgress';
 
 interface PageItemData {
   page: Page;
@@ -31,15 +31,22 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
   const [isCreating, setIsCreating] = useState(false);
   const [tienDo, setTienDo] = useState<TienDoMap>({});
   const [completedPages, setCompletedPages] = useState<string[]>([]);
+  const [resume, setResume] = useState<XemTiepInfo | null>(null);
 
   useEffect(() => {
     checkIsAdminClient().then((admin) => setIsAdmin(admin));
-    try {
-      setTienDo(getStoredTienDo());
-      setCompletedPages(getCompletedPages());
-    } catch {
-      // Bỏ qua
-    }
+    const handleProgress = () => {
+      try {
+        setTienDo(getStoredTienDo());
+        setCompletedPages(getCompletedPages());
+        setResume(getStoredXemTiep());
+      } catch {
+        // Bỏ qua
+      }
+    };
+    handleProgress();
+    window.addEventListener('learning_progress_changed', handleProgress);
+    return () => window.removeEventListener('learning_progress_changed', handleProgress);
   }, []);
 
   const handleMove = async (index: number, direction: 'up' | 'down') => {
@@ -183,14 +190,27 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
               const isCompleted = completedPages.includes(page.id);
               const formattedOrder = String(orderNumber).padStart(2, '0');
 
+              // Kiểm tra xem bài này có phải bài đang học trong xem_tiep không
+              const cleanTopicSlug = topic.slug.replace('cot-song-that-lung', 'cot-song');
+              const resumeTopicSlug = (resume?.topic_slug || '').replace('cot-song-that-lung', 'cot-song');
+              const isResumeMatch = resumeTopicSlug === cleanTopicSlug && (
+                resume?.page_slug === page.slug ||
+                (typeof resume?.page_number === 'number' && resume.page_number === orderNumber)
+              );
+
+              const effectiveLastVideo = lastVideo || (isResumeMatch ? (resume?.video_index || 1) : undefined);
+              const isCurrentlyLearning = !isCompleted && (isResumeMatch || (effectiveLastVideo !== undefined && effectiveLastVideo > 0));
+
               return (
                 <div key={page.id} className="w-full relative group flex flex-col gap-1.5">
                   <div className="w-full flex items-center gap-2 sm:gap-2.5">
-                    {/* Cột mốc tròn số thứ tự trên dòng lộ trình (như Ảnh mẫu 2) */}
+                    {/* Cột mốc tròn số thứ tự trên dòng lộ trình */}
                     <div
                       className={`w-[29px] h-[29px] rounded-full flex items-center justify-center text-[11px] font-black shrink-0 shadow-2xs z-10 font-mono transition-colors ${
                         isCompleted
                           ? 'bg-emerald-50 text-emerald-700 border-[1.5px] border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-600/50'
+                          : isCurrentlyLearning
+                          ? 'bg-amber-50 text-amber-800 border-[1.5px] border-amber-400 dark:bg-amber-950/70 dark:text-amber-200 dark:border-amber-400/60 ring-2 ring-amber-400/30'
                           : 'bg-white dark:bg-[#160D30] text-slate-500 dark:text-white/75 border-[1.5px] border-slate-200 dark:border-purple-500/40'
                       }`}
                       title={`Bước ${formattedOrder}`}
@@ -218,9 +238,9 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
                         orderNumber={orderNumber}
                         videoCount={videoCount}
                         watchedVideos={watchedVideos}
-                        lastVideo={lastVideo}
+                        lastVideo={effectiveLastVideo}
                         isCompleted={isCompleted}
-                        isActive={activePageId === page.id}
+                        isActive={activePageId === page.id || isResumeMatch}
                         onActivate={() => setActivePageId(page.id)}
                       />
                       </LongPressSave>

@@ -208,7 +208,10 @@ export default function TopicLearningExperience({
 
   const visiblePages = pages.filter(({ page }) => page.is_visible && page.status === 'published');
   const progress = visiblePages.length ? Math.min(100, Math.round((completedIds.filter((id) => visiblePages.some(({ page }) => page.id === id)).length / visiblePages.length) * 100)) : 0;
-  const continuePage = resume?.topic_slug === topic.slug ? resume : null;
+  const completedCount = completedIds.filter((id) => visiblePages.some(({ page }) => page.id === id)).length;
+  const cleanTopicSlug = topic.slug.replace('cot-song-that-lung', 'cot-song');
+  const resumeTopicSlug = (resume?.topic_slug || '').replace('cot-song-that-lung', 'cot-song');
+  const continuePage = resumeTopicSlug === cleanTopicSlug ? resume : null;
   const firstPage = visiblePages[0]?.page;
   const actionHref = continuePage?.page_slug
     ? `/${topic.slug}/${continuePage.page_slug}?v=${continuePage.video_index || 1}`
@@ -217,37 +220,81 @@ export default function TopicLearningExperience({
 
   return (
     <>
-      <section className="overflow-hidden rounded-[20px] border-2 border-[#CAD5E5] bg-gradient-to-br from-white via-[#FAFBFE] to-[#F2F6FC] p-2.5 shadow-[0_10px_26px_-20px_rgba(30,58,138,.4)] dark:border-[#55436F] dark:from-[#1A1236] dark:via-[#17102D] dark:to-[#100B20] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.045),0_12px_26px_-18px_rgba(0,0,0,.8)] sm:p-3">
-        <div className="grid grid-cols-[minmax(92px,31%)_1fr] items-center gap-2.5 sm:gap-3.5">
-          <div className="relative aspect-square overflow-hidden rounded-[15px] border border-white/80 bg-[#101D43] shadow-[0_5px_12px_-7px_rgba(0,0,0,.45)] dark:border-white/15">
+      <section className="overflow-hidden rounded-[16px] border border-[#CAD5E5] bg-gradient-to-br from-white via-[#FAFBFE] to-[#F2F6FC] p-2 sm:p-3 shadow-[0_6px_20px_-16px_rgba(30,58,138,.35)] dark:border-[#55436F] dark:from-[#1A1236] dark:via-[#17102D] dark:to-[#100B20] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,.045),0_10px_22px_-16px_rgba(0,0,0,.8)]">
+        <div className="grid grid-cols-[76px_1fr] sm:grid-cols-[96px_1fr] items-center gap-2 sm:gap-3">
+          <div className="relative w-[76px] h-[76px] sm:w-[96px] sm:h-[96px] aspect-square overflow-hidden rounded-[12px] border border-white/80 bg-[#101D43] shadow-[0_4px_10px_-6px_rgba(0,0,0,.45)] dark:border-white/15 shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={cover} alt={topic.title} className="h-full w-full object-cover" />
           </div>
-          <div className="min-w-0 py-0.5">
-            <span className="inline-flex rounded-full bg-[#F4C94E] px-2 py-0.5 text-[8px] font-black uppercase tracking-wide text-[#16264A]">Chuyên đề đào tạo</span>
-            <h1 className="mt-1.5 text-[19px] font-black uppercase leading-[1.08] tracking-tight text-[#101B38] dark:text-white sm:text-[24px]">{topic.title}</h1>
-            <p className="mt-1 text-[10px] font-semibold text-slate-600 dark:text-slate-300">Tác giả: <strong className="text-slate-900 dark:text-white">Tùng Dinh Dưỡng</strong></p>
-            {topic.description && <p className="mt-1.5 line-clamp-2 text-[10.5px] leading-snug text-slate-600 dark:text-slate-300 sm:text-[13px]">{topic.description}</p>}
-            <div className="mt-2 flex items-center gap-1.5 flex-nowrap text-[10px] font-bold text-slate-600 dark:text-slate-300">
-              <span className="inline-flex items-center gap-1 rounded-[7px] bg-white/90 dark:bg-white/10 px-2 py-0.5 border border-slate-200 dark:border-white/10 shrink-0 whitespace-nowrap">
-                <BookOpen size={10} className="text-blue-600 shrink-0" />{visiblePages.length} bài
+          <div className="min-w-0 py-0 flex flex-col justify-center">
+            <div className="flex items-center justify-between gap-1 flex-nowrap">
+              <span className="inline-flex rounded-full bg-[#F4C94E] px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wide text-[#16264A] shrink-0">
+                Chuyên đề đào tạo
               </span>
-              <span className="inline-flex items-center gap-1 rounded-[7px] bg-white/90 dark:bg-white/10 px-2 py-0.5 border border-slate-200 dark:border-white/10 shrink-0 whitespace-nowrap">
-                <PlaySquare size={10} className="text-emerald-600 shrink-0" />{totalVideos} video
+              <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 truncate">
+                Tác giả: <strong className="text-slate-800 dark:text-white">Tùng Dinh Dưỡng</strong>
               </span>
-              <span className="inline-flex items-center gap-1 rounded-[7px] bg-white/90 dark:bg-white/10 px-2 py-0.5 border border-slate-200 dark:border-white/10 shrink-0 whitespace-nowrap">
-                <Clock3 size={10} className="text-amber-600 shrink-0" />~{totalVideos * 5}p
+            </div>
+            <h1 className="mt-0.5 text-[17px] sm:text-[22px] font-black uppercase leading-[1.12] tracking-tight text-[#101B38] dark:text-white truncate">
+              {topic.title}
+            </h1>
+            {topic.description && (
+              <p className="mt-0.5 line-clamp-1 text-[10px] leading-tight text-slate-600 dark:text-slate-300 sm:text-[12px]">
+                {topic.description}
+              </p>
+            )}
+            <div className="mt-1 flex items-center gap-1 sm:gap-1.5 flex-nowrap text-[9px] sm:text-[10px] font-bold text-slate-600 dark:text-slate-300">
+              <span className="inline-flex items-center gap-1 rounded-[6px] bg-white/90 dark:bg-white/10 px-1.5 py-0.5 border border-slate-200 dark:border-white/10 shrink-0 whitespace-nowrap">
+                <BookOpen size={9} className="text-blue-600 shrink-0" />{visiblePages.length} bài
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-[6px] bg-white/90 dark:bg-white/10 px-1.5 py-0.5 border border-slate-200 dark:border-white/10 shrink-0 whitespace-nowrap">
+                <PlaySquare size={9} className="text-emerald-600 shrink-0" />{totalVideos} video
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-[6px] bg-white/90 dark:bg-white/10 px-1.5 py-0.5 border border-slate-200 dark:border-white/10 shrink-0 whitespace-nowrap">
+                <Clock3 size={9} className="text-amber-600 shrink-0" />~{totalVideos * 5}p
               </span>
             </div>
           </div>
         </div>
-        <div className="mt-2.5 flex items-center gap-2.5 border-t border-slate-200/70 pt-2.5 dark:border-white/10">
-          <div className="min-w-0 flex-1 rounded-[12px] bg-white/75 px-2 py-1.5 dark:bg-white/5">
-            <div className="flex items-center justify-between gap-2 text-[10px] font-bold text-slate-600 dark:text-slate-300"><span className="inline-flex items-center gap-1"><BarChart3 size={12} />Tiến độ</span><span>{completedIds.filter((id) => visiblePages.some(({ page }) => page.id === id)).length}/{visiblePages.length}</span></div>
-            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-200 dark:bg-black/30"><div className="h-full rounded-full bg-gradient-to-r from-[#F5B923] to-[#F6D86F] transition-[width]" style={{ width: `${progress}%` }} /></div>
+        <div className="mt-2 flex items-center gap-2 border-t border-slate-200/60 pt-2 dark:border-white/10">
+          <div className="min-w-0 flex-1 rounded-[10px] bg-white/80 px-2 py-1 dark:bg-white/5">
+            <div className="flex items-center justify-between gap-1.5 text-[9.5px] sm:text-[10px] font-bold text-slate-600 dark:text-slate-300">
+              <span className="inline-flex items-center gap-1">
+                <BarChart3 size={11} className={continuePage ? 'text-amber-500' : ''} />
+                {completedCount > 0 ? 'Tiến độ' : continuePage ? 'Đang học dở' : 'Tiến độ'}
+              </span>
+              <span>
+                {completedCount > 0
+                  ? `${completedCount}/${visiblePages.length} bài`
+                  : continuePage
+                  ? `Bài ${String(continuePage.page_number || 1).padStart(2, '0')}/${String(visiblePages.length).padStart(2, '0')}`
+                  : `0/${visiblePages.length}`}
+              </span>
+            </div>
+            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-200 dark:bg-black/30">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-[#F5B923] to-[#F6D86F] transition-[width]"
+                style={{
+                  width: `${
+                    progress > 0
+                      ? progress
+                      : continuePage
+                      ? Math.min(90, Math.max(16, Math.round(((continuePage.page_number || 1) / visiblePages.length) * 100 * 0.5)))
+                      : 0
+                  }%`
+                }}
+              />
+            </div>
           </div>
-          <Link href={actionHref} prefetch={true} onClick={playTapSound} className="flex min-h-[40px] shrink-0 items-center justify-center gap-1.5 rounded-[12px] bg-gradient-to-r from-[#204DA4] to-[#173B85] px-2.5 text-[11px] font-black text-white shadow-[0_6px_14px_-10px_rgba(30,58,138,.7)] active:scale-[.98] sm:px-4 sm:text-[13px] cursor-pointer">
-            <Play size={15} fill="currentColor" />{continuePage ? 'Tiếp tục học' : 'Bắt đầu học'}<ArrowRight size={15} />
+          <Link
+            href={actionHref}
+            prefetch={true}
+            onClick={playTapSound}
+            className="flex h-[34px] sm:h-[38px] shrink-0 items-center justify-center gap-1.5 rounded-[10px] bg-gradient-to-r from-[#204DA4] to-[#173B85] px-2.5 sm:px-3 text-[11px] sm:text-[12px] font-black text-white shadow-xs active:scale-[.98] cursor-pointer"
+          >
+            <Play size={13} fill="currentColor" />
+            <span>{continuePage ? 'Tiếp tục học' : 'Bắt đầu học'}</span>
+            <ArrowRight size={13} />
           </Link>
         </div>
       </section>
@@ -261,11 +308,11 @@ export default function TopicLearningExperience({
             playTapSound();
             setTab('path');
           }}
-          className={`flex min-h-[44px] items-center justify-center gap-1.5 rounded-[13px] text-[12.5px] font-black transition-colors cursor-pointer ${
-            tab === 'path' ? 'bg-[#1E4697] text-white shadow-md' : 'bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-300'
+          className={`flex h-[38px] sm:h-[42px] items-center justify-center gap-1.5 rounded-[11px] text-[12px] font-black transition-colors cursor-pointer ${
+            tab === 'path' ? 'bg-[#1E4697] text-white shadow-xs' : 'bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-300'
           }`}
         >
-          <BookOpen size={16} />
+          <BookOpen size={15} />
           <span>Lộ trình ({visiblePages.length})</span>
         </button>
         <button
@@ -276,14 +323,14 @@ export default function TopicLearningExperience({
             playTapSound();
             setTab('faq');
           }}
-          className={`flex min-h-[44px] items-center justify-center gap-1.5 rounded-[13px] text-[12.5px] font-black transition-colors cursor-pointer ${
-            tab === 'faq' ? 'bg-[#1E4697] text-white shadow-md' : 'bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-300'
+          className={`flex h-[38px] sm:h-[42px] items-center justify-center gap-1.5 rounded-[11px] text-[12px] font-black transition-colors cursor-pointer ${
+            tab === 'faq' ? 'bg-[#1E4697] text-white shadow-xs' : 'bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-300'
           }`}
         >
-          <HelpCircle size={16} />
+          <HelpCircle size={15} />
           <span>Vấn đề thường gặp</span>
           {displayedFaqs.reduce((sum, f) => sum + f.items.length, 0) > 0 && (
-            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+            <span className={`px-1.5 py-0.5 rounded-full text-[9.5px] font-bold ${
               tab === 'faq' ? 'bg-white/20 text-white' : 'bg-blue-100 dark:bg-sky-950/80 text-blue-700 dark:text-sky-300'
             }`}>
               {displayedFaqs.reduce((sum, f) => sum + f.items.length, 0)}
@@ -329,6 +376,7 @@ export default function TopicLearningExperience({
             progress={progress}
             completedLessons={completedIds.filter((id) => visiblePages.some(({ page }) => page.id === id)).length}
             totalLessons={visiblePages.length}
+            activeLessonNumber={continuePage?.page_number}
             className="mb-12"
           />
         </div>

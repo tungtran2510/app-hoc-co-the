@@ -131,7 +131,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
   const faqs = dbFaqs.length > 0 ? [...dbFaqs, ...masterFaqs] : masterFaqs;
 
   return (
-    <main className="flex-1 flex flex-col px-4 sm:px-5 pt-3 pb-28 gap-3.5 sm:gap-4">
+    <main className="flex-1 flex flex-col px-3.5 sm:px-5 pt-2 pb-24 gap-2.5 sm:gap-3.5">
       <TopicHeaderNav topicTitle={topic.title} topicSlug={topic.slug} />
       <TopicLearningExperience topic={topic} pages={pagesWithDetails} totalVideos={totalVideos} faqs={faqs} />
       <BottomNav />

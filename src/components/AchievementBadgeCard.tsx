@@ -10,6 +10,7 @@ interface AchievementBadgeCardProps {
   progress: number;
   totalLessons: number;
   completedLessons?: number;
+  activeLessonNumber?: number;
   className?: string;
 }
 
@@ -19,6 +20,7 @@ export default function AchievementBadgeCard({
   progress,
   totalLessons,
   completedLessons,
+  activeLessonNumber,
   className = '',
 }: AchievementBadgeCardProps) {
   const isCompleted = progress >= 100;
@@ -91,7 +93,11 @@ export default function AchievementBadgeCard({
             </span>
 
             <span className="text-[10px] font-black text-cyan-200 bg-sky-950/90 px-2 py-0.2 rounded-full border border-sky-500/50 shrink-0 shadow-2xs font-mono">
-              {doneCount}/{totalLessons} bài ({progress}%)
+              {doneCount > 0
+                ? `${doneCount}/${totalLessons} bài (${progress}%)`
+                : activeLessonNumber
+                ? `Đang học bài ${String(activeLessonNumber).padStart(2, '0')}/${String(totalLessons).padStart(2, '0')}`
+                : `0/${totalLessons} bài (0%)`}
             </span>
           </div>
 
@@ -120,12 +126,20 @@ export default function AchievementBadgeCard({
               <div className="flex-1 h-1.5 rounded-full bg-slate-800/90 border border-slate-700/80 overflow-hidden p-0.2">
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 shadow-[0_0_8px_rgba(56,189,248,0.5)] transition-all duration-500"
-                  style={{ width: `${Math.max(progress, 4)}%` }}
+                  style={{
+                    width: `${
+                      progress > 0
+                        ? Math.max(progress, 4)
+                        : activeLessonNumber
+                        ? Math.min(90, Math.max(12, Math.round((activeLessonNumber / totalLessons) * 100 * 0.4)))
+                        : 4
+                    }%`
+                  }}
                 />
               </div>
               <span className="inline-flex items-center gap-0.5 text-[9.5px] font-bold text-sky-300/80 shrink-0">
                 <Lock size={10} className="text-cyan-400/80" />
-                <span>Mở khóa khi học hết</span>
+                <span>{doneCount === 0 && activeLessonNumber ? 'Đang tích lũy bài' : 'Mở khóa khi học hết'}</span>
               </span>
             </div>
           )}

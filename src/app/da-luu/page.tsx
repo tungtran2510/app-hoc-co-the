@@ -36,6 +36,7 @@ import { getUserPhone, syncUserProgress, LEARNING_PROGRESS_EVENT } from '../../l
 import { playTapSound } from '../../lib/audioFeedback';
 import UserSyncModal from '../../components/UserSyncModal';
 import BottomNav from '../../components/BottomNav';
+import ContinueCard from '../../components/ContinueCard';
 
 export default function SavedPages() {
   const [activeTab, setActiveTab] = useState<'saved' | 'review'>('saved');
@@ -254,69 +255,14 @@ export default function SavedPages() {
       <div className={activeTab === 'saved' ? 'flex flex-col gap-3' : 'hidden'}>
           {/* Đang học dở */}
           {resume && resume.topic_slug && resume.page_slug && (
-            <section className="flex flex-col gap-2">
+            <section className="flex flex-col gap-1.5 mb-1">
               <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5 text-slate-800 dark:text-purple-100 text-[12.5px] font-black uppercase tracking-wide">
-                  <PlayCircle size={16} className="text-blue-600 dark:text-[#F8DF7B]" />
+                <h2 className="flex items-center gap-1.5 text-slate-800 dark:text-purple-100 text-[12.5px] font-black uppercase tracking-wide">
+                  <PlayCircle size={15} className="text-amber-500 dark:text-[#F8DF7B]" />
                   <span>Đang học dở</span>
-                </div>
+                </h2>
               </div>
-              <div className="rounded-[18px] border border-blue-100 bg-white p-3 shadow-xs dark:border-purple-700/50 dark:bg-[#160D30]">
-                <Link
-                  href={`/${resume.topic_slug.replace('cot-song-that-lung', 'cot-song')}/${resume.page_slug}?v=${resume.video_index || 1}`}
-                  className="grid grid-cols-[38%_1fr] items-center gap-3 active:opacity-90"
-                >
-                  <div className="relative aspect-[4/3] overflow-hidden rounded-[12px] bg-[#102D5C]">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={resume.cover_url || '/images/lessons/tong-quan-ve-cot-song.png'}
-                      alt={resume.page_title}
-                      className="h-full w-full object-cover"
-                    />
-                    <span className="absolute bottom-1.5 left-1.5 rounded-full bg-white/95 p-1 text-blue-700 shadow">
-                      <PlayCircle size={15} />
-                    </span>
-                  </div>
-                  <div className="min-w-0">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-[9px] font-black uppercase tracking-wide text-blue-800 dark:bg-blue-950/60 dark:text-blue-200">
-                      <PlayCircle size={11} /> Đang xem dở
-                    </span>
-                    <p className="mt-1 text-[13px] font-black leading-snug text-slate-900 dark:text-white line-clamp-2">
-                      {resume.page_title}
-                    </p>
-                    <p className="mt-0.5 text-[10.5px] text-slate-500 dark:text-slate-300 line-clamp-1">
-                      {resume.topic_title}
-                      {resume.video_title ? ` · ${resume.video_title}` : ''}
-                    </p>
-                    <div className="mt-2 flex items-center gap-2">
-                      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200 dark:bg-white/10">
-                        <div
-                          className="h-full rounded-full bg-blue-700"
-                          style={{
-                            width: `${
-                              resume.video_total
-                                ? Math.min(100, Math.round((resume.video_index / resume.video_total) * 100))
-                                : 0
-                            }%`,
-                          }}
-                        />
-                      </div>
-                      <span className="text-[10px] font-bold text-slate-500 dark:text-slate-300">
-                        {resume.video_total
-                          ? Math.min(100, Math.round((resume.video_index / resume.video_total) * 100))
-                          : 0}
-                        %
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-                <Link
-                  href={`/${resume.topic_slug.replace('cot-song-that-lung', 'cot-song')}/${resume.page_slug}?v=${resume.video_index || 1}`}
-                  className="mt-2.5 flex h-9 items-center justify-center gap-1.5 rounded-[11px] bg-gradient-to-r from-[#12366F] to-[#0B2A59] text-[12px] font-black text-white shadow-xs active:scale-[.99]"
-                >
-                  <PlayCircle size={15} fill="currentColor" /> Tiếp tục học <ArrowRight size={14} />
-                </Link>
-              </div>
+              <ContinueCard info={resume} />
             </section>
           )}
 
@@ -337,11 +283,11 @@ export default function SavedPages() {
                 </p>
               </div>
               <Link
-                href="/cot-song"
+                href="/chuyen-de"
                 className="flex items-center justify-center gap-1.5 h-10 px-4 rounded-[11px] bg-gradient-to-r from-blue-700 to-indigo-800 text-white font-black text-[13px] shadow-xs active:scale-95 transition-transform"
               >
                 <BookOpen size={15} />
-                <span>Khám phá Cột sống ngay</span>
+                <span>Khám phá các chuyên đề</span>
               </Link>
             </div>
           ) : (

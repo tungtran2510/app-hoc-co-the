@@ -44,10 +44,12 @@ export default function PageCard({
     progressPercent = hasStarted ? 50 : 0;
   } else if (hasStarted) {
     const currentVideo = lastVideo || (watchedVideos.length > 0 ? Math.max(...watchedVideos) : 1);
-    subtitle = `${count} video · Đang ở video ${String(currentVideo).padStart(2, '0')}`;
+    subtitle = count > 1
+      ? `Video ${currentVideo}/${count}`
+      : `Đang học dở`;
     progressPercent = Math.min(100, Math.round((watchedCount / count) * 100));
     if (progressPercent === 0 && currentVideo > 0) {
-      progressPercent = Math.round((1 / count) * 100);
+      progressPercent = Math.round((currentVideo / count) * 100);
     }
   }
 
@@ -110,7 +112,8 @@ export default function PageCard({
                 ĐÃ XONG
               </span>
             ) : hasStarted ? (
-              <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-950 border border-blue-300 dark:bg-[#93C5FD] dark:text-[#160C2C] dark:border-transparent text-[10px] sm:text-[10.5px] font-black tracking-wide shrink-0">
+              <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-900 border border-amber-300 dark:bg-amber-400 dark:text-slate-950 dark:border-transparent text-[10px] sm:text-[10.5px] font-black tracking-wide shrink-0 inline-flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-slate-950 animate-pulse" />
                 ĐANG HỌC
               </span>
             ) : orderNumber === 1 ? (

@@ -89,10 +89,10 @@ export default function TopicHeaderNav({ topicTitle, topicSlug }: TopicHeaderNav
         <Link
           href="/"
           prefetch={true}
-          className="inline-flex items-center gap-1 h-[48px] min-h-[48px] text-[#1E3A8A] hover:text-[#172554] dark:text-[#F8DF7B] text-[17px] font-extrabold cursor-pointer"
+          className="inline-flex items-center gap-0.5 h-8.5 sm:h-9 text-[#1E3A8A] hover:text-[#172554] dark:text-[#F8DF7B] text-[16px] font-extrabold cursor-pointer"
           aria-label="Quay lại Trang chủ"
         >
-          <ChevronLeft size={24} strokeWidth={2.5} />
+          <ChevronLeft size={22} strokeWidth={2.5} />
           <span>Trang chủ</span>
         </Link>
 
