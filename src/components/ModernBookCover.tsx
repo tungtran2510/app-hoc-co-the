@@ -86,11 +86,11 @@ export default function ModernBookCover({
           boxShadow: '-2px 4px 7px rgba(15,23,42,.16)',
         }}
       />
-      {/* Tag nằm sát bên trong mép trên, vắt nhẹ từ gáy sang mặt bìa. */}
+      {/* Tag nằm gọn gàng bên trong mép trên bìa sách, cân đối sắc nét */}
       {displayBadge && (
-        <div className="pointer-events-none absolute top-0 -left-[4.2%] z-30 flex h-[10px] max-w-[78%] select-none items-center gap-[2px] truncate rounded-[2.5px] border border-[#E7C84C]/60 bg-[#173A79] px-[4px] text-[5.75px] font-extrabold uppercase leading-none tracking-[0.06em] text-[#FFE66A] shadow-[0_1px_4px_rgba(15,23,42,.22)] sm:h-[11px] sm:px-[4.5px] sm:text-[6.25px]">
-          <Sparkles size={5.5} strokeWidth={2.2} className="shrink-0 fill-[#FFE66A] text-[#FFE66A]" />
-          <span className="truncate">{displayBadge}</span>
+        <div className="pointer-events-none absolute top-1 left-1 z-30 flex items-center gap-1 rounded-[4px] bg-slate-950/85 backdrop-blur-xs border border-amber-400/50 px-1.5 py-0.5 text-[7.5px] sm:text-[8px] font-black uppercase leading-none tracking-wide text-amber-300 shadow-sm">
+          <Sparkles size={6.5} className="shrink-0 fill-amber-300 text-amber-300" />
+          <span>{displayBadge}</span>
         </div>
       )}
       <div className="pointer-events-none absolute top-[1.5%] -right-[1.5%] bottom-[2.5%] w-[2%] z-0 rounded-r-[3px] border-r border-slate-300 bg-[repeating-linear-gradient(to_right,#fff_0px,#eef1f5_1px,#fff_2px)]" />

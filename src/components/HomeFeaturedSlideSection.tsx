@@ -161,22 +161,28 @@ export default function HomeFeaturedSlideSection({ defaultHidden = false }: Home
         </div>
       </div>
 
-      {/* Slide lướt ngang chuẩn 16:9 Snap Scroll */}
-      <div
-        ref={scrollRef}
-        onScroll={handleScroll}
-        className="flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 py-0.5"
-      >
-        {FEATURED_ITEMS.map((item, idx) => {
-          const itemHref = `/${item.topicSlug}/${item.pageSlug}`;
+      {/* Slide lướt ngang tinh gọn Snap Scroll sát vừa mép trang trên đầu */}
+      <div className="-mx-1 sm:mx-0 w-[calc(100%+8px)] sm:w-full overflow-hidden rounded-[18px]">
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="flex gap-2.5 overflow-x-auto snap-x snap-mandatory scrollbar-none w-full"
+        >
+          {FEATURED_ITEMS.map((item) => {
+            const itemHref = `/${item.topicSlug}/${item.pageSlug}`;
+            const dotColor = item.badgeColor.includes('amber')
+              ? 'bg-amber-400'
+              : item.badgeColor.includes('emerald')
+              ? 'bg-emerald-400'
+              : 'bg-sky-400';
 
-          return (
-            <article
-              key={item.id}
-              className="relative w-full shrink-0 snap-start rounded-[20px] overflow-hidden border border-slate-200/90 dark:border-purple-800/40 shadow-xs bg-slate-900 group"
-            >
-              {/* Khung ảnh 16:9 với lớp phủ Gradient */}
-              <div className="relative aspect-[16/9] w-full overflow-hidden">
+            return (
+              <article
+                key={item.id}
+                className="relative w-full shrink-0 snap-start rounded-[18px] overflow-hidden border border-slate-200/90 dark:border-purple-800/40 shadow-xs bg-slate-900 group"
+              >
+              {/* Khung ảnh tinh gọn với lớp phủ Gradient */}
+              <div className="relative aspect-[16/8.5] w-full overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={item.coverUrl}
@@ -190,39 +196,37 @@ export default function HomeFeaturedSlideSection({ defaultHidden = false }: Home
                 {/* Gradient nền để chữ luôn tương phản hoàn hảo */}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#061226] via-[#0B254E]/75 to-black/30" />
 
-                {/* Huy hiệu góc trên bên trái */}
-                <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
-                  <span
-                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider shadow-sm ${item.badgeColor}`}
-                  >
-                    <Sparkles size={10} />
+                {/* Thẻ Tag cân đối, sắc nét ở góc trên bên trái */}
+                <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 z-20">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/20 text-white text-[9px] sm:text-[9.5px] font-black uppercase tracking-wider shadow-sm">
+                    <span className={`w-1.5 h-1.5 rounded-full ${dotColor} shrink-0 animate-pulse`} />
                     <span>{item.badge}</span>
                   </span>
-                  <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-xs text-white text-[9px] font-extrabold">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/20 backdrop-blur-md border border-white/15 text-white text-[9px] sm:text-[9.5px] font-bold">
                     {item.topicTitle} · {item.videoCount} video
                   </span>
                 </div>
 
                 {/* Nội dung chữ ở góc dưới */}
-                <div className="absolute bottom-2.5 left-3 right-3 flex flex-col gap-1 text-white">
-                  <h4 className="text-[14px] sm:text-[16px] font-black leading-snug line-clamp-1 drop-shadow-sm">
+                <div className="absolute bottom-2 left-3 right-3 flex flex-col gap-0.5 text-white">
+                  <h4 className="text-[13.5px] sm:text-[15px] font-black leading-snug line-clamp-1 drop-shadow-sm">
                     {item.pageTitle}
                   </h4>
-                  <p className="text-[11px] sm:text-[12px] text-slate-200 line-clamp-1 font-normal opacity-90">
+                  <p className="text-[10.5px] sm:text-[11.5px] text-slate-200 line-clamp-1 font-normal opacity-90">
                     {item.description}
                   </p>
 
                   <div className="flex items-center justify-between mt-1">
                     <Link
                       href={itemHref}
-                      className="inline-flex items-center gap-1.5 h-7 px-3 rounded-[9px] bg-white text-[#1E3A8A] text-[11px] font-black shadow-xs active:scale-95 transition-transform hover:bg-blue-50"
+                      className="inline-flex items-center gap-1.5 h-6.5 px-2.5 rounded-[8px] bg-white text-[#0E2A5C] text-[10.5px] font-black shadow-xs active:scale-95 transition-transform hover:bg-blue-50"
                     >
-                      <Play size={11} fill="currentColor" />
+                      <Play size={10} fill="currentColor" />
                       <span>Học ngay</span>
-                      <ArrowRight size={12} strokeWidth={2.5} />
+                      <ArrowRight size={11} strokeWidth={2.5} />
                     </Link>
 
-                    <span className="text-[10px] text-white/75 font-semibold">
+                    <span className="text-[9.5px] text-white/70 font-semibold">
                       Vuốt để xem tiếp ➔
                     </span>
                   </div>
@@ -231,6 +235,7 @@ export default function HomeFeaturedSlideSection({ defaultHidden = false }: Home
             </article>
           );
         })}
+        </div>
       </div>
     </section>
   );
