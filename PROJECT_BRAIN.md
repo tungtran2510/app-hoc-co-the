@@ -181,7 +181,19 @@ Hệ thống hỗ trợ đầy đủ **10 khối nội dung chuẩn**:
    - Tiêu đề ngắn gọn, cỡ chữ `11.5px/12.5px` font-black, không bị rớt dòng và không bị cắt chữ trên màn hình 390px.
 3. **Cài Đặt Quản Trị Chuẩn Apple iOS Card (`AdminSettingsModal.tsx`):**
    - Tab Giao diện được gom cụm thành các thẻ nhóm liền mạch (Grouped Card):
-     - Bảng màu giao diện (Chàm Y Khoa / Xanh Navy).
+     - Bảng màu giao diện: 3 bảng màu trên cùng 1 dòng (Chàm Y Khoa / Xanh Navy / Tối Giản).
      - Cỡ chữ bài học (Nhỏ / Vừa / Lớn).
      - Nhóm tùy chọn hiển thị & trải nghiệm: Tự động chuyển video, Thanh tiến độ học tập, Cầu nối đọc sách (Ebook).
      - Khi bật Ebook, ô URL App hiện ra liền mạch ngay trong khối, không sinh ra các hộp rời rạc thừa thãi.
+
+---
+
+## 12. HỆ THỐNG BẢNG MÀU 3 TÔNG & TỐI ƯU MENU BỐ CỤC XỔ XUỐNG
+1. **3 Bảng màu toàn ứng dụng trên cùng 1 dòng:**
+   - **Chàm Y Khoa (`indigo`):** Nền trắng sáng ngọc y tế viền xanh chàm kinh điển.
+   - **Xanh Navy (`navy_luxury`):** Sắc sẫm hoàng gia sang trọng.
+   - **Tối Giản (`minimal`):** Tông màu trung tính (Clean Slate) thanh thoát, không ám xanh.
+2. **Tối ưu không gian hiển thị Chuyên Đề Học:**
+   - Đã loại bỏ hoàn toàn chế độ "Chỉ chữ" (`text`).
+   - Xóa bỏ khối nút bấm dàn ngang 2 dòng cồng kềnh của Admin.
+   - Tích hợp nút capsule xổ xuống tinh gọn `[ ⚙️ Lưới bìa ⌵ ]` ngay cạnh tiêu đề, khi bấm xổ ra 4 lựa chọn: Lưới bìa, Danh mục 3 cột, Danh sách ảnh, Khung to.
