@@ -45,6 +45,7 @@ export async function POST(req: NextRequest) {
       flat_books: settings.flat_books !== undefined ? settings.flat_books : (existingBlockStyles.flat_books ?? []),
       home_sections_order: settings.home_sections_order !== undefined ? settings.home_sections_order : (existingBlockStyles.home_sections_order ?? ['brand_card', 'topics', 'recent_activity', 'author_profile', 'author_books', 'author_philosophy', 'recommended_books', 'flat_books', 'author_contact']),
       hidden_home_sections: settings.hidden_home_sections !== undefined ? settings.hidden_home_sections : (existingBlockStyles.hidden_home_sections ?? []),
+      hidden_home_topic_ids: settings.hidden_home_topic_ids !== undefined ? settings.hidden_home_topic_ids : (existingBlockStyles.hidden_home_topic_ids ?? []),
       ai_training: (settings.ai_training && typeof settings.ai_training === 'object' && ('guidelines' in settings.ai_training || 'documents' in settings.ai_training || 'faqs' in settings.ai_training))
         ? settings.ai_training
         : (existingBlockStyles.ai_training ?? null),

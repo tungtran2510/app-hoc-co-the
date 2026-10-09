@@ -116,6 +116,7 @@ export interface Settings {
   flat_books?: RecommendedBook[];
   home_sections_order?: string[] | null;
   hidden_home_sections?: string[] | null;
+  hidden_home_topic_ids?: string[] | null;
   ai_training?: AiTrainingConfig | null;
   welcome_title?: string | null;
   welcome_message?: string | null;

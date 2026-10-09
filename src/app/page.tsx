@@ -67,6 +67,7 @@ export default async function HomePage() {
       <HomeSectionsClient
         initialSectionsOrder={settings.home_sections_order}
         initialHiddenSections={settings.hidden_home_sections}
+        initialHiddenHomeTopicIds={settings.hidden_home_topic_ids}
         topicsWithCounts={topicsWithCounts}
         topicsTitle={settings.topics_title || 'Chuyên Đề Học'}
         topicsDisplay={settings.home_topics_display || settings.topics_display}

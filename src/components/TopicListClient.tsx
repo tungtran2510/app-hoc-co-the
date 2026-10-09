@@ -65,6 +65,7 @@ interface TopicListClientProps {
   }[];
   initialFaqVideos?: { key: string; page_id: string; page_title: string; page_slug: string; video_title: string; thumbnail_url?: string | null; index: number; topic_id: string; topic_title: string; topic_slug: string }[];
   initialFaqTopics?: { id: string; title: string }[];
+  initialHiddenHomeTopicIds?: string[] | null;
   settingsScope?: 'home' | 'page';
 }
 
@@ -86,6 +87,7 @@ export default function TopicListClient({
   initialDescription,
   initialGuide,
   initialFeaturedTopicIds = [],
+  initialHiddenHomeTopicIds = [],
   initialFaqs = [],
   initialFaqVideos = [],
   initialFaqTopics = [],
@@ -93,6 +95,14 @@ export default function TopicListClient({
 }: TopicListClientProps) {
   const router = useRouter();
   const [topicsWithCounts, setTopicsWithCounts] = useState(initialTopics);
+  const [hiddenHomeTopicIds, setHiddenHomeTopicIds] = useState<string[]>(initialHiddenHomeTopicIds || []);
+
+  const hiddenHomeTopicIdsKey = (initialHiddenHomeTopicIds || []).join(',');
+  useEffect(() => {
+    if (initialHiddenHomeTopicIds) {
+      setHiddenHomeTopicIds(initialHiddenHomeTopicIds);
+    }
+  }, [hiddenHomeTopicIdsKey]);
   const [topicsTitle, setTopicsTitle] = useState(
     initialTopicsTitle && initialTopicsTitle !== 'Chọn chủ đề' ? initialTopicsTitle : 'Chuyên Đề Học'
   );
@@ -132,7 +142,10 @@ export default function TopicListClient({
     ? TOPICS_DISPLAY_OPTIONS.filter((opt) => ['card', 'logo', 'catalog'].includes(opt.value))
     : TOPICS_DISPLAY_OPTIONS;
 
-  useEffect(() => setTopicFaqRows(initialFaqs), [initialFaqs]);
+  const initialFaqsCount = initialFaqs.length;
+  useEffect(() => {
+    setTopicFaqRows(initialFaqs);
+  }, [initialFaqsCount]);
 
   const filteredFaqRows = useMemo(() => topicFaqRows.filter((faq) => selectedFaqCategory === 'all'
     ? true
@@ -309,6 +322,24 @@ export default function TopicListClient({
   const handleToggleVisible = async (index: number) => {
     const list = [...topicsWithCounts];
     const item = list[index];
+
+    // Nếu đang ở Trang Tổng Quan (home): Chỉ ẩn/hiện chuyên đề trên Trang Chủ, KHÔNG can thiệp cờ toàn cục của chuyên đề
+    if (settingsScope === 'home') {
+      const isCurrentlyHiddenOnHome = hiddenHomeTopicIds.includes(item.topic.id);
+      const nextHidden = isCurrentlyHiddenOnHome
+        ? hiddenHomeTopicIds.filter((id) => id !== item.topic.id)
+        : [...hiddenHomeTopicIds, item.topic.id];
+      setHiddenHomeTopicIds(nextHidden);
+      const res = await saveSettingsApi({
+        hidden_home_topic_ids: nextHidden,
+      });
+      if (!res.success) {
+        alert(res.error || 'Chưa lưu được cài đặt');
+        setHiddenHomeTopicIds(hiddenHomeTopicIds);
+      }
+      return;
+    }
+
     const updated = {
       ...item.topic,
       is_visible: !item.topic.is_visible,
@@ -748,7 +779,11 @@ export default function TopicListClient({
       <div className={topicsContainerClass(displayMode)}>
         {topicsWithCounts.map(({ topic, pageCount }, index) => {
           // Người xem bình thường không thấy chủ đề bị ẩn
-          if (!topic.is_visible && !isAdmin) return null;
+          const isHiddenOnThisSurface =
+            settingsScope === 'home'
+              ? (hiddenHomeTopicIds.includes(topic.id) || !topic.is_visible)
+              : (!topic.is_visible);
+          if (isHiddenOnThisSurface && !isAdmin) return null;
           if (query.trim() && !topic.title.toLowerCase().includes(query.trim().toLowerCase())) return null;
           if (enableSearch && query.trim().length === 0 && featuredTopicIds.includes(topic.id)) return null;
 
@@ -766,10 +801,16 @@ export default function TopicListClient({
                 />
 
                 {/* Nhãn Đang ẩn nếu admin */}
-                {!topic.is_visible && isAdmin && (
-                  <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-black/70 text-white text-[11px] font-bold">
-                    Đang ẩn
-                  </div>
+                {isAdmin && (
+                  settingsScope === 'home' && hiddenHomeTopicIds.includes(topic.id) ? (
+                    <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-amber-500/90 text-slate-950 text-[10px] font-black shadow-xs">
+                      Ẩn ở Trang chủ
+                    </div>
+                  ) : !topic.is_visible ? (
+                    <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-black/70 text-white text-[11px] font-bold">
+                      Đang ẩn
+                    </div>
+                  ) : null
                 )}
               </div>
 
@@ -815,13 +856,21 @@ export default function TopicListClient({
                       type="button"
                       onClick={() => handleToggleVisible(index)}
                       className={`w-6 h-6 rounded-[6px] flex items-center justify-center shrink-0 cursor-pointer active:scale-90 transition-colors ${
-                        topic.is_visible
+                        (settingsScope === 'home' ? !hiddenHomeTopicIds.includes(topic.id) : topic.is_visible)
                           ? 'text-slate-300 hover:text-white hover:bg-white/15'
                           : 'bg-amber-500/20 text-amber-300 border border-amber-400/40'
                       }`}
-                      title={topic.is_visible ? 'Đang hiện – Bấm để ẩn' : 'Đang ẩn – Bấm để hiện'}
+                      title={
+                        settingsScope === 'home'
+                          ? (hiddenHomeTopicIds.includes(topic.id) ? 'Đang ẩn ở Trang chủ – Bấm để hiện' : 'Đang hiện ở Trang chủ – Bấm để ẩn')
+                          : (topic.is_visible ? 'Đang hiện – Bấm để ẩn' : 'Đang ẩn – Bấm để hiện')
+                      }
                     >
-                      {topic.is_visible ? <Eye size={11} strokeWidth={2.2} /> : <EyeOff size={11} strokeWidth={2.5} className="text-amber-400" />}
+                      {(settingsScope === 'home' ? !hiddenHomeTopicIds.includes(topic.id) : topic.is_visible) ? (
+                        <Eye size={11} strokeWidth={2.2} />
+                      ) : (
+                        <EyeOff size={11} strokeWidth={2.5} className="text-amber-400" />
+                      )}
                     </button>
                   </div>
 

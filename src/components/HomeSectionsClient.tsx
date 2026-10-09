@@ -32,6 +32,7 @@ import HomeReviewVideosSection from './HomeReviewVideosSection';
 interface HomeSectionsClientProps {
   initialSectionsOrder?: string[] | null;
   initialHiddenSections?: string[] | null;
+  initialHiddenHomeTopicIds?: string[] | null;
   topicsWithCounts: {
     topic: Topic;
     pageCount: number;
@@ -62,6 +63,7 @@ interface HomeSectionsClientProps {
 export default function HomeSectionsClient({
   initialSectionsOrder,
   initialHiddenSections,
+  initialHiddenHomeTopicIds,
   topicsWithCounts,
   topicsTitle,
   topicsDisplay,
@@ -542,6 +544,7 @@ export default function HomeSectionsClient({
                 initialTopicsTitle={topicsTitle}
                 initialDisplay={topicsDisplay}
                 initialFeaturedTopicIds={featuredTopicIds}
+                initialHiddenHomeTopicIds={initialHiddenHomeTopicIds}
                 settingsScope="home"
                 initialDescription={topicsDescription}
                 sectionIndex={index}

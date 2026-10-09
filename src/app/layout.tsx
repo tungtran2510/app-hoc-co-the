@@ -92,7 +92,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi" className={`${beVietnamPro.variable} ${lora.variable} ${inter.variable} ${nunito.variable} ${beVietnamPro.className}`}>
+    <html lang="vi" suppressHydrationWarning className={`${beVietnamPro.variable} ${lora.variable} ${inter.variable} ${nunito.variable} ${beVietnamPro.className}`}>
       <head>
         <meta name="referrer" content="strict-origin-when-cross-origin" />
         <meta name="theme-color" id="app-theme-color" content="#FFFFFF" />
@@ -113,7 +113,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${beVietnamPro.className} bg-bg text-ink min-h-screen flex justify-center selection:bg-primary-soft selection:text-primary-dark`}>
+      <body suppressHydrationWarning className={`${beVietnamPro.className} bg-bg text-ink min-h-screen flex justify-center selection:bg-primary-soft selection:text-primary-dark`}>
         <PwaRegistrar />
         <OfflineManager />
         <div className="w-full max-w-[480px] md:max-w-[820px] lg:max-w-[820px] min-h-screen bg-bg relative flex flex-col mx-auto shadow-2xl transition-all">

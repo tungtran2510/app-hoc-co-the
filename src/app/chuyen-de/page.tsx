@@ -19,7 +19,7 @@ export default async function AllTopicsPage() {
     getAllPages(true),
     getAllBlocks(true),
   ]);
-  const visibleTopics = topicsWithCounts.filter(({ topic }) => topic.is_visible);
+  const visibleTopics = topicsWithCounts;
   const topicFaqs: Array<{
     id: string; blockId: string; itemId: string; block: Extract<Block, { type: 'faq' }>;
     question: string; answer: string; topicId: string; topicTitle: string; faqCategoryId: string; faqCategoryTitle: string; topicSlug: string; pageTitle: string;
@@ -107,6 +107,7 @@ export default async function AllTopicsPage() {
         initialTopicsTitle={settings.topics_title || 'Chuyên Đề Học'}
         initialDisplay="catalog"
         initialFeaturedTopicIds={settings.featured_topic_ids}
+        initialHiddenHomeTopicIds={settings.hidden_home_topic_ids}
         settingsScope="page"
         initialDescription={settings.topics_description}
         initialGuide={settings.topics_guide}

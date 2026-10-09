@@ -298,6 +298,7 @@ export async function getSettings(includeAiTraining = false): Promise<Settings> 
             flat_books: normalizeRecommendedBooks(data.flat_books || sanitizedBlockStyles.flat_books || DEFAULT_RECOMMENDED_BOOKS),
             home_sections_order: normalizeHomeSectionsOrder(sanitizedBlockStyles.home_sections_order || data.home_sections_order),
             hidden_home_sections: normalizeHiddenHomeSections(sanitizedBlockStyles.hidden_home_sections || data.hidden_home_sections),
+            hidden_home_topic_ids: Array.isArray(sanitizedBlockStyles.hidden_home_topic_ids) ? sanitizedBlockStyles.hidden_home_topic_ids : [],
             ai_training: includeAiTraining ? normalizeAiTraining(data.ai_training || data.block_styles?.ai_training) : DEFAULT_AI_TRAINING,
             welcome_title: data.welcome_title || sanitizedBlockStyles.welcome_title || 'Chào mừng bạn đến với Qbiz Books',
             welcome_message: data.welcome_message || sanitizedBlockStyles.welcome_message || 'Hi vọng nền tảng học hiểu cơ thể và chăm sóc sức khỏe chủ động này sẽ giúp bạn hiểu sâu hơn về cơ thể mình, nuôi dưỡng hệ cơ xương khớp và sống khỏe mỗi ngày.',
