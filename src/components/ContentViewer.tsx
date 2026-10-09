@@ -87,6 +87,7 @@ import { playTapSound, playSuccessChime } from '../lib/audioFeedback';
 import { getUserPhone } from '../lib/userSync';
 import UserSyncModal from './UserSyncModal';
 import Anatomy3DModal from './Anatomy3DModal';
+import Spine3DFocusedWidget from './Spine3DFocusedWidget';
 import { Settings as SettingsIcon } from 'lucide-react';
 
 const get3DSystemForTopic = (slug: string): string => {
@@ -1311,6 +1312,11 @@ export default function ContentViewer({
             <span>Thêm nội dung</span>
           </button>
         </div>
+      )}
+
+      {/* Khối 3D Cột Sống Trực Quan Xoay Tại Chỗ (Dành riêng cho Chuyên Đề Cột Sống) */}
+      {topic.slug === 'cot-song' && (
+        <Spine3DFocusedWidget onOpenFull3D={() => setShow3DModal(true)} />
       )}
 
       {/* PHÂN CÁCH DANH SÁCH BÀI HỌC VÀ TIỆN ÍCH */}

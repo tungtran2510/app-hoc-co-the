@@ -25,6 +25,90 @@
   <link rel="modulepreload" crossorigin href="./assets/paths-C53js1nF.js">
   <link rel="modulepreload" crossorigin href="./assets/loadModel-BIpreATg.js">
   <link rel="stylesheet" crossorigin href="./assets/index-Bxhr5Gyr.css">
+  <style>
+    /* Clean Widget / Mini-Viewer Mode for Embedded Lesson Consultation */
+    html.widget-mode, body.widget-mode {
+      overflow: hidden !important;
+    }
+    html.widget-mode,
+    html.widget-mode body,
+    html.widget-mode.dark,
+    html.widget-mode.dark body {
+      background: #080c16 !important;
+    }
+    html.widget-mode.light,
+    html.widget-mode.light body {
+      background: #f8fafc !important;
+    }
+    html.widget-mode.dark #loadingOverlay,
+    html.widget-mode.dark .loading-overlay {
+      background: #080c16 !important;
+      color: #94a3b8 !important;
+    }
+    html.widget-mode.light #loadingOverlay,
+    html.widget-mode.light .loading-overlay {
+      background: #f8fafc !important;
+      color: #475569 !important;
+    }
+    html.widget-mode .header,
+    html.widget-mode .mobile-bottom-bar,
+    html.widget-mode .sidebar,
+    html.widget-mode .viewer-tools,
+    html.widget-mode #sidebarBackdrop,
+    html.widget-mode .radiological-scout-box,
+    html.widget-mode .floating-ar-btn,
+    html.widget-mode .floating-views-quick-nav,
+    html.widget-mode .floating-top-view-btn,
+    html.widget-mode .app-brand-logo-img,
+    html.widget-mode #netStatusBadge,
+    html.widget-mode .offline-prompt,
+    html.widget-mode .offline-modal,
+    html.widget-mode #offlinePrompt,
+    html.widget-mode #offlineModal,
+    html.widget-mode [class*="offline"],
+    html.widget-mode [class*="systems-"],
+    html.widget-mode [class*="compass"],
+    html.widget-mode .depth-control,
+    html.widget-mode #depthControl,
+    html.widget-mode .floating-ai-bubble,
+    html.widget-mode #floatingAIBubble,
+    html.widget-mode .btn-fullscreen-toggle,
+    html.widget-mode #btnFullscreenToggle,
+    html.widget-mode .voice-toast,
+    html.widget-mode #voiceToast,
+    html.widget-mode .viewer-controls,
+    html.widget-mode #viewerControls {
+      display: none !important;
+    }
+    html.widget-mode .main-layout {
+      top: 0 !important;
+      height: 100vh !important;
+      padding: 0 !important;
+    }
+    html.widget-mode .viewer-section {
+      height: 100vh !important;
+      padding: 0 !important;
+    }
+    html.widget-mode .viewer-container {
+      height: 100vh !important;
+    }
+  </style>
+  <script>
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.has('widget') || searchParams.has('mode') || window.self !== window.top) {
+      document.documentElement.classList.add('widget-mode');
+    }
+    const themeParam = searchParams.get('theme');
+    if (themeParam === 'light') {
+      document.documentElement.classList.add('light');
+      document.documentElement.classList.remove('dark');
+      try { localStorage.setItem('giao_dien', 'light'); } catch (e) {}
+    } else if (themeParam === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
+      try { localStorage.setItem('giao_dien', 'dark'); } catch (e) {}
+    }
+  </script>
 </head>
 <body>
   <div id="app">
