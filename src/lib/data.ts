@@ -129,6 +129,8 @@ export const DEFAULT_HOME_SECTIONS_ORDER = [
   'brand_card',
   'recent_activity',
   'topics',
+  'personalized_roadmap',
+  'featured_lessons',
   'author_profile',
   'author_books',
   'author_philosophy',
@@ -193,6 +195,25 @@ export function normalizeHomeSectionsOrder(raw?: any): string[] {
       unique.splice(rIdx + 1, 0, 'topics');
     } else {
       unique.push('topics');
+    }
+  }
+
+  // Tự động bổ sung personalized_roadmap và featured_lessons ngay sau topics nếu dữ liệu cũ chưa có
+  if (!unique.includes('personalized_roadmap')) {
+    const tIdx = unique.indexOf('topics');
+    if (tIdx !== -1) {
+      unique.splice(tIdx + 1, 0, 'personalized_roadmap');
+    } else {
+      unique.push('personalized_roadmap');
+    }
+  }
+
+  if (!unique.includes('featured_lessons')) {
+    const prIdx = unique.indexOf('personalized_roadmap');
+    if (prIdx !== -1) {
+      unique.splice(prIdx + 1, 0, 'featured_lessons');
+    } else {
+      unique.push('featured_lessons');
     }
   }
 

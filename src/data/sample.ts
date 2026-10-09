@@ -239,8 +239,10 @@ export const sampleSettings: Settings = {
   flat_books: DEFAULT_RECOMMENDED_BOOKS,
   home_sections_order: [
     'brand_card',
-    'topics',
     'recent_activity',
+    'topics',
+    'personalized_roadmap',
+    'featured_lessons',
     'author_profile',
     'author_books',
     'author_philosophy',

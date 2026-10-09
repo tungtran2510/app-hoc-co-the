@@ -16,6 +16,8 @@ import {
   PhoneCall,
   Eye,
   EyeOff,
+  Compass,
+  PlaySquare,
 } from 'lucide-react';
 import { saveSettingsApi } from '../../lib/apiAdmin';
 import { normalizeHomeSectionsOrder } from '../../lib/data';
@@ -34,17 +36,29 @@ const SECTION_DEFS: Record<string, SectionMeta> = {
     desc: 'Logo, Tên ứng dụng, định vị và huy hiệu chứng nhận',
     icon: Sparkles,
   },
+  recent_activity: {
+    key: 'recent_activity',
+    name: 'Đang học dở',
+    desc: 'Thẻ bài học đang theo dõi dở dang của người dùng',
+    icon: Sparkles,
+  },
   topics: {
     key: 'topics',
     name: 'Danh sách chuyên đề học',
     desc: 'Lưới các chủ đề chính (Cột sống, Dinh dưỡng, Nước...)',
     icon: FolderTree,
   },
-  recent_activity: {
-    key: 'recent_activity',
-    name: 'Đang học dở',
-    desc: 'Thẻ bài học đang theo dõi dở dang của người dùng',
-    icon: Sparkles,
+  personalized_roadmap: {
+    key: 'personalized_roadmap',
+    name: 'Định hướng lộ trình cá nhân hóa',
+    desc: 'Thẻ khảo sát gợi ý lộ trình học tập theo thể trạng và thói quen',
+    icon: Compass,
+  },
+  featured_lessons: {
+    key: 'featured_lessons',
+    name: 'Bài giảng nổi bật & Video ôn tập',
+    desc: 'Slide bài giảng nổi bật trong tuần và danh sách video cần ôn tập',
+    icon: PlaySquare,
   },
   author_profile: {
     key: 'author_profile',

@@ -141,11 +141,13 @@ function getRecommendations(
 interface PersonalizedRoadmapCardProps {
   isAdmin?: boolean;
   defaultHidden?: boolean;
+  hideAdminBar?: boolean;
 }
 
 export default function PersonalizedRoadmapCard({
   isAdmin = false,
   defaultHidden = true,
+  hideAdminBar = false,
 }: PersonalizedRoadmapCardProps) {
   const [isEnabled, setIsEnabled] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(defaultHidden);
@@ -268,7 +270,7 @@ export default function PersonalizedRoadmapCard({
   if (isCollapsed) {
     return (
       <div className="w-full flex flex-col gap-1.5">
-        {isAdmin && (
+        {isAdmin && !hideAdminBar && (
           <div data-testid="roadmap-admin-bar" className="flex items-center justify-between px-3 py-1.5 rounded-[12px] bg-slate-900 dark:bg-[#120A24] text-white border border-white/10 text-[11px] font-bold shadow-xs">
             <div className="flex items-center gap-1.5 min-w-0">
               <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
@@ -330,7 +332,7 @@ export default function PersonalizedRoadmapCard({
   return (
     <div className="flex flex-col gap-1.5">
       {/* Thanh Admin: Thu gọn & Ẩn hiện nhanh trên Trang chủ */}
-      {isAdmin && (
+      {isAdmin && !hideAdminBar && (
         <div data-testid="roadmap-admin-bar" className="flex items-center justify-between px-3 py-1.5 rounded-[12px] bg-slate-900 dark:bg-[#120A24] text-white border border-white/10 text-[11px] font-bold shadow-xs">
           <div className="flex items-center gap-1.5 min-w-0">
             <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />

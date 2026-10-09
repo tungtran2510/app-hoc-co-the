@@ -403,6 +403,46 @@ html.theme-navy-luxury .badge-navy-accent {
   border: 1px solid #C6DBF5;
 }
 
+/* Thẻ Chuyên Đề Bìa Sách 3D Xanh Navy Hoàng Gia Đậm Sang Trọng */
+html.theme-navy-luxury .topic-card-container .topic-card-spine {
+  background: linear-gradient(to right, #93C5FD, #E0F2FE, #60A5FA) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+}
+html.theme-navy-luxury .topic-card-container .topic-card-glow {
+  background: linear-gradient(135deg, #0E2A5C 0%, #0A1F45 50%, #06142E 100%) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.28) !important;
+  border-right: 1px solid rgba(6, 20, 46, 0.6) !important;
+  border-bottom: 2px solid rgba(6, 20, 46, 0.85) !important;
+  border-left: 4px solid #1E4697 !important;
+  color: #ffffff !important;
+  border-radius: 0 12px 14px 14px !important;
+  box-shadow: 0 10px 24px -4px rgba(10, 31, 69, 0.42), 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+}
+html.theme-navy-luxury .topic-card-container .topic-card-glow h3 {
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
+}
+html.theme-navy-luxury .topic-card-container .topic-card-badge {
+  background: linear-gradient(135deg, #FDE047 0%, #EAB308 100%) !important;
+  color: #07142E !important;
+  border: none !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  padding: 3px 8px !important;
+  border-radius: 4px !important;
+  box-shadow: 0 2px 6px rgba(234, 179, 8, 0.4) !important;
+}
+html.theme-navy-luxury .topic-card-container .topic-card-subdot {
+  background-color: #38BDF8 !important;
+}
+html.theme-navy-luxury .topic-card-container [class*='text-purple-200'] {
+  color: #93C5FD !important;
+}
+html.theme-navy-luxury .topic-card-heart {
+  color: #38BDF8 !important;
+}
+
 /* CHẾ ĐỘ TỐI TRONG TÔNG NAVY (NIGHT NAVY - THEO ẢNH 3 CỦA NGƯỜI DÙNG) */
 html.theme-navy-luxury.dark {
   --color-bg: #061021;
@@ -543,6 +583,60 @@ html.theme-minimal.dark {
 html.theme-minimal.dark body {
   background-color: #0F172A !important;
   color: #F8FAFC !important;
+}
+
+/* Thẻ Chuyên Đề Tối Giản Trắng Sứ Clean Slate */
+html.theme-minimal .topic-card-container .topic-card-spine {
+  display: none !important;
+}
+html.theme-minimal .topic-card-container .topic-card-crease-1,
+html.theme-minimal .topic-card-container .topic-card-crease-2 {
+  display: none !important;
+}
+html.theme-minimal .topic-card-container .topic-card-glow {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FAFBFD 50%, #F4F6FB 100%) !important;
+  border: 1px solid rgba(226, 232, 240, 0.9) !important;
+  color: #0F172A !important;
+  border-radius: 18px !important;
+  box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+}
+html.theme-minimal .topic-card-container .topic-card-glow h3 {
+  color: #0F172A !important;
+  text-shadow: none !important;
+}
+html.theme-minimal .topic-card-container .topic-card-badge {
+  background-color: #F1F5F9 !important;
+  color: #475569 !important;
+  border: 1px solid #E2E8F0 !important;
+  font-weight: 700 !important;
+  border-radius: 9999px !important;
+  box-shadow: none !important;
+  padding: 2px 8px !important;
+}
+html.theme-minimal .topic-card-container .topic-card-subdot {
+  background-color: #64748B !important;
+}
+html.theme-minimal .topic-card-container [class*='text-purple-200'] {
+  color: #64748B !important;
+}
+html.theme-minimal .topic-card-heart {
+  color: #64748B !important;
+}
+html.theme-minimal.dark .topic-card-container .topic-card-glow {
+  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%) !important;
+  border: 1px solid #334155 !important;
+  color: #F8FAFC !important;
+}
+html.theme-minimal.dark .topic-card-container .topic-card-glow h3 {
+  color: #F8FAFC !important;
+}
+html.theme-minimal.dark .topic-card-container .topic-card-badge {
+  background-color: #334155 !important;
+  color: #E2E8F0 !important;
+  border: 1px solid #475569 !important;
+}
+html.theme-minimal.dark .topic-card-container [class*='text-purple-200'] {
+  color: #94A3B8 !important;
 }
 
 /* ============================================================================

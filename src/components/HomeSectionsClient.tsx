@@ -557,17 +557,64 @@ export default function HomeSectionsClient({
                 onMoveDown={() => handleMoveSection(index, 'down')}
                 onOpenReorderModal={() => setShowReorderModal(true)}
               />
-              {/* Lộ trình cá nhân hóa (Demo) định hướng học tập đặt DƯỚI phần Chuyên Đề (MẶC ĐỊNH ẨN) */}
-              <div className="mt-2.5">
-                <PersonalizedRoadmapCard isAdmin={isAdmin} defaultHidden={true} />
-              </div>
-
-              {/* 2 Khối mới: Slide Nổi bật & Video Chưa hiểu cần ôn tập (MẶC ĐỊNH ẨN, ĐẶT DƯỚI KHỐI CHUYÊN ĐỀ) */}
-              <div className="mt-2.5 flex flex-col gap-2">
-                <HomeFeaturedSlideSection defaultHidden={true} />
-                <HomeReviewVideosSection defaultHidden={true} />
-              </div>
             </React.Fragment>
+          );
+        }
+
+        // KHỐI ĐỊNH HƯỚNG LỘ TRÌNH (PERSONALIZED ROADMAP)
+        if (sectionKey === 'personalized_roadmap') {
+          const isRoadmapCollapsed = isSectionCollapsed('personalized_roadmap');
+          return (
+            <section key="personalized_roadmap" className="flex flex-col gap-1 mt-1">
+              {hiddenBanner}
+              {isAdmin && (
+                <SectionOrderControls
+                  sectionTitle="ĐỊNH HƯỚNG LỘ TRÌNH"
+                  sectionIndex={index}
+                  totalSections={sectionsOrder.length}
+                  isHidden={isHidden}
+                  isCollapsed={isRoadmapCollapsed}
+                  onToggleCollapse={() => handleToggleCollapseSection('personalized_roadmap')}
+                  onToggleVisibility={() => handleToggleSectionVisibility('personalized_roadmap')}
+                  onMoveUp={() => handleMoveSection(index, 'up')}
+                  onMoveDown={() => handleMoveSection(index, 'down')}
+                  onOpenReorderModal={() => setShowReorderModal(true)}
+                />
+              )}
+              {isAdmin && isRoadmapCollapsed ? null : (
+                <PersonalizedRoadmapCard isAdmin={isAdmin} hideAdminBar={true} defaultHidden={false} />
+              )}
+            </section>
+          );
+        }
+
+        // KHỐI BÀI GIẢNG NỔI BẬT & ÔN TẬP (FEATURED LESSONS & REVIEW VIDEOS)
+        if (sectionKey === 'featured_lessons') {
+          const isFeaturedCollapsed = isSectionCollapsed('featured_lessons');
+          return (
+            <section key="featured_lessons" className="flex flex-col gap-2 mt-1">
+              {hiddenBanner}
+              {isAdmin && (
+                <SectionOrderControls
+                  sectionTitle="BÀI GIẢNG NỔI BẬT & ÔN TẬP"
+                  sectionIndex={index}
+                  totalSections={sectionsOrder.length}
+                  isHidden={isHidden}
+                  isCollapsed={isFeaturedCollapsed}
+                  onToggleCollapse={() => handleToggleCollapseSection('featured_lessons')}
+                  onToggleVisibility={() => handleToggleSectionVisibility('featured_lessons')}
+                  onMoveUp={() => handleMoveSection(index, 'up')}
+                  onMoveDown={() => handleMoveSection(index, 'down')}
+                  onOpenReorderModal={() => setShowReorderModal(true)}
+                />
+              )}
+              {isAdmin && isFeaturedCollapsed ? null : (
+                <div className="flex flex-col gap-2">
+                  <HomeFeaturedSlideSection defaultHidden={false} />
+                  <HomeReviewVideosSection defaultHidden={false} />
+                </div>
+              )}
+            </section>
           );
         }
 
