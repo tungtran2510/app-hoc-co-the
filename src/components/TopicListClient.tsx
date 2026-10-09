@@ -138,9 +138,7 @@ export default function TopicListClient({
   const [lessonIndex, setLessonIndex] = useState<
     { id: string; title: string; slug: string; topic_slug: string; topic_title: string; page_number: number; summary: string | null }[] | null
   >(null);
-  const displayOptions = enableSearch
-    ? TOPICS_DISPLAY_OPTIONS.filter((opt) => ['card', 'logo', 'catalog'].includes(opt.value))
-    : TOPICS_DISPLAY_OPTIONS;
+  const displayOptions = TOPICS_DISPLAY_OPTIONS;
 
   const initialFaqsCount = initialFaqs.length;
   useEffect(() => {
@@ -534,32 +532,40 @@ export default function TopicListClient({
               <button
                 type="button"
                 onClick={() => setShowDisplayMenu((v) => !v)}
-                title="Chọn cách hiển thị chuyên đề"
-                aria-label="Chọn cách hiển thị chuyên đề"
+                title="Chọn kiểu hiển thị chuyên đề"
+                aria-label="Chọn kiểu hiển thị chuyên đề"
                 aria-expanded={showDisplayMenu}
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-300/70 bg-slate-100/70 text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-700 active:scale-95 dark:border-white/15 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/15 dark:hover:text-white"
+                className="flex h-7.5 items-center gap-1.5 px-2.5 rounded-full border border-slate-300/80 bg-white/90 dark:border-white/15 dark:bg-white/10 text-ink text-[12px] font-bold shadow-2xs hover:bg-slate-50 dark:hover:bg-white/15 transition-all cursor-pointer active:scale-95"
               >
-                <SlidersHorizontal size={16} strokeWidth={2} />
+                <SlidersHorizontal size={13} className="text-primary shrink-0" />
+                <span className="truncate max-w-[95px]">{displayOptions.find((o) => o.value === displayMode)?.label || 'Bố cục'}</span>
+                <ChevronDown size={13} className={`text-slate-400 shrink-0 transition-transform duration-200 ${showDisplayMenu ? 'rotate-180' : ''}`} />
               </button>
               {showDisplayMenu && (
-                <div className="absolute right-0 top-10 z-30 w-44 rounded-[14px] border border-slate-200 bg-white p-1.5 shadow-lg dark:border-white/15 dark:bg-[#1B1431]">
-                  <span className="px-2 pt-1 text-[10.5px] font-extrabold uppercase text-slate-500 dark:text-slate-300">Chọn cách hiển thị</span>
-                  {displayOptions.map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => {
-                        handleChangeDisplay(opt.value);
-                        setShowDisplayMenu(false);
-                      }}
-                      className={`block h-8 w-full rounded-[8px] px-2.5 text-left text-[12.5px] font-bold ${
-                        displayMode === opt.value ? 'bg-primary text-white' : 'text-slate-700 hover:bg-primary-soft dark:text-slate-200 dark:hover:bg-white/10'
-                      }`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
+                <>
+                  <div className="fixed inset-0 z-30" onClick={() => setShowDisplayMenu(false)} />
+                  <div className="absolute right-0 top-9 z-40 w-44 rounded-[14px] border border-line bg-white dark:bg-[#1B1431] p-1.5 shadow-xl flex flex-col gap-0.5 animate-in fade-in zoom-in-95 duration-100">
+                    <span className="px-2 pt-1 pb-0.5 text-[10px] font-extrabold uppercase tracking-wider text-muted block">Kiểu hiển thị</span>
+                    {displayOptions.map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => {
+                          handleChangeDisplay(opt.value);
+                          setShowDisplayMenu(false);
+                        }}
+                        className={`flex items-center justify-between h-8.5 w-full rounded-[9px] px-2.5 text-left text-[12.5px] font-bold cursor-pointer transition-colors ${
+                          displayMode === opt.value
+                            ? 'bg-primary text-white shadow-2xs'
+                            : 'text-ink hover:bg-surface-2'
+                        }`}
+                      >
+                        <span>{opt.label}</span>
+                        {displayMode === opt.value && <Check size={14} className="stroke-[2.5]" />}
+                      </button>
+                    ))}
+                  </div>
+                </>
               )}
             </div>
           )}
@@ -682,26 +688,6 @@ export default function TopicListClient({
         </div>
       )}
 
-      {/* Chọn kiểu hiển thị chuyên đề (chỉ quản trị viên thấy) */}
-      {isAdmin && !enableSearch && (
-        <div className="flex items-center gap-1.5 flex-wrap p-1.5 rounded-[12px] bg-slate-100 dark:bg-white/5 border border-line">
-          <span className="text-[11px] font-extrabold uppercase text-muted dark:text-slate-300 px-1.5">Kiểu hiển thị</span>
-          {displayOptions.map((opt) => (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => handleChangeDisplay(opt.value)}
-              className={`h-7 px-2.5 rounded-[8px] text-[12px] font-bold cursor-pointer transition-colors ${
-                displayMode === opt.value
-                  ? 'bg-[#1E3A8A] text-amber-300 shadow-xs'
-                  : 'bg-white dark:bg-[#261B40] text-slate-700 dark:text-[#E6DCFA] border border-line'
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      )}
 
       {enableSearch && query.trim().length >= 2 && lessonIndex && (() => {
         const q = query.trim().toLowerCase();

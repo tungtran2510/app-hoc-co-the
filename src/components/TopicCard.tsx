@@ -30,6 +30,75 @@ export const TOPIC_MIND_MAP_SUBTITLES: Record<string, string> = {
   'tung-dinh-duong': 'EXPERT TRAINING',
 };
 
+export const TOPIC_ACCENTS: Record<string, {
+  tagBg: string;
+  tagText: string;
+  tagBorder: string;
+  badgeDot: string;
+}> = {
+  'cot-song': {
+    tagBg: 'bg-blue-50/90 dark:bg-blue-950/60',
+    tagText: 'text-[#1E3A8A] dark:text-blue-300',
+    tagBorder: 'border-blue-200/80 dark:border-blue-800/60',
+    badgeDot: 'bg-[#1E3A8A] dark:bg-blue-400',
+  },
+  'dinh-duong': {
+    tagBg: 'bg-amber-50/90 dark:bg-amber-950/60',
+    tagText: 'text-amber-800 dark:text-amber-300',
+    tagBorder: 'border-amber-200/80 dark:border-amber-800/60',
+    badgeDot: 'bg-amber-600 dark:bg-amber-400',
+  },
+  'tieu-hoa': {
+    tagBg: 'bg-rose-50/90 dark:bg-rose-950/60',
+    tagText: 'text-rose-800 dark:text-rose-300',
+    tagBorder: 'border-rose-200/80 dark:border-rose-800/60',
+    badgeDot: 'bg-rose-600 dark:bg-rose-400',
+  },
+  'nuoc': {
+    tagBg: 'bg-cyan-50/90 dark:bg-cyan-950/60',
+    tagText: 'text-cyan-800 dark:text-cyan-300',
+    tagBorder: 'border-cyan-200/80 dark:border-cyan-800/60',
+    badgeDot: 'bg-cyan-600 dark:bg-cyan-400',
+  },
+  'mien-dich': {
+    tagBg: 'bg-purple-50/90 dark:bg-purple-950/60',
+    tagText: 'text-purple-800 dark:text-purple-300',
+    tagBorder: 'border-purple-200/80 dark:border-purple-800/60',
+    badgeDot: 'bg-purple-600 dark:bg-purple-400',
+  },
+  'co-the-nguoi': {
+    tagBg: 'bg-slate-100/90 dark:bg-slate-800/60',
+    tagText: 'text-slate-800 dark:text-slate-200',
+    tagBorder: 'border-slate-300/80 dark:border-slate-700/60',
+    badgeDot: 'bg-slate-600 dark:bg-slate-400',
+  },
+  'noi-tiet-chuyen-hoa': {
+    tagBg: 'bg-indigo-50/90 dark:bg-indigo-950/60',
+    tagText: 'text-indigo-800 dark:text-indigo-300',
+    tagBorder: 'border-indigo-200/80 dark:border-indigo-800/60',
+    badgeDot: 'bg-indigo-600 dark:bg-indigo-400',
+  },
+  'gan-mat-tuy': {
+    tagBg: 'bg-emerald-50/90 dark:bg-emerald-950/60',
+    tagText: 'text-emerald-800 dark:text-emerald-300',
+    tagBorder: 'border-emerald-200/80 dark:border-emerald-800/60',
+    badgeDot: 'bg-emerald-600 dark:bg-emerald-400',
+  },
+  'tung-dinh-duong': {
+    tagBg: 'bg-blue-50/90 dark:bg-blue-950/60',
+    tagText: 'text-blue-800 dark:text-blue-300',
+    tagBorder: 'border-blue-200/80 dark:border-blue-800/60',
+    badgeDot: 'bg-blue-600 dark:bg-blue-400',
+  },
+};
+
+const DEFAULT_TOPIC_ACCENT = {
+  tagBg: 'bg-slate-100/90 dark:bg-purple-950/60',
+  tagText: 'text-slate-700 dark:text-purple-200',
+  tagBorder: 'border-slate-200/80 dark:border-purple-800/50',
+  badgeDot: 'bg-[#1E3A8A] dark:bg-purple-400',
+};
+
 interface TopicCardProps {
   topic: Topic;
   pageCount: number;
@@ -52,6 +121,7 @@ export default function TopicCard({
   const coverUrl = (topic.slug === 'tung-dinh-duong' ? DEFAULT_TOPIC_COVERS[topic.slug] : (topic.cover_url || DEFAULT_TOPIC_COVERS[topic.slug])) || null;
   const hasCoverImage = Boolean(coverUrl) && !imgError;
   const mindMapSubtitle = TOPIC_MIND_MAP_SUBTITLES[topic.slug] || 'ANATOMY';
+  const accent = TOPIC_ACCENTS[topic.slug] || DEFAULT_TOPIC_ACCENT;
 
   // Định dạng tiêu đề hiển thị đồng bộ, ngắt dòng tự nhiên không bị cắt dấu
   const formatTopicTitle = (title: string) => {
@@ -118,12 +188,14 @@ export default function TopicCard({
           )}
         </div>
 
-        {/* 2. CỘT THÔNG TIN BÊN TRÁI: NHÃN PHỤ TINH GỌN + TIÊU ĐỀ XANH THAN QUYỀN LỰC */}
+        {/* 2. CỘT THÔNG TIN BÊN TRÁI: NHÃN PHÂN LOẠI Y KHOA ĐẶC TRƯNG + TIÊU ĐỀ XANH THAN QUYỀN LỰC */}
         <div className={`relative z-10 flex flex-col gap-1 ${boldTitle ? 'max-w-[66%]' : 'max-w-[62%] sm:max-w-[58%]'}`}>
-          {/* Nhãn tiếng Anh phụ trên cùng: Slate-400 thanh lịch ở Light, Tím nhạt ở Dark */}
-          <div className="flex items-center gap-1.5 text-[8.5px] sm:text-[9.5px] font-bold uppercase tracking-wider text-slate-400 dark:text-purple-300/80 leading-tight">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#1E3A8A] dark:bg-purple-400 shrink-0" />
-            <span className="truncate">{mindMapSubtitle}</span>
+          {/* Nhãn phân loại chuyên khoa y tế nhỏ gọn, tinh tế, riêng biệt cho từng khối */}
+          <div className="flex items-center">
+            <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md border text-[7.5px] sm:text-[8px] font-black uppercase tracking-wider leading-tight shadow-3xs ${accent.tagBg} ${accent.tagText} ${accent.tagBorder}`}>
+              <span className={`w-1 h-1 rounded-full ${accent.badgeDot} shrink-0`} />
+              <span className="truncate">{mindMapSubtitle}</span>
+            </span>
           </div>
 
           {/* Tiêu đề tiếng Việt in hoa đồng bộ: Xanh Than #071735 ở Light Mode & Trắng sáng ở Dark Mode */}
@@ -133,9 +205,9 @@ export default function TopicCard({
         </div>
 
         {/* 3. HUY HIỆU DẠNG VIÊN THUỐC (PILL BADGE) TINH TẾ & THÔNG MINH */}
-        <div className="relative z-10 mt-auto pt-2.5 flex items-center">
+        <div className="relative z-10 mt-auto pt-2 flex items-center">
           <span className="topic-card-badge inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100/90 dark:bg-purple-950/70 border border-slate-200/80 dark:border-purple-800/50 text-slate-700 dark:text-purple-200 text-[9.5px] sm:text-[10px] font-bold tracking-tight shadow-2xs transition-all duration-100 group-active:!bg-[#1E3A8A] group-active:!text-white group-active:!border-[#1E3A8A] group-[.is-active]:!bg-[#1E3A8A] group-[.is-active]:!text-white group-[.is-active]:!border-[#1E3A8A] dark:group-active:!bg-[#FDE047] dark:group-active:!text-black dark:group-[.is-active]:!bg-[#FDE047] dark:group-[.is-active]:!text-black">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#1E3A8A] dark:bg-purple-400 shrink-0" />
+            <span className={`w-1.5 h-1.5 rounded-full ${accent.badgeDot} shrink-0`} />
             <span>{isAvailable ? `${pageCount} bài cốt lõi` : 'Sắp ra mắt'}</span>
           </span>
         </div>

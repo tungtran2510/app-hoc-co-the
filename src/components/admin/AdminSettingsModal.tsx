@@ -542,7 +542,7 @@ export default function AdminSettingsModal({
           {/* TAB 2: TRẢI NGHIỆM HỌC TẬP & GIAO DIỆN */}
           {activeTab === 'trai_nghiem' && (
             <div className="flex flex-col gap-3">
-              {/* Bảng màu giao diện - Tinh gọn 1 dòng */}
+              {/* Bảng màu giao diện - Tinh gọn 1 dòng 3 lựa chọn */}
               <div className="flex flex-col gap-2 p-3 rounded-[14px] bg-surface-2 border border-line">
                 <div className="flex items-center justify-between">
                   <span className="text-[13px] font-bold text-ink flex items-center gap-1.5">
@@ -550,11 +550,11 @@ export default function AdminSettingsModal({
                     <span>Bảng màu giao diện</span>
                   </span>
                   <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-primary-soft text-primary border border-primary/20">
-                    {settings.theme_palette === 'navy_luxury' ? 'Xanh Navy' : 'Chàm Y Khoa'}
+                    {settings.theme_palette === 'navy_luxury' ? 'Xanh Navy' : settings.theme_palette === 'minimal' ? 'Tối Giản' : 'Chàm Y Khoa'}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 pt-0.5">
+                <div className="grid grid-cols-3 gap-1.5 pt-0.5">
                   {/* Tông 1: Chàm Y Khoa (Mặc định) */}
                   <button
                     type="button"
@@ -563,11 +563,11 @@ export default function AdminSettingsModal({
                       setSettings(next);
                       try {
                         localStorage.setItem('qbiz_theme_palette', 'indigo');
-                        document.documentElement.classList.remove('theme-navy-luxury');
+                        document.documentElement.classList.remove('theme-navy-luxury', 'theme-minimal');
                         window.dispatchEvent(new CustomEvent('qbiz_theme_palette_changed', { detail: { palette: 'indigo' } }));
                       } catch {}
                     }}
-                    className={`h-11 px-2.5 rounded-[11px] border-2 flex items-center gap-2 transition-all cursor-pointer text-left ${
+                    className={`h-11 px-2 rounded-[11px] border-2 flex items-center gap-1.5 transition-all cursor-pointer text-left ${
                       (!settings.theme_palette || settings.theme_palette === 'indigo')
                         ? 'bg-white border-[#1E3A8A] shadow-2xs ring-1 ring-[#1E3A8A]/20'
                         : 'bg-white/70 border-line hover:border-slate-300'
@@ -579,7 +579,7 @@ export default function AdminSettingsModal({
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <span className="text-[12px] font-extrabold text-ink truncate block">Chàm Y Khoa</span>
+                      <span className="text-[11.5px] font-extrabold text-ink truncate block">Chàm</span>
                     </div>
                   </button>
 
@@ -592,10 +592,11 @@ export default function AdminSettingsModal({
                       try {
                         localStorage.setItem('qbiz_theme_palette', 'navy_luxury');
                         document.documentElement.classList.add('theme-navy-luxury');
+                        document.documentElement.classList.remove('theme-minimal');
                         window.dispatchEvent(new CustomEvent('qbiz_theme_palette_changed', { detail: { palette: 'navy_luxury' } }));
                       } catch {}
                     }}
-                    className={`h-11 px-2.5 rounded-[11px] border-2 flex items-center gap-2 transition-all cursor-pointer text-left ${
+                    className={`h-11 px-2 rounded-[11px] border-2 flex items-center gap-1.5 transition-all cursor-pointer text-left ${
                       settings.theme_palette === 'navy_luxury'
                         ? 'bg-white border-[#0E2A5C] shadow-2xs ring-2 ring-[#0284C7]/30'
                         : 'bg-white/70 border-line hover:border-slate-300'
@@ -607,7 +608,36 @@ export default function AdminSettingsModal({
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <span className="text-[12px] font-extrabold text-[#0E2A5C] truncate block">Xanh Navy</span>
+                      <span className="text-[11.5px] font-extrabold text-[#0E2A5C] truncate block">Navy</span>
+                    </div>
+                  </button>
+
+                  {/* Tông 3: Tối Giản / Cơ Bản */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = { ...settings, theme_palette: 'minimal' as const };
+                      setSettings(next);
+                      try {
+                        localStorage.setItem('qbiz_theme_palette', 'minimal');
+                        document.documentElement.classList.add('theme-minimal');
+                        document.documentElement.classList.remove('theme-navy-luxury');
+                        window.dispatchEvent(new CustomEvent('qbiz_theme_palette_changed', { detail: { palette: 'minimal' } }));
+                      } catch {}
+                    }}
+                    className={`h-11 px-2 rounded-[11px] border-2 flex items-center gap-1.5 transition-all cursor-pointer text-left ${
+                      settings.theme_palette === 'minimal'
+                        ? 'bg-white border-[#1E293B] shadow-2xs ring-2 ring-[#64748B]/30'
+                        : 'bg-white/70 border-line hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#1E293B] via-[#475569] to-[#94A3B8] flex items-center justify-center shrink-0 shadow-2xs border border-white">
+                      {settings.theme_palette === 'minimal' && (
+                        <Check size={12} className="text-white stroke-[3]" />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <span className="text-[11.5px] font-extrabold text-[#1E293B] truncate block">Tối giản</span>
                     </div>
                   </button>
                 </div>

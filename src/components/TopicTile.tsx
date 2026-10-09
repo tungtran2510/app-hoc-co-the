@@ -9,27 +9,25 @@ import TopicIcon from './TopicIcon';
 import { Topic } from '../lib/types';
 import { playTapSound } from '../lib/audioFeedback';
 
-export type TopicsDisplayMode = 'card' | 'text' | 'logo' | 'large' | 'catalog';
+export type TopicsDisplayMode = 'card' | 'logo' | 'large' | 'catalog';
 
 export const TOPICS_DISPLAY_OPTIONS: { value: TopicsDisplayMode; label: string }[] = [
   { value: 'card', label: 'Lưới bìa' },
-  { value: 'text', label: 'Chỉ chữ' },
+  { value: 'catalog', label: 'Danh mục 3 cột' },
   { value: 'logo', label: 'Danh sách ảnh' },
   { value: 'large', label: 'Khung to' },
-  { value: 'catalog', label: 'Danh mục 3 cột' },
 ];
 
 /** Lớp CSS của khung chứa danh sách chuyên đề theo từng kiểu hiển thị */
 export function topicsContainerClass(mode: TopicsDisplayMode): string {
   switch (mode) {
-    case 'text':
-      return 'flex flex-col gap-2 mt-1.5';
     case 'logo':
       return 'flex flex-col gap-2 sm:gap-2.5 mt-1.5';
     case 'large':
       return 'grid grid-cols-1 gap-3.5 mt-1.5';
     case 'catalog':
       return 'grid grid-cols-3 gap-2 mt-1.5';
+    case 'card':
     default:
       return 'grid grid-cols-2 gap-2 sm:gap-2.5 mt-1.5';
   }
@@ -67,26 +65,6 @@ export default function TopicTile({ mode, topic, pageCount, isActive, onActivate
     }
   };
 
-  if (mode === 'text') {
-    return (
-      <Link
-        href={`/${topic.slug}`}
-        prefetch={true}
-        onClick={handleNav}
-        className={`flex items-center justify-between gap-3 px-4 py-3.5 rounded-[14px] bg-white dark:bg-[#160D30] border shadow-2xs active:scale-[0.99] transition-all [&.is-active]:border-[#FDE047] [&.is-active]:ring-2 [&.is-active]:ring-[#FDE047] [&.is-active]:shadow-[0_0_20px_rgba(250,204,21,0.6)] ${
-          isActive
-            ? 'border-[#FDE047] ring-2 ring-[#FDE047] shadow-[0_0_20px_rgba(250,204,21,0.6)]'
-            : 'border-slate-200/80 dark:border-purple-800/40'
-        }`}
-      >
-        <div className="min-w-0">
-          <p className="text-[15px] font-extrabold text-slate-900 dark:text-white leading-snug line-clamp-2">{topic.title}</p>
-          <p className="text-[12px] text-slate-500 dark:text-purple-300/80 font-medium mt-0.5">{countText}</p>
-        </div>
-        <ChevronRight size={18} className="text-slate-400 dark:text-purple-300 shrink-0" />
-      </Link>
-    );
-  }
 
   if (mode === 'logo') {
     return (

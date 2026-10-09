@@ -304,7 +304,7 @@ export async function getSettings(includeAiTraining = false): Promise<Settings> 
             welcome_message: data.welcome_message || sanitizedBlockStyles.welcome_message || 'Hi vọng nền tảng học hiểu cơ thể và chăm sóc sức khỏe chủ động này sẽ giúp bạn hiểu sâu hơn về cơ thể mình, nuôi dưỡng hệ cơ xương khớp và sống khỏe mỗi ngày.',
             welcome_video_url: data.welcome_video_url || sanitizedBlockStyles.welcome_video_url || 'https://www.youtube.com/watch?v=c9kmCxFKHPY',
             home_custom_blocks: (sanitizedBlockStyles.home_custom_blocks && typeof sanitizedBlockStyles.home_custom_blocks === 'object') ? sanitizedBlockStyles.home_custom_blocks : {},
-            topics_display: ['card', 'text', 'logo', 'large'].includes(sanitizedBlockStyles.topics_display) ? sanitizedBlockStyles.topics_display : 'card',
+            topics_display: ['card', 'logo', 'large', 'catalog'].includes(sanitizedBlockStyles.topics_display) ? sanitizedBlockStyles.topics_display : 'card',
             topics_description: sanitizedBlockStyles.topics_description || 'Hệ thống chuyên đề & bài học giải phẫu cơ thể',
             topics_guide: (sanitizedBlockStyles.topics_guide && typeof sanitizedBlockStyles.topics_guide === 'object') ? sanitizedBlockStyles.topics_guide : null,
           } as Settings;

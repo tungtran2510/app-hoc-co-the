@@ -55,13 +55,13 @@ export default function PageHeaderBar({
   const [showToc, setShowToc] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   const [soundActive, setSoundActive] = useState(true);
-  const [themePalette, setThemePalette] = useState<'indigo' | 'navy_luxury'>('indigo');
+  const [themePalette, setThemePalette] = useState<'indigo' | 'navy_luxury' | 'minimal'>('indigo');
   const [readerFont, setReaderFont] = useState<'sans' | 'serif' | 'rounded'>('sans');
 
   React.useEffect(() => {
     try {
       const p = localStorage.getItem('qbiz_theme_palette');
-      if (p === 'navy_luxury' || p === 'indigo') {
+      if (p === 'navy_luxury' || p === 'indigo' || p === 'minimal') {
         setThemePalette(p);
       }
       const font = localStorage.getItem('qbiz_reader_font');
@@ -88,14 +88,18 @@ export default function PageHeaderBar({
     } catch {}
   };
 
-  const handlePaletteChange = (palette: 'indigo' | 'navy_luxury') => {
+  const handlePaletteChange = (palette: 'indigo' | 'navy_luxury' | 'minimal') => {
     setThemePalette(palette);
     try {
       localStorage.setItem('qbiz_theme_palette', palette);
       if (palette === 'navy_luxury') {
         document.documentElement.classList.add('theme-navy-luxury');
-      } else {
+        document.documentElement.classList.remove('theme-minimal');
+      } else if (palette === 'minimal') {
+        document.documentElement.classList.add('theme-minimal');
         document.documentElement.classList.remove('theme-navy-luxury');
+      } else {
+        document.documentElement.classList.remove('theme-navy-luxury', 'theme-minimal');
       }
       window.dispatchEvent(new CustomEvent('qbiz_theme_palette_changed', { detail: { palette } }));
     } catch {}

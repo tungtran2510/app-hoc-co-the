@@ -9,7 +9,7 @@ export interface AppCustomSettings {
   auto_next_video: boolean;
   default_font_size: 'small' | 'normal' | 'large';
   show_progress_bar: boolean;
-  theme_palette?: 'indigo' | 'navy_luxury';
+  theme_palette?: 'indigo' | 'navy_luxury' | 'minimal';
   show_ebook_bridge?: boolean;
   ebook_app_url?: string;
   auto_offline_cache?: boolean;
@@ -119,7 +119,7 @@ export async function saveStoredPageStatus(pageId: string, status: 'draft' | 'pu
 export function getStoredAppSettings(): AppCustomSettings {
   if (typeof window !== 'undefined') {
     try {
-      const savedPalette = localStorage.getItem('qbiz_theme_palette') as 'indigo' | 'navy_luxury' | null;
+      const savedPalette = localStorage.getItem('qbiz_theme_palette') as 'indigo' | 'navy_luxury' | 'minimal' | null;
       const savedShowEbook = localStorage.getItem('qbiz_show_ebook_bridge');
       const savedEbookUrl = localStorage.getItem('qbiz_ebook_app_url');
       const savedAutoOffline = localStorage.getItem('qbiz_auto_offline_cache');
@@ -138,7 +138,7 @@ export function getStoredAppSettings(): AppCustomSettings {
         : savedEbookUrl;
       return {
         ...DEFAULT_APP_SETTINGS,
-        theme_palette: savedPalette === 'navy_luxury' || savedPalette === 'indigo' ? savedPalette : DEFAULT_APP_SETTINGS.theme_palette,
+        theme_palette: savedPalette === 'navy_luxury' || savedPalette === 'indigo' || savedPalette === 'minimal' ? savedPalette : DEFAULT_APP_SETTINGS.theme_palette,
         show_ebook_bridge: savedShowEbook !== null ? savedShowEbook === 'true' : DEFAULT_APP_SETTINGS.show_ebook_bridge,
         ebook_app_url: resolvedEbookUrl,
         auto_offline_cache: savedAutoOffline !== null ? savedAutoOffline === 'true' : DEFAULT_APP_SETTINGS.auto_offline_cache,
@@ -159,8 +159,12 @@ export async function saveStoredAppSettings(settings: Partial<AppCustomSettings>
         localStorage.setItem('qbiz_theme_palette', settings.theme_palette);
         if (settings.theme_palette === 'navy_luxury') {
           document.documentElement.classList.add('theme-navy-luxury');
-        } else {
+          document.documentElement.classList.remove('theme-minimal');
+        } else if (settings.theme_palette === 'minimal') {
+          document.documentElement.classList.add('theme-minimal');
           document.documentElement.classList.remove('theme-navy-luxury');
+        } else {
+          document.documentElement.classList.remove('theme-navy-luxury', 'theme-minimal');
         }
         window.dispatchEvent(new CustomEvent('qbiz_theme_palette_changed', { detail: { palette: settings.theme_palette } }));
       }

@@ -38,7 +38,7 @@ interface HomeSectionsClientProps {
     pageCount: number;
   }[];
   topicsTitle?: string | null;
-  topicsDisplay?: 'card' | 'text' | 'logo' | 'large' | 'catalog' | null;
+  topicsDisplay?: 'card' | 'logo' | 'large' | 'catalog' | null;
   featuredTopicIds?: string[] | null;
   topicsDescription?: string | null;
   authorProfile?: AuthorProfile | null;
@@ -477,28 +477,28 @@ export default function HomeSectionsClient({
                 />
               )}
 
-              {/* DÒNG BRAND CARD NỔI BẬT ("MEDICA LEARN" STYLE) */}
+              {/* DÒNG BRAND CARD NỔI BẬT: TRẮNG SỨ NỔI KHỐI 3D (3D FLOATING PORCELAIN HERO) */}
               {isAdmin && isBrandCollapsed ? null : (
                 <div
                   onClick={() => setShowWelcomeModal(true)}
-                  className={`w-full rounded-[14px] bg-white text-slate-900 border border-slate-200/80 shadow-xs animate-bio-breathing hover:shadow-lg hover:shadow-blue-950/10 hover:border-[#1E3A8A]/60 dark:hover:border-purple-400/70 dark:hover:shadow-[0_10px_28px_rgba(139,92,246,0.15)] hover:-translate-y-1 active:scale-[0.99] transition-all duration-300 dark:bg-gradient-to-br dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0B132B] dark:border-white/15 dark:text-white p-3 sm:p-3.5 flex items-center justify-between gap-3 cursor-pointer group ${
+                  className={`w-full relative overflow-hidden rounded-[20px] bg-white/95 text-slate-900 border border-blue-200/90 shadow-[0_10px_28px_-6px_rgba(30,58,138,0.16),0_2px_8px_-2px_rgba(15,23,42,0.06)] ring-1 ring-blue-500/10 hover:shadow-[0_14px_34px_-6px_rgba(30,58,138,0.22)] hover:border-blue-400/90 hover:-translate-y-0.5 active:scale-[0.99] transition-all duration-300 dark:bg-gradient-to-br dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0B132B] dark:border-white/15 dark:text-white p-3 sm:p-3.5 flex items-center justify-between gap-3 cursor-pointer group before:absolute before:top-0 before:left-8 before:right-8 before:h-[2px] before:bg-gradient-to-r before:from-transparent before:via-blue-400/50 before:to-transparent ${
                     isHidden ? 'opacity-80 ring-2 ring-dashed ring-blue-500/40' : ''
                   }`}
                   title="Bấm để xem lời ngỏ chào mừng & video giới thiệu"
                 >
-                  {/* Logo app 3D bên trái */}
-                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[14px] overflow-hidden border border-slate-200/90 dark:border-white/10 shadow-md shrink-0 bg-[#0C152B] p-0.5">
+                  {/* Logo app 3D bên trái trong khung sứ bo viền Sapphire */}
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[15px] overflow-hidden border border-blue-200/90 shadow-xs shrink-0 bg-gradient-to-br from-blue-50 via-white to-blue-100/60 p-0.5 group-hover:scale-105 transition-transform dark:bg-[#0C152B] dark:border-white/10">
                     <img
                       src={logoUrl || '/app_logo.png'}
                       alt="Logo Qbiz Books"
-                      className="w-full h-full object-cover rounded-[11px]"
+                      className="w-full h-full object-cover rounded-[12px]"
                     />
                   </div>
 
-                  {/* Khối chữ thương hiệu ở giữa */}
+                  {/* Khối chữ thương hiệu ở giữa - Tinh tế, sang trọng, đẳng cấp */}
                   <div className="flex flex-col flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-slate-900 dark:text-white uppercase">
+                      <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-slate-950 dark:text-white uppercase">
                         {appName ? appName.split(' ')[0] : 'QBIZ'}
                       </span>
                       <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-[#1E3A8A] dark:text-[#A78BFA] uppercase">
@@ -507,7 +507,7 @@ export default function HomeSectionsClient({
                       {isAdmin && <Edit2 size={12} className="text-slate-400 dark:text-slate-400 opacity-60" />}
                     </div>
                     {brandTagline && brandTagline.trim() ? (
-                      <span className="text-[9.5px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-400 mt-0.5 truncate">
+                      <span className="text-[9.5px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 mt-0.5 truncate">
                         {brandTagline.trim()}
                       </span>
                     ) : null}
@@ -518,8 +518,8 @@ export default function HomeSectionsClient({
                     ) : null}
                   </div>
 
-                  {/* Huy hiệu Y Khoa bên phải - Icon quả tim đập nhịp y khoa tông Navy */}
-                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[15px] bg-gradient-to-br from-blue-50/80 via-slate-50 to-blue-100/50 border border-blue-200/80 dark:bg-none dark:bg-[#0B132B] dark:border-purple-800/60 p-[2px] shadow-sm shrink-0 flex items-center justify-center relative overflow-hidden">
+                  {/* Huy hiệu Y Khoa bên phải - Quả tim đập nhịp y khoa trên nền ngọc bích */}
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[15px] bg-gradient-to-br from-blue-50/90 via-white to-blue-100/70 border border-blue-300/80 shadow-xs shrink-0 flex items-center justify-center relative overflow-hidden group-hover:border-blue-400 group-hover:shadow-sm transition-all dark:bg-none dark:bg-[#0B132B] dark:border-purple-800/60">
                     <div className="flex flex-col items-center justify-center text-[#1E3A8A] dark:text-purple-300">
                       <svg className="w-5 h-5 text-[#1E3A8A] dark:text-purple-300 drop-shadow-xs dark:drop-shadow-[0_1px_3px_rgba(139,92,246,0.8)] animate-medica-heartbeat" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" fill="currentColor" fillOpacity="0.25" />

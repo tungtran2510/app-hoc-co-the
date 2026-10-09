@@ -104,9 +104,10 @@ export interface Settings {
   topics_title?: string | null;
   topics_description?: string | null;
   topics_guide?: TopicsGuide | null;
-  topics_display?: 'card' | 'text' | 'logo' | 'large' | null;
-  home_topics_display?: 'card' | 'text' | 'logo' | 'large' | 'catalog' | null;
-  topics_page_display?: 'card' | 'text' | 'logo' | 'large' | 'catalog' | null;
+  topics_display?: 'card' | 'logo' | 'large' | 'catalog' | null;
+  home_topics_display?: 'card' | 'logo' | 'large' | 'catalog' | null;
+  topics_page_display?: 'card' | 'logo' | 'large' | 'catalog' | null;
+  theme_palette?: 'indigo' | 'navy_luxury' | 'minimal' | null;
   featured_topic_ids?: string[] | null;
   recommended_books_title?: string | null;
   recommended_books_subtitle?: string | null;
