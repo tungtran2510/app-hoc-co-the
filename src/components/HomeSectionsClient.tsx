@@ -481,13 +481,13 @@ export default function HomeSectionsClient({
               {isAdmin && isBrandCollapsed ? null : (
                 <div
                   onClick={() => setShowWelcomeModal(true)}
-                  className={`w-full relative overflow-hidden rounded-[20px] bg-white/95 text-slate-900 border border-blue-200/90 shadow-[0_10px_28px_-6px_rgba(30,58,138,0.16),0_2px_8px_-2px_rgba(15,23,42,0.06)] ring-1 ring-blue-500/10 hover:shadow-[0_14px_34px_-6px_rgba(30,58,138,0.22)] hover:border-blue-400/90 hover:-translate-y-0.5 active:scale-[0.99] transition-all duration-300 dark:bg-gradient-to-br dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0B132B] dark:border-white/15 dark:text-white p-3 sm:p-3.5 flex items-center justify-between gap-3 cursor-pointer group before:absolute before:top-0 before:left-8 before:right-8 before:h-[2px] before:bg-gradient-to-r before:from-transparent before:via-blue-400/50 before:to-transparent ${
-                    isHidden ? 'opacity-80 ring-2 ring-dashed ring-blue-500/40' : ''
+                  className={`w-full relative overflow-hidden rounded-[20px] bg-white/95 text-slate-900 border border-amber-200/90 shadow-[0_10px_28px_-6px_rgba(245,158,11,0.14),0_2px_8px_-2px_rgba(15,23,42,0.06)] ring-1 ring-amber-500/10 hover:shadow-[0_14px_34px_-6px_rgba(245,158,11,0.22)] hover:border-amber-400/90 hover:-translate-y-0.5 active:scale-[0.99] transition-all duration-300 dark:bg-gradient-to-br dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0B132B] dark:border-white/15 dark:text-white p-3 sm:p-3.5 flex items-center justify-between gap-3 cursor-pointer group before:absolute before:top-0 before:left-8 before:right-8 before:h-[2px] before:bg-gradient-to-r before:from-transparent before:via-amber-400/50 before:to-transparent ${
+                    isHidden ? 'opacity-80 ring-2 ring-dashed ring-amber-500/40' : ''
                   }`}
                   title="Bấm để xem lời ngỏ chào mừng & video giới thiệu"
                 >
-                  {/* Logo app 3D bên trái trong khung sứ bo viền Sapphire */}
-                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[15px] overflow-hidden border border-blue-200/90 shadow-xs shrink-0 bg-gradient-to-br from-blue-50 via-white to-blue-100/60 p-0.5 group-hover:scale-105 transition-transform dark:bg-[#0C152B] dark:border-white/10">
+                  {/* Logo app 3D bên trái trong khung sứ bo viền Hổ phách */}
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[15px] overflow-hidden border border-amber-200/90 shadow-xs shrink-0 bg-gradient-to-br from-amber-50 via-white to-amber-100/60 p-0.5 group-hover:scale-105 transition-transform dark:bg-[#0C152B] dark:border-white/10">
                     <img
                       src={logoUrl || '/app_logo.png'}
                       alt="Logo Qbiz Books"
@@ -501,14 +501,14 @@ export default function HomeSectionsClient({
                     />
                   </div>
 
-                  {/* Khối chữ thương hiệu ở giữa - Tinh tế, sang trọng, đẳng cấp */}
+                  {/* Khối chữ thương hiệu ở giữa - Tinh tế, sang trọng, đẳng cấp với sắc Vàng Cam Hổ Phách */}
                   <div className="flex flex-col flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
                       <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-slate-950 dark:text-white uppercase">
-                        {appName ? appName.split(' ')[0] : 'QBIZ'}
+                        {appName ? appName.split(' ')[0] : 'SỐNG'}
                       </span>
-                      <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-[#1E3A8A] dark:text-[#A78BFA] uppercase">
-                        {appName && appName.includes(' ') ? appName.split(' ').slice(1).join(' ') : 'BOOKS'}
+                      <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-[#D97706] dark:text-[#FBBF24] uppercase">
+                        {appName && appName.includes(' ') ? appName.split(' ').slice(1).join(' ') : 'KHỎE MỖI NGÀY'}
                       </span>
                       {isAdmin && <Edit2 size={12} className="text-slate-400 dark:text-slate-400 opacity-60" />}
                     </div>
@@ -524,14 +524,14 @@ export default function HomeSectionsClient({
                     ) : null}
                   </div>
 
-                  {/* Huy hiệu Y Khoa bên phải - Quả tim đập nhịp y khoa trên nền ngọc bích */}
-                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[15px] bg-gradient-to-br from-blue-50/90 via-white to-blue-100/70 border border-blue-300/80 shadow-xs shrink-0 flex items-center justify-center relative overflow-hidden group-hover:border-blue-400 group-hover:shadow-sm transition-all dark:bg-none dark:bg-[#0B132B] dark:border-purple-800/60">
-                    <div className="flex flex-col items-center justify-center text-[#1E3A8A] dark:text-purple-300">
-                      <svg className="w-5 h-5 text-[#1E3A8A] dark:text-purple-300 drop-shadow-xs dark:drop-shadow-[0_1px_3px_rgba(139,92,246,0.8)] animate-medica-heartbeat" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  {/* Huy hiệu Y Khoa bên phải - Quả tim đập nhịp y khoa trên nền cam vàng MEDICA */}
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[15px] bg-gradient-to-br from-amber-50/90 via-white to-amber-100/70 border border-amber-300/80 shadow-xs shrink-0 flex items-center justify-center relative overflow-hidden group-hover:border-amber-400 group-hover:shadow-sm transition-all dark:bg-[#1E1435] dark:border-amber-500/30">
+                    <div className="flex flex-col items-center justify-center text-amber-600 dark:text-amber-400">
+                      <svg className="w-5 h-5 text-amber-600 dark:text-amber-400 drop-shadow-xs animate-medica-heartbeat" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" fill="currentColor" fillOpacity="0.25" />
                         <path d="M3.5 12h3l2-3 3 6 2-3h7" stroke="currentColor" strokeWidth="1.8" />
                       </svg>
-                      <span className="text-[7px] font-black tracking-widest text-[#1E3A8A] dark:text-purple-200 uppercase mt-0.5">MEDICA</span>
+                      <span className="text-[7px] font-black tracking-widest text-amber-600 dark:text-amber-300 uppercase mt-0.5">MEDICA</span>
                     </div>
                   </div>
                 </div>
@@ -646,10 +646,13 @@ export default function HomeSectionsClient({
               )}
               {isAdmin && isRecentCollapsed ? null : (
                 <>
-                  <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
                     <h3 className="text-[17.5px] sm:text-[18.5px] font-black text-ink tracking-tight whitespace-nowrap">
-                      Đang học dở
+                      Hoạt động gần đây
                     </h3>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-amber-100 text-amber-800 border border-amber-300/80 shadow-2xs">
+                      ĐANG HỌC DỞ
+                    </span>
                   </div>
                   <HomeContinueSection />
                 </>

@@ -181,7 +181,8 @@ export default function AllTopicsFaqHub() {
 }
 
 // ==========================================
-// COMPONENT CARD TỪNG MỤC CÂU HỎI
+// COMPONENT CARD TỪNG MỤC CÂU HỎI (MỤC CON BẬC 1)
+// MẶC ĐỊNH THU GỌN CÁC MỤC CON BÊN TRONG (CÂU HỎI)
 // ==========================================
 interface CategoryCardProps {
   category: MasterFaqCategory;
@@ -198,56 +199,99 @@ function CategoryCard({
   expandedFaqId,
   onToggleFaq,
 }: CategoryCardProps) {
+  const [isCategoryExpanded, setIsCategoryExpanded] = useState<boolean>(false);
   const indexFormatted = String(categoryIndex).padStart(2, '0');
 
+  const handleToggleCategory = () => {
+    playTapSound();
+    setIsCategoryExpanded((prev) => !prev);
+  };
+
   return (
-    <div className="rounded-[18px] border border-slate-200/90 bg-white p-3 sm:p-4 shadow-[0_4px_16px_-12px_rgba(15,23,42,0.1)] dark:border-white/10 dark:bg-[#1B1630]">
-      {/* HEADER CỦA MỤC */}
-      <div className="mb-3 flex items-start gap-2.5">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-[13px] font-black text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-          {indexFormatted}
-        </span>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between gap-2">
-            <h4 className="text-[13.5px] sm:text-[14.5px] font-black leading-snug text-slate-900 dark:text-slate-100">
+    <div
+      className={`rounded-[18px] border transition-all ${
+        isCategoryExpanded
+          ? 'border-blue-300/80 bg-white shadow-[0_6px_20px_-10px_rgba(30,58,138,0.15)] dark:border-blue-500/30 dark:bg-[#1B1630]'
+          : 'border-slate-200/90 bg-white shadow-[0_4px_16px_-12px_rgba(15,23,42,0.08)] hover:border-blue-200/80 dark:border-white/10 dark:bg-[#1B1630]'
+      } p-3 sm:p-4`}
+    >
+      {/* HEADER CỦA MỤC CON BẬC 1: BẤM ĐỂ MỞ / THU GỌN CÁC CÂU HỎI BÊN TRONG */}
+      <button
+        type="button"
+        onClick={handleToggleCategory}
+        className="w-full flex items-start justify-between gap-2.5 text-left cursor-pointer group active:scale-[0.99] transition-transform"
+        aria-expanded={isCategoryExpanded}
+      >
+        <div className="flex items-start gap-2.5 min-w-0 flex-1">
+          <span
+            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-[13px] font-black transition-colors ${
+              isCategoryExpanded
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 group-hover:bg-blue-100'
+            }`}
+          >
+            {indexFormatted}
+          </span>
+          <div className="min-w-0 flex-1">
+            <h4 className="text-[13.5px] sm:text-[14.5px] font-black leading-snug text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-colors">
               {category.title}
             </h4>
-            <span className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[9.5px] font-bold text-slate-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
-              {category.items.length} câu
-            </span>
+            {category.subtitle && (
+              <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                {category.badge && (
+                  <span className="rounded-[6px] bg-blue-50 px-1.5 py-0.5 text-[9px] font-extrabold text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                    {category.badge}
+                  </span>
+                )}
+                <p className="text-[11px] leading-tight text-slate-500 dark:text-slate-400">
+                  {category.subtitle}
+                </p>
+              </div>
+            )}
           </div>
-          {category.subtitle && (
-            <div className="mt-1 flex flex-wrap items-center gap-1.5">
-              {category.badge && (
-                <span className="rounded-[6px] bg-blue-50 px-1.5 py-0.5 text-[9.5px] font-extrabold text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                  {category.badge}
-                </span>
-              )}
-              <p className="text-[11px] leading-tight text-slate-500 dark:text-slate-400">
-                {category.subtitle}
-              </p>
-            </div>
-          )}
         </div>
-      </div>
 
-      {/* DANH SÁCH ACCORDION CÂU HỎI */}
-      <div className="flex flex-col gap-2">
-        {category.items.map((item, itemIdx) => {
-          const isExpanded = expandedFaqId === item.id;
-          const qNumber = `Q${itemIdx + 1}`;
+        {/* Góc phải: Số câu + Nút mũi tên xoay */}
+        <div className="flex items-center gap-1.5 shrink-0 pt-0.5">
+          <span
+            className={`rounded-full border px-2 py-0.5 text-[9.5px] font-bold transition-colors ${
+              isCategoryExpanded
+                ? 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-500/30 dark:bg-blue-900/30 dark:text-blue-300'
+                : 'border-slate-200 bg-slate-50 text-slate-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-300'
+            }`}
+          >
+            {category.items.length} câu
+          </span>
+          <span
+            className={`flex h-6 w-6 items-center justify-center rounded-full transition-all duration-200 ${
+              isCategoryExpanded
+                ? 'rotate-180 bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-200'
+                : 'bg-slate-100 text-slate-400 group-hover:bg-slate-200 dark:bg-white/10 dark:text-slate-400'
+            }`}
+          >
+            <ChevronDown size={14} strokeWidth={2.5} />
+          </span>
+        </div>
+      </button>
 
-          return (
-            <div
-              key={item.id}
-              className="overflow-hidden rounded-[13px] border border-slate-100 bg-[#FBFDFF] transition-all dark:border-white/10 dark:bg-[#150F26]"
-            >
-              <button
-                type="button"
-                onClick={() => onToggleFaq(item.id)}
-                aria-expanded={isExpanded}
-                className="flex w-full min-h-[46px] items-center justify-between gap-2.5 px-3 py-2.5 text-left cursor-pointer hover:bg-slate-50/80 active:bg-slate-100/80 dark:hover:bg-white/5"
+      {/* DANH SÁCH CÂU HỎI CON BÊN TRONG: CHỈ HIỂN THỊ KHI ĐƯỢC MỞ RỘNG (MẶC ĐỊNH THU GỌN) */}
+      {isCategoryExpanded && (
+        <div className="mt-3 pt-3 border-t border-slate-100 dark:border-white/10 flex flex-col gap-2 animate-fade-in">
+          {category.items.map((item, itemIdx) => {
+            const isExpanded = expandedFaqId === item.id;
+            const qNumber = `Q${itemIdx + 1}`;
+
+            return (
+              <div
+                key={item.id}
+                className="overflow-hidden rounded-[13px] border border-slate-100 bg-[#FBFDFF] transition-all dark:border-white/10 dark:bg-[#150F26]"
               >
+                <button
+                  type="button"
+                  onClick={() => onToggleFaq(item.id)}
+                  aria-expanded={isExpanded}
+                  className="flex w-full min-h-[46px] items-center justify-between gap-2.5 px-3 py-2.5 text-left cursor-pointer hover:bg-slate-50/80 active:bg-slate-100/80 dark:hover:bg-white/5"
+                >
                 <div className="flex min-w-0 flex-1 items-start gap-2">
                   <span className="mt-0.5 flex h-5 w-6 shrink-0 items-center justify-center rounded-[6px] bg-blue-100/70 text-[10px] font-black text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
                     {qNumber}
@@ -325,6 +369,8 @@ function CategoryCard({
           );
         })}
       </div>
-    </div>
-  );
+    )}
+  </div>
+);
 }
+

@@ -119,13 +119,13 @@ export default function FloatingAiButton() {
 
   // Đọc tọa độ từ localStorage hoặc đặt mặc định: "Dưới chân bên trên tìm kiếm"
   useEffect(() => {
-    const btnWidth = hasLessonContext ? 104 : 76;
+    const btnWidth = 116;
     try {
       const saved = localStorage.getItem('qbiz_floating_ai_pos_v2');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (typeof parsed.x === 'number' && typeof parsed.y === 'number') {
-          const clampedX = Math.max(12, Math.min(parsed.x, window.innerWidth - btnWidth - 12));
+          const clampedX = Math.max(12, Math.min(parsed.x, window.innerWidth - btnWidth - 16));
           const clampedY = Math.max(50, Math.min(parsed.y, window.innerHeight - (isLessonPage ? 80 : 110)));
           setPos({ x: clampedX, y: clampedY });
           return;
@@ -134,9 +134,9 @@ export default function FloatingAiButton() {
     } catch {}
 
     // Vị trí mặc định: Dưới chân bên trên tìm kiếm
-    // - Trang có BottomNav (cao 80px): Đặt tại góc phải (right: 14px), ngay trên tab Tìm kiếm (bottom: 88px, y ≈ innerHeight - 118)
-    // - Trang bài học có Sticky Dock (cao 52px): Đặt tại góc phải (right: 14px), ngay trên dock (bottom: 60px, y ≈ innerHeight - 88)
-    const defaultX = Math.max(12, window.innerWidth - btnWidth - 14);
+    // - Trang có BottomNav (cao 80px): Đặt tại góc phải (right: 16px), ngay trên tab Tìm kiếm (bottom: 92px)
+    // - Trang bài học có Sticky Dock (cao 52px): Đặt tại góc phải (right: 16px), ngay trên dock (bottom: 64px)
+    const defaultX = Math.max(12, window.innerWidth - btnWidth - 16);
     const defaultY = Math.max(50, window.innerHeight - (isLessonPage ? 88 : 118));
     setPos({ x: defaultX, y: defaultY });
   }, [hasLessonContext, isLessonPage]);
@@ -144,10 +144,10 @@ export default function FloatingAiButton() {
   // Đảm bảo không bị lọt khỏi màn hình khi xoay điện thoại hoặc thay đổi kích thước
   useEffect(() => {
     const handleResize = () => {
-      const btnWidth = hasLessonContext ? 104 : 76;
+      const btnWidth = 116;
       setPos((prev) => {
         if (!prev) return prev;
-        const clampedX = Math.max(12, Math.min(prev.x, window.innerWidth - btnWidth - 12));
+        const clampedX = Math.max(12, Math.min(prev.x, window.innerWidth - btnWidth - 16));
         const clampedY = Math.max(50, Math.min(prev.y, window.innerHeight - (isLessonPage ? 80 : 110)));
         return { x: clampedX, y: clampedY };
       });
@@ -160,8 +160,8 @@ export default function FloatingAiButton() {
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0 && e.pointerType === 'mouse') return;
 
-    const btnWidth = hasLessonContext ? 104 : 76;
-    const currentX = pos ? pos.x : Math.max(12, window.innerWidth - btnWidth - 14);
+    const btnWidth = hasLessonContext ? 124 : 108;
+    const currentX = pos ? pos.x : Math.max(12, window.innerWidth - btnWidth - 16);
     const currentY = pos ? pos.y : Math.max(50, window.innerHeight - (isLessonPage ? 88 : 118));
 
     dragInfoRef.current = {
@@ -229,7 +229,7 @@ export default function FloatingAiButton() {
 
       // Khi ĐÃ mở khóa (sau 2.5s) => Cho phép kéo nút tự do
       dragInfoRef.current.moved = true;
-      const btnWidth = hasLessonContext ? 104 : 76;
+      const btnWidth = 116;
       const minX = 12;
       const maxX = window.innerWidth - btnWidth - 12;
       const minY = 50;
@@ -328,10 +328,10 @@ export default function FloatingAiButton() {
       }}
       style={{
         transform: 'translateZ(0)',
-        left: pos ? `${pos.x}px` : 'auto',
-        right: pos ? 'auto' : '14px',
-        top: pos ? `${pos.y}px` : 'auto',
-        bottom: pos ? 'auto' : isLessonPage ? '60px' : '88px',
+        left: (isUnlocked || isDragging) && pos ? `${pos.x}px` : 'auto',
+        right: (isUnlocked || isDragging) ? 'auto' : '16px',
+        top: (isUnlocked || isDragging) && pos ? `${pos.y}px` : 'auto',
+        bottom: (isUnlocked || isDragging) ? 'auto' : isLessonPage ? '64px' : '92px',
         WebkitTouchCallout: 'none',
         WebkitUserSelect: 'none',
         userSelect: 'none',
@@ -349,7 +349,7 @@ export default function FloatingAiButton() {
       title={
         activeLesson?.page_title
           ? `Hỏi Trợ lý AI về bài "${activeLesson.page_title}" (Bấm để mở, giữ 2.5s để kéo thả)`
-          : 'Hỏi AI (Bấm để mở, giữ 2.5s để kéo thả di chuyển)'
+          : 'Hỏi Trợ lý AI (Bấm để mở, giữ 2.5s để kéo thả di chuyển)'
       }
     >
       {/* Vòng / Thanh tiến trình khi người dùng đang giữ nút (đếm 2.5s) */}
@@ -374,7 +374,7 @@ export default function FloatingAiButton() {
           WebkitUserSelect: 'none',
           userSelect: 'none',
         }}
-        className={`relative flex items-center gap-1 px-2.5 py-1 rounded-full backdrop-blur-md transition-all shadow-sm select-none ${
+        className={`relative flex items-center justify-center gap-1.5 px-4 py-2 min-w-[112px] rounded-full backdrop-blur-md transition-all shadow-sm select-none ${
           isUnlocked || isDragging
             ? 'bg-black/90 dark:bg-[#160D30]/95 border-2 border-[#FDE047] text-[#FDE047] shadow-[0_0_18px_rgba(250,204,21,0.65)] ring-2 ring-[#FDE047]/50'
             : hasLessonContext
@@ -383,7 +383,7 @@ export default function FloatingAiButton() {
         }`}
       >
         <Sparkles
-          size={12}
+          size={14}
           strokeWidth={2.2}
           className={`${
             isUnlocked || isDragging
@@ -393,11 +393,11 @@ export default function FloatingAiButton() {
               : 'text-[#1E3A8A] dark:text-[#F8DF7B] fill-[#1E3A8A]/20 dark:fill-amber-300/30 animate-pulse'
           }`}
         />
-        <span className="text-[10.5px] font-bold tracking-tight whitespace-nowrap">
-          {isUnlocked ? 'Thả đặt' : hasLessonContext && activeLesson?.page_title ? 'Hỏi bài này' : 'Hỏi AI'}
+        <span className="text-[11.5px] font-bold tracking-tight whitespace-nowrap">
+          {isUnlocked ? 'Thả đặt' : hasLessonContext && activeLesson?.page_title ? 'Hỏi AI bài này' : 'Hỏi Trợ lý AI'}
         </span>
         {hasLessonContext && !isUnlocked && (
-          <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
         )}
       </button>
 

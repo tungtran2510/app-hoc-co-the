@@ -354,11 +354,11 @@ export default function HomeHeader({
             <button
               type="button"
               onClick={toggleTheme}
-              className="w-9 h-9 rounded-full bg-white dark:bg-[#1E1342] hover:bg-slate-100 dark:hover:bg-[#281855] border border-slate-200 dark:border-purple-800/40 flex items-center justify-center text-slate-700 dark:text-purple-200 hover:text-[#1E3A8A] transition-colors shadow-2xs cursor-pointer"
+              className="w-9 h-9 rounded-full bg-white dark:bg-[#1E1342] hover:bg-amber-50 dark:hover:bg-[#281855] border border-amber-200/70 dark:border-purple-800/40 flex items-center justify-center transition-colors shadow-2xs cursor-pointer"
               title={isDark ? "Chuyển sang nền sáng" : "Chuyển sang nền tối"}
               aria-label="Chuyển chế độ Sáng / Tối"
             >
-              {isDark ? <Sun size={18} strokeWidth={2.2} /> : <Moon size={18} strokeWidth={2.2} />}
+              {isDark ? <Sun size={18} strokeWidth={2.2} className="text-amber-400" /> : <Moon size={18} strokeWidth={2.2} className="text-amber-500 fill-amber-500/20" />}
             </button>
 
             {/* Avatar Bác sĩ / Quản trị viền Navy sang trọng */}

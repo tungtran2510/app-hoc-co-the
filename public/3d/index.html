@@ -126,12 +126,24 @@
           if (obj.isMesh && obj.userData && obj.userData._origEmissive !== undefined) {
             const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
             mats.forEach(m => {
-              if (m && m.emissive) {
-                m.emissive.setHex(obj.userData._origEmissive);
-                m.emissiveIntensity = obj.userData._origIntensity;
+              if (m) {
+                if (m.emissive) {
+                  m.emissive.setHex(obj.userData._origEmissive);
+                  m.emissiveIntensity = obj.userData._origIntensity;
+                }
+                if (m.color && obj.userData._origColor !== undefined) {
+                  m.color.setHex(obj.userData._origColor);
+                }
                 m.needsUpdate = true;
               }
             });
+          }
+          // Khôi phục hiển thị của dây chằng dọc trước
+          if (obj.isMesh && obj.userData && obj.userData._origVisible !== undefined) {
+            const id = obj.userData?.partId || obj.name;
+            if (id.includes('Anterior longitudinal ligament')) {
+              obj.visible = obj.userData._origVisible;
+            }
           }
         });
 
@@ -143,22 +155,12 @@
         // 2. Xác định danh sách cấu trúc và màu sắc phát sáng dạ quang y khoa
         let targets = [];
         let color = 0x00f5ff;
-        let intensity = 1.0;
+        let intensity = 1.1;
 
         if (hlType === 'c5') {
           targets = ['Vertebra C5'];
           color = 0x00f5ff; // Xanh neon cực sáng
-          intensity = 1.0;
-        } else if (hlType === 'disc') {
-          targets = [
-            'Intervertebral disc L4-L5',
-            'Intervertebral disc L3-L4',
-            'Intervertebral disc L5-S1',
-            'Intervertebral disc L2-L3',
-            'Intervertebral disc L1-L2'
-          ];
-          color = 0x10b981; // Xanh ngọc bích dạ quang
-          intensity = 1.0;
+          intensity = 1.2;
         } else if (hlType === 'cervical') {
           targets = [
             'Atlas (C1)',
@@ -170,43 +172,72 @@
             'Vertebra C7'
           ];
           color = 0x00d2ff; // Xanh cyan sáng toàn bộ đoạn cổ C1-C7
-          intensity = 0.95;
+          intensity = 1.1;
         } else if (hlType === 'thoracic') {
           targets = [
             'Vertebra T1', 'Vertebra T2', 'Vertebra T3', 'Vertebra T4', 'Vertebra T5', 'Vertebra T6',
             'Vertebra T7', 'Vertebra T8', 'Vertebra T9', 'Vertebra T10', 'Vertebra T11', 'Vertebra T12'
           ];
           color = 0xf59e0b; // Ánh vàng hổ phách sáng toàn bộ 12 đốt ngực
-          intensity = 0.95;
+          intensity = 1.1;
+        } else if (hlType === 'lumbar') {
+          targets = [
+            'Vertebra L1', 'Vertebra L2', 'Vertebra L3', 'Vertebra L4', 'Vertebra L5'
+          ];
+          color = 0x60a5fa; // Xanh biển neon sáng rực 5 đốt thắt lưng
+          intensity = 1.2;
+        } else if (hlType === 'disc') {
+          targets = [
+            'Intervertebral disc'
+          ];
+          color = 0x00ff88; // Xanh ngọc lục bảo Neon cực rực rỡ
+          intensity = 1.4;
         } else if (hlType === 'full') {
           targets = [
-            'Atlas', 'Axis', 'Vertebra', 'Sacrum', 'Coccyx'
+            'Atlas', 'Axis', 'Vertebra', 'Sacrum', 'Coccyx', 'Intervertebral disc'
           ];
-          color = 0x38bdf8; // Xanh da trời sáng
-          intensity = 0.85;
+          color = 0x38bdf8; // Xanh da trời sáng toàn trục
+          intensity = 0.95;
         }
 
         scene.traverse(obj => {
-          if (obj.isMesh && obj.visible) {
+          if (obj.isMesh) {
             const id = obj.userData?.partId || obj.name;
-            const match = targets.some(t => id === t || id.includes(t) || obj.name.includes(t.replace(/[\s()]/g, '_')));
-            if (match) {
-              if (!obj.userData.ownsMaterial) {
-                obj.material = Array.isArray(obj.material) ? obj.material.map(m => m.clone()) : obj.material.clone();
-                obj.userData.ownsMaterial = true;
+
+            // Khi xem đĩa đệm, tạm ẩn dây chằng dọc trước để lộ trọn vẹn 100% các đĩa đệm
+            if (id.includes('Anterior longitudinal ligament')) {
+              if (obj.userData._origVisible === undefined) {
+                obj.userData._origVisible = obj.visible;
               }
-              const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
-              mats.forEach(m => {
-                if (obj.userData._origEmissive === undefined) {
-                  obj.userData._origEmissive = m.emissive ? m.emissive.getHex() : 0x000000;
-                  obj.userData._origIntensity = m.emissiveIntensity ?? 1;
+              if (hlType === 'disc') {
+                obj.visible = false;
+              }
+            }
+
+            if (obj.visible) {
+              const match = targets.some(t => id === t || id.includes(t) || obj.name.includes(t.replace(/[\s()]/g, '_')));
+              if (match) {
+                if (!obj.userData.ownsMaterial) {
+                  obj.material = Array.isArray(obj.material) ? obj.material.map(m => m.clone()) : obj.material.clone();
+                  obj.userData.ownsMaterial = true;
                 }
-                if (m.emissive) {
-                  m.emissive.setHex(color);
-                  m.emissiveIntensity = intensity;
+                const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+                mats.forEach(m => {
+                  if (obj.userData._origEmissive === undefined) {
+                    obj.userData._origEmissive = m.emissive ? m.emissive.getHex() : 0x000000;
+                    obj.userData._origIntensity = m.emissiveIntensity ?? 1;
+                    obj.userData._origColor = m.color ? m.color.getHex() : 0xffffff;
+                  }
+                  if (m.emissive) {
+                    m.emissive.setHex(color);
+                    m.emissiveIntensity = intensity;
+                  }
+                  if (m.color && hlType === 'disc') {
+                    m.color.setHex(0x00ff88);
+                  }
                   m.needsUpdate = true;
-                }
-              });
+                });
+              }
             }
           }
         });
@@ -226,8 +257,25 @@
       }
 
       window.addEventListener('message', (event) => {
-        if (event.data && event.data.type === 'HIGHLIGHT_SPINE') {
+        if (!event.data) return;
+        if (event.data.type === 'HIGHLIGHT_SPINE') {
           window.applySpineHighlight(event.data.hl);
+        } else if (event.data.type === 'NAVIGATE_SPINE') {
+          if (event.data.cam && window.viewer) {
+            const nums = event.data.cam.split(',').map(Number);
+            if (nums.length === 6 && nums.every(Number.isFinite)) {
+              const { camera, controls } = window.viewer;
+              if (camera && controls) {
+                camera.position.set(nums[0], nums[1], nums[2]);
+                controls.target.set(nums[3], nums[4], nums[5]);
+                controls.update();
+                window.viewer.render && window.viewer.render();
+              }
+            }
+          }
+          if (event.data.hl) {
+            window.applySpineHighlight(event.data.hl);
+          }
         }
       });
 

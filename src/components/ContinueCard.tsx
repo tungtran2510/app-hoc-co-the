@@ -36,16 +36,16 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
     <a
       href={targetUrl}
       onClick={playTapSound}
-      className="group relative block overflow-hidden rounded-[18px] bg-white text-slate-900 border border-slate-200/90 border-l-[4px] border-l-[#1E3A8A] shadow-sm hover:shadow-md hover:border-[#1E3A8A]/60 dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] dark:border-t-white/15 dark:border-r-black/50 dark:border-b-black/70 dark:border-l-[#A78BFA] dark:text-white dark:hover:border-purple-400 dark:hover:shadow-[0_0_26px_rgba(139,92,246,0.35)] px-3.5 py-2.5 sm:px-4.5 sm:py-3 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.985] cursor-pointer"
+      className="group relative block overflow-hidden rounded-[18px] bg-white text-slate-900 border border-slate-200/90 border-l-[5px] border-l-amber-500 shadow-sm hover:shadow-md hover:border-amber-400/80 dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] dark:border-t-white/15 dark:border-r-black/50 dark:border-b-black/70 dark:border-l-amber-400 dark:text-white dark:hover:border-amber-400 dark:hover:shadow-[0_0_26px_rgba(245,158,11,0.25)] px-3.5 py-2.5 sm:px-4.5 sm:py-3 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.985] cursor-pointer"
       aria-label={`Xem tiếp ${info.topic_title} bài ${info.page_title}`}
     >
       {/* Tia sáng viền trên (dark mode) */}
-      <div className="hidden dark:block absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-purple-400/50 to-transparent" />
+      <div className="hidden dark:block absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-amber-400/50 to-transparent" />
 
       {/* 3D Anatomy / Avatar Render bên phải */}
       <div className="absolute -right-2 top-0 bottom-0 w-[42%] sm:w-[36%] pointer-events-none overflow-hidden select-none">
         {/* Điểm sáng hào quang đốt sống thở nhẹ */}
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-blue-500/10 dark:bg-purple-600/20 blur-xl pointer-events-none animate-pulse" />
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-amber-500/10 dark:bg-purple-600/20 blur-xl pointer-events-none animate-pulse" />
 
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -64,8 +64,8 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
       <div className="relative z-10 flex flex-col gap-0.5 sm:gap-1">
         {/* Dòng 1: Huy hiệu chủ đề có icon Play + Nút sửa ảnh (nếu Admin) + Vị trí video */}
         <div className="flex items-center justify-between gap-1.5">
-          <div className="flex items-center gap-1.5 text-[#1E3A8A] dark:text-purple-300 text-[11px] sm:text-[11.5px] font-bold min-w-0 flex-1">
-            <span className="w-4 h-4 rounded-full bg-blue-50 text-[#1E3A8A] dark:bg-purple-900/60 dark:text-purple-200 flex items-center justify-center shrink-0 shadow-2xs">
+          <div className="flex items-center gap-1.5 text-amber-700 dark:text-amber-300 text-[11px] sm:text-[11.5px] font-bold min-w-0 flex-1">
+            <span className="w-4 h-4 rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/60 dark:text-amber-300 flex items-center justify-center shrink-0 shadow-2xs">
               <Play size={7.5} fill="currentColor" className="ml-0.5" />
             </span>
             <span className="truncate">{info.topic_title || 'Cột sống'}</span>
@@ -108,7 +108,7 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
           </p>
         )}
 
-        {/* Dòng 4: Thanh tiến độ + Phần trăm + Nút Xem tiếp Navy Hoàng Gia sang trọng */}
+        {/* Dòng 4: Thanh tiến độ + Phần trăm + Nút Xem tiếp Vàng Cam Hổ Phách sang trọng */}
         <div className="flex items-center justify-between gap-2.5 pt-0.5">
           {hasMultipleVideos ? (
             <div className="flex-1 max-w-[54%] sm:max-w-[62%] flex items-center gap-2">
@@ -120,33 +120,33 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
                 aria-valuemax={100}
               >
                 <div
-                  className="h-full bg-[#1E3A8A] dark:bg-gradient-to-r dark:from-purple-400 dark:via-purple-500 dark:to-indigo-500 rounded-full transition-all duration-300 shadow-xs"
+                  className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all duration-300 shadow-xs"
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
-              <span className="text-[10.5px] font-extrabold text-[#1E3A8A] dark:text-purple-300 shrink-0 font-mono">
+              <span className="text-[10.5px] font-extrabold text-amber-700 dark:text-amber-300 shrink-0 font-mono">
                 {progressPercent}%
               </span>
             </div>
           ) : (
             <div className="flex-1 max-w-[54%] sm:max-w-[62%] flex items-center gap-1.5">
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-purple-950/40 border border-blue-200/60 dark:border-purple-800/60 text-[#1E3A8A] dark:text-purple-200 text-[10px] font-bold">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#1E3A8A] dark:bg-purple-400" />
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-700/60 text-amber-800 dark:text-amber-200 text-[10px] font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400" />
                 Bài học trọng tâm
               </span>
             </div>
           )}
 
-          {/* Nút Xem tiếp Xanh Navy Hoàng Gia Đẳng Cấp */}
-          <div className="relative shrink-0 flex items-center gap-1.5 h-[28px] sm:h-[30px] px-3 sm:px-3.5 rounded-full bg-[#1E3A8A] hover:bg-[#172554] dark:bg-gradient-to-r dark:from-purple-600 dark:to-indigo-600 text-white font-bold text-[11.5px] sm:text-[12px] shadow-sm transition-all duration-200 overflow-hidden select-none">
+          {/* Nút Xem tiếp Vàng Cam Hổ Phách Nổi Bật Chuẩn Gốc */}
+          <div className="relative shrink-0 flex items-center gap-1.5 h-[28px] sm:h-[30px] px-3 sm:px-3.5 rounded-full bg-gradient-to-r from-amber-500 via-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-black text-[11.5px] sm:text-[12px] shadow-[0_2px_10px_rgba(245,158,11,0.38)] transition-all duration-200 overflow-hidden select-none">
             {/* Chấm tròn phát sáng LIVE */}
             <span className="relative flex h-1.5 w-1.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-300 dark:bg-purple-300 opacity-70" />
-              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-200 opacity-70" />
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-slate-950" />
             </span>
 
-            <span className="tracking-tight">Xem tiếp</span>
-            <ArrowRight size={12} strokeWidth={2.5} className="transition-transform group-hover:translate-x-0.5" />
+            <span className="tracking-tight text-slate-950 font-black">Xem tiếp</span>
+            <ArrowRight size={12} strokeWidth={2.8} className="text-slate-950 transition-transform group-hover:translate-x-0.5" />
           </div>
         </div>
       </div>
