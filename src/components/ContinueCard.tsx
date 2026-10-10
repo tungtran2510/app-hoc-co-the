@@ -36,16 +36,16 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
     <a
       href={targetUrl}
       onClick={playTapSound}
-      className="group relative block overflow-hidden rounded-[18px] bg-white text-slate-900 border border-slate-200/90 border-l-[5px] border-l-amber-500 shadow-sm hover:shadow-md hover:border-amber-400/80 dark:bg-gradient-to-br dark:from-[#1C123D] dark:via-[#160D30] dark:to-[#0E0720] dark:border-t-white/15 dark:border-r-black/50 dark:border-b-black/70 dark:border-l-amber-400 dark:text-white dark:hover:border-amber-400 dark:hover:shadow-[0_0_26px_rgba(245,158,11,0.25)] px-3.5 py-2.5 sm:px-4.5 sm:py-3 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.985] cursor-pointer"
+      className="home-continue-card group relative block overflow-hidden rounded-[18px] bg-gradient-to-br from-[#0E2A5C] via-[#0A1F45] to-[#06142E] text-white border-t border-t-white/20 border-r border-r-black/40 border-b-2 border-b-black/60 border-l-[5px] border-l-amber-400 shadow-[0_10px_26px_-4px_rgba(10,31,69,0.45)] hover:shadow-[0_14px_32px_-4px_rgba(10,31,69,0.6)] hover:border-l-amber-300 px-3.5 py-2.5 sm:px-4.5 sm:py-3 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.985] cursor-pointer"
       aria-label={`Xem tiếp ${info.topic_title} bài ${info.page_title}`}
     >
-      {/* Tia sáng viền trên (dark mode) */}
-      <div className="hidden dark:block absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-amber-400/50 to-transparent" />
+      {/* Tia sáng viền trên */}
+      <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-amber-400/60 to-transparent" />
 
       {/* 3D Anatomy / Avatar Render bên phải */}
       <div className="absolute -right-2 top-0 bottom-0 w-[42%] sm:w-[36%] pointer-events-none overflow-hidden select-none">
         {/* Điểm sáng hào quang đốt sống thở nhẹ */}
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-amber-500/10 dark:bg-purple-600/20 blur-xl pointer-events-none animate-pulse" />
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-amber-500/20 blur-xl pointer-events-none animate-pulse" />
 
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -54,18 +54,18 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
           className={`w-full h-full object-cover object-center ${
             info.cover_url && !info.cover_url.endsWith('.png')
               ? 'opacity-90'
-              : 'mix-blend-multiply opacity-80 dark:mix-blend-screen dark:opacity-95 scale-105'
+              : 'mix-blend-screen opacity-90 scale-105'
           }`}
         />
         {/* Gradient mờ chuyển từ nền sang ảnh */}
-        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 via-50% to-transparent dark:from-[#1C123D] dark:via-[#1C123D]/80 dark:via-50% dark:to-transparent w-28 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0E2A5C] via-[#0E2A5C]/85 via-50% to-transparent w-28 pointer-events-none" />
       </div>
 
       <div className="relative z-10 flex flex-col gap-0.5 sm:gap-1">
         {/* Dòng 1: Huy hiệu chủ đề có icon Play + Nút sửa ảnh (nếu Admin) + Vị trí video */}
         <div className="flex items-center justify-between gap-1.5">
-          <div className="flex items-center gap-1.5 text-amber-700 dark:text-amber-300 text-[11px] sm:text-[11.5px] font-bold min-w-0 flex-1">
-            <span className="w-4 h-4 rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/60 dark:text-amber-300 flex items-center justify-center shrink-0 shadow-2xs">
+          <div className="flex items-center gap-1.5 text-amber-300 text-[11px] sm:text-[11.5px] font-bold min-w-0 flex-1">
+            <span className="w-4 h-4 rounded-full bg-amber-400/20 text-amber-300 flex items-center justify-center shrink-0 shadow-2xs">
               <Play size={7.5} fill="currentColor" className="ml-0.5" />
             </span>
             <span className="truncate">{info.topic_title || 'Cột sống'}</span>
@@ -80,7 +80,7 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
                   e.stopPropagation();
                   onEditPage();
                 }}
-                className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 dark:bg-white/20 dark:hover:bg-white/35 dark:text-white text-[9.5px] sm:text-[10px] font-bold flex items-center gap-1 backdrop-blur-xs cursor-pointer transition-colors shadow-2xs shrink-0 whitespace-nowrap"
+                className="px-2 py-0.5 rounded-full bg-white/15 text-white border border-white/20 hover:bg-white/25 text-[9.5px] sm:text-[10px] font-bold flex items-center gap-1 backdrop-blur-xs cursor-pointer transition-colors shadow-2xs shrink-0 whitespace-nowrap"
                 title="Cài đặt ảnh đại diện & thông tin bài học này"
               >
                 <Edit2 size={9.5} />
@@ -89,7 +89,7 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
             )}
 
             {hasMultipleVideos && (
-              <span className="px-1.5 py-0.5 rounded-md bg-white/90 dark:bg-black/60 border border-slate-200/80 dark:border-white/10 text-[9.5px] sm:text-[10px] font-bold text-slate-700 dark:text-white/90 shrink-0 backdrop-blur-xs shadow-2xs">
+              <span className="px-1.5 py-0.5 rounded-md bg-black/50 border border-white/15 text-[9.5px] sm:text-[10px] font-bold text-white/90 shrink-0 backdrop-blur-xs shadow-2xs">
                 Video {String(current).padStart(2, '0')}/{String(total).padStart(2, '0')}
               </span>
             )}
@@ -97,13 +97,13 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
         </div>
 
         {/* Dòng 2: Tiêu đề bài học chính - TO RÕ CHO DỄ NHÌN */}
-        <h2 className="text-[15.5px] sm:text-[17px] font-black text-slate-900 dark:text-white leading-tight tracking-tight line-clamp-1 max-w-[84%] sm:max-w-[86%]">
+        <h2 className="text-[15.5px] sm:text-[17px] font-black text-white leading-tight tracking-tight line-clamp-1 max-w-[84%] sm:max-w-[86%] drop-shadow-sm">
           {String(info.page_number || 1).padStart(2, '0')} - {info.page_title || 'Tổng quan về cột sống'}
         </h2>
 
         {/* Dòng 3: Mô tả/Tiêu đề video - CHỈ HIỂN THỊ KHI KHÁC TIÊU ĐỀ BÀI (KHỬ LẶP CHỮ) */}
         {!isSameTitle && Boolean(info.video_title) && (
-          <p className="text-[11px] sm:text-[11.5px] text-slate-600 dark:text-white/80 leading-tight line-clamp-1 max-w-[70%] sm:max-w-[76%] font-medium">
+          <p className="text-[11px] sm:text-[11.5px] text-blue-100/80 leading-tight line-clamp-1 max-w-[70%] sm:max-w-[76%] font-medium">
             {info.video_title}
           </p>
         )}
@@ -113,25 +113,25 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
           {hasMultipleVideos ? (
             <div className="flex-1 max-w-[54%] sm:max-w-[62%] flex items-center gap-2">
               <div
-                className="flex-1 h-1.5 bg-slate-100 dark:bg-black/30 rounded-full overflow-hidden p-[0.5px] border border-slate-200/60 dark:border-transparent"
+                className="flex-1 h-1.5 bg-black/40 rounded-full overflow-hidden p-[0.5px] border border-white/10"
                 role="progressbar"
                 aria-valuenow={progressPercent}
                 aria-valuemin={0}
                 aria-valuemax={100}
               >
                 <div
-                  className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all duration-300 shadow-xs"
+                  className="h-full bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 rounded-full transition-all duration-300 shadow-xs"
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
-              <span className="text-[10.5px] font-extrabold text-amber-700 dark:text-amber-300 shrink-0 font-mono">
+              <span className="text-[10.5px] font-extrabold text-amber-300 shrink-0 font-mono">
                 {progressPercent}%
               </span>
             </div>
           ) : (
             <div className="flex-1 max-w-[54%] sm:max-w-[62%] flex items-center gap-1.5">
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-700/60 text-amber-800 dark:text-amber-200 text-[10px] font-bold">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400" />
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/40 text-blue-200 text-[10px] font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
                 Bài học trọng tâm
               </span>
             </div>
@@ -139,6 +139,9 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
 
           {/* Nút Xem tiếp Vàng Cam Hổ Phách Nổi Bật Chuẩn Gốc */}
           <div className="relative shrink-0 flex items-center gap-1.5 h-[28px] sm:h-[30px] px-3 sm:px-3.5 rounded-full bg-gradient-to-r from-amber-500 via-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-black text-[11.5px] sm:text-[12px] shadow-[0_2px_10px_rgba(245,158,11,0.38)] transition-all duration-200 overflow-hidden select-none">
+            {/* Vệt sáng quét ngang lấp lánh (Shimmer Sweep Light) */}
+            <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer-sweep" />
+
             {/* Chấm tròn phát sáng LIVE */}
             <span className="relative flex h-1.5 w-1.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-200 opacity-70" />

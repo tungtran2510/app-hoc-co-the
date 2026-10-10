@@ -443,6 +443,24 @@ html.theme-navy-luxury .topic-card-heart {
   color: #38BDF8 !important;
 }
 
+/* Đồng bộ Phần Đầu (Brand Card & Continue Card) tông Xanh Navy Hoàng Gia Chuẩn Màu */
+html.theme-navy-luxury .home-brand-card {
+  background: linear-gradient(135deg, #0E2A5C 0%, #0A1F45 50%, #06142E 100%) !important;
+  border: 1px solid rgba(147, 197, 253, 0.3) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 10px 28px -6px rgba(10, 31, 69, 0.45), 0 2px 8px -2px rgba(0, 0, 0, 0.2) !important;
+}
+
+html.theme-navy-luxury .home-continue-card {
+  background: linear-gradient(135deg, #0E2A5C 0%, #0A1F45 50%, #06142E 100%) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-right: 1px solid rgba(6, 20, 46, 0.6) !important;
+  border-bottom: 2px solid rgba(6, 20, 46, 0.8) !important;
+  border-left: 5px solid #F59E0B !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 10px 26px -4px rgba(10, 31, 69, 0.45) !important;
+}
+
 /* CHẾ ĐỘ TỐI TRONG TÔNG NAVY (NIGHT NAVY - THEO ẢNH 3 CỦA NGƯỜI DÙNG) */
 html.theme-navy-luxury.dark {
   --color-bg: #061021;
@@ -637,6 +655,36 @@ html.theme-minimal.dark .topic-card-container .topic-card-badge {
 }
 html.theme-minimal.dark .topic-card-container [class*='text-purple-200'] {
   color: #94A3B8 !important;
+}
+
+html.theme-minimal .home-brand-card {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  color: #0F172A !important;
+  box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.08) !important;
+}
+html.theme-minimal .home-brand-card span.text-white {
+  color: #0F172A !important;
+}
+html.theme-minimal .home-brand-card [class*="text-blue-200"] {
+  color: #64748B !important;
+}
+html.theme-minimal .home-brand-card [class*="text-slate-200"] {
+  color: #475569 !important;
+}
+
+html.theme-minimal .home-continue-card {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  border-left: 5px solid #0F172A !important;
+  color: #0F172A !important;
+  box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.08) !important;
+}
+html.theme-minimal .home-continue-card h2 {
+  color: #0F172A !important;
+}
+html.theme-minimal .home-continue-card p {
+  color: #64748B !important;
 }
 
 /* ============================================================================

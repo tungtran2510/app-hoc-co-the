@@ -477,17 +477,17 @@ export default function HomeSectionsClient({
                 />
               )}
 
-              {/* DÒNG BRAND CARD NỔI BẬT: TRẮNG SỨ NỔI KHỐI 3D (3D FLOATING PORCELAIN HERO) */}
+              {/* DÒNG BRAND CARD NỔI BẬT: XANH NAVY HOÀNG GIA ĐẲNG CẤP VỚI ĐIỂM NHẤN VÀNG HỔ PHÁCH */}
               {isAdmin && isBrandCollapsed ? null : (
                 <div
                   onClick={() => setShowWelcomeModal(true)}
-                  className={`w-full relative overflow-hidden rounded-[20px] bg-white/95 text-slate-900 border border-amber-200/90 shadow-[0_10px_28px_-6px_rgba(245,158,11,0.14),0_2px_8px_-2px_rgba(15,23,42,0.06)] ring-1 ring-amber-500/10 hover:shadow-[0_14px_34px_-6px_rgba(245,158,11,0.22)] hover:border-amber-400/90 hover:-translate-y-0.5 active:scale-[0.99] transition-all duration-300 dark:bg-gradient-to-br dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0B132B] dark:border-white/15 dark:text-white p-3 sm:p-3.5 flex items-center justify-between gap-3 cursor-pointer group before:absolute before:top-0 before:left-8 before:right-8 before:h-[2px] before:bg-gradient-to-r before:from-transparent before:via-amber-400/50 before:to-transparent ${
+                  className={`home-brand-card w-full relative overflow-hidden rounded-[20px] bg-gradient-to-br from-[#0E2A5C] via-[#0A1F45] to-[#06142E] text-white border border-blue-400/30 shadow-[0_10px_28px_-6px_rgba(10,31,69,0.45),0_2px_8px_-2px_rgba(0,0,0,0.2)] ring-1 ring-blue-500/20 hover:shadow-[0_14px_34px_-6px_rgba(10,31,69,0.55)] hover:border-amber-400/80 hover:-translate-y-0.5 active:scale-[0.99] transition-all duration-300 p-3 sm:p-3.5 flex items-center justify-between gap-3 cursor-pointer group before:absolute before:top-0 before:left-8 before:right-8 before:h-[2px] before:bg-gradient-to-r before:from-transparent before:via-amber-400/80 before:to-transparent ${
                     isHidden ? 'opacity-80 ring-2 ring-dashed ring-amber-500/40' : ''
                   }`}
                   title="Bấm để xem lời ngỏ chào mừng & video giới thiệu"
                 >
-                  {/* Logo app 3D bên trái trong khung sứ bo viền Hổ phách */}
-                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[15px] overflow-hidden border border-amber-200/90 shadow-xs shrink-0 bg-gradient-to-br from-amber-50 via-white to-amber-100/60 p-0.5 group-hover:scale-105 transition-transform dark:bg-[#0C152B] dark:border-white/10">
+                  {/* Logo app 3D bên trái trong khung bo viền Hổ phách */}
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[15px] overflow-hidden border border-amber-400/50 shadow-xs shrink-0 bg-[#06142E] p-0.5 group-hover:scale-105 transition-transform">
                     <img
                       src={logoUrl || '/app_logo.png'}
                       alt="Logo Qbiz Books"
@@ -504,34 +504,34 @@ export default function HomeSectionsClient({
                   {/* Khối chữ thương hiệu ở giữa - Tinh tế, sang trọng, đẳng cấp với sắc Vàng Cam Hổ Phách */}
                   <div className="flex flex-col flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-slate-950 dark:text-white uppercase">
+                      <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-white uppercase drop-shadow-sm">
                         {appName ? appName.split(' ')[0] : 'SỐNG'}
                       </span>
-                      <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-[#D97706] dark:text-[#FBBF24] uppercase">
+                      <span className="text-[16px] sm:text-[17px] font-black tracking-tight text-[#FBBF24] uppercase drop-shadow-sm">
                         {appName && appName.includes(' ') ? appName.split(' ').slice(1).join(' ') : 'KHỎE MỖI NGÀY'}
                       </span>
-                      {isAdmin && <Edit2 size={12} className="text-slate-400 dark:text-slate-400 opacity-60" />}
+                      {isAdmin && <Edit2 size={12} className="text-slate-400 opacity-60" />}
                     </div>
                     {brandTagline && brandTagline.trim() ? (
-                      <span className="text-[9.5px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 mt-0.5 truncate">
+                      <span className="text-[9.5px] sm:text-[10px] font-bold uppercase tracking-wider text-blue-200/80 mt-0.5 truncate">
                         {brandTagline.trim()}
                       </span>
                     ) : null}
                     {appSubtitle && appSubtitle.trim() ? (
-                      <span className="text-[10.5px] sm:text-[11px] text-slate-600 dark:text-slate-200 font-medium line-clamp-1">
+                      <span className="text-[10.5px] sm:text-[11px] text-slate-200 font-medium line-clamp-1">
                         {appSubtitle.trim()}
                       </span>
                     ) : null}
                   </div>
 
                   {/* Huy hiệu Y Khoa bên phải - Quả tim đập nhịp y khoa trên nền cam vàng MEDICA */}
-                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[15px] bg-gradient-to-br from-amber-50/90 via-white to-amber-100/70 border border-amber-300/80 shadow-xs shrink-0 flex items-center justify-center relative overflow-hidden group-hover:border-amber-400 group-hover:shadow-sm transition-all dark:bg-[#1E1435] dark:border-amber-500/30">
-                    <div className="flex flex-col items-center justify-center text-amber-600 dark:text-amber-400">
-                      <svg className="w-5 h-5 text-amber-600 dark:text-amber-400 drop-shadow-xs animate-medica-heartbeat" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[15px] bg-gradient-to-br from-amber-500/15 via-[#0A1F45] to-[#06142E] border border-amber-400/50 shadow-xs shrink-0 flex items-center justify-center relative overflow-hidden group-hover:border-amber-400 group-hover:shadow-sm transition-all">
+                    <div className="flex flex-col items-center justify-center text-amber-400">
+                      <svg className="w-5 h-5 text-amber-400 drop-shadow-xs animate-medica-heartbeat" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" fill="currentColor" fillOpacity="0.25" />
                         <path d="M3.5 12h3l2-3 3 6 2-3h7" stroke="currentColor" strokeWidth="1.8" />
                       </svg>
-                      <span className="text-[7px] font-black tracking-widest text-amber-600 dark:text-amber-300 uppercase mt-0.5">MEDICA</span>
+                      <span className="text-[7px] font-black tracking-widest text-amber-400 uppercase mt-0.5">MEDICA</span>
                     </div>
                   </div>
                 </div>
