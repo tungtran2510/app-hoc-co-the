@@ -25,8 +25,8 @@ const SPINE_POINTS: SpinePoint[] = [
     name: 'Đốt Sống Cổ C5',
     code: 'C5 (Cổ)',
     pinLabel: 'Đốt sống C5',
-    camFront: '0,1.47,0.28,0,1.47,-0.02',
-    camBack: '0,1.47,-0.28,0,1.47,-0.02',
+    camFront: '0,1.47,0.30,0,1.47,-0.02',
+    camBack: '0,1.47,-0.30,0,1.47,-0.02',
     clinicalDesc: 'Nằm ở trung tâm đoạn cong sinh lý cột sống cổ, là điểm chịu lực uốn gập nhiều nhất của cổ khi xoay và ngửa đầu.',
     warningNote: 'Chèn ép rễ thần kinh C5 gây đau buốt từ sau gáy lan sang bả vai, tê yếu cơ delta và khó nâng cánh tay lên cao.',
   },
@@ -35,8 +35,8 @@ const SPINE_POINTS: SpinePoint[] = [
     name: 'Đĩa Đệm L4 - L5 (Giảm xóc)',
     code: 'Đĩa đệm',
     pinLabel: 'Đĩa đệm L4 - L5',
-    camFront: '0,0.998,0.28,0,0.998,-0.01',
-    camBack: '0,0.998,-0.28,0,0.998,-0.02',
+    camFront: '0,0.998,0.30,0,0.998,-0.01',
+    camBack: '0,0.998,-0.30,0,0.998,-0.02',
     clinicalDesc: 'Tấm đệm sợi sụn đàn hồi nằm giữa hai thân đốt sống, chứa nhân nhầy ngậm nước hoạt động như bộ giảm xóc thủy lực bảo vệ cột sống.',
     warningNote: 'Tư thế cúi vặn người bê nặng dễ làm rách bao xơ, thoát vị đĩa đệm L4-L5 chèn ép dây thần kinh tọa gây tê buốt lan xuống chân.',
   },
@@ -44,9 +44,9 @@ const SPINE_POINTS: SpinePoint[] = [
     id: 'cervical',
     name: 'Đoạn Cổ C1 - C7',
     code: 'C1 - C7',
-    pinLabel: 'Vùng Cổ C1 - C7',
-    camFront: '0,1.49,0.38,0,1.49,-0.02',
-    camBack: '0,1.49,-0.38,0,1.49,-0.02',
+    pinLabel: '',
+    camFront: '0,1.46,0.44,0,1.46,-0.02',
+    camBack: '0,1.46,-0.44,0,1.46,-0.02',
     clinicalDesc: 'Gồm 7 đốt sống cổ nâng đỡ hộp sọ (~5kg), là đoạn linh hoạt nhất của trục cơ thể cho phép đầu xoay 180° và gập ngửa.',
     warningNote: 'Tư thế cúi 60° xem điện thoại làm tăng tải trọng lên đĩa đệm cổ tới 27kg, gây thoái hóa và mất đường cong sinh lý.',
   },
@@ -54,9 +54,9 @@ const SPINE_POINTS: SpinePoint[] = [
     id: 'thoracic',
     name: 'Đoạn Ngực T1 - T12',
     code: 'T1 - T12',
-    pinLabel: 'Đoạn Ngực T1 - T12',
-    camFront: '0,1.28,0.72,0,1.28,-0.04',
-    camBack: '0,1.28,-0.72,0,1.28,-0.04',
+    pinLabel: '',
+    camFront: '0,1.26,0.75,0,1.26,-0.04',
+    camBack: '0,1.26,-0.75,0,1.26,-0.04',
     clinicalDesc: '12 đốt liên kết cùng xương sườn bao bọc tim phổi. Đoạn này có độ cứng vững cao nhất để bảo vệ nội tạng lồng ngực.',
     warningNote: 'Ngồi gù làm chèn ép dây thần kinh liên sườn, gây cảm giác đau nhói tức ngực nhầm lẫn với đau tim và hạn chế thở sâu.',
   },
@@ -65,8 +65,8 @@ const SPINE_POINTS: SpinePoint[] = [
     name: 'Toàn Bộ Cột Sống (33 đốt)',
     code: '33 đốt',
     pinLabel: '',
-    camFront: '0,1.18,1.45,0,1.18,-0.04',
-    camBack: '0,1.18,-1.45,0,1.18,-0.04',
+    camFront: '0,1.18,1.50,0,1.18,-0.04',
+    camBack: '0,1.18,-1.50,0,1.18,-0.04',
     clinicalDesc: 'Hệ thống giảm xóc tự nhiên với 4 đoạn cong sinh lý chữ S cân bằng hoàn hảo, bảo vệ tủy sống và tạo trục vận động toàn thân.',
     warningNote: 'Sai lệch tư thế kéo dài làm mòn đĩa đệm, gai xương và biến dạng trục khớp toàn thân.',
   },
@@ -74,7 +74,8 @@ const SPINE_POINTS: SpinePoint[] = [
 
 export default function Spine3DFocusedWidget({ onOpenFull3D }: Spine3DFocusedWidgetProps) {
   const [selectedPoint, setSelectedPoint] = useState<SpinePoint>(SPINE_POINTS[0]); // Mặc định C5
-  const [isFrontView, setIsFrontView] = useState(false); // Mặc định nhìn sau để thấy gai sau
+  const [isFrontView, setIsFrontView] = useState(false); // Mặc định nhìn sau để thấy toàn bộ cột sống
+  const [showPinLabel, setShowPinLabel] = useState(false); // Mặc định khung 3D sạch hoàn toàn, trừ khi ấn vào mới hiện tên
   const [keyCounter, setKeyCounter] = useState(0);
   const [isDark, setIsDark] = useState(false);
 
@@ -97,6 +98,7 @@ export default function Spine3DFocusedWidget({ onOpenFull3D }: Spine3DFocusedWid
   const handleSelectPoint = (pt: SpinePoint) => {
     playTapSound();
     setSelectedPoint(pt);
+    setShowPinLabel(false); // Reset để khung 3D luôn sạch sẽ, không tự ý hiện tên
     setKeyCounter((k) => k + 1);
   };
 
@@ -108,7 +110,7 @@ export default function Spine3DFocusedWidget({ onOpenFull3D }: Spine3DFocusedWid
 
   const activeCam = isFrontView ? selectedPoint.camFront : selectedPoint.camBack;
   const themeParam = isDark ? 'dark' : 'light';
-  const iframeUrl = `/3d/index.html?widget=1&theme=${themeParam}#sys=skeletal,joints&cam=${activeCam}`;
+  const iframeUrl = `/3d/index.html?widget=1&theme=${themeParam}&pt=${selectedPoint.id}&dir=${isFrontView ? 'front' : 'back'}#sys=skeletal,joints&cam=${activeCam}`;
 
   return (
     <section
@@ -155,34 +157,46 @@ export default function Spine3DFocusedWidget({ onOpenFull3D }: Spine3DFocusedWid
           allow="fullscreen; accelerometer; gyroscope"
         />
 
-        {/* CHỈ ĐIỂM GIẢI PHẪU KHI ẤN ĐỐT SỐNG (Pointer trỏ chính xác 100% vào vị trí giải phẫu trên trục cột sống) */}
+        {/* CHỈ ĐIỂM GIẢI PHẪU: Mặc định khung 3D sạch bóng, CHỈ HIỆN TÊN KHI NGƯỜI DÙNG BẤM VÀO */}
         {selectedPoint.pinLabel && (
-          <div className="absolute top-1/2 left-1/2 pointer-events-none transition-all duration-300">
-            {/* Tâm ngắm giải phẫu: đặt chính xác tại tâm điểm (0,0) tức top-1/2 left-1/2 của khung */}
-            <div className="absolute -top-1.5 -left-1.5 flex h-3 w-3">
-              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                isDark ? 'bg-cyan-400' : 'bg-blue-500'
-              }`} />
-              <span className={`relative inline-flex rounded-full h-3 w-3 border-2 border-white shadow-md ${
-                isDark ? 'bg-cyan-400' : 'bg-blue-600'
-              }`} />
-            </div>
+          <div className="absolute top-1/2 left-1/2 z-10 transition-all duration-300">
+            {/* Tâm ngắm giải phẫu: Chạm vào để bật/tắt thẻ tên */}
+            <button
+              type="button"
+              onClick={() => {
+                playTapSound();
+                setShowPinLabel(!showPinLabel);
+              }}
+              className="absolute -top-3.5 -left-3.5 w-7 h-7 flex items-center justify-center pointer-events-auto cursor-pointer group"
+              title="Chạm vào để hiện / ẩn tên giải phẫu"
+            >
+              <span className="relative flex h-3.5 w-3.5">
+                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                  isDark ? 'bg-cyan-400' : 'bg-blue-500'
+                }`} />
+                <span className={`relative inline-flex rounded-full h-3.5 w-3.5 border-2 border-white shadow-md transition-transform group-hover:scale-125 ${
+                  isDark ? 'bg-cyan-400' : 'bg-blue-600'
+                }`} />
+              </span>
+            </button>
 
-            {/* Đường gióng chỉ sang bên phải và thẻ tên vị trí */}
-            <div className="absolute top-[-11px] left-2 flex items-center">
-              <div className={`w-5 sm:w-8 h-[1.5px] shadow-xs ${
-                isDark
-                  ? 'bg-gradient-to-r from-cyan-400 to-cyan-500/80'
-                  : 'bg-gradient-to-r from-blue-500 to-blue-600'
-              }`} />
-              <div className={`px-2 py-0.5 rounded-full shadow-md text-[10px] font-black tracking-wide whitespace-nowrap ${
-                isDark
-                  ? 'bg-slate-950/90 backdrop-blur-xs border border-cyan-400/80 text-cyan-200'
-                  : 'bg-white/95 backdrop-blur-xs border border-blue-400/80 text-blue-900'
-              }`}>
-                📍 {selectedPoint.pinLabel}
+            {/* Thẻ tên vị trí: CHỈ HIỆN KHI ẤN VÀO (showPinLabel === true) */}
+            {showPinLabel && (
+              <div className="absolute top-[-12px] left-3 flex items-center animate-fade-in pointer-events-none">
+                <div className={`w-4 sm:w-6 h-[1.5px] shadow-xs ${
+                  isDark
+                    ? 'bg-gradient-to-r from-cyan-400 to-cyan-500/80'
+                    : 'bg-gradient-to-r from-blue-500 to-blue-600'
+                }`} />
+                <div className={`px-2.5 py-0.5 rounded-full shadow-lg text-[10px] font-black tracking-wide whitespace-nowrap ${
+                  isDark
+                    ? 'bg-slate-950/95 backdrop-blur-xs border border-cyan-400 text-cyan-200'
+                    : 'bg-white/95 backdrop-blur-xs border border-blue-500 text-blue-950'
+                }`}>
+                  📍 {selectedPoint.pinLabel}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
       </div>
@@ -231,7 +245,7 @@ export default function Spine3DFocusedWidget({ onOpenFull3D }: Spine3DFocusedWid
               title="Đổi góc nhìn mặt trước / sau"
             >
               <RotateCcw size={11} strokeWidth={2.5} />
-              <span>{isFrontView ? 'Mặt trước' : 'Mặt sau'}</span>
+              <span>{isFrontView ? 'Nhìn sau lưng' : 'Nhìn trước'}</span>
             </button>
           </div>
 

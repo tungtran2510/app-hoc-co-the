@@ -77,8 +77,22 @@
     html.widget-mode .voice-toast,
     html.widget-mode #voiceToast,
     html.widget-mode .viewer-controls,
-    html.widget-mode #viewerControls {
+    html.widget-mode #viewerControls,
+    html.widget-mode .selection-card,
+    html.widget-mode #selectionCard,
+    html.widget-mode .compact-mode-bar,
+    html.widget-mode #btnSwitchCompactMode,
+    html.widget-mode .structure-info,
+    html.widget-mode #structureInfo,
+    html.widget-mode .landmark-pin,
+    html.widget-mode #labelsOverlay,
+    html.widget-mode .labels-overlay,
+    html.widget-mode #toast,
+    html.widget-mode .toast {
       display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      opacity: 0 !important;
     }
     html.widget-mode .main-layout {
       top: 0 !important;
@@ -95,8 +109,42 @@
   </style>
   <script>
     const searchParams = new URLSearchParams(window.location.search);
-    if (searchParams.has('widget') || searchParams.has('mode') || window.self !== window.top) {
+    const isWidgetMode = searchParams.has('widget') || searchParams.has('mode') || window.self !== window.top;
+    if (isWidgetMode) {
       document.documentElement.classList.add('widget-mode');
+      try {
+        localStorage.removeItem('anatomy:view');
+      } catch (e) {}
+
+      // Lắng nghe hashchange để chuyển camera tức thì khi đổi điểm xem
+      function applyCamFromHash() {
+        const hash = window.location.hash.replace(/^#/, '');
+        if (!hash) return;
+        const p = new URLSearchParams(hash);
+        const camStr = p.get('cam');
+        if (camStr && window.viewer) {
+          const nums = camStr.split(',').map(Number);
+          if (nums.length === 6 && nums.every(Number.isFinite)) {
+            const { camera, controls } = window.viewer;
+            if (camera && controls) {
+              camera.position.set(nums[0], nums[1], nums[2]);
+              controls.target.set(nums[3], nums[4], nums[5]);
+              controls.update();
+              window.viewer.render && window.viewer.render();
+            }
+          }
+        }
+      }
+      window.addEventListener('hashchange', applyCamFromHash);
+
+      // Định kỳ kiểm tra nếu viewer vừa sẵn sàng thì nạp camera chuẩn
+      let checkTimer = setInterval(() => {
+        if (window.viewer) {
+          applyCamFromHash();
+          clearInterval(checkTimer);
+        }
+      }, 200);
+      setTimeout(() => clearInterval(checkTimer), 10000);
     }
     const themeParam = searchParams.get('theme');
     if (themeParam === 'light') {
