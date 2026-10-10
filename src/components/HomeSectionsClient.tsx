@@ -491,6 +491,12 @@ export default function HomeSectionsClient({
                     <img
                       src={logoUrl || '/app_logo.png'}
                       alt="Logo Qbiz Books"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (target.src && !target.src.endsWith('/app_logo.png')) {
+                          target.src = '/app_logo.png';
+                        }
+                      }}
                       className="w-full h-full object-cover rounded-[12px]"
                     />
                   </div>

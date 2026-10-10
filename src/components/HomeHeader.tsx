@@ -71,6 +71,14 @@ export default function HomeHeader({
   const [nameInput, setNameInput] = useState('');
   const router = useRouter();
 
+  // Đảm bảo lời chào luôn tinh gọn trên 1 dòng duy nhất, không rớt dòng
+  const getDisplayGreeting = (name: string) => {
+    if (!name || name === 'bạn') return 'bạn';
+    if (/quản trị viên/i.test(name) || /admin/i.test(name)) return 'Quản trị viên';
+    if (name.length > 14) return name.slice(0, 12) + '...';
+    return name;
+  };
+
   useEffect(() => {
     router.prefetch('/dang-nhap');
     router.prefetch('/tro-ly-ai');
@@ -300,9 +308,9 @@ export default function HomeHeader({
                 className="flex items-center gap-1.5 text-left group cursor-pointer hover:opacity-90 transition-opacity"
                 title="Bấm để đổi tên của bạn"
               >
-                <div className="flex items-center gap-1.5 animate-greeting-bounce">
-                  <span className="text-[21px] sm:text-[23px] font-black text-ink tracking-tight leading-tight group-hover:text-[#1E3A8A] dark:group-hover:text-purple-300 transition-colors">
-                    Hi, {userName || 'bạn'}!
+                <div className="flex items-center gap-1.5 flex-nowrap animate-greeting-bounce">
+                  <span className="text-[20px] min-[390px]:text-[22px] font-black text-ink tracking-tight leading-tight group-hover:text-[#1E3A8A] dark:group-hover:text-purple-300 transition-colors whitespace-nowrap truncate max-w-[185px] min-[390px]:max-w-[215px]">
+                    Hi, {getDisplayGreeting(userName)}!
                   </span>
                   {/* 1 biểu tượng duy nhất ngay cạnh tên: Chuông thông báo & Đồng bộ */}
                   <span
@@ -362,8 +370,14 @@ export default function HomeHeader({
               aria-label="Quản trị"
             >
               <img
-                src={logoUrl || "/images/author_tung.png"}
-                alt="Tác giả"
+                src={logoUrl || "/app_logo.png"}
+                alt="Logo"
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (target.src && !target.src.endsWith('/app_logo.png')) {
+                    target.src = '/app_logo.png';
+                  }
+                }}
                 className="w-full h-full rounded-full object-cover"
               />
             </button>

@@ -116,6 +116,121 @@
         localStorage.removeItem('anatomy:view');
       } catch (e) {}
 
+      // Cơ chế làm sáng rực rỡ (Highlight & Glow) các đốt sống hoặc khu vực theo bài học
+      window.applySpineHighlight = function(hlType) {
+        if (!window.viewer || !window.viewer.scene) return;
+        const scene = window.viewer.scene;
+
+        // 1. Reset vật liệu của các đốt đã highlight trước đó về nguyên bản
+        scene.traverse(obj => {
+          if (obj.isMesh && obj.userData && obj.userData._origEmissive !== undefined) {
+            const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+            mats.forEach(m => {
+              if (m && m.emissive) {
+                m.emissive.setHex(obj.userData._origEmissive);
+                m.emissiveIntensity = obj.userData._origIntensity;
+                m.needsUpdate = true;
+              }
+            });
+          }
+        });
+
+        if (!hlType) {
+          window.viewer.render && window.viewer.render();
+          return;
+        }
+
+        // 2. Xác định danh sách cấu trúc và màu sắc phát sáng dạ quang y khoa
+        let targets = [];
+        let color = 0x00f5ff;
+        let intensity = 1.0;
+
+        if (hlType === 'c5') {
+          targets = ['Vertebra C5'];
+          color = 0x00f5ff; // Xanh neon cực sáng
+          intensity = 1.0;
+        } else if (hlType === 'disc') {
+          targets = [
+            'Intervertebral disc L4-L5',
+            'Intervertebral disc L3-L4',
+            'Intervertebral disc L5-S1',
+            'Intervertebral disc L2-L3',
+            'Intervertebral disc L1-L2'
+          ];
+          color = 0x10b981; // Xanh ngọc bích dạ quang
+          intensity = 1.0;
+        } else if (hlType === 'cervical') {
+          targets = [
+            'Atlas (C1)',
+            'Axis (C2)',
+            'Vertebra C3',
+            'Vertebra C4',
+            'Vertebra C5',
+            'Vertebra C6',
+            'Vertebra C7'
+          ];
+          color = 0x00d2ff; // Xanh cyan sáng toàn bộ đoạn cổ C1-C7
+          intensity = 0.95;
+        } else if (hlType === 'thoracic') {
+          targets = [
+            'Vertebra T1', 'Vertebra T2', 'Vertebra T3', 'Vertebra T4', 'Vertebra T5', 'Vertebra T6',
+            'Vertebra T7', 'Vertebra T8', 'Vertebra T9', 'Vertebra T10', 'Vertebra T11', 'Vertebra T12'
+          ];
+          color = 0xf59e0b; // Ánh vàng hổ phách sáng toàn bộ 12 đốt ngực
+          intensity = 0.95;
+        } else if (hlType === 'full') {
+          targets = [
+            'Atlas', 'Axis', 'Vertebra', 'Sacrum', 'Coccyx'
+          ];
+          color = 0x38bdf8; // Xanh da trời sáng
+          intensity = 0.85;
+        }
+
+        scene.traverse(obj => {
+          if (obj.isMesh && obj.visible) {
+            const id = obj.userData?.partId || obj.name;
+            const match = targets.some(t => id === t || id.includes(t) || obj.name.includes(t.replace(/[\s()]/g, '_')));
+            if (match) {
+              if (!obj.userData.ownsMaterial) {
+                obj.material = Array.isArray(obj.material) ? obj.material.map(m => m.clone()) : obj.material.clone();
+                obj.userData.ownsMaterial = true;
+              }
+              const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+              mats.forEach(m => {
+                if (obj.userData._origEmissive === undefined) {
+                  obj.userData._origEmissive = m.emissive ? m.emissive.getHex() : 0x000000;
+                  obj.userData._origIntensity = m.emissiveIntensity ?? 1;
+                }
+                if (m.emissive) {
+                  m.emissive.setHex(color);
+                  m.emissiveIntensity = intensity;
+                  m.needsUpdate = true;
+                }
+              });
+            }
+          }
+        });
+
+        window.viewer.render && window.viewer.render();
+      };
+
+      function getActiveHl() {
+        const p = new URLSearchParams(window.location.search);
+        let hl = p.get('hl') || p.get('pt');
+        const hash = window.location.hash.replace(/^#/, '');
+        if (hash) {
+          const hp = new URLSearchParams(hash);
+          if (hp.get('hl')) hl = hp.get('hl');
+        }
+        return hl;
+      }
+
+      window.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'HIGHLIGHT_SPINE') {
+          window.applySpineHighlight(event.data.hl);
+        }
+      });
+
       // Lắng nghe hashchange để chuyển camera tức thì khi đổi điểm xem
       function applyCamFromHash() {
         const hash = window.location.hash.replace(/^#/, '');
@@ -134,17 +249,24 @@
             }
           }
         }
+        const hl = p.get('hl');
+        if (hl) {
+          window.applySpineHighlight(hl);
+        }
       }
       window.addEventListener('hashchange', applyCamFromHash);
 
-      // Định kỳ kiểm tra nếu viewer vừa sẵn sàng thì nạp camera chuẩn
+      // Định kỳ kiểm tra nếu viewer vừa sẵn sàng thì nạp camera chuẩn và làm sáng đốt sống
       let checkTimer = setInterval(() => {
-        if (window.viewer) {
+        if (window.viewer && window.viewer.scene) {
           applyCamFromHash();
-          clearInterval(checkTimer);
+          const activeHl = getActiveHl();
+          if (activeHl) {
+            window.applySpineHighlight(activeHl);
+          }
         }
-      }, 200);
-      setTimeout(() => clearInterval(checkTimer), 10000);
+      }, 300);
+      setTimeout(() => clearInterval(checkTimer), 12000);
     }
     const themeParam = searchParams.get('theme');
     if (themeParam === 'light') {

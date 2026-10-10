@@ -26,17 +26,27 @@ async function verifyLive() {
   });
   await page.waitForTimeout(3000);
 
-  // Chụp C5 trên bản thật
-  const shot1 = path.join(ARTIFACTS_DIR, '309_live_prod_c5.png');
+  // 1. Chụp C5 sạch trên bản thật
+  const shot1 = path.join(ARTIFACTS_DIR, '320_live_prod_c5_clean.png');
   await page.screenshot({ path: shot1 });
   console.log('Saved:', shot1);
 
-  // Bấm Đĩa đệm trên bản thật
-  await page.locator('button:has-text("Đĩa đệm")').click();
-  await page.waitForTimeout(4000);
-  const shot2 = path.join(ARTIFACTS_DIR, '310_live_prod_disc.png');
-  await page.screenshot({ path: shot2 });
-  console.log('Saved:', shot2);
+  // 2. Chạm vào tâm ngắm để hiện thẻ tên
+  const targetDot = page.locator('button[title="Chạm vào để hiện / ẩn tên giải phẫu"]').first();
+  if (await targetDot.count() > 0) {
+    await targetDot.click();
+    await page.waitForTimeout(600);
+    const shot2 = path.join(ARTIFACTS_DIR, '321_live_prod_c5_clicked.png');
+    await page.screenshot({ path: shot2 });
+    console.log('Saved:', shot2);
+  }
+
+  // 3. Bấm C1 - C7 kiểm tra góc nhìn sau lưng chuẩn trên bản thật
+  await page.locator('button:has-text("C1 - C7")').click();
+  await page.waitForTimeout(3500);
+  const shot3 = path.join(ARTIFACTS_DIR, '322_live_prod_c1c7_posterior.png');
+  await page.screenshot({ path: shot3 });
+  console.log('Saved:', shot3);
 
   await browser.close();
 }

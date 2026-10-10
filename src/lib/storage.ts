@@ -31,7 +31,7 @@ export const DEFAULT_APP_SETTINGS: AppCustomSettings = {
   auto_next_video: true,
   default_font_size: 'normal',
   show_progress_bar: true,
-  theme_palette: 'navy_luxury',
+  theme_palette: 'indigo',
   show_ebook_bridge: true,
   ebook_app_url: 'https://qbiz-ebook.vercel.app',
   auto_offline_cache: true,

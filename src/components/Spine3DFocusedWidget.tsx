@@ -8,6 +8,13 @@ interface Spine3DFocusedWidgetProps {
   onOpenFull3D?: () => void;
 }
 
+interface SubPointDetail {
+  code: string;
+  name: string;
+  badge?: string;
+  desc: string;
+}
+
 interface SpinePoint {
   id: string;
   name: string;
@@ -17,6 +24,7 @@ interface SpinePoint {
   camBack: string;
   clinicalDesc: string;
   warningNote: string;
+  subDetails?: SubPointDetail[];
 }
 
 const SPINE_POINTS: SpinePoint[] = [
@@ -27,18 +35,57 @@ const SPINE_POINTS: SpinePoint[] = [
     pinLabel: 'Đốt sống C5',
     camFront: '0,1.47,0.30,0,1.47,-0.02',
     camBack: '0,1.47,-0.30,0,1.47,-0.02',
-    clinicalDesc: 'Nằm ở trung tâm đoạn cong sinh lý cột sống cổ, là điểm chịu lực uốn gập nhiều nhất của cổ khi xoay và ngửa đầu.',
-    warningNote: 'Chèn ép rễ thần kinh C5 gây đau buốt từ sau gáy lan sang bả vai, tê yếu cơ delta và khó nâng cánh tay lên cao.',
+    clinicalDesc: 'Nằm ở đỉnh đường cong ưỡn sinh lý của cột sống cổ, là điểm chịu lực uốn gập nhiều nhất của đầu khi xoay, gật và ngửa.',
+    warningNote: 'Chèn ép rễ thần kinh C5 gây đau buốt từ sau gáy lan sang bả vai ngoài, tê yếu cơ delta và khó nâng cánh tay lên cao.',
+    subDetails: [
+      {
+        code: 'Vị trí',
+        name: 'Đỉnh cong ưỡn cổ (Lordosis)',
+        desc: 'Cân bằng trọng lượng hộp sọ ~5kg, có lỗ mỏm ngang cho động mạch đốt sống đi lên nuôi não.',
+      },
+      {
+        code: 'Thần kinh',
+        name: 'Rễ thần kinh C5 (Chi phối vai)',
+        desc: 'Xuất phát qua lỗ gian đốt sống C4-C5, điều khiển vận động cơ delta (nâng cánh tay) và cơ nhị đầu cánh tay.',
+      },
+      {
+        code: 'Bệnh lý',
+        name: 'Hội chứng cổ - vai - cánh tay',
+        desc: 'Thoái hóa gai xương C5 chèn rễ gây mỏi buốt lan sang vai, yếu tay khi nâng đồ vật và teo cơ delta nếu kéo dài.',
+      },
+    ],
   },
   {
     id: 'disc',
-    name: 'Đĩa Đệm L4 - L5 (Giảm xóc)',
+    name: 'Đĩa Đệm L4 - L5',
     code: 'Đĩa đệm',
     pinLabel: 'Đĩa đệm L4 - L5',
     camFront: '0,0.998,0.30,0,0.998,-0.01',
     camBack: '0,0.998,-0.30,0,0.998,-0.02',
-    clinicalDesc: 'Tấm đệm sợi sụn đàn hồi nằm giữa hai thân đốt sống, chứa nhân nhầy ngậm nước hoạt động như bộ giảm xóc thủy lực bảo vệ cột sống.',
-    warningNote: 'Tư thế cúi vặn người bê nặng dễ làm rách bao xơ, thoát vị đĩa đệm L4-L5 chèn ép dây thần kinh tọa gây tê buốt lan xuống chân.',
+    clinicalDesc: 'Khối đệm sụn sợi đàn hồi nằm giữa hai thân đốt sống, chứa nhân nhầy hoạt động như viên bi thủy lực giảm chấn cho toàn thân.',
+    warningNote: 'Cúi gập xoay người bê vật nặng tạo áp lực đè nén lên đĩa đệm tới 300–400kg, dễ rách bao xơ gây thoát vị đĩa đệm chèn ép dây thần kinh tọa.',
+    subDetails: [
+      {
+        code: 'Bao xơ',
+        name: 'Vòng sợi (Annulus Fibrosus)',
+        desc: 'Gồm 15–25 lớp phiến collagen đan chéo so le góc 60°, chịu lực xé vặn xoắn cực đại khi cúi gập và xoay thân.',
+      },
+      {
+        code: 'Nhân nhầy',
+        name: 'Nhân tủy (Nucleus Pulposus)',
+        desc: 'Chứa 80% nước và gel proteoglycan, hoạt động như quả cầu thủy lực phân tán lực đều 360° sang các hướng.',
+      },
+      {
+        code: 'Chịu tải',
+        name: 'Bản lề L4 - L5 (Thắt lưng)',
+        desc: 'Điểm chuyển tiếp giữa thắt lưng cử động và khung chậu cố định, hấp thu hơn 80% xung lực trọng lượng thân trên.',
+      },
+      {
+        code: 'Thần kinh',
+        name: 'Rễ thần kinh tọa L5',
+        desc: 'Thoát vị đĩa đệm L4-L5 chèn ép rễ L5 gây đau rát buốt dọc từ mông qua bắp chân ngoài xuống ngón chân cái.',
+      },
+    ],
   },
   {
     id: 'cervical',
@@ -47,28 +94,88 @@ const SPINE_POINTS: SpinePoint[] = [
     pinLabel: '',
     camFront: '0,1.46,0.44,0,1.46,-0.02',
     camBack: '0,1.46,-0.44,0,1.46,-0.02',
-    clinicalDesc: 'Gồm 7 đốt sống cổ nâng đỡ hộp sọ (~5kg), là đoạn linh hoạt nhất của trục cơ thể cho phép đầu xoay 180° và gập ngửa.',
-    warningNote: 'Tư thế cúi 60° xem điện thoại làm tăng tải trọng lên đĩa đệm cổ tới 27kg, gây thoái hóa và mất đường cong sinh lý.',
+    clinicalDesc: 'Gồm 7 đốt sống cổ nâng đỡ trọn vẹn hộp sọ (~5kg), là đoạn có biên độ cử động linh hoạt nhất của trục cơ thể với cấu tạo chuyên biệt từng đốt.',
+    warningNote: 'Tư thế cúi 60° bấm điện thoại làm tăng tải trọng nén lên đĩa đệm cổ từ 5kg vọt lên tới 27kg, gây biến dạng và mất đường cong sinh lý.',
+    subDetails: [
+      {
+        code: 'C1',
+        name: 'Đốt Đội (Atlas)',
+        badge: 'Nâng sọ',
+        desc: 'Không có thân đốt sống và mỏm gai, hình vòng nhẫn. 2 diện khớp trên đỡ lồi cầu chẩm cho phép động tác gật đầu ("Đồng ý").',
+      },
+      {
+        code: 'C2',
+        name: 'Đốt Trục (Axis)',
+        badge: 'Trục xoay',
+        desc: 'Có mỏm răng (dens) dựng đứng cắm vào cung trước C1 làm trục xoay, giúp đầu quay ngang trái/phải 180° ("Lắc đầu").',
+      },
+      {
+        code: 'C3-C5',
+        name: 'Đoạn Uốn Lực & Hô Hấp',
+        badge: 'TK hoành',
+        desc: 'Nơi phát xuất của thần kinh hoành (C3, 4, 5) chỉ huy nhịp thở cơ hoành. Đốt C5 là đỉnh uốn cong chịu tải nhiều nhất.',
+      },
+      {
+        code: 'C7',
+        name: 'Đốt Sống Lồi (C7 Prominens)',
+        badge: 'Mốc chuẩn',
+        desc: 'Mỏm gai dài nhất sau gáy sờ thấy cục xương nổi gồ rõ khi cúi đầu, là mốc lâm sàng chuẩn xác để bác sĩ đếm các đốt sống.',
+      },
+    ],
   },
   {
     id: 'thoracic',
-    name: 'Đoạn Ngực T1 - T12',
+    name: 'Đoạn Ngực T1 - T12 (12 Đốt Ngực)',
     code: 'T1 - T12',
     pinLabel: '',
     camFront: '0,1.26,0.75,0,1.26,-0.04',
     camBack: '0,1.26,-0.75,0,1.26,-0.04',
-    clinicalDesc: '12 đốt liên kết cùng xương sườn bao bọc tim phổi. Đoạn này có độ cứng vững cao nhất để bảo vệ nội tạng lồng ngực.',
-    warningNote: 'Ngồi gù làm chèn ép dây thần kinh liên sườn, gây cảm giác đau nhói tức ngực nhầm lẫn với đau tim và hạn chế thở sâu.',
+    clinicalDesc: '12 đốt sống ngực khớp động với 12 đôi xương sườn tạo thành lồng ngực bảo vệ trái tim và phổi với độ vững chắc cao nhất.',
+    warningNote: 'Ngồi gù khom lưng chèn ép dây thần kinh liên sườn, gây cảm giác đau nhói tức ngực vòng quanh mạn sườn dễ nhầm với cơn đau thắt ngực.',
+    subDetails: [
+      {
+        code: 'T1-T12',
+        name: 'Khung Lồng Ngực (Thoracic Cage)',
+        desc: 'Thân đốt dày hình trái tim, có các diện khớp sườn tiếp khớp với chỏm và củ sườn tạo buồng ngực bảo vệ tim phổi.',
+      },
+      {
+        code: 'Mỏm gai',
+        name: 'Cấu trúc xếp ngói (Spinous Process)',
+        desc: 'Mỏm gai chúc dốc sâu xuống dưới che chắn mặt sau ống sống, hạn chế động tác ngửa để bảo vệ nội tạng.',
+      },
+      {
+        code: 'Đặc tính',
+        name: 'Độ vững chắc cao & Biên độ hẹp',
+        desc: 'Đoạn cột sống ít vận động uốn gập nhất nhằm duy trì thể tích cố định cho hoạt động hô hấp của hai lá phổi.',
+      },
+    ],
   },
   {
     id: 'full',
-    name: 'Toàn Bộ Cột Sống (33 đốt)',
+    name: 'Toàn Bộ Cột Sống (33 Đốt)',
     code: '33 đốt',
     pinLabel: '',
     camFront: '0,1.18,1.50,0,1.18,-0.04',
     camBack: '0,1.18,-1.50,0,1.18,-0.04',
-    clinicalDesc: 'Hệ thống giảm xóc tự nhiên với 4 đoạn cong sinh lý chữ S cân bằng hoàn hảo, bảo vệ tủy sống và tạo trục vận động toàn thân.',
-    warningNote: 'Sai lệch tư thế kéo dài làm mòn đĩa đệm, gai xương và biến dạng trục khớp toàn thân.',
+    clinicalDesc: 'Hệ thống giảm chấn tự nhiên hoàn hảo gồm 33 đốt sống xếp chồng với 4 đường cong sinh lý chữ S bảo vệ tủy sống toàn thân.',
+    warningNote: 'Sai lệch tư thế kéo dài làm mòn đĩa đệm, gai xương, mất đường cong sinh lý và biến dạng trục khớp vận động toàn thân.',
+    subDetails: [
+      {
+        code: 'Phân đoạn',
+        name: '5 Nhóm Đốt Sống Trục',
+        desc: '7 đốt cổ (C1-C7) + 12 đốt ngực (T1-T12) + 5 đốt thắt lưng (L1-L5) + 5 đốt cùng (hàn xương) + 4 đốt cụt.',
+      },
+      {
+        code: 'Đường cong',
+        name: '4 Đường Cong Sinh Lý Chữ S',
+        desc: 'Ưỡn cổ - Gù ngực - Ưỡn thắt lưng - Gù cùng cụt: tăng sức chịu tải nén đàn hồi gấp 10 lần so với cột thẳng (R = N² + 1).',
+      },
+      {
+        code: 'Bảo vệ',
+        name: 'Ống Sống & Tủy Gai',
+        desc: 'Bảo vệ toàn vẹn tủy sống và 31 đôi dây thần kinh tủy gai truyền dẫn tín hiệu thần kinh trung ương đi toàn thân.',
+      },
+    ],
   },
 ];
 
@@ -78,6 +185,8 @@ export default function Spine3DFocusedWidget({ onOpenFull3D }: Spine3DFocusedWid
   const [showPinLabel, setShowPinLabel] = useState(false); // Mặc định khung 3D sạch hoàn toàn, trừ khi ấn vào mới hiện tên
   const [keyCounter, setKeyCounter] = useState(0);
   const [isDark, setIsDark] = useState(false);
+  const [is3DActive, setIs3DActive] = useState(false); // Chống kẹt ngón tay khi cuộn trang điện thoại
+  const iframeRef = React.useRef<HTMLIFrameElement>(null);
 
   // Lắng nghe thay đổi theme Sáng / Tối từ trang cha
   useEffect(() => {
@@ -95,10 +204,23 @@ export default function Spine3DFocusedWidget({ onOpenFull3D }: Spine3DFocusedWid
     return () => observer.disconnect();
   }, []);
 
+  // Gửi postMessage làm sáng đốt sống tương ứng trong iframe
+  useEffect(() => {
+    if (iframeRef.current?.contentWindow) {
+      try {
+        iframeRef.current.contentWindow.postMessage({
+          type: 'HIGHLIGHT_SPINE',
+          hl: selectedPoint.id,
+        }, '*');
+      } catch (e) {}
+    }
+  }, [selectedPoint]);
+
   const handleSelectPoint = (pt: SpinePoint) => {
     playTapSound();
     setSelectedPoint(pt);
     setShowPinLabel(false); // Reset để khung 3D luôn sạch sẽ, không tự ý hiện tên
+    setIs3DActive(false); // Nhả tương tác để cuộn trang mượt mà
     setKeyCounter((k) => k + 1);
   };
 
@@ -110,7 +232,7 @@ export default function Spine3DFocusedWidget({ onOpenFull3D }: Spine3DFocusedWid
 
   const activeCam = isFrontView ? selectedPoint.camFront : selectedPoint.camBack;
   const themeParam = isDark ? 'dark' : 'light';
-  const iframeUrl = `/3d/index.html?widget=1&theme=${themeParam}&pt=${selectedPoint.id}&dir=${isFrontView ? 'front' : 'back'}#sys=skeletal,joints&cam=${activeCam}`;
+  const iframeUrl = `/3d/index.html?widget=1&theme=${themeParam}&pt=${selectedPoint.id}&hl=${selectedPoint.id}&dir=${isFrontView ? 'front' : 'back'}#sys=skeletal,joints&cam=${activeCam}&hl=${selectedPoint.id}`;
 
   return (
     <section
@@ -150,12 +272,48 @@ export default function Spine3DFocusedWidget({ onOpenFull3D }: Spine3DFocusedWid
       {/* 2. KHUNG CHÍNH XEM: DÀI ĐỨNG TỶ LỆ 3x5 (ASPECT 3:5) */}
       <div className="relative w-full max-w-[340px] aspect-[3/5] mx-auto bg-slate-100 dark:bg-[#070B14] overflow-hidden select-none border-y border-slate-200/80 dark:border-slate-800/80">
         <iframe
+          ref={iframeRef}
           key={`${selectedPoint.id}-${isFrontView ? 'front' : 'back'}-${keyCounter}-${themeParam}`}
           src={iframeUrl}
           title={`Mô hình 3D ${selectedPoint.name}`}
-          className="w-full h-full border-0 pointer-events-auto"
+          className={`w-full h-full border-0 transition-opacity ${is3DActive ? 'pointer-events-auto' : 'pointer-events-none'}`}
           allow="fullscreen; accelerometer; gyroscope"
         />
+
+        {/* LỚP BẢO VỆ CUỘN TRANG (CHỐNG KẸT NGÓN TAY KHI VUỐT BÀI HỌC TRÊN ĐIỆN THOẠI):
+            Mặc định iframe pointer-events-none để người dùng vuốt dọc cuộn trang mượt mà 100%.
+            Chạm vào huy hiệu để kích hoạt xoay 3D. */}
+        {!is3DActive && (
+          <div
+            onClick={() => {
+              playTapSound();
+              setIs3DActive(true);
+            }}
+            className="absolute inset-0 z-20 flex flex-col items-center justify-end pb-3.5 bg-transparent cursor-pointer"
+          >
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-950/85 hover:bg-slate-900 text-white dark:bg-blue-600/90 dark:hover:bg-blue-600 text-[11px] font-bold shadow-lg backdrop-blur-xs border border-white/20 active:scale-95 transition-all">
+              <span className="text-[12px]">👆</span>
+              <span>Chạm để xoay 3D 360°</span>
+            </div>
+          </div>
+        )}
+
+        {/* KHI ĐANG BẬT XOAY 3D: NÚT XONG Ở GÓC TRÊN ĐỂ TIẾP TỤC CUỘN TRANG DỄ DÀNG */}
+        {is3DActive && (
+          <div className="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5 animate-fade-in">
+            <button
+              type="button"
+              onClick={() => {
+                playTapSound();
+                setIs3DActive(false);
+              }}
+              className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-[10.5px] font-black shadow-lg border border-blue-400/40 active:scale-95 transition-all cursor-pointer"
+              title="Khóa xoay 3D để tiếp tục cuộn trang"
+            >
+              <span>✓ Xong (Cuộn tiếp)</span>
+            </button>
+          </div>
+        )}
 
         {/* CHỈ ĐIỂM GIẢI PHẪU: Mặc định khung 3D sạch bóng, CHỈ HIỆN TÊN KHI NGƯỜI DÙNG BẤM VÀO */}
         {selectedPoint.pinLabel && (
@@ -225,14 +383,14 @@ export default function Spine3DFocusedWidget({ onOpenFull3D }: Spine3DFocusedWid
         </div>
 
         {/* 4. THẺ MÔ TẢ & LÝ GIẢI Y KHOA: ĐÚNG MÀU NỀN SÁNG / TỐI & ĐẦY ĐỦ TIÊU ĐỀ */}
-        <div className="p-3 rounded-[14px] bg-white dark:bg-slate-950/60 border border-slate-200/90 dark:border-blue-900/30 shadow-2xs dark:shadow-none flex flex-col gap-2 text-left">
+        <div className="p-3 rounded-[14px] bg-white dark:bg-slate-950/60 border border-slate-200/90 dark:border-blue-900/30 shadow-2xs dark:shadow-none flex flex-col gap-2.5 text-left">
           {/* Thanh tiêu đề thẻ + Nút đổi góc nhìn Mặt trước / Mặt sau */}
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-1.5 min-w-0">
               <span className="text-[11.5px] font-black text-blue-600 dark:text-cyan-400 shrink-0">
                 🎯 Điểm chỉ:
               </span>
-              <span className="text-[12.5px] font-black text-slate-900 dark:text-white">
+              <span className="text-[12.5px] font-black text-slate-900 dark:text-white truncate">
                 {selectedPoint.name}
               </span>
             </div>
@@ -253,13 +411,49 @@ export default function Spine3DFocusedWidget({ onOpenFull3D }: Spine3DFocusedWid
             {selectedPoint.clinicalDesc}
           </p>
 
+          {/* DANH SÁCH CHI TIẾT CÁC ĐỐT SỐNG & Ý NGHĨA BÀI HỌC Y KHOA */}
+          {selectedPoint.subDetails && selectedPoint.subDetails.length > 0 && (
+            <div className="flex flex-col gap-1.5 pt-1.5 border-t border-slate-100 dark:border-slate-800/80">
+              <div className="flex items-center justify-between text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                <span>📖 Chi tiết các đốt sống trong bài học:</span>
+                <span className="text-[9.5px] px-1.5 py-0.2 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-cyan-300 font-black">
+                  {selectedPoint.subDetails.length} cấu trúc
+                </span>
+              </div>
+              <div className="grid grid-cols-1 gap-1.5">
+                {selectedPoint.subDetails.map((sub, idx) => (
+                  <div
+                    key={idx}
+                    className="p-2 rounded-[10px] bg-slate-50/90 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800/80 flex flex-col gap-0.5 text-left"
+                  >
+                    <div className="flex items-center justify-between gap-1.5">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="px-1.5 py-0.2 rounded-md bg-blue-600 text-white text-[9.5px] font-black shrink-0">
+                          {sub.code}
+                        </span>
+                        <span className="text-[11.5px] font-bold text-slate-900 dark:text-white truncate">
+                          {sub.name}
+                        </span>
+                      </div>
+                      {sub.badge && (
+                        <span className="px-1.5 py-0.2 rounded-full bg-cyan-100 dark:bg-cyan-950/80 text-cyan-800 dark:text-cyan-300 text-[9px] font-bold shrink-0">
+                          {sub.badge}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-snug">
+                      {sub.desc}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Hộp cảnh báo cơ chế bệnh sinh */}
           <div className="p-2 rounded-[10px] bg-amber-50/90 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/40 flex items-start gap-1.5 text-[11.5px] leading-snug">
             <span className="shrink-0 font-bold text-amber-800 dark:text-amber-300">⚠️ Cơ chế:</span>
             <span className="text-amber-950 dark:text-amber-200/90">{selectedPoint.warningNote}</span>
-          </div>
-
-          <div className="text-[10px] text-slate-400 dark:text-slate-500 text-right pt-0.5">
-            (Chạm trực tiếp vào mô hình 3D để xoay 360°)
           </div>
         </div>
       </div>
