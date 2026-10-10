@@ -8,8 +8,8 @@ interface PageCardProps {
   topic: Topic;
   orderNumber: number;
   videoCount: number;
-  watchedVideos?: number[];
-  lastVideo?: number;
+  watchedVideos?: (string | number)[];
+  lastVideo?: number | string;
   isCompleted?: boolean;
   isActive?: boolean;
   onActivate?: () => void;
@@ -31,7 +31,7 @@ export default function PageCard({
   const count = typeof videoCount === 'number' ? videoCount : 0;
   const watchedCount = watchedVideos.length;
   const isAllWatched = count > 0 && watchedCount >= count;
-  const hasStarted = isCompleted || watchedCount > 0 || (lastVideo !== undefined && lastVideo > 0);
+  const hasStarted = isCompleted || watchedCount > 0 || (lastVideo !== undefined && (typeof lastVideo === 'number' ? lastVideo > 0 : Boolean(lastVideo)));
 
   let subtitle = count > 0 ? `${count} video · Chưa xem` : `Bài học · Chưa xem`;
   let progressPercent = 0;
@@ -43,7 +43,14 @@ export default function PageCard({
     subtitle = hasStarted ? `Đang học bài` : `Bài học lý thuyết`;
     progressPercent = hasStarted ? 50 : 0;
   } else if (hasStarted) {
-    const currentVideo = lastVideo || (watchedVideos.length > 0 ? Math.max(...watchedVideos) : 1);
+    const numericWatched = watchedVideos
+      .map((v) => (typeof v === 'number' ? v : parseInt(String(v), 10)))
+      .filter((n) => !isNaN(n) && n > 0);
+    const numericLastVideo = typeof lastVideo === 'number'
+      ? lastVideo
+      : parseInt(String(lastVideo), 10);
+    const validLastVideo = !isNaN(numericLastVideo) && numericLastVideo > 0 ? numericLastVideo : undefined;
+    const currentVideo = validLastVideo || (numericWatched.length > 0 ? Math.max(...numericWatched) : 1);
     subtitle = count > 1
       ? `Video ${currentVideo}/${count}`
       : `Đang học dở`;
@@ -53,9 +60,10 @@ export default function PageCard({
     }
   }
 
-  const targetUrl = lastVideo
-    ? `/${topic.slug}/${page.slug}?v=${lastVideo}`
-    : `/${topic.slug}/${page.slug}`;
+  const vParam = typeof lastVideo === 'number' || (typeof lastVideo === 'string' && /^\d+$/.test(lastVideo))
+    ? `?v=${lastVideo}`
+    : '';
+  const targetUrl = `/${topic.slug}/${page.slug}${vParam}`;
 
   return (
     <Link

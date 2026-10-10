@@ -1,3 +1,11 @@
+-- ============================================================================
+-- CẢNH BÁO: TẬP LỆNH NÀY HIỆN TẠI KHÔNG DÙNG (DO SAI CỘT VÀ SAI CẤU TRÚC).
+-- KHÔNG CHẠY FILE NÀY TRÊN SUPABASE PRODUCTION!
+-- Bảng settings và tiến độ đồng bộ đang hoạt động ổn định qua API server.
+-- Xem chi tiết lộ trình kỹ thuật tại docs/KE_HOACH.md.
+-- ============================================================================
+-- 
+-- (Lưu trữ lịch sử)
 -- Chạy trong Supabase > SQL Editor (dự án evuhamqlzprrbuabxyyn).
 -- Mục đích: ngăn người lạ (khóa anon) đọc dữ liệu đồng bộ học viên và ghi đè dữ liệu.
 -- Server dùng SERVICE_ROLE_KEY nên không bị ảnh hưởng bởi RLS.

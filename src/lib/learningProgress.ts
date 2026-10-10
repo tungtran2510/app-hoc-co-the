@@ -1,4 +1,5 @@
 export interface XemTiepInfo {
+  page_id?: string;
   topic_slug: string;
   topic_title: string;
   page_slug: string;
@@ -7,6 +8,7 @@ export interface XemTiepInfo {
   video_index: number;
   video_total: number;
   video_title: string;
+  video_id?: string;
   cover_url?: string | null;
   scroll_y?: number;
   updated_at: number;
@@ -14,13 +16,74 @@ export interface XemTiepInfo {
 
 export interface TienDoMap {
   [page_id: string]: {
-    last_video: number;
-    watched: number[];
+    last_video: number | string;
+    watched: (string | number)[];
   };
 }
 
 const XEM_TIEP_KEY = 'xem_tiep';
 const TIEN_DO_KEY = 'tien_do';
+
+const DELETED_SAVED_KEY = 'qbiz_deleted_saved';
+const DELETED_COMPLETED_KEY = 'qbiz_deleted_completed';
+const COMPLETED_TIMESTAMPS_KEY = 'qbiz_completed_timestamps';
+
+export function getDeletedSavedMap(): Record<string, number> {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = localStorage.getItem(DELETED_SAVED_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+export function recordDeletedSaved(pageId: string): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const map = getDeletedSavedMap();
+    map[pageId] = Date.now();
+    localStorage.setItem(DELETED_SAVED_KEY, JSON.stringify(map));
+  } catch {}
+}
+
+export function getDeletedCompletedMap(): Record<string, number> {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = localStorage.getItem(DELETED_COMPLETED_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+export function recordDeletedCompleted(pageId: string): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const map = getDeletedCompletedMap();
+    map[pageId] = Date.now();
+    localStorage.setItem(DELETED_COMPLETED_KEY, JSON.stringify(map));
+  } catch {}
+}
+
+export function getCompletedTimestampsMap(): Record<string, number> {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = localStorage.getItem(COMPLETED_TIMESTAMPS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+export function recordCompletedTimestamp(pageId: string): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const map = getCompletedTimestampsMap();
+    map[pageId] = Date.now();
+    localStorage.setItem(COMPLETED_TIMESTAMPS_KEY, JSON.stringify(map));
+  } catch {}
+}
 
 export function notifyProgressChanged(): void {
   if (typeof window !== 'undefined') {
@@ -87,17 +150,17 @@ export function getStoredTienDo(): TienDoMap {
   }
 }
 
-export function saveVideoWatched(pageId: string, videoIndex: number): void {
+export function saveVideoWatched(pageId: string, videoIdOrIndex: string | number, videoIndex?: number): void {
   if (typeof window === 'undefined') return;
   try {
     const all = getStoredTienDo();
-    const current = all[pageId] || { last_video: videoIndex, watched: [] };
-    const watchedSet = new Set(current.watched || []);
-    watchedSet.add(videoIndex);
+    const current = all[pageId] || { last_video: videoIndex || 1, watched: [] };
+    const watchedSet = new Set((current.watched || []).map(String));
+    watchedSet.add(String(videoIdOrIndex));
 
     all[pageId] = {
-      last_video: videoIndex,
-      watched: Array.from(watchedSet).sort((a, b) => a - b),
+      last_video: videoIndex !== undefined ? videoIndex : (current.last_video || 1),
+      watched: Array.from(watchedSet),
     };
     localStorage.setItem(TIEN_DO_KEY, JSON.stringify(all));
     notifyProgressChanged();
@@ -157,8 +220,9 @@ export function toggleSavePage(info: SavedPageInfo): boolean {
     if (exists) {
       updated = list.filter((p) => p.page_id !== info.page_id);
       newState = false;
+      recordDeletedSaved(info.page_id);
     } else {
-      updated = [info, ...list];
+      updated = [{ ...info, saved_at: Date.now() }, ...list];
       newState = true;
     }
     localStorage.setItem(BAI_DA_LUU_KEY, JSON.stringify(updated));
@@ -204,9 +268,11 @@ export function togglePageCompleted(pageId: string): boolean {
     if (list.includes(pageId)) {
       updated = list.filter((id) => id !== pageId);
       newState = false;
+      recordDeletedCompleted(pageId);
     } else {
       updated = [...list, pageId];
       newState = true;
+      recordCompletedTimestamp(pageId);
     }
     localStorage.setItem(DA_HOAN_THANH_KEY, JSON.stringify(updated));
     notifyProgressChanged();

@@ -62,35 +62,49 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      const payloads = blocks.map((b: any, idx: number) => {
-        const inputBlockId = b.id ? String(b.id).trim() : '';
-        const finalBlockId = isValidUuid(inputBlockId) ? inputBlockId : generateUuid();
-        const isFaq = b.type === 'faq';
-        const isBooks = b.type === 'books';
-        return {
-          id: finalBlockId,
-          workspace_id: b.workspace_id || 'default',
-          page_id: resolvedPageId,
-          type: isFaq || isBooks ? 'text' : b.type,
-          display_style: isFaq ? 'faq' : isBooks ? 'books' : b.display_style,
-          data: isFaq
-            ? { ...(b.data || {}), __kind: 'faq', __style: b.display_style || 'accordion' }
-            : isBooks
-            ? { ...(b.data || {}), __kind: 'books', __style: b.display_style || 'list' }
-            : b.data || {},
-          sort_order: typeof b.sort_order === 'number' ? b.sort_order : idx + 1,
-          is_visible: b.is_visible ?? true,
-          updated_at: new Date().toISOString(),
-        };
+      // 1. Chỉ cập nhật những khối thực sự thay đổi thứ tự (chỉ ghi id + sort_order)
+      const validBlockIds = blocks
+        .map((b: any) => String(b.id || '').trim())
+        .filter((id: string) => isValidUuid(id));
+
+      const { data: dbRows, error: fetchOrderErr } = await supabase
+        .from('blocks')
+        .select('id, sort_order')
+        .in('id', validBlockIds);
+
+      if (fetchOrderErr) {
+        console.error('[Save Blocks Fetch Order Error]', fetchOrderErr);
+        return NextResponse.json({ error: fetchOrderErr.message || 'Lỗi kiểm tra thứ tự khối' }, { status: 500 });
+      }
+
+      const dbSortMap = new Map((dbRows || []).map((r) => [r.id, r.sort_order]));
+
+      const changedBlocks = blocks.filter((b: any, idx: number) => {
+        const targetSort = typeof b.sort_order === 'number' ? b.sort_order : idx + 1;
+        const currentSort = dbSortMap.get(b.id);
+        return currentSort === undefined || currentSort !== targetSort;
       });
 
-      const { error: upsertErr } = await supabase
-        .from('blocks')
-        .upsert(payloads, { onConflict: 'id' });
+      if (changedBlocks.length === 0) {
+        return NextResponse.json({ success: true, count: 0, message: 'Thứ tự không thay đổi' });
+      }
 
-      if (upsertErr) {
-        console.error('[Save Blocks Batch Error]', upsertErr);
-        return NextResponse.json({ error: upsertErr.message || 'Chưa lưu được – chưa kết nối dữ liệu' }, { status: 500 });
+      const updatePromises = changedBlocks.map((b: any, idx: number) => {
+        const targetSort = typeof b.sort_order === 'number' ? b.sort_order : idx + 1;
+        return supabase
+          .from('blocks')
+          .update({
+            sort_order: targetSort,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', b.id);
+      });
+
+      const updateResults = await Promise.all(updatePromises);
+      const firstError = updateResults.find((r) => r.error)?.error;
+      if (firstError) {
+        console.error('[Save Blocks Update Error]', firstError);
+        return NextResponse.json({ error: firstError.message || 'Chưa lưu được thứ tự mới' }, { status: 500 });
       }
 
       try {
@@ -101,7 +115,7 @@ export async function POST(req: NextRequest) {
         // Bỏ qua
       }
 
-      return NextResponse.json({ success: true, count: payloads.length });
+      return NextResponse.json({ success: true, count: changedBlocks.length });
     }
 
     const { block } = body;
@@ -145,6 +159,26 @@ export async function POST(req: NextRequest) {
     const inputBlockId = block.id ? String(block.id).trim() : '';
     const finalBlockId = isValidUuid(inputBlockId) ? inputBlockId : generateUuid();
 
+    // 3. Chống lưu đè (Concurrency check qua updated_at)
+    if (inputBlockId && isValidUuid(inputBlockId)) {
+      const { data: dbBlock } = await supabase
+        .from('blocks')
+        .select('updated_at')
+        .eq('id', inputBlockId)
+        .maybeSingle();
+
+      if (dbBlock && dbBlock.updated_at && block.updated_at) {
+        const dbTime = new Date(dbBlock.updated_at).getTime();
+        const clientTime = new Date(block.updated_at).getTime();
+        if (!isNaN(dbTime) && !isNaN(clientTime) && dbTime > clientTime + 1000) {
+          return NextResponse.json(
+            { error: 'Nội dung đã thay đổi, tải lại trang' },
+            { status: 409 }
+          );
+        }
+      }
+    }
+
     const isFaq = block.type === 'faq';
     const isBooks = block.type === 'books';
     const payload = {
@@ -163,17 +197,16 @@ export async function POST(req: NextRequest) {
       updated_at: new Date().toISOString(),
     };
 
-    const { data: savedData, error } = await supabase
+    const { error: saveError } = await supabase
       .from('blocks')
-      .upsert(payload, { onConflict: 'id' })
-      .select('*')
-      .single();
+      .upsert(payload, { onConflict: 'id' });
 
-    if (error) {
-      console.error('[Save Block Error]', error);
-      return NextResponse.json({ error: error.message || 'Chưa lưu được – chưa kết nối dữ liệu' }, { status: 500 });
+    if (saveError) {
+      console.error('[Save Block Error]', saveError);
+      return NextResponse.json({ error: saveError.message || 'Chưa lưu được – chưa kết nối dữ liệu' }, { status: 500 });
     }
 
+    // 4. Sau khi lưu, đọc lại trực tiếp từ DB, không dùng bộ đệm
     try {
       const { clearDataCache } = await import('../../../../lib/data');
       clearDataCache();
@@ -182,8 +215,19 @@ export async function POST(req: NextRequest) {
       // Bỏ qua
     }
 
-    const decoded = savedData && isFaq ? { ...savedData, type: 'faq', display_style: block.display_style || 'accordion', data: block.data || {} } : savedData && isBooks ? { ...savedData, type: 'books', display_style: block.display_style || 'list', data: block.data || {} } : savedData;
-    return NextResponse.json({ success: true, block: decoded || { ...payload, ...(isFaq ? { type: 'faq', display_style: block.display_style, data: block.data } : {}), ...(isBooks ? { type: 'books', display_style: block.display_style, data: block.data } : {}) } });
+    const { data: freshRow, error: fetchFreshErr } = await supabase
+      .from('blocks')
+      .select('*')
+      .eq('id', finalBlockId)
+      .single();
+
+    if (fetchFreshErr || !freshRow) {
+      return NextResponse.json({ error: 'Đã lưu nhưng không đọc lại được khối từ cơ sở dữ liệu' }, { status: 500 });
+    }
+
+    const { decodeBlockRow } = await import('../../../../lib/data');
+    const decoded = decodeBlockRow(freshRow);
+    return NextResponse.json({ success: true, block: decoded });
   } catch (err: any) {
     console.error('[Save Block Exception]', err);
     return NextResponse.json({ error: err.message || 'Lỗi hệ thống khi lưu khối' }, { status: 500 });

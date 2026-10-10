@@ -138,6 +138,7 @@ export default function ContentViewer({
   useEffect(() => {
     if (topic?.slug && page?.slug) {
       saveStoredXemTiep({
+        page_id: page.id,
         topic_slug: topic.slug,
         topic_title: topic.title,
         page_slug: page.slug,
@@ -149,7 +150,7 @@ export default function ContentViewer({
         cover_url: page.cover_url || null,
       });
     }
-  }, [topic?.slug, topic?.title, page?.slug, page?.title, page?.sort_order, page?.cover_url]);
+  }, [page?.id, topic?.slug, topic?.title, page?.slug, page?.title, page?.sort_order, page?.cover_url]);
 
   const [fontSizeMode, setFontSizeMode] = useState<FontSizeOption>('normal');
   const [isAdmin, setIsAdmin] = useState(false);

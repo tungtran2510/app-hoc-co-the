@@ -64,18 +64,34 @@ export async function saveStoredBlocks(_pageId: string, blocks: Block[]): Promis
 
     if (res.ok) {
       const data = await res.json().catch(() => ({}));
-      if (typeof window !== 'undefined' && 'serviceWorker' in navigator && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_PAGE_CACHE' });
+      if (data.success) {
+        if (typeof window !== 'undefined' && 'serviceWorker' in navigator && navigator.serviceWorker.controller) {
+          navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_PAGE_CACHE' });
+        }
+        return true;
       }
-      return Boolean(data.success);
+      console.error('[saveStoredBlocks] Lưu khối hàng loạt không thành công:', data.error || 'Lỗi không xác định');
+      return false;
     }
 
-    // Dự phòng lưu tuần tự nếu cần
+    const errData = await res.json().catch(() => ({}));
+    console.warn('[saveStoredBlocks] Yêu cầu hàng loạt thất bại (HTTP ' + res.status + '):', errData?.error);
+
+    // Dự phòng lưu tuần tự từng khối nếu batch thất bại: CHỈ TRẢ VỀ THÀNH CÔNG KHI MỌI LẦN LƯU ĐỀU THÀNH CÔNG
     for (const block of blocks) {
-      await saveBlockApi(block);
+      const singleRes = await saveBlockApi(block);
+      if (!singleRes || !singleRes.success) {
+        console.error('[saveStoredBlocks] Thất bại khi lưu khối ID ' + block.id + ':', singleRes?.error || 'Lỗi lưu khối');
+        return false;
+      }
+    }
+
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_PAGE_CACHE' });
     }
     return true;
-  } catch {
+  } catch (err: any) {
+    console.error('[saveStoredBlocks] Ngoại lệ khi lưu khối:', err?.message || err);
     return false;
   }
 }

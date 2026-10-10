@@ -5,6 +5,9 @@ import {
   getSavedPages,
   getCompletedPages,
   getReviewVideos,
+  getDeletedSavedMap,
+  getDeletedCompletedMap,
+  getCompletedTimestampsMap,
 } from './learningProgress';
 
 export const USER_PHONE_KEY = 'user_phone';
@@ -107,6 +110,9 @@ export function getLocalLearningData(): {
   da_hoan_thanh: string[];
   can_on_tap_videos: any[];
   reader_font?: string | null;
+  deleted_saved: Record<string, number>;
+  deleted_completed: Record<string, number>;
+  completed_timestamps: Record<string, number>;
 } {
   return {
     xem_tiep: getStoredXemTiep(),
@@ -115,6 +121,9 @@ export function getLocalLearningData(): {
     da_hoan_thanh: getCompletedPages(),
     can_on_tap_videos: getReviewVideos(),
     reader_font: typeof window !== 'undefined' ? localStorage.getItem('qbiz_reader_font') : null,
+    deleted_saved: getDeletedSavedMap(),
+    deleted_completed: getDeletedCompletedMap(),
+    completed_timestamps: getCompletedTimestampsMap(),
   };
 }
 
@@ -142,6 +151,15 @@ export function applyRemoteLearningData(data: UserProgressSyncData): void {
     if (data.reader_font && typeof data.reader_font === 'string') {
       localStorage.setItem('qbiz_reader_font', data.reader_font);
       document.documentElement.setAttribute('data-reader-font', data.reader_font);
+    }
+    if ((data as any).deleted_saved && typeof (data as any).deleted_saved === 'object') {
+      localStorage.setItem('qbiz_deleted_saved', JSON.stringify((data as any).deleted_saved));
+    }
+    if ((data as any).deleted_completed && typeof (data as any).deleted_completed === 'object') {
+      localStorage.setItem('qbiz_deleted_completed', JSON.stringify((data as any).deleted_completed));
+    }
+    if ((data as any).completed_timestamps && typeof (data as any).completed_timestamps === 'object') {
+      localStorage.setItem('qbiz_completed_timestamps', JSON.stringify((data as any).completed_timestamps));
     }
 
     // Bắn sự kiện để các trang/thành phần đang mở cập nhật tức thì

@@ -199,7 +199,7 @@ export default function PageListClient({ initialPages, topic }: PageListClientPr
               );
 
               const effectiveLastVideo = lastVideo || (isResumeMatch ? (resume?.video_index || 1) : undefined);
-              const isCurrentlyLearning = !isCompleted && (isResumeMatch || (effectiveLastVideo !== undefined && effectiveLastVideo > 0));
+              const isCurrentlyLearning = !isCompleted && (isResumeMatch || (effectiveLastVideo !== undefined && (typeof effectiveLastVideo === 'number' ? effectiveLastVideo > 0 : Boolean(effectiveLastVideo))));
 
               return (
                 <div key={page.id} className="w-full relative group flex flex-col gap-1.5">

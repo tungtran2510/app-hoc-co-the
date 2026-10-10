@@ -235,13 +235,22 @@ export function normalizeHomeSectionsOrder(raw?: any): string[] {
   return unique;
 }
 
+export function isSupabaseConfigured(): boolean {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = typeof window === 'undefined'
+    ? (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+    : process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  return Boolean(url && key);
+}
+
 // ================= BỘ NHỚ ĐỆM NHANH (IN-MEMORY CACHE) =================
 interface CacheEntry<T> {
   data: T;
   expiry: number;
 }
 const dataCache = new Map<string, CacheEntry<any>>();
-const CACHE_TTL_MS = 10 * 60 * 1000; // 10 phút tối ưu hiệu năng, tự động làm mới tức thì khi Admin bấm lưu
+// Giảm cache cho người xem xuống 60 giây; tự động làm mới tức thì khi Admin bấm lưu
+const CACHE_TTL_MS = 60 * 1000;
 
 export function clearDataCache(keyPrefix?: string): void {
   if (!keyPrefix) {
@@ -255,7 +264,22 @@ export function clearDataCache(keyPrefix?: string): void {
   }
 }
 
+function isAdminLoggedIn(): boolean {
+  if (typeof window !== 'undefined') {
+    try {
+      return Boolean(localStorage.getItem('app_admin_token'));
+    } catch {
+      return false;
+    }
+  }
+  return false;
+}
+
 async function getCachedOrFetch<T>(key: string, fetcher: () => Promise<T>, ttlMs = CACHE_TTL_MS): Promise<T> {
+  // Admin đã đăng nhập thì luôn đọc thẳng DB, không dùng bộ đệm
+  if (isAdminLoggedIn()) {
+    return await fetcher();
+  }
   const cached = dataCache.get(key);
   if (cached && cached.expiry > Date.now()) {
     return cached.data;
@@ -265,18 +289,49 @@ async function getCachedOrFetch<T>(key: string, fetcher: () => Promise<T>, ttlMs
   return data;
 }
 
+/** Đọc tất cả dòng từ một truy vấn theo phân trang 1000 dòng/lần */
+export async function fetchAllRowsPaged<T>(
+  queryFn: (from: number, to: number) => PromiseLike<{ data: any; error: any }>
+): Promise<T[]> {
+  const pageSize = 1000;
+  let allRows: T[] = [];
+  let from = 0;
+  while (true) {
+    const to = from + pageSize - 1;
+    const { data, error } = await queryFn(from, to);
+    if (error) {
+      throw new Error(`Lỗi đọc dữ liệu phân trang: ${error.message || error}`);
+    }
+    if (!data || data.length === 0) {
+      break;
+    }
+    allRows.push(...data);
+    if (data.length < pageSize) {
+      break;
+    }
+    from += pageSize;
+  }
+  return allRows;
+}
+
 export async function getSettings(includeAiTraining = false): Promise<Settings> {
   const cacheKey = includeAiTraining ? 'settings:full' : 'settings:light';
   return getCachedOrFetch(cacheKey, async () => {
+    const supabaseConfigured = isSupabaseConfigured();
     const supabase = getSupabase();
     if (supabase) {
       try {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('settings')
           .select('*')
           .eq('workspace_id', 'default')
           .single();
-        if (data) {
+
+        if (error && supabaseConfigured) {
+          throw new Error(`Không tải được dữ liệu cài đặt: ${error.message}`);
+        }
+
+      if (data) {
           const rawFlatBooks = data.flat_books || (data.block_styles && typeof data.block_styles === 'object' ? data.block_styles.flat_books : null);
           const authProfile = normalizeAuthorProfile(data.author_profile, rawFlatBooks);
           const finalHotline = data.hotline || authProfile.phone || DEFAULT_AUTHOR_PROFILE.phone;
@@ -330,8 +385,13 @@ export async function getSettings(includeAiTraining = false): Promise<Settings> 
             topics_guide: (sanitizedBlockStyles.topics_guide && typeof sanitizedBlockStyles.topics_guide === 'object') ? sanitizedBlockStyles.topics_guide : null,
           } as Settings;
         }
-      } catch {
-        // fallback
+        if (supabaseConfigured) {
+          throw new Error('Không tải được dữ liệu: không tìm thấy cấu hình hệ thống trên cơ sở dữ liệu');
+        }
+      } catch (err: any) {
+        if (supabaseConfigured) {
+          throw err;
+        }
       }
     }
     return sampleSettings;
@@ -341,6 +401,7 @@ export async function getSettings(includeAiTraining = false): Promise<Settings> 
 export async function getTopics(includeHidden = false): Promise<Topic[]> {
   const cacheKey = `topics:${includeHidden}`;
   return getCachedOrFetch(cacheKey, async () => {
+    const supabaseConfigured = isSupabaseConfigured();
     const supabase = getSupabase();
     if (supabase) {
       try {
@@ -348,10 +409,14 @@ export async function getTopics(includeHidden = false): Promise<Topic[]> {
         if (!includeHidden) {
           query = query.eq('is_visible', true);
         }
-        const { data } = await query.order('sort_order', { ascending: true });
-        if (data && data.length > 0) return data as Topic[];
-      } catch {
-        // fallback
+        const { data, error } = await query.order('sort_order', { ascending: true });
+        if (error && supabaseConfigured) {
+          throw new Error(`Không tải được dữ liệu chuyên đề: ${error.message}`);
+        }
+        if (data) return data as Topic[];
+        if (supabaseConfigured) return [];
+      } catch (err: any) {
+        if (supabaseConfigured) throw err;
       }
     }
     return sampleTopics
@@ -363,21 +428,52 @@ export async function getTopics(includeHidden = false): Promise<Topic[]> {
 export async function getTopicBySlug(slug: string): Promise<Topic | null> {
   const cacheKey = `topic_by_slug:${slug}`;
   return getCachedOrFetch(cacheKey, async () => {
+    const supabaseConfigured = isSupabaseConfigured();
     const supabase = getSupabase();
     if (supabase) {
       try {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('topics')
           .select('*')
           .eq('workspace_id', 'default')
           .eq('slug', slug)
-          .single();
+          .maybeSingle();
+        if (error && supabaseConfigured) {
+          throw new Error(`Không tải được dữ liệu chuyên đề: ${error.message}`);
+        }
         if (data) return data as Topic;
-      } catch {
-        // fallback
+        if (supabaseConfigured) return null;
+      } catch (err: any) {
+        if (supabaseConfigured) throw err;
       }
     }
     const topic = sampleTopics.find((t) => t.slug === slug);
+    return topic || null;
+  });
+}
+
+export async function getTopicById(id: string): Promise<Topic | null> {
+  const cacheKey = `topic_by_id:${id}`;
+  return getCachedOrFetch(cacheKey, async () => {
+    const supabaseConfigured = isSupabaseConfigured();
+    const supabase = getSupabase();
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('topics')
+          .select('*')
+          .eq('id', id)
+          .maybeSingle();
+        if (error && supabaseConfigured) {
+          throw new Error(`Không tải được dữ liệu chuyên đề: ${error.message}`);
+        }
+        if (data) return data as Topic;
+        if (supabaseConfigured) return null;
+      } catch (err: any) {
+        if (supabaseConfigured) throw err;
+      }
+    }
+    const topic = sampleTopics.find((t) => t.id === id);
     return topic || null;
   });
 }
@@ -421,6 +517,7 @@ export const EXCLUDED_DRAFT_PAGE_SLUGS = ['08', 'hbv'];
 export async function getPagesByTopic(topicId: string, includeHidden = false): Promise<Page[]> {
   const cacheKey = `pages_by_topic:${topicId}:${includeHidden}`;
   return getCachedOrFetch(cacheKey, async () => {
+    const supabaseConfigured = isSupabaseConfigured();
     const supabase = getSupabase();
     if (supabase) {
       try {
@@ -428,10 +525,14 @@ export async function getPagesByTopic(topicId: string, includeHidden = false): P
         if (!includeHidden) {
           query = query.eq('is_visible', true).eq('status', 'published').not('slug', 'in', '("08","hbv")');
         }
-        const { data } = await query.order('sort_order', { ascending: true });
-        if (data && data.length > 0) return data as Page[];
-      } catch {
-        // fallback
+        const { data, error } = await query.order('sort_order', { ascending: true });
+        if (error && supabaseConfigured) {
+          throw new Error(`Không tải được dữ liệu bài học: ${error.message}`);
+        }
+        if (data) return data as Page[];
+        if (supabaseConfigured) return [];
+      } catch (err: any) {
+        if (supabaseConfigured) throw err;
       }
     }
     const targetSampleId = UUID_TO_SAMPLE_TOPIC_ID[topicId] || topicId;
@@ -453,6 +554,7 @@ export async function getTopicsWithCounts(includeHidden = false): Promise<{ topi
   const cacheKey = `topics_with_counts:${includeHidden}`;
   return getCachedOrFetch(cacheKey, async () => {
     const topics = await getTopics(includeHidden);
+    const supabaseConfigured = isSupabaseConfigured();
     const supabase = getSupabase();
     const pageCounts: Record<string, number> = {};
 
@@ -462,7 +564,10 @@ export async function getTopicsWithCounts(includeHidden = false): Promise<{ topi
         if (!includeHidden) {
           query = query.eq('is_visible', true).eq('status', 'published').not('slug', 'in', '("08","hbv")');
         }
-        const { data } = await query;
+        const { data, error } = await query;
+        if (error && supabaseConfigured) {
+          throw new Error(`Không tải được số lượng bài học: ${error.message}`);
+        }
         if (data) {
           for (const row of data) {
             if (row.topic_id) {
@@ -470,8 +575,8 @@ export async function getTopicsWithCounts(includeHidden = false): Promise<{ topi
             }
           }
         }
-      } catch {
-        // fallback
+      } catch (err: any) {
+        if (supabaseConfigured) throw err;
       }
     }
 
@@ -482,11 +587,13 @@ export async function getTopicsWithCounts(includeHidden = false): Promise<{ topi
         topic,
         pageCount:
           pageCounts[topic.id] ??
-          samplePages.filter(
-            (p) =>
-              (p.topic_id === topic.id || p.topic_id === targetSampleId || p.topic_id === targetUuid) &&
-              (includeHidden || !EXCLUDED_DRAFT_PAGE_SLUGS.includes(p.slug))
-          ).length,
+          (supabaseConfigured
+            ? 0
+            : samplePages.filter(
+                (p) =>
+                  (p.topic_id === topic.id || p.topic_id === targetSampleId || p.topic_id === targetUuid) &&
+                  (includeHidden || !EXCLUDED_DRAFT_PAGE_SLUGS.includes(p.slug))
+              ).length),
       };
     });
   });
@@ -513,13 +620,18 @@ export async function getPageBySlug(
 }
 
 export async function getPageById(id: string): Promise<Page | null> {
+  const supabaseConfigured = isSupabaseConfigured();
   const supabase = getSupabase();
   if (supabase) {
     try {
-      const { data } = await supabase.from('pages').select('*').eq('id', id).single();
+      const { data, error } = await supabase.from('pages').select('*').eq('id', id).maybeSingle();
+      if (error && supabaseConfigured) {
+        throw new Error(`Không tải được bài học: ${error.message}`);
+      }
       if (data) return data as Page;
-    } catch {
-      // fallback
+      if (supabaseConfigured) return null;
+    } catch (err: any) {
+      if (supabaseConfigured) throw err;
     }
   }
   const page = samplePages.find((p) => p.id === id);
@@ -545,6 +657,7 @@ export function decodeBlockRow(row: any): Block {
 export async function getBlocksByPage(pageId: string, includeHidden = false): Promise<Block[]> {
   const cacheKey = `blocks_by_page:${pageId}:${includeHidden}`;
   return getCachedOrFetch(cacheKey, async () => {
+    const supabaseConfigured = isSupabaseConfigured();
     const supabase = getSupabase();
     if (supabase) {
       try {
@@ -552,10 +665,14 @@ export async function getBlocksByPage(pageId: string, includeHidden = false): Pr
         if (!includeHidden) {
           query = query.eq('is_visible', true);
         }
-        const { data } = await query.order('sort_order', { ascending: true });
-        if (data && data.length > 0) return data.map(decodeBlockRow);
-      } catch {
-        // fallback
+        const { data, error } = await query.order('sort_order', { ascending: true });
+        if (error && supabaseConfigured) {
+          throw new Error(`Không tải được dữ liệu khối bài học: ${error.message}`);
+        }
+        if (data) return data.map(decodeBlockRow);
+        if (supabaseConfigured) return [];
+      } catch (err: any) {
+        if (supabaseConfigured) throw err;
       }
     }
     return sampleBlocks
@@ -572,6 +689,7 @@ export async function getBlocksByPages(pageIds: string[], includeHidden = false)
   if (!pageIds || pageIds.length === 0) return {};
   const cacheKey = `blocks_by_pages:${pageIds.sort().join(',')}:${includeHidden}`;
   return getCachedOrFetch(cacheKey, async () => {
+    const supabaseConfigured = isSupabaseConfigured();
     const supabase = getSupabase();
     const result: Record<string, Block[]> = {};
     pageIds.forEach((id) => {
@@ -584,8 +702,11 @@ export async function getBlocksByPages(pageIds: string[], includeHidden = false)
         if (!includeHidden) {
           query = query.eq('is_visible', true);
         }
-        const { data } = await query.order('sort_order', { ascending: true });
-        if (data && data.length > 0) {
+        const { data, error } = await query.order('sort_order', { ascending: true });
+        if (error && supabaseConfigured) {
+          throw new Error(`Không tải được dữ liệu khối bài học: ${error.message}`);
+        }
+        if (data) {
           for (const row of data) {
             const decoded = decodeBlockRow(row);
             if (result[decoded.page_id]) {
@@ -596,8 +717,9 @@ export async function getBlocksByPages(pageIds: string[], includeHidden = false)
           }
           return result;
         }
-      } catch {
-        // fallback
+        if (supabaseConfigured) return result;
+      } catch (err: any) {
+        if (supabaseConfigured) throw err;
       }
     }
 
@@ -620,17 +742,20 @@ export async function getBlocksByPages(pageIds: string[], includeHidden = false)
 export async function getAllPages(includeHidden = false): Promise<Page[]> {
   const cacheKey = `all_pages:${includeHidden}`;
   return getCachedOrFetch(cacheKey, async () => {
+    const supabaseConfigured = isSupabaseConfigured();
     const supabase = getSupabase();
     if (supabase) {
       try {
-        let query = supabase.from('pages').select('*');
+        let baseQuery = supabase.from('pages').select('*');
         if (!includeHidden) {
-          query = query.eq('is_visible', true).eq('status', 'published').not('slug', 'in', '("08","hbv")');
+          baseQuery = baseQuery.eq('is_visible', true).eq('status', 'published').not('slug', 'in', '("08","hbv")');
         }
-        const { data } = await query.order('sort_order', { ascending: true });
-        if (data) return data as Page[];
-      } catch {
-        // fallback
+        const pages = await fetchAllRowsPaged<Page>((from, to) =>
+          baseQuery.order('sort_order', { ascending: true }).range(from, to)
+        );
+        return pages;
+      } catch (err: any) {
+        if (supabaseConfigured) throw err;
       }
     }
     return samplePages
@@ -642,17 +767,20 @@ export async function getAllPages(includeHidden = false): Promise<Page[]> {
 export async function getAllBlocks(includeHidden = false): Promise<Block[]> {
   const cacheKey = `all_blocks:${includeHidden}`;
   return getCachedOrFetch(cacheKey, async () => {
+    const supabaseConfigured = isSupabaseConfigured();
     const supabase = getSupabase();
     if (supabase) {
       try {
-        let query = supabase.from('blocks').select('id, page_id, type, data, is_visible, sort_order');
+        let baseQuery = supabase.from('blocks').select('id, page_id, type, data, is_visible, sort_order');
         if (!includeHidden) {
-          query = query.eq('is_visible', true);
+          baseQuery = baseQuery.eq('is_visible', true);
         }
-        const { data } = await query.order('sort_order', { ascending: true });
-        if (data && data.length > 0) return data.map(decodeBlockRow);
-      } catch {
-        // fallback
+        const rawBlocks = await fetchAllRowsPaged<any>((from, to) =>
+          baseQuery.order('sort_order', { ascending: true }).range(from, to)
+        );
+        return rawBlocks.map(decodeBlockRow);
+      } catch (err: any) {
+        if (supabaseConfigured) throw err;
       }
     }
     return sampleBlocks
@@ -697,13 +825,18 @@ export async function getContinue(): Promise<ContinueInfo | null> {
 export async function getAllPageSlugMap(): Promise<Record<string, { slug: string; topicSlug: string; title: string; cover_url: string }>> {
   const cacheKey = 'all_page_slug_map';
   return getCachedOrFetch(cacheKey, async () => {
+    const supabaseConfigured = isSupabaseConfigured();
     const supabase = getSupabase();
     const map: Record<string, { slug: string; topicSlug: string; title: string; cover_url: string }> = {};
     if (supabase) {
       try {
-        const [{ data: topics }, { data: pages }] = await Promise.all([
-          supabase.from('topics').select('id, slug'),
-          supabase.from('pages').select('id, topic_id, slug, title, cover_url'),
+        const [topics, pages] = await Promise.all([
+          fetchAllRowsPaged<{ id: string; slug: string }>((from, to) =>
+            supabase.from('topics').select('id, slug').range(from, to)
+          ),
+          fetchAllRowsPaged<{ id: string; topic_id: string; slug: string; title: string; cover_url: string | null }>((from, to) =>
+            supabase.from('pages').select('id, topic_id, slug, title, cover_url').range(from, to)
+          ),
         ]);
         if (topics && pages) {
           const topicMap = Object.fromEntries(topics.map((t) => [t.id, t.slug]));
@@ -720,8 +853,8 @@ export async function getAllPageSlugMap(): Promise<Record<string, { slug: string
           });
           return map;
         }
-      } catch {
-        // fallback
+      } catch (err: any) {
+        if (supabaseConfigured) throw err;
       }
     }
     const sampleTopicMap = Object.fromEntries(sampleTopics.map((t) => [t.id, t.slug]));

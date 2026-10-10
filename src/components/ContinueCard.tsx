@@ -20,7 +20,7 @@ export default function ContinueCard({ info, isAdmin, onEditPage }: ContinueCard
     : 100;
   const cleanTopicSlug = (info.topic_slug || 'cot-song').replace('cot-song-that-lung', 'cot-song');
   const cleanPageSlug = info.page_slug || 'tu-the-va-van-dong';
-  const targetUrl = `/${cleanTopicSlug}/${cleanPageSlug}?v=${current}`;
+  const targetUrl = `/${cleanTopicSlug}/${cleanPageSlug}?v=${current}${info.page_id ? `&page_id=${encodeURIComponent(info.page_id)}` : ''}`;
 
   // Kiểm tra trùng lặp tiêu đề bài học và tiêu đề video để khử lặp chữ
   const stripPrefix = (str: string) => str.replace(/^(\d+[\.\-\s:]+)+/, '').trim().toLowerCase();

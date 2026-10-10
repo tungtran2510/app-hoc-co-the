@@ -170,6 +170,7 @@ export interface Image {
 }
 
 export interface Video {
+  id?: string;
   youtube_id: string;
   title: string;
   description?: string;

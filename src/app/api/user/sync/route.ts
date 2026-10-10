@@ -99,12 +99,21 @@ export async function POST(req: NextRequest) {
     if (action === 'save_preferences') {
       const incoming = normalizeDisplayPreferences(localData?.display_preferences);
       const nextPreferences = { ...displayPreferences, ...incoming };
-      const progressData: UserProgressSyncData = {
+      const progressData: UserProgressSyncData & {
+        deleted_saved?: Record<string, number>;
+        deleted_completed?: Record<string, number>;
+        completed_timestamps?: Record<string, number>;
+      } = {
         phone: '',
         xem_tiep: cloudData.xem_tiep || null,
         tien_do: cloudData.tien_do || {},
         bai_da_luu: cloudData.bai_da_luu || [],
         da_hoan_thanh: cloudData.da_hoan_thanh || [],
+        can_on_tap_videos: cloudData.can_on_tap_videos || [], // Giữ nguyên can_on_tap_videos
+        reader_font: cloudData.reader_font || 'sans', // Giữ nguyên reader_font
+        deleted_saved: (cloudData as any)?.deleted_saved || {},
+        deleted_completed: (cloudData as any)?.deleted_completed || {},
+        completed_timestamps: (cloudData as any)?.completed_timestamps || {},
         updated_at: new Date().toISOString(),
       };
       const { error: upsertErr } = await supabase.from('settings').upsert(
@@ -135,38 +144,79 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Đồng bộ & Gộp dữ liệu đám mây + thiết bị hiện tại (SYNC / SAVE)
-    // Merge danh sách bài đã lưu (bai_da_luu)
+    // Gộp danh sách thời gian đã xoá (bên nào mới hơn thì thắng)
+    const cloudDeletedSaved: Record<string, number> = (cloudData as any)?.deleted_saved || {};
+    const localDeletedSaved: Record<string, number> = (localData as any)?.deleted_saved || {};
+    const mergedDeletedSaved: Record<string, number> = { ...cloudDeletedSaved };
+    for (const [pid, t] of Object.entries(localDeletedSaved)) {
+      mergedDeletedSaved[pid] = Math.max(mergedDeletedSaved[pid] || 0, Number(t) || 0);
+    }
+
+    const cloudDeletedCompleted: Record<string, number> = (cloudData as any)?.deleted_completed || {};
+    const localDeletedCompleted: Record<string, number> = (localData as any)?.deleted_completed || {};
+    const mergedDeletedCompleted: Record<string, number> = { ...cloudDeletedCompleted };
+    for (const [pid, t] of Object.entries(localDeletedCompleted)) {
+      mergedDeletedCompleted[pid] = Math.max(mergedDeletedCompleted[pid] || 0, Number(t) || 0);
+    }
+
+    const cloudCompletedTimestamps: Record<string, number> = (cloudData as any)?.completed_timestamps || {};
+    const localCompletedTimestamps: Record<string, number> = (localData as any)?.completed_timestamps || {};
+    const mergedCompletedTimestamps: Record<string, number> = { ...cloudCompletedTimestamps };
+    for (const [pid, t] of Object.entries(localCompletedTimestamps)) {
+      mergedCompletedTimestamps[pid] = Math.max(mergedCompletedTimestamps[pid] || 0, Number(t) || 0);
+    }
+
+    // Merge danh sách bài đã lưu (bai_da_luu) kèm kiểm tra thời gian xoá
     const cloudSaved = Array.isArray(cloudData?.bai_da_luu) ? cloudData!.bai_da_luu : [];
     const localSaved = Array.isArray(localData?.bai_da_luu) ? localData.bai_da_luu : [];
     const savedMap = new Map<string, any>();
 
     for (const item of [...cloudSaved, ...localSaved]) {
       if (!item || !item.page_id) continue;
-      const existing = savedMap.get(item.page_id);
-      if (!existing || (item.saved_at || 0) >= (existing.saved_at || 0)) {
-        savedMap.set(item.page_id, item);
+      const pid = item.page_id;
+      const savedAt = item.saved_at || 0;
+      const deletedAt = mergedDeletedSaved[pid] || 0;
+      // Nếu thời gian xoá mới hơn thời gian lưu: bên xoá mới hơn thắng -> bỏ qua!
+      if (deletedAt > savedAt) {
+        continue;
+      }
+      const existing = savedMap.get(pid);
+      if (!existing || savedAt >= (existing.saved_at || 0)) {
+        savedMap.set(pid, item);
       }
     }
     const mergedBaiDaLuu = Array.from(savedMap.values()).sort(
       (a, b) => (b.saved_at || 0) - (a.saved_at || 0)
     );
 
-    // Merge danh sách bài đã hiểu (da_hoan_thanh)
+    // Merge danh sách bài đã hiểu (da_hoan_thanh) kèm kiểm tra thời gian bỏ đánh dấu
     const cloudCompleted = Array.isArray(cloudData?.da_hoan_thanh) ? cloudData!.da_hoan_thanh : [];
     const localCompleted = Array.isArray(localData?.da_hoan_thanh) ? localData.da_hoan_thanh : [];
-    const mergedDaHoanThanh = Array.from(new Set([...cloudCompleted, ...localCompleted]));
+    const allCompletedPids = Array.from(new Set([...cloudCompleted, ...localCompleted]));
+    const mergedDaHoanThanh: string[] = [];
 
-    // Merge tiến độ video từng bài (tien_do)
+    for (const pid of allCompletedPids) {
+      if (!pid) continue;
+      const completedAt = mergedCompletedTimestamps[pid] || 1;
+      const deletedAt = mergedDeletedCompleted[pid] || 0;
+      // Nếu thời gian bỏ đánh dấu mới hơn thời gian hoàn thành: bên bỏ đánh dấu thắng!
+      if (deletedAt > completedAt) {
+        continue;
+      }
+      mergedDaHoanThanh.push(pid);
+    }
+
+    // Merge tiến độ video từng bài (tien_do) - hỗ trợ cả youtube_id và index
     const cloudTienDo = (cloudData?.tien_do && typeof cloudData.tien_do === 'object') ? cloudData.tien_do : {};
     const localTienDo = (localData?.tien_do && typeof localData.tien_do === 'object') ? localData.tien_do : {};
-    const mergedTienDo: Record<string, { last_video: number; watched: number[] }> = {};
+    const mergedTienDo: Record<string, { last_video: any; watched: (string | number)[] }> = {};
     const allPageIds = Array.from(new Set([...Object.keys(cloudTienDo), ...Object.keys(localTienDo)]));
 
     for (const pid of allPageIds) {
       const c = cloudTienDo[pid] || { last_video: 0, watched: [] };
       const l = localTienDo[pid] || { last_video: 0, watched: [] };
-      const watched = Array.from(new Set([...(c.watched || []), ...(l.watched || [])])).sort((a, b) => a - b);
-      const last_video = Math.max(c.last_video || 0, l.last_video || 0);
+      const watched = Array.from(new Set([...(c.watched || []).map(String), ...(l.watched || []).map(String)]));
+      const last_video = l.last_video || c.last_video || 0;
       mergedTienDo[pid] = { last_video, watched };
     }
 
@@ -196,15 +246,22 @@ export async function POST(req: NextRequest) {
     // Merge phông chữ đọc sách
     const mergedReaderFont = localData?.reader_font || cloudData?.reader_font || 'sans';
 
-    const mergedPayload: UserProgressSyncData = {
+    const mergedPayload: UserProgressSyncData & {
+      deleted_saved?: Record<string, number>;
+      deleted_completed?: Record<string, number>;
+      completed_timestamps?: Record<string, number>;
+    } = {
       phone: '',
       xem_tiep: mergedXemTiep,
-      tien_do: mergedTienDo,
+      tien_do: mergedTienDo as any,
       bai_da_luu: mergedBaiDaLuu,
       da_hoan_thanh: mergedDaHoanThanh,
       can_on_tap_videos: mergedCanOnTap,
       reader_font: mergedReaderFont,
       display_preferences: displayPreferences,
+      deleted_saved: mergedDeletedSaved,
+      deleted_completed: mergedDeletedCompleted,
+      completed_timestamps: mergedCompletedTimestamps,
       updated_at: new Date().toISOString(),
     };
 

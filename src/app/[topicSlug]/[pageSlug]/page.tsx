@@ -1,8 +1,10 @@
 import React from 'react';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import {
   getPageBySlug,
+  getPageById,
+  getTopicById,
   getBlocksByPage,
   getPagesByTopic,
   getSettings,
@@ -34,15 +36,28 @@ interface PageProps {
     v?: string;
     autoplay?: string;
     play?: string;
+    page_id?: string;
   };
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
   const { topicSlug, pageSlug } = params;
-  const [result, settings] = await Promise.all([
+  let [result, settings] = await Promise.all([
     getPageBySlug(topicSlug, pageSlug),
     getSettings(),
   ]);
+
+  if (!result && searchParams?.page_id) {
+    try {
+      const fallbackPage = await getPageById(searchParams.page_id);
+      if (fallbackPage && fallbackPage.topic_id) {
+        const fallbackTopic = await getTopicById(fallbackPage.topic_id);
+        if (fallbackTopic) {
+          result = await getPageBySlug(fallbackTopic.slug, fallbackPage.slug);
+        }
+      }
+    } catch {}
+  }
 
   if (!result) {
     return {
@@ -101,8 +116,26 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function ContentPage({ params, searchParams }: PageProps) {
   const { topicSlug, pageSlug } = params;
 
-  const result = await getPageBySlug(topicSlug, pageSlug);
+  let result = await getPageBySlug(topicSlug, pageSlug);
   if (!result) {
+    // Nếu slug không còn (hoặc đã đổi), tìm theo page_id rồi chuyển hướng tới đúng trang
+    const pageId = searchParams?.page_id;
+    if (pageId) {
+      try {
+        const foundPage = await getPageById(pageId);
+        if (foundPage && foundPage.topic_id) {
+          const foundTopic = await getTopicById(foundPage.topic_id);
+          if (foundTopic) {
+            const vQuery = searchParams?.v ? `?v=${encodeURIComponent(searchParams.v)}` : '';
+            redirect(`/${foundTopic.slug}/${foundPage.slug}${vQuery}`);
+          }
+        }
+      } catch (err: any) {
+        if (err?.digest?.startsWith('NEXT_REDIRECT')) {
+          throw err;
+        }
+      }
+    }
     notFound();
   }
 

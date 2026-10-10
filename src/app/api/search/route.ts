@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server';
-import { getTopics, getPagesByTopic, getBlocksByPage } from '../../../lib/data';
+import { getTopics, getAllPages, getAllBlocks } from '../../../lib/data';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const topics = await getTopics(false); // Chỉ lấy chủ đề đang hiện
     const searchData: {
       topics: {
         id: string;
@@ -46,6 +45,29 @@ export async function GET() {
       videos: [],
     };
 
+    const [topics, allPages, allBlocks] = await Promise.all([
+      getTopics(false),
+      getAllPages(false),
+      getAllBlocks(false),
+    ]);
+
+    const topicMap = new Map(topics.map((t) => [t.id, t]));
+    const blocksByPageMap = new Map<string, typeof allBlocks>();
+    for (const b of allBlocks) {
+      if (!blocksByPageMap.has(b.page_id)) {
+        blocksByPageMap.set(b.page_id, []);
+      }
+      blocksByPageMap.get(b.page_id)!.push(b);
+    }
+
+    const pagesByTopicMap = new Map<string, typeof allPages>();
+    for (const p of allPages) {
+      if (!pagesByTopicMap.has(p.topic_id)) {
+        pagesByTopicMap.set(p.topic_id, []);
+      }
+      pagesByTopicMap.get(p.topic_id)!.push(p);
+    }
+
     for (const topic of topics) {
       searchData.topics.push({
         id: topic.id,
@@ -58,10 +80,10 @@ export async function GET() {
         cover_url: topic.cover_url || `/images/topics/${topic.slug}.png`,
       });
 
-      const pages = await getPagesByTopic(topic.id, false); // Chỉ lấy trang published và visible
+      const pages = (pagesByTopicMap.get(topic.id) || []).sort((a, b) => a.sort_order - b.sort_order);
       for (let pIdx = 0; pIdx < pages.length; pIdx++) {
         const page = pages[pIdx];
-        const blocks = await getBlocksByPage(page.id);
+        const blocks = (blocksByPageMap.get(page.id) || []).sort((a, b) => a.sort_order - b.sort_order);
 
         const textSnippets: string[] = [];
         let videoRunningIndex = 0;

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { rateLimit, getClientIp } from '../../../../lib/authServer';
-import { getSettings } from '../../../../lib/data';
+import { getSettings, fetchAllRowsPaged } from '../../../../lib/data';
 import { sampleTopics, samplePages, sampleBlocks } from '../../../../data/sample';
 import { getSupabaseClient } from '../../../../lib/supabaseClient';
 import { retrieveKnowledge, formatKnowledgeForPrompt, KnowledgeExcerpt } from '../../../../lib/aiKnowledgeRetrieval';
@@ -434,10 +434,16 @@ async function getOrBuildLessonCatalog(): Promise<LessonCatalogItem[]> {
   try {
     const supabase = getSupabaseClient();
     if (supabase) {
-      const [{ data: topics }, { data: pages }, { data: blocks }] = await Promise.all([
-        supabase.from('topics').select('id, title, slug').order('sort_order'),
-        supabase.from('pages').select('id, title, slug, summary, topic_id').order('sort_order'),
-        supabase.from('blocks').select('page_id, type, data').eq('type', 'videos'),
+      const [topics, pages, blocks] = await Promise.all([
+        fetchAllRowsPaged<any>((from, to) =>
+          supabase.from('topics').select('id, title, slug').order('sort_order').range(from, to)
+        ),
+        fetchAllRowsPaged<any>((from, to) =>
+          supabase.from('pages').select('id, title, slug, summary, topic_id').order('sort_order').range(from, to)
+        ),
+        fetchAllRowsPaged<any>((from, to) =>
+          supabase.from('blocks').select('page_id, type, data').eq('type', 'videos').range(from, to)
+        ),
       ]);
 
       if (topics && pages && pages.length > 0) {

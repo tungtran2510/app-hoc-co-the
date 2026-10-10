@@ -173,7 +173,7 @@ export default function VideosBlock({
   const [activeIndex, setActiveIndex] = useState(initialIndex);
   const [isPlaying, setIsPlaying] = useState(shouldAutoPlay);
   const [isEndedPlaylist, setIsEndedPlaylist] = useState(false);
-  const [watchedList, setWatchedList] = useState<number[]>([]);
+  const [watchedList, setWatchedList] = useState<string[]>([]);
   const [reviewIndices, setReviewIndices] = useState<number[]>([]);
   const [localTab, setLocalTab] = useState<'syllabus' | 'summary' | 'resources'>('syllabus');
   const [expandedTakeaways, setExpandedTakeaways] = useState<Record<number, boolean>>({});
@@ -347,8 +347,38 @@ export default function VideosBlock({
     const loadStatus = () => {
       try {
         const tienDo = getStoredTienDo();
-        if (tienDo[pageId]?.watched) {
-          setWatchedList(tienDo[pageId].watched);
+        const pageProgress = tienDo[pageId];
+        if (pageProgress?.watched && Array.isArray(pageProgress.watched)) {
+          let hasLegacyNumbers = false;
+          const normalizedWatched: string[] = [];
+
+          pageProgress.watched.forEach((item) => {
+            const strVal = String(item).trim();
+            // Nếu là số thứ tự cũ (1, 2, 3...)
+            if (/^\d+$/.test(strVal)) {
+              const num = parseInt(strVal, 10);
+              if (num >= 1 && num <= videoList.length) {
+                const vid = videoList[num - 1];
+                const key = vid.youtube_id || vid.id || strVal;
+                normalizedWatched.push(key);
+                hasLegacyNumbers = true;
+                return;
+              }
+            }
+            normalizedWatched.push(strVal);
+          });
+
+          const uniqueWatched = Array.from(new Set(normalizedWatched));
+          setWatchedList(uniqueWatched);
+
+          // Tự chuyển dữ liệu cũ khi đọc: nếu có số thứ tự cũ, lưu lại chuẩn youtube_id vào localStorage
+          if (hasLegacyNumbers) {
+            tienDo[pageId] = {
+              ...pageProgress,
+              watched: uniqueWatched,
+            };
+            localStorage.setItem('tien_do', JSON.stringify(tienDo));
+          }
         } else {
           setWatchedList([]);
         }
@@ -366,7 +396,7 @@ export default function VideosBlock({
     return () => {
       window.removeEventListener('learning_progress_changed', loadStatus);
     };
-  }, [pageId]);
+  }, [pageId, videoList]);
 
   // Tự động nhận diện video dạng dọc (Shorts/Reels 9:16) hay dạng ngang (16:9)
   useEffect(() => {
@@ -481,6 +511,7 @@ export default function VideosBlock({
     if (!topicSlug || !pageSlug) return;
     const vid = videoList[vidIndex] || videoList[0];
     saveStoredXemTiep({
+      page_id: pageId,
       topic_slug: topicSlug,
       topic_title: topicTitle,
       page_slug: pageSlug,
@@ -502,28 +533,32 @@ export default function VideosBlock({
 
   // Đánh dấu video đã xem
   const markWatched = (vidIndex: number) => {
-    const videoNum = vidIndex + 1;
+    const vid = videoList[vidIndex];
+    if (!vid) return;
+    const videoKey = vid.youtube_id || vid.id || String(vidIndex + 1);
     if (pageId) {
-      saveVideoWatched(pageId, videoNum);
-      setWatchedList((prev) => (prev.includes(videoNum) ? prev : [...prev, videoNum]));
+      saveVideoWatched(pageId, videoKey, vidIndex + 1);
+      setWatchedList((prev) => (prev.includes(videoKey) ? prev : [...prev, videoKey]));
     }
   };
 
   // Đánh dấu chuyển đổi Đã hiểu <-> Chưa hiểu cho từng video (Hỗ trợ nút gạt hoặc vuốt sang)
   const handleToggleVideoWatched = (vidIndex: number) => {
     playTapSound();
+    const vid = videoList[vidIndex];
+    if (!vid) return;
+    const videoKey = vid.youtube_id || vid.id || String(vidIndex + 1);
     const videoNum = vidIndex + 1;
-    const isCurrentlyWatched = watchedList.includes(videoNum);
-    let nextWatched: number[];
+    const isCurrentlyWatched = watchedList.includes(videoKey);
+    let nextWatched: string[];
     if (isCurrentlyWatched) {
-      nextWatched = watchedList.filter((n) => n !== videoNum);
+      nextWatched = watchedList.filter((n) => n !== videoKey);
       // Chuyển sang Chưa hiểu -> Tự động thêm vào danh sách Cần ôn tập
       if (pageId && topicSlug && pageSlug) {
-        const vid = videoList[vidIndex];
         const yid = vid?.youtube_id;
         const thumbUrl = vid?.thumbnail_url || (yid ? `https://i.ytimg.com/vi/${yid}/mqdefault.jpg` : pageCoverUrl || null);
         saveReviewVideo({
-          id: `${pageId}_${videoNum}`,
+          id: `${pageId}_${videoKey}`,
           page_id: pageId,
           topic_slug: topicSlug,
           topic_title: topicTitle || '',
@@ -538,7 +573,7 @@ export default function VideosBlock({
         setReviewIndices((prev) => Array.from(new Set([...prev, videoNum])));
       }
     } else {
-      nextWatched = [...watchedList, videoNum].sort((a, b) => a - b);
+      nextWatched = Array.from(new Set([...watchedList, videoKey]));
       // Chuyển sang Đã hiểu -> Tự động gỡ khỏi danh sách Cần ôn tập
       if (pageId) {
         removeReviewVideo(pageId, videoNum);
@@ -1019,7 +1054,7 @@ export default function VideosBlock({
             <BarChart2 size={12} className="text-blue-600 dark:text-[#93C5FD] shrink-0" />
             <span>Tiến độ:</span>
             <strong className="text-blue-700 dark:text-[#93C5FD] font-black">
-              {Math.min(100, Math.round(((videoList.filter((_, idx) => watchedList.includes(idx + 1)).length) / (videoList.length || 1)) * 100))}%
+              {Math.min(100, Math.round(((videoList.filter((v, i) => watchedList.includes(v.youtube_id || v.id || String(i + 1))).length) / (videoList.length || 1)) * 100))}%
             </strong>
           </div>
 
@@ -1029,14 +1064,14 @@ export default function VideosBlock({
               className="h-full rounded-full bg-blue-600 dark:bg-gradient-to-r dark:from-purple-500 dark:to-[#93C5FD] transition-all duration-500"
               style={{
                 width: `${Math.max(
-                  Math.min(100, Math.round(((videoList.filter((_, idx) => watchedList.includes(idx + 1)).length) / (videoList.length || 1)) * 100)),
+                  Math.min(100, Math.round(((videoList.filter((v, i) => watchedList.includes(v.youtube_id || v.id || String(i + 1))).length) / (videoList.length || 1)) * 100)),
                   4
                 )}%`,
               }}
             />
           </div>
 
-          {videoList.filter((_, idx) => watchedList.includes(idx + 1)).length === videoList.length && videoList.length > 0 && (
+          {videoList.filter((v, i) => watchedList.includes(v.youtube_id || v.id || String(i + 1))).length === videoList.length && videoList.length > 0 && (
             <span className="text-emerald-700 dark:text-emerald-300 text-[10px] font-black bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-500/30 px-1.5 py-0.2 rounded-full shrink-0">
               ✓ Hoàn thành
             </span>
@@ -1104,7 +1139,8 @@ export default function VideosBlock({
       <div className={currentTab === 'syllabus' ? 'flex flex-col gap-1.5 mt-1.5' : 'hidden'}>
         {videoList.map((vid, idx) => {
           const isActive = idx === safeIndex;
-          const isWatched = watchedList.includes(idx + 1);
+          const videoKey = vid.youtube_id || vid.id || String(idx + 1);
+          const isWatched = watchedList.includes(videoKey);
           const isReview = reviewIndices.includes(idx + 1);
           const thumbUrl =
             vid.thumbnail_url ||
