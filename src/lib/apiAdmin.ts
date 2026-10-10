@@ -147,6 +147,23 @@ export async function saveSettingsApi(
   }
 }
 
+export async function getSettingsApi(): Promise<{ success: boolean; error?: string; settings?: any }> {
+  try {
+    const res = await fetch('/api/admin/save-settings', {
+      method: 'GET',
+      headers: getAdminHeaders(),
+      cache: 'no-store',
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      return { success: false, error: data.error || 'Chưa tải được cài đặt' };
+    }
+    return { success: true, settings: data.settings };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Lỗi mạng khi tải cài đặt' };
+  }
+}
+
 export async function changePasswordApi(
   currentPassword: string,
   newPassword: string

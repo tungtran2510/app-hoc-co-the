@@ -10,6 +10,7 @@ export interface AppCustomSettings {
   default_font_size: 'small' | 'normal' | 'large';
   show_progress_bar: boolean;
   theme_palette?: 'indigo' | 'navy_luxury' | 'minimal';
+  home_topics_display?: 'card' | 'catalog' | 'logo' | 'large';
   show_ebook_bridge?: boolean;
   ebook_app_url?: string;
   auto_offline_cache?: boolean;
@@ -32,6 +33,7 @@ export const DEFAULT_APP_SETTINGS: AppCustomSettings = {
   default_font_size: 'normal',
   show_progress_bar: true,
   theme_palette: 'indigo',
+  home_topics_display: 'card',
   show_ebook_bridge: true,
   ebook_app_url: 'https://qbiz-ebook.vercel.app',
   auto_offline_cache: true,
@@ -136,6 +138,7 @@ export function getStoredAppSettings(): AppCustomSettings {
   if (typeof window !== 'undefined') {
     try {
       const savedPalette = localStorage.getItem('qbiz_theme_palette') as 'indigo' | 'navy_luxury' | 'minimal' | null;
+      const savedHomeDisplay = localStorage.getItem('qbiz_home_topics_display') as 'card' | 'catalog' | 'logo' | 'large' | null;
       const savedShowEbook = localStorage.getItem('qbiz_show_ebook_bridge');
       const savedEbookUrl = localStorage.getItem('qbiz_ebook_app_url');
       const savedAutoOffline = localStorage.getItem('qbiz_auto_offline_cache');
@@ -155,6 +158,9 @@ export function getStoredAppSettings(): AppCustomSettings {
       return {
         ...DEFAULT_APP_SETTINGS,
         theme_palette: savedPalette === 'navy_luxury' || savedPalette === 'indigo' || savedPalette === 'minimal' ? savedPalette : DEFAULT_APP_SETTINGS.theme_palette,
+        home_topics_display: (savedHomeDisplay === 'card' || savedHomeDisplay === 'catalog' || savedHomeDisplay === 'logo' || savedHomeDisplay === 'large')
+          ? savedHomeDisplay
+          : DEFAULT_APP_SETTINGS.home_topics_display,
         show_ebook_bridge: savedShowEbook !== null ? savedShowEbook === 'true' : DEFAULT_APP_SETTINGS.show_ebook_bridge,
         ebook_app_url: resolvedEbookUrl,
         auto_offline_cache: savedAutoOffline !== null ? savedAutoOffline === 'true' : DEFAULT_APP_SETTINGS.auto_offline_cache,
@@ -183,6 +189,10 @@ export async function saveStoredAppSettings(settings: Partial<AppCustomSettings>
           document.documentElement.classList.remove('theme-navy-luxury', 'theme-minimal');
         }
         window.dispatchEvent(new CustomEvent('qbiz_theme_palette_changed', { detail: { palette: settings.theme_palette } }));
+      }
+      if (settings.home_topics_display) {
+        localStorage.setItem('qbiz_home_topics_display', settings.home_topics_display);
+        window.dispatchEvent(new CustomEvent('qbiz_home_topics_display_changed', { detail: { display: settings.home_topics_display } }));
       }
       if (typeof settings.show_ebook_bridge !== 'undefined') {
         localStorage.setItem('qbiz_show_ebook_bridge', String(settings.show_ebook_bridge));
@@ -220,6 +230,7 @@ export async function saveStoredAppSettings(settings: Partial<AppCustomSettings>
     zalo_url: settings.zalo_url,
     workspace_id: 'default',
     theme_palette: settings.theme_palette,
+    home_topics_display: settings.home_topics_display,
   } as any);
   return res.success;
 }

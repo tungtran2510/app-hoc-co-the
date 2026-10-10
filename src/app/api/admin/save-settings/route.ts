@@ -4,6 +4,38 @@ import { checkIsAdminRequest } from '../../../../lib/authServer';
 import { getSupabaseServer } from '../../../../lib/supabaseServer';
 import { clearDataCache } from '../../../../lib/data';
 
+export async function GET(req: NextRequest) {
+  if (!checkIsAdminRequest(req)) {
+    return NextResponse.json({ error: 'Chưa đăng nhập quyền quản trị' }, { status: 401 });
+  }
+
+  const supabase = getSupabaseServer();
+  if (!supabase) {
+    return NextResponse.json({ error: 'Chưa kết nối cơ sở dữ liệu' }, { status: 503 });
+  }
+
+  try {
+    const { data: existing } = await supabase
+      .from('settings')
+      .select('*')
+      .eq('workspace_id', 'default')
+      .maybeSingle();
+
+    const blockStyles = existing?.block_styles || {};
+    return NextResponse.json({
+      success: true,
+      settings: {
+        ...existing,
+        home_topics_display: blockStyles.home_topics_display || blockStyles.topics_display || 'card',
+        topics_page_display: blockStyles.topics_page_display || 'catalog',
+        theme_palette: blockStyles.theme_palette || 'indigo',
+      },
+    });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message || 'Lỗi khi tải cài đặt' }, { status: 500 });
+  }
+}
+
 export async function POST(req: NextRequest) {
   if (!checkIsAdminRequest(req)) {
     return NextResponse.json({ error: 'Chưa đăng nhập quyền quản trị' }, { status: 401 });

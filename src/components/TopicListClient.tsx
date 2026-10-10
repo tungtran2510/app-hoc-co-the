@@ -254,6 +254,16 @@ export default function TopicListClient({
   }, []);
 
   useEffect(() => {
+    const handleDisplayChange = (e: any) => {
+      if (e.detail?.display && settingsScope === 'home') {
+        setDisplayMode(e.detail.display);
+      }
+    };
+    window.addEventListener('qbiz_home_topics_display_changed', handleDisplayChange);
+    return () => window.removeEventListener('qbiz_home_topics_display_changed', handleDisplayChange);
+  }, [settingsScope]);
+
+  useEffect(() => {
     if (!isAdminResolved || isAdmin) return;
     setDisplayMode(initialDisplay || (enableSearch || settingsScope === 'page' ? 'catalog' : 'card'));
     const scope: TopicDisplayScope = settingsScope === 'page' ? 'page' : 'home';
@@ -532,14 +542,12 @@ export default function TopicListClient({
               <button
                 type="button"
                 onClick={() => setShowDisplayMenu((v) => !v)}
-                title="Chọn kiểu hiển thị chuyên đề"
+                title={`Kiểu hiển thị: ${displayOptions.find((o) => o.value === displayMode)?.label || 'Bố cục'}`}
                 aria-label="Chọn kiểu hiển thị chuyên đề"
                 aria-expanded={showDisplayMenu}
-                className="flex h-7.5 items-center gap-1.5 px-2.5 rounded-full border border-slate-300/80 bg-white/90 dark:border-white/15 dark:bg-white/10 text-ink text-[12px] font-bold shadow-2xs hover:bg-slate-50 dark:hover:bg-white/15 transition-all cursor-pointer active:scale-95"
+                className="w-8 h-8 rounded-full border border-slate-300/80 bg-white/90 dark:border-white/15 dark:bg-white/10 text-ink flex items-center justify-center shadow-2xs hover:bg-slate-50 dark:hover:bg-white/15 transition-all cursor-pointer active:scale-95 shrink-0"
               >
-                <SlidersHorizontal size={13} className="text-primary shrink-0" />
-                <span className="truncate max-w-[95px]">{displayOptions.find((o) => o.value === displayMode)?.label || 'Bố cục'}</span>
-                <ChevronDown size={13} className={`text-slate-400 shrink-0 transition-transform duration-200 ${showDisplayMenu ? 'rotate-180' : ''}`} />
+                <SlidersHorizontal size={14} className="text-primary shrink-0" />
               </button>
               {showDisplayMenu && (
                 <>

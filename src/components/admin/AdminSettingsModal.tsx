@@ -21,6 +21,7 @@ import {
   Compass,
   Plus,
   Minus,
+  LayoutGrid,
 } from 'lucide-react';
 
 function ToggleSwitch({
@@ -60,7 +61,7 @@ import {
   AppCustomSettings,
 } from '../../lib/storage';
 import { logoutAdmin, isSuperAdmin, checkAdminStatus } from '../../lib/adminAuth';
-import { saveSettingsApi, changePasswordApi, getAdminHeaders, restoreBackupApi } from '../../lib/apiAdmin';
+import { saveSettingsApi, getSettingsApi, changePasswordApi, getAdminHeaders, restoreBackupApi } from '../../lib/apiAdmin';
 import InstructorManagerSection from './InstructorManagerSection';
 import WorkspaceManagerSection from './WorkspaceManagerSection';
 
@@ -233,6 +234,14 @@ export default function AdminSettingsModal({
       checkAdminStatus().then((st) => {
         setIsSuper(isSuperAdmin(st.user));
       });
+      getSettingsApi().then((res) => {
+        if (res.success && res.settings) {
+          setSettings((prev) => ({
+            ...prev,
+            home_topics_display: res.settings.home_topics_display || prev.home_topics_display || 'card',
+          }));
+        }
+      }).catch(() => {});
     }
   }, [isOpen, initialTab]);
 
@@ -282,12 +291,14 @@ export default function AdminSettingsModal({
         expert_title: settings.expert_title?.trim() || null,
         hotline: settings.hotline?.trim() || null,
         zalo_url: settings.zalo_url?.trim() || null,
+        home_topics_display: settings.home_topics_display || 'card',
         author_profile: {
           phone: settings.hotline?.trim() || null,
           zalo_url: settings.zalo_url?.trim() || null,
         },
         block_styles: {
           theme_palette: settings.theme_palette || 'indigo',
+          home_topics_display: settings.home_topics_display || 'card',
           enable_personalized_roadmap: settings.enable_personalized_roadmap,
           custom_roadmap: settings.custom_roadmap,
         },
@@ -665,6 +676,43 @@ export default function AdminSettingsModal({
                     </button>
                   ))}
                 </div>
+              </div>
+
+              {/* Bố cục chuyên đề mặc định (cho khách) */}
+              <div className="flex flex-col gap-2 p-3 rounded-[14px] bg-surface-2 border border-line">
+                <div className="flex items-center justify-between">
+                  <span className="text-[13px] font-bold text-ink flex items-center gap-1.5">
+                    <LayoutGrid size={15} className="text-primary shrink-0" />
+                    <span className="truncate">Bố cục chuyên đề mặc định (cho khách)</span>
+                  </span>
+                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-primary-soft text-primary border border-primary/20 shrink-0">
+                    {settings.home_topics_display === 'catalog' ? '3 cột' : settings.home_topics_display === 'logo' ? 'Danh sách' : settings.home_topics_display === 'large' ? 'Khung to' : 'Lưới bìa'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {[
+                    { value: 'card' as const, label: 'Lưới bìa' },
+                    { value: 'catalog' as const, label: '3 cột' },
+                    { value: 'logo' as const, label: 'Danh sách' },
+                    { value: 'large' as const, label: 'Khung to' },
+                  ].map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setSettings({ ...settings, home_topics_display: opt.value })}
+                      className={`h-9 px-1 rounded-[9px] font-extrabold text-[11.5px] border transition-all cursor-pointer truncate ${
+                        (settings.home_topics_display || 'card') === opt.value
+                          ? 'bg-primary text-white border-primary shadow-2xs'
+                          : 'bg-white text-ink border-line hover:border-primary/40'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[10.5px] text-muted leading-tight">
+                  Áp dụng làm kiểu xem chuyên đề ban đầu khi khách & học viên mới truy cập trang chủ.
+                </p>
               </div>
 
               {/* Nhóm tùy chọn hiển thị & trải nghiệm - Tinh gọn, chuẩn Apple iOS card dạng tấm mở rộng */}
